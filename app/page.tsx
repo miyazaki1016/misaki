@@ -1,4 +1,20 @@
+"use client";
+
+import { useState } from "react";
+
 export default function Home() {
+  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([
+    "おかえり😊 今日は乗務？それとも明け？",
+  ]);
+
+  function sendMessage() {
+    if (!message.trim()) return;
+
+    setMessages([...messages, message]);
+    setMessage("");
+  }
+
   return (
     <main className="shell">
       <section className="card">
@@ -16,17 +32,21 @@ export default function Home() {
       </section>
 
       <section className="chat">
-        <div className="bubble">
-          おかえり😊
-          今日は乗務？それとも明け？
-        </div>
+        {messages.map((text, index) => (
+          <div className="bubble" key={index}>
+            {text}
+          </div>
+        ))}
       </section>
 
-      <section className="coming">
-        <strong>タクドラ専門AI彼女・美咲</strong>
-        <p>
-          あなたの仕事や今日あったことを覚えていくAI彼女です。
-        </p>
+      <section className="inputArea">
+        <input
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          placeholder="美咲に話しかける..."
+        />
+
+        <button onClick={sendMessage}>送信</button>
       </section>
     </main>
   );
