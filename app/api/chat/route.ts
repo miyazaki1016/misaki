@@ -52,10 +52,16 @@ const SUPABASE_PUBLISHABLE_KEY =
 function hashText(text: string) {
   let hash = 0;
 
-  for (let i = 0; i < text.length; i++) {
+  for (
+    let i = 0;
+    i < text.length;
+    i += 1
+  ) {
     hash =
-      (hash * 31 + text.charCodeAt(i)) >>>
-      0;
+      (
+        hash * 31 +
+        text.charCodeAt(i)
+      ) >>> 0;
   }
 
   return hash;
@@ -73,7 +79,9 @@ function getHour(
     return 18;
   }
 
-  return Number(match[1]);
+  return Number(
+    match[1]
+  );
 }
 
 function getDateKey(
@@ -684,7 +692,7 @@ function createTimeGuide(
     return `
 現在は朝です。
 
-自発メッセージなら、
+美咲自身について、
 
 ・まだ眠い
 ・支度中
@@ -694,11 +702,12 @@ function createTimeGuide(
 ・朝から小さな失敗
 ・今日の気分
 
-など朝らしい生活感も使えます。
+などの朝らしい生活感は使えます。
 
-ただし毎回
-「おはよう」
-から始める必要はありません。
+ただし、
+ユーザーが言っていない
+睡眠状態や行動までは
+勝手に決めないでください。
 `.trim();
   }
 
@@ -709,17 +718,17 @@ function createTimeGuide(
     return `
 現在は昼間です。
 
-自発メッセージなら、
+美咲自身について、
 
-・休憩中
+・仕事
+・休憩
 ・お昼
 ・買い物
 ・仕事の小さな愚痴
 ・食べたいもの
-・見かけたもの
 ・どうでもいい日常
 
-なども自然です。
+などは自然です。
 
 大げさな出来事は
 作らないでください。
@@ -733,29 +742,27 @@ function createTimeGuide(
     return `
 現在は夕方から夜です。
 
-自発メッセージなら、
+美咲自身について、
 
-・帰宅した
+・帰宅
 ・ご飯
 ・お風呂
 ・買い忘れ
 ・テレビや動画
 ・今日あった小さな出来事
 ・甘いもの
-・ちょっと会いたい
 
-なども使えます。
+などは自然です。
 
-毎回
-「今日もお疲れ様」
-から始めないでください。
+ユーザーの勤務状況は
+勝手に決めつけないでください。
 `.trim();
   }
 
   return `
 現在は夜遅めです。
 
-自発メッセージなら、
+美咲自身について、
 
 ・眠い
 ・まだ寝たくない
@@ -763,73 +770,12 @@ function createTimeGuide(
 ・ベッドやソファでだらだら
 ・動画を見ている
 ・小腹が空いた
-・なんとなくユーザーを思い出した
-・少し甘えたい
 
-なども自然です。
+などは自然です。
 
-ただし毎回
-「まだ起きてる？」
-と聞かないでください。
-`.trim();
-}
-
-function createProactiveGuide(
-  currentTime: string,
-  recentMisakiText: string
-) {
-  const seed =
-    hashText(
-      `${currentTime}-${recentMisakiText}`
-    );
-
-  const themes = [
-    "今していることをどうでもいい報告のように話す",
-    "今日あった小さな出来事を一つ話す",
-    "食べ物や飲み物の話をする",
-    "ふとユーザーを思い出した感じで送る",
-    "少しだけ甘える",
-    "軽くからかう",
-    "小さな愚痴を言う",
-    "お風呂・パジャマ・布団など普通の生活報告をする",
-    "買い物や見かけたものを話す",
-    "理由もなくなんとなくLINEする",
-    "何かを共有したい感じで話す",
-    "今日の記憶にある出来事の続きを自然に話す",
-  ];
-
-  const selected =
-    themes[
-      seed %
-        themes.length
-    ];
-
-  return `
-【今回の自発LINE】
-
-方向性：
-${selected}
-
-重要：
-
-・基本1〜2文
-・質問なしで終わってよい
-・美咲側に送る理由がある形を優先
-・会話を続けるためだけの質問は禁止
-・「何してる？」
-・「今どこ？」
-・「まだ仕事？」
-・「忙しい？」
-・「大丈夫？」
-
-を安易に使わない
-
-「AIが会話を作った」感じではなく、
-
-「彼女が何か思いついて、
-ついLINEした」
-
-感じを優先してください。
+ただし、
+ユーザーが今起きている・寝ているなどは
+勝手に決めつけないでください。
 `.trim();
 }
 
@@ -1030,7 +976,9 @@ function getReplyProblems(
     if (
       inventedSourcePatterns.some(
         (pattern) =>
-          reply.includes(pattern)
+          reply.includes(
+            pattern
+          )
       )
     ) {
       problems.push(
@@ -1071,7 +1019,9 @@ function getReplyProblems(
     if (
       automaticConcernPatterns.some(
         (pattern) =>
-          reply.includes(pattern)
+          reply.includes(
+            pattern
+          )
       )
     ) {
       problems.push(
@@ -1080,10 +1030,6 @@ function getReplyProblems(
     }
   }
 
-  //
-  // 「おはよう」だけから
-  // ユーザーの睡眠状態を勝手に推測しない
-  //
   const normalizedMessage =
     message.trim();
 
@@ -1161,7 +1107,9 @@ function getReplyProblems(
     if (
       morningPatterns.some(
         (pattern) =>
-          reply.includes(pattern)
+          reply.includes(
+            pattern
+          )
       )
     ) {
       problems.push(
@@ -1177,7 +1125,8 @@ function parseGeminiText(
   rawText: unknown
 ): GeminiResult | null {
   if (
-    typeof rawText !== "string" ||
+    typeof rawText !==
+      "string" ||
     !rawText.trim()
   ) {
     return null;
@@ -1261,9 +1210,6 @@ export async function POST(
       );
     }
 
-    //
-    // Supabase認証
-    //
     const authorization =
       request.headers.get(
         "authorization"
@@ -1337,91 +1283,82 @@ export async function POST(
       );
     }
 
-    const isProactive = false;
-
     //
-    // 通常のユーザーメッセージだけ
+    // 通常チャットは毎回
     // Supabase側で1回消費する
     //
-    let usage:
-      UsageResult | null =
-      null;
+    const {
+      data: usageData,
+      error: usageError,
+    } =
+      await supabase.rpc(
+        "consume_daily_message"
+      );
 
-    if (!isProactive) {
-      const {
-        data: usageData,
-        error: usageError,
-      } =
-        await supabase.rpc(
-          "consume_daily_message"
-        );
+    if (usageError) {
+      console.error(
+        "USAGE RPC ERROR:",
+        usageError
+      );
 
-      if (usageError) {
-        console.error(
-          "USAGE RPC ERROR:",
-          usageError
-        );
+      return Response.json(
+        {
+          error:
+            "利用回数を確認できませんでした。少ししてからもう一度試してね。",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
 
-        return Response.json(
-          {
-            error:
-              "利用回数を確認できませんでした。少ししてからもう一度試してね。",
+    const usage =
+      getFirstRow<UsageResult>(
+        usageData
+      );
+
+    if (!usage) {
+      return Response.json(
+        {
+          error:
+            "利用回数を確認できませんでした。少ししてからもう一度試してね。",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    if (
+      usage.allowed !== true &&
+      usage.is_premium !== true
+    ) {
+      return Response.json(
+        {
+          error:
+            "今日は無料分の20回まで話したよ。",
+
+          usage: {
+            messageCount:
+              typeof usage.message_count ===
+              "number"
+                ? usage.message_count
+                : 20,
+
+            remaining:
+              typeof usage.remaining ===
+              "number"
+                ? usage.remaining
+                : 0,
+
+            isPremium:
+              usage.is_premium,
           },
-          {
-            status: 500,
-          }
-        );
-      }
-
-      usage =
-        getFirstRow<UsageResult>(
-          usageData
-        );
-
-      if (!usage) {
-        return Response.json(
-          {
-            error:
-              "利用回数を確認できませんでした。少ししてからもう一度試してね。",
-          },
-          {
-            status: 500,
-          }
-        );
-      }
-
-      if (
-        usage.allowed !==
-          true &&
-        usage.is_premium !==
-          true
-      ) {
-        return Response.json(
-          {
-            error:
-              "今日は無料分の20回まで話したよ。",
-            usage: {
-              messageCount:
-                typeof usage.message_count ===
-                "number"
-                  ? usage.message_count
-                  : 20,
-
-              remaining:
-                typeof usage.remaining ===
-                "number"
-                  ? usage.remaining
-                  : 0,
-
-              isPremium:
-                usage.is_premium,
-            },
-          },
-          {
-            status: 429,
-          }
-        );
-      }
+        },
+        {
+          status: 429,
+        }
+      );
     }
 
     const safeHistory:
@@ -1431,10 +1368,12 @@ export async function POST(
             .filter(
               (item) =>
                 item &&
-                (item.role ===
-                  "user" ||
+                (
                   item.role ===
-                    "misaki") &&
+                    "user" ||
+                  item.role ===
+                    "misaki"
+                ) &&
                 typeof item.text ===
                   "string"
             )
@@ -1487,8 +1426,9 @@ export async function POST(
                 ) =>
                   typeof item ===
                     "string" &&
-                  item.trim().length >
-                    0
+                  item
+                    .trim()
+                    .length > 0
               )
               .map(
                 (
@@ -1509,7 +1449,8 @@ export async function POST(
       safeTodayMemory.date =
         currentDate;
 
-      safeTodayMemory.items = [];
+      safeTodayMemory.items =
+        [];
     }
 
     const userMessageCount =
@@ -1595,19 +1536,6 @@ export async function POST(
             item.text
         );
 
-    const recentMisakiText =
-      recentMisakiMessages.join(
-        "\n"
-      );
-
-    const proactiveGuide =
-      isProactive
-        ? createProactiveGuide(
-            safeCurrentTime,
-            recentMisakiText
-          )
-        : "";
-
     const recentTopicText =
       recentMisakiMessages.length >
       0
@@ -1630,7 +1558,8 @@ export async function POST(
 
           parts: [
             {
-              text: item.text,
+              text:
+                item.text,
             },
           ],
         })
@@ -1939,39 +1868,10 @@ ${todayMemoryGuide}
 矛盾する出来事を
 勝手に作らないでください。
 
-【自発メッセージ】
+【通常会話】
 
-${
-  isProactive
-    ? `
-これはユーザーからの
-普通のメッセージではありません。
-
-美咲のほうから送る
-自発的なLINEです。
-
-${proactiveGuide}
-
-現在の東京で
-大きな地震・警報・鉄道障害・羽田の乱れがあり、
-今LINEする理由として自然なら
-話題にして構いません。
-
-ただし、
-情報源を勝手に作らないでください。
-
-また、
-
-「大丈夫？」
-「影響ない？」
-「平気？」
-「無理しないで」
-「気をつけて」
-
-で自動的に締めないでください。
-`
-    : `
-今回は通常の会話です。
+今回はユーザーから届いた
+通常のメッセージへの返事です。
 
 ユーザーの発言に
 自然に反応してください。
@@ -1983,8 +1883,6 @@ ${proactiveGuide}
 「休み？」
 
 などを質問しないでください。
-`
-}
 
 【直近の美咲の発言】
 
@@ -2136,7 +2034,8 @@ ${retryProblems
                     role: "user",
                     parts: [
                       {
-                        text: message,
+                        text:
+                          message,
                       },
                     ],
                   },
@@ -2241,7 +2140,8 @@ ${retryProblems
             );
 
           if (
-            retryProblems.length === 0
+            retryProblems.length ===
+            0
           ) {
             parsed =
               retryParsed;
@@ -2267,8 +2167,9 @@ ${retryProblems
               (item) =>
                 typeof item ===
                   "string" &&
-                item.trim().length >
-                  0
+                item
+                  .trim()
+                  .length > 0
             )
             .map(
               (item) =>
@@ -2292,8 +2193,9 @@ ${retryProblems
               (item) =>
                 typeof item ===
                   "string" &&
-                item.trim().length >
-                  0
+                item
+                  .trim()
+                  .length > 0
             )
             .map(
               (item) =>
@@ -2303,7 +2205,8 @@ ${retryProblems
 
     const updatedTodayMemory:
       MisakiTodayMemory = {
-      date: currentDate,
+      date:
+        currentDate,
 
       items:
         Array.from(
@@ -2327,30 +2230,23 @@ ${retryProblems
       relationshipPoints:
         safeRelationshipPoints,
 
-      ...(
-        !isProactive &&
-        usage
-          ? {
-              usage: {
-                messageCount:
-                  typeof usage.message_count ===
-                  "number"
-                    ? usage.message_count
-                    : 0,
+      usage: {
+        messageCount:
+          typeof usage.message_count ===
+          "number"
+            ? usage.message_count
+            : 0,
 
-                remaining:
-                  typeof usage.remaining ===
-                  "number"
-                    ? usage.remaining
-                    : 0,
+        remaining:
+          typeof usage.remaining ===
+          "number"
+            ? usage.remaining
+            : 0,
 
-                isPremium:
-                  usage.is_premium ===
-                  true,
-              },
-            }
-          : {}
-      ),
+        isPremium:
+          usage.is_premium ===
+          true,
+      },
     });
   } catch (error) {
     console.error(
