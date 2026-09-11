@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "../lib/supabase";
 
 type ChatMessage = {
   role: "misaki" | "user";
@@ -12,13 +13,13 @@ type DailyUsage = {
   count: number;
 };
 
+type Plan = "free" | "premium";
+
 const STORAGE_KEY = "misaki-chat-history";
 const MEMORY_KEY = "misaki-long-term-memory";
 const PROACTIVE_KEY = "misaki-proactive-state";
-const RELATIONSHIP_KEY =
-  "misaki-relationship-points";
-const DAILY_USAGE_KEY =
-  "misaki-daily-usage";
+const RELATIONSHIP_KEY = "misaki-relationship-points";
+const DAILY_USAGE_KEY = "misaki-daily-usage";
 
 const MAX_MESSAGES = 60;
 
@@ -26,12 +27,10 @@ const MAX_MESSAGES = 60;
 const FREE_DAILY_LIMIT = 20;
 
 // 10分ごとに、美咲から話しかける条件を確認
-const PROACTIVE_CHECK_MS =
-  10 * 60 * 1000;
+const PROACTIVE_CHECK_MS = 10 * 60 * 1000;
 
 // 自発メッセージ同士は最低45分空ける
-const PROACTIVE_COOLDOWN_MS =
-  45 * 60 * 1000;
+const PROACTIVE_COOLDOWN_MS = 45 * 60 * 1000;
 
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
@@ -39,49 +38,58 @@ const MAX_PROACTIVE_PER_DAY = 4;
 const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  );
+  return new Date().toLocaleDateString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  );
+  return new Date().toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function isPremiumActive(
+  plan: string | null | undefined,
+  premiumUntil: string | null | undefined
+) {
+  if (plan !== "premium") {
+    return false;
+  }
+
+  if (!premiumUntil) {
+    return true;
+  }
+
+  const expiresAt = new Date(premiumUntil).getTime();
+
+  if (!Number.isFinite(expiresAt)) {
+    return false;
+  }
+
+  return expiresAt > Date.now();
 }
 
 export default function Home() {
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
   const [messages, setMessages] =
-    useState<ChatMessage[]>(
-      INITIAL_MESSAGES
-    );
+    useState<ChatMessage[]>(INITIAL_MESSAGES);
 
-  const [memory, setMemory] =
-    useState<string[]>([]);
+  const [memory, setMemory] = useState<string[]>([]);
 
-  const [
-    relationshipPoints,
-    setRelationshipPoints,
-  ] = useState(0);
+  const [relationshipPoints, setRelationshipPoints] =
+    useState(0);
 
   const [dailyUsage, setDailyUsage] =
     useState<DailyUsage>({
@@ -89,10 +97,14 @@ export default function Home() {
       count: 0,
     });
 
-  const [
-    showPremium,
-    setShowPremium,
-  ] = useState(false);
+  const [plan, setPlan] =
+    useState<Plan>("free");
+
+  const [accountLoaded, setAccountLoaded] =
+    useState(false);
+
+  const [showPremium, setShowPremium] =
+    useState(false);
 
   const [showMemory, setShowMemory] =
     useState(false);
@@ -107,31 +119,183 @@ export default function Home() {
     notificationPermission,
     setNotificationPermission,
   ] = useState<
-    | "default"
-    | "granted"
-    | "denied"
-    | "unsupported"
+    "default" | "granted" | "denied" | "unsupported"
   >("default");
 
-  const today =
-    getJapanDateKey();
+  const isPremium = plan === "premium";
+
+  const today = getJapanDateKey();
 
   const usageCountToday =
     dailyUsage.date === today
       ? dailyUsage.count
       : 0;
 
-  const freeRemaining =
-    Math.max(
-      0,
-      FREE_DAILY_LIMIT -
-        usageCountToday
-    );
+  const freeRemaining = Math.max(
+    0,
+    FREE_DAILY_LIMIT - usageCountToday
+  );
 
   const freeLimitReached =
-    usageCountToday >=
-    FREE_DAILY_LIMIT;
+    accountLoaded &&
+    !isPremium &&
+    usageCountToday >= FREE_DAILY_LIMIT;
 
+  //
+  // Supabaseユーザー初期化
+  //
+  useEffect(() => {
+    let active = true;
+
+    async function loadEntitlement(
+      userId: string
+    ) {
+      // 新規匿名ユーザーの場合、
+      // DBトリガーで権限レコードが作られるまで
+      // 少し時間がかかる場合があるためリトライする。
+      for (
+        let attempt = 0;
+        attempt < 5;
+        attempt += 1
+      ) {
+        const {
+          data,
+          error,
+        } = await supabase
+          .from("user_entitlements")
+          .select(
+            "plan,premium_until"
+          )
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          return isPremiumActive(
+            data.plan,
+            data.premium_until
+          );
+        }
+
+        await new Promise(
+          (resolve) =>
+            window.setTimeout(
+              resolve,
+              350
+            )
+        );
+      }
+
+      return false;
+    }
+
+    async function initializeAccount() {
+      try {
+        const {
+          data: sessionData,
+          error: sessionError,
+        } =
+          await supabase.auth.getSession();
+
+        if (sessionError) {
+          throw sessionError;
+        }
+
+        let user =
+          sessionData.session?.user ??
+          null;
+
+        if (!user) {
+          const {
+            data: signInData,
+            error: signInError,
+          } =
+            await supabase.auth.signInAnonymously();
+
+          if (signInError) {
+            throw signInError;
+          }
+
+          user =
+            signInData.user ?? null;
+        }
+
+        if (!user) {
+          throw new Error(
+            "Supabase user was not created."
+          );
+        }
+
+        const premium =
+          await loadEntitlement(
+            user.id
+          );
+
+        if (!active) {
+          return;
+        }
+
+        setPlan(
+          premium
+            ? "premium"
+            : "free"
+        );
+      } catch (error) {
+        console.error(
+          "Supabase account initialization failed:",
+          error
+        );
+
+        if (active) {
+          // Supabaseに接続できなかった場合は
+          // 安全側として無料プランとして扱う
+          setPlan("free");
+        }
+      } finally {
+        if (active) {
+          setAccountLoaded(true);
+        }
+      }
+    }
+
+    initializeAccount();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  //
+  // プレミアム状態に応じた表示
+  //
+  useEffect(() => {
+    if (!accountLoaded) {
+      return;
+    }
+
+    if (isPremium) {
+      setShowPremium(false);
+      return;
+    }
+
+    if (
+      usageCountToday >=
+      FREE_DAILY_LIMIT
+    ) {
+      setShowPremium(true);
+    }
+  }, [
+    accountLoaded,
+    isPremium,
+    usageCountToday,
+  ]);
+
+  //
+  // Service Worker
+  //
   useEffect(() => {
     if (
       "serviceWorker" in
@@ -156,9 +320,15 @@ export default function Home() {
     }
   }, []);
 
+  //
+  // 通知権限確認
+  //
   useEffect(() => {
     if (
-      !("Notification" in window)
+      !(
+        "Notification" in
+        window
+      )
     ) {
       setNotificationPermission(
         "unsupported"
@@ -171,6 +341,9 @@ export default function Home() {
     );
   }, []);
 
+  //
+  // 保存データ読み込み
+  //
   useEffect(() => {
     try {
       const savedMessages =
@@ -312,30 +485,18 @@ export default function Home() {
             );
 
           setDailyUsage({
-            date:
-              currentDate,
+            date: currentDate,
             count,
           });
-
-          if (
-            count >=
-            FREE_DAILY_LIMIT
-          ) {
-            setShowPremium(
-              true
-            );
-          }
         } else {
           setDailyUsage({
-            date:
-              currentDate,
+            date: currentDate,
             count: 0,
           });
         }
       } else {
         setDailyUsage({
-          date:
-            currentDate,
+          date: currentDate,
           count: 0,
         });
       }
@@ -355,6 +516,9 @@ export default function Home() {
     }
   }, []);
 
+  //
+  // 会話履歴保存
+  //
   useEffect(() => {
     if (!loaded) return;
 
@@ -378,13 +542,18 @@ export default function Home() {
     }
   }, [messages, loaded]);
 
+  //
+  // 長期記憶保存
+  //
   useEffect(() => {
     if (!loaded) return;
 
     try {
       localStorage.setItem(
         MEMORY_KEY,
-        JSON.stringify(memory)
+        JSON.stringify(
+          memory
+        )
       );
     } catch (error) {
       console.error(
@@ -394,6 +563,9 @@ export default function Home() {
     }
   }, [memory, loaded]);
 
+  //
+  // 関係性ポイント保存
+  //
   useEffect(() => {
     if (!loaded) return;
 
@@ -415,6 +587,9 @@ export default function Home() {
     loaded,
   ]);
 
+  //
+  // 無料利用回数保存
+  //
   useEffect(() => {
     if (!loaded) return;
 
@@ -438,7 +613,10 @@ export default function Home() {
 
   async function requestNotificationPermission() {
     if (
-      !("Notification" in window)
+      !(
+        "Notification" in
+        window
+      )
     ) {
       alert(
         "この環境では通知機能を利用できません。"
@@ -566,6 +744,12 @@ export default function Home() {
   }
 
   function incrementDailyUsage() {
+    // プレミアムユーザーは
+    // 無料利用回数を消費しない
+    if (isPremium) {
+      return;
+    }
+
     const currentDate =
       getJapanDateKey();
 
@@ -593,6 +777,10 @@ export default function Home() {
   }
 
   function openPremium() {
+    if (isPremium) {
+      return;
+    }
+
     setShowPremium(true);
   }
 
@@ -623,8 +811,9 @@ export default function Home() {
         : 0;
 
     if (
+      !isPremium &&
       currentUsage >=
-      FREE_DAILY_LIMIT
+        FREE_DAILY_LIMIT
     ) {
       setShowPremium(true);
       return;
@@ -1300,35 +1489,41 @@ export default function Home() {
         }}
       >
         <span>
-          無料版・今日あと
-          {freeRemaining}回
+          {!accountLoaded
+            ? "プラン確認中..."
+            : isPremium
+              ? "プレミアム利用中"
+              : `無料版・今日あと${freeRemaining}回`}
         </span>
 
-        <button
-          onClick={
-            openPremium
-          }
-          style={{
-            border:
-              "none",
-            background:
-              "transparent",
-            padding: 0,
-            fontSize:
-              "12px",
-            fontWeight:
-              700,
-            cursor:
-              "pointer",
-            textDecoration:
-              "underline",
-          }}
-        >
-          プレミアム
-        </button>
+        {!isPremium && (
+          <button
+            onClick={
+              openPremium
+            }
+            style={{
+              border:
+                "none",
+              background:
+                "transparent",
+              padding: 0,
+              fontSize:
+                "12px",
+              fontWeight:
+                700,
+              cursor:
+                "pointer",
+              textDecoration:
+                "underline",
+            }}
+          >
+            プレミアム
+          </button>
+        )}
       </section>
 
-      {showPremium && (
+      {showPremium &&
+        !isPremium && (
         <section
           style={{
             margin:
@@ -1512,7 +1707,7 @@ export default function Home() {
           ) => {
             if (
               e.key ===
-              "Enter"
+              "Enter"ん
             ) {
               sendMessage();
             }
