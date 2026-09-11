@@ -36,7 +36,6 @@ const PROACTIVE_COOLDOWN_MS =
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
 
-// 最初は空画面
 const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
@@ -133,7 +132,6 @@ export default function Home() {
     usageCountToday >=
     FREE_DAILY_LIMIT;
 
-  // Service Workerを登録
   useEffect(() => {
     if (
       "serviceWorker" in
@@ -158,7 +156,6 @@ export default function Home() {
     }
   }, []);
 
-  // 現在の通知許可状態を確認
   useEffect(() => {
     if (
       !("Notification" in window)
@@ -174,7 +171,6 @@ export default function Home() {
     );
   }, []);
 
-  // 保存済みデータを読み込む
   useEffect(() => {
     try {
       const savedMessages =
@@ -359,7 +355,6 @@ export default function Home() {
     }
   }, []);
 
-  // 会話履歴を保存
   useEffect(() => {
     if (!loaded) return;
 
@@ -383,7 +378,6 @@ export default function Home() {
     }
   }, [messages, loaded]);
 
-  // 長期記憶を保存
   useEffect(() => {
     if (!loaded) return;
 
@@ -400,7 +394,6 @@ export default function Home() {
     }
   }, [memory, loaded]);
 
-  // 関係ポイントを保存
   useEffect(() => {
     if (!loaded) return;
 
@@ -422,7 +415,6 @@ export default function Home() {
     loaded,
   ]);
 
-  // 1日の通常会話回数を保存
   useEffect(() => {
     if (!loaded) return;
 
@@ -724,12 +716,10 @@ export default function Home() {
         );
       }
 
-      // 正常に会話できた時だけ関係値を増やす
       setRelationshipPoints(
         nextRelationshipPoints
       );
 
-      // 正常に返事が来た通常会話だけカウント
       incrementDailyUsage();
 
       setMessages(
@@ -780,7 +770,6 @@ export default function Home() {
       return;
     }
 
-    // アプリが画面に出ていない時は送らない
     if (
       document.visibilityState !==
       "visible"
@@ -788,7 +777,6 @@ export default function Home() {
       return;
     }
 
-    // 入力途中なら邪魔しない
     if (
       message
         .trim()
@@ -1038,19 +1026,14 @@ export default function Home() {
           style={{
             marginLeft:
               "auto",
-
             display:
               "flex",
-
             gap:
               "8px",
-
             alignItems:
               "center",
-
             flexWrap:
               "wrap",
-
             justifyContent:
               "flex-end",
           }}
@@ -1069,22 +1052,16 @@ export default function Home() {
                 style={{
                   border:
                     "none",
-
                   background:
                     "#ff6b81",
-
                   color:
                     "#ffffff",
-
                   borderRadius:
                     "999px",
-
                   padding:
                     "7px 10px",
-
                   fontSize:
                     "12px",
-
                   cursor:
                     "pointer",
                 }}
@@ -1099,7 +1076,6 @@ export default function Home() {
               style={{
                 fontSize:
                   "12px",
-
                 opacity:
                   0.6,
               }}
@@ -1121,16 +1097,12 @@ export default function Home() {
             style={{
               border:
                 "none",
-
               background:
                 "transparent",
-
               fontSize:
                 "12px",
-
               cursor:
                 "pointer",
-
               opacity:
                 0.7,
             }}
@@ -1148,16 +1120,12 @@ export default function Home() {
             style={{
               border:
                 "none",
-
               background:
                 "transparent",
-
               fontSize:
                 "12px",
-
               cursor:
                 "pointer",
-
               opacity:
                 0.6,
             }}
@@ -1172,16 +1140,12 @@ export default function Home() {
           style={{
             margin:
               "12px 0",
-
             padding:
               "14px",
-
             borderRadius:
               "14px",
-
             background:
               "rgba(255,255,255,0.8)",
-
             boxShadow:
               "0 2px 10px rgba(0,0,0,0.06)",
           }}
@@ -1190,13 +1154,10 @@ export default function Home() {
             style={{
               display:
                 "flex",
-
               alignItems:
                 "center",
-
               justifyContent:
                 "space-between",
-
               marginBottom:
                 "10px",
             }}
@@ -1214,16 +1175,12 @@ export default function Home() {
                 style={{
                   border:
                     "none",
-
                   background:
                     "transparent",
-
                   fontSize:
                     "12px",
-
                   cursor:
                     "pointer",
-
                   opacity:
                     0.6,
                 }}
@@ -1239,10 +1196,8 @@ export default function Home() {
               style={{
                 fontSize:
                   "14px",
-
                 opacity:
                   0.6,
-
                 margin: 0,
               }}
             >
@@ -1253,10 +1208,8 @@ export default function Home() {
               style={{
                 display:
                   "flex",
-
                 flexDirection:
                   "column",
-
                 gap:
                   "8px",
               }}
@@ -1271,19 +1224,14 @@ export default function Home() {
                     style={{
                       display:
                         "flex",
-
                       gap:
                         "8px",
-
                       alignItems:
                         "center",
-
                       padding:
                         "10px",
-
                       borderRadius:
                         "10px",
-
                       background:
                         "rgba(255,255,255,0.9)",
                     }}
@@ -1291,10 +1239,8 @@ export default function Home() {
                     <div
                       style={{
                         flex: 1,
-
                         fontSize:
                           "14px",
-
                         lineHeight:
                           1.5,
                       }}
@@ -1311,16 +1257,12 @@ export default function Home() {
                       style={{
                         border:
                           "none",
-
                         background:
                           "transparent",
-
                         cursor:
                           "pointer",
-
                         fontSize:
                           "12px",
-
                         opacity:
                           0.6,
                       }}
@@ -1343,22 +1285,16 @@ export default function Home() {
         style={{
           display:
             "flex",
-
           justifyContent:
             "space-between",
-
           alignItems:
             "center",
-
           gap:
             "10px",
-
           margin:
-            "8px 2px 10px",
-
+            "8px 12px 10px",
           fontSize:
             "12px",
-
           opacity:
             0.7,
         }}
@@ -1375,21 +1311,15 @@ export default function Home() {
           style={{
             border:
               "none",
-
             background:
               "transparent",
-
             padding: 0,
-
             fontSize:
               "12px",
-
             fontWeight:
               700,
-
             cursor:
               "pointer",
-
             textDecoration:
               "underline",
           }}
@@ -1402,17 +1332,13 @@ export default function Home() {
         <section
           style={{
             margin:
-              "10px 0 14px",
-
+              "10px 12px 14px",
             padding:
               "18px",
-
             borderRadius:
               "18px",
-
             background:
               "#ffffff",
-
             boxShadow:
               "0 4px 18px rgba(0,0,0,0.08)",
           }}
@@ -1421,13 +1347,10 @@ export default function Home() {
             style={{
               display:
                 "flex",
-
               justifyContent:
                 "space-between",
-
               gap:
                 "12px",
-
               alignItems:
                 "flex-start",
             }}
@@ -1446,10 +1369,8 @@ export default function Home() {
                 style={{
                   margin:
                     "8px 0 0",
-
                   fontSize:
                     "14px",
-
                   lineHeight:
                     1.6,
                 }}
@@ -1468,13 +1389,10 @@ export default function Home() {
               style={{
                 border:
                   "none",
-
                 background:
                   "transparent",
-
                 cursor:
                   "pointer",
-
                 fontSize:
                   "18px",
               }}
@@ -1488,10 +1406,8 @@ export default function Home() {
               style={{
                 margin:
                   "14px 0 0",
-
                 fontSize:
                   "13px",
-
                 fontWeight:
                   700,
               }}
@@ -1507,31 +1423,22 @@ export default function Home() {
             style={{
               width:
                 "100%",
-
               marginTop:
                 "16px",
-
               border:
                 "none",
-
               borderRadius:
                 "14px",
-
               padding:
                 "13px 16px",
-
               background:
                 "#ff6b81",
-
               color:
                 "#ffffff",
-
               fontSize:
                 "15px",
-
               fontWeight:
                 700,
-
               cursor:
                 "pointer",
             }}
@@ -1543,13 +1450,10 @@ export default function Home() {
             style={{
               margin:
                 "9px 0 0",
-
               textAlign:
                 "center",
-
               fontSize:
                 "11px",
-
               opacity:
                 0.55,
             }}
@@ -1582,8 +1486,10 @@ export default function Home() {
         )}
 
         {loading && (
-          <div className="bubble">
-            ・・・
+          <div className="bubble typingBubble">
+            <span></span>
+            <span></span>
+            <span></span>
           </div>
         )}
       </section>
@@ -1633,7 +1539,7 @@ export default function Home() {
           }
         >
           {loading
-            ? "送信中..."
+            ? "入力中"
             : freeLimitReached
               ? "続きを話す"
               : "送信"}
