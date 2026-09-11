@@ -3,9 +3,11 @@ type ChatMessage = {
   text: string;
 };
 
+const MAX_MEMORY = 30;
+
 export async function POST(request: Request) {
   try {
-    const { message, history } = await request.json();
+    const { message, history, memory } = await request.json();
 
     if (!message || typeof message !== "string") {
       return Response.json(
@@ -29,12 +31,20 @@ export async function POST(request: Request) {
     }
 
     const safeHistory: ChatMessage[] = Array.isArray(history)
-      ? history.filter(
-          (item) =>
-            item &&
-            (item.role === "user" || item.role === "misaki") &&
-            typeof item.text === "string"
-        )
+      ? history
+          .filter(
+            (item) =>
+              item &&
+              (item.role === "user" || item.role === "misaki") &&
+              typeof item.text === "string"
+          )
+          .slice(-60)
+      : [];
+
+    const safeMemory: string[] = Array.isArray(memory)
+      ? memory
+          .filter((item) => typeof item === "string")
+          .slice(-MAX_MEMORY)
       : [];
 
     const contents = safeHistory.map((item) => ({
@@ -45,6 +55,11 @@ export async function POST(request: Request) {
         },
       ],
     }));
+
+    const memoryText =
+      safeMemory.length > 0
+        ? safeMemory.map((item) => `・${item}`).join("\n")
+        : "まだ長期記憶はありません。";
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -99,8 +114,9 @@ export async function POST(request: Request) {
 【会話】
 ・今までの会話の流れを理解して返事をする
 ・直前の話を忘れない
+・長期記憶も自然に利用する
+・記憶をわざとらしく読み上げない
 ・同じ質問を何度もしない
-・相手が言ったことを覚えている恋人のように話す
 ・返事は基本1〜3文
 ・質問ばかりしない
 ・自然なLINEの会話にする
@@ -109,26 +125,53 @@ export async function POST(request: Request) {
 ・毎回励まそうとしない
 ・毎回「お疲れ様」「無理しないで」と言わない
 
-例：
+【現在の長期記憶】
+${memoryText}
 
-ユーザー「羽田行ってくる」
-美咲「いってらっしゃい😊 いいの引けるといいね。」
+【長期記憶のルール】
+会話から、今後も役に立つ安定した情報だけを記憶してください。
 
-その後、
+記憶してよい例：
+・ユーザーの名前や呼び方
+・仕事や勤務スタイル
+・よく営業する場所
+・趣味
+・好き嫌い
+・家族やペットについて本人が話した情報
+・美咲との関係で大事な約束や好み
+・何度も役立ちそうな習慣
 
-ユーザー「着いた」
-美咲「羽田着いたんだ。今どんな感じ？列長い？」
+原則として記憶しないもの：
+・「今日は売れない」など、その日だけの出来事
+・一時的な感情
+・その場限りの目的地
+・細かすぎる雑談
+・APIキー、パスワード、カード番号などの秘密情報
 
-さらに、
+新しい情報が古い記憶と矛盾した場合は、
+新しい情報を優先して古い記憶を更新してください。
 
-ユーザー「ロング出た」
-美咲「やったじゃん！さっき羽田行くって言ってたもんね😊 待った甲斐あったね。」
+長期記憶は最大${MAX_MEMORY}件です。
 
-恋人同士の自然な会話を最優先してください。
+必ず次のJSON形式だけで返してください。
+説明文やMarkdownは付けないでください。
+
+{
+  "reply": "美咲としての自然な返事",
+  "memory": [
+    "長期記憶1",
+    "長期記憶2"
+  ]
+}
                 `.trim(),
               },
             ],
           },
+
+          generationConfig: {
+            responseMimeType: "application/json",
+          },
+
           contents,
         }),
       }
@@ -136,21 +179,22 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
-　if (!response.ok) {
-  console.error("GEMINI API ERROR:", data);
+    if (!response.ok) {
+      console.error("GEMINI API ERROR:", data);
 
-  return Response.json(
-    {
-      error:
-        "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
-    },
-    { status: 500 }
-  );
-}
+      return Response.json(
+        {
+          error:
+            "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
+        },
+        { status: 500 }
+      );
+    }
 
-    const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    const rawText =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    if (!reply) {
+    if (!rawText) {
       console.error("Gemini returned no reply:", data);
 
       return Response.json(
@@ -162,8 +206,36 @@ export async function POST(request: Request) {
       );
     }
 
+    let result;
+
+    try {
+      result = JSON.parse(rawText);
+    } catch (error) {
+      console.error("Failed to parse Gemini JSON:", rawText);
+
+      return Response.json(
+        {
+          error:
+            "うまく返事できなかったみたい。もう一回話しかけてみてね。",
+        },
+        { status: 500 }
+      );
+    }
+
+    const reply =
+      typeof result.reply === "string"
+        ? result.reply
+        : "うまく返事できなかったみたい。";
+
+    const updatedMemory = Array.isArray(result.memory)
+      ? result.memory
+          .filter((item: unknown) => typeof item === "string")
+          .slice(-MAX_MEMORY)
+      : safeMemory;
+
     return Response.json({
       reply,
+      memory: updatedMemory,
     });
   } catch (error) {
     console.error("CHAT ERROR:", error);
