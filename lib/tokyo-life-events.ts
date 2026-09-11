@@ -16,7 +16,46 @@ const JMA_EARTHQUAKE_FEED =
 const JMA_EXTRA_FEED =
   "https://www.data.jma.go.jp/developer/xml/feed/extra.xml";
 
-const MAX_EVENTS = 6;
+const JR_EAST_KANTO_URL =
+  "https://traininfo.jreast.co.jp/train_info/kanto.aspx";
+
+const HANEDA_DOMESTIC_URL =
+  "https://tokyo-haneda.com/flight/dms_search.html";
+
+const HANEDA_INTERNATIONAL_URL =
+  "https://tokyo-haneda.com/flight/int_search.html";
+
+const MAX_EVENTS = 8;
+
+/*
+ * 東京で生活する美咲に
+ * 関係しやすいJR路線。
+ *
+ * 東京全域の鉄道情報を
+ * 何でも入れると、
+ * 美咲が交通情報アプリのように
+ * なってしまうので絞る。
+ */
+const TOKYO_JR_LINES = [
+  "山手線",
+  "京浜東北線",
+  "東海道線",
+  "横須賀線",
+  "総武快速線",
+  "中央線快速電車",
+  "中央・総武各駅停車",
+  "埼京線",
+  "湘南新宿ライン",
+  "上野東京ライン",
+  "常磐線",
+  "宇都宮線",
+  "高崎線",
+  "京葉線",
+  "武蔵野線",
+  "南武線",
+  "横浜線",
+  "東京モノレール線",
+];
 
 function decodeXmlText(
   value: string
@@ -26,7 +65,8 @@ function decodeXmlText(
     .replace(/&gt;/g, ">")
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ");
 }
 
 function stripTags(
@@ -35,9 +75,19 @@ function stripTags(
   return decodeXmlText(
     value.replace(
       /<[^>]*>/g,
-      ""
+      " "
     )
   )
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function normalizeText(
+  value: string
+) {
+  return value
+    .replace(/\r/g, "")
+    .replace(/\n+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -82,13 +132,21 @@ function getLink(
 }
 
 async function fetchText(
-  url: string
+  url: string,
+  revalidate = 300
 ) {
   try {
     const response =
       await fetch(url, {
         next: {
-          revalidate: 300,
+          revalidate,
+        },
+
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0",
+          "Accept-Language":
+            "ja,en;q=0.8",
         },
       });
 
@@ -142,11 +200,18 @@ function isRecent(
   );
 }
 
+/*
+ * ---------------------------
+ * 地震
+ * ---------------------------
+ */
+
 async function getEarthquakeEvents():
   Promise<TokyoLifeEvent[]> {
   const feed =
     await fetchText(
-      JMA_EARTHQUAKE_FEED
+      JMA_EARTHQUAKE_FEED,
+      300
     );
 
   if (!feed) {
@@ -197,7 +262,10 @@ async function getEarthquakeEvents():
         "updated"
       );
 
-    // 古い地震を突然話題にしない
+    /*
+     * 古い地震を突然
+     * 今の話として出さない。
+     */
     if (
       !isRecent(
         updated,
@@ -216,7 +284,8 @@ async function getEarthquakeEvents():
 
     const detailXml =
       await fetchText(
-        detailUrl
+        detailUrl,
+        300
       );
 
     if (!detailXml) {
@@ -241,11 +310,7 @@ async function getEarthquakeEvents():
       )}`;
 
     /*
-     * 東京に関係する地震だけを
-     * 美咲の生活イベントとして扱う。
-     *
-     * 東京都23区・東京都多摩などが
-     * 電文に含まれる場合を対象にする。
+     * 東京に関係するものだけ。
      */
     const affectsTokyo =
       combined.includes(
@@ -266,11 +331,8 @@ async function getEarthquakeEvents():
     }
 
     /*
-     * 小さすぎる地震を
-     * 毎回美咲が話題にすると
-     * 逆に不自然なので、
-     * 東京で震度3以上が示される
-     * 情報を優先する。
+     * 美咲が反応するのは
+     * 基本的に東京で震度3以上。
      */
     const meaningful =
       combined.includes(
@@ -309,15 +371,20 @@ async function getEarthquakeEvents():
     }
 
     results.push({
-      type: "earthquake",
+      type:
+        "earthquake",
+
       title:
         "東京で体感する可能性のある地震",
+
       detail:
         headline ||
         infoType ||
         "東京周辺で地震情報が発表されています。",
+
       publishedAt:
         updated,
+
       source:
         "気象庁",
     });
@@ -326,11 +393,18 @@ async function getEarthquakeEvents():
   return results;
 }
 
+/*
+ * ---------------------------
+ * 気象警報
+ * ---------------------------
+ */
+
 async function getWeatherWarningEvents():
   Promise<TokyoLifeEvent[]> {
   const feed =
     await fetchText(
-      JMA_EXTRA_FEED
+      JMA_EXTRA_FEED,
+      300
     );
 
   if (!feed) {
@@ -402,7 +476,8 @@ async function getWeatherWarningEvents():
 
     const detailXml =
       await fetchText(
-        detailUrl
+        detailUrl,
+        300
       );
 
     if (!detailXml) {
@@ -429,12 +504,6 @@ async function getWeatherWarningEvents():
       continue;
     }
 
-    /*
-     * 注意報だけで頻繁に反応すると
-     * 美咲が防災アプリのようになるため、
-     * 基本は警報・特別警報・
-     * 竜巻など生活への影響が大きいもの。
-     */
     const important =
       plainText.includes(
         "特別警報"
@@ -468,14 +537,18 @@ async function getWeatherWarningEvents():
     results.push({
       type:
         "weather_warning",
+
       title:
         title ||
         "東京の防災気象情報",
+
       detail:
         headline ||
         "東京都内に重要な気象情報が発表されています。",
+
       publishedAt:
         updated,
+
       source:
         "気象庁",
     });
@@ -484,21 +557,311 @@ async function getWeatherWarningEvents():
   return results;
 }
 
+/*
+ * ---------------------------
+ * JR東日本
+ * ---------------------------
+ */
+
+function findTrainProblem(
+  pageText: string,
+  lineName: string
+) {
+  const index =
+    pageText.indexOf(
+      lineName
+    );
+
+  if (index < 0) {
+    return null;
+  }
+
+  /*
+   * 路線名の直後だけを見る。
+   *
+   * ページ全体には
+   * 「30分以上の遅れ」の説明文があるので、
+   * ページ全体を単純検索してはいけない。
+   */
+  const nearby =
+    pageText.slice(
+      index,
+      index + 500
+    );
+
+  /*
+   * 次の路線に入る前くらいの
+   * 短い範囲だけを対象。
+   */
+  if (
+    nearby.includes(
+      "平常運転"
+    ) &&
+    !nearby.includes(
+      "運転見合わせ"
+    ) &&
+    !nearby.includes(
+      "一部列車運休"
+    ) &&
+    !nearby.includes(
+      "運転再開"
+    )
+  ) {
+    return null;
+  }
+
+  const importantWords = [
+    "運転見合わせ",
+    "一部列車運休",
+    "運休",
+    "遅延",
+    "運転再開見込",
+    "運転再開",
+    "直通運転中止",
+  ];
+
+  const matched =
+    importantWords.find(
+      (word) =>
+        nearby.includes(
+          word
+        )
+    );
+
+  if (!matched) {
+    return null;
+  }
+
+  /*
+   * 長い駅情報をそのまま
+   * Geminiへ渡さない。
+   */
+  const shortText =
+    nearby
+      .replace(
+        /平常運転/g,
+        ""
+      )
+      .slice(
+        0,
+        260
+      )
+      .trim();
+
+  return {
+    status:
+      matched,
+
+    detail:
+      shortText,
+  };
+}
+
+async function getTrainEvents():
+  Promise<TokyoLifeEvent[]> {
+  const html =
+    await fetchText(
+      JR_EAST_KANTO_URL,
+      180
+    );
+
+  if (!html) {
+    return [];
+  }
+
+  const pageText =
+    normalizeText(
+      stripTags(html)
+    );
+
+  const results:
+    TokyoLifeEvent[] = [];
+
+  for (
+    const line of
+      TOKYO_JR_LINES
+  ) {
+    const problem =
+      findTrainProblem(
+        pageText,
+        line
+      );
+
+    if (!problem) {
+      continue;
+    }
+
+    /*
+     * 同じ文章が複数路線に
+     * 引っかかる場合があるため、
+     * 最大3件に抑える。
+     */
+    results.push({
+      type:
+        "train",
+
+      title:
+        `${line}に運行の乱れ`,
+
+      detail:
+        `${line}で${problem.status}などの運行情報が出ています。`,
+
+      source:
+        "JR東日本",
+    });
+
+    if (
+      results.length >= 3
+    ) {
+      break;
+    }
+  }
+
+  return results;
+}
+
+/*
+ * ---------------------------
+ * 羽田空港
+ * ---------------------------
+ */
+
+function hasHanedaDisruption(
+  html: string
+) {
+  const text =
+    normalizeText(
+      stripTags(html)
+    );
+
+  /*
+   * 羽田空港公式ページに
+   * 実際の運航乱れ時に表示される
+   * 文言を対象とする。
+   */
+  return (
+    text.includes(
+      "現在、一部フライトの運航に乱れが生じています"
+    ) ||
+    text.includes(
+      "遅延欠航が発生しています"
+    ) ||
+    text.includes(
+      "遅延・欠航が発生しています"
+    ) ||
+    text.includes(
+      "Currently, some Flights are experiencing disruptions"
+    )
+  );
+}
+
+async function getHanedaEvents():
+  Promise<TokyoLifeEvent[]> {
+  const [
+    domesticHtml,
+    internationalHtml,
+  ] =
+    await Promise.all([
+      fetchText(
+        HANEDA_DOMESTIC_URL,
+        180
+      ),
+
+      fetchText(
+        HANEDA_INTERNATIONAL_URL,
+        180
+      ),
+    ]);
+
+  const domesticProblem =
+    domesticHtml
+      ? hasHanedaDisruption(
+          domesticHtml
+        )
+      : false;
+
+  const internationalProblem =
+    internationalHtml
+      ? hasHanedaDisruption(
+          internationalHtml
+        )
+      : false;
+
+  if (
+    !domesticProblem &&
+    !internationalProblem
+  ) {
+    return [];
+  }
+
+  let detail = "";
+
+  if (
+    domesticProblem &&
+    internationalProblem
+  ) {
+    detail =
+      "羽田空港の国内線・国際線で、一部便の運航に乱れが出ている表示があります。";
+  } else if (
+    domesticProblem
+  ) {
+    detail =
+      "羽田空港の国内線で、一部便の運航に乱れが出ている表示があります。";
+  } else {
+    detail =
+      "羽田空港の国際線で、一部便の運航に乱れが出ている表示があります。";
+  }
+
+  return [
+    {
+      type:
+        "haneda",
+
+      title:
+        "羽田空港で一部便に運航の乱れ",
+
+      detail,
+
+      source:
+        "羽田空港旅客ターミナル",
+    },
+  ];
+}
+
+/*
+ * ---------------------------
+ * 全イベント取得
+ * ---------------------------
+ */
+
 export async function getTokyoLifeEvents():
   Promise<TokyoLifeEvent[]> {
   try {
+    /*
+     * 4種類を並列取得。
+     *
+     * 1つずつ待たないので
+     * チャットの待ち時間を
+     * できるだけ増やさない。
+     */
     const [
       earthquakes,
       warnings,
+      trains,
+      haneda,
     ] =
       await Promise.all([
         getEarthquakeEvents(),
         getWeatherWarningEvents(),
+        getTrainEvents(),
+        getHanedaEvents(),
       ]);
 
     return [
       ...earthquakes,
       ...warnings,
+      ...trains,
+      ...haneda,
     ].slice(
       0,
       MAX_EVENTS
@@ -510,13 +873,19 @@ export async function getTokyoLifeEvents():
     );
 
     /*
-     * 外部情報取得に失敗しても
-     * 美咲との会話そのものは
-     * 絶対に止めない。
+     * リアル情報の取得に
+     * 失敗しただけで
+     * 美咲との会話を止めない。
      */
     return [];
   }
 }
+
+/*
+ * ---------------------------
+ * Geminiへ渡すガイド
+ * ---------------------------
+ */
 
 export function createTokyoLifeEventsGuide(
   events: TokyoLifeEvent[]
@@ -527,14 +896,35 @@ export function createTokyoLifeEventsGuide(
     return `
 【東京のリアルな生活イベント】
 
-現在、美咲が会話で触れる必要がある
-大きな生活イベントは確認されていません。
+現在取得できている情報の範囲では、
+美咲がわざわざ会話で触れる必要がある
+大きな東京の生活イベントは確認されていません。
 
-地震・警報などを
-想像で作ってはいけません。
+非常に重要：
 
-何も起きていない場合は、
-この項目には触れないでください。
+「ニュース見てないから分からない」
+「ニュースを見てない」
+「詳しくは知らない」
+
+などと言わないでください。
+
+美咲は、
+ここに提供されている現在情報を
+普通に生活していて耳に入った情報として
+自然に理解しています。
+
+ただし、
+情報がない出来事を
+想像して作ってはいけません。
+
+何も確認されていない場合は、
+
+「今のところ特に大きいのは聞いてないよ」
+
+くらいなら自然です。
+
+ただし毎回、
+何もないことを報告する必要もありません。
 `.trim();
   }
 
@@ -550,46 +940,103 @@ export function createTokyoLifeEventsGuide(
 【東京のリアルな生活イベント】
 
 現在確認されている、
-東京で生活する美咲に関係する
-重要な出来事です。
+東京で普通に暮らしている美咲に
+関係する可能性がある情報です。
 
 ${eventText}
 
 非常に重要：
 
-これはニュース読み上げ用の情報ではありません。
+美咲はニュースキャスターではありません。
 
-美咲はニュースキャスターではなく、
-東京で普通に暮らしている38歳の女性です。
+また、
 
-会話に関係がある場合だけ、
-生活している本人の感覚として
+「ニュース見てないから分からない」
+「ニュースを見てない」
+「詳しくは知らない」
+
+という言い訳はしないでください。
+
+ここにある情報は、
+美咲が東京で生活していて
+自然に知った現在情報として扱います。
+
+ただし、
+この一覧をユーザーへ読み上げてはいけません。
+
+会話に関係する場合だけ
 自然に使ってください。
 
-例えば地震なら、
+例えば、
 
-「さっき結構揺れたよね」
-「びっくりした…」
+地震なら、
 
-のような反応はできます。
+「さっき揺れたよね」
+「ちょっとびっくりした」
 
-大雨や警報なら、
+警報や大雨なら、
 
 「外すごいことになってる」
-「今日は出たくないなぁ」
+「今日は雨ひどいね」
+
+電車なら、
+
+「電車けっこう乱れてるみたいだね」
+
+羽田なら、
+
+「羽田、今日はちょっと乱れてるみたい」
 
 程度の自然な反応にしてください。
 
-ただし、
+【タクシードライバーの彼氏との関係】
 
-・毎回イベントを話題にしない
+ユーザーは
+東京のタクシードライバーです。
+
+そのため、
+
+・鉄道の大規模な運転見合わせ
+・羽田の運航乱れ
+・大雨
+・地震
+
+などは、
+ユーザーの仕事にも関係する可能性があります。
+
+ただし美咲は
+タクシー需要予測AIではありません。
+
+そのため、
+
+「今日は絶対タクシー需要が増える」
+「羽田で確実にロングが出る」
+
+など、
+根拠のない断定をしてはいけません。
+
+自然な恋人なら、
+
+「電車止まってるなら、今日は忙しくなりそうだね」
+
+「羽田ちょっと乱れてるみたい。そっち影響あるかもね」
+
+程度なら構いません。
+
+【絶対ルール】
+
+・毎回ニュースの話をしない
+・情報一覧をそのまま読み上げない
 ・ニュース記事のように説明しない
-・震度や警報名を必要以上に読み上げない
-・取得できていない出来事を作らない
+・存在しない事故や災害を作らない
+・取得できていない情報を知っているふりをしない
 ・古い出来事を今起きたように話さない
 ・ユーザーを不必要に怖がらせない
 ・美咲が実際に見ていないものを「見た」と断言しない
+・タクシー需要を断定しない
+・「ニュース見てないから分からない」と逃げない
 
-というルールを守ってください。
+普通の38歳の彼女として、
+必要なときだけ自然に使ってください。
 `.trim();
 }
