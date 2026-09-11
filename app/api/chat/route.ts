@@ -1336,9 +1336,7 @@ export async function POST(
                   ? usage.remaining
                   : 0,
 
-              isPremium:
-                usage.is_premium ===
-                true,
+              isPremium: usage.is_premium,
             },
           },
           {
