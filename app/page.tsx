@@ -22,14 +22,15 @@ export default function Home() {
 
     if (!text || loading) return;
 
-    setMessages((prev) => [
-      ...prev,
+    const newMessages: ChatMessage[] = [
+      ...messages,
       {
         role: "user",
         text,
       },
-    ]);
+    ];
 
+    setMessages(newMessages);
     setMessage("");
     setLoading(true);
 
@@ -41,22 +42,14 @@ export default function Home() {
         },
         body: JSON.stringify({
           message: text,
+          history: newMessages,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        const details = [
-          data?.error,
-          data?.type ? `type: ${data.type}` : "",
-          data?.code ? `code: ${data.code}` : "",
-          data?.status ? `status: ${data.status}` : "",
-        ]
-          .filter(Boolean)
-          .join(" / ");
-
-        throw new Error(details || `HTTP ${res.status}`);
+        throw new Error(data?.error || "通信に失敗しました");
       }
 
       setMessages((prev) => [
@@ -71,7 +64,9 @@ export default function Home() {
         ...prev,
         {
           role: "misaki",
-          text: `エラー: ${error?.message || "不明なエラー"}`,
+          text:
+            error?.message ||
+            "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
         },
       ]);
     } finally {
@@ -124,10 +119,7 @@ export default function Home() {
           disabled={loading}
         />
 
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-        >
+        <button onClick={sendMessage} disabled={loading}>
           {loading ? "送信中..." : "送信"}
         </button>
       </section>
