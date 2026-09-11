@@ -3,6 +3,16 @@ type ChatMessage = {
   text: string;
 };
 
+type TokyoWeather = {
+  temperature: number | null;
+  apparentTemperature: number | null;
+  precipitation: number | null;
+  rain: number | null;
+  weatherCode: number | null;
+  windSpeed: number | null;
+  description: string;
+};
+
 const MAX_MEMORY = 30;
 
 function hashText(text: string) {
@@ -28,6 +38,324 @@ function getHour(currentTime: string) {
   return Number(match[1]);
 }
 
+function weatherCodeToText(
+  code: number | null
+) {
+  if (code === null) {
+    return "不明";
+  }
+
+  if (code === 0) {
+    return "快晴";
+  }
+
+  if (
+    code === 1 ||
+    code === 2
+  ) {
+    return "晴れ時々くもり";
+  }
+
+  if (code === 3) {
+    return "くもり";
+  }
+
+  if (
+    code === 45 ||
+    code === 48
+  ) {
+    return "霧";
+  }
+
+  if (
+    code === 51 ||
+    code === 53 ||
+    code === 55
+  ) {
+    return "霧雨";
+  }
+
+  if (
+    code === 56 ||
+    code === 57
+  ) {
+    return "着氷性の霧雨";
+  }
+
+  if (
+    code === 61 ||
+    code === 63 ||
+    code === 65
+  ) {
+    return "雨";
+  }
+
+  if (
+    code === 66 ||
+    code === 67
+  ) {
+    return "着氷性の雨";
+  }
+
+  if (
+    code === 71 ||
+    code === 73 ||
+    code === 75
+  ) {
+    return "雪";
+  }
+
+  if (code === 77) {
+    return "雪粒";
+  }
+
+  if (
+    code === 80 ||
+    code === 81 ||
+    code === 82
+  ) {
+    return "にわか雨";
+  }
+
+  if (
+    code === 85 ||
+    code === 86
+  ) {
+    return "にわか雪";
+  }
+
+  if (code === 95) {
+    return "雷雨";
+  }
+
+  if (
+    code === 96 ||
+    code === 99
+  ) {
+    return "ひょうを伴う雷雨";
+  }
+
+  return "不明";
+}
+
+async function getTokyoWeather():
+  Promise<TokyoWeather | null> {
+  try {
+    const url =
+      "https://api.open-meteo.com/v1/forecast" +
+      "?latitude=35.6762" +
+      "&longitude=139.6503" +
+      "&current=" +
+      [
+        "temperature_2m",
+        "apparent_temperature",
+        "precipitation",
+        "rain",
+        "weather_code",
+        "wind_speed_10m",
+      ].join(",") +
+      "&timezone=Asia%2FTokyo";
+
+    const response =
+      await fetch(url, {
+        next: {
+          revalidate: 600,
+        },
+      });
+
+    if (!response.ok) {
+      console.error(
+        "WEATHER API ERROR:",
+        response.status
+      );
+
+      return null;
+    }
+
+    const data =
+      await response.json();
+
+    const current =
+      data?.current;
+
+    if (!current) {
+      return null;
+    }
+
+    const weatherCode =
+      typeof current.weather_code ===
+      "number"
+        ? current.weather_code
+        : null;
+
+    return {
+      temperature:
+        typeof current.temperature_2m ===
+        "number"
+          ? current.temperature_2m
+          : null,
+
+      apparentTemperature:
+        typeof current.apparent_temperature ===
+        "number"
+          ? current.apparent_temperature
+          : null,
+
+      precipitation:
+        typeof current.precipitation ===
+        "number"
+          ? current.precipitation
+          : null,
+
+      rain:
+        typeof current.rain ===
+        "number"
+          ? current.rain
+          : null,
+
+      weatherCode,
+
+      windSpeed:
+        typeof current.wind_speed_10m ===
+        "number"
+          ? current.wind_speed_10m
+          : null,
+
+      description:
+        weatherCodeToText(
+          weatherCode
+        ),
+    };
+  } catch (error) {
+    console.error(
+      "WEATHER FETCH ERROR:",
+      error
+    );
+
+    return null;
+  }
+}
+
+function createWeatherGuide(
+  weather: TokyoWeather | null
+) {
+  if (!weather) {
+    return `
+【美咲のいる東京の現在の天気】
+
+現在、天気情報を取得できていません。
+
+天気について聞かれた場合でも、
+分からない天気を作ってはいけません。
+
+「今ちょっと天気わかんない」
+くらいの自然な返事で構いません。
+`.trim();
+  }
+
+  const lines = [
+    `天気：${weather.description}`,
+  ];
+
+  if (
+    weather.temperature !== null
+  ) {
+    lines.push(
+      `気温：${weather.temperature}℃`
+    );
+  }
+
+  if (
+    weather.apparentTemperature !==
+    null
+  ) {
+    lines.push(
+      `体感温度：${weather.apparentTemperature}℃`
+    );
+  }
+
+  if (
+    weather.rain !== null
+  ) {
+    lines.push(
+      `現在の雨量：${weather.rain}mm`
+    );
+  }
+
+  if (
+    weather.precipitation !== null
+  ) {
+    lines.push(
+      `降水量：${weather.precipitation}mm`
+    );
+  }
+
+  if (
+    weather.windSpeed !== null
+  ) {
+    lines.push(
+      `風速：${weather.windSpeed}km/h`
+    );
+  }
+
+  return `
+【美咲のいる東京の現在の天気】
+
+美咲は東京で生活しています。
+
+現在の東京の気象情報：
+
+${lines
+  .map(
+    (line) => `・${line}`
+  )
+  .join("\n")}
+
+この情報は
+美咲自身が東京で普通に生活していて
+感じている天気として扱ってください。
+
+重要：
+
+・天気予報士のように説明しない
+・毎回気温を数字で読み上げない
+・ユーザーが聞いていないのに毎回天気を話さない
+・天気を生活感として自然に使う
+・実際の気象情報と矛盾することを言わない
+
+例えば雨なら、
+
+「雨けっこう降ってる」
+「外出るのやだなー☔️」
+「こっち雨だよ」
+
+など自然に使えます。
+
+暑ければ、
+
+「今日ほんと暑い」
+「外出た瞬間むわってした笑」
+
+寒ければ、
+
+「今日ちょっと寒い」
+「外出たら思ったより寒かった」
+
+など、
+普通の恋人のLINEとして使ってください。
+
+ユーザーから
+
+「そっち雨？」
+「東京暑い？」
+「美咲のところ天気どう？」
+
+などと聞かれた場合は、
+この実際の気象情報を使って
+自然に答えてください。
+`.trim();
+}
+
 function createMisakiLife(
   currentTime: string
 ) {
@@ -38,6 +366,7 @@ function createMisakiLife(
     currentTime.slice(0, 10);
 
   const seed = hashText(dateKey);
+
   const hour =
     getHour(currentTime);
 
@@ -286,7 +615,7 @@ function createProactiveGuide(
 「美咲の今していること」
 から始めてください。
 
-例の方向性：
+例えば、
 
 ・今ご飯を食べている
 ・髪を乾かしている
@@ -294,6 +623,8 @@ function createProactiveGuide(
 ・スマホをいじっている
 ・片付けをしている
 ・ベッドに入った
+
+などです。
 
 ユーザーへの質問は
 なくても構いません。
@@ -332,10 +663,11 @@ function createProactiveGuide(
 ・小腹が空いた
 ・何か食べたい
 
-など。
+などです。
 
 直近で同じ食べ物を
-話していた場合は別の話題にしてください。
+話していた場合は
+別の話題にしてください。
 `,
     `
 今回の自発メッセージは
@@ -486,7 +818,7 @@ function createProactiveGuide(
 ・こういうの好き
 ・今日こんな気分
 
-など。
+などです。
 
 実際の画像やURLを
 見たふりはしないでください。
@@ -825,6 +1157,14 @@ export async function POST(
         safeCurrentTime
       );
 
+    const tokyoWeather =
+      await getTokyoWeather();
+
+    const weatherGuide =
+      createWeatherGuide(
+        tokyoWeather
+      );
+
     const isProactive =
       message.includes(
         "自発会話のきっかけ"
@@ -897,11 +1237,10 @@ export async function POST(
 
           body:
             JSON.stringify({
-              system_instruction:
-                {
-                  parts: [
-                    {
-                      text: `
+              system_instruction: {
+                parts: [
+                  {
+                    text: `
 あなたは「美咲」という38歳の日本人女性です。
 
 ユーザーの恋人として、
@@ -910,6 +1249,7 @@ LINEのように会話してください。
 【基本設定】
 
 ・38歳の日本人女性
+・東京で生活している
 ・ユーザーとはすでに付き合っている恋人同士
 ・ユーザーにはかなり心を許している
 ・明るく、少し甘えん坊
@@ -1204,6 +1544,8 @@ ${timeGuide}
 ただし毎回、
 時刻や曜日に触れる必要はありません。
 
+${weatherGuide}
+
 【美咲自身の生活】
 
 ${misakiLife}
@@ -1228,6 +1570,9 @@ ${misakiLife}
 ・髪
 ・買い物
 ・食べ物
+・天気
+・暑さや寒さ
+・雨
 ・小さな失敗
 ・ちょっとした愚痴
 ・どうでもいい報告
@@ -1242,6 +1587,12 @@ ${misakiLife}
 
 の3種類だけに
 偏らないでください。
+
+天気も毎回話題にする必要はありません。
+
+実際の人間のように、
+その日の天気が生活に影響したときだけ
+自然に触れて構いません。
 
 【美咲から話題を出す】
 
@@ -1295,8 +1646,15 @@ ${proactiveGuide}
 ・ユーザーを思い出した
 ・会いたくなった
 ・どうでもいいことを報告したくなった
+・雨が急に降ってきた
+・暑くて外に出たくない
+・思ったより寒かった
 
 などです。
+
+天気を使う場合も、
+現在の東京の実際の天気と
+矛盾してはいけません。
 
 毎回
 ユーザーの仕事の様子を
@@ -1395,6 +1753,8 @@ memory に追加してください。
 ・一時的な気分
 ・その場限りの雑談
 ・現在地のようにすぐ変わる情報
+・その日の天気
+・現在の気温
 ・パスワード
 ・APIキー
 ・秘密情報
@@ -1423,9 +1783,9 @@ reply は、
 Markdown、
 コードブロックは不要です。
 `.trim(),
-                    },
-                  ],
-                },
+                  },
+                ],
+              },
 
               contents: [
                 ...contents,
