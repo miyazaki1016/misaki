@@ -23,12 +23,8 @@ const PROACTIVE_COOLDOWN_MS =
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
 
-const INITIAL_MESSAGES: ChatMessage[] = [
-  {
-    role: "misaki",
-    text: "おかえり😊 今日は乗務？それとも明け？",
-  },
-];
+// 最初は完全に空画面
+const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
   return new Date().toLocaleDateString(
@@ -100,8 +96,7 @@ export default function Home() {
         if (
           Array.isArray(
             parsedMessages
-          ) &&
-          parsedMessages.length > 0
+          )
         ) {
           setMessages(
             parsedMessages.slice(
@@ -192,9 +187,7 @@ export default function Home() {
       STORAGE_KEY
     );
 
-    setMessages(
-      INITIAL_MESSAGES
-    );
+    setMessages([]);
 
     setMessage("");
   }
@@ -531,8 +524,6 @@ export default function Home() {
         );
       }
 
-      // 隠し指示は履歴へ残さず、
-      // 美咲の返事だけ追加する
       setMessages(
         (prev) =>
           [
