@@ -23,6 +23,15 @@ type MisakiTodayMemory = {
   items: string[];
 };
 
+type GeminiResult = {
+  reply?: string;
+  memory?: string[];
+  misakiTodayMemory?: {
+    date?: string;
+    items?: string[];
+  };
+};
+
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
 
@@ -866,6 +875,209 @@ function createRelationshipGuide(
 `.trim();
 }
 
+function hasRealtimeTopic(
+  text: string
+) {
+  const words = [
+    "羽田",
+    "飛行機",
+    "便",
+    "欠航",
+    "遅延",
+    "運航",
+    "電車",
+    "鉄道",
+    "運転見合わせ",
+    "地震",
+    "震度",
+    "警報",
+    "注意報",
+    "雷",
+    "土砂",
+    "台風",
+    "雨",
+    "霧雨",
+    "天気",
+  ];
+
+  return words.some(
+    (word) =>
+      text.includes(word)
+  );
+}
+
+function userIsActuallyInDanger(
+  message: string
+) {
+  const dangerWords = [
+    "事故った",
+    "事故にあった",
+    "事故ったよ",
+    "怪我した",
+    "けがした",
+    "血が出て",
+    "救急車",
+    "病院",
+    "倒れた",
+    "具合悪い",
+    "体調悪い",
+    "熱が",
+    "高熱",
+    "息苦しい",
+    "苦しい",
+    "地震すごい",
+    "揺れすごい",
+    "避難",
+    "冠水",
+    "浸水",
+    "動けない",
+    "閉じ込め",
+  ];
+
+  return dangerWords.some(
+    (word) =>
+      message.includes(word)
+  );
+}
+
+function getReplyProblems(
+  reply: string,
+  message: string,
+  currentTime: string
+) {
+  const problems: string[] = [];
+
+  const realtime =
+    hasRealtimeTopic(reply);
+
+  if (realtime) {
+    const inventedSourcePatterns = [
+      "ニュース見て",
+      "ニュースを見て",
+      "ニュースで見",
+      "テレビで見",
+      "テレビ見て",
+      "SNSで見",
+      "SNS見て",
+      "スマホで見",
+      "スマホ見て",
+      "ネットで見",
+      "ネット見て",
+      "通知が来",
+      "通知きた",
+      "友達から聞",
+      "人から聞",
+      "さっき知った",
+      "今知った",
+      "朝起きて知",
+      "って書いてあった",
+      "と書いてあった",
+    ];
+
+    if (
+      inventedSourcePatterns.some(
+        (pattern) =>
+          reply.includes(pattern)
+      )
+    ) {
+      problems.push(
+        "リアルタイム情報について、与えられていない情報入手経路を作っている"
+      );
+    }
+  }
+
+  if (
+    !userIsActuallyInDanger(
+      message
+    )
+  ) {
+    const automaticConcernPatterns = [
+      "そっちは大丈夫",
+      "大丈夫？",
+      "大丈夫かな",
+      "影響ない？",
+      "影響大丈夫",
+      "平気？",
+      "平気かな",
+      "問題ない？",
+      "無事？",
+      "困ってない？",
+      "仕事大丈夫",
+      "気をつけてね",
+      "気をつけて。",
+      "気をつけて！",
+      "無理しないでね",
+      "無理しないで。",
+      "無理しないで！",
+      "安全第一で",
+      "ちゃんと休んでね",
+      "頑張りすぎないで",
+      "体調に気をつけて",
+    ];
+
+    if (
+      automaticConcernPatterns.some(
+        (pattern) =>
+          reply.includes(pattern)
+      )
+    ) {
+      problems.push(
+        "通常の雑談なのに、AI・カウンセラー的な心配や確認を自動で付けている"
+      );
+    }
+  }
+
+  const hour =
+    getHour(currentTime);
+
+  if (
+    hour >= 0 &&
+    hour < 5
+  ) {
+    const morningPatterns = [
+      "朝から",
+      "朝起きて",
+      "今朝",
+      "朝ニュース",
+      "朝のニュース",
+      "起きたら",
+      "起きてニュース",
+    ];
+
+    if (
+      morningPatterns.some(
+        (pattern) =>
+          reply.includes(pattern)
+      )
+    ) {
+      problems.push(
+        "深夜0時〜4時台なのに、すでに朝になったような表現を使っている"
+      );
+    }
+  }
+
+  return problems;
+}
+
+function parseGeminiText(
+  rawText: unknown
+): GeminiResult | null {
+  if (
+    typeof rawText !== "string" ||
+    !rawText.trim()
+  ) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(
+      rawText
+    ) as GeminiResult;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(
   request: Request
 ) {
@@ -1129,23 +1341,7 @@ export async function POST(
         })
       );
 
-    const response =
-      await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
-
-          body:
-            JSON.stringify({
-              system_instruction: {
-                parts: [
-                  {
-                    text: `
+    const baseSystemPrompt = `
 あなたは「美咲」という38歳の日本人女性です。
 
 ユーザーの恋人として、
@@ -1226,6 +1422,7 @@ ${relationshipGuide}
 「朝起きて知った」
 「通知が来た」
 「友達から聞いた」
+「〜って書いてあった」
 
 など、
 
@@ -1281,6 +1478,18 @@ ${tokyoLifeEventsGuide}
 
 ニュースキャスターのように
 説明しないでください。
+
+上のデータに書かれていない
+警報・注意報・災害の種類や件数を
+勝手に追加しないでください。
+
+「けっこう出てる」
+「たくさん出てる」
+「かなり出てる」
+
+など、
+数や規模が確認できないのに
+誇張しないでください。
 
 羽田なら、
 
@@ -1472,81 +1681,122 @@ misakiTodayMemory に追加してください。
 }
 
 Markdownや説明文は不要です。
-`.trim(),
-                  },
-                ],
-              },
+`.trim();
 
-              contents: [
-                ...contents,
-                {
-                  role: "user",
+    async function generateReply(
+      retryProblems?: string[]
+    ) {
+      const retryGuide =
+        retryProblems &&
+        retryProblems.length > 0
+          ? `
+
+【重要：前の返答は不採用です】
+
+前回の返答には次の問題がありました。
+
+${retryProblems
+  .map(
+    (problem) =>
+      `・${problem}`
+  )
+  .join("\n")}
+
+同じ問題を絶対に繰り返さず、
+最初から自然な返答を
+作り直してください。
+
+禁止表現を別の言葉に
+言い換えて逃げるのも禁止です。
+
+リアルタイム情報は
+与えられた事実だけを使い、
+美咲がどうやって知ったかは
+説明しないでください。
+
+通常の天気・交通・羽田の話では
+ユーザーへの安否確認で締めず、
+普通の感想や一言で終えてください。
+
+例：
+
+「こんな時間なのに雨じめじめしてるね。羽田もちょっと乱れてるみたい。」
+
+「羽田の方ちょっとバタバタしてそうだね。」
+
+必ずJSONだけを返してください。
+`
+          : "";
+
+      const response =
+        await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                system_instruction: {
                   parts: [
                     {
-                      text: message,
+                      text:
+                        baseSystemPrompt +
+                        retryGuide,
                     },
                   ],
                 },
-              ],
 
-              generationConfig: {
-                responseMimeType:
-                  "application/json",
-              },
-            }),
-        }
-      );
+                contents: [
+                  ...contents,
+                  {
+                    role: "user",
+                    parts: [
+                      {
+                        text: message,
+                      },
+                    ],
+                  },
+                ],
 
-    const data =
-      await response.json();
+                generationConfig: {
+                  responseMimeType:
+                    "application/json",
+                },
+              }),
+          }
+        );
 
-    if (!response.ok) {
-      console.error(
-        "GEMINI API ERROR:",
-        data
-      );
+      const data =
+        await response.json();
 
-      return Response.json(
-        {
-          error:
-            "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
+      if (!response.ok) {
+        console.error(
+          "GEMINI API ERROR:",
+          data
+        );
 
-    const rawText =
-      data?.candidates?.[0]
-        ?.content?.parts?.[0]
-        ?.text;
+        return null;
+      }
 
-    if (!rawText) {
-      return Response.json(
-        {
-          error:
-            "美咲から返事が来なかったみたい。もう一度話しかけてね。",
-        },
-        {
-          status: 500,
-        }
+      const rawText =
+        data?.candidates?.[0]
+          ?.content?.parts?.[0]
+          ?.text;
+
+      return parseGeminiText(
+        rawText
       );
     }
 
-    let parsed: {
-      reply?: string;
-      memory?: string[];
-      misakiTodayMemory?: {
-        date?: string;
-        items?: string[];
-      };
-    };
+    let parsed =
+      await generateReply();
 
-    try {
-      parsed =
-        JSON.parse(rawText);
-    } catch {
+    if (!parsed) {
       return Response.json(
         {
           error:
@@ -1558,7 +1808,7 @@ Markdownや説明文は不要です。
       );
     }
 
-    const reply =
+    let reply =
       typeof parsed.reply ===
       "string"
         ? parsed.reply.trim()
@@ -1574,6 +1824,59 @@ Markdownや説明文は不要です。
           status: 500,
         }
       );
+    }
+
+    const firstProblems =
+      getReplyProblems(
+        reply,
+        message,
+        safeCurrentTime
+      );
+
+    if (
+      firstProblems.length > 0
+    ) {
+      console.log(
+        "MISAKI REPLY RETRY:",
+        firstProblems
+      );
+
+      const retryParsed =
+        await generateReply(
+          firstProblems
+        );
+
+      if (retryParsed) {
+        const retryReply =
+          typeof retryParsed.reply ===
+          "string"
+            ? retryParsed.reply.trim()
+            : "";
+
+        if (retryReply) {
+          const retryProblems =
+            getReplyProblems(
+              retryReply,
+              message,
+              safeCurrentTime
+            );
+
+          if (
+            retryProblems.length === 0
+          ) {
+            parsed =
+              retryParsed;
+
+            reply =
+              retryReply;
+          } else {
+            console.warn(
+              "MISAKI RETRY STILL HAS PROBLEMS:",
+              retryProblems
+            );
+          }
+        }
+      }
     }
 
     const updatedMemory =
