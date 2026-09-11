@@ -20,11 +20,23 @@ type MisakiTodayMemory = {
 
 type Plan = "free" | "premium";
 
+type UsageRpcResult = {
+  message_count?: number;
+  remaining?: number;
+  is_premium?: boolean;
+};
+
+type ConsumeRpcResult = {
+  allowed?: boolean;
+  message_count?: number;
+  remaining?: number;
+  is_premium?: boolean;
+};
+
 const STORAGE_KEY = "misaki-chat-history";
 const MEMORY_KEY = "misaki-long-term-memory";
 const PROACTIVE_KEY = "misaki-proactive-state";
 const RELATIONSHIP_KEY = "misaki-relationship-points";
-const DAILY_USAGE_KEY = "misaki-daily-usage";
 const MISAKI_TODAY_MEMORY_KEY =
   "misaki-today-memory";
 
@@ -112,6 +124,26 @@ function isPremiumActive(
   }
 
   return expiresAt > Date.now();
+}
+
+function getFirstRpcRow<T>(
+  value: unknown
+): T | null {
+  if (
+    Array.isArray(value) &&
+    value.length > 0
+  ) {
+    return value[0] as T;
+  }
+
+  if (
+    value &&
+    typeof value === "object"
+  ) {
+    return value as T;
+  }
+
+  return null;
 }
 
 export default function Home() {
@@ -276,6 +308,42 @@ export default function Home() {
       return false;
     }
 
+    async function loadDailyUsage() {
+      const {
+        data,
+        error,
+      } =
+        await supabase.rpc(
+          "get_daily_message_usage"
+        );
+
+      if (error) {
+        throw error;
+      }
+
+      const usage =
+        getFirstRpcRow<UsageRpcResult>(
+          data
+        );
+
+      return {
+        count:
+          typeof usage?.message_count ===
+          "number"
+            ? Math.max(
+                0,
+                Math.floor(
+                  usage.message_count
+                )
+              )
+            : 0,
+
+        isPremium:
+          usage?.is_premium ===
+          true,
+      };
+    }
+
     async function initializeAccount() {
       try {
         const {
@@ -324,20 +392,37 @@ export default function Home() {
           );
         }
 
-        const premium =
-          await loadEntitlement(
-            user.id
-          );
+        const [
+          entitlementPremium,
+          usage,
+        ] =
+          await Promise.all([
+            loadEntitlement(
+              user.id
+            ),
+            loadDailyUsage(),
+          ]);
 
         if (!active) {
           return;
         }
+
+        const premium =
+          entitlementPremium ||
+          usage.isPremium;
 
         setPlan(
           premium
             ? "premium"
             : "free"
         );
+
+        setDailyUsage({
+          date:
+            getJapanDateKey(),
+          count:
+            usage.count,
+        });
       } catch (error) {
         console.error(
           "Supabase account initialization failed:",
@@ -348,6 +433,12 @@ export default function Home() {
           setPlan(
             "free"
           );
+
+          setDailyUsage({
+            date:
+              getJapanDateKey(),
+            count: 0,
+          });
         }
       } finally {
         if (active) {
@@ -469,11 +560,6 @@ export default function Home() {
       const savedRelationship =
         localStorage.getItem(
           RELATIONSHIP_KEY
-        );
-
-      const savedDailyUsage =
-        localStorage.getItem(
-          DAILY_USAGE_KEY
         );
 
       const savedTodayMemory =
@@ -645,52 +731,6 @@ export default function Home() {
           items: [],
         });
       }
-
-      if (
-        savedDailyUsage
-      ) {
-        const parsedUsage =
-          JSON.parse(
-            savedDailyUsage
-          );
-
-        if (
-          parsedUsage &&
-          parsedUsage.date ===
-            currentDate &&
-          typeof parsedUsage.count ===
-            "number" &&
-          Number.isFinite(
-            parsedUsage.count
-          )
-        ) {
-          const count =
-            Math.max(
-              0,
-              Math.floor(
-                parsedUsage.count
-              )
-            );
-
-          setDailyUsage({
-            date:
-              currentDate,
-            count,
-          });
-        } else {
-          setDailyUsage({
-            date:
-              currentDate,
-            count: 0,
-          });
-        }
-      } else {
-        setDailyUsage({
-          date:
-            currentDate,
-          count: 0,
-        });
-      }
     } catch (error) {
       console.error(
         "Failed to load saved data:",
@@ -699,12 +739,6 @@ export default function Home() {
 
       const currentDate =
         getJapanDateKey();
-
-      setDailyUsage({
-        date:
-          currentDate,
-        count: 0,
-      });
 
       setMisakiTodayMemory({
         date:
@@ -847,32 +881,6 @@ export default function Home() {
     loaded,
   ]);
 
-  //
-  // 無料利用回数保存
-  //
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(
-        DAILY_USAGE_KEY,
-        JSON.stringify(
-          dailyUsage
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save daily usage:",
-        error
-      );
-    }
-  }, [
-    dailyUsage,
-    loaded,
-  ]);
-
   async function requestNotificationPermission() {
     if (
       !(
@@ -1010,36 +1018,67 @@ export default function Home() {
     setMemory([]);
   }
 
-  function incrementDailyUsage() {
-    if (isPremium) {
-      return;
+  async function consumeDailyUsage() {
+    const {
+      data,
+      error,
+    } =
+      await supabase.rpc(
+        "consume_daily_message"
+      );
+
+    if (error) {
+      throw error;
     }
 
-    const currentDate =
-      getJapanDateKey();
+    const usage =
+      getFirstRpcRow<ConsumeRpcResult>(
+        data
+      );
 
-    setDailyUsage(
-      (prev) => {
-        if (
-          prev.date !==
-          currentDate
-        ) {
-          return {
-            date:
-              currentDate,
-            count: 1,
-          };
-        }
+    if (!usage) {
+      throw new Error(
+        "利用回数を確認できませんでした。"
+      );
+    }
 
-        return {
-          date:
-            currentDate,
-          count:
-            prev.count +
-            1,
-        };
-      }
-    );
+    const count =
+      typeof usage.message_count ===
+      "number"
+        ? Math.max(
+            0,
+            Math.floor(
+              usage.message_count
+            )
+          )
+        : 0;
+
+    setDailyUsage({
+      date:
+        getJapanDateKey(),
+      count,
+    });
+
+    if (
+      usage.is_premium ===
+      true
+    ) {
+      setPlan(
+        "premium"
+      );
+    }
+
+    return {
+      allowed:
+        usage.allowed ===
+        true,
+
+      count,
+
+      isPremium:
+        usage.is_premium ===
+        true,
+    };
   }
 
   function openPremium() {
@@ -1132,7 +1171,8 @@ export default function Home() {
 
     if (
       !text ||
-      loading
+      loading ||
+      !accountLoaded
     ) {
       return;
     }
@@ -1140,15 +1180,9 @@ export default function Home() {
     const currentDate =
       getJapanDateKey();
 
-    const currentUsage =
-      dailyUsage.date ===
-      currentDate
-        ? dailyUsage.count
-        : 0;
-
     if (
       !isPremium &&
-      currentUsage >=
+      usageCountToday >=
         FREE_DAILY_LIMIT
     ) {
       setShowPremium(
@@ -1157,33 +1191,50 @@ export default function Home() {
       return;
     }
 
-    const userMessage:
-      ChatMessage = {
-        role: "user",
-        text,
-      };
-
-    const newMessages =
-      [
-        ...messages,
-        userMessage,
-      ].slice(
-        -MAX_MESSAGES
-      );
-
-    setMessages(
-      newMessages
-    );
-
-    setMessage("");
-
     setLoading(true);
 
-    const nextRelationshipPoints =
-      relationshipPoints +
-      1;
-
     try {
+      //
+      // Supabase側で送信1回分を確保
+      //
+      const usage =
+        await consumeDailyUsage();
+
+      if (
+        !usage.allowed &&
+        !usage.isPremium
+      ) {
+        setShowPremium(
+          true
+        );
+
+        return;
+      }
+
+      const userMessage:
+        ChatMessage = {
+          role: "user",
+          text,
+        };
+
+      const newMessages =
+        [
+          ...messages,
+          userMessage,
+        ].slice(
+          -MAX_MESSAGES
+        );
+
+      setMessages(
+        newMessages
+      );
+
+      setMessage("");
+
+      const nextRelationshipPoints =
+        relationshipPoints +
+        1;
+
       const currentTime =
         getJapanCurrentTime();
 
@@ -1266,8 +1317,6 @@ export default function Home() {
       setRelationshipPoints(
         nextRelationshipPoints
       );
-
-      incrementDailyUsage();
 
       setMessages(
         (prev) =>
@@ -2091,12 +2140,15 @@ export default function Home() {
             }
           }}
           placeholder={
-            freeLimitReached
-              ? "今日は無料分を使い切りました"
-              : "美咲に話しかける..."
+            !accountLoaded
+              ? "準備中..."
+              : freeLimitReached
+                ? "今日は無料分を使い切りました"
+                : "美咲に話しかける..."
           }
           disabled={
             loading ||
+            !accountLoaded ||
             freeLimitReached
           }
         />
@@ -2108,14 +2160,17 @@ export default function Home() {
               : sendMessage
           }
           disabled={
-            loading
+            loading ||
+            !accountLoaded
           }
         >
-          {loading
-            ? "入力中"
-            : freeLimitReached
-              ? "続きを話す"
-              : "送信"}
+          {!accountLoaded
+            ? "準備中"
+            : loading
+              ? "入力中"
+              : freeLimitReached
+                ? "続きを話す"
+                : "送信"}
         </button>
       </section>
     </main>
