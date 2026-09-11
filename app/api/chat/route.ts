@@ -8,7 +8,7 @@ type ChatMessage = {
   role: "misaki" | "user";
   text: string;
 };
-じ
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
