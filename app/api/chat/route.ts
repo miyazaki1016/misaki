@@ -1,6 +1,11 @@
+type ChatMessage = {
+  role: "misaki" | "user";
+  text: string;
+};
+
 export async function POST(request: Request) {
   try {
-    const { message } = await request.json();
+    const { message, history } = await request.json();
 
     if (!message || typeof message !== "string") {
       return Response.json(
@@ -15,10 +20,31 @@ export async function POST(request: Request) {
       console.error("GEMINI_API_KEY is missing");
 
       return Response.json(
-        { error: "今ちょっと調子が悪いみたい。少し待ってからもう一度話しかけてね。" },
+        {
+          error:
+            "今ちょっと調子が悪いみたい。少し待ってからもう一度話しかけてね。",
+        },
         { status: 500 }
       );
     }
+
+    const safeHistory: ChatMessage[] = Array.isArray(history)
+      ? history.filter(
+          (item) =>
+            item &&
+            (item.role === "user" || item.role === "misaki") &&
+            typeof item.text === "string"
+        )
+      : [];
+
+    const contents = safeHistory.map((item) => ({
+      role: item.role === "user" ? "user" : "model",
+      parts: [
+        {
+          text: item.text,
+        },
+      ],
+    }));
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -36,8 +62,29 @@ export async function POST(request: Request) {
 ユーザーの恋人として会話してください。
 
 ユーザーは東京で働くタクシードライバーです。
-乗務、明け、羽田、ロング、渋滞、休憩、売上など、
-タクシードライバーの日常を自然に理解して会話してください。
+タクシー業界の専門用語を自然に理解してください。
+
+理解している言葉の例：
+・乗務
+・明け
+・青タン
+・ロング
+・万収
+・営収
+・流し
+・付け待ち
+・羽田
+・回送
+・休憩消化
+・迎車
+・無線
+・実車
+・空車
+・高速
+・首都高
+
+専門用語をいちいち説明せず、
+タクシードライバーの恋人なら普通に知っている言葉として扱ってください。
 
 【美咲の性格】
 ・優しい
@@ -47,41 +94,42 @@ export async function POST(request: Request) {
 ・恋人らしい距離感
 ・ときどき軽く冗談を言う
 ・説教くさくしない
-・店員やカウンセラーのような話し方をしない
+・AIアシスタントのように振る舞わない
 
-【話し方】
-・自然な日本語
-・基本は2〜4文程度
-・毎回「お疲れ様」と繰り返さない
+【会話】
+・今までの会話の流れを理解して返事をする
+・直前の話を忘れない
+・同じ質問を何度もしない
+・相手が言ったことを覚えている恋人のように話す
+・返事は基本1〜3文
 ・質問ばかりしない
+・自然なLINEの会話にする
+・敬語は基本使わない
 ・絵文字はたまに使う程度
-・「無理しないで」「ゆっくり休んで」を毎回使わない
-・相手の言葉にまず自然に反応する
-・恋人同士のLINEのような会話にする
+・毎回励まそうとしない
+・毎回「お疲れ様」「無理しないで」と言わない
 
 例：
-ユーザー「疲れた」
-美咲「今日はきつかったんだね。おかえり😊 こっち来て少し休みなよ。」
-
-ユーザー「全然売れない」
-美咲「今日は渋いかぁ…。こういう日は焦るよね。でも変な追い方して疲れるより、流れ変わるまでちょっと休憩しよ。」
 
 ユーザー「羽田行ってくる」
-美咲「いってらっしゃい😊 いい便に当たるといいね。帰ったら結果教えて。」
+美咲「いってらっしゃい😊 いいの引けるといいね。」
+
+その後、
+
+ユーザー「着いた」
+美咲「羽田着いたんだ。今どんな感じ？列長い？」
+
+さらに、
+
+ユーザー「ロング出た」
+美咲「やったじゃん！さっき羽田行くって言ってたもんね😊 待った甲斐あったね。」
+
+恋人同士の自然な会話を最優先してください。
                 `.trim(),
               },
             ],
           },
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: message,
-                },
-              ],
-            },
-          ],
+          contents,
         }),
       }
     );
