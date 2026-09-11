@@ -1,3 +1,4 @@
+import { createClient } from "@supabase/supabase-js";
 import {
   createTokyoLifeEventsGuide,
   getTokyoLifeEvents,
@@ -32,8 +33,21 @@ type GeminiResult = {
   };
 };
 
+type UsageResult = {
+  allowed?: boolean;
+  message_count?: number;
+  remaining?: number;
+  is_premium?: boolean;
+};
+
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
+
+const SUPABASE_URL =
+  "https://tzozajnwznxqgxnjikoy.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
 
 function hashText(text: string) {
   let hash = 0;
@@ -78,6 +92,26 @@ function getDateKey(
     0,
     10
   );
+}
+
+function getFirstRow<T>(
+  value: unknown
+): T | null {
+  if (
+    Array.isArray(value) &&
+    value.length > 0
+  ) {
+    return value[0] as T;
+  }
+
+  if (
+    value &&
+    typeof value === "object"
+  ) {
+    return value as T;
+  }
+
+  return null;
 }
 
 function weatherCodeToText(
@@ -1078,6 +1112,29 @@ function parseGeminiText(
   }
 }
 
+function createAuthenticatedSupabase(
+  accessToken: string
+) {
+  return createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      global: {
+        headers: {
+          Authorization:
+            `Bearer ${accessToken}`,
+        },
+      },
+
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    }
+  );
+}
+
 export async function POST(
   request: Request
 ) {
@@ -1122,6 +1179,173 @@ export async function POST(
           status: 500,
         }
       );
+    }
+
+    //
+    // Supabase認証
+    //
+    const authorization =
+      request.headers.get(
+        "authorization"
+      ) ?? "";
+
+    if (
+      !authorization.startsWith(
+        "Bearer "
+      )
+    ) {
+      return Response.json(
+        {
+          error:
+            "ログイン情報を確認できませんでした。ページを再読み込みしてね。",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    const accessToken =
+      authorization
+        .slice(
+          "Bearer ".length
+        )
+        .trim();
+
+    if (!accessToken) {
+      return Response.json(
+        {
+          error:
+            "ログイン情報を確認できませんでした。ページを再読み込みしてね。",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    const supabase =
+      createAuthenticatedSupabase(
+        accessToken
+      );
+
+    const {
+      data: userData,
+      error: userError,
+    } =
+      await supabase.auth.getUser(
+        accessToken
+      );
+
+    if (
+      userError ||
+      !userData.user
+    ) {
+      console.error(
+        "SUPABASE AUTH ERROR:",
+        userError
+      );
+
+      return Response.json(
+        {
+          error:
+            "ログイン情報を確認できませんでした。ページを再読み込みしてね。",
+        },
+        {
+          status: 401,
+        }
+      );
+    }
+
+    const isProactive =
+      message.includes(
+        "自発会話のきっかけ"
+      );
+
+    //
+    // 通常のユーザーメッセージだけ
+    // Supabase側で1回消費する
+    //
+    let usage:
+      UsageResult | null =
+      null;
+
+    if (!isProactive) {
+      const {
+        data: usageData,
+        error: usageError,
+      } =
+        await supabase.rpc(
+          "consume_daily_message"
+        );
+
+      if (usageError) {
+        console.error(
+          "USAGE RPC ERROR:",
+          usageError
+        );
+
+        return Response.json(
+          {
+            error:
+              "利用回数を確認できませんでした。少ししてからもう一度試してね。",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
+
+      usage =
+        getFirstRow<UsageResult>(
+          usageData
+        );
+
+      if (!usage) {
+        return Response.json(
+          {
+            error:
+              "利用回数を確認できませんでした。少ししてからもう一度試してね。",
+          },
+          {
+            status: 500,
+          }
+        );
+      }
+
+      if (
+        usage.allowed !==
+          true &&
+        usage.is_premium !==
+          true
+      ) {
+        return Response.json(
+          {
+            error:
+              "今日は無料分の20回まで話したよ。",
+            usage: {
+              messageCount:
+                typeof usage.message_count ===
+                "number"
+                  ? usage.message_count
+                  : 20,
+
+              remaining:
+                typeof usage.remaining ===
+                "number"
+                  ? usage.remaining
+                  : 0,
+
+              isPremium:
+                usage.is_premium ===
+                true,
+            },
+          },
+          {
+            status: 429,
+          }
+        );
+      }
     }
 
     const safeHistory:
@@ -1280,11 +1504,6 @@ export async function POST(
     const tokyoLifeEventsGuide =
       createTokyoLifeEventsGuide(
         tokyoLifeEvents
-      );
-
-    const isProactive =
-      message.includes(
-        "自発会話のきっかけ"
       );
 
     const recentMisakiMessages =
@@ -1925,6 +2144,7 @@ ${retryProblems
     const updatedTodayMemory:
       MisakiTodayMemory = {
       date: currentDate,
+
       items:
         Array.from(
           new Set(
@@ -1937,12 +2157,40 @@ ${retryProblems
 
     return Response.json({
       reply,
+
       memory:
         updatedMemory,
+
       misakiTodayMemory:
         updatedTodayMemory,
+
       relationshipPoints:
         safeRelationshipPoints,
+
+      ...(
+        !isProactive &&
+        usage
+          ? {
+              usage: {
+                messageCount:
+                  typeof usage.message_count ===
+                  "number"
+                    ? usage.message_count
+                    : 0,
+
+                remaining:
+                  typeof usage.remaining ===
+                  "number"
+                    ? usage.remaining
+                    : 0,
+
+                isPremium:
+                  usage.is_premium ===
+                  true,
+              },
+            }
+          : {}
+      ),
     });
   } catch (error) {
     console.error(
