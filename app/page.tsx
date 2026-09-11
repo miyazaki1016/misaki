@@ -1707,7 +1707,7 @@ export default function Home() {
           ) => {
             if (
               e.key ===
-              "Enter"ん
+              "Enter"
             ) {
               sendMessage();
             }
