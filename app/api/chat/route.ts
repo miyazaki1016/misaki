@@ -8,7 +8,7 @@ type ChatMessage = {
   role: "misaki" | "user";
   text: string;
 };
-
+じ
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -1337,10 +1337,7 @@ export async function POST(
       );
     }
 
-    const isProactive =
-      message.includes(
-        "自発会話のきっかけ"
-      );
+    const isProactive = false;
 
     //
     // 通常のユーザーメッセージだけ
