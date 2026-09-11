@@ -313,7 +313,8 @@ export default function Home() {
 
         body: JSON.stringify({
           message: text,
-          history: newMessages,
+          history:
+            messages.slice(-MAX_MESSAGES),
           memory,
           currentTime,
         }),
