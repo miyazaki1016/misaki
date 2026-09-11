@@ -1,3 +1,5 @@
+// Redeploy Gemini 3.6
+
 export async function POST(request: Request) {
   try {
     const { message } = await request.json();
