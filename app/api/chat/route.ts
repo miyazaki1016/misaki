@@ -1,3 +1,8 @@
+import {
+  createTokyoLifeEventsGuide,
+  getTokyoLifeEvents,
+} from "../../../lib/tokyo-life-events";
+
 type ChatMessage = {
   role: "misaki" | "user";
   text: string;
