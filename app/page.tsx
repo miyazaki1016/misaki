@@ -13,6 +13,11 @@ type DailyUsage = {
   count: number;
 };
 
+type MisakiTodayMemory = {
+  date: string;
+  items: string[];
+};
+
 type Plan = "free" | "premium";
 
 const STORAGE_KEY = "misaki-chat-history";
@@ -20,6 +25,8 @@ const MEMORY_KEY = "misaki-long-term-memory";
 const PROACTIVE_KEY = "misaki-proactive-state";
 const RELATIONSHIP_KEY = "misaki-relationship-points";
 const DAILY_USAGE_KEY = "misaki-daily-usage";
+const MISAKI_TODAY_MEMORY_KEY =
+  "misaki-today-memory";
 
 const MAX_MESSAGES = 60;
 
@@ -27,41 +34,61 @@ const MAX_MESSAGES = 60;
 const FREE_DAILY_LIMIT = 20;
 
 // 10分ごとに、美咲から話しかける条件を確認
-const PROACTIVE_CHECK_MS = 10 * 60 * 1000;
+const PROACTIVE_CHECK_MS =
+  10 * 60 * 1000;
 
 // 自発メッセージ同士は最低45分空ける
-const PROACTIVE_COOLDOWN_MS = 45 * 60 * 1000;
+const PROACTIVE_COOLDOWN_MS =
+  45 * 60 * 1000;
 
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
 
-const INITIAL_MESSAGES: ChatMessage[] = [];
+const INITIAL_MESSAGES: ChatMessage[] =
+  [];
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return new Date().toLocaleDateString(
+    "ja-JP",
+    {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }
+  );
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  return new Date().toLocaleString(
+    "ja-JP",
+    {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }
+  );
+}
+
+function createEmptyTodayMemory():
+  MisakiTodayMemory {
+  return {
+    date: getJapanDateKey(),
+    items: [],
+  };
 }
 
 function isPremiumActive(
   plan: string | null | undefined,
-  premiumUntil: string | null | undefined
+  premiumUntil:
+    | string
+    | null
+    | undefined
 ) {
   if (plan !== "premium") {
     return false;
@@ -71,9 +98,16 @@ function isPremiumActive(
     return true;
   }
 
-  const expiresAt = new Date(premiumUntil).getTime();
+  const expiresAt =
+    new Date(
+      premiumUntil
+    ).getTime();
 
-  if (!Number.isFinite(expiresAt)) {
+  if (
+    !Number.isFinite(
+      expiresAt
+    )
+  ) {
     return false;
   }
 
@@ -81,65 +115,112 @@ function isPremiumActive(
 }
 
 export default function Home() {
-  const [message, setMessage] = useState("");
+  const [
+    message,
+    setMessage,
+  ] = useState("");
 
-  const [messages, setMessages] =
-    useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [
+    messages,
+    setMessages,
+  ] =
+    useState<ChatMessage[]>(
+      INITIAL_MESSAGES
+    );
 
-  const [memory, setMemory] = useState<string[]>([]);
+  const [
+    memory,
+    setMemory,
+  ] = useState<string[]>([]);
 
-  const [relationshipPoints, setRelationshipPoints] =
-    useState(0);
+  const [
+    misakiTodayMemory,
+    setMisakiTodayMemory,
+  ] =
+    useState<MisakiTodayMemory>(
+      createEmptyTodayMemory()
+    );
 
-  const [dailyUsage, setDailyUsage] =
+  const [
+    relationshipPoints,
+    setRelationshipPoints,
+  ] = useState(0);
+
+  const [
+    dailyUsage,
+    setDailyUsage,
+  ] =
     useState<DailyUsage>({
-      date: getJapanDateKey(),
+      date:
+        getJapanDateKey(),
       count: 0,
     });
 
-  const [plan, setPlan] =
+  const [
+    plan,
+    setPlan,
+  ] =
     useState<Plan>("free");
 
-  const [accountLoaded, setAccountLoaded] =
-    useState(false);
+  const [
+    accountLoaded,
+    setAccountLoaded,
+  ] = useState(false);
 
-  const [showPremium, setShowPremium] =
-    useState(false);
+  const [
+    showPremium,
+    setShowPremium,
+  ] = useState(false);
 
-  const [showMemory, setShowMemory] =
-    useState(false);
+  const [
+    showMemory,
+    setShowMemory,
+  ] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [
+    loading,
+    setLoading,
+  ] = useState(false);
 
-  const [loaded, setLoaded] =
-    useState(false);
+  const [
+    loaded,
+    setLoaded,
+  ] = useState(false);
 
   const [
     notificationPermission,
     setNotificationPermission,
   ] = useState<
-    "default" | "granted" | "denied" | "unsupported"
+    | "default"
+    | "granted"
+    | "denied"
+    | "unsupported"
   >("default");
 
-  const isPremium = plan === "premium";
+  const isPremium =
+    plan === "premium";
 
-  const today = getJapanDateKey();
+  const today =
+    getJapanDateKey();
 
   const usageCountToday =
-    dailyUsage.date === today
+    dailyUsage.date ===
+    today
       ? dailyUsage.count
       : 0;
 
-  const freeRemaining = Math.max(
-    0,
-    FREE_DAILY_LIMIT - usageCountToday
-  );
+  const freeRemaining =
+    Math.max(
+      0,
+      FREE_DAILY_LIMIT -
+        usageCountToday
+    );
 
   const freeLimitReached =
     accountLoaded &&
     !isPremium &&
-    usageCountToday >= FREE_DAILY_LIMIT;
+    usageCountToday >=
+      FREE_DAILY_LIMIT;
 
   //
   // Supabaseユーザー初期化
@@ -150,9 +231,6 @@ export default function Home() {
     async function loadEntitlement(
       userId: string
     ) {
-      // 新規匿名ユーザーの場合、
-      // DBトリガーで権限レコードが作られるまで
-      // 少し時間がかかる場合があるためリトライする。
       for (
         let attempt = 0;
         attempt < 5;
@@ -161,13 +239,19 @@ export default function Home() {
         const {
           data,
           error,
-        } = await supabase
-          .from("user_entitlements")
-          .select(
-            "plan,premium_until"
-          )
-          .eq("user_id", userId)
-          .maybeSingle();
+        } =
+          await supabase
+            .from(
+              "user_entitlements"
+            )
+            .select(
+              "plan,premium_until"
+            )
+            .eq(
+              "user_id",
+              userId
+            )
+            .maybeSingle();
 
         if (error) {
           throw error;
@@ -195,32 +279,43 @@ export default function Home() {
     async function initializeAccount() {
       try {
         const {
-          data: sessionData,
-          error: sessionError,
+          data:
+            sessionData,
+          error:
+            sessionError,
         } =
           await supabase.auth.getSession();
 
-        if (sessionError) {
+        if (
+          sessionError
+        ) {
           throw sessionError;
         }
 
         let user =
-          sessionData.session?.user ??
+          sessionData
+            .session
+            ?.user ??
           null;
 
         if (!user) {
           const {
-            data: signInData,
-            error: signInError,
+            data:
+              signInData,
+            error:
+              signInError,
           } =
             await supabase.auth.signInAnonymously();
 
-          if (signInError) {
+          if (
+            signInError
+          ) {
             throw signInError;
           }
 
           user =
-            signInData.user ?? null;
+            signInData.user ??
+            null;
         }
 
         if (!user) {
@@ -250,13 +345,15 @@ export default function Home() {
         );
 
         if (active) {
-          // Supabaseに接続できなかった場合は
-          // 安全側として無料プランとして扱う
-          setPlan("free");
+          setPlan(
+            "free"
+          );
         }
       } finally {
         if (active) {
-          setAccountLoaded(true);
+          setAccountLoaded(
+            true
+          );
         }
       }
     }
@@ -269,15 +366,19 @@ export default function Home() {
   }, []);
 
   //
-  // プレミアム状態に応じた表示
+  // プレミアム状態
   //
   useEffect(() => {
-    if (!accountLoaded) {
+    if (
+      !accountLoaded
+    ) {
       return;
     }
 
     if (isPremium) {
-      setShowPremium(false);
+      setShowPremium(
+        false
+      );
       return;
     }
 
@@ -285,7 +386,9 @@ export default function Home() {
       usageCountToday >=
       FREE_DAILY_LIMIT
     ) {
-      setShowPremium(true);
+      setShowPremium(
+        true
+      );
     }
   }, [
     accountLoaded,
@@ -301,22 +404,29 @@ export default function Home() {
       "serviceWorker" in
       navigator
     ) {
-      navigator.serviceWorker
-        .register("/sw.js")
+      navigator
+        .serviceWorker
+        .register(
+          "/sw.js"
+        )
         .then(
-          (registration) => {
+          (
+            registration
+          ) => {
             console.log(
               "Service Worker registered:",
               registration
             );
           }
         )
-        .catch((error) => {
-          console.error(
-            "Service Worker registration failed:",
-            error
-          );
-        });
+        .catch(
+          (error) => {
+            console.error(
+              "Service Worker registration failed:",
+              error
+            );
+          }
+        );
     }
   }, []);
 
@@ -366,23 +476,34 @@ export default function Home() {
           DAILY_USAGE_KEY
         );
 
+      const savedTodayMemory =
+        localStorage.getItem(
+          MISAKI_TODAY_MEMORY_KEY
+        );
+
       let parsedMessages:
         | ChatMessage[]
         | null = null;
 
-      if (savedMessages) {
+      if (
+        savedMessages
+      ) {
         const parsed =
           JSON.parse(
             savedMessages
           );
 
         if (
-          Array.isArray(parsed)
+          Array.isArray(
+            parsed
+          )
         ) {
           parsedMessages =
             parsed
               .filter(
-                (item) =>
+                (
+                  item
+                ) =>
                   item &&
                   (item.role ===
                     "user" ||
@@ -401,7 +522,9 @@ export default function Home() {
         }
       }
 
-      if (savedMemory) {
+      if (
+        savedMemory
+      ) {
         const parsedMemory =
           JSON.parse(
             savedMemory
@@ -414,7 +537,9 @@ export default function Home() {
         ) {
           setMemory(
             parsedMemory.filter(
-              (item) =>
+              (
+                item
+              ) =>
                 typeof item ===
                 "string"
             )
@@ -447,7 +572,9 @@ export default function Home() {
       ) {
         const previousUserMessages =
           parsedMessages.filter(
-            (item) =>
+            (
+              item
+            ) =>
               item.role ===
               "user"
           ).length;
@@ -460,7 +587,68 @@ export default function Home() {
       const currentDate =
         getJapanDateKey();
 
-      if (savedDailyUsage) {
+      if (
+        savedTodayMemory
+      ) {
+        const parsedTodayMemory =
+          JSON.parse(
+            savedTodayMemory
+          );
+
+        if (
+          parsedTodayMemory &&
+          parsedTodayMemory.date ===
+            currentDate &&
+          Array.isArray(
+            parsedTodayMemory.items
+          )
+        ) {
+          setMisakiTodayMemory({
+            date:
+              currentDate,
+            items:
+              parsedTodayMemory.items
+                .filter(
+                  (
+                    item:
+                      unknown
+                  ) =>
+                    typeof item ===
+                      "string" &&
+                    item
+                      .trim()
+                      .length >
+                      0
+                )
+                .map(
+                  (
+                    item:
+                      string
+                  ) =>
+                    item.trim()
+                )
+                .slice(
+                  -12
+                ),
+          });
+        } else {
+          setMisakiTodayMemory({
+            date:
+              currentDate,
+            items: [],
+          });
+        }
+      } else {
+        setMisakiTodayMemory({
+          date:
+            currentDate,
+          items: [],
+        });
+      }
+
+      if (
+        savedDailyUsage
+      ) {
         const parsedUsage =
           JSON.parse(
             savedDailyUsage
@@ -485,18 +673,21 @@ export default function Home() {
             );
 
           setDailyUsage({
-            date: currentDate,
+            date:
+              currentDate,
             count,
           });
         } else {
           setDailyUsage({
-            date: currentDate,
+            date:
+              currentDate,
             count: 0,
           });
         }
       } else {
         setDailyUsage({
-          date: currentDate,
+          date:
+            currentDate,
           count: 0,
         });
       }
@@ -506,10 +697,19 @@ export default function Home() {
         error
       );
 
+      const currentDate =
+        getJapanDateKey();
+
       setDailyUsage({
         date:
-          getJapanDateKey(),
+          currentDate,
         count: 0,
+      });
+
+      setMisakiTodayMemory({
+        date:
+          currentDate,
+        items: [],
       });
     } finally {
       setLoaded(true);
@@ -520,7 +720,9 @@ export default function Home() {
   // 会話履歴保存
   //
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      return;
+    }
 
     try {
       const limitedMessages =
@@ -540,13 +742,18 @@ export default function Home() {
         error
       );
     }
-  }, [messages, loaded]);
+  }, [
+    messages,
+    loaded,
+  ]);
 
   //
   // 長期記憶保存
   //
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      return;
+    }
 
     try {
       localStorage.setItem(
@@ -561,13 +768,66 @@ export default function Home() {
         error
       );
     }
-  }, [memory, loaded]);
+  }, [
+    memory,
+    loaded,
+  ]);
+
+  //
+  // 美咲の今日の記憶保存
+  //
+  useEffect(() => {
+    if (!loaded) {
+      return;
+    }
+
+    try {
+      const currentDate =
+        getJapanDateKey();
+
+      const safeTodayMemory =
+        misakiTodayMemory.date ===
+        currentDate
+          ? misakiTodayMemory
+          : {
+              date:
+                currentDate,
+              items: [],
+            };
+
+      localStorage.setItem(
+        MISAKI_TODAY_MEMORY_KEY,
+        JSON.stringify(
+          safeTodayMemory
+        )
+      );
+
+      if (
+        misakiTodayMemory.date !==
+        currentDate
+      ) {
+        setMisakiTodayMemory(
+          safeTodayMemory
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Failed to save Misaki today memory:",
+        error
+      );
+    }
+  }, [
+    misakiTodayMemory,
+    loaded,
+  ]);
 
   //
   // 関係性ポイント保存
   //
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      return;
+    }
 
     try {
       localStorage.setItem(
@@ -591,7 +851,9 @@ export default function Home() {
   // 無料利用回数保存
   //
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      return;
+    }
 
     try {
       localStorage.setItem(
@@ -712,11 +974,16 @@ export default function Home() {
       return;
     }
 
-    setMemory((prev) =>
-      prev.filter(
-        (_, i) =>
-          i !== index
-      )
+    setMemory(
+      (prev) =>
+        prev.filter(
+          (
+            _,
+            i
+          ) =>
+            i !==
+            index
+        )
     );
   }
 
@@ -744,8 +1011,6 @@ export default function Home() {
   }
 
   function incrementDailyUsage() {
-    // プレミアムユーザーは
-    // 無料利用回数を消費しない
     if (isPremium) {
       return;
     }
@@ -770,7 +1035,8 @@ export default function Home() {
           date:
             currentDate,
           count:
-            prev.count + 1,
+            prev.count +
+            1,
         };
       }
     );
@@ -781,13 +1047,83 @@ export default function Home() {
       return;
     }
 
-    setShowPremium(true);
+    setShowPremium(
+      true
+    );
   }
 
   function startPremium() {
     alert(
       "プレミアム決済は次の工程で接続します。今はまだ料金は発生しません。"
     );
+  }
+
+  function applyTodayMemory(
+    value: unknown
+  ) {
+    if (
+      !value ||
+      typeof value !==
+        "object"
+    ) {
+      return;
+    }
+
+    const data =
+      value as {
+        date?: unknown;
+        items?: unknown;
+      };
+
+    const currentDate =
+      getJapanDateKey();
+
+    if (
+      data.date !==
+        currentDate ||
+      !Array.isArray(
+        data.items
+      )
+    ) {
+      return;
+    }
+
+    const items =
+      data.items
+        .filter(
+          (
+            item:
+              unknown
+          ) =>
+            typeof item ===
+              "string" &&
+            item
+              .trim()
+              .length >
+              0
+        )
+        .map(
+          (
+            item
+          ) =>
+            (
+              item as string
+            ).trim()
+        )
+        .slice(
+          -12
+        );
+
+    setMisakiTodayMemory({
+      date:
+        currentDate,
+      items:
+        Array.from(
+          new Set(
+            items
+          )
+        ),
+    });
   }
 
   async function sendMessage() {
@@ -815,22 +1151,25 @@ export default function Home() {
       currentUsage >=
         FREE_DAILY_LIMIT
     ) {
-      setShowPremium(true);
+      setShowPremium(
+        true
+      );
       return;
     }
 
-    const userMessage: ChatMessage =
-      {
+    const userMessage:
+      ChatMessage = {
         role: "user",
         text,
       };
 
-    const newMessages = [
-      ...messages,
-      userMessage,
-    ].slice(
-      -MAX_MESSAGES
-    );
+    const newMessages =
+      [
+        ...messages,
+        userMessage,
+      ].slice(
+        -MAX_MESSAGES
+      );
 
     setMessages(
       newMessages
@@ -841,11 +1180,22 @@ export default function Home() {
     setLoading(true);
 
     const nextRelationshipPoints =
-      relationshipPoints + 1;
+      relationshipPoints +
+      1;
 
     try {
       const currentTime =
         getJapanCurrentTime();
+
+      const todayMemoryForRequest =
+        misakiTodayMemory.date ===
+        currentDate
+          ? misakiTodayMemory
+          : {
+              date:
+                currentDate,
+              items: [],
+            };
 
       const res =
         await fetch(
@@ -870,6 +1220,9 @@ export default function Home() {
                   ),
 
                 memory,
+
+                misakiTodayMemory:
+                  todayMemoryForRequest,
 
                 currentTime,
 
@@ -897,13 +1250,18 @@ export default function Home() {
         setMemory(
           data.memory.filter(
             (
-              item: unknown
+              item:
+                unknown
             ) =>
               typeof item ===
               "string"
           )
         );
       }
+
+      applyTodayMemory(
+        data.misakiTodayMemory
+      );
 
       setRelationshipPoints(
         nextRelationshipPoints
@@ -969,7 +1327,8 @@ export default function Home() {
     if (
       message
         .trim()
-        .length > 0
+        .length >
+      0
     ) {
       return;
     }
@@ -1046,17 +1405,27 @@ export default function Home() {
       return;
     }
 
-    const hiddenInstruction: ChatMessage =
-      {
+    const hiddenInstruction:
+      ChatMessage = {
         role: "user",
 
         text:
-          "【これは画面には表示されない自発会話のきっかけです】ユーザーからメッセージが来たわけではありません。美咲のほうから、今の時間帯・今日の美咲自身の生活・直近の会話・長期記憶を参考にして、恋人へ自然にひとことLINEしてください。質問を無理につけず、1〜2文程度にしてください。話すことが特になければ、美咲自身の今の様子や気分を短く話してください。",
+          "【これは画面には表示されない自発会話のきっかけです】ユーザーからメッセージが来たわけではありません。美咲のほうから、今の時間帯・今日の美咲自身の生活・今日すでに起きた美咲自身の出来事・直近の会話・長期記憶を参考にして、恋人へ自然にひとことLINEしてください。質問を無理につけず、1〜2文程度にしてください。話すことが特になければ、美咲自身の今の様子や気分を短く話してください。",
       };
 
     try {
       const currentTime =
         getJapanCurrentTime();
+
+      const todayMemoryForRequest =
+        misakiTodayMemory.date ===
+        currentDate
+          ? misakiTodayMemory
+          : {
+              date:
+                currentDate,
+              items: [],
+            };
 
       const res =
         await fetch(
@@ -1081,6 +1450,9 @@ export default function Home() {
                   ),
 
                 memory,
+
+                misakiTodayMemory:
+                  todayMemoryForRequest,
 
                 currentTime,
 
@@ -1117,13 +1489,18 @@ export default function Home() {
         setMemory(
           data.memory.filter(
             (
-              item: unknown
+              item:
+                unknown
             ) =>
               typeof item ===
               "string"
           )
         );
       }
+
+      applyTodayMemory(
+        data.misakiTodayMemory
+      );
 
       setMessages(
         (prev) =>
@@ -1190,6 +1567,7 @@ export default function Home() {
     message,
     messages,
     memory,
+    misakiTodayMemory,
     relationshipPoints,
   ]);
 
