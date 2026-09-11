@@ -8,6 +8,7 @@ type ChatMessage = {
 };
 
 const STORAGE_KEY = "misaki-chat-history";
+const MEMORY_KEY = "misaki-long-term-memory";
 const MAX_MESSAGES = 60;
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -20,22 +21,39 @@ const INITIAL_MESSAGES: ChatMessage[] = [
 export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
+  const [memory, setMemory] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const savedMessages = localStorage.getItem(STORAGE_KEY);
+      const savedMemory = localStorage.getItem(MEMORY_KEY);
 
-      if (saved) {
-        const parsed = JSON.parse(saved);
+      if (savedMessages) {
+        const parsedMessages = JSON.parse(savedMessages);
 
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed.slice(-MAX_MESSAGES));
+        if (
+          Array.isArray(parsedMessages) &&
+          parsedMessages.length > 0
+        ) {
+          setMessages(parsedMessages.slice(-MAX_MESSAGES));
+        }
+      }
+
+      if (savedMemory) {
+        const parsedMemory = JSON.parse(savedMemory);
+
+        if (Array.isArray(parsedMemory)) {
+          setMemory(
+            parsedMemory.filter(
+              (item) => typeof item === "string"
+            )
+          );
         }
       }
     } catch (error) {
-      console.error("Failed to load chat history:", error);
+      console.error("Failed to load saved data:", error);
     } finally {
       setLoaded(true);
     }
@@ -46,6 +64,7 @@ export default function Home() {
 
     try {
       const limitedMessages = messages.slice(-MAX_MESSAGES);
+
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(limitedMessages)
@@ -54,6 +73,19 @@ export default function Home() {
       console.error("Failed to save chat history:", error);
     }
   }, [messages, loaded]);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    try {
+      localStorage.setItem(
+        MEMORY_KEY,
+        JSON.stringify(memory)
+      );
+    } catch (error) {
+      console.error("Failed to save memory:", error);
+    }
+  }, [memory, loaded]);
 
   function resetChat() {
     const confirmed = window.confirm(
@@ -77,7 +109,9 @@ export default function Home() {
       text,
     };
 
-    const newMessages = [...messages, userMessage].slice(-MAX_MESSAGES);
+    const newMessages = [...messages, userMessage].slice(
+      -MAX_MESSAGES
+    );
 
     setMessages(newMessages);
     setMessage("");
@@ -92,13 +126,24 @@ export default function Home() {
         body: JSON.stringify({
           message: text,
           history: newMessages,
+          memory,
         }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.error || "通信に失敗しました");
+        throw new Error(
+          data?.error || "通信に失敗しました"
+        );
+      }
+
+      if (Array.isArray(data.memory)) {
+        setMemory(
+          data.memory.filter(
+            (item: unknown) => typeof item === "string"
+          )
+        );
       }
 
       setMessages((prev) =>
@@ -106,7 +151,9 @@ export default function Home() {
           ...prev,
           {
             role: "misaki" as const,
-            text: data.reply || "返事を取得できませんでした。",
+            text:
+              data.reply ||
+              "返事を取得できませんでした。",
           },
         ].slice(-MAX_MESSAGES)
       );
@@ -161,19 +208,27 @@ export default function Home() {
         {messages.map((item, index) => (
           <div
             key={index}
-            className={`bubble ${item.role === "user" ? "user" : ""}`}
+            className={`bubble ${
+              item.role === "user" ? "user" : ""
+            }`}
           >
             {item.text}
           </div>
         ))}
 
-        {loading && <div className="bubble">美咲が考え中…</div>}
+        {loading && (
+          <div className="bubble">
+            美咲が考え中…
+          </div>
+        )}
       </section>
 
       <section className="inputArea">
         <input
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) =>
+            setMessage(e.target.value)
+          }
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               sendMessage();
@@ -183,7 +238,10 @@ export default function Home() {
           disabled={loading}
         />
 
-        <button onClick={sendMessage} disabled={loading}>
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+        >
           {loading ? "送信中..." : "送信"}
         </button>
       </section>
