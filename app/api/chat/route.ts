@@ -1,4 +1,3 @@
-
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -8,6 +7,13 @@ const openai = new OpenAI({
 export async function POST(request: Request) {
   try {
     const { message } = await request.json();
+
+    if (!message) {
+      return Response.json(
+        { error: "message がありません" },
+        { status: 400 }
+      );
+    }
 
     const response = await openai.responses.create({
       model: "gpt-5-mini",
@@ -19,9 +25,16 @@ export async function POST(request: Request) {
     return Response.json({
       reply: response.output_text,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error("OPENAI ERROR:", error);
+
     return Response.json(
-      { error: "美咲との通信に失敗しました" },
+      {
+        error: error?.message || "美咲との通信に失敗しました",
+        type: error?.type || null,
+        code: error?.code || null,
+        status: error?.status || 500,
+      },
       { status: 500 }
     );
   }
