@@ -115,20 +115,17 @@ textarea {
 }
 
 .bubble:not(.user)::before {
-  content: "美";
+  content: "";
   position: absolute;
   left: -44px;
   top: 0;
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: linear-gradient(145deg, #ff8aa2, #ff5f7d);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  font-weight: 700;
+  background-image: url("/icon-192.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 .bubble.user {
