@@ -565,8 +565,11 @@ export default function Home() {
     <main className="shell">
       <section className="card">
         <div className="avatar">
-          美
-        </div>
+  <img
+    src="/icon-192.png"
+    alt="美咲"
+  />
+</div>
 
         <div>
           <h1>美咲</h1>
