@@ -776,12 +776,16 @@ function getReplyProblems(
 
   const concernPatterns = [
     "大丈夫？",
+    "大丈夫かな",
     "そっちは大丈夫",
+    "そっちは平気",
     "影響ない？",
+    "影響大丈夫",
     "平気？",
     "無事？",
     "困ってない？",
     "気をつけてね",
+    "気をつけて",
     "無理しないで",
     "安全第一で",
     "ちゃんと休んでね",
@@ -805,15 +809,36 @@ function getReplyProblems(
   const inventedSourcePatterns = [
     "ニュース見て",
     "ニュースを見て",
+    "ニュースで見",
     "テレビで見",
     "SNSで見",
+    "SNS見て",
+    "SNSを見",
     "スマホで見",
+    "スマホ見",
+    "スマホを見",
+    "さっきスマホ",
     "ネットで見",
+    "ネット見",
+    "ネットを見",
+    "サイトで見",
+    "サイト見",
+    "サイトを見",
+    "記事で見",
+    "記事見",
+    "記事を見",
     "通知が来",
+    "通知見",
     "友達から聞",
+    "知り合いから聞",
     "さっき知った",
     "今知った",
     "って書いてあった",
+    "って書いてある",
+    "って載ってた",
+    "って載ってる",
+    "って出てた",
+    "って出てる",
   ];
 
   if (
@@ -1352,21 +1377,41 @@ ${tokyoLifeEventsGuide}
 「ニュースを見た」
 「SNSで見た」
 「テレビで見た」
+「スマホを見た」
+「スマホ見てた」
+「ネットで見た」
+「サイトで見た」
+「記事で見た」
 「通知が来た」
 「友達から聞いた」
+「さっき知った」
+「〜って書いてあった」
+「〜って載ってた」
+「〜って出てた」
 
-など
-情報の入手経路を
+など、
+美咲がどこでその情報を知ったかという
+情報入手経路を
 勝手に作らないでください。
+
+リアルタイム情報は
+美咲が自然に知っている
+生活上の状況としてだけ
+話してください。
 
 また、
 
 「大丈夫？」
+「そっちは大丈夫？」
 「影響ない？」
 「気をつけて」
 
 などで
 自動的に締めないでください。
+
+ユーザー自身が危険・困窮・体調不良などを
+明確に話していない限り、
+心配確認を付ける必要はありません。
 
 【東京タクシー】
 
@@ -1508,6 +1553,25 @@ ${retryProblems
 美咲自身から送りたくなった
 一言を優先してください。
 
+架空の情報入手経路は
+絶対に作らないでください。
+
+「スマホ見てたら」
+「ネットで見た」
+「ニュースで見た」
+「〜って書いてあった」
+
+のような表現は禁止です。
+
+ユーザー自身が
+危険だと明確に分かっていない限り、
+
+「大丈夫？」
+「そっちは大丈夫？」
+「影響ない？」
+
+なども付けないでください。
+
 必ずJSONだけを返してください。
 `
           : "";
@@ -1632,19 +1696,68 @@ ${retryProblems
             ? retryParsed.reply.trim()
             : "";
 
-        if (
-          retryReply &&
-          getReplyProblems(
-            retryReply
-          ).length === 0
-        ) {
-          parsed =
-            retryParsed;
+        if (retryReply) {
+          const retryProblems =
+            getReplyProblems(
+              retryReply
+            );
 
-          reply =
-            retryReply;
+          if (
+            retryProblems.length ===
+            0
+          ) {
+            parsed =
+              retryParsed;
+
+            reply =
+              retryReply;
+          }
         }
       }
+    }
+
+    //
+    // 再生成してもNGなら
+    // 問題のある自発メッセージは
+    // ユーザーへ送らない
+    //
+    const finalProblems =
+      getReplyProblems(
+        reply
+      );
+
+    if (
+      finalProblems.length >
+      0
+    ) {
+      console.warn(
+        "PROACTIVE REPLY REJECTED:",
+        finalProblems,
+        reply
+      );
+
+      return Response.json({
+        sent: false,
+
+        reason:
+          "generation_rejected",
+
+        proactive: {
+          count:
+            typeof proactiveUsage.message_count ===
+            "number"
+              ? proactiveUsage.message_count
+              : 0,
+
+          remaining:
+            typeof proactiveUsage.remaining ===
+            "number"
+              ? proactiveUsage.remaining
+              : 0,
+
+          retryAfterSeconds: 0,
+        },
+      });
     }
 
     const updatedMemory =
