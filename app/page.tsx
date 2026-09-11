@@ -1482,14 +1482,6 @@ export default function Home() {
       return;
     }
 
-    const hiddenInstruction:
-      ChatMessage = {
-        role: "user",
-
-        text:
-          "【これは画面には表示されない自発会話のきっかけです】ユーザーからメッセージが来たわけではありません。美咲のほうから、今の時間帯・今日の美咲自身の生活・今日すでに起きた美咲自身の出来事・直近の会話・長期記憶を参考にして、恋人へ自然にひとことLINEしてください。質問を無理につけず、1〜2文程度にしてください。話すことが特になければ、美咲自身の今の様子や気分を短く話してください。",
-      };
-
     try {
       const accessToken =
         await getAccessToken();
@@ -1509,7 +1501,7 @@ export default function Home() {
 
       const res =
         await fetch(
-          "/api/chat",
+          "/api/proactive",
           {
             method:
               "POST",
@@ -1524,9 +1516,6 @@ export default function Home() {
 
             body:
               JSON.stringify({
-                message:
-                  hiddenInstruction.text,
-
                 history:
                   messages.slice(
                     -MAX_MESSAGES
@@ -1553,6 +1542,13 @@ export default function Home() {
           data
         );
 
+        return;
+      }
+
+      if (
+        data.sent ===
+        false
+      ) {
         return;
       }
 
