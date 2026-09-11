@@ -55,11 +55,21 @@ export default function Home() {
 
   const [memory, setMemory] = useState<string[]>([]);
 
-  const [showMemory, setShowMemory] = useState(false);
+  const [showMemory, setShowMemory] =
+    useState(false);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] =
+    useState(false);
 
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] =
+    useState(false);
+
+  const [
+    notificationPermission,
+    setNotificationPermission,
+  ] = useState<
+    "default" | "granted" | "denied" | "unsupported"
+  >("default");
 
   // Service Workerを登録
   useEffect(() => {
@@ -79,6 +89,20 @@ export default function Home() {
           );
         });
     }
+  }, []);
+
+  // 現在の通知許可状態を確認
+  useEffect(() => {
+    if (!("Notification" in window)) {
+      setNotificationPermission(
+        "unsupported"
+      );
+      return;
+    }
+
+    setNotificationPermission(
+      Notification.permission
+    );
   }, []);
 
   // 保存済みの会話と記憶を読み込む
@@ -161,6 +185,59 @@ export default function Home() {
     }
   }, [memory, loaded]);
 
+  async function requestNotificationPermission() {
+    if (!("Notification" in window)) {
+      alert(
+        "この環境では通知機能を利用できません。"
+      );
+
+      setNotificationPermission(
+        "unsupported"
+      );
+
+      return;
+    }
+
+    if (!("serviceWorker" in navigator)) {
+      alert(
+        "この環境では通知機能を利用できません。"
+      );
+
+      return;
+    }
+
+    try {
+      // Service Workerが使える状態になるまで待つ
+      await navigator.serviceWorker.ready;
+
+      const permission =
+        await Notification.requestPermission();
+
+      setNotificationPermission(permission);
+
+      if (permission === "granted") {
+        alert(
+          "通知を許可しました。美咲から通知を受け取れる準備ができました。"
+        );
+      }
+
+      if (permission === "denied") {
+        alert(
+          "通知が許可されませんでした。iPhoneの設定から通知を許可してください。"
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Notification permission error:",
+        error
+      );
+
+      alert(
+        "通知の設定に失敗しました。"
+      );
+    }
+  }
+
   function resetChat() {
     const confirmed = window.confirm(
       "美咲との会話履歴をリセットしますか？"
@@ -232,7 +309,8 @@ export default function Home() {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
 
         body: JSON.stringify({
@@ -504,8 +582,45 @@ export default function Home() {
             display: "flex",
             gap: "8px",
             alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "flex-end",
           }}
         >
+          {notificationPermission !==
+            "granted" &&
+            notificationPermission !==
+              "unsupported" && (
+              <button
+                onClick={
+                  requestNotificationPermission
+                }
+                disabled={loading}
+                style={{
+                  border: "none",
+                  background: "#ff6b81",
+                  color: "#ffffff",
+                  borderRadius: "999px",
+                  padding: "7px 10px",
+                  fontSize: "12px",
+                  cursor: "pointer",
+                }}
+              >
+                通知をON
+              </button>
+            )}
+
+          {notificationPermission ===
+            "granted" && (
+            <span
+              style={{
+                fontSize: "12px",
+                opacity: 0.6,
+              }}
+            >
+              通知ON
+            </span>
+          )}
+
           <button
             onClick={() =>
               setShowMemory(
