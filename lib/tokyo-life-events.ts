@@ -27,15 +27,6 @@ const HANEDA_INTERNATIONAL_URL =
 
 const MAX_EVENTS = 8;
 
-/*
- * 東京で生活する美咲に
- * 関係しやすいJR路線。
- *
- * 東京全域の鉄道情報を
- * 何でも入れると、
- * 美咲が交通情報アプリのように
- * なってしまうので絞る。
- */
 const TOKYO_JR_LINES = [
   "山手線",
   "京浜東北線",
@@ -200,6 +191,31 @@ function isRecent(
   );
 }
 
+function affectsTokyo(
+  text: string
+) {
+  return (
+    text.includes(
+      "東京都２３区"
+    ) ||
+    text.includes(
+      "東京都23区"
+    ) ||
+    text.includes(
+      "東京都多摩"
+    ) ||
+    text.includes(
+      "東京地方"
+    ) ||
+    text.includes(
+      "東京都"
+    ) ||
+    text.includes(
+      "２３区"
+    )
+  );
+}
+
 /*
  * ---------------------------
  * 地震
@@ -262,10 +278,6 @@ async function getEarthquakeEvents():
         "updated"
       );
 
-    /*
-     * 古い地震を突然
-     * 今の話として出さない。
-     */
     if (
       !isRecent(
         updated,
@@ -309,31 +321,14 @@ async function getEarthquakeEvents():
         detailXml
       )}`;
 
-    /*
-     * 東京に関係するものだけ。
-     */
-    const affectsTokyo =
-      combined.includes(
-        "東京都２３区"
-      ) ||
-      combined.includes(
-        "東京都23区"
-      ) ||
-      combined.includes(
-        "東京都多摩"
-      ) ||
-      combined.includes(
-        "東京地方"
-      );
-
-    if (!affectsTokyo) {
+    if (
+      !affectsTokyo(
+        combined
+      )
+    ) {
       continue;
     }
 
-    /*
-     * 美咲が反応するのは
-     * 基本的に東京で震度3以上。
-     */
     const meaningful =
       combined.includes(
         "震度３"
@@ -399,6 +394,108 @@ async function getEarthquakeEvents():
  * ---------------------------
  */
 
+function isRelevantWarningTitle(
+  title: string
+) {
+  return (
+    title.includes(
+      "気象警報"
+    ) ||
+    title.includes(
+      "気象特別警報"
+    ) ||
+    title.includes(
+      "土砂災害警戒情報"
+    ) ||
+    title.includes(
+      "竜巻注意情報"
+    )
+  );
+}
+
+function isCancelledWarning(
+  text: string
+) {
+  const normalized =
+    normalizeText(text);
+
+  /*
+   * 解除された情報だけを
+   * 現在の警報として扱わない。
+   */
+  if (
+    normalized.includes(
+      "すべて解除"
+    ) ||
+    normalized.includes(
+      "全て解除"
+    ) ||
+    normalized.includes(
+      "警報を解除"
+    ) ||
+    normalized.includes(
+      "注意報を解除"
+    ) ||
+    normalized.includes(
+      "解除しました"
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+function createWarningDetail(
+  title: string,
+  headline: string
+) {
+  /*
+   * Geminiに曖昧な
+   * 「警報がいろいろ」
+   * と言わせないため、
+   * 種類を明示して渡す。
+   */
+
+  if (
+    title.includes(
+      "土砂災害警戒情報"
+    )
+  ) {
+    return (
+      headline ||
+      "東京都内に土砂災害警戒情報が発表されています。"
+    );
+  }
+
+  if (
+    title.includes(
+      "竜巻注意情報"
+    )
+  ) {
+    return (
+      headline ||
+      "東京都内に竜巻注意情報が発表されています。"
+    );
+  }
+
+  if (
+    title.includes(
+      "気象特別警報"
+    )
+  ) {
+    return (
+      headline ||
+      "東京都内に気象特別警報が発表されています。"
+    );
+  }
+
+  return (
+    headline ||
+    "東京都内に気象警報・注意報の情報が発表されています。"
+  );
+}
+
 async function getWeatherWarningEvents():
   Promise<TokyoLifeEvent[]> {
   const feed =
@@ -424,17 +521,8 @@ async function getWeatherWarningEvents():
           );
 
         return (
-          title.includes(
-            "気象警報"
-          ) ||
-          title.includes(
-            "気象特別警報"
-          ) ||
-          title.includes(
-            "土砂災害警戒"
-          ) ||
-          title.includes(
-            "竜巻注意"
+          isRelevantWarningTitle(
+            title
           )
         );
       }
@@ -442,6 +530,9 @@ async function getWeatherWarningEvents():
 
   const results:
     TokyoLifeEvent[] = [];
+
+  const seen =
+    new Set<string>();
 
   for (
     const entry of candidates
@@ -458,10 +549,14 @@ async function getWeatherWarningEvents():
         "updated"
       );
 
+    /*
+     * 古い警報を現在情報として
+     * 長時間残さない。
+     */
     if (
       !isRecent(
         updated,
-        6
+        3
       )
     ) {
       continue;
@@ -489,36 +584,11 @@ async function getWeatherWarningEvents():
         detailXml
       );
 
-    const affectsTokyo =
-      plainText.includes(
-        "東京都"
-      ) ||
-      plainText.includes(
-        "東京地方"
-      ) ||
-      plainText.includes(
-        "２３区"
-      );
-
-    if (!affectsTokyo) {
-      continue;
-    }
-
-    const important =
-      plainText.includes(
-        "特別警報"
-      ) ||
-      plainText.includes(
-        "警報"
-      ) ||
-      plainText.includes(
-        "竜巻注意情報"
-      ) ||
-      plainText.includes(
-        "土砂災害警戒情報"
-      );
-
-    if (!important) {
+    if (
+      !affectsTokyo(
+        plainText
+      )
+    ) {
       continue;
     }
 
@@ -534,17 +604,40 @@ async function getWeatherWarningEvents():
         "title"
       );
 
+    const combined =
+      `${title} ${headline} ${plainText}`;
+
+    if (
+      isCancelledWarning(
+        combined
+      )
+    ) {
+      continue;
+    }
+
+    /*
+     * タイトルが同じ情報を
+     * 何件もGeminiへ渡さない。
+     */
+    if (
+      seen.has(title)
+    ) {
+      continue;
+    }
+
+    seen.add(title);
+
     results.push({
       type:
         "weather_warning",
 
-      title:
-        title ||
-        "東京の防災気象情報",
+      title,
 
       detail:
-        headline ||
-        "東京都内に重要な気象情報が発表されています。",
+        createWarningDetail(
+          title,
+          headline
+        ),
 
       publishedAt:
         updated,
@@ -563,61 +656,95 @@ async function getWeatherWarningEvents():
  * ---------------------------
  */
 
-function findTrainProblem(
+function getTrainSection(
   pageText: string,
   lineName: string
 ) {
-  const index =
+  const start =
     pageText.indexOf(
       lineName
     );
 
-  if (index < 0) {
+  if (start < 0) {
     return null;
   }
 
   /*
-   * 路線名の直後だけを見る。
+   * 固定500文字ではなく、
+   * 次の対象路線名までを
+   * この路線の範囲として扱う。
    *
-   * ページ全体には
-   * 「30分以上の遅れ」の説明文があるので、
-   * ページ全体を単純検索してはいけない。
+   * これで隣の路線の遅延を
+   * 誤って拾いにくくする。
    */
-  const nearby =
-    pageText.slice(
-      index,
-      index + 500
-    );
+  let end =
+    pageText.length;
+
+  for (
+    const otherLine of
+      TOKYO_JR_LINES
+  ) {
+    if (
+      otherLine === lineName
+    ) {
+      continue;
+    }
+
+    const otherIndex =
+      pageText.indexOf(
+        otherLine,
+        start +
+          lineName.length
+      );
+
+    if (
+      otherIndex > start &&
+      otherIndex < end
+    ) {
+      end =
+        otherIndex;
+    }
+  }
 
   /*
-   * 次の路線に入る前くらいの
-   * 短い範囲だけを対象。
+   * HTML構造変更などで
+   * 次路線が見つからない場合も
+   * 無制限に後ろを見ない。
    */
-  if (
-    nearby.includes(
-      "平常運転"
-    ) &&
-    !nearby.includes(
-      "運転見合わせ"
-    ) &&
-    !nearby.includes(
-      "一部列車運休"
-    ) &&
-    !nearby.includes(
-      "運転再開"
-    )
-  ) {
+  end =
+    Math.min(
+      end,
+      start + 500
+    );
+
+  return pageText.slice(
+    start,
+    end
+  );
+}
+
+function findTrainProblem(
+  pageText: string,
+  lineName: string
+) {
+  const nearby =
+    getTrainSection(
+      pageText,
+      lineName
+    );
+
+  if (!nearby) {
     return null;
   }
 
   const importantWords = [
     "運転見合わせ",
     "一部列車運休",
-    "運休",
-    "遅延",
+    "直通運転中止",
     "運転再開見込",
     "運転再開",
-    "直通運転中止",
+    "運休",
+    "遅延",
   ];
 
   const matched =
@@ -633,27 +760,36 @@ function findTrainProblem(
   }
 
   /*
-   * 長い駅情報をそのまま
-   * Geminiへ渡さない。
+   * この路線の範囲内で
+   * 平常運転しか出ていないなら
+   * イベントにしない。
    */
-  const shortText =
-    nearby
-      .replace(
-        /平常運転/g,
-        ""
-      )
-      .slice(
-        0,
-        260
-      )
-      .trim();
+  if (
+    nearby.includes(
+      "平常運転"
+    ) &&
+    !nearby.includes(
+      "運転見合わせ"
+    ) &&
+    !nearby.includes(
+      "一部列車運休"
+    ) &&
+    !nearby.includes(
+      "直通運転中止"
+    ) &&
+    !nearby.includes(
+      "運転再開見込"
+    ) &&
+    !nearby.includes(
+      "遅延"
+    )
+  ) {
+    return null;
+  }
 
   return {
     status:
       matched,
-
-    detail:
-      shortText,
   };
 }
 
@@ -691,11 +827,6 @@ async function getTrainEvents():
       continue;
     }
 
-    /*
-     * 同じ文章が複数路線に
-     * 引っかかる場合があるため、
-     * 最大3件に抑える。
-     */
     results.push({
       type:
         "train",
@@ -735,19 +866,25 @@ function hasHanedaDisruption(
     );
 
   /*
-   * 羽田空港公式ページに
-   * 実際の運航乱れ時に表示される
-   * 文言を対象とする。
+   * 重要：
+   *
+   * ページ内部には
+   * モーダルやテンプレート用の
+   *
+   * 「遅延欠航が発生しています」
+   * 「遅延・欠航が発生しています」
+   *
+   * という固定文言が含まれることがある。
+   *
+   * それを現在の運航乱れと
+   * 誤認しない。
+   *
+   * 実際にページ上部へ出る
+   * 現在状態の告知だけを使う。
    */
   return (
     text.includes(
       "現在、一部フライトの運航に乱れが生じています"
-    ) ||
-    text.includes(
-      "遅延欠航が発生しています"
-    ) ||
-    text.includes(
-      "遅延・欠航が発生しています"
     ) ||
     text.includes(
       "Currently, some Flights are experiencing disruptions"
@@ -837,13 +974,6 @@ async function getHanedaEvents():
 export async function getTokyoLifeEvents():
   Promise<TokyoLifeEvent[]> {
   try {
-    /*
-     * 4種類を並列取得。
-     *
-     * 1つずつ待たないので
-     * チャットの待ち時間を
-     * できるだけ増やさない。
-     */
     const [
       earthquakes,
       warnings,
@@ -873,9 +1003,8 @@ export async function getTokyoLifeEvents():
     );
 
     /*
-     * リアル情報の取得に
-     * 失敗しただけで
-     * 美咲との会話を止めない。
+     * 外部情報の取得失敗だけで
+     * チャット自体を止めない。
      */
     return [];
   }
@@ -898,7 +1027,8 @@ export function createTokyoLifeEventsGuide(
 
 現在取得できている情報の範囲では、
 美咲がわざわざ会話で触れる必要がある
-大きな東京の生活イベントは確認されていません。
+大きな東京の生活イベントは
+確認されていません。
 
 非常に重要：
 
@@ -908,23 +1038,22 @@ export function createTokyoLifeEventsGuide(
 
 などと言わないでください。
 
-美咲は、
-ここに提供されている現在情報を
-普通に生活していて耳に入った情報として
-自然に理解しています。
+また、
 
-ただし、
+「特に何もない」
+と断定する必要もありません。
+
 情報がない出来事を
 想像して作ってはいけません。
 
-何も確認されていない場合は、
+ユーザーから聞かれた場合は、
 
 「今のところ特に大きいのは聞いてないよ」
 
 くらいなら自然です。
 
-ただし毎回、
-何もないことを報告する必要もありません。
+毎回この情報について
+話す必要はありません。
 `.trim();
   }
 
@@ -939,55 +1068,87 @@ export function createTokyoLifeEventsGuide(
   return `
 【東京のリアルな生活イベント】
 
-現在確認されている、
-東京で普通に暮らしている美咲に
-関係する可能性がある情報です。
+現在確認できている
+東京の生活情報です。
 
 ${eventText}
 
 非常に重要：
 
-美咲はニュースキャスターではありません。
+上に書かれている内容だけが、
+今回確認できている情報です。
 
-また、
+情報を勝手に増やさないでください。
 
-「ニュース見てないから分からない」
-「ニュースを見てない」
-「詳しくは知らない」
+特に、
 
-という言い訳はしないでください。
+「警報がいろいろ出てる」
+「注意報がたくさん出てる」
+「かなり警報が出てる」
 
-ここにある情報は、
-美咲が東京で生活していて
-自然に知った現在情報として扱います。
+など、
 
-ただし、
-この一覧をユーザーへ読み上げてはいけません。
+種類や数を
+勝手にまとめたり
+誇張したりしないでください。
 
-会話に関係する場合だけ
-自然に使ってください。
+警報について話す場合は、
+上に具体的に書かれている
+種類だけを使ってください。
 
-例えば、
+例えば上に
+「竜巻注意情報」
+とだけある場合は、
+
+「竜巻の注意情報が出てるみたい」
+
+程度にしてください。
+
+上に警報情報がない場合は、
+警報が出ているとは
+言わないでください。
+
+美咲は
+ニュースキャスターではありません。
+
+この一覧を
+そのまま読み上げないでください。
+
+情報の入手方法も
+作らないでください。
+
+禁止例：
+
+「ニュースで見た」
+「スマホで見た」
+「テレビで見た」
+「ネットに書いてあった」
+「通知が来た」
+
+自然な例：
 
 地震なら、
 
-「さっき揺れたよね」
-「ちょっとびっくりした」
+「さっきちょっと揺れたみたいだね」
 
-警報や大雨なら、
+警報なら、
 
-「外すごいことになってる」
-「今日は雨ひどいね」
+上にある具体的な種類に合わせて、
+
+「大雨の警報出てるみたい」
+「竜巻の注意情報出てるみたい」
+
+など。
 
 電車なら、
 
-「電車けっこう乱れてるみたいだね」
+「山手線ちょっと乱れてるみたい」
 
 羽田なら、
 
-「羽田、今日はちょっと乱れてるみたい」
+「羽田ちょっと乱れてるみたい」
 
-程度の自然な反応にしてください。
+程度で十分です。
 
 【タクシードライバーの彼氏との関係】
 
@@ -1002,39 +1163,42 @@ ${eventText}
 ・地震
 
 などは、
-ユーザーの仕事にも関係する可能性があります。
+ユーザーの仕事にも
+関係する可能性があります。
 
-ただし美咲は
-タクシー需要予測AIではありません。
-
-そのため、
+ただし、
 
 「今日は絶対タクシー需要が増える」
 「羽田で確実にロングが出る」
 
 など、
-根拠のない断定をしてはいけません。
+タクシー需要を
+断定してはいけません。
 
-自然な恋人なら、
+自然な表現なら、
 
-「電車止まってるなら、今日は忙しくなりそうだね」
+「電車止まってるなら、
+今日はバタバタしそうだね」
 
-「羽田ちょっと乱れてるみたい。そっち影響あるかもね」
+「羽田ちょっと乱れてるみたい。
+あっちバタバタしてそう」
 
-程度なら構いません。
+程度にしてください。
 
 【絶対ルール】
 
 ・毎回ニュースの話をしない
-・情報一覧をそのまま読み上げない
+・情報一覧を読み上げない
 ・ニュース記事のように説明しない
 ・存在しない事故や災害を作らない
 ・取得できていない情報を知っているふりをしない
 ・古い出来事を今起きたように話さない
+・警報や注意報の数を勝手に増やさない
+・「いろいろ出てる」と曖昧にまとめない
 ・ユーザーを不必要に怖がらせない
-・美咲が実際に見ていないものを「見た」と断言しない
+・情報をどうやって知ったか作らない
 ・タクシー需要を断定しない
-・「ニュース見てないから分からない」と逃げない
+・通常の交通や天気の話だけで「大丈夫？」と聞かない
 
 普通の38歳の彼女として、
 必要なときだけ自然に使ってください。
