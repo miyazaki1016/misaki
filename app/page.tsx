@@ -44,19 +44,38 @@ const MAX_MESSAGES = 60;
 // 無料版は1日20往復まで
 const FREE_DAILY_LIMIT = 20;
 
-// 10分ごとに、美咲から話しかける条件を確認
+// 5分ごとに、自発メッセージの予定時刻になったか確認
 const PROACTIVE_CHECK_MS =
-  10 * 60 * 1000;
+  5 * 60 * 1000;
 
 // 自発メッセージ同士は最低45分空ける
 const PROACTIVE_COOLDOWN_MS =
   45 * 60 * 1000;
+
+// 次の自発メッセージは
+// 45分〜3時間30分の間でランダム
+const PROACTIVE_MIN_DELAY_MS =
+  45 * 60 * 1000;
+
+const PROACTIVE_MAX_DELAY_MS =
+  3.5 * 60 * 60 * 1000;
 
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
 
 const INITIAL_MESSAGES: ChatMessage[] =
   [];
+
+function getRandomProactiveDelayMs() {
+  return Math.floor(
+    PROACTIVE_MIN_DELAY_MS +
+      Math.random() *
+        (
+          PROACTIVE_MAX_DELAY_MS -
+          PROACTIVE_MIN_DELAY_MS
+        )
+  );
+}
 
 function getJapanDateKey() {
   return new Date().toLocaleDateString(
@@ -1421,6 +1440,7 @@ export default function Home() {
         currentDate,
       count: 0,
       lastSentAt: 0,
+      nextAttemptAt: 0,
     };
 
     try {
@@ -1455,6 +1475,12 @@ export default function Home() {
               "number"
                 ? parsed.lastSentAt
                 : 0,
+
+            nextAttemptAt:
+              typeof parsed.nextAttemptAt ===
+              "number"
+                ? parsed.nextAttemptAt
+                : 0,
           };
         }
       }
@@ -1478,6 +1504,40 @@ export default function Home() {
       now -
         state.lastSentAt <
         PROACTIVE_COOLDOWN_MS
+    ) {
+      return;
+    }
+
+    //
+    // 次の予定時刻がまだ決まっていなければ、
+    // 45分〜3時間30分後をランダムで予約
+    //
+    if (
+      state.nextAttemptAt <=
+      0
+    ) {
+      const nextAttemptAt =
+        now +
+        getRandomProactiveDelayMs();
+
+      localStorage.setItem(
+        PROACTIVE_KEY,
+        JSON.stringify({
+          ...state,
+          nextAttemptAt,
+        })
+      );
+
+      return;
+    }
+
+    //
+    // まだランダム予定時刻になっていなければ
+    // 何もしない
+    //
+    if (
+      now <
+      state.nextAttemptAt
     ) {
       return;
     }
@@ -1597,6 +1657,10 @@ export default function Home() {
           )
       );
 
+      //
+      // 送信に成功したら、
+      // 次回のランダム予定時刻を決める
+      //
       const nextState = {
         date:
           currentDate,
@@ -1606,6 +1670,10 @@ export default function Home() {
 
         lastSentAt:
           now,
+
+        nextAttemptAt:
+          now +
+          getRandomProactiveDelayMs(),
       };
 
       localStorage.setItem(
@@ -1623,9 +1691,19 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (!loaded) {
+    if (
+      !loaded ||
+      !accountLoaded
+    ) {
       return;
     }
+
+    //
+    // 最初の予定時刻を
+    // ページ表示後すぐに決める。
+    // 実際の送信は45分〜3時間30分後。
+    //
+    sendProactiveMessage();
 
     const timer =
       window.setInterval(
