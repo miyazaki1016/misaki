@@ -7,11 +7,18 @@ type ChatMessage = {
   text: string;
 };
 
+type DailyUsage = {
+  date: string;
+  count: number;
+};
+
 const STORAGE_KEY = "misaki-chat-history";
 const MEMORY_KEY = "misaki-long-term-memory";
 const PROACTIVE_KEY = "misaki-proactive-state";
 const RELATIONSHIP_KEY =
   "misaki-relationship-points";
+const DAILY_USAGE_KEY =
+  "misaki-daily-usage";
 
 const MAX_MESSAGES = 60;
 
@@ -30,36 +37,29 @@ const MAX_PROACTIVE_PER_DAY = 4;
 const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  );
+  return new Date().toLocaleDateString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  );
+  return new Date().toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
 export default function Home() {
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
   const [messages, setMessages] =
     useState<ChatMessage[]>(
@@ -73,6 +73,12 @@ export default function Home() {
     relationshipPoints,
     setRelationshipPoints,
   ] = useState(0);
+
+  const [dailyUsage, setDailyUsage] =
+    useState<DailyUsage>({
+      date: getJapanDateKey(),
+      count: 0,
+    });
 
   const [showMemory, setShowMemory] =
     useState(false);
@@ -145,6 +151,11 @@ export default function Home() {
           RELATIONSHIP_KEY
         );
 
+      const savedDailyUsage =
+        localStorage.getItem(
+          DAILY_USAGE_KEY
+        );
+
       let parsedMessages:
         | ChatMessage[]
         | null = null;
@@ -154,19 +165,17 @@ export default function Home() {
           JSON.parse(savedMessages);
 
         if (Array.isArray(parsed)) {
-          parsedMessages =
-            parsed
-              .filter(
-                (item) =>
-                  item &&
-                  (item.role ===
-                    "user" ||
-                    item.role ===
-                      "misaki") &&
-                  typeof item.text ===
-                    "string"
-              )
-              .slice(-MAX_MESSAGES);
+          parsedMessages = parsed
+            .filter(
+              (item) =>
+                item &&
+                (item.role === "user" ||
+                  item.role ===
+                    "misaki") &&
+                typeof item.text ===
+                  "string"
+            )
+            .slice(-MAX_MESSAGES);
 
           setMessages(
             parsedMessages
@@ -214,9 +223,8 @@ export default function Home() {
       } else if (
         parsedMessages
       ) {
-        // 初回導入時は、
-        // すでに残っている会話数を
-        // 最低限の関係値として引き継ぐ
+        // 初回導入時は
+        // 保存済み会話を最低限引き継ぐ
         const previousUserMessages =
           parsedMessages.filter(
             (item) =>
@@ -227,11 +235,60 @@ export default function Home() {
           previousUserMessages
         );
       }
+
+      const today =
+        getJapanDateKey();
+
+      if (savedDailyUsage) {
+        const parsedUsage =
+          JSON.parse(
+            savedDailyUsage
+          );
+
+        if (
+          parsedUsage &&
+          parsedUsage.date ===
+            today &&
+          typeof parsedUsage.count ===
+            "number" &&
+          Number.isFinite(
+            parsedUsage.count
+          )
+        ) {
+          setDailyUsage({
+            date: today,
+            count: Math.max(
+              0,
+              Math.floor(
+                parsedUsage.count
+              )
+            ),
+          });
+        } else {
+          // 日付が変わっていたら
+          // その日のカウントを0から開始
+          setDailyUsage({
+            date: today,
+            count: 0,
+          });
+        }
+      } else {
+        setDailyUsage({
+          date: today,
+          count: 0,
+        });
+      }
     } catch (error) {
       console.error(
         "Failed to load saved data:",
         error
       );
+
+      setDailyUsage({
+        date:
+          getJapanDateKey(),
+        count: 0,
+      });
     } finally {
       setLoaded(true);
     }
@@ -299,6 +356,25 @@ export default function Home() {
     relationshipPoints,
     loaded,
   ]);
+
+  // 1日の通常会話回数を保存
+  useEffect(() => {
+    if (!loaded) return;
+
+    try {
+      localStorage.setItem(
+        DAILY_USAGE_KEY,
+        JSON.stringify(
+          dailyUsage
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Failed to save daily usage:",
+        error
+      );
+    }
+  }, [dailyUsage, loaded]);
 
   async function requestNotificationPermission() {
     if (
@@ -420,6 +496,28 @@ export default function Home() {
     setMemory([]);
   }
 
+  function incrementDailyUsage() {
+    const today =
+      getJapanDateKey();
+
+    setDailyUsage((prev) => {
+      if (
+        prev.date !== today
+      ) {
+        return {
+          date: today,
+          count: 1,
+        };
+      }
+
+      return {
+        date: today,
+        count:
+          prev.count + 1,
+      };
+    });
+  }
+
   async function sendMessage() {
     const text =
       message.trim();
@@ -511,6 +609,10 @@ export default function Home() {
         nextRelationshipPoints
       );
 
+      // 正常に美咲から返事が来た
+      // 通常会話だけを1回として記録
+      incrementDailyUsage();
+
       setMessages((prev) =>
         [
           ...prev,
@@ -561,7 +663,8 @@ export default function Home() {
 
     // 入力途中なら邪魔しない
     if (
-      message.trim().length > 0
+      message.trim().length >
+      0
     ) {
       return;
     }
@@ -588,7 +691,8 @@ export default function Home() {
 
         if (
           parsed &&
-          parsed.date === today
+          parsed.date ===
+            today
         ) {
           state = {
             date: today,
