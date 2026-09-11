@@ -1,106 +1,41 @@
-"use client";
+import OpenAI from "openai";
 
-import { useState } from "react";
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-export default function Home() {
-  const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([
-    { role: "misaki", text: "おかえり😊 今日は乗務？それとも明け？" },
-  ]);
-  const [loading, setLoading] = useState(false);
+export async function POST(request: Request) {
+  try {
+    const { message } = await request.json();
 
-  async function sendMessage() {
-    const text = message.trim();
-    if (!text || loading) return;
-
-    setMessages((prev) => [
-      ...prev,
-      { role: "user", text },
-    ]);
-    setMessage("");
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: text }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "通信エラー");
-      }
-
-      setMessages((prev) => [
-        ...prev,
-        { role: "misaki", text: data.reply },
-      ]);
-    } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "misaki",
-          text: "ごめんね、今ちょっと通信できなかったみたい。もう一度話しかけてね。",
-        },
-      ]);
-    } finally {
-      setLoading(false);
+    if (!message) {
+      return Response.json(
+        { error: "message がありません" },
+        { status: 400 }
+      );
     }
+
+    const response = await openai.responses.create({
+      model: "gpt-5-mini",
+      instructions:
+        "あなたは美咲、38歳の女性。タクシードライバーの彼女として、優しく親しみのある日本語で会話してください。返事は短めで自然にしてください。",
+      input: message,
+    });
+
+    return Response.json({
+      reply: response.output_text,
+    });
+  } catch (error: any) {
+    console.error("OPENAI ERROR:", error);
+
+    return Response.json(
+      {
+        error: error?.message || "美咲との通信に失敗しました",
+        type: error?.type || null,
+        code: error?.code || null,
+        status: error?.status || 500,
+      },
+      { status: 500 }
+    );
   }
-
-  return (
-    <main className="shell">
-      <section className="card">
-        <div className="avatar">美</div>
-
-        <div>
-          <h1>美咲</h1>
-          <p>タクドラの彼女・38歳</p>
-        </div>
-      </section>
-
-      <section className="notice">
-        運転中の画面操作はしないでね。安全な場所に停車してから話そう。
-      </section>
-
-      <section className="chat">
-        {messages.map((item, index) => (
-          <div
-            className={`bubble ${item.role === "user" ? "user" : ""}`}
-            key={index}
-          >
-            {item.text}
-          </div>
-        ))}
-
-        {loading && (
-          <div className="bubble">
-            美咲が考え中…
-          </div>
-        )}
-      </section>
-
-      <section className="inputArea">
-        <input
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") sendMessage();
-          }}
-          placeholder="美咲に話しかける..."
-        />
-
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-        >
-          送信
-        </button>
-      </section>
-    </main>
-  );
 }
