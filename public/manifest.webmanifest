@@ -1,0 +1,12 @@
+{
+  "name": "美咲 - タクドラの彼女",
+  "short_name": "美咲",
+  "description": "東京のタクシードライバー向けAI彼女",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "lang": "ja",
+  "orientation": "portrait-primary"
+}
