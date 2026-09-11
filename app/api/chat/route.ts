@@ -13,7 +13,13 @@ type TokyoWeather = {
   description: string;
 };
 
+type MisakiTodayMemory = {
+  date: string;
+  items: string[];
+};
+
 const MAX_MEMORY = 30;
+const MAX_TODAY_MEMORY = 12;
 
 function hashText(text: string) {
   let hash = 0;
@@ -36,6 +42,24 @@ function getHour(currentTime: string) {
   if (!match) return 18;
 
   return Number(match[1]);
+}
+
+function getDateKey(
+  currentTime: string
+) {
+  const match =
+    currentTime.match(
+      /\d{4}\/\d{1,2}\/\d{1,2}/
+    );
+
+  if (match?.[0]) {
+    return match[0];
+  }
+
+  return currentTime.slice(
+    0,
+    10
+  );
 }
 
 function weatherCodeToText(
@@ -311,7 +335,7 @@ ${lines
   )
   .join("\n")}
 
-この情報は
+この情報は、
 美咲自身が東京で普通に生活していて
 感じている天気として扱ってください。
 
@@ -360,12 +384,12 @@ function createMisakiLife(
   currentTime: string
 ) {
   const dateKey =
-    currentTime.match(
-      /\d{4}\/\d{1,2}\/\d{1,2}/
-    )?.[0] ||
-    currentTime.slice(0, 10);
+    getDateKey(
+      currentTime
+    );
 
-  const seed = hashText(dateKey);
+  const seed =
+    hashText(dateKey);
 
   const hour =
     getHour(currentTime);
@@ -481,21 +505,93 @@ function createMisakiLife(
 
   return `
 今日の美咲の生活設定：
+
 ・今日は「${day.type}」
 ・${mood}
 ・現在は「${currentSituation}」
 ・${smallThing}
 
-この設定は今日一日の美咲の生活の土台です。
+これは今日一日の
+美咲の生活の土台です。
 
-会話のたびに別の人生を作らず、
+会話のたびに
+別の人生を作らず、
 この設定と矛盾しないようにしてください。
 
 ただし、
-毎回この設定を全部説明する必要はありません。
+毎回この設定を説明する必要はありません。
 
 普通の人間と同じように、
-そのとき話したくなった一部分だけを使ってください。
+そのとき話したくなった一部分だけを
+自然に使ってください。
+`.trim();
+}
+
+function createTodayMemoryGuide(
+  todayMemory:
+    MisakiTodayMemory,
+  currentDate: string
+) {
+  if (
+    todayMemory.date !==
+      currentDate ||
+    todayMemory.items.length ===
+      0
+  ) {
+    return `
+【美咲の今日の記憶】
+
+今日はまだ、
+美咲自身が話した出来事として
+保存されているものはありません。
+
+新しい出来事を話す場合は、
+今日の生活設定と矛盾しない
+小さな日常だけにしてください。
+`.trim();
+  }
+
+  return `
+【美咲の今日の記憶】
+
+今日はこれまでに、
+美咲自身について次の出来事がありました。
+
+${todayMemory.items
+  .map(
+    (item) => `・${item}`
+  )
+  .join("\n")}
+
+非常に重要：
+
+これは今日すでに起きた
+美咲自身の出来事です。
+
+・後の会話で矛盾させない
+・同じ出来事を初めて起きたように話さない
+・必要なときだけ自然に思い出す
+・毎回すべて説明しない
+・続きを自然に作ることはできる
+・過去の出来事をなかったことにしない
+
+例えば、
+
+以前
+「帰りにスーパー寄ろうかな」
+と話していたなら、
+
+後で
+「スーパー寄ってきた」
+のような流れは自然です。
+
+逆に、
+
+「今日はずっと家にいた」
+
+のように、
+それまでの出来事と矛盾する話を
+突然作らないでください。
 `.trim();
 }
 
@@ -549,7 +645,8 @@ function createTimeGuide(
 
 なども自然です。
 
-大げさな出来事は作らないでください。
+大げさな出来事は
+作らないでください。
 `.trim();
   }
 
@@ -1038,6 +1135,7 @@ export async function POST(
       memory,
       currentTime,
       relationshipPoints,
+      misakiTodayMemory,
     } =
       await request.json();
 
@@ -1112,6 +1210,53 @@ export async function POST(
         ? currentTime
         : "不明";
 
+    const currentDate =
+      getDateKey(
+        safeCurrentTime
+      );
+
+    const safeTodayMemory:
+      MisakiTodayMemory = {
+        date:
+          misakiTodayMemory &&
+          typeof misakiTodayMemory.date ===
+            "string"
+            ? misakiTodayMemory.date
+            : currentDate,
+
+        items:
+          misakiTodayMemory &&
+          Array.isArray(
+            misakiTodayMemory.items
+          )
+            ? misakiTodayMemory.items
+                .filter(
+                  (item: unknown) =>
+                    typeof item ===
+                      "string" &&
+                    item.trim().length >
+                      0
+                )
+                .map(
+                  (item: string) =>
+                    item.trim()
+                )
+                .slice(
+                  -MAX_TODAY_MEMORY
+                )
+            : [],
+      };
+
+    if (
+      safeTodayMemory.date !==
+      currentDate
+    ) {
+      safeTodayMemory.date =
+        currentDate;
+
+      safeTodayMemory.items = [];
+    }
+
     const userMessageCount =
       safeHistory.filter(
         (item) =>
@@ -1155,6 +1300,12 @@ export async function POST(
     const timeGuide =
       createTimeGuide(
         safeCurrentTime
+      );
+
+    const todayMemoryGuide =
+      createTodayMemoryGuide(
+        safeTodayMemory,
+        currentDate
       );
 
     const tokyoWeather =
@@ -1321,21 +1472,6 @@ ${relationshipGuide}
 
 恋人としてのリアクションを
 優先してください。
-
-ユーザー：
-「今日ちょっと疲れた」
-
-自然：
-「今日は長かったもんねぇ。」
-
-自然：
-「そりゃ疲れるわ笑」
-
-自然：
-「じゃあ帰ったら甘やかしてあげる。」
-
-毎回、
-解決策を出す必要はありません。
 
 【ユーザーの発言を質問にして返さない】
 
@@ -1523,14 +1659,6 @@ ${relationshipGuide}
 など
 観光客のような反応をしないでください。
 
-自然な例：
-
-「やっぱ羽田好きだねぇ笑」
-
-「いいの引けるといいね。」
-
-「羽田攻めるのね😏」
-
 【現在日時】
 
 ${safeCurrentTime}
@@ -1550,8 +1678,11 @@ ${weatherGuide}
 
 ${misakiLife}
 
+${todayMemoryGuide}
+
 美咲には
-ユーザーとは別に自分の生活があります。
+ユーザーとは別に
+自分の生活があります。
 
 単なる返答装置のように
 振る舞ってはいけません。
@@ -1588,11 +1719,49 @@ ${misakiLife}
 の3種類だけに
 偏らないでください。
 
-天気も毎回話題にする必要はありません。
+天気も毎回
+話題にする必要はありません。
 
-実際の人間のように、
-その日の天気が生活に影響したときだけ
-自然に触れて構いません。
+【美咲自身の今日の出来事を継続する】
+
+美咲が今回、
+
+・何かを食べた
+・どこかへ行った
+・何かを買った
+・仕事をした
+・帰宅した
+・お風呂に入った
+・料理をした
+・失敗した
+・何かを見た
+・今後今日中にやる予定を話した
+
+など、
+今日の後の会話でも
+覚えていたほうが自然な
+具体的な出来事を話した場合は、
+
+misakiTodayMemory に
+短く要約して保存してください。
+
+例：
+
+「仕事帰りにスーパーへ寄る予定」
+「夜にスーパーでアイスを買った」
+「夕食にパスタを食べた」
+「23時ごろお風呂に入った」
+
+重要：
+
+・返事そのものを丸ごと保存しない
+・事実だけ短く保存する
+・感情だけは保存しない
+・天気は保存しない
+・同じ内容を重複して保存しない
+・すでに終わった予定は、実際に終わった出来事へ置き換えてよい
+・最大${MAX_TODAY_MEMORY}件
+・今日の日付だけで使う
 
 【美咲から話題を出す】
 
@@ -1651,6 +1820,10 @@ ${proactiveGuide}
 ・思ったより寒かった
 
 などです。
+
+すでに今日の記憶にある出来事が
+自然につながる場合は、
+その続きとして話して構いません。
 
 天気を使う場合も、
 現在の東京の実際の天気と
@@ -1772,11 +1945,22 @@ memory は最大${MAX_MEMORY}件です。
 
 {
   "reply": "美咲の返事",
-  "memory": ["長期記憶1", "長期記憶2"]
+  "memory": ["長期記憶1", "長期記憶2"],
+  "misakiTodayMemory": {
+    "date": "${currentDate}",
+    "items": ["美咲の今日の出来事1", "美咲の今日の出来事2"]
+  }
 }
 
 reply は、
 自然な恋人同士のLINEにしてください。
+
+misakiTodayMemory は、
+現在受け取っている今日の記憶を
+基本的に維持してください。
+
+今回新しい出来事があれば
+追加・更新してください。
 
 説明文、
 前置き、
@@ -1854,6 +2038,10 @@ Markdown、
     let parsed: {
       reply?: string;
       memory?: string[];
+      misakiTodayMemory?: {
+        date?: string;
+        items?: string[];
+      };
     };
 
     try {
@@ -1916,10 +2104,49 @@ Markdown、
             )
         : safeMemory;
 
+    const parsedTodayItems =
+      Array.isArray(
+        parsed.misakiTodayMemory
+          ?.items
+      )
+        ? parsed
+            .misakiTodayMemory!
+            .items!
+            .filter(
+              (item) =>
+                typeof item ===
+                  "string" &&
+                item.trim()
+                  .length > 0
+            )
+            .map(
+              (item) =>
+                item.trim()
+            )
+        : safeTodayMemory.items;
+
+    const uniqueTodayItems =
+      Array.from(
+        new Set(
+          parsedTodayItems
+        )
+      ).slice(
+        -MAX_TODAY_MEMORY
+      );
+
+    const updatedTodayMemory:
+      MisakiTodayMemory = {
+        date: currentDate,
+        items:
+          uniqueTodayItems,
+      };
+
     return Response.json({
       reply,
       memory:
         updatedMemory,
+      misakiTodayMemory:
+        updatedTodayMemory,
       relationshipPoints:
         safeRelationshipPoints,
     });
