@@ -46,7 +46,6 @@ export default function Home() {
 
     try {
       const limitedMessages = messages.slice(-MAX_MESSAGES);
-
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify(limitedMessages)
@@ -55,6 +54,18 @@ export default function Home() {
       console.error("Failed to save chat history:", error);
     }
   }, [messages, loaded]);
+
+  function resetChat() {
+    const confirmed = window.confirm(
+      "美咲との会話履歴をリセットしますか？"
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem(STORAGE_KEY);
+    setMessages(INITIAL_MESSAGES);
+    setMessage("");
+  }
 
   async function sendMessage() {
     const text = message.trim();
@@ -125,6 +136,21 @@ export default function Home() {
           <h1>美咲</h1>
           <p>タクドラの彼女・38歳</p>
         </div>
+
+        <button
+          onClick={resetChat}
+          disabled={loading}
+          style={{
+            marginLeft: "auto",
+            border: "none",
+            background: "transparent",
+            fontSize: "12px",
+            cursor: "pointer",
+            opacity: 0.6,
+          }}
+        >
+          会話をリセット
+        </button>
       </section>
 
       <section className="notice">
