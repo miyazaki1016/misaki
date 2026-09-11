@@ -31,6 +31,7 @@ export default function Home() {
     try {
       const savedMessages =
         localStorage.getItem(STORAGE_KEY);
+
       const savedMemory =
         localStorage.getItem(MEMORY_KEY);
 
@@ -163,15 +164,30 @@ export default function Home() {
     setLoading(true);
 
     try {
+      const currentTime =
+        new Date().toLocaleString("ja-JP", {
+          timeZone: "Asia/Tokyo",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          weekday: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
       const res = await fetch("/api/chat", {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           message: text,
           history: newMessages,
           memory,
+          currentTime,
         }),
       });
 
@@ -277,7 +293,8 @@ export default function Home() {
             margin: "12px 0",
             padding: "14px",
             borderRadius: "14px",
-            background: "rgba(255,255,255,0.8)",
+            background:
+              "rgba(255,255,255,0.8)",
             boxShadow:
               "0 2px 10px rgba(0,0,0,0.06)",
           }}
