@@ -26,11 +26,10 @@ type UsageRpcResult = {
   is_premium?: boolean;
 };
 
-type ConsumeRpcResult = {
-  allowed?: boolean;
-  message_count?: number;
+type ApiUsage = {
+  messageCount?: number;
   remaining?: number;
-  is_premium?: boolean;
+  isPremium?: boolean;
 };
 
 const STORAGE_KEY = "misaki-chat-history";
@@ -881,6 +880,74 @@ export default function Home() {
     loaded,
   ]);
 
+  async function getAccessToken() {
+    const {
+      data,
+      error,
+    } =
+      await supabase.auth.getSession();
+
+    if (error) {
+      throw error;
+    }
+
+    const accessToken =
+      data.session
+        ?.access_token;
+
+    if (!accessToken) {
+      throw new Error(
+        "ログイン情報を確認できませんでした。ページを再読み込みしてね。"
+      );
+    }
+
+    return accessToken;
+  }
+
+  function applyApiUsage(
+    value: unknown
+  ) {
+    if (
+      !value ||
+      typeof value !==
+        "object"
+    ) {
+      return;
+    }
+
+    const usage =
+      value as ApiUsage;
+
+    if (
+      usage.isPremium ===
+      true
+    ) {
+      setPlan(
+        "premium"
+      );
+    }
+
+    if (
+      typeof usage.messageCount ===
+        "number" &&
+      Number.isFinite(
+        usage.messageCount
+      )
+    ) {
+      setDailyUsage({
+        date:
+          getJapanDateKey(),
+        count:
+          Math.max(
+            0,
+            Math.floor(
+              usage.messageCount
+            )
+          ),
+      });
+    }
+  }
+
   async function requestNotificationPermission() {
     if (
       !(
@@ -1018,69 +1085,6 @@ export default function Home() {
     setMemory([]);
   }
 
-  async function consumeDailyUsage() {
-    const {
-      data,
-      error,
-    } =
-      await supabase.rpc(
-        "consume_daily_message"
-      );
-
-    if (error) {
-      throw error;
-    }
-
-    const usage =
-      getFirstRpcRow<ConsumeRpcResult>(
-        data
-      );
-
-    if (!usage) {
-      throw new Error(
-        "利用回数を確認できませんでした。"
-      );
-    }
-
-    const count =
-      typeof usage.message_count ===
-      "number"
-        ? Math.max(
-            0,
-            Math.floor(
-              usage.message_count
-            )
-          )
-        : 0;
-
-    setDailyUsage({
-      date:
-        getJapanDateKey(),
-      count,
-    });
-
-    if (
-      usage.is_premium ===
-      true
-    ) {
-      setPlan(
-        "premium"
-      );
-    }
-
-    return {
-      allowed:
-        usage.allowed ===
-        true,
-
-      count,
-
-      isPremium:
-        usage.is_premium ===
-        true,
-    };
-  }
-
   function openPremium() {
     if (isPremium) {
       return;
@@ -1194,22 +1198,8 @@ export default function Home() {
     setLoading(true);
 
     try {
-      //
-      // Supabase側で送信1回分を確保
-      //
-      const usage =
-        await consumeDailyUsage();
-
-      if (
-        !usage.allowed &&
-        !usage.isPremium
-      ) {
-        setShowPremium(
-          true
-        );
-
-        return;
-      }
+      const accessToken =
+        await getAccessToken();
 
       const userMessage:
         ChatMessage = {
@@ -1258,6 +1248,9 @@ export default function Home() {
             headers: {
               "Content-Type":
                 "application/json",
+
+              Authorization:
+                `Bearer ${accessToken}`,
             },
 
             body:
@@ -1285,6 +1278,40 @@ export default function Home() {
 
       const data =
         await res.json();
+
+      applyApiUsage(
+        data?.usage
+      );
+
+      if (
+        res.status ===
+        429
+      ) {
+        setShowPremium(
+          true
+        );
+
+        setMessages(
+          (prev) =>
+            prev.filter(
+              (
+                item,
+                index
+              ) =>
+                !(
+                  index ===
+                    prev.length -
+                      1 &&
+                  item.role ===
+                    "user" &&
+                  item.text ===
+                    text
+                )
+            )
+        );
+
+        return;
+      }
 
       if (!res.ok) {
         throw new Error(
@@ -1361,7 +1388,8 @@ export default function Home() {
   async function sendProactiveMessage() {
     if (
       loading ||
-      !loaded
+      !loaded ||
+      !accountLoaded
     ) {
       return;
     }
@@ -1463,6 +1491,9 @@ export default function Home() {
       };
 
     try {
+      const accessToken =
+        await getAccessToken();
+
       const currentTime =
         getJapanCurrentTime();
 
@@ -1486,6 +1517,9 @@ export default function Home() {
             headers: {
               "Content-Type":
                 "application/json",
+
+              Authorization:
+                `Bearer ${accessToken}`,
             },
 
             body:
@@ -1612,6 +1646,7 @@ export default function Home() {
     };
   }, [
     loaded,
+    accountLoaded,
     loading,
     message,
     messages,
