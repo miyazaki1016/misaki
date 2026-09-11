@@ -22,6 +22,9 @@ const DAILY_USAGE_KEY =
 
 const MAX_MESSAGES = 60;
 
+// 無料版は1日20往復まで
+const FREE_DAILY_LIMIT = 20;
+
 // 10分ごとに、美咲から話しかける条件を確認
 const PROACTIVE_CHECK_MS =
   10 * 60 * 1000;
@@ -37,29 +40,36 @@ const MAX_PROACTIVE_PER_DAY = 4;
 const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  return new Date().toLocaleDateString(
+    "ja-JP",
+    {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }
+  );
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString("ja-JP", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
+  return new Date().toLocaleString(
+    "ja-JP",
+    {
+      timeZone: "Asia/Tokyo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      weekday: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }
+  );
 }
 
 export default function Home() {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] =
+    useState("");
 
   const [messages, setMessages] =
     useState<ChatMessage[]>(
@@ -80,6 +90,11 @@ export default function Home() {
       count: 0,
     });
 
+  const [
+    showPremium,
+    setShowPremium,
+  ] = useState(false);
+
   const [showMemory, setShowMemory] =
     useState(false);
 
@@ -99,17 +114,41 @@ export default function Home() {
     | "unsupported"
   >("default");
 
+  const today =
+    getJapanDateKey();
+
+  const usageCountToday =
+    dailyUsage.date === today
+      ? dailyUsage.count
+      : 0;
+
+  const freeRemaining =
+    Math.max(
+      0,
+      FREE_DAILY_LIMIT -
+        usageCountToday
+    );
+
+  const freeLimitReached =
+    usageCountToday >=
+    FREE_DAILY_LIMIT;
+
   // Service Workerを登録
   useEffect(() => {
-    if ("serviceWorker" in navigator) {
+    if (
+      "serviceWorker" in
+      navigator
+    ) {
       navigator.serviceWorker
         .register("/sw.js")
-        .then((registration) => {
-          console.log(
-            "Service Worker registered:",
-            registration
-          );
-        })
+        .then(
+          (registration) => {
+            console.log(
+              "Service Worker registered:",
+              registration
+            );
+          }
+        )
         .catch((error) => {
           console.error(
             "Service Worker registration failed:",
@@ -121,7 +160,9 @@ export default function Home() {
 
   // 現在の通知許可状態を確認
   useEffect(() => {
-    if (!("Notification" in window)) {
+    if (
+      !("Notification" in window)
+    ) {
       setNotificationPermission(
         "unsupported"
       );
@@ -162,20 +203,28 @@ export default function Home() {
 
       if (savedMessages) {
         const parsed =
-          JSON.parse(savedMessages);
+          JSON.parse(
+            savedMessages
+          );
 
-        if (Array.isArray(parsed)) {
-          parsedMessages = parsed
-            .filter(
-              (item) =>
-                item &&
-                (item.role === "user" ||
-                  item.role ===
-                    "misaki") &&
-                typeof item.text ===
-                  "string"
-            )
-            .slice(-MAX_MESSAGES);
+        if (
+          Array.isArray(parsed)
+        ) {
+          parsedMessages =
+            parsed
+              .filter(
+                (item) =>
+                  item &&
+                  (item.role ===
+                    "user" ||
+                    item.role ===
+                      "misaki") &&
+                  typeof item.text ===
+                    "string"
+              )
+              .slice(
+                -MAX_MESSAGES
+              );
 
           setMessages(
             parsedMessages
@@ -185,7 +234,9 @@ export default function Home() {
 
       if (savedMemory) {
         const parsedMemory =
-          JSON.parse(savedMemory);
+          JSON.parse(
+            savedMemory
+          );
 
         if (
           Array.isArray(
@@ -202,7 +253,9 @@ export default function Home() {
         }
       }
 
-      if (savedRelationship) {
+      if (
+        savedRelationship
+      ) {
         const parsedPoints =
           Number(
             savedRelationship
@@ -223,12 +276,11 @@ export default function Home() {
       } else if (
         parsedMessages
       ) {
-        // 初回導入時は
-        // 保存済み会話を最低限引き継ぐ
         const previousUserMessages =
           parsedMessages.filter(
             (item) =>
-              item.role === "user"
+              item.role ===
+              "user"
           ).length;
 
         setRelationshipPoints(
@@ -236,7 +288,7 @@ export default function Home() {
         );
       }
 
-      const today =
+      const currentDate =
         getJapanDateKey();
 
       if (savedDailyUsage) {
@@ -248,33 +300,46 @@ export default function Home() {
         if (
           parsedUsage &&
           parsedUsage.date ===
-            today &&
+            currentDate &&
           typeof parsedUsage.count ===
             "number" &&
           Number.isFinite(
             parsedUsage.count
           )
         ) {
-          setDailyUsage({
-            date: today,
-            count: Math.max(
+          const count =
+            Math.max(
               0,
               Math.floor(
                 parsedUsage.count
               )
-            ),
-          });
-        } else {
-          // 日付が変わっていたら
-          // その日のカウントを0から開始
+            );
+
           setDailyUsage({
-            date: today,
+            date:
+              currentDate,
+            count,
+          });
+
+          if (
+            count >=
+            FREE_DAILY_LIMIT
+          ) {
+            setShowPremium(
+              true
+            );
+          }
+        } else {
+          setDailyUsage({
+            date:
+              currentDate,
             count: 0,
           });
         }
       } else {
         setDailyUsage({
-          date: today,
+          date:
+            currentDate,
           count: 0,
         });
       }
@@ -374,7 +439,10 @@ export default function Home() {
         error
       );
     }
-  }, [dailyUsage, loaded]);
+  }, [
+    dailyUsage,
+    loaded,
+  ]);
 
   async function requestNotificationPermission() {
     if (
@@ -450,7 +518,9 @@ export default function Home() {
         "美咲との会話履歴をリセットしますか？"
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     localStorage.removeItem(
       STORAGE_KEY
@@ -468,17 +538,22 @@ export default function Home() {
         "この記憶を削除しますか？"
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     setMemory((prev) =>
       prev.filter(
-        (_, i) => i !== index
+        (_, i) =>
+          i !== index
       )
     );
   }
 
   function resetMemory() {
-    if (memory.length === 0) {
+    if (
+      memory.length === 0
+    ) {
       return;
     }
 
@@ -487,7 +562,9 @@ export default function Home() {
         "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
       );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     localStorage.removeItem(
       MEMORY_KEY
@@ -497,32 +574,67 @@ export default function Home() {
   }
 
   function incrementDailyUsage() {
-    const today =
+    const currentDate =
       getJapanDateKey();
 
-    setDailyUsage((prev) => {
-      if (
-        prev.date !== today
-      ) {
+    setDailyUsage(
+      (prev) => {
+        if (
+          prev.date !==
+          currentDate
+        ) {
+          return {
+            date:
+              currentDate,
+            count: 1,
+          };
+        }
+
         return {
-          date: today,
-          count: 1,
+          date:
+            currentDate,
+          count:
+            prev.count + 1,
         };
       }
+    );
+  }
 
-      return {
-        date: today,
-        count:
-          prev.count + 1,
-      };
-    });
+  function openPremium() {
+    setShowPremium(true);
+  }
+
+  function startPremium() {
+    alert(
+      "プレミアム決済は次の工程で接続します。今はまだ料金は発生しません。"
+    );
   }
 
   async function sendMessage() {
     const text =
       message.trim();
 
-    if (!text || loading) {
+    if (
+      !text ||
+      loading
+    ) {
+      return;
+    }
+
+    const currentDate =
+      getJapanDateKey();
+
+    const currentUsage =
+      dailyUsage.date ===
+      currentDate
+        ? dailyUsage.count
+        : 0;
+
+    if (
+      currentUsage >=
+      FREE_DAILY_LIMIT
+    ) {
+      setShowPremium(true);
       return;
     }
 
@@ -535,10 +647,16 @@ export default function Home() {
     const newMessages = [
       ...messages,
       userMessage,
-    ].slice(-MAX_MESSAGES);
+    ].slice(
+      -MAX_MESSAGES
+    );
 
-    setMessages(newMessages);
+    setMessages(
+      newMessages
+    );
+
     setMessage("");
+
     setLoading(true);
 
     const nextRelationshipPoints =
@@ -548,36 +666,37 @@ export default function Home() {
       const currentTime =
         getJapanCurrentTime();
 
-      const res = await fetch(
-        "/api/chat",
-        {
-          method: "POST",
+      const res =
+        await fetch(
+          "/api/chat",
+          {
+            method:
+              "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          body: JSON.stringify({
-            message: text,
+            body:
+              JSON.stringify({
+                message:
+                  text,
 
-            // 現在の発言は
-            // messageで別に送るため
-            // historyには入れない
-            history:
-              messages.slice(
-                -MAX_MESSAGES
-              ),
+                history:
+                  messages.slice(
+                    -MAX_MESSAGES
+                  ),
 
-            memory,
+                memory,
 
-            currentTime,
+                currentTime,
 
-            relationshipPoints:
-              nextRelationshipPoints,
-          }),
-        }
-      );
+                relationshipPoints:
+                  nextRelationshipPoints,
+              }),
+          }
+        );
 
       const data =
         await res.json();
@@ -596,49 +715,57 @@ export default function Home() {
       ) {
         setMemory(
           data.memory.filter(
-            (item: unknown) =>
+            (
+              item: unknown
+            ) =>
               typeof item ===
               "string"
           )
         );
       }
 
-      // 正常に会話できた時だけ
-      // 関係ポイントを増やす
+      // 正常に会話できた時だけ関係値を増やす
       setRelationshipPoints(
         nextRelationshipPoints
       );
 
-      // 正常に美咲から返事が来た
-      // 通常会話だけを1回として記録
+      // 正常に返事が来た通常会話だけカウント
       incrementDailyUsage();
 
-      setMessages((prev) =>
-        [
-          ...prev,
-          {
-            role:
-              "misaki" as const,
+      setMessages(
+        (prev) =>
+          [
+            ...prev,
+            {
+              role:
+                "misaki" as const,
 
-            text:
-              data.reply ||
-              "返事を取得できませんでした。",
-          },
-        ].slice(-MAX_MESSAGES)
+              text:
+                data.reply ||
+                "返事を取得できませんでした。",
+            },
+          ].slice(
+            -MAX_MESSAGES
+          )
       );
-    } catch (error: any) {
-      setMessages((prev) =>
-        [
-          ...prev,
-          {
-            role:
-              "misaki" as const,
+    } catch (
+      error: any
+    ) {
+      setMessages(
+        (prev) =>
+          [
+            ...prev,
+            {
+              role:
+                "misaki" as const,
 
-            text:
-              error?.message ||
-              "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
-          },
-        ].slice(-MAX_MESSAGES)
+              text:
+                error?.message ||
+                "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
+            },
+          ].slice(
+            -MAX_MESSAGES
+          )
       );
     } finally {
       setLoading(false);
@@ -663,18 +790,22 @@ export default function Home() {
 
     // 入力途中なら邪魔しない
     if (
-      message.trim().length >
-      0
+      message
+        .trim()
+        .length > 0
     ) {
       return;
     }
 
-    const now = Date.now();
-    const today =
+    const now =
+      Date.now();
+
+    const currentDate =
       getJapanDateKey();
 
     let state = {
-      date: today,
+      date:
+        currentDate,
       count: 0,
       lastSentAt: 0,
     };
@@ -687,15 +818,18 @@ export default function Home() {
 
       if (saved) {
         const parsed =
-          JSON.parse(saved);
+          JSON.parse(
+            saved
+          );
 
         if (
           parsed &&
           parsed.date ===
-            today
+            currentDate
         ) {
           state = {
-            date: today,
+            date:
+              currentDate,
 
             count:
               typeof parsed.count ===
@@ -726,7 +860,8 @@ export default function Home() {
     }
 
     if (
-      state.lastSentAt > 0 &&
+      state.lastSentAt >
+        0 &&
       now -
         state.lastSentAt <
         PROACTIVE_COOLDOWN_MS
@@ -750,7 +885,8 @@ export default function Home() {
         await fetch(
           "/api/chat",
           {
-            method: "POST",
+            method:
+              "POST",
 
             headers: {
               "Content-Type":
@@ -762,9 +898,6 @@ export default function Home() {
                 message:
                   hiddenInstruction.text,
 
-                // hiddenInstructionは
-                // messageとして送るため
-                // historyには重ねない
                 history:
                   messages.slice(
                     -MAX_MESSAGES
@@ -806,29 +939,40 @@ export default function Home() {
       ) {
         setMemory(
           data.memory.filter(
-            (item: unknown) =>
+            (
+              item: unknown
+            ) =>
               typeof item ===
               "string"
           )
         );
       }
 
-      setMessages((prev) =>
-        [
-          ...prev,
-          {
-            role:
-              "misaki" as const,
-            text: data.reply,
-          },
-        ].slice(-MAX_MESSAGES)
+      setMessages(
+        (prev) =>
+          [
+            ...prev,
+            {
+              role:
+                "misaki" as const,
+
+              text:
+                data.reply,
+            },
+          ].slice(
+            -MAX_MESSAGES
+          )
       );
 
       const nextState = {
-        date: today,
+        date:
+          currentDate,
+
         count:
           state.count + 1,
-        lastSentAt: now,
+
+        lastSentAt:
+          now,
       };
 
       localStorage.setItem(
@@ -846,7 +990,9 @@ export default function Home() {
   }
 
   useEffect(() => {
-    if (!loaded) return;
+    if (!loaded) {
+      return;
+    }
 
     const timer =
       window.setInterval(
@@ -890,12 +1036,21 @@ export default function Home() {
 
         <div
           style={{
-            marginLeft: "auto",
-            display: "flex",
-            gap: "8px",
+            marginLeft:
+              "auto",
+
+            display:
+              "flex",
+
+            gap:
+              "8px",
+
             alignItems:
               "center",
-            flexWrap: "wrap",
+
+            flexWrap:
+              "wrap",
+
             justifyContent:
               "flex-end",
           }}
@@ -914,16 +1069,22 @@ export default function Home() {
                 style={{
                   border:
                     "none",
+
                   background:
                     "#ff6b81",
+
                   color:
                     "#ffffff",
+
                   borderRadius:
                     "999px",
+
                   padding:
                     "7px 10px",
+
                   fontSize:
                     "12px",
+
                   cursor:
                     "pointer",
                 }}
@@ -938,6 +1099,7 @@ export default function Home() {
               style={{
                 fontSize:
                   "12px",
+
                 opacity:
                   0.6,
               }}
@@ -953,31 +1115,51 @@ export default function Home() {
                   !prev
               )
             }
-            disabled={loading}
+            disabled={
+              loading
+            }
             style={{
-              border: "none",
+              border:
+                "none",
+
               background:
                 "transparent",
-              fontSize: "12px",
+
+              fontSize:
+                "12px",
+
               cursor:
                 "pointer",
-              opacity: 0.7,
+
+              opacity:
+                0.7,
             }}
           >
             美咲の記憶
           </button>
 
           <button
-            onClick={resetChat}
-            disabled={loading}
+            onClick={
+              resetChat
+            }
+            disabled={
+              loading
+            }
             style={{
-              border: "none",
+              border:
+                "none",
+
               background:
                 "transparent",
-              fontSize: "12px",
+
+              fontSize:
+                "12px",
+
               cursor:
                 "pointer",
-              opacity: 0.6,
+
+              opacity:
+                0.6,
             }}
           >
             会話をリセット
@@ -990,22 +1172,31 @@ export default function Home() {
           style={{
             margin:
               "12px 0",
-            padding: "14px",
+
+            padding:
+              "14px",
+
             borderRadius:
               "14px",
+
             background:
               "rgba(255,255,255,0.8)",
+
             boxShadow:
               "0 2px 10px rgba(0,0,0,0.06)",
           }}
         >
           <div
             style={{
-              display: "flex",
+              display:
+                "flex",
+
               alignItems:
                 "center",
+
               justifyContent:
                 "space-between",
+
               marginBottom:
                 "10px",
             }}
@@ -1023,12 +1214,16 @@ export default function Home() {
                 style={{
                   border:
                     "none",
+
                   background:
                     "transparent",
+
                   fontSize:
                     "12px",
+
                   cursor:
                     "pointer",
+
                   opacity:
                     0.6,
                 }}
@@ -1044,7 +1239,10 @@ export default function Home() {
               style={{
                 fontSize:
                   "14px",
-                opacity: 0.6,
+
+                opacity:
+                  0.6,
+
                 margin: 0,
               }}
             >
@@ -1055,9 +1253,12 @@ export default function Home() {
               style={{
                 display:
                   "flex",
+
                 flexDirection:
                   "column",
-                gap: "8px",
+
+                gap:
+                  "8px",
               }}
             >
               {memory.map(
@@ -1070,14 +1271,19 @@ export default function Home() {
                     style={{
                       display:
                         "flex",
+
                       gap:
                         "8px",
+
                       alignItems:
                         "center",
+
                       padding:
                         "10px",
+
                       borderRadius:
                         "10px",
+
                       background:
                         "rgba(255,255,255,0.9)",
                     }}
@@ -1085,8 +1291,10 @@ export default function Home() {
                     <div
                       style={{
                         flex: 1,
+
                         fontSize:
                           "14px",
+
                         lineHeight:
                           1.5,
                       }}
@@ -1103,12 +1311,16 @@ export default function Home() {
                       style={{
                         border:
                           "none",
+
                         background:
                           "transparent",
+
                         cursor:
                           "pointer",
+
                         fontSize:
                           "12px",
+
                         opacity:
                           0.6,
                       }}
@@ -1127,11 +1339,236 @@ export default function Home() {
         運転中の画面操作はしないでね。安全な場所に停車してから話そう。
       </section>
 
+      <section
+        style={{
+          display:
+            "flex",
+
+          justifyContent:
+            "space-between",
+
+          alignItems:
+            "center",
+
+          gap:
+            "10px",
+
+          margin:
+            "8px 2px 10px",
+
+          fontSize:
+            "12px",
+
+          opacity:
+            0.7,
+        }}
+      >
+        <span>
+          無料版・今日あと
+          {freeRemaining}回
+        </span>
+
+        <button
+          onClick={
+            openPremium
+          }
+          style={{
+            border:
+              "none",
+
+            background:
+              "transparent",
+
+            padding: 0,
+
+            fontSize:
+              "12px",
+
+            fontWeight:
+              700,
+
+            cursor:
+              "pointer",
+
+            textDecoration:
+              "underline",
+          }}
+        >
+          プレミアム
+        </button>
+      </section>
+
+      {showPremium && (
+        <section
+          style={{
+            margin:
+              "10px 0 14px",
+
+            padding:
+              "18px",
+
+            borderRadius:
+              "18px",
+
+            background:
+              "#ffffff",
+
+            boxShadow:
+              "0 4px 18px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div
+            style={{
+              display:
+                "flex",
+
+              justifyContent:
+                "space-between",
+
+              gap:
+                "12px",
+
+              alignItems:
+                "flex-start",
+            }}
+          >
+            <div>
+              <strong
+                style={{
+                  fontSize:
+                    "17px",
+                }}
+              >
+                美咲プレミアム
+              </strong>
+
+              <p
+                style={{
+                  margin:
+                    "8px 0 0",
+
+                  fontSize:
+                    "14px",
+
+                  lineHeight:
+                    1.6,
+                }}
+              >
+                もっと美咲と話したい人向けのプランです。
+                会話回数を気にせず、美咲との関係を続けられるようにします。
+              </p>
+            </div>
+
+            <button
+              onClick={() =>
+                setShowPremium(
+                  false
+                )
+              }
+              style={{
+                border:
+                  "none",
+
+                background:
+                  "transparent",
+
+                cursor:
+                  "pointer",
+
+                fontSize:
+                  "18px",
+              }}
+            >
+              ×
+            </button>
+          </div>
+
+          {freeLimitReached && (
+            <p
+              style={{
+                margin:
+                  "14px 0 0",
+
+                fontSize:
+                  "13px",
+
+                fontWeight:
+                  700,
+              }}
+            >
+              今日は無料分の20回まで話したよ。
+            </p>
+          )}
+
+          <button
+            onClick={
+              startPremium
+            }
+            style={{
+              width:
+                "100%",
+
+              marginTop:
+                "16px",
+
+              border:
+                "none",
+
+              borderRadius:
+                "14px",
+
+              padding:
+                "13px 16px",
+
+              background:
+                "#ff6b81",
+
+              color:
+                "#ffffff",
+
+              fontSize:
+                "15px",
+
+              fontWeight:
+                700,
+
+              cursor:
+                "pointer",
+            }}
+          >
+            プレミアムを始める
+          </button>
+
+          <p
+            style={{
+              margin:
+                "9px 0 0",
+
+              textAlign:
+                "center",
+
+              fontSize:
+                "11px",
+
+              opacity:
+                0.55,
+            }}
+          >
+            現在はテスト中のため、まだ料金は発生しません。
+          </p>
+        </section>
+      )}
+
       <section className="chat">
         {messages.map(
-          (item, index) => (
+          (
+            item,
+            index
+          ) => (
             <div
-              key={index}
+              key={
+                index
+              }
               className={`bubble ${
                 item.role ===
                 "user"
@@ -1153,13 +1590,20 @@ export default function Home() {
 
       <section className="inputArea">
         <input
-          value={message}
-          onChange={(e) =>
+          value={
+            message
+          }
+          onChange={(
+            e
+          ) =>
             setMessage(
-              e.target.value
+              e.target
+                .value
             )
           }
-          onKeyDown={(e) => {
+          onKeyDown={(
+            e
+          ) => {
             if (
               e.key ===
               "Enter"
@@ -1167,19 +1611,32 @@ export default function Home() {
               sendMessage();
             }
           }}
-          placeholder="美咲に話しかける..."
-          disabled={loading}
+          placeholder={
+            freeLimitReached
+              ? "今日は無料分を使い切りました"
+              : "美咲に話しかける..."
+          }
+          disabled={
+            loading ||
+            freeLimitReached
+          }
         />
 
         <button
           onClick={
-            sendMessage
+            freeLimitReached
+              ? openPremium
+              : sendMessage
           }
-          disabled={loading}
+          disabled={
+            loading
+          }
         >
           {loading
             ? "送信中..."
-            : "送信"}
+            : freeLimitReached
+              ? "続きを話す"
+              : "送信"}
         </button>
       </section>
     </main>
