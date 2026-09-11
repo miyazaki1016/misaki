@@ -17,8 +17,7 @@ const MAX_MESSAGES = 60;
 const PROACTIVE_CHECK_MS = 10 * 60 * 1000;
 
 // 美咲からの自発メッセージ同士は最低45分空ける
-const PROACTIVE_COOLDOWN_MS =
-  45 * 60 * 1000;
+const PROACTIVE_COOLDOWN_MS = 45 * 60 * 1000;
 
 // 1日最大4回
 const MAX_PROACTIVE_PER_DAY = 4;
@@ -27,101 +26,90 @@ const MAX_PROACTIVE_PER_DAY = 4;
 const INITIAL_MESSAGES: ChatMessage[] = [];
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  );
+  return new Date().toLocaleDateString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  );
+  return new Date().toLocaleString("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
 
 export default function Home() {
-  const [message, setMessage] =
-    useState("");
+  const [message, setMessage] = useState("");
 
   const [messages, setMessages] =
-    useState<ChatMessage[]>(
-      INITIAL_MESSAGES
-    );
+    useState<ChatMessage[]>(INITIAL_MESSAGES);
 
-  const [memory, setMemory] =
-    useState<string[]>([]);
+  const [memory, setMemory] = useState<string[]>([]);
 
-  const [showMemory, setShowMemory] =
-    useState(false);
+  const [showMemory, setShowMemory] = useState(false);
 
-  const [loading, setLoading] =
-    useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const [loaded, setLoaded] =
-    useState(false);
+  const [loaded, setLoaded] = useState(false);
 
+  // Service Workerを登録
+  useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          console.log(
+            "Service Worker registered:",
+            registration
+          );
+        })
+        .catch((error) => {
+          console.error(
+            "Service Worker registration failed:",
+            error
+          );
+        });
+    }
+  }, []);
+
+  // 保存済みの会話と記憶を読み込む
   useEffect(() => {
     try {
       const savedMessages =
-        localStorage.getItem(
-          STORAGE_KEY
-        );
+        localStorage.getItem(STORAGE_KEY);
 
       const savedMemory =
-        localStorage.getItem(
-          MEMORY_KEY
-        );
+        localStorage.getItem(MEMORY_KEY);
 
       if (savedMessages) {
         const parsedMessages =
-          JSON.parse(
-            savedMessages
-          );
+          JSON.parse(savedMessages);
 
-        if (
-          Array.isArray(
-            parsedMessages
-          )
-        ) {
+        if (Array.isArray(parsedMessages)) {
           setMessages(
-            parsedMessages.slice(
-              -MAX_MESSAGES
-            )
+            parsedMessages.slice(-MAX_MESSAGES)
           );
         }
       }
 
       if (savedMemory) {
         const parsedMemory =
-          JSON.parse(
-            savedMemory
-          );
+          JSON.parse(savedMemory);
 
-        if (
-          Array.isArray(
-            parsedMemory
-          )
-        ) {
+        if (Array.isArray(parsedMemory)) {
           setMemory(
             parsedMemory.filter(
               (item) =>
-                typeof item ===
-                "string"
+                typeof item === "string"
             )
           );
         }
@@ -136,20 +124,17 @@ export default function Home() {
     }
   }, []);
 
+  // 会話履歴を保存
   useEffect(() => {
     if (!loaded) return;
 
     try {
       const limitedMessages =
-        messages.slice(
-          -MAX_MESSAGES
-        );
+        messages.slice(-MAX_MESSAGES);
 
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(
-          limitedMessages
-        )
+        JSON.stringify(limitedMessages)
       );
     } catch (error) {
       console.error(
@@ -159,6 +144,7 @@ export default function Home() {
     }
   }, [messages, loaded]);
 
+  // 長期記憶を保存
   useEffect(() => {
     if (!loaded) return;
 
@@ -176,86 +162,64 @@ export default function Home() {
   }, [memory, loaded]);
 
   function resetChat() {
-    const confirmed =
-      window.confirm(
-        "美咲との会話履歴をリセットしますか？"
-      );
+    const confirmed = window.confirm(
+      "美咲との会話履歴をリセットしますか？"
+    );
 
     if (!confirmed) return;
 
-    localStorage.removeItem(
-      STORAGE_KEY
-    );
+    localStorage.removeItem(STORAGE_KEY);
 
     setMessages([]);
-
     setMessage("");
   }
 
-  function deleteMemory(
-    index: number
-  ) {
-    const confirmed =
-      window.confirm(
-        "この記憶を削除しますか？"
-      );
+  function deleteMemory(index: number) {
+    const confirmed = window.confirm(
+      "この記憶を削除しますか？"
+    );
 
     if (!confirmed) return;
 
     setMemory((prev) =>
-      prev.filter(
-        (_, i) =>
-          i !== index
-      )
+      prev.filter((_, i) => i !== index)
     );
   }
 
   function resetMemory() {
-    if (
-      memory.length === 0
-    ) {
+    if (memory.length === 0) {
       return;
     }
 
-    const confirmed =
-      window.confirm(
-        "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
-      );
+    const confirmed = window.confirm(
+      "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
+    );
 
     if (!confirmed) return;
 
-    localStorage.removeItem(
-      MEMORY_KEY
-    );
+    localStorage.removeItem(MEMORY_KEY);
 
     setMemory([]);
   }
 
   async function sendMessage() {
-    const text =
-      message.trim();
+    const text = message.trim();
 
-    if (
-      !text ||
-      loading
-    ) {
+    if (!text || loading) {
       return;
     }
 
-    const userMessage:
-      ChatMessage = {
-        role: "user",
-        text,
-      };
+    const userMessage: ChatMessage = {
+      role: "user",
+      text,
+    };
 
     const newMessages = [
       ...messages,
       userMessage,
     ].slice(-MAX_MESSAGES);
 
-    setMessages(
-      newMessages
-    );
+    setMessages(newMessages);
 
     setMessage("");
     setLoading(true);
@@ -264,34 +228,22 @@ export default function Home() {
       const currentTime =
         getJapanCurrentTime();
 
-      const res =
-        await fetch(
-          "/api/chat",
-          {
-            method: "POST",
+      const res = await fetch("/api/chat", {
+        method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
+        headers: {
+          "Content-Type": "application/json",
+        },
 
-            body:
-              JSON.stringify({
-                message:
-                  text,
+        body: JSON.stringify({
+          message: text,
+          history: newMessages,
+          memory,
+          currentTime,
+        }),
+      });
 
-                history:
-                  newMessages,
-
-                memory,
-
-                currentTime,
-              }),
-          }
-        );
-
-      const data =
-        await res.json();
+      const data = await res.json();
 
       if (!res.ok) {
         throw new Error(
@@ -300,54 +252,37 @@ export default function Home() {
         );
       }
 
-      if (
-        Array.isArray(
-          data.memory
-        )
-      ) {
+      if (Array.isArray(data.memory)) {
         setMemory(
           data.memory.filter(
-            (
-              item: unknown
-            ) =>
-              typeof item ===
-              "string"
+            (item: unknown) =>
+              typeof item === "string"
           )
         );
       }
 
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                data.reply ||
-                "返事を取得できませんでした。",
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
+      setMessages((prev) =>
+        [
+          ...prev,
+          {
+            role: "misaki" as const,
+            text:
+              data.reply ||
+              "返事を取得できませんでした。",
+          },
+        ].slice(-MAX_MESSAGES)
       );
     } catch (error: any) {
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                error?.message ||
-                "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
+      setMessages((prev) =>
+        [
+          ...prev,
+          {
+            role: "misaki" as const,
+            text:
+              error?.message ||
+              "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
+          },
+        ].slice(-MAX_MESSAGES)
       );
     } finally {
       setLoading(false);
@@ -355,10 +290,7 @@ export default function Home() {
   }
 
   async function sendProactiveMessage() {
-    if (
-      loading ||
-      !loaded
-    ) {
+    if (loading || !loaded) {
       return;
     }
 
@@ -371,17 +303,13 @@ export default function Home() {
     }
 
     // 入力途中なら邪魔しない
-    if (
-      message.trim().length > 0
-    ) {
+    if (message.trim().length > 0) {
       return;
     }
 
-    const now =
-      Date.now();
+    const now = Date.now();
 
-    const today =
-      getJapanDateKey();
+    const today = getJapanDateKey();
 
     let state = {
       date: today,
@@ -396,13 +324,11 @@ export default function Home() {
         );
 
       if (saved) {
-        const parsed =
-          JSON.parse(saved);
+        const parsed = JSON.parse(saved);
 
         if (
           parsed &&
-          parsed.date ===
-            today
+          parsed.date === today
         ) {
           state = {
             date: today,
@@ -436,22 +362,19 @@ export default function Home() {
     }
 
     if (
-      state.lastSentAt >
-        0 &&
-      now -
-        state.lastSentAt <
+      state.lastSentAt > 0 &&
+      now - state.lastSentAt <
         PROACTIVE_COOLDOWN_MS
     ) {
       return;
     }
 
-    const hiddenInstruction:
-      ChatMessage = {
-        role: "user",
+    const hiddenInstruction: ChatMessage = {
+      role: "user",
 
-        text:
-          "【これは画面には表示されない自発会話のきっかけです】ユーザーからメッセージが来たわけではありません。美咲のほうから、今の時間帯・今日の美咲自身の生活・直近の会話・長期記憶を参考にして、恋人へ自然にひとことLINEしてください。質問を無理につけず、1〜2文程度にしてください。話すことが特になければ、美咲自身の今の様子や気分を短く話してください。",
-      };
+      text:
+        "【これは画面には表示されない自発会話のきっかけです】ユーザーからメッセージが来たわけではありません。美咲のほうから、今の時間帯・今日の美咲自身の生活・直近の会話・長期記憶を参考にして、恋人へ自然にひとことLINEしてください。質問を無理につけず、1〜2文程度にしてください。話すことが特になければ、美咲自身の今の様子や気分を短く話してください。",
+    };
 
     const proactiveHistory = [
       ...messages,
@@ -462,34 +385,31 @@ export default function Home() {
       const currentTime =
         getJapanCurrentTime();
 
-      const res =
-        await fetch(
-          "/api/chat",
-          {
-            method: "POST",
+      const res = await fetch(
+        "/api/chat",
+        {
+          method: "POST",
 
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
 
-            body:
-              JSON.stringify({
-                message:
-                  hiddenInstruction.text,
+          body: JSON.stringify({
+            message:
+              hiddenInstruction.text,
 
-                history:
-                  proactiveHistory,
+            history:
+              proactiveHistory,
 
-                memory,
+            memory,
 
-                currentTime,
-              }),
-          }
-        );
+            currentTime,
+          }),
+        }
+      );
 
-      const data =
-        await res.json();
+      const data = await res.json();
 
       if (!res.ok) {
         console.error(
@@ -502,59 +422,39 @@ export default function Home() {
 
       if (
         !data.reply ||
-        typeof data.reply !==
-          "string"
+        typeof data.reply !== "string"
       ) {
         return;
       }
 
-      if (
-        Array.isArray(
-          data.memory
-        )
-      ) {
+      if (Array.isArray(data.memory)) {
         setMemory(
           data.memory.filter(
-            (
-              item: unknown
-            ) =>
-              typeof item ===
-              "string"
+            (item: unknown) =>
+              typeof item === "string"
           )
         );
       }
 
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                data.reply,
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
+      setMessages((prev) =>
+        [
+          ...prev,
+          {
+            role: "misaki" as const,
+            text: data.reply,
+          },
+        ].slice(-MAX_MESSAGES)
       );
 
       const nextState = {
         date: today,
-
-        count:
-          state.count + 1,
-
-        lastSentAt:
-          now,
+        count: state.count + 1,
+        lastSentAt: now,
       };
 
       localStorage.setItem(
         PROACTIVE_KEY,
-        JSON.stringify(
-          nextState
-        )
+        JSON.stringify(nextState)
       );
     } catch (error) {
       console.error(
@@ -568,17 +468,12 @@ export default function Home() {
     if (!loaded) return;
 
     const timer =
-      window.setInterval(
-        () => {
-          sendProactiveMessage();
-        },
-        PROACTIVE_CHECK_MS
-      );
+      window.setInterval(() => {
+        sendProactiveMessage();
+      }, PROACTIVE_CHECK_MS);
 
     return () => {
-      window.clearInterval(
-        timer
-      );
+      window.clearInterval(timer);
     };
   }, [
     loaded,
@@ -605,19 +500,16 @@ export default function Home() {
 
         <div
           style={{
-            marginLeft:
-              "auto",
+            marginLeft: "auto",
             display: "flex",
             gap: "8px",
-            alignItems:
-              "center",
+            alignItems: "center",
           }}
         >
           <button
             onClick={() =>
               setShowMemory(
-                (prev) =>
-                  !prev
+                (prev) => !prev
               )
             }
             disabled={loading}
@@ -625,10 +517,8 @@ export default function Home() {
               border: "none",
               background:
                 "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
+              fontSize: "12px",
+              cursor: "pointer",
               opacity: 0.7,
             }}
           >
@@ -636,18 +526,14 @@ export default function Home() {
           </button>
 
           <button
-            onClick={
-              resetChat
-            }
+            onClick={resetChat}
             disabled={loading}
             style={{
               border: "none",
               background:
                 "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
+              fontSize: "12px",
+              cursor: "pointer",
               opacity: 0.6,
             }}
           >
@@ -659,11 +545,9 @@ export default function Home() {
       {showMemory && (
         <section
           style={{
-            margin:
-              "12px 0",
+            margin: "12px 0",
             padding: "14px",
-            borderRadius:
-              "14px",
+            borderRadius: "14px",
             background:
               "rgba(255,255,255,0.8)",
             boxShadow:
@@ -672,37 +556,27 @@ export default function Home() {
         >
           <div
             style={{
-              display:
-                "flex",
-              alignItems:
-                "center",
+              display: "flex",
+              alignItems: "center",
               justifyContent:
                 "space-between",
-              marginBottom:
-                "10px",
+              marginBottom: "10px",
             }}
           >
             <strong>
               美咲が覚えていること
             </strong>
 
-            {memory.length >
-              0 && (
+            {memory.length > 0 && (
               <button
-                onClick={
-                  resetMemory
-                }
+                onClick={resetMemory}
                 style={{
-                  border:
-                    "none",
+                  border: "none",
                   background:
                     "transparent",
-                  fontSize:
-                    "12px",
-                  cursor:
-                    "pointer",
-                  opacity:
-                    0.6,
+                  fontSize: "12px",
+                  cursor: "pointer",
+                  opacity: 0.6,
                 }}
               >
                 すべて削除
@@ -710,12 +584,10 @@ export default function Home() {
             )}
           </div>
 
-          {memory.length ===
-          0 ? (
+          {memory.length === 0 ? (
             <p
               style={{
-                fontSize:
-                  "14px",
+                fontSize: "14px",
                 opacity: 0.6,
                 margin: 0,
               }}
@@ -725,18 +597,14 @@ export default function Home() {
           ) : (
             <div
               style={{
-                display:
-                  "flex",
+                display: "flex",
                 flexDirection:
                   "column",
                 gap: "8px",
               }}
             >
               {memory.map(
-                (
-                  item,
-                  index
-                ) => (
+                (item, index) => (
                   <div
                     key={`${item}-${index}`}
                     style={{
@@ -800,15 +668,11 @@ export default function Home() {
 
       <section className="chat">
         {messages.map(
-          (
-            item,
-            index
-          ) => (
+          (item, index) => (
             <div
               key={index}
               className={`bubble ${
-                item.role ===
-                "user"
+                item.role === "user"
                   ? "user"
                   : ""
               }`}
@@ -835,8 +699,7 @@ export default function Home() {
           }
           onKeyDown={(e) => {
             if (
-              e.key ===
-              "Enter"
+              e.key === "Enter"
             ) {
               sendMessage();
             }
@@ -846,9 +709,7 @@ export default function Home() {
         />
 
         <button
-          onClick={
-            sendMessage
-          }
+          onClick={sendMessage}
           disabled={loading}
         >
           {loading
