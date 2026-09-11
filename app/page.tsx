@@ -9,13 +9,12 @@ type ChatMessage = {
 
 const STORAGE_KEY = "misaki-chat-history";
 const MEMORY_KEY = "misaki-long-term-memory";
-
 const PROACTIVE_KEY = "misaki-proactive-state";
 
 const MAX_MESSAGES = 60;
 
-// 最後の会話から10分後
-const PROACTIVE_IDLE_MS = 10 * 60 * 1000;
+// 10分ごとに、美咲から話しかける条件を確認
+const PROACTIVE_CHECK_MS = 10 * 60 * 1000;
 
 // 美咲からの自発メッセージ同士は最低45分空ける
 const PROACTIVE_COOLDOWN_MS =
@@ -532,7 +531,7 @@ export default function Home() {
         );
       }
 
-      // 隠し指示は画面にも履歴にも残さない
+      // 隠し指示は履歴へ残さず、
       // 美咲の返事だけ追加する
       setMessages(
         (prev) =>
@@ -552,9 +551,12 @@ export default function Home() {
 
       const nextState = {
         date: today,
+
         count:
           state.count + 1,
-        lastSentAt: now,
+
+        lastSentAt:
+          now,
       };
 
       localStorage.setItem(
@@ -574,25 +576,16 @@ export default function Home() {
   useEffect(() => {
     if (!loaded) return;
 
-    if (loading) return;
-
-    if (
-      message.trim().length >
-      0
-    ) {
-      return;
-    }
-
     const timer =
-      window.setTimeout(
+      window.setInterval(
         () => {
           sendProactiveMessage();
         },
-        PROACTIVE_IDLE_MS
+        PROACTIVE_CHECK_MS
       );
 
     return () => {
-      window.clearTimeout(
+      window.clearInterval(
         timer
       );
     };
@@ -601,6 +594,7 @@ export default function Home() {
     loading,
     message,
     messages,
+    memory,
   ]);
 
   return (
@@ -612,6 +606,7 @@ export default function Home() {
 
         <div>
           <h1>美咲</h1>
+
           <p>
             タクドラの彼女・38歳
           </p>
