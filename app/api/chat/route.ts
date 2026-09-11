@@ -180,16 +180,17 @@ ${memoryText}
     const data = await response.json();
 
     if (!response.ok) {
-      console.error("GEMINI API ERROR:", data);
+  console.error("GEMINI API ERROR:", data);
 
-      return Response.json(
-        {
-          error:
-            "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
-        },
-        { status: 500 }
-      );
-    }
+  return Response.json(
+    {
+      error:
+        data?.error?.message ||
+        "Gemini APIでエラーが発生しました。",
+    },
+    { status: 500 }
+  );
+}
 
     const rawText =
       data?.candidates?.[0]?.content?.parts?.[0]?.text;
