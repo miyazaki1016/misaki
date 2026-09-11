@@ -5,14 +5,51 @@ import { useState } from "react";
 export default function Home() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
-    "おかえり😊 今日は乗務？それとも明け？",
+    { role: "misaki", text: "おかえり😊 今日は乗務？それとも明け？" },
   ]);
+  const [loading, setLoading] = useState(false);
 
-  function sendMessage() {
-    if (!message.trim()) return;
+  async function sendMessage() {
+    const text = message.trim();
+    if (!text || loading) return;
 
-    setMessages([...messages, message]);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", text },
+    ]);
     setMessage("");
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message: text }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "通信エラー");
+      }
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "misaki", text: data.reply },
+      ]);
+    } catch (error) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "misaki",
+          text: "ごめんね、今ちょっと通信できなかったみたい。もう一度話しかけてね。",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -27,26 +64,42 @@ export default function Home() {
       </section>
 
       <section className="notice">
-        運転中の画面操作はしないでね。
-        安全な場所に停車してから話そう。
+        運転中の画面操作はしないでね。安全な場所に停車してから話そう。
       </section>
 
       <section className="chat">
-        {messages.map((text, index) => (
-          <div className="bubble" key={index}>
-            {text}
+        {messages.map((item, index) => (
+          <div
+            className={`bubble ${item.role === "user" ? "user" : ""}`}
+            key={index}
+          >
+            {item.text}
           </div>
         ))}
+
+        {loading && (
+          <div className="bubble">
+            美咲が考え中…
+          </div>
+        )}
       </section>
 
       <section className="inputArea">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
           placeholder="美咲に話しかける..."
         />
 
-        <button onClick={sendMessage}>送信</button>
+        <button
+          onClick={sendMessage}
+          disabled={loading}
+        >
+          送信
+        </button>
       </section>
     </main>
   );
