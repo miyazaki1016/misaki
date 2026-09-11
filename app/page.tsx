@@ -1,21 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type ChatMessage = {
   role: "misaki" | "user";
   text: string;
 };
 
+const STORAGE_KEY = "misaki-chat-history";
+
+const INITIAL_MESSAGES: ChatMessage[] = [
+  {
+    role: "misaki",
+    text: "おかえり😊 今日は乗務？それとも明け？",
+  },
+];
+
 export default function Home() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      role: "misaki",
-      text: "おかえり😊 今日は乗務？それとも明け？",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [loading, setLoading] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+
+      if (saved) {
+        const parsed = JSON.parse(saved);
+
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load chat history:", error);
+    } finally {
+      setLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loaded) return;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (error) {
+      console.error("Failed to save chat history:", error);
+    }
+  }, [messages, loaded]);
 
   async function sendMessage() {
     const text = message.trim();
@@ -99,11 +132,7 @@ export default function Home() {
           </div>
         ))}
 
-        {loading && (
-          <div className="bubble">
-            美咲が考え中…
-          </div>
-        )}
+        {loading && <div className="bubble">美咲が考え中…</div>}
       </section>
 
       <section className="inputArea">
