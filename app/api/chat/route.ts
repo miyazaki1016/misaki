@@ -136,14 +136,13 @@ export async function POST(request: Request) {
 
     const data = await response.json();
 
-if (!response.ok) {
+　if (!response.ok) {
   console.error("GEMINI API ERROR:", data);
 
   return Response.json(
     {
       error:
-        data?.error?.message ||
-        JSON.stringify(data),
+        "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
     },
     { status: 500 }
   );
