@@ -8,6 +8,7 @@ type ChatMessage = {
 };
 
 const STORAGE_KEY = "misaki-chat-history";
+const MAX_MESSAGES = 60;
 
 const INITIAL_MESSAGES: ChatMessage[] = [
   {
@@ -30,7 +31,7 @@ export default function Home() {
         const parsed = JSON.parse(saved);
 
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setMessages(parsed);
+          setMessages(parsed.slice(-MAX_MESSAGES));
         }
       }
     } catch (error) {
@@ -44,7 +45,12 @@ export default function Home() {
     if (!loaded) return;
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+      const limitedMessages = messages.slice(-MAX_MESSAGES);
+
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(limitedMessages)
+      );
     } catch (error) {
       console.error("Failed to save chat history:", error);
     }
@@ -55,13 +61,12 @@ export default function Home() {
 
     if (!text || loading) return;
 
-    const newMessages: ChatMessage[] = [
-      ...messages,
-      {
-        role: "user",
-        text,
-      },
-    ];
+    const userMessage: ChatMessage = {
+      role: "user",
+      text,
+    };
+
+    const newMessages = [...messages, userMessage].slice(-MAX_MESSAGES);
 
     setMessages(newMessages);
     setMessage("");
@@ -85,23 +90,27 @@ export default function Home() {
         throw new Error(data?.error || "通信に失敗しました");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "misaki",
-          text: data.reply || "返事を取得できませんでした。",
-        },
-      ]);
+      setMessages((prev) =>
+        [
+          ...prev,
+          {
+            role: "misaki" as const,
+            text: data.reply || "返事を取得できませんでした。",
+          },
+        ].slice(-MAX_MESSAGES)
+      );
     } catch (error: any) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "misaki",
-          text:
-            error?.message ||
-            "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
-        },
-      ]);
+      setMessages((prev) =>
+        [
+          ...prev,
+          {
+            role: "misaki" as const,
+            text:
+              error?.message ||
+              "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
+          },
+        ].slice(-MAX_MESSAGES)
+      );
     } finally {
       setLoading(false);
     }
