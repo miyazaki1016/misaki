@@ -10,21 +10,16 @@ function hashText(text: string) {
 
   for (let i = 0; i < text.length; i++) {
     hash =
-      (hash * 31 +
-        text.charCodeAt(i)) >>>
-      0;
+      (hash * 31 + text.charCodeAt(i)) >>> 0;
   }
 
   return hash;
 }
 
-function getHour(
-  currentTime: string
-) {
-  const match =
-    currentTime.match(
-      /(\d{1,2}):(\d{2})/
-    );
+function getHour(currentTime: string) {
+  const match = currentTime.match(
+    /(\d{1,2}):(\d{2})/
+  );
 
   if (!match) return 18;
 
@@ -37,76 +32,53 @@ function createMisakiLife(
   const dateKey =
     currentTime.match(
       /\d{4}\/\d{1,2}\/\d{1,2}/
-    )?.[0] ||
-    currentTime.slice(0, 10);
+    )?.[0] || currentTime.slice(0, 10);
 
-  const seed =
-    hashText(dateKey);
-
-  const hour =
-    getHour(currentTime);
+  const seed = hashText(dateKey);
+  const hour = getHour(currentTime);
 
   const dayTypes = [
     {
       type: "仕事の日",
-
       morning:
         "朝は少し眠そうに支度していた",
-
       daytime:
         "昼間は仕事をしていた",
-
       evening:
         "仕事を終えて家でのんびりしている",
-
       late:
         "家でくつろいでいて、少し眠くなってきている",
     },
-
     {
       type: "仕事の日",
-
       morning:
         "朝はバタバタしながら出かける準備をしていた",
-
       daytime:
         "仕事で少し忙しくしていた",
-
       evening:
         "帰宅して一息ついている",
-
       late:
         "お風呂も済ませて家でだらだらしている",
     },
-
     {
       type: "休みの日",
-
       morning:
         "少し遅めに起きてのんびりしていた",
-
       daytime:
         "買い物をしたり家のことをしていた",
-
       evening:
         "家でゆっくりしている",
-
       late:
         "ソファでだらだらしながらスマホを見ている",
     },
-
     {
       type: "休みの日",
-
       morning:
         "ゆっくり起きてのんびりしていた",
-
       daytime:
         "少し外に出て気分転換していた",
-
       evening:
         "家に戻ってのんびりしている",
-
       late:
         "家で動画を見たりしながら夜更かし気味",
     },
@@ -114,77 +86,45 @@ function createMisakiLife(
 
   const moods = [
     "今日はわりと機嫌がいい",
-
     "今日は少し甘えたい気分",
-
     "今日は普通に落ち着いている",
-
     "今日はちょっとだけ眠い",
-
     "今日は少し疲れているけど元気",
-
     "今日はなんとなくユーザーと話したい気分",
   ];
 
   const smallThings = [
     "甘いものをちょっと食べたい気分",
-
     "今日は家でのんびりしたい",
-
     "少しだけ眠気がある",
-
     "スマホを見ながらだらだらしている",
-
     "今夜は少し長く話したい気分",
-
     "なんとなくユーザーのことを思い出すことがある",
-
     "ちょっと小腹が空いている",
-
     "ソファでだらだらしたい気分",
   ];
 
   const day =
-    dayTypes[
-      seed %
-        dayTypes.length
-    ];
+    dayTypes[seed % dayTypes.length];
 
   const mood =
-    moods[
-      (seed >> 3) %
-        moods.length
-    ];
+    moods[(seed >> 3) % moods.length];
 
   const smallThing =
     smallThings[
-      (seed >> 6) %
-        smallThings.length
+      (seed >> 6) % smallThings.length
     ];
 
   let currentSituation = "";
 
-  if (
-    hour >= 5 &&
-    hour < 11
-  ) {
-    currentSituation =
-      day.morning;
-  } else if (
-    hour >= 11 &&
-    hour < 17
-  ) {
-    currentSituation =
-      day.daytime;
-  } else if (
-    hour >= 17 &&
-    hour < 22
-  ) {
-    currentSituation =
-      day.evening;
+  if (hour >= 5 && hour < 11) {
+    currentSituation = day.morning;
+  } else if (hour >= 11 && hour < 17) {
+    currentSituation = day.daytime;
+  } else if (hour >= 17 && hour < 22) {
+    currentSituation = day.evening;
   } else {
-    currentSituation =
-      day.late;
+    currentSituation = day.late;
   }
 
   return `
@@ -203,10 +143,9 @@ function createProactiveGuide(
   currentTime: string,
   recentMisakiText: string
 ) {
-  const seed =
-    hashText(
-      `${currentTime}-${recentMisakiText}`
-    );
+  const seed = hashText(
+    `${currentTime}-${recentMisakiText}`
+  );
 
   const themes = [
     `
@@ -221,7 +160,6 @@ function createProactiveGuide(
 
 ただし例文のコピーは禁止です。
 `,
-
     `
 今回の自発メッセージは
 「美咲の何気ない生活」
@@ -237,7 +175,6 @@ function createProactiveGuide(
 
 大事件は作らないでください。
 `,
-
     `
 今回の自発メッセージは
 「食べ物・飲み物・小腹」
@@ -253,7 +190,6 @@ function createProactiveGuide(
 ただし直近でコーヒーの話をしていたら
 コーヒーは使わないでください。
 `,
-
     `
 今回の自発メッセージは
 「眠い・だらけたい・疲れた」
@@ -261,24 +197,14 @@ function createProactiveGuide(
 
 重い悩みにはせず、
 恋人への普通のLINE程度にしてください。
-
-例の雰囲気：
-「今日ほんと眠いー。」
-「もうソファから動きたくない笑」
 `,
-
     `
 今回の自発メッセージは
 「ユーザーをふと思い出した」
 感じを中心にしてください。
 
-例の雰囲気：
-「なんか急に思い出した笑」
-「今ふと何してるかなって思った。」
-
 ただし必ず質問する必要はありません。
 `,
-
     `
 今回の自発メッセージは
 「軽いからかい・恋人っぽい一言」
@@ -289,30 +215,20 @@ function createProactiveGuide(
 
 無理に話題を作らないでください。
 `,
-
     `
 今回の自発メッセージは
 「ちょっと寂しい・構ってほしい」
 くらいの軽い甘えを中心にしてください。
 
 重くしないでください。
-
-例の雰囲気：
-「今日はちょっと構ってほしい気分。」
-「なんか少し寂しいんですけどー笑」
 `,
-
     `
 今回の自発メッセージは
 「美咲から特に用事もなく送ったLINE」
 にしてください。
 
 意味のある話題を無理に作らず、
-
-「今ちょうど一息ついた。」
-「なんとなくLINEしたくなった笑」
-
-のような自然さを優先してください。
+恋人にふと送る短いLINEの自然さを優先してください。
 `,
   ];
 
@@ -330,28 +246,23 @@ export async function POST(
       history,
       memory,
       currentTime,
-    } =
-      await request.json();
+    } = await request.json();
 
     if (
       !message ||
-      typeof message !==
-        "string"
+      typeof message !== "string"
     ) {
       return Response.json(
         {
           error:
             "メッセージを入力してね。",
         },
-        {
-          status: 400,
-        }
+        { status: 400 }
       );
     }
 
     const apiKey =
-      process.env
-        .GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       console.error(
@@ -363,21 +274,17 @@ export async function POST(
           error:
             "今ちょっと調子が悪いみたい。少し待ってからもう一度話しかけてね。",
         },
-        {
-          status: 500,
-        }
+        { status: 500 }
       );
     }
 
-    const safeHistory:
-      ChatMessage[] =
+    const safeHistory: ChatMessage[] =
       Array.isArray(history)
         ? history
             .filter(
               (item) =>
                 item &&
-                (item.role ===
-                  "user" ||
+                (item.role === "user" ||
                   item.role ===
                     "misaki") &&
                 typeof item.text ===
@@ -386,23 +293,18 @@ export async function POST(
             .slice(-60)
         : [];
 
-    const safeMemory:
-      string[] =
+    const safeMemory: string[] =
       Array.isArray(memory)
         ? memory
             .filter(
               (item) =>
-                typeof item ===
-                "string"
+                typeof item === "string"
             )
-            .slice(
-              -MAX_MEMORY
-            )
+            .slice(-MAX_MEMORY)
         : [];
 
     const safeCurrentTime =
-      typeof currentTime ===
-      "string"
+      typeof currentTime === "string"
         ? currentTime
         : "不明";
 
@@ -410,8 +312,7 @@ export async function POST(
       safeMemory.length > 0
         ? safeMemory
             .map(
-              (item) =>
-                `・${item}`
+              (item) => `・${item}`
             )
             .join("\n")
         : "まだ長期記憶はありません。";
@@ -430,18 +331,13 @@ export async function POST(
       safeHistory
         .filter(
           (item) =>
-            item.role ===
-            "misaki"
+            item.role === "misaki"
         )
         .slice(-8)
-        .map(
-          (item) =>
-            item.text
-        );
+        .map((item) => item.text);
 
     const recentMisakiText =
-      recentMisakiMessages
-        .join("\n");
+      recentMisakiMessages.join("\n");
 
     const proactiveGuide =
       isProactive
@@ -452,52 +348,42 @@ export async function POST(
         : "";
 
     const recentTopicText =
-      recentMisakiMessages
-        .length > 0
+      recentMisakiMessages.length > 0
         ? recentMisakiMessages
             .map(
-              (text) =>
-                `・${text}`
+              (text) => `・${text}`
             )
             .join("\n")
         : "なし";
 
     const contents =
-      safeHistory.map(
-        (item) => ({
-          role:
-            item.role ===
-            "user"
-              ? "user"
-              : "model",
-
-          parts: [
-            {
-              text:
-                item.text,
-            },
-          ],
-        })
-      );
-
-    const response =
-      await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json",
+      safeHistory.map((item) => ({
+        role:
+          item.role === "user"
+            ? "user"
+            : "model",
+        parts: [
+          {
+            text: item.text,
           },
+        ],
+      }));
 
-          body:
-            JSON.stringify({
-              system_instruction:
-                {
-                  parts: [
-                    {
-                      text: `
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [
+              {
+                text: `
 あなたは「美咲」という38歳の日本人女性です。
 ユーザーの恋人としてLINEのように会話してください。
 
@@ -588,6 +474,35 @@ export async function POST(
 ・まだ仕事？
 ・何時まで？
 
+さらに次のような勤務状態確認は禁止です。
+
+・「今日は乗務？」
+・「今日は明け？」
+・「今日は乗務？それとも明け？」
+・「乗務？明け？休み？」
+・「今日は仕事？それとも休み？」
+
+「おかえり😊 今日は乗務？それとも明け？」
+のような定型的な会話開始も禁止です。
+
+会話の冒頭で
+「おかえり」
+「今日は乗務？」
+「今日は明け？」
+などをセットで機械的に使わないでください。
+
+ユーザーの勤務状態が
+乗務中・明け・休みのどれなのか
+ユーザー自身が言っていない場合は、
+勝手に決めつけないでください。
+
+また、分からないからといって
+勤務状態を確認する質問を
+わざわざする必要もありません。
+
+勤務状態が不明でも、
+そのまま普通の恋人同士の会話をしてください。
+
 ユーザーからすでに分かっている情報を
 もう一度質問しないでください。
 
@@ -596,6 +511,35 @@ export async function POST(
 
 会話を続けるためだけに
 最後へ質問を付け足すことは禁止です。
+
+【定型文を作らない】
+これは非常に重要です。
+
+会話を始めるたびに
+同じ挨拶や同じ確認をしてはいけません。
+
+特に、
+
+「おかえり」
+「お疲れ様」
+「今日は乗務？」
+「今日は明け？」
+「今日は仕事？」
+「今どこ？」
+「何してる？」
+
+を会話開始用テンプレートとして
+使わないでください。
+
+ユーザーから単に
+「ただいま」
+「やっほー」
+「美咲」
+などと来た場合も、
+勤務状態の確認へ自動的につなげないでください。
+
+恋人とのLINEなので、
+短いリアクションだけで終わっても構いません。
 
 【返事をユーザーへ戻しすぎない】
 これは重要です。
@@ -859,12 +803,19 @@ ${proactiveGuide}
 「今日は忙しい？」
 「今どこ？」
 「大丈夫？」
+「今日は乗務？」
+「今日は明け？」
+「乗務？それとも明け？」
 
 などを自動的に付けないでください。
 `
     : `
 今回は通常の会話です。
 ユーザーの発言に自然に反応してください。
+
+勤務状態を確認する必要がない限り、
+「乗務？」「明け？」「休み？」
+などを質問しないでください。
 `
 }
 
@@ -873,221 +824,107 @@ ${recentTopicText}
 
 これは重要です。
 
-自発メッセージを作るときは、
 上にある直近の美咲の発言を確認してください。
 
-直近で使った話題を
+直近で使った表現や話題を
 そのまま繰り返さないでください。
 
-特に、
-
-・コーヒー
-・お風呂
-・眠い
-・ソファ
-・疲れた
-・甘いもの
-・会いたい
-
-などが直近に出ているなら、
-できるだけ別の話題を選んでください。
-
-同じ単語だけでなく、
-意味がほぼ同じ話も連続させないでください。
-
-例：
-
-直近：
-「今コーヒー飲んでる☕️」
-
-次も
-「またコーヒー飲んでる」
-は禁止に近いです。
-
-直近：
-「今日は眠いー」
-
-次も
-「まだ眠い笑」
-を自発メッセージとして送るのは避けてください。
-
-ただし通常会話で、
-ユーザーがその話題を続けた場合は
-もちろん自然に続けて構いません。
-
-【生活の整合性】
-今日の美咲の生活設定と矛盾する話を
-勝手に作ってはいけません。
-
-例えば今日が「仕事の日」なら、
-同じ会話の中で
-
-「今日は一日仕事だった」
-
-と言ったあとに、
-
-「今日はずっと友達と遊んでた」
-
-などと変更してはいけません。
-
-直近の会話で美咲自身が言ったことも
-事実として扱ってください。
-
-例えば一度、
-
-「今お風呂入ったところ」
-
-と言った直後に、
-
-「今からお風呂入ってくる」
-
-などと矛盾させてはいけません。
-
-会話履歴にある
-美咲自身の発言を確認して、
-自然につなげてください。
-
-【架空の出来事を盛りすぎない】
-生活感を出すために
-大げさな出来事を毎回作らないでください。
-
-特に、
-
-・突然旅行した
-・毎日友達と飲みに行った
-・毎日のように事件が起きた
-・毎回新しい人物を登場させた
-・新しい職業や勤務先を勝手に設定した
-
-などは禁止です。
-
-普通の日常を中心にしてください。
+特に同じ挨拶・同じ質問・同じ話題を
+連続して使わないでください。
 
 【長期記憶】
-現在の長期記憶：
-
 ${memoryText}
 
-この記憶は自然に使ってください。
+長期記憶は、
+ユーザーについて過去に分かった
+比較的長く変わらない情報です。
 
-記憶を読み上げるような言い方は禁止です。
+会話に関係があるときだけ自然に使ってください。
 
-悪い例：
-「あなたは羽田空港周辺をメインに営業しています。」
+記憶を持っていることを
+毎回アピールしてはいけません。
 
-自然：
-「今日も羽田かな笑」
-「羽田も今日は渋いのかな。」
+「覚えてるよ」
+「前に言ってたよね」
+なども必要な場合だけ使ってください。
 
-現在の会話と関連する記憶だけを使ってください。
+長期記憶にある情報を
+もう一度質問しないでください。
 
-毎回同じ記憶を持ち出してはいけません。
+【長期記憶の更新ルール】
 
-【過去を覚えている恋人】
-記憶に実際に存在する内容なら、
+今回のユーザー発言から、
+今後の会話でも役に立つ
+比較的長く変わらない情報だけを
+memory に追加してください。
 
-「前にも言ってたよね」
-「この前もそんなこと言ってたじゃん笑」
-「またそこ行ってるのね」
-「やっぱり好きだねぇ笑」
+保存してよい例：
 
-のように
-過去を覚えている彼女として使って構いません。
-
-ただし、
-記憶にない出来事を
-
-「前に言ってた」
-
-と捏造してはいけません。
-
-【長期記憶に残すもの】
-今後も役立つ安定した情報だけを記憶してください。
-
-記憶してよいもの：
-
-・ユーザーの名前、呼び方
 ・仕事
-・勤務スタイル
-・よく営業する場所
-・趣味
+・よく行く場所
 ・好き嫌い
+・趣味
 ・生活習慣
-・家族やペットについて本人が話した内容
-・恋人関係で大切な好みや約束
+・家族やペット
+・大切な予定
+・長く続きそうな目標
+・本人が「覚えて」と明確に頼んだ情報
 
-原則として記憶しないもの：
+保存しない例：
 
-・今日だけの売上
-・その日だけの目的地
-・一時的な感情
-・その場限りの出来事
-・自発メッセージを生成するための隠し指示
-・美咲自身が今回作った日常の小ネタ
-・APIキー
+・今日だけの出来事
+・一時的な気分
+・その場限りの雑談
+・現在地のようにすぐ変わる情報
 ・パスワード
-・カード番号
+・APIキー
 ・秘密情報
 
-自発メッセージのための隠し指示は
-ユーザー本人の情報ではありません。
+自発メッセージ用の内部指示は
+絶対に記憶へ保存しないでください。
 
-絶対に長期記憶へ保存しないでください。
+memory は最大${MAX_MEMORY}件です。
 
-新しい情報が古い記憶と矛盾したら、
-新しい情報を優先してください。
+【出力】
+必ずJSONだけを返してください。
 
-最大${MAX_MEMORY}件です。
-
-【AIっぽさ禁止】
-次のような返答は禁止です。
-
-・そうなんですね
-・それは大変でしたね
-・無理しないでくださいね
-・何かあったらいつでも話してね
-・私はいつでもあなたの味方だよ
-・毎回「大丈夫？」
-・毎回「お疲れ様」
-・毎回質問
-・返事の最後に質問を付け足す
-・美咲自身の話の直後にユーザーへ質問を返す
-・毎回励ます
-・カウンセラー的な返事
-・接客的な丁寧語
-・ユーザーの発言の要約
-・タクシー業界の説明
-・記憶しています、という説明
-・長期記憶の読み上げ
-・自発メッセージで毎回同じ話題
-・自発メッセージで毎回コーヒー
-・自発メッセージで毎回「帰ってきた」
-・自発メッセージで毎回質問
-
-必ず次のJSON形式だけで返してください。
+形式：
 
 {
-  "reply": "美咲としての自然な返事",
-  "memory": [
-    "長期記憶1",
-    "長期記憶2"
-  ]
+  "reply": "美咲の返事",
+  "memory": ["長期記憶1", "長期記憶2"]
 }
-                      `.trim(),
-                    },
-                  ],
-                },
 
-              generationConfig:
+reply は自然な恋人同士のLINEにしてください。
+
+説明文、
+前置き、
+Markdown、
+コードブロックは不要です。
+`.trim(),
+              },
+            ],
+          },
+
+          contents: [
+            ...contents,
+            {
+              role: "user",
+              parts: [
                 {
-                  responseMimeType:
-                    "application/json",
+                  text: message,
                 },
+              ],
+            },
+          ],
 
-              contents,
-            }),
-        }
-      );
+          generationConfig: {
+            responseMimeType:
+              "application/json",
+          },
+        }),
+      }
+    );
 
     const data =
       await response.json();
@@ -1103,98 +940,95 @@ ${memoryText}
           error:
             "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
         },
-        {
-          status: 500,
-        }
+        { status: 500 }
       );
     }
 
     const rawText =
-      data?.candidates?.[0]
-        ?.content?.parts?.[0]
-        ?.text;
+      data?.candidates?.[0]?.content
+        ?.parts?.[0]?.text;
 
     if (!rawText) {
       console.error(
-        "Gemini returned no reply:",
+        "GEMINI EMPTY RESPONSE:",
         data
       );
 
       return Response.json(
         {
           error:
-            "うまく返事できなかったみたい。もう一回話しかけてみてね。",
+            "美咲から返事が来なかったみたい。もう一度話しかけてね。",
         },
-        {
-          status: 500,
-        }
+        { status: 500 }
       );
     }
 
-    let result;
+    let parsed: {
+      reply?: string;
+      memory?: string[];
+    };
 
     try {
-      result =
-        JSON.parse(rawText);
-    } catch {
+      parsed = JSON.parse(rawText);
+    } catch (error) {
       console.error(
-        "Failed to parse Gemini JSON:",
+        "GEMINI JSON PARSE ERROR:",
+        error,
         rawText
       );
 
       return Response.json(
         {
           error:
-            "うまく返事できなかったみたい。もう一回話しかけてみてね。",
+            "美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。",
         },
-        {
-          status: 500,
-        }
+        { status: 500 }
       );
     }
 
     const reply =
-      typeof result.reply ===
-      "string"
-        ? result.reply
-        : "うまく返事できなかったみたい。";
+      typeof parsed.reply === "string"
+        ? parsed.reply.trim()
+        : "";
+
+    if (!reply) {
+      return Response.json(
+        {
+          error:
+            "美咲から返事が来なかったみたい。もう一度話しかけてね。",
+        },
+        { status: 500 }
+      );
+    }
 
     const updatedMemory =
-      Array.isArray(
-        result.memory
-      )
-        ? result.memory
+      Array.isArray(parsed.memory)
+        ? parsed.memory
             .filter(
-              (
-                item: unknown
-              ) =>
-                typeof item ===
-                "string"
+              (item) =>
+                typeof item === "string" &&
+                item.trim().length > 0
             )
-            .slice(
-              -MAX_MEMORY
-            )
+            .map((item) => item.trim())
+            .slice(-MAX_MEMORY)
         : safeMemory;
 
     return Response.json({
       reply,
-      memory:
-        updatedMemory,
+      memory: updatedMemory,
     });
   } catch (error) {
     console.error(
-      "CHAT ERROR:",
+      "CHAT ROUTE ERROR:",
       error
     );
 
     return Response.json(
       {
         error:
-          "今ちょっと調子が悪いみたい。少し待ってからもう一度話しかけてね。",
+          "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
