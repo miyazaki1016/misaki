@@ -769,8 +769,45 @@ function parseGeminiText(
   }
 }
 
+function userContextShowsFreeTime(
+  userContextText: string
+) {
+  const patterns = [
+    "今日は休み",
+    "今日休み",
+    "休みだよ",
+    "休みです",
+    "今日は明け",
+    "今日明け",
+    "明けだよ",
+    "明けです",
+    "今日は仕事ない",
+    "今日仕事ない",
+    "今日は勤務ない",
+    "今日勤務ない",
+    "今日は乗務ない",
+    "今日乗務ない",
+    "今日は暇",
+    "今日暇",
+    "予定ない",
+    "予定はない",
+    "のんびりできる",
+    "ゆっくりできる",
+    "今日はのんびり",
+    "今日はゆっくり",
+  ];
+
+  return patterns.some(
+    (pattern) =>
+      userContextText.includes(
+        pattern
+      )
+  );
+}
+
 function getReplyProblems(
-  reply: string
+  reply: string,
+  userContextText: string
 ) {
   const problems: string[] = [];
 
@@ -852,6 +889,54 @@ function getReplyProblems(
     problems.push(
       "与えられていない情報入手経路を作っている"
     );
+  }
+
+  if (
+    !userContextShowsFreeTime(
+      userContextText
+    )
+  ) {
+    const unsupportedDayOffPatterns = [
+      "週末だし今日はのんびり",
+      "週末だしのんびり",
+      "週末だから今日はのんびり",
+      "週末だからのんびり",
+      "週末だし今日はゆっくり",
+      "週末だしゆっくり",
+      "週末だから今日はゆっくり",
+      "週末だからゆっくり",
+      "土曜日だし今日はのんびり",
+      "土曜日だから今日はのんびり",
+      "日曜日だし今日はのんびり",
+      "日曜日だから今日はのんびり",
+      "土日だしのんびり",
+      "土日だからのんびり",
+      "休日だしのんびり",
+      "休日だからのんびり",
+      "今日は休みでしょ",
+      "今日休みでしょ",
+      "今日は休みだよね",
+      "今日休みだよね",
+      "今日は仕事休み",
+      "今日は乗務ない",
+      "今日はゆっくりできるね",
+      "今日はのんびりできるね",
+      "日曜だからゆっくり",
+      "土曜だからゆっくり",
+    ];
+
+    if (
+      unsupportedDayOffPatterns.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "曜日・週末・休日という情報だけから、ユーザーも休みで自由に過ごせると勝手に推測している"
+      );
+    }
   }
 
   return problems;
@@ -951,88 +1036,6 @@ export async function POST(
           status: 401,
         }
       );
-    }
-
-    //
-    // Supabase側で
-    // 45分間隔・1日4回を判定
-    //
-    const {
-      data: proactiveData,
-      error: proactiveError,
-    } =
-      await supabase.rpc(
-        "consume_proactive_message"
-      );
-
-    if (proactiveError) {
-      console.error(
-        "PROACTIVE USAGE ERROR:",
-        proactiveError
-      );
-
-      return Response.json(
-        {
-          error:
-            "Proactive usage check failed.",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const proactiveUsage =
-      getFirstRow<ProactiveUsageResult>(
-        proactiveData
-      );
-
-    if (!proactiveUsage) {
-      return Response.json(
-        {
-          error:
-            "Proactive usage result was empty.",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    if (
-      proactiveUsage.allowed !==
-      true
-    ) {
-      return Response.json({
-        sent: false,
-
-        reason:
-          proactiveUsage.retry_after_seconds &&
-          proactiveUsage.retry_after_seconds >
-            0
-            ? "cooldown"
-            : "daily_limit",
-
-        proactive: {
-          count:
-            typeof proactiveUsage.message_count ===
-            "number"
-              ? proactiveUsage.message_count
-              : 0,
-
-          remaining:
-            typeof proactiveUsage.remaining ===
-            "number"
-              ? proactiveUsage.remaining
-              : 0,
-
-          retryAfterSeconds:
-            typeof proactiveUsage.retry_after_seconds ===
-            "number"
-              ? proactiveUsage.retry_after_seconds
-              : 0,
-        },
-      });
     }
 
     //
@@ -1175,6 +1178,20 @@ export async function POST(
       recentMisakiMessages.join(
         "\n"
       );
+
+    const userContextText = [
+      ...safeHistory
+        .filter(
+          (item) =>
+            item.role === "user"
+        )
+        .slice(-20)
+        .map(
+          (item) =>
+            item.text
+        ),
+      ...safeMemory,
+    ].join("\n");
 
     const memoryText =
       safeMemory.length > 0
@@ -1345,12 +1362,63 @@ ${relationshipGuide}
 ・寝ている
 ・起きている
 ・疲れている
+・今日は仕事なのか
+・今日は休みなのか
+・今日は乗務なのか
+・今日は明けなのか
+・自由にのんびりできるのか
 
 などと
 勝手に決めつけないでください。
 
 会話履歴や長期記憶に
 明確にある場合だけ使ってください。
+
+特に重要：
+
+現在日時が
+
+・土曜日
+・日曜日
+・週末
+・祝日
+
+だからという理由だけで、
+
+「今日は休み」
+「今日はのんびりできる」
+「今日はゆっくりできる」
+
+と決めつけないでください。
+
+ユーザーは
+東京のタクシードライバーです。
+
+土日・祝日・週末でも
+乗務することがあります。
+
+「週末だし今日はのんびりしよう」
+「日曜だからゆっくりできるね」
+「今日は休みでしょ」
+
+などは禁止です。
+
+ユーザー本人が会話で、
+
+「今日は休み」
+「今日は明け」
+「今日は仕事ない」
+「今日はのんびりできる」
+
+などと明確に話している場合だけ
+その情報を使ってください。
+
+美咲自身が
+仕事の日・休みの日なのは
+美咲自身の生活設定です。
+
+ユーザーの勤務状態とは
+完全に別に扱ってください。
 
 【現在日時】
 
@@ -1442,6 +1510,10 @@ ${tokyoLifeEventsGuide}
 ただし、
 ユーザーの現在の勤務状態は
 勝手に決めつけないでください。
+
+曜日・週末・祝日だけから
+勤務・休み・明けを
+推測しないでください。
 
 【美咲自身の今日】
 
@@ -1572,6 +1644,19 @@ ${retryProblems
 
 なども付けないでください。
 
+曜日・週末・祝日だけから、
+
+「今日は休み」
+「今日はのんびりできる」
+「今日はゆっくりできる」
+
+などと
+ユーザーの勤務状況を
+勝手に決めないでください。
+
+美咲自身の休日設定と
+ユーザーの休日は別です。
+
 必ずJSONだけを返してください。
 `
           : "";
@@ -1642,14 +1727,19 @@ ${retryProblems
       );
     }
 
+    //
+    // ここではまだ
+    // 自発メッセージ枠を消費しない
+    //
     let parsed =
       await generateReply();
 
     if (!parsed) {
       return Response.json(
         {
-          error:
-            "Proactive reply generation failed.",
+          sent: false,
+          reason:
+            "generation_failed",
         },
         {
           status: 500,
@@ -1666,8 +1756,9 @@ ${retryProblems
     if (!reply) {
       return Response.json(
         {
-          error:
-            "Proactive reply was empty.",
+          sent: false,
+          reason:
+            "generation_empty",
         },
         {
           status: 500,
@@ -1677,7 +1768,8 @@ ${retryProblems
 
     const firstProblems =
       getReplyProblems(
-        reply
+        reply,
+        userContextText
       );
 
     if (
@@ -1699,7 +1791,8 @@ ${retryProblems
         if (retryReply) {
           const retryProblems =
             getReplyProblems(
-              retryReply
+              retryReply,
+              userContextText
             );
 
           if (
@@ -1719,11 +1812,15 @@ ${retryProblems
     //
     // 再生成してもNGなら
     // 問題のある自発メッセージは
-    // ユーザーへ送らない
+    // ユーザーへ送らない。
+    //
+    // この時点ではまだ
+    // 4回枠を消費していない。
     //
     const finalProblems =
       getReplyProblems(
-        reply
+        reply,
+        userContextText
       );
 
     if (
@@ -1741,22 +1838,6 @@ ${retryProblems
 
         reason:
           "generation_rejected",
-
-        proactive: {
-          count:
-            typeof proactiveUsage.message_count ===
-            "number"
-              ? proactiveUsage.message_count
-              : 0,
-
-          remaining:
-            typeof proactiveUsage.remaining ===
-            "number"
-              ? proactiveUsage.remaining
-              : 0,
-
-          retryAfterSeconds: 0,
-        },
       });
     }
 
@@ -1822,6 +1903,95 @@ ${retryProblems
         ),
     };
 
+    //
+    // 生成・再生成・最終検査を
+    // すべて通過してから
+    // 初めて自発メッセージ枠を消費する。
+    //
+    // このRPCが同時に
+    // 45分間隔・1日4回も最終判定するため、
+    // 競合が起きても過剰送信しない。
+    //
+    const {
+      data: proactiveData,
+      error: proactiveError,
+    } =
+      await supabase.rpc(
+        "consume_proactive_message"
+      );
+
+    if (proactiveError) {
+      console.error(
+        "PROACTIVE USAGE ERROR:",
+        proactiveError
+      );
+
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "usage_check_failed",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const proactiveUsage =
+      getFirstRow<ProactiveUsageResult>(
+        proactiveData
+      );
+
+    if (!proactiveUsage) {
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "usage_result_empty",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    if (
+      proactiveUsage.allowed !==
+      true
+    ) {
+      return Response.json({
+        sent: false,
+
+        reason:
+          proactiveUsage.retry_after_seconds &&
+          proactiveUsage.retry_after_seconds >
+            0
+            ? "cooldown"
+            : "daily_limit",
+
+        proactive: {
+          count:
+            typeof proactiveUsage.message_count ===
+            "number"
+              ? proactiveUsage.message_count
+              : 0,
+
+          remaining:
+            typeof proactiveUsage.remaining ===
+            "number"
+              ? proactiveUsage.remaining
+              : 0,
+
+          retryAfterSeconds:
+            typeof proactiveUsage.retry_after_seconds ===
+            "number"
+              ? proactiveUsage.retry_after_seconds
+              : 0,
+        },
+      });
+    }
+
     return Response.json({
       sent: true,
 
@@ -1857,6 +2027,7 @@ ${retryProblems
 
     return Response.json(
       {
+        sent: false,
         error:
           "Proactive message failed.",
       },
