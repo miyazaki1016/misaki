@@ -83,15 +83,14 @@ self.addEventListener(
               const client
                 of windowClients
             ) {
-              const url =
+              const clientUrl =
                 new URL(
                   client.url
                 );
 
               if (
-                url.origin ===
-                self.location
-                  .origin
+                clientUrl.origin ===
+                self.location.origin
               ) {
                 if (
                   "navigate" in
