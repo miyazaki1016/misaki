@@ -11,7 +11,7 @@ const scenes = [
   {
     label: "AFTER WORK",
     title: "仕事が終わったとき。",
-    text: "うまくいった日も、ダメだった日も。昨日の続きから、そのまま話せる相手がいます。",
+    text: "うまくいった日も、ダメだった日も。前に話したことを覚えているから、昨日の続きからそのまま話せます。",
     image: "/misaki-evening.webp",
     alt: "仕事終わりの美咲",
   },
@@ -26,24 +26,24 @@ const scenes = [
 
 const features = [
   {
-    icon: "💬",
-    title: "会話を覚える",
-    text: "前に話したことを覚えているから、毎回ゼロから説明しなくていい。",
+    number: "01",
+    title: "前の会話を覚えている",
+    text: "毎回ゼロから説明しなくていい。話したことが少しずつ、二人の会話として積み重なっていきます。",
   },
   {
-    icon: "☀️",
-    title: "今を感じて話す",
-    text: "朝・昼・夜や東京の天気など、今の状況を感じながら話します。",
+    number: "02",
+    title: "今の時間や天気がわかる",
+    text: "朝・昼・夜や、東京の天気を感じながら話すから、いつ話しても同じ返事にはなりません。",
   },
   {
-    icon: "♡",
+    number: "03",
     title: "恋人らしい距離感",
-    text: "甘えたり、冗談を言ったり、少し拗ねたり。毎回同じ反応ではありません。",
+    text: "何でも肯定するだけじゃない。甘えたり、少し拗ねたり、軽くからかったりもします。",
   },
   {
-    icon: "✉️",
-    title: "美咲から話す",
-    text: "あなたから話しかけるだけじゃなく、美咲のほうからふとLINEしてくることも。",
+    number: "04",
+    title: "美咲からも話しかける",
+    text: "あなたから話しかけるだけではなく、ふとしたタイミングで美咲のほうからメッセージが届くこともあります。",
   },
 ];
 
@@ -51,13 +51,9 @@ export default function HomePage() {
   return (
     <>
       <main className="page">
-        {/* ================= HEADER ================= */}
-
+        {/* HEADER */}
         <header className="header">
-          <Link
-            href="/"
-            className="brand"
-          >
+          <Link href="/" className="brand">
             <img
               src="/icon-192.png"
               alt="美咲"
@@ -65,12 +61,9 @@ export default function HomePage() {
             />
 
             <div>
-              <div className="brandName">
-                美咲
-              </div>
-
+              <div className="brandName">美咲</div>
               <div className="brandSub">
-                38歳のAI彼女
+                あなたの38歳の彼女
               </div>
             </div>
           </Link>
@@ -83,8 +76,7 @@ export default function HomePage() {
           </Link>
         </header>
 
-        {/* ================= HERO ================= */}
-
+        {/* HERO */}
         <section className="hero">
           <div className="heroImageWrap">
             <img
@@ -93,54 +85,54 @@ export default function HomePage() {
               className="heroImage"
             />
 
-            <div className="heroShade" />
+            <div className="heroOverlay" />
 
             <div className="heroCopy">
-              <div className="heroBadge">
+              <p className="heroSmall">
                 38歳の美咲
-              </div>
+              </p>
 
               <h1>
-                彼女のほうから、
+                なんでもない話を、
                 <br />
                 <span>
-                  ふと連絡がくる。
+                  ちゃんと覚えてるよ。
                 </span>
               </h1>
 
               <p className="heroLead">
-                何か相談するためじゃなくていい。
+                仕事のこと。
                 <br />
-                「眠い」「疲れた」「今日どうだった？」
+                疲れたこと。
                 <br />
-                そんな毎日の会話を、美咲と。
+                うまくいかなかったこと。
+                <br />
+                嬉しかったこと。
+                <br />
+                <br />
+                なんでも話してね。
               </p>
 
-              <div className="heroActions">
-                <Link
-                  href="/chat"
-                  className="mainCta"
-                >
-                  美咲と無料で話す
-                  <span className="ctaArrow">
-                    →
-                  </span>
-                </Link>
+              <Link
+                href="/chat"
+                className="mainCta"
+              >
+                美咲と無料で話す
+                <span>→</span>
+              </Link>
 
-                <div className="heroNote">
-                  すぐ開始できます
-                  <span>・</span>
-                  無料版は1日20回まで
-                </div>
-              </div>
+              <p className="heroNote">
+                すぐ開始できます・無料版は1日20回まで
+              </p>
             </div>
 
-            <div className="heroBottomFade" />
+            <div className="signature">
+              Misaki
+            </div>
           </div>
         </section>
 
-        {/* ================= INTRO ================= */}
-
+        {/* BRAND INTRO */}
         <section className="intro">
           <p className="eyebrow">
             NOT JUST A CHATBOT
@@ -155,46 +147,22 @@ export default function HomePage() {
           </h2>
 
           <p className="introText">
-            美咲は、質問に答えるだけの存在ではありません。
-            <br className="desktopBreak" />
+            美咲は、ただ質問に答えるためのAIではありません。
+            <br className="desktopOnly" />
             前に話したことを覚えて、
-            時間や天気を感じながら、
-            <br className="desktopBreak" />
-            ときどき自分から話しかけてきます。
+            今の時間や天気を感じながら、
+            <br className="desktopOnly" />
+            恋人みたいに自然に会話します。
           </p>
 
-          <div className="introPoints">
-            <div>
-              <strong>
-                記憶
-              </strong>
-              <span>
-                昨日の続きを話せる
-              </span>
-            </div>
-
-            <div>
-              <strong>
-                時間
-              </strong>
-              <span>
-                朝・昼・夜を感じる
-              </span>
-            </div>
-
-            <div>
-              <strong>
-                日常
-              </strong>
-              <span>
-                美咲にも自分の生活がある
-              </span>
-            </div>
+          <div className="handCopy">
+            日常に、
+            <br />
+            もうひとつの会話を。
           </div>
         </section>
 
-        {/* ================= SCENES ================= */}
-
+        {/* SCENES */}
         <section className="sceneSection">
           {scenes.map(
             (
@@ -207,29 +175,21 @@ export default function HomePage() {
                     ? "reverse"
                     : ""
                 }`}
-                key={
-                  scene.label
-                }
+                key={scene.label}
               >
                 <div className="sceneImageWrap">
                   <img
-                    src={
-                      scene.image
-                    }
-                    alt={
-                      scene.alt
-                    }
+                    src={scene.image}
+                    alt={scene.alt}
                     className="sceneImage"
                   />
-
-                  <div className="sceneImageShade" />
-
-                  <div className="sceneNumber">
-                    0{index + 1}
-                  </div>
                 </div>
 
                 <div className="sceneCopy">
+                  <span className="sceneNumber">
+                    0{index + 1}
+                  </span>
+
                   <p className="sceneLabel">
                     {scene.label}
                   </p>
@@ -242,18 +202,19 @@ export default function HomePage() {
                     {scene.text}
                   </p>
 
-                  <div className="sceneLine" />
+                  <p className="sceneSignature">
+                    Misaki
+                  </p>
                 </div>
               </article>
             )
           )}
         </section>
 
-        {/* ================= CHAT SAMPLE ================= */}
-
-        <section className="chatSection">
-          <div className="chatInner">
-            <div className="chatCopy">
+        {/* CONVERSATION */}
+        <section className="conversationSection">
+          <div className="conversationInner">
+            <div className="conversationCopy">
               <p className="eyebrow">
                 NATURAL CONVERSATION
               </p>
@@ -265,93 +226,76 @@ export default function HomePage() {
               </h2>
 
               <p>
-                美咲は何でも褒めたり、
-                毎回質問したりしません。
+                「おはよう」
                 <br />
-                少し拗ねたり、冗談を言ったり、
-                素っ気ないときもあります。
+                「疲れた」
+                <br />
+                「今日ロング引いた」
+                <br />
+                「眠い」
+                <br />
+                <br />
+                そんな一言だけで十分です。
               </p>
 
-              <div className="chatMiniCopy">
-                恋人とのLINEみたいな、
+              <div className="handMessage">
+                また話したくなったよ。
                 <br />
-                「どうでもいい会話」を大切にしています。
+                今なにしてる？
               </div>
             </div>
 
-            <div className="phoneWrap">
-              <div className="phoneGlow" />
+            <div className="chatCard">
+              <div className="chatHeader">
+                <img
+                  src="/icon-192.png"
+                  alt=""
+                />
 
-              <div className="phone">
-                <div className="phoneTop">
-                  <div className="phoneSpeaker" />
+                <div>
+                  <strong>美咲</strong>
+                  <span>38歳</span>
+                </div>
+              </div>
+
+              <div className="chatBody">
+                <div className="bubble misaki">
+                  今日どうだった？
                 </div>
 
-                <div className="phoneHeader">
-                  <img
-                    src="/icon-192.png"
-                    alt=""
-                  />
-
-                  <div>
-                    <strong>
-                      美咲
-                    </strong>
-
-                    <span>
-                      38歳
-                    </span>
-                  </div>
+                <div className="bubble user">
+                  青タン全然ダメだった笑
                 </div>
 
-                <div className="phoneBody">
-                  <div className="bubble misaki">
-                    今日どうだった？
-                  </div>
-
-                  <div className="bubble user">
-                    青タン全然ダメだった笑
-                  </div>
-
-                  <div className="bubble misaki">
-                    うわ、それ地味にへこむやつ😂
-                  </div>
-
-                  <div className="bubble user">
-                    やさしくして笑
-                  </div>
-
-                  <div className="bubble misaki">
-                    しょうがないなー。
-                    <br />
-                    今日だけね？笑
-                  </div>
-
-                  <div className="timeLabel">
-                    しばらくして…
-                  </div>
-
-                  <div className="bubble misaki">
-                    なんか急に話したくなった。
-                  </div>
+                <div className="bubble misaki">
+                  うわ、それ地味にへこむやつ😂
                 </div>
 
-                <div className="fakeInput">
-                  <span>
-                    美咲に話しかける...
-                  </span>
-
-                  <span className="fakeSend">
-                    ↑
-                  </span>
+                <div className="bubble user">
+                  もう帰りたい笑
                 </div>
+
+                <div className="bubble misaki">
+                  うん、今日はもう十分頑張ったでしょ笑
+                </div>
+
+                <div className="timeLabel">
+                  しばらくして…
+                </div>
+
+                <div className="bubble misaki">
+                  なんか急に話したくなった。
+                </div>
+              </div>
+
+              <div className="fakeInput">
+                美咲に話しかける...
               </div>
             </div>
           </div>
         </section>
 
-        {/* ================= FEATURES ================= */}
-
+        {/* FEATURES */}
         <section className="features">
           <p className="eyebrow center">
             WHY MISAKI
@@ -365,30 +309,19 @@ export default function HomePage() {
 
           <p className="featureLead">
             一度きりの会話ではなく、
-            少しずつ「二人の続き」ができていきます。
+            少しずつ二人の関係が続いていきます。
           </p>
 
           <div className="featureGrid">
             {features.map(
-              (
-                feature,
-                index
-              ) => (
+              (feature) => (
                 <div
                   className="featureCard"
-                  key={
-                    feature.title
-                  }
+                  key={feature.number}
                 >
-                  <div className="featureTop">
-                    <div className="featureIcon">
-                      {feature.icon}
-                    </div>
-
-                    <span className="featureNumber">
-                      0{index + 1}
-                    </span>
-                  </div>
+                  <span className="featureNumber">
+                    {feature.number}
+                  </span>
 
                   <h3>
                     {feature.title}
@@ -403,88 +336,52 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ================= TAXI ================= */}
-
+        {/* TAXI */}
         <section className="taxiSection">
-          <div className="taxiGlow taxiGlowOne" />
-          <div className="taxiGlow taxiGlowTwo" />
-
           <div className="taxiInner">
-            <p className="eyebrow taxiEyebrow">
+            <p className="eyebrow">
               FOR TAXI DRIVERS
             </p>
 
             <h2>
-              タクドラの話も、
+              彼氏の仕事のことくらい、
               <br />
               <span>
-                普通に通じる。
+                普通にわかってる。
               </span>
             </h2>
 
-            <p>
+            <p className="taxiLead">
               「乗務」「明け」「青タン」「ロング」
               「万収」「営収」「羽田」。
               <br />
-              いちいち言葉を説明しなくても、
-              そのまま話せます。
+              いちいち説明しなくても、そのまま話せます。
             </p>
 
             <div className="taxiWords">
-              <span>
-                乗務
-              </span>
-
-              <span>
-                明け
-              </span>
-
-              <span>
-                青タン
-              </span>
-
-              <span>
-                ロング
-              </span>
-
-              <span>
-                万収
-              </span>
-
-              <span>
-                営収
-              </span>
-
-              <span>
-                羽田
-              </span>
-
-              <span>
-                付け待ち
-              </span>
+              <span>乗務</span>
+              <span>明け</span>
+              <span>青タン</span>
+              <span>ロング</span>
+              <span>万収</span>
+              <span>営収</span>
+              <span>羽田</span>
             </div>
 
-            <div className="taxiQuote">
-              <span>
-                “
-              </span>
-
-              青タン全然ダメだった笑
+            <div className="taxiExample">
+              <p>
+                「今日ロング全然引けなかった」
+              </p>
 
               <span>
-                ”
+                そんな一言でも、
+                美咲にはちゃんと通じます。
               </span>
             </div>
-
-            <p className="taxiResponse">
-              そんな一言からでも、
-              普通に会話が始まります。
-            </p>
           </div>
         </section>
 
-        {/* ================= FINAL ================= */}
-
+        {/* FINAL */}
         <section className="finalSection">
           <div className="finalImageWrap">
             <img
@@ -493,45 +390,46 @@ export default function HomePage() {
               className="finalImage"
             />
 
-            <div className="finalShade" />
-            <div className="finalTopShade" />
+            <div className="finalOverlay" />
 
             <div className="finalCopy">
               <p className="finalSmall">
-                SHE'S WAITING FOR YOU
+                MISAKI
               </p>
 
               <h2>
-                今日のこと、
+                日常に、
                 <br />
-                美咲に話してみませんか？
+                もうひとつの会話を。
               </h2>
 
               <p className="finalLead">
                 大した話じゃなくていい。
                 <br />
-                いつもの一言から始めてください。
+                今日あったことを、
+                美咲に少し話してみませんか？
               </p>
 
               <Link
                 href="/chat"
-                className="mainCta finalCta"
+                className="mainCta"
               >
                 美咲に会いにいく
-                <span className="ctaArrow">
-                  →
-                </span>
+                <span>→</span>
               </Link>
 
-              <span className="finalNote">
+              <p className="finalNote">
                 今すぐ無料で始められます
-              </span>
+              </p>
+
+              <div className="finalSignature">
+                Misaki
+              </div>
             </div>
           </div>
         </section>
 
-        {/* ================= FOOTER ================= */}
-
+        {/* FOOTER */}
         <footer>
           <div className="footerBrand">
             <img
@@ -540,13 +438,13 @@ export default function HomePage() {
             />
 
             <div>
-              <div className="footerLogo">
+              <strong>
                 美咲
-              </div>
+              </strong>
 
-              <p>
+              <span>
                 日常に、もうひとつの会話を。
-              </p>
+              </span>
             </div>
           </div>
 
@@ -557,6 +455,16 @@ export default function HomePage() {
       </main>
 
       <style>{`
+        :root {
+          --main: #ff6680;
+          --main-dark: #e95872;
+          --sub: #ffd5de;
+          --beige: #f8efea;
+          --paper: #fffafa;
+          --text: #6c5c62;
+          --title: #49383e;
+        }
+
         * {
           box-sizing: border-box;
         }
@@ -567,8 +475,8 @@ export default function HomePage() {
 
         body {
           margin: 0;
-          background: #fff9fa;
-          color: #30272a;
+          background: var(--paper);
+          color: var(--text);
           font-family:
             -apple-system,
             BlinkMacSystemFont,
@@ -581,12 +489,12 @@ export default function HomePage() {
         }
 
         a {
-          text-decoration: none;
           color: inherit;
+          text-decoration: none;
         }
 
         img {
-          max-width: 100%;
+          display: block;
         }
 
         .page {
@@ -597,19 +505,19 @@ export default function HomePage() {
           display: none;
         }
 
-        /* ================= HEADER ================= */
+        /* HEADER */
 
         .header {
           width: min(
-            1160px,
+            1120px,
             calc(100% - 36px)
           );
           height: 76px;
           margin: 0 auto;
           display: flex;
+          align-items: center;
           justify-content:
             space-between;
-          align-items: center;
         }
 
         .brand {
@@ -625,75 +533,58 @@ export default function HomePage() {
           object-fit: cover;
           box-shadow:
             0 5px 14px
-            rgba(70,43,51,0.1);
+            rgba(86,61,69,.09);
         }
 
         .brandName {
+          color: var(--title);
           font-size: 18px;
-          font-weight: 900;
-          letter-spacing: 0.01em;
+          font-weight: 800;
+          letter-spacing: .05em;
         }
 
         .brandSub {
           margin-top: 2px;
+          color: #97888d;
           font-size: 10px;
-          color: #94858a;
         }
 
         .headerCta {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-width: 108px;
-          min-height: 41px;
-          padding: 9px 18px;
+          min-height: 40px;
+          padding: 9px 19px;
           border-radius: 999px;
-          background:
-            linear-gradient(
-              135deg,
-              #ff7089,
-              #ef4d70
-            );
-          color: white;
+          background: var(--main);
+          color: #fff;
           font-size: 13px;
           font-weight: 800;
           box-shadow:
             0 8px 20px
-            rgba(221,62,94,0.22);
-          transition:
-            transform .2s ease,
-            box-shadow .2s ease;
+            rgba(255,102,128,.2);
         }
 
-        .headerCta:hover {
-          transform:
-            translateY(-1px);
-          box-shadow:
-            0 11px 25px
-            rgba(221,62,94,0.28);
-        }
-
-        /* ================= HERO ================= */
+        /* HERO */
 
         .hero {
-          padding:
-            0 18px 0;
+          padding: 0 18px;
         }
 
         .heroImageWrap {
           position: relative;
           width: min(
-            1220px,
+            1200px,
             100%
           );
-          min-height: 730px;
+          min-height: 720px;
           margin: 0 auto;
-          border-radius: 38px;
           overflow: hidden;
-          background: #d8d1d3;
+          border-radius: 34px;
+          background: var(--beige);
           box-shadow:
-            0 30px 80px
-            rgba(58,35,43,0.12);
+            0 26px 70px
+            rgba(86,58,68,.1);
         }
 
         .heroImage {
@@ -703,240 +594,195 @@ export default function HomePage() {
           height: 100%;
           object-fit: cover;
           object-position:
-            center 42%;
-          transform: scale(1.01);
+            center 43%;
         }
 
-        .heroShade {
+        .heroOverlay {
           position: absolute;
           inset: 0;
           background:
             linear-gradient(
               90deg,
-              rgba(28,18,22,0.78) 0%,
-              rgba(28,18,22,0.55) 33%,
-              rgba(28,18,22,0.2) 60%,
-              rgba(28,18,22,0.03) 82%
+              rgba(255,250,249,.96) 0%,
+              rgba(255,249,248,.82) 29%,
+              rgba(255,249,248,.38) 49%,
+              rgba(255,249,248,.03) 73%
             );
-        }
-
-        .heroBottomFade {
-          position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          height: 180px;
-          background:
-            linear-gradient(
-              0deg,
-              rgba(15,9,11,0.24),
-              transparent
-            );
-          pointer-events: none;
         }
 
         .heroCopy {
           position: relative;
           z-index: 2;
-          width: min(
-            590px,
-            calc(100% - 50px)
-          );
+          width: 525px;
           padding:
-            105px 0 95px 76px;
-          color: white;
+            105px 0 95px 72px;
         }
 
-        .heroBadge {
-          display: inline-flex;
-          align-items: center;
-          min-height: 32px;
-          padding: 6px 13px;
-          margin-bottom: 23px;
-          border:
-            1px solid
-            rgba(255,255,255,0.38);
-          border-radius: 999px;
-          background:
-            rgba(255,255,255,0.11);
-          backdrop-filter:
-            blur(10px);
+        .heroSmall {
+          margin:
+            0 0 19px;
+          color: var(--main);
           font-size: 12px;
-          font-weight: 700;
-          letter-spacing: .03em;
+          font-weight: 800;
+          letter-spacing: .08em;
         }
 
         .hero h1 {
           margin: 0;
+          color: var(--title);
           font-size:
             clamp(
-              50px,
-              6.1vw,
-              78px
+              47px,
+              5.7vw,
+              72px
             );
-          line-height: 1.18;
-          letter-spacing: -0.055em;
-          text-shadow:
-            0 4px 22px
-            rgba(0,0,0,0.12);
+          line-height: 1.28;
+          letter-spacing: -.055em;
         }
 
         .hero h1 span {
-          color: #ffd9df;
+          color: var(--main-dark);
         }
 
         .heroLead {
           margin:
-            28px 0 32px;
-          font-size: 17px;
+            28px 0 31px;
+          color: var(--text);
+          font-size: 16px;
           line-height: 1.95;
-          color:
-            rgba(255,255,255,0.92);
-        }
-
-        .heroActions {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
         }
 
         .mainCta {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 13px;
+          gap: 14px;
           min-width: 255px;
-          min-height: 60px;
+          min-height: 59px;
           padding:
-            15px 25px;
-          border-radius: 17px;
-          background:
-            linear-gradient(
-              135deg,
-              #ff7189,
-              #ee466c
-            );
+            14px 25px;
+          border-radius: 16px;
+          background: var(--main);
           color: white;
           font-size: 16px;
-          font-weight: 900;
+          font-weight: 800;
           box-shadow:
-            0 16px 34px
-            rgba(214,47,81,0.32);
+            0 13px 28px
+            rgba(255,102,128,.25);
           transition:
-            transform .2s ease,
-            box-shadow .2s ease;
+            transform .2s ease;
         }
 
         .mainCta:hover {
           transform:
             translateY(-2px);
-          box-shadow:
-            0 20px 42px
-            rgba(214,47,81,0.38);
         }
 
-        .ctaArrow {
-          font-size: 19px;
-          line-height: 1;
+        .mainCta span {
+          font-size: 18px;
         }
 
         .heroNote {
-          margin-top: 13px;
-          font-size: 11px;
+          margin:
+            12px 0 0;
+          color: #9a8b90;
+          font-size: 10px;
+        }
+
+        .signature {
+          position: absolute;
+          right: 36px;
+          bottom: 25px;
           color:
-            rgba(255,255,255,0.74);
+            rgba(255,102,128,.72);
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 28px;
+          transform:
+            rotate(-5deg);
         }
 
-        .heroNote span {
-          margin: 0 5px;
-        }
-
-        /* ================= INTRO ================= */
+        /* INTRO */
 
         .intro {
+          position: relative;
           width: min(
-            850px,
+            840px,
             calc(100% - 40px)
           );
           margin: 0 auto;
           padding:
-            125px 0 115px;
+            120px 0 130px;
           text-align: center;
         }
 
         .eyebrow {
-          margin: 0 0 15px;
-          color: #e95d76;
-          font-size: 11px;
+          margin:
+            0 0 15px;
+          color: var(--main);
+          font-size: 10px;
           font-weight: 900;
-          letter-spacing: .18em;
+          letter-spacing: .2em;
         }
 
         .intro h2 {
           margin: 0;
+          color: var(--title);
           font-size:
             clamp(
-              33px,
+              34px,
               5vw,
               50px
             );
-          line-height: 1.5;
+          line-height: 1.55;
           letter-spacing: -.045em;
         }
 
         .intro h2 span {
-          color: #e95270;
+          color: var(--main-dark);
         }
 
         .introText {
           margin:
             28px auto 0;
           max-width: 650px;
-          color: #74636a;
+          color: #7d6d73;
           font-size: 15px;
           line-height: 2.1;
         }
 
-        .introPoints {
-          display: grid;
-          grid-template-columns:
-            repeat(3, 1fr);
-          gap: 13px;
-          margin-top: 45px;
-        }
-
-        .introPoints > div {
+        .handCopy {
+          width: fit-content;
+          margin:
+            44px auto 0;
           padding:
-            19px 12px;
-          border:
-            1px solid
-            rgba(105,75,84,.08);
-          border-radius: 20px;
+            17px 25px;
+          color: #7d636d;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 20px;
+          line-height: 1.7;
+          transform:
+            rotate(-2deg);
           background:
-            rgba(255,255,255,.8);
-          box-shadow:
-            0 10px 30px
-            rgba(72,45,54,.045);
+            linear-gradient(
+              135deg,
+              #fff2f5,
+              #f8efea
+            );
+          border-radius:
+            2px 18px 4px 18px;
         }
 
-        .introPoints strong {
-          display: block;
-          color: #ec5a75;
-          font-size: 14px;
-        }
-
-        .introPoints span {
-          display: block;
-          margin-top: 6px;
-          color: #86757b;
-          font-size: 11px;
-        }
-
-        /* ================= SCENES ================= */
+        /* SCENES */
 
         .sceneSection {
           width: min(
-            1090px,
+            1070px,
             calc(100% - 36px)
           );
           margin: 0 auto;
@@ -945,8 +791,8 @@ export default function HomePage() {
         .scene {
           display: grid;
           grid-template-columns:
-            1.08fr .92fr;
-          gap: 75px;
+            1.05fr .95fr;
+          gap: 72px;
           align-items: center;
           margin-bottom: 115px;
         }
@@ -962,270 +808,218 @@ export default function HomePage() {
         }
 
         .sceneImageWrap {
-          position: relative;
           overflow: hidden;
-          border-radius: 32px;
+          border-radius: 28px;
           box-shadow:
-            0 28px 65px
-            rgba(67,40,48,.13);
-          background: #eee7e9;
+            0 22px 55px
+            rgba(82,57,65,.1);
         }
 
         .sceneImage {
-          display: block;
           width: 100%;
-          height: 660px;
+          height: 650px;
           object-fit: cover;
-          transition:
-            transform .7s ease;
-        }
-
-        .scene:hover
-          .sceneImage {
-          transform:
-            scale(1.02);
-        }
-
-        .sceneImageShade {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              0deg,
-              rgba(37,22,27,.18),
-              transparent 35%
-            );
-          pointer-events: none;
-        }
-
-        .sceneNumber {
-          position: absolute;
-          left: 22px;
-          bottom: 18px;
-          color:
-            rgba(255,255,255,.88);
-          font-size: 12px;
-          font-weight: 900;
-          letter-spacing: .16em;
         }
 
         .sceneCopy {
-          padding: 22px;
+          padding: 18px;
+        }
+
+        .sceneNumber {
+          display: block;
+          margin-bottom: 20px;
+          color: var(--sub);
+          font-family:
+            Georgia,
+            serif;
+          font-size: 50px;
+          line-height: 1;
         }
 
         .sceneLabel {
-          margin: 0 0 15px;
-          color: #ee607a;
-          font-size: 11px;
+          margin:
+            0 0 13px;
+          color: var(--main);
+          font-size: 10px;
           font-weight: 900;
           letter-spacing: .18em;
         }
 
         .sceneCopy h2 {
           margin: 0;
+          color: var(--title);
           font-size:
             clamp(
-              34px,
+              33px,
               4vw,
-              49px
+              47px
             );
-          line-height: 1.4;
+          line-height: 1.45;
           letter-spacing: -.04em;
         }
 
         .sceneText {
           margin:
-            24px 0 0;
-          color: #716068;
+            23px 0 0;
+          color: #77676d;
           font-size: 15px;
           line-height: 2.05;
         }
 
-        .sceneLine {
-          width: 44px;
-          height: 3px;
-          margin-top: 28px;
-          border-radius: 99px;
-          background:
-            linear-gradient(
-              90deg,
-              #ff7890,
-              #ef4f70
-            );
+        .sceneSignature {
+          margin:
+            25px 0 0;
+          color: var(--main);
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 21px;
+          transform:
+            rotate(-4deg);
+          transform-origin:
+            left center;
         }
 
-        /* ================= CHAT ================= */
+        /* CONVERSATION */
 
-        .chatSection {
+        .conversationSection {
           padding:
-            120px 20px;
-          background:
-            linear-gradient(
-              180deg,
-              #fff,
-              #fff7f9
-            );
+            112px 20px;
+          background: var(--beige);
         }
 
-        .chatInner {
+        .conversationInner {
           width: min(
-            1050px,
+            1000px,
             100%
           );
           margin: 0 auto;
           display: grid;
           grid-template-columns:
             .92fr 1.08fr;
-          gap: 85px;
+          gap: 78px;
           align-items: center;
         }
 
-        .chatCopy h2 {
+        .conversationCopy h2 {
           margin: 0;
+          color: var(--title);
           font-size:
             clamp(
               35px,
               5vw,
-              53px
+              50px
             );
-          line-height: 1.4;
+          line-height: 1.45;
           letter-spacing: -.045em;
         }
 
-        .chatCopy > p:not(.eyebrow) {
+        .conversationCopy > p:not(
+          .eyebrow
+        ) {
           margin:
-            25px 0 0;
-          color: #74636a;
+            24px 0 0;
+          color: #75656b;
           font-size: 15px;
           line-height: 2;
         }
 
-        .chatMiniCopy {
-          margin-top: 28px;
-          padding-left: 15px;
-          border-left:
-            3px solid #f36a82;
-          color: #8c7b81;
-          font-size: 12px;
-          line-height: 1.9;
-        }
-
-        .phoneWrap {
-          position: relative;
-          display: flex;
-          justify-content: center;
-        }
-
-        .phoneGlow {
-          position: absolute;
-          width: 360px;
-          height: 360px;
-          top: 120px;
-          border-radius: 50%;
-          background:
-            rgba(248,116,141,.18);
-          filter: blur(70px);
-        }
-
-        .phone {
-          position: relative;
-          z-index: 2;
-          width: min(
-            375px,
-            95%
-          );
-          border:
-            9px solid #282426;
-          border-radius: 44px;
-          overflow: hidden;
-          background: #efede8;
-          box-shadow:
-            0 32px 70px
-            rgba(48,32,37,.18);
-        }
-
-        .phoneTop {
-          height: 21px;
-          display: flex;
-          justify-content: center;
-          align-items: flex-end;
+        .handMessage {
+          width: fit-content;
+          margin-top: 30px;
+          padding:
+            16px 22px;
           background: white;
+          border-radius:
+            4px 18px 5px 18px;
+          color: #80646e;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 17px;
+          line-height: 1.6;
+          box-shadow:
+            0 10px 25px
+            rgba(74,54,61,.06);
+          transform:
+            rotate(-2deg);
         }
 
-        .phoneSpeaker {
-          width: 68px;
-          height: 5px;
-          border-radius: 999px;
-          background: #e1dcde;
+        .chatCard {
+          width: min(
+            385px,
+            100%
+          );
+          margin: 0 auto;
+          overflow: hidden;
+          border-radius: 30px;
+          background: #f3f0ec;
+          box-shadow:
+            0 25px 60px
+            rgba(71,49,57,.14);
         }
 
-        .phoneHeader {
+        .chatHeader {
           display: flex;
           align-items: center;
           gap: 10px;
-          padding:
-            12px 20px 17px;
+          padding: 19px;
           background: white;
-          border-bottom:
-            1px solid #eee8ea;
         }
 
-        .phoneHeader img {
-          width: 43px;
-          height: 43px;
+        .chatHeader img {
+          width: 42px;
+          height: 42px;
           border-radius: 50%;
         }
 
-        .phoneHeader strong {
+        .chatHeader strong {
           display: block;
-          font-size: 15px;
+          color: var(--title);
+          font-size: 14px;
         }
 
-        .phoneHeader span {
+        .chatHeader span {
           display: block;
           margin-top: 2px;
-          color: #9b8e92;
+          color: #a09297;
           font-size: 10px;
         }
 
-        .phoneBody {
-          min-height: 480px;
+        .chatBody {
+          min-height: 470px;
           padding:
             24px 15px;
           display: flex;
           flex-direction: column;
-          background:
-            linear-gradient(
-              180deg,
-              #f2f0ec,
-              #ece9e4
-            );
         }
 
         .bubble {
           width: fit-content;
-          max-width: 81%;
+          max-width: 82%;
           margin-bottom: 11px;
           padding:
             11px 13px;
           border-radius: 17px;
+          color: #56474c;
           font-size: 13px;
           line-height: 1.6;
-          box-shadow:
-            0 2px 6px
-            rgba(0,0,0,.035);
         }
 
         .bubble.misaki {
-          align-self: flex-start;
+          align-self:
+            flex-start;
           background: white;
           border-bottom-left-radius:
             5px;
         }
 
         .bubble.user {
-          align-self: flex-end;
-          background: #ffd0da;
+          align-self:
+            flex-end;
+          background: var(--sub);
           border-bottom-right-radius:
             5px;
         }
@@ -1233,49 +1027,31 @@ export default function HomePage() {
         .timeLabel {
           margin:
             5px auto 14px;
-          color: #a69a9e;
+          color: #aaa0a3;
           font-size: 9px;
         }
 
         .fakeInput {
           margin:
-            0 12px 14px;
-          min-height: 48px;
+            0 12px 13px;
           padding:
-            8px 8px 8px 15px;
+            14px 15px;
           border-radius: 18px;
           background: white;
-          color: #b0a5a8;
-          font-size: 12px;
-          display: flex;
-          align-items: center;
-          justify-content:
-            space-between;
+          color: #b5aaae;
+          font-size: 11px;
         }
 
-        .fakeSend {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          background: #f56882;
-          color: white;
-          font-size: 15px;
-          font-weight: 900;
-        }
-
-        /* ================= FEATURES ================= */
+        /* FEATURES */
 
         .features {
           width: min(
-            1050px,
+            1030px,
             calc(100% - 40px)
           );
           margin: 0 auto;
           padding:
-            125px 0 130px;
+            120px 0 125px;
         }
 
         .center {
@@ -1284,23 +1060,24 @@ export default function HomePage() {
 
         .featureTitle {
           margin: 0;
+          color: var(--title);
           text-align: center;
           font-size:
             clamp(
               33px,
               5vw,
-              47px
+              46px
             );
-          line-height: 1.45;
-          letter-spacing: -.045em;
+          line-height: 1.5;
+          letter-spacing: -.04em;
         }
 
         .featureLead {
-          max-width: 560px;
+          max-width: 540px;
           margin:
-            19px auto 46px;
+            19px auto 45px;
+          color: #84747a;
           text-align: center;
-          color: #837278;
           font-size: 14px;
           line-height: 1.9;
         }
@@ -1308,151 +1085,94 @@ export default function HomePage() {
         .featureGrid {
           display: grid;
           grid-template-columns:
-            repeat(2, 1fr);
+            repeat(2,1fr);
           gap: 18px;
         }
 
         .featureCard {
-          position: relative;
-          min-height: 210px;
+          min-height: 205px;
           padding: 28px;
+          border-radius: 23px;
+          background:
+            linear-gradient(
+              145deg,
+              #fff,
+              #fff8f9
+            );
           border:
             1px solid
-            rgba(90,58,69,.055);
-          border-radius: 25px;
-          background:
-            rgba(255,255,255,.94);
+            rgba(118,88,98,.05);
           box-shadow:
-            0 15px 38px
-            rgba(58,36,43,.06);
-          transition:
-            transform .2s ease,
-            box-shadow .2s ease;
-        }
-
-        .featureCard:hover {
-          transform:
-            translateY(-3px);
-          box-shadow:
-            0 22px 46px
-            rgba(58,36,43,.09);
-        }
-
-        .featureTop {
-          display: flex;
-          align-items: center;
-          justify-content:
-            space-between;
-        }
-
-        .featureIcon {
-          width: 48px;
-          height: 48px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 15px;
-          background: #fff2f5;
-          font-size: 24px;
+            0 12px 32px
+            rgba(74,52,59,.055);
         }
 
         .featureNumber {
-          color: #e6dbde;
-          font-size: 12px;
-          font-weight: 900;
-          letter-spacing: .12em;
+          display: block;
+          color: var(--sub);
+          font-family:
+            Georgia,
+            serif;
+          font-size: 31px;
         }
 
         .featureCard h3 {
           margin:
-            20px 0 9px;
-          font-size: 19px;
+            15px 0 10px;
+          color: var(--title);
+          font-size: 18px;
         }
 
         .featureCard p {
           margin: 0;
-          color: #77666c;
-          font-size: 14px;
+          color: #7b6b71;
+          font-size: 13px;
           line-height: 1.9;
         }
 
-        /* ================= TAXI ================= */
+        /* TAXI */
 
         .taxiSection {
-          position: relative;
-          overflow: hidden;
           padding:
-            110px 20px;
+            105px 20px;
           background:
             linear-gradient(
-              145deg,
-              #292426,
-              #373033
+              180deg,
+              #fff8f9,
+              #f8efea
             );
-          color: white;
-        }
-
-        .taxiGlow {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(90px);
-          opacity: .2;
-        }
-
-        .taxiGlowOne {
-          width: 400px;
-          height: 400px;
-          top: -200px;
-          right: -100px;
-          background: #ff7992;
-        }
-
-        .taxiGlowTwo {
-          width: 300px;
-          height: 300px;
-          bottom: -180px;
-          left: -100px;
-          background: #a65975;
         }
 
         .taxiInner {
-          position: relative;
-          z-index: 2;
           width: min(
-            800px,
+            820px,
             100%
           );
           margin: 0 auto;
           text-align: center;
         }
 
-        .taxiEyebrow {
-          color: #ff91a5;
-        }
-
         .taxiInner h2 {
           margin: 0;
+          color: var(--title);
           font-size:
             clamp(
-              36px,
+              35px,
               5vw,
-              53px
+              50px
             );
-          line-height: 1.42;
+          line-height: 1.5;
           letter-spacing: -.04em;
         }
 
         .taxiInner h2 span {
-          color: #ff9aad;
+          color: var(--main-dark);
         }
 
-        .taxiInner >
-          p:not(.eyebrow):not(
-            .taxiResponse
-          ) {
+        .taxiLead {
           margin:
-            24px 0 29px;
-          color: #d9d0d3;
+            25px 0 28px;
+          color: #78686e;
           font-size: 15px;
           line-height: 2;
         }
@@ -1467,63 +1187,63 @@ export default function HomePage() {
         .taxiWords span {
           padding:
             8px 14px;
-          border:
-            1px solid
-            rgba(255,255,255,.16);
           border-radius: 999px;
-          background:
-            rgba(255,255,255,.07);
-          color: #f1e9ec;
+          background: white;
+          color: #7a686f;
           font-size: 12px;
+          box-shadow:
+            0 6px 18px
+            rgba(79,55,63,.05);
         }
 
-        .taxiQuote {
+        .taxiExample {
+          width: min(
+            470px,
+            100%
+          );
           margin:
-            44px auto 0;
-          width: fit-content;
-          max-width: 100%;
+            40px auto 0;
           padding:
-            15px 22px;
-          border-radius: 18px;
+            22px 25px;
+          border-radius: 22px;
           background:
-            rgba(255,255,255,.08);
-          color: white;
+            rgba(255,255,255,.72);
+        }
+
+        .taxiExample p {
+          margin: 0;
+          color: var(--title);
           font-size: 17px;
           font-weight: 700;
         }
 
-        .taxiQuote span {
-          color: #ff91a6;
-        }
-
-        .taxiResponse {
-          margin:
-            14px 0 0;
-          color: #a99da1;
+        .taxiExample span {
+          display: block;
+          margin-top: 9px;
+          color: #9a8b90;
           font-size: 11px;
         }
 
-        /* ================= FINAL ================= */
+        /* FINAL */
 
         .finalSection {
           padding:
-            100px 18px;
+            95px 18px;
         }
 
         .finalImageWrap {
           position: relative;
           width: min(
-            1050px,
+            1030px,
             100%
           );
           min-height: 650px;
           margin: 0 auto;
           overflow: hidden;
-          border-radius: 36px;
-          background: #ddd;
+          border-radius: 34px;
           box-shadow:
-            0 30px 75px
-            rgba(55,34,41,.13);
+            0 28px 70px
+            rgba(78,51,60,.12);
         }
 
         .finalImage {
@@ -1533,29 +1253,18 @@ export default function HomePage() {
           height: 100%;
           object-fit: cover;
           object-position:
-            center 38%;
+            center 40%;
         }
 
-        .finalShade {
+        .finalOverlay {
           position: absolute;
           inset: 0;
           background:
             linear-gradient(
               0deg,
-              rgba(29,17,21,.82) 0%,
-              rgba(29,17,21,.43) 38%,
-              rgba(29,17,21,.05) 70%
-            );
-        }
-
-        .finalTopShade {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(
-              90deg,
-              rgba(0,0,0,.1),
-              transparent 45%
+              rgba(73,48,57,.68) 0%,
+              rgba(73,48,57,.3) 35%,
+              rgba(73,48,57,.02) 70%
             );
         }
 
@@ -1564,66 +1273,72 @@ export default function HomePage() {
           left: 0;
           right: 0;
           bottom: 0;
-          z-index: 3;
+          z-index: 2;
           padding:
-            65px 35px;
+            55px 30px;
           text-align: center;
           color: white;
         }
 
         .finalSmall {
           margin:
-            0 0 13px;
-          color:
-            rgba(255,255,255,.72);
+            0 0 12px;
           font-size: 10px;
           font-weight: 800;
           letter-spacing: .2em;
+          opacity: .75;
         }
 
         .finalCopy h2 {
           margin: 0;
           font-size:
             clamp(
-              32px,
+              34px,
               5vw,
-              50px
+              49px
             );
-          line-height: 1.45;
+          line-height: 1.5;
           letter-spacing: -.04em;
         }
 
         .finalLead {
           margin:
-            17px 0 27px;
-          color:
-            rgba(255,255,255,.82);
+            18px 0 27px;
           font-size: 13px;
           line-height: 1.9;
-        }
-
-        .finalCta {
-          min-width: 250px;
+          color:
+            rgba(255,255,255,.85);
         }
 
         .finalNote {
-          display: block;
-          margin-top: 13px;
+          margin:
+            12px 0 0;
           color:
             rgba(255,255,255,.68);
           font-size: 10px;
         }
 
-        /* ================= FOOTER ================= */
+        .finalSignature {
+          margin-top: 17px;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 25px;
+          transform:
+            rotate(-4deg);
+        }
+
+        /* FOOTER */
 
         footer {
           width: min(
-            1080px,
+            1040px,
             calc(100% - 40px)
           );
           margin: 0 auto;
           padding:
-            25px 0 55px;
+            18px 0 50px;
           display: flex;
           align-items: center;
           justify-content:
@@ -1642,28 +1357,30 @@ export default function HomePage() {
           border-radius: 50%;
         }
 
-        .footerLogo {
-          font-size: 18px;
-          font-weight: 900;
+        .footerBrand strong {
+          display: block;
+          color: var(--title);
+          font-size: 16px;
         }
 
-        footer p {
-          margin: 3px 0 0;
-          color: #8b7c81;
+        .footerBrand span {
+          display: block;
+          margin-top: 2px;
+          color: #92848a;
           font-size: 10px;
         }
 
         footer small {
-          color: #aaa0a3;
-          font-size: 10px;
+          color: #ada2a6;
+          font-size: 9px;
         }
 
-        /* ================= MOBILE ================= */
+        /* MOBILE */
 
         @media (
           max-width: 760px
         ) {
-          .desktopBreak {
+          .desktopOnly {
             display: none;
           }
 
@@ -1687,12 +1404,11 @@ export default function HomePage() {
           }
 
           .headerCta {
-            min-width: 96px;
-            min-height: 38px;
+            min-height: 37px;
+            padding:
+              8px 16px;
             font-size: 12px;
           }
-
-          /* HERO */
 
           .hero {
             padding:
@@ -1700,23 +1416,23 @@ export default function HomePage() {
           }
 
           .heroImageWrap {
-            min-height: 705px;
+            min-height: 715px;
             border-radius: 27px;
           }
 
           .heroImage {
             object-position:
-              55% center;
+              58% center;
           }
 
-          .heroShade {
+          .heroOverlay {
             background:
               linear-gradient(
                 0deg,
-                rgba(27,17,21,.88) 0%,
-                rgba(27,17,21,.58) 31%,
-                rgba(27,17,21,.12) 63%,
-                rgba(27,17,21,.02) 100%
+                rgba(255,250,249,.98) 0%,
+                rgba(255,250,249,.91) 27%,
+                rgba(255,250,249,.34) 52%,
+                rgba(255,250,249,.02) 76%
               );
           }
 
@@ -1727,28 +1443,20 @@ export default function HomePage() {
             bottom: 0;
             width: 100%;
             padding:
-              38px 23px 34px;
+              35px 22px 35px;
             text-align: center;
           }
 
-          .heroBadge {
-            margin-bottom: 14px;
-          }
-
           .hero h1 {
-            font-size: 40px;
-            line-height: 1.22;
+            font-size: 39px;
+            line-height: 1.3;
           }
 
           .heroLead {
             margin:
-              20px 0 25px;
-            font-size: 14px;
+              19px 0 24px;
+            font-size: 13px;
             line-height: 1.85;
-          }
-
-          .heroActions {
-            align-items: center;
           }
 
           .mainCta {
@@ -1756,40 +1464,31 @@ export default function HomePage() {
             max-width: 330px;
           }
 
-          /* INTRO */
+          .signature {
+            display: none;
+          }
 
           .intro {
             padding:
-              85px 0 80px;
+              82px 0 90px;
           }
 
           .intro h2 {
-            font-size: 30px;
+            font-size: 29px;
           }
 
           .introText {
             font-size: 14px;
-            line-height: 2;
           }
 
-          .introPoints {
-            grid-template-columns:
-              1fr;
-            gap: 9px;
-            margin-top: 35px;
+          .handCopy {
+            font-size: 18px;
           }
-
-          .introPoints > div {
-            padding:
-              15px;
-          }
-
-          /* SCENE */
 
           .scene {
             grid-template-columns:
               1fr;
-            gap: 26px;
+            gap: 25px;
             margin-bottom: 78px;
           }
 
@@ -1800,77 +1499,66 @@ export default function HomePage() {
             order: initial;
           }
 
-          .sceneImageWrap {
-            border-radius: 25px;
-          }
-
           .sceneImage {
             height: auto;
             aspect-ratio: 2 / 3;
           }
 
           .sceneCopy {
-            padding:
-              0 9px;
             text-align: center;
+            padding:
+              0 8px;
+          }
+
+          .sceneNumber {
+            font-size: 40px;
           }
 
           .sceneCopy h2 {
-            font-size: 30px;
+            font-size: 29px;
           }
 
           .sceneText {
             font-size: 14px;
           }
 
-          .sceneLine {
-            margin:
-              24px auto 0;
+          .sceneSignature {
+            transform:
+              rotate(-3deg);
           }
 
-          /* CHAT */
-
-          .chatSection {
+          .conversationSection {
             padding:
               82px 20px;
           }
 
-          .chatInner {
+          .conversationInner {
             grid-template-columns:
               1fr;
-            gap: 40px;
+            gap: 42px;
           }
 
-          .chatCopy {
+          .conversationCopy {
             text-align: center;
           }
 
-          .chatCopy h2 {
-            font-size: 32px;
+          .conversationCopy h2 {
+            font-size: 31px;
           }
 
-          .chatCopy > p:not(.eyebrow) {
+          .conversationCopy >
+            p:not(.eyebrow) {
             font-size: 14px;
           }
 
-          .chatMiniCopy {
-            width: fit-content;
+          .handMessage {
             margin:
-              24px auto 0;
-            padding:
-              0 0 0 14px;
-            text-align: left;
+              28px auto 0;
           }
-
-          .phone {
-            margin: 0 auto;
-          }
-
-          /* FEATURES */
 
           .features {
             padding:
-              85px 0 90px;
+              86px 0 90px;
           }
 
           .featureTitle {
@@ -1878,7 +1566,7 @@ export default function HomePage() {
           }
 
           .featureLead {
-            margin-bottom: 31px;
+            margin-bottom: 30px;
           }
 
           .featureGrid {
@@ -1887,42 +1575,30 @@ export default function HomePage() {
           }
 
           .featureCard {
-            min-height: 0;
+            min-height: auto;
             padding: 24px;
           }
 
-          /* TAXI */
-
           .taxiSection {
             padding:
-              82px 20px;
+              80px 20px;
           }
 
           .taxiInner h2 {
-            font-size: 32px;
+            font-size: 31px;
           }
 
-          .taxiInner >
-            p:not(.eyebrow):not(
-              .taxiResponse
-            ) {
+          .taxiLead {
             font-size: 14px;
           }
 
-          .taxiQuote {
-            margin-top: 35px;
-            font-size: 15px;
-          }
-
-          /* FINAL */
-
           .finalSection {
             padding:
-              72px 10px;
+              70px 10px;
           }
 
           .finalImageWrap {
-            min-height: 680px;
+            min-height: 690px;
             border-radius: 27px;
           }
 
@@ -1931,13 +1607,13 @@ export default function HomePage() {
               center center;
           }
 
-          .finalShade {
+          .finalOverlay {
             background:
               linear-gradient(
                 0deg,
-                rgba(29,17,21,.9) 0%,
-                rgba(29,17,21,.58) 38%,
-                rgba(29,17,21,.08) 67%
+                rgba(73,48,57,.78) 0%,
+                rgba(73,48,57,.4) 35%,
+                rgba(73,48,57,.02) 70%
               );
           }
 
@@ -1950,17 +1626,11 @@ export default function HomePage() {
             font-size: 31px;
           }
 
-          .finalLead {
-            font-size: 12px;
-          }
-
-          /* FOOTER */
-
           footer {
             padding:
-              10px 2px 38px;
+              8px 0 38px;
             flex-direction: column;
-            gap: 22px;
+            gap: 20px;
             text-align: center;
           }
 
