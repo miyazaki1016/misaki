@@ -45,6 +45,10 @@ type UsageResult = {
   is_premium?: boolean;
 };
 
+type ActivityEvidence = {
+  texts: string[];
+};
+
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
 
@@ -60,11 +64,7 @@ const MISAKI_LONGITUDE = 139.8174;
 function hashText(text: string) {
   let hash = 0;
 
-  for (
-    let i = 0;
-    i < text.length;
-    i += 1
-  ) {
+  for (let i = 0; i < text.length; i += 1) {
     hash =
       (
         hash * 31 +
@@ -75,9 +75,7 @@ function hashText(text: string) {
   return hash;
 }
 
-function getHour(
-  currentTime: string
-) {
+function getHour(currentTime: string) {
   const match =
     currentTime.match(
       /(\d{1,2}):(\d{2})/
@@ -339,15 +337,11 @@ function getHumidityFeel(
     return "やや蒸し暑く感じやすい";
   }
 
-  if (
-    humidity >= 75
-  ) {
+  if (humidity >= 75) {
     return "湿気を感じやすい";
   }
 
-  if (
-    humidity <= 40
-  ) {
+  if (humidity <= 40) {
     return "空気はやや乾燥気味";
   }
 
@@ -574,34 +568,22 @@ ${lines
 
 「ちょっと蒸し暑い」
 「湿気あるね」
-「今日はわりとカラッとしてる」
+「わりとカラッとしてる」
 
 など、
 自然な体感表現に使って構いません。
 
-ただし、
+湿度データがない場合は、
 
-湿度データがない場合に
 「蒸し暑い」
 「湿気がすごい」
 「カラッとしてる」
 
-などと想像で作らないでください。
+などを想像で作らないでください。
 
 数値を毎回答える必要はありません。
 
-恋人同士の普通の会話では、
-
-「湿度72％だよ」
-
-より、
-
-「ちょっと蒸しっとしてる」
-
-のような自然な言い方を優先してください。
-
-ただしユーザーが
-具体的な湿度を聞いた場合は、
+ユーザーが具体的な湿度を聞いた場合は、
 数値で答えて構いません。
 
 【会話履歴と天気】
@@ -614,15 +596,10 @@ ${lines
 「さっきより少し曇ってきた」
 
 など、
-
 直前の美咲自身の発言と
-現在情報を比較する自然な会話はできます。
-
-これは天気APIが過去を観測したという意味ではなく、
-会話履歴を覚えているという意味です。
+現在情報を比較できます。
 
 一方で、
-
 直前の会話に根拠がないのに、
 
 「さっきから雨」
@@ -649,7 +626,6 @@ ${lines
 「極端に崩れることはなさそう」
 「大きく崩れることはなさそう」
 「荒れることはなさそう」
-「今日は荒れなさそう」
 「今日は大丈夫そう」
 「一日安定しそう」
 
@@ -706,46 +682,46 @@ function createMisakiLife(
     {
       type: "仕事の日",
       morning:
-        "朝は少し眠そうに支度していた",
+        "朝の時間を過ごしている",
       daytime:
-        "昼間は仕事をしていた",
+        "仕事の日として過ごしている",
       evening:
-        "仕事を終えて家でのんびりしている",
+        "夕方から夜の時間を過ごしている",
       late:
-        "家でくつろいでいて、少し眠くなってきている",
+        "夜の時間を家で過ごしている",
     },
     {
       type: "仕事の日",
       morning:
-        "朝はバタバタしながら出かける準備をしていた",
+        "仕事の日の朝を過ごしている",
       daytime:
-        "仕事で少し忙しくしていた",
+        "昼間は仕事の日として過ごしている",
       evening:
-        "帰宅して一息ついている",
+        "仕事の日の夜を過ごしている",
       late:
-        "お風呂も済ませて家でだらだらしている",
+        "夜は自分の時間を過ごしている",
     },
     {
       type: "休みの日",
       morning:
-        "少し遅めに起きてのんびりしていた",
+        "休みの日の朝をのんびり過ごしている",
       daytime:
-        "買い物をしたり家のことをしていた",
+        "休みの日として過ごしている",
       evening:
-        "家でゆっくりしている",
+        "休みの日の夕方をゆっくり過ごしている",
       late:
-        "ソファでだらだらしながらスマホを見ている",
+        "夜は家でのんびりしている",
     },
     {
       type: "休みの日",
       morning:
-        "ゆっくり起きてのんびりしていた",
+        "少しゆったりした朝を過ごしている",
       daytime:
-        "少し外に出て気分転換していた",
+        "自由な時間を過ごしている",
       evening:
-        "家に戻ってのんびりしている",
+        "家でゆったりした時間を過ごしている",
       late:
-        "家で動画を見たりしながら夜更かし気味",
+        "静かな夜を過ごしている",
     },
   ];
 
@@ -754,19 +730,19 @@ function createMisakiLife(
     "今日は少し甘えたい気分",
     "今日は普通に落ち着いている",
     "今日はちょっとだけ眠い",
-    "今日は少し疲れているけど元気",
+    "今日はのんびり話したい気分",
     "今日はなんとなくユーザーと話したい気分",
   ];
 
   const smallThings = [
     "甘いものをちょっと食べたい気分",
-    "今日は家でのんびりしたい",
+    "今日は家でのんびりしたい気分",
     "少しだけ眠気がある",
-    "スマホを見ながらだらだらしている",
+    "ぼーっとしたい気分",
     "今夜は少し長く話したい気分",
     "なんとなくユーザーのことを思い出すことがある",
     "ちょっと小腹が空いている",
-    "ソファでだらだらしたい気分",
+    "ゆっくりしたい気分",
   ];
 
   const day =
@@ -813,22 +789,34 @@ function createMisakiLife(
   }
 
   return `
-今日の美咲の生活設定：
+【今日の美咲の生活背景】
 
 ・今日は「${day.type}」
 ・${mood}
 ・現在は「${currentSituation}」
 ・${smallThing}
 
-これは今日一日の
-美咲の生活の土台です。
+これは美咲の
+今日の雰囲気と生活背景です。
 
-会話のたびに
-別の人生を作らず、
-この設定と矛盾しないようにしてください。
+重要：
 
-毎回この設定を
-説明する必要はありません。
+この生活背景は、
+具体的な過去の出来事を意味しません。
+
+ここから勝手に、
+
+「さっき買い物してた」
+「仕事から帰ってきた」
+「さっきまで外にいた」
+「お風呂に入ってた」
+「ご飯食べてた」
+
+などの過去行動を作らないでください。
+
+具体的な過去行動は、
+今日の記憶または会話履歴に
+実際の根拠がある場合だけ使えます。
 `.trim();
 }
 
@@ -846,7 +834,12 @@ function createTodayMemoryGuide(
 【美咲の今日の記憶】
 
 今日はまだ、
-保存されている美咲自身の出来事はありません。
+保存されている美咲自身の
+具体的な出来事はありません。
+
+したがって、
+会話履歴にも根拠がない具体的な過去行動を
+新しく作らないでください。
 `.trim();
   }
 
@@ -860,10 +853,15 @@ ${todayMemory.items
   )
   .join("\n")}
 
-今日すでに起きた
+これは今日すでに起きた
 美咲自身の出来事です。
 
-後の会話で矛盾させないでください。
+この記憶に書かれている出来事は、
+後の会話で自然に使えます。
+
+ただし、
+ここにない別の過去行動を
+新しく作らないでください。
 `.trim();
 }
 
@@ -896,7 +894,7 @@ function createTimeGuide(
     return `
 現在は朝です。
 
-朝らしい生活感は使えますが、
+朝らしい雰囲気は使えますが、
 ユーザーの睡眠状態は
 勝手に決めないでください。
 `.trim();
@@ -909,8 +907,14 @@ function createTimeGuide(
     return `
 現在は昼間です。
 
-仕事・休憩・昼食など、
-美咲自身の自然な日常を使えます。
+昼らしい自然な会話はできます。
+
+ただし、
+時間帯だけを根拠に
+美咲が実際に昼食を食べた、
+買い物をした、
+外出したなどと
+過去の出来事を確定しないでください。
 `.trim();
   }
 
@@ -921,17 +925,23 @@ function createTimeGuide(
     return `
 現在は夕方から夜です。
 
-帰宅・夕食・お風呂など、
-美咲自身の自然な日常を使えます。
+夜らしい自然な会話はできます。
+
+ただし、
+時間帯だけを根拠に
+帰宅した、
+夕食を食べた、
+お風呂に入ったなどと
+過去の出来事を確定しないでください。
 `.trim();
   }
 
   return `
 現在は夜遅めです。
 
-美咲自身の夜の生活感は使えますが、
-ユーザーの睡眠状態は
-勝手に決めないでください。
+夜らしい自然な会話はできますが、
+美咲やユーザーの直前の行動を
+時間帯だけから作らないでください。
 `.trim();
 }
 
@@ -1069,6 +1079,254 @@ function hasRecentMisakiWeatherContext(
           item.text
         )
     );
+}
+
+function buildActivityEvidence(
+  history: ChatMessage[],
+  todayMemory: MisakiTodayMemory
+): ActivityEvidence {
+  const recentMisaki =
+    history
+      .filter(
+        (item) =>
+          item.role ===
+          "misaki"
+      )
+      .slice(-20)
+      .map(
+        (item) =>
+          item.text
+      );
+
+  return {
+    texts: [
+      ...recentMisaki,
+      ...todayMemory.items,
+    ],
+  };
+}
+
+const activityGroups = [
+  {
+    name: "買い物",
+    patterns: [
+      "買い物",
+      "スーパー",
+      "コンビニ",
+    ],
+  },
+  {
+    name: "外出",
+    patterns: [
+      "出かけ",
+      "外に出",
+      "外出",
+      "散歩",
+    ],
+  },
+  {
+    name: "帰宅",
+    patterns: [
+      "帰ってき",
+      "帰宅",
+      "家に戻",
+    ],
+  },
+  {
+    name: "仕事",
+    patterns: [
+      "仕事して",
+      "仕事だった",
+      "仕事終わ",
+      "勤務して",
+      "会社",
+    ],
+  },
+  {
+    name: "入浴",
+    patterns: [
+      "お風呂",
+      "風呂",
+      "シャワー",
+    ],
+  },
+  {
+    name: "食事",
+    patterns: [
+      "ご飯食べ",
+      "ごはん食べ",
+      "夕飯",
+      "晩ごはん",
+      "昼ごはん",
+      "朝ごはん",
+      "食べてた",
+    ],
+  },
+  {
+    name: "睡眠",
+    patterns: [
+      "昼寝",
+      "寝てた",
+      "寝ていた",
+      "仮眠",
+    ],
+  },
+  {
+    name: "料理",
+    patterns: [
+      "料理して",
+      "ご飯作",
+      "ごはん作",
+    ],
+  },
+  {
+    name: "掃除",
+    patterns: [
+      "掃除して",
+      "片付けて",
+      "片づけて",
+    ],
+  },
+];
+
+function textContainsGroup(
+  text: string,
+  patterns: string[]
+) {
+  return patterns.some(
+    (pattern) =>
+      text.includes(
+        pattern
+      )
+  );
+}
+
+function evidenceSupportsGroup(
+  evidence: ActivityEvidence,
+  patterns: string[]
+) {
+  return evidence.texts.some(
+    (text) =>
+      textContainsGroup(
+        text,
+        patterns
+      )
+  );
+}
+
+function findUnsupportedActivityGroups(
+  reply: string,
+  evidence: ActivityEvidence
+) {
+  const pastMarkers = [
+    "さっき",
+    "さっきまで",
+    "少し前",
+    "今まで",
+    "帰ってき",
+    "帰宅",
+    "してた",
+    "していた",
+    "だった",
+    "終わった",
+    "済ませ",
+    "行ってた",
+    "行ってきた",
+  ];
+
+  const soundsLikePastEvent =
+    pastMarkers.some(
+      (marker) =>
+        reply.includes(
+          marker
+        )
+    );
+
+  if (!soundsLikePastEvent) {
+    return [];
+  }
+
+  return activityGroups
+    .filter(
+      (group) =>
+        textContainsGroup(
+          reply,
+          group.patterns
+        ) &&
+        !evidenceSupportsGroup(
+          evidence,
+          group.patterns
+        )
+    )
+    .map(
+      (group) =>
+        group.name
+    );
+}
+
+function createActivityGroundingGuide(
+  evidence: ActivityEvidence
+) {
+  if (
+    evidence.texts.length ===
+    0
+  ) {
+    return `
+【美咲自身の過去行動】
+
+現在、
+会話履歴にも今日の記憶にも、
+美咲自身の具体的な過去行動の根拠はありません。
+
+したがって、
+
+「さっきまで買い物してた」
+「今帰ってきた」
+「仕事終わったところ」
+「お風呂入ってた」
+「ご飯食べてた」
+「外に出てた」
+「昼寝してた」
+
+などを新しく作らないでください。
+
+現在の気分や、
+今の天気について話すことはできます。
+`.trim();
+  }
+
+  return `
+【美咲自身の過去行動】
+
+美咲が過去の具体的な行動として
+根拠にできる情報は、
+次の会話履歴・今日の記憶だけです。
+
+${evidence.texts
+  .slice(-20)
+  .map(
+    (text) =>
+      `・${text}`
+  )
+  .join("\n")}
+
+重要：
+
+ここに根拠がある出来事については、
+
+「さっき買い物してた」
+「仕事終わったところ」
+「お風呂入ってた」
+
+などと自然に振り返ることができます。
+
+しかし、
+ここにない別の行動を
+新しく過去の事実として作らないでください。
+
+生活背景は、
+具体的な過去行動の証拠ではありません。
+`.trim();
 }
 
 function userIsActuallyInDanger(
@@ -1278,12 +1536,43 @@ function removeUnsupportedWeatherForecast(
     .trim();
 }
 
+function removeUnsupportedMisakiActivity(
+  reply: string,
+  evidence: ActivityEvidence
+) {
+  const parts =
+    reply.match(
+      /[^。！？!?]+[。！？!?]?/gu
+    ) ?? [reply];
+
+  const cleaned =
+    parts
+      .filter(
+        (part) =>
+          findUnsupportedActivityGroups(
+            part,
+            evidence
+          ).length === 0
+      )
+      .join("")
+      .trim();
+
+  return cleaned;
+}
+
 function cleanFinalReply(
   reply: string,
-  message: string
+  message: string,
+  activityEvidence: ActivityEvidence
 ) {
   let cleaned =
     reply.trim();
+
+  cleaned =
+    removeUnsupportedMisakiActivity(
+      cleaned,
+      activityEvidence
+    );
 
   if (
     userAskedMisakiWeather(
@@ -1316,10 +1605,26 @@ function getReplyProblems(
   reply: string,
   message: string,
   currentTime: string,
-  history: ChatMessage[]
+  history: ChatMessage[],
+  activityEvidence: ActivityEvidence
 ) {
   const problems:
     string[] = [];
+
+  const unsupportedActivities =
+    findUnsupportedActivityGroups(
+      reply,
+      activityEvidence
+    );
+
+  if (
+    unsupportedActivities.length >
+    0
+  ) {
+    problems.push(
+      `美咲自身の過去行動「${unsupportedActivities.join("・")}」を、会話履歴や今日の記憶に根拠がないのに作っている`
+    );
+  }
 
   const realtime =
     hasRealtimeTopic(
@@ -1557,9 +1862,7 @@ function getReplyProblems(
       normalizedMessage
     );
 
-  if (
-    isMorningGreeting
-  ) {
+  if (isMorningGreeting) {
     const sleepPatterns = [
       "こんな時間まで起きて",
       "まだ起きてるの",
@@ -2046,6 +2349,17 @@ export async function POST(
         currentDate
       );
 
+    const activityEvidence =
+      buildActivityEvidence(
+        safeHistory,
+        safeTodayMemory
+      );
+
+    const activityGroundingGuide =
+      createActivityGroundingGuide(
+        activityEvidence
+      );
+
     const [
       tokyoWeather,
       tokyoLifeEvents,
@@ -2213,6 +2527,39 @@ ${relationshipGuide}
 
 などを勝手に事実化しないでください。
 
+【美咲自身の行動も勝手に作らない】
+
+美咲の生活背景と、
+実際に起きた具体的な出来事は
+別物です。
+
+「仕事の日」
+「休みの日」
+「今は家でゆっくりしている」
+
+程度の現在の生活背景は使えます。
+
+しかし、
+
+「さっきまで買い物してた」
+「仕事から帰ってきたところ」
+「さっきまで外にいた」
+「お風呂入ってた」
+「夕飯食べてた」
+「昼寝してた」
+
+などの具体的な過去行動は、
+
+・今日の記憶
+・直前の会話履歴
+
+のどちらかに根拠がある場合だけ使ってください。
+
+話を自然にするためだけに
+過去の出来事を新しく作ることは禁止です。
+
+${activityGroundingGuide}
+
 【リアルタイム情報の入手経路を作らない】
 
 天気・交通・羽田・地震・警報について、
@@ -2271,7 +2618,7 @@ ${tokyoLifeEventsGuide}
 
 「ちょっと蒸し暑い」
 「湿気あるね」
-「今日はわりとカラッとしてる」
+「わりとカラッとしてる」
 
 など、
 自然な生活感として使って構いません。
@@ -2289,7 +2636,17 @@ ${tokyoLifeEventsGuide}
 ユーザーが美咲側の天気を聞いた場合は、
 
 美咲側の現在天気と
-短時間予報だけに答えてください。
+短時間予報を中心に答えてください。
+
+天気の返事を自然にするためだけに、
+
+「買い物して疲れた」
+「外から帰ってきた」
+「仕事帰り」
+
+などの、
+根拠のない美咲自身の行動を
+付け足さないでください。
 
 その場合、
 
@@ -2350,6 +2707,18 @@ ${memoryText}
 
 必要なときだけ自然に使ってください。
 
+【今日の記憶に保存するルール】
+
+misakiTodayMemory に
+新しい出来事を保存する場合も、
+
+返答の自然さのために
+架空の過去行動を作って
+記憶へ追加してはいけません。
+
+実際に会話で確定した出来事だけを
+保存してください。
+
 【出力】
 
 必ずJSONだけを返してください。
@@ -2386,6 +2755,19 @@ ${retryProblems
   .join("\n")}
 
 最初から作り直してください。
+
+美咲自身の具体的な過去行動は、
+会話履歴または今日の記憶に
+根拠がある場合だけ使ってください。
+
+生活背景を根拠にして、
+
+「さっきまで買い物してた」
+「今帰ってきた」
+「仕事終わったところ」
+「お風呂入ってた」
+
+などを作らないでください。
 
 天気について、
 架空の情報入手経路は作らないでください。
@@ -2540,7 +2922,8 @@ ${retryProblems
         reply,
         message,
         safeCurrentTime,
-        safeHistory
+        safeHistory,
+        activityEvidence
       );
 
     if (
@@ -2557,18 +2940,14 @@ ${retryProblems
           firstProblems
         );
 
-      if (
-        retryParsed
-      ) {
+      if (retryParsed) {
         const retryReply =
           typeof retryParsed.reply ===
           "string"
             ? retryParsed.reply.trim()
             : "";
 
-        if (
-          retryReply
-        ) {
+        if (retryReply) {
           parsed =
             retryParsed;
 
@@ -2581,7 +2960,8 @@ ${retryProblems
     reply =
       cleanFinalReply(
         reply,
-        message
+        message,
+        activityEvidence
       );
 
     const finalProblems =
@@ -2589,7 +2969,8 @@ ${retryProblems
         reply,
         message,
         safeCurrentTime,
-        safeHistory
+        safeHistory,
+        activityEvidence
       );
 
     if (
@@ -2650,6 +3031,41 @@ ${retryProblems
             )
         : safeTodayMemory.items;
 
+    /*
+      既存の今日の記憶は保持する。
+      Geminiが今回突然作った過去行動が
+      そのまま「既成事実」として記憶されるのを避けるため、
+      新規項目は返答に残っている内容か、
+      既存履歴に根拠のあるものを中心に採用する。
+    */
+    const safeNewTodayItems =
+      parsedTodayItems.filter(
+        (item) => {
+          if (
+            safeTodayMemory.items.includes(
+              item
+            )
+          ) {
+            return true;
+          }
+
+          const unsupported =
+            findUnsupportedActivityGroups(
+              item,
+              activityEvidence
+            );
+
+          if (
+            unsupported.length ===
+            0
+          ) {
+            return true;
+          }
+
+          return false;
+        }
+      );
+
     const updatedTodayMemory:
       MisakiTodayMemory = {
       date:
@@ -2657,9 +3073,10 @@ ${retryProblems
 
       items:
         Array.from(
-          new Set(
-            parsedTodayItems
-          )
+          new Set([
+            ...safeTodayMemory.items,
+            ...safeNewTodayItems,
+          ])
         ).slice(
           -MAX_TODAY_MEMORY
         ),
