@@ -49,6 +49,15 @@ type ActivityEvidence = {
   texts: string[];
 };
 
+type MisakiDayType =
+  | "work"
+  | "off";
+
+type MisakiLifeContext = {
+  dayType: MisakiDayType;
+  guide: string;
+};
+
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
 
@@ -61,10 +70,20 @@ const SUPABASE_PUBLISHABLE_KEY =
 const MISAKI_LATITUDE = 35.6728;
 const MISAKI_LONGITUDE = 139.8174;
 
-function hashText(text: string) {
+/* =========================================================
+   BASIC HELPERS
+========================================================= */
+
+function hashText(
+  text: string
+) {
   let hash = 0;
 
-  for (let i = 0; i < text.length; i += 1) {
+  for (
+    let i = 0;
+    i < text.length;
+    i += 1
+  ) {
     hash =
       (
         hash * 31 +
@@ -75,7 +94,9 @@ function hashText(text: string) {
   return hash;
 }
 
-function getHour(currentTime: string) {
+function getHour(
+  currentTime: string
+) {
   const match =
     currentTime.match(
       /(\d{1,2}):(\d{2})/
@@ -85,7 +106,9 @@ function getHour(currentTime: string) {
     return 18;
   }
 
-  return Number(match[1]);
+  return Number(
+    match[1]
+  );
 }
 
 function getDateKey(
@@ -96,7 +119,9 @@ function getDateKey(
       /\d{4}\/\d{1,2}\/\d{1,2}/
     );
 
-  if (match?.[0]) {
+  if (
+    match?.[0]
+  ) {
     return match[0];
   }
 
@@ -118,13 +143,18 @@ function getFirstRow<T>(
 
   if (
     value &&
-    typeof value === "object"
+    typeof value ===
+      "object"
   ) {
     return value as T;
   }
 
   return null;
 }
+
+/* =========================================================
+   USAGE
+========================================================= */
 
 async function consumeDailyMessageWithRetry(
   supabase: SupabaseClient,
@@ -207,14 +237,22 @@ async function consumeDailyMessageWithRetry(
   );
 }
 
+/* =========================================================
+   WEATHER
+========================================================= */
+
 function weatherCodeToText(
   code: number | null
 ) {
-  if (code === null) {
+  if (
+    code === null
+  ) {
     return "不明";
   }
 
-  if (code === 0) {
+  if (
+    code === 0
+  ) {
     return "快晴";
   }
 
@@ -225,7 +263,9 @@ function weatherCodeToText(
     return "晴れ時々くもり";
   }
 
-  if (code === 3) {
+  if (
+    code === 3
+  ) {
     return "くもり";
   }
 
@@ -274,7 +314,9 @@ function weatherCodeToText(
     return "雪";
   }
 
-  if (code === 77) {
+  if (
+    code === 77
+  ) {
     return "雪粒";
   }
 
@@ -293,7 +335,9 @@ function weatherCodeToText(
     return "にわか雪";
   }
 
-  if (code === 95) {
+  if (
+    code === 95
+  ) {
     return "雷雨";
   }
 
@@ -337,11 +381,15 @@ function getHumidityFeel(
     return "やや蒸し暑く感じやすい";
   }
 
-  if (humidity >= 75) {
+  if (
+    humidity >= 75
+  ) {
     return "湿気を感じやすい";
   }
 
-  if (humidity <= 40) {
+  if (
+    humidity <= 40
+  ) {
     return "空気はやや乾燥気味";
   }
 
@@ -377,7 +425,9 @@ async function getTokyoWeather():
         }
       );
 
-    if (!response.ok) {
+    if (
+      !response.ok
+    ) {
       console.error(
         "WEATHER API ERROR:",
         response.status
@@ -532,7 +582,9 @@ function createWeatherGuide(
       weather
     );
 
-  if (humidityFeel) {
+  if (
+    humidityFeel
+  ) {
     lines.push(
       `湿度と気温から見た体感：${humidityFeel}`
     );
@@ -547,7 +599,8 @@ function createWeatherGuide(
 
 ${lines
   .map(
-    (line) => `・${line}`
+    (line) =>
+      `・${line}`
   )
   .join("\n")}
 
@@ -615,12 +668,6 @@ ${lines
 与えられている短時間予報の範囲だけを
 自然に話してください。
 
-「このあとしばらく」
-「夕方くらいまで」
-
-など、
-確認できている時間範囲を限定してください。
-
 短時間予報だけから、
 
 「極端に崩れることはなさそう」
@@ -660,9 +707,39 @@ ${lines
 `.trim();
 }
 
+/* =========================================================
+   MISAKI DAY / LIFE
+========================================================= */
+
+function getMisakiDayType(
+  currentTime: string
+): MisakiDayType {
+  const dateKey =
+    getDateKey(
+      currentTime
+    );
+
+  const seed =
+    hashText(
+      dateKey
+    );
+
+  /*
+    以前の dayTypes は
+    0,1 = 仕事の日
+    2,3 = 休みの日
+    だったので、その判定をそのまま維持。
+  */
+  return (
+    seed % 4 < 2
+      ? "work"
+      : "off"
+  );
+}
+
 function createMisakiLife(
   currentTime: string
-) {
+): MisakiLifeContext {
   const dateKey =
     getDateKey(
       currentTime
@@ -678,52 +755,10 @@ function createMisakiLife(
       currentTime
     );
 
-  const dayTypes = [
-    {
-      type: "仕事の日",
-      morning:
-        "朝の時間を過ごしている",
-      daytime:
-        "仕事の日として過ごしている",
-      evening:
-        "夕方から夜の時間を過ごしている",
-      late:
-        "夜の時間を家で過ごしている",
-    },
-    {
-      type: "仕事の日",
-      morning:
-        "仕事の日の朝を過ごしている",
-      daytime:
-        "昼間は仕事の日として過ごしている",
-      evening:
-        "仕事の日の夜を過ごしている",
-      late:
-        "夜は自分の時間を過ごしている",
-    },
-    {
-      type: "休みの日",
-      morning:
-        "休みの日の朝をのんびり過ごしている",
-      daytime:
-        "休みの日として過ごしている",
-      evening:
-        "休みの日の夕方をゆっくり過ごしている",
-      late:
-        "夜は家でのんびりしている",
-    },
-    {
-      type: "休みの日",
-      morning:
-        "少しゆったりした朝を過ごしている",
-      daytime:
-        "自由な時間を過ごしている",
-      evening:
-        "家でゆったりした時間を過ごしている",
-      late:
-        "静かな夜を過ごしている",
-    },
-  ];
+  const dayType =
+    getMisakiDayType(
+      currentTime
+    );
 
   const moods = [
     "今日はわりと機嫌がいい",
@@ -736,20 +771,14 @@ function createMisakiLife(
 
   const smallThings = [
     "甘いものをちょっと食べたい気分",
-    "今日は家でのんびりしたい気分",
+    "少しゆっくりしたい気分",
     "少しだけ眠気がある",
-    "ぼーっとしたい気分",
+    "ちょっとぼーっとしたい気分",
     "今夜は少し長く話したい気分",
     "なんとなくユーザーのことを思い出すことがある",
     "ちょっと小腹が空いている",
-    "ゆっくりしたい気分",
+    "少し力を抜きたい気分",
   ];
-
-  const day =
-    dayTypes[
-      seed %
-        dayTypes.length
-    ];
 
   const mood =
     moods[
@@ -763,43 +792,163 @@ function createMisakiLife(
         smallThings.length
     ];
 
-  let currentSituation = "";
+  let currentSituation =
+    "";
 
   if (
-    hour >= 5 &&
-    hour < 11
+    dayType === "work"
   ) {
-    currentSituation =
-      day.morning;
-  } else if (
-    hour >= 11 &&
-    hour < 17
-  ) {
-    currentSituation =
-      day.daytime;
-  } else if (
-    hour >= 17 &&
-    hour < 22
-  ) {
-    currentSituation =
-      day.evening;
+    if (
+      hour >= 5 &&
+      hour < 10
+    ) {
+      currentSituation =
+        "仕事の日の朝の時間帯";
+    } else if (
+      hour >= 10 &&
+      hour < 17
+    ) {
+      currentSituation =
+        "仕事の日の昼間";
+    } else if (
+      hour >= 17 &&
+      hour < 22
+    ) {
+      currentSituation =
+        "仕事の日の夕方から夜";
+    } else {
+      currentSituation =
+        "仕事の日の夜遅め";
+    }
   } else {
-    currentSituation =
-      day.late;
+    if (
+      hour >= 5 &&
+      hour < 10
+    ) {
+      currentSituation =
+        "休みの日の朝";
+    } else if (
+      hour >= 10 &&
+      hour < 17
+    ) {
+      currentSituation =
+        "休みの日の昼間";
+    } else if (
+      hour >= 17 &&
+      hour < 22
+    ) {
+      currentSituation =
+        "休みの日の夕方から夜";
+    } else {
+      currentSituation =
+        "休みの日の夜遅め";
+    }
   }
 
-  return `
+  const dayLabel =
+    dayType === "work"
+      ? "仕事の日"
+      : "休みの日";
+
+  const consistencyGuide =
+    dayType === "work"
+      ? `
+今日は「仕事の日」です。
+
+したがって、
+
+「今日は暇」
+「今日は何も予定ない」
+「今日は一日のんびり」
+「今日はずっとだらだら」
+「今日はのんびりしてるから、このままだらだら過ごす」
+
+など、
+今日一日が完全な休みであるような表現は禁止です。
+
+ただし、
+
+「今ちょっとゆっくりしてる」
+「少し休憩したい」
+「今はちょっとのんびり」
+
+など、
+その瞬間だけの休憩や気分は使えます。
+
+「仕事の日」は、
+24時間ずっと仕事をしているという意味ではありません。
+`
+      : `
+今日は「休みの日」です。
+
+したがって、
+今日の記憶や会話履歴に別の根拠がない限り、
+
+「今日は仕事」
+「今仕事中」
+「仕事で忙しい」
+「これから仕事」
+「仕事終わった」
+
+など、
+仕事の日であるような事実を
+新しく作らないでください。
+
+休みの日らしい
+ゆったりした気分や予定のなさは
+自然に使えます。
+
+ただし休みの日だからといって、
+
+「朝からずっと寝てた」
+「買い物してきた」
+「一日中家にいた」
+
+などの具体的な行動まで
+勝手に作らないでください。
+`;
+
+  return {
+    dayType,
+
+    guide: `
 【今日の美咲の生活背景】
 
-・今日は「${day.type}」
-・${mood}
+・今日は「${dayLabel}」
 ・現在は「${currentSituation}」
+・${mood}
 ・${smallThing}
 
-これは美咲の
-今日の雰囲気と生活背景です。
+この「${dayLabel}」という設定は、
+今日の日付の間は固定です。
 
-重要：
+会話の途中で
+仕事の日と休みの日を
+入れ替えないでください。
+
+${consistencyGuide}
+
+【気分と行動を分ける】
+
+「眠い」
+「甘いもの食べたい」
+「ゆっくりしたい」
+「だらだらしたい」
+
+などは現在の気分です。
+
+それだけを根拠に、
+
+「今日は一日のんびりしてる」
+「今日は暇」
+「今日は何もしてない」
+「ずっとだらだらしてた」
+
+など、
+一日全体の行動や予定に
+拡大しないでください。
+
+【過去行動】
 
 この生活背景は、
 具体的な過去の出来事を意味しません。
@@ -817,8 +966,13 @@ function createMisakiLife(
 具体的な過去行動は、
 今日の記憶または会話履歴に
 実際の根拠がある場合だけ使えます。
-`.trim();
+`.trim(),
+  };
 }
+
+/* =========================================================
+   TODAY MEMORY / TIME
+========================================================= */
 
 function createTodayMemoryGuide(
   todayMemory: MisakiTodayMemory,
@@ -945,6 +1099,10 @@ function createTimeGuide(
 `.trim();
 }
 
+/* =========================================================
+   RELATIONSHIP
+========================================================= */
+
 function createRelationshipGuide(
   relationshipPoints: number
 ) {
@@ -999,6 +1157,10 @@ function createRelationshipGuide(
 ・無理に質問しない
 `.trim();
 }
+
+/* =========================================================
+   TOPIC DETECTION
+========================================================= */
 
 function hasRealtimeTopic(
   text: string
@@ -1080,6 +1242,10 @@ function hasRecentMisakiWeatherContext(
         )
     );
 }
+
+/* =========================================================
+   MISAKI ACTIVITY GROUNDING
+========================================================= */
 
 function buildActivityEvidence(
   history: ChatMessage[],
@@ -1242,7 +1408,9 @@ function findUnsupportedActivityGroups(
         )
     );
 
-  if (!soundsLikePastEvent) {
+  if (
+    !soundsLikePastEvent
+  ) {
     return [];
   }
 
@@ -1312,13 +1480,8 @@ ${evidence.texts
 
 重要：
 
-ここに根拠がある出来事については、
-
-「さっき買い物してた」
-「仕事終わったところ」
-「お風呂入ってた」
-
-などと自然に振り返ることができます。
+ここに根拠がある出来事については
+自然に振り返ることができます。
 
 しかし、
 ここにない別の行動を
@@ -1328,6 +1491,110 @@ ${evidence.texts
 具体的な過去行動の証拠ではありません。
 `.trim();
 }
+
+/* =========================================================
+   DAY TYPE CONSISTENCY
+========================================================= */
+
+function findDayTypeProblems(
+  reply: string,
+  dayType: MisakiDayType
+) {
+  const problems:
+    string[] = [];
+
+  if (
+    dayType === "work"
+  ) {
+    const workDayContradictions = [
+      "今日は暇",
+      "今日はずっと暇",
+      "今日は何も予定ない",
+      "今日は予定ない",
+      "今日は一日のんびり",
+      "今日はずっとのんびり",
+      "今日はのんびりしてる",
+      "一日だらだら",
+      "今日はだらだら",
+      "今日はずっとだらだら",
+      "このままだらだら過ごし",
+      "一日中だらだら",
+    ];
+
+    if (
+      workDayContradictions.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "今日は仕事の日なのに、一日が完全な休み・暇であるように話している"
+      );
+    }
+  }
+
+  if (
+    dayType === "off"
+  ) {
+    const offDayContradictions = [
+      "今日は仕事",
+      "今日仕事",
+      "今仕事中",
+      "仕事中だよ",
+      "勤務中",
+      "仕事してる",
+      "仕事してるよ",
+      "これから仕事",
+      "仕事行ってくる",
+      "仕事に行ってくる",
+    ];
+
+    if (
+      offDayContradictions.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "今日は休みの日なのに、仕事の日であるように話している"
+      );
+    }
+  }
+
+  return problems;
+}
+
+function removeDayTypeContradictions(
+  reply: string,
+  dayType: MisakiDayType
+) {
+  const parts =
+    reply.match(
+      /[^。！？!?]+[。！？!?]?/gu
+    ) ?? [reply];
+
+  const cleaned =
+    parts
+      .filter(
+        (part) =>
+          findDayTypeProblems(
+            part,
+            dayType
+          ).length === 0
+      )
+      .join("")
+      .trim();
+
+  return cleaned;
+}
+
+/* =========================================================
+   USER CONTEXT
+========================================================= */
 
 function userIsActuallyInDanger(
   message: string
@@ -1438,6 +1705,10 @@ function userAskedMisakiWeather(
   );
 }
 
+/* =========================================================
+   DETERMINISTIC CLEANERS
+========================================================= */
+
 function removeWeatherQuestionBack(
   reply: string
 ) {
@@ -1545,25 +1816,23 @@ function removeUnsupportedMisakiActivity(
       /[^。！？!?]+[。！？!?]?/gu
     ) ?? [reply];
 
-  const cleaned =
-    parts
-      .filter(
-        (part) =>
-          findUnsupportedActivityGroups(
-            part,
-            evidence
-          ).length === 0
-      )
-      .join("")
-      .trim();
-
-  return cleaned;
+  return parts
+    .filter(
+      (part) =>
+        findUnsupportedActivityGroups(
+          part,
+          evidence
+        ).length === 0
+    )
+    .join("")
+    .trim();
 }
 
 function cleanFinalReply(
   reply: string,
   message: string,
-  activityEvidence: ActivityEvidence
+  activityEvidence: ActivityEvidence,
+  dayType: MisakiDayType
 ) {
   let cleaned =
     reply.trim();
@@ -1572,6 +1841,12 @@ function cleanFinalReply(
     removeUnsupportedMisakiActivity(
       cleaned,
       activityEvidence
+    );
+
+  cleaned =
+    removeDayTypeContradictions(
+      cleaned,
+      dayType
     );
 
   if (
@@ -1601,15 +1876,30 @@ function cleanFinalReply(
   );
 }
 
+/* =========================================================
+   REPLY VALIDATION
+========================================================= */
+
 function getReplyProblems(
   reply: string,
   message: string,
   currentTime: string,
   history: ChatMessage[],
-  activityEvidence: ActivityEvidence
+  activityEvidence: ActivityEvidence,
+  dayType: MisakiDayType
 ) {
   const problems:
     string[] = [];
+
+  const dayProblems =
+    findDayTypeProblems(
+      reply,
+      dayType
+    );
+
+  problems.push(
+    ...dayProblems
+  );
 
   const unsupportedActivities =
     findUnsupportedActivityGroups(
@@ -1636,7 +1926,9 @@ function getReplyProblems(
       history
     );
 
-  if (realtime) {
+  if (
+    realtime
+  ) {
     const inventedSourcePatterns = [
       "ニュース見て",
       "ニュースを見て",
@@ -1862,7 +2154,9 @@ function getReplyProblems(
       normalizedMessage
     );
 
-  if (isMorningGreeting) {
+  if (
+    isMorningGreeting
+  ) {
     const sleepPatterns = [
       "こんな時間まで起きて",
       "まだ起きてるの",
@@ -1954,6 +2248,10 @@ function getReplyProblems(
   return problems;
 }
 
+/* =========================================================
+   GEMINI / SUPABASE HELPERS
+========================================================= */
+
 function parseGeminiText(
   rawText: unknown
 ): GeminiResult | null {
@@ -1999,6 +2297,10 @@ function createAuthenticatedSupabase(
     }
   );
 }
+
+/* =========================================================
+   POST
+========================================================= */
 
 export async function POST(
   request: Request
@@ -2074,7 +2376,9 @@ export async function POST(
         )
         .trim();
 
-    if (!accessToken) {
+    if (
+      !accessToken
+    ) {
       return Response.json(
         {
           error:
@@ -2131,7 +2435,9 @@ export async function POST(
         usageRequestId
       );
 
-    if (usageError) {
+    if (
+      usageError
+    ) {
       console.error(
         "USAGE RPC FINAL ERROR:",
         usageError
@@ -2153,7 +2459,9 @@ export async function POST(
         usageData
       );
 
-    if (!usage) {
+    if (
+      !usage
+    ) {
       return Response.json(
         {
           error:
@@ -2196,6 +2504,8 @@ export async function POST(
         }
       );
     }
+
+    /* ---------- SAFE INPUT ---------- */
 
     const safeHistory:
       ChatMessage[] =
@@ -2315,6 +2625,8 @@ export async function POST(
           )
         : userMessageCount;
 
+    /* ---------- GUIDES ---------- */
+
     const relationshipGuide =
       createRelationshipGuide(
         safeRelationshipPoints
@@ -2333,10 +2645,16 @@ export async function POST(
             )
         : "まだ長期記憶はありません。";
 
-    const misakiLife =
+    const misakiLifeContext =
       createMisakiLife(
         safeCurrentTime
       );
+
+    const misakiDayType =
+      misakiLifeContext.dayType;
+
+    const misakiLife =
+      misakiLifeContext.guide;
 
     const timeGuide =
       createTimeGuide(
@@ -2470,6 +2788,8 @@ export async function POST(
         })
       );
 
+    /* ---------- SYSTEM PROMPT ---------- */
+
     const baseSystemPrompt = `
 あなたは「美咲」という38歳の日本人女性です。
 
@@ -2527,28 +2847,38 @@ ${relationshipGuide}
 
 などを勝手に事実化しないでください。
 
+${misakiLife}
+
+【美咲の仕事日・休日は固定】
+
+今日が仕事の日なら、
+今日の会話中ずっと仕事の日です。
+
+今日が休みの日なら、
+今日の会話中ずっと休みの日です。
+
+会話の自然さのために
+途中で仕事日と休日を
+入れ替えないでください。
+
+「今ゆっくりしている」と
+「今日は休み」は別です。
+
+仕事の日でも、
+今だけ休憩したり
+ゆっくりしていることはあります。
+
+逆に、
+休みの日なのに
+根拠なく「仕事中」にはしないでください。
+
 【美咲自身の行動も勝手に作らない】
 
 美咲の生活背景と、
 実際に起きた具体的な出来事は
 別物です。
 
-「仕事の日」
-「休みの日」
-「今は家でゆっくりしている」
-
-程度の現在の生活背景は使えます。
-
-しかし、
-
-「さっきまで買い物してた」
-「仕事から帰ってきたところ」
-「さっきまで外にいた」
-「お風呂入ってた」
-「夕飯食べてた」
-「昼寝してた」
-
-などの具体的な過去行動は、
+具体的な過去行動は、
 
 ・今日の記憶
 ・直前の会話履歴
@@ -2607,11 +2937,8 @@ ${tokyoLifeEventsGuide}
 現在観測だけから、
 過去の天気経過を作ってはいけません。
 
-一方、
 直前の会話履歴に
 美咲自身の天気発言があるなら、
-
-その発言を覚えている恋人として
 現在との比較はできます。
 
 湿度データがある場合は、
@@ -2648,15 +2975,22 @@ ${tokyoLifeEventsGuide}
 根拠のない美咲自身の行動を
 付け足さないでください。
 
-その場合、
+さらに、
+現在の天気を聞かれただけなのに、
+
+「今日は一日のんびり」
+「このままだらだら過ごす」
+「今日は暇」
+
+など、
+今日一日の予定まで
+勝手に付け足さないでください。
 
 「そっちは？」
 「そっちはどう？」
 「そっちは今どんな感じ？」
 
 などと質問し返さないでください。
-
-また、
 
 「傘持ったほうがいいよ」
 「折り畳み傘持ったほうがいいよ」
@@ -2690,8 +3024,6 @@ ${tokyoLifeEventsGuide}
 
 を自然に理解してください。
 
-${misakiLife}
-
 ${todayMemoryGuide}
 
 【直近の美咲の発言】
@@ -2715,6 +3047,10 @@ misakiTodayMemory に
 返答の自然さのために
 架空の過去行動を作って
 記憶へ追加してはいけません。
+
+仕事の日／休みの日という
+今日の固定設定に反する出来事も
+新しく保存しないでください。
 
 実際に会話で確定した出来事だけを
 保存してください。
@@ -2756,6 +3092,33 @@ ${retryProblems
 
 最初から作り直してください。
 
+今日の美咲は
+「${
+  misakiDayType === "work"
+    ? "仕事の日"
+    : "休みの日"
+}」です。
+
+この設定と矛盾しないでください。
+
+仕事の日でも、
+「今ちょっとゆっくりしている」
+程度は構いません。
+
+しかし仕事の日に、
+
+「今日は暇」
+「今日は一日のんびり」
+「このままだらだら過ごす」
+
+など、
+一日が完全な休日のように
+広げないでください。
+
+休みの日に、
+根拠なく「今仕事中」などと
+仕事の日へ変えないでください。
+
 美咲自身の具体的な過去行動は、
 会話履歴または今日の記憶に
 根拠がある場合だけ使ってください。
@@ -2789,14 +3152,8 @@ ${retryProblems
 
 のような会話上の比較を使えます。
 
-ただし、
-
-「さっきからずっと」
-「朝からずっと」
-「降ったり止んだり」
-
-など、
-確認できない時間経過は作らないでください。
+確認できない天気の時間経過は
+作らないでください。
 
 短時間予報より先まで
 天気が安定・悪化すると
@@ -2884,10 +3241,14 @@ ${retryProblems
       );
     }
 
+    /* ---------- FIRST GENERATION ---------- */
+
     let parsed =
       await generateReply();
 
-    if (!parsed) {
+    if (
+      !parsed
+    ) {
       return Response.json(
         {
           error:
@@ -2905,7 +3266,9 @@ ${retryProblems
         ? parsed.reply.trim()
         : "";
 
-    if (!reply) {
+    if (
+      !reply
+    ) {
       return Response.json(
         {
           error:
@@ -2917,13 +3280,16 @@ ${retryProblems
       );
     }
 
+    /* ---------- VALIDATE + RETRY ---------- */
+
     const firstProblems =
       getReplyProblems(
         reply,
         message,
         safeCurrentTime,
         safeHistory,
-        activityEvidence
+        activityEvidence,
+        misakiDayType
       );
 
     if (
@@ -2940,14 +3306,18 @@ ${retryProblems
           firstProblems
         );
 
-      if (retryParsed) {
+      if (
+        retryParsed
+      ) {
         const retryReply =
           typeof retryParsed.reply ===
           "string"
             ? retryParsed.reply.trim()
             : "";
 
-        if (retryReply) {
+        if (
+          retryReply
+        ) {
           parsed =
             retryParsed;
 
@@ -2957,11 +3327,14 @@ ${retryProblems
       }
     }
 
+    /* ---------- FINAL CLEAN ---------- */
+
     reply =
       cleanFinalReply(
         reply,
         message,
-        activityEvidence
+        activityEvidence,
+        misakiDayType
       );
 
     const finalProblems =
@@ -2970,7 +3343,8 @@ ${retryProblems
         message,
         safeCurrentTime,
         safeHistory,
-        activityEvidence
+        activityEvidence,
+        misakiDayType
       );
 
     if (
@@ -2983,6 +3357,8 @@ ${retryProblems
         reply
       );
     }
+
+    /* ---------- LONG MEMORY ---------- */
 
     const updatedMemory =
       Array.isArray(
@@ -3006,6 +3382,8 @@ ${retryProblems
               -MAX_MEMORY
             )
         : safeMemory;
+
+    /* ---------- TODAY MEMORY ---------- */
 
     const parsedTodayItems =
       Array.isArray(
@@ -3031,13 +3409,6 @@ ${retryProblems
             )
         : safeTodayMemory.items;
 
-    /*
-      既存の今日の記憶は保持する。
-      Geminiが今回突然作った過去行動が
-      そのまま「既成事実」として記憶されるのを避けるため、
-      新規項目は返答に残っている内容か、
-      既存履歴に根拠のあるものを中心に採用する。
-    */
     const safeNewTodayItems =
       parsedTodayItems.filter(
         (item) => {
@@ -3049,20 +3420,33 @@ ${retryProblems
             return true;
           }
 
-          const unsupported =
+          const unsupportedActivities =
             findUnsupportedActivityGroups(
               item,
               activityEvidence
             );
 
           if (
-            unsupported.length ===
+            unsupportedActivities.length >
             0
           ) {
-            return true;
+            return false;
           }
 
-          return false;
+          const dayProblems =
+            findDayTypeProblems(
+              item,
+              misakiDayType
+            );
+
+          if (
+            dayProblems.length >
+            0
+          ) {
+            return false;
+          }
+
+          return true;
         }
       );
 
@@ -3081,6 +3465,8 @@ ${retryProblems
           -MAX_TODAY_MEMORY
         ),
     };
+
+    /* ---------- RESPONSE ---------- */
 
     return Response.json({
       reply,
