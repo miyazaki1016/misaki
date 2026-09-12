@@ -6,8 +6,7 @@ import {
   NextResponse,
 } from "next/server";
 
-import webpush
-  from "web-push";
+import webpush from "web-push";
 
 export const runtime =
   "nodejs";
@@ -237,12 +236,11 @@ export async function POST(
       );
     }
 
-    webpush
-      .setVapidDetails(
-        subject,
-        publicKey,
-        privateKey
-      );
+    webpush.setVapidDetails(
+      subject,
+      publicKey,
+      privateKey
+    );
 
     const payload =
       JSON.stringify({
@@ -256,7 +254,7 @@ export async function POST(
 
     for (
       const subscription
-        of subscriptions
+      of subscriptions
     ) {
       try {
         await webpush
