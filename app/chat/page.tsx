@@ -52,8 +52,7 @@ const PROACTIVE_CHECK_MS =
 const PROACTIVE_COOLDOWN_MS =
   45 * 60 * 1000;
 
-// 次の自発メッセージは
-// 45分〜3時間30分の間でランダム
+// 次の自発メッセージは45分〜3時間30分の間でランダム
 const PROACTIVE_MIN_DELAY_MS =
   45 * 60 * 1000;
 
@@ -225,6 +224,11 @@ export default function ChatPage() {
   const [
     showMemory,
     setShowMemory,
+  ] = useState(false);
+
+  const [
+    showMenu,
+    setShowMenu,
   ] = useState(false);
 
   const [
@@ -482,6 +486,7 @@ export default function ChatPage() {
       setShowPremium(
         false
       );
+
       return;
     }
 
@@ -540,6 +545,7 @@ export default function ChatPage() {
       setNotificationPermission(
         "unsupported"
       );
+
       return;
     }
 
@@ -594,10 +600,12 @@ export default function ChatPage() {
                   item
                 ) =>
                   item &&
-                  (item.role ===
-                    "user" ||
+                  (
                     item.role ===
-                      "misaki") &&
+                      "user" ||
+                    item.role ===
+                      "misaki"
+                  ) &&
                   typeof item.text ===
                     "string"
               )
@@ -695,6 +703,7 @@ export default function ChatPage() {
           setMisakiTodayMemory({
             date:
               currentDate,
+
             items:
               parsedTodayMemory.items
                 .filter(
@@ -929,6 +938,7 @@ export default function ChatPage() {
       setDailyUsage({
         date:
           getJapanDateKey(),
+
         count:
           Math.max(
             0,
@@ -1027,6 +1037,7 @@ export default function ChatPage() {
 
     setMessages([]);
     setMessage("");
+    setShowMenu(false);
   }
 
   function deleteMemory(
@@ -1152,6 +1163,7 @@ export default function ChatPage() {
     setMisakiTodayMemory({
       date:
         currentDate,
+
       items:
         Array.from(
           new Set(
@@ -1184,6 +1196,7 @@ export default function ChatPage() {
       setShowPremium(
         true
       );
+
       return;
     }
 
@@ -1687,479 +1700,452 @@ export default function ChatPage() {
 
   return (
     <main className="shell">
-      <section className="card">
-        <div className="avatar">
-          <img
-            src="/icon-192.png"
-            alt="美咲"
-          />
-        </div>
+      {/* =========================
+          BRAND HEADER
+      ========================== */}
 
-        <div>
-          <h1>美咲</h1>
-
-          <p>
-            タクドラの彼女・38歳
-          </p>
-        </div>
-
-        <div
-          style={{
-            marginLeft:
-              "auto",
-            display:
-              "flex",
-            gap:
-              "8px",
-            alignItems:
-              "center",
-            flexWrap:
-              "wrap",
-            justifyContent:
-              "flex-end",
-          }}
+      <header className="misakiChatHeader">
+        <a
+          href="/"
+          className="misakiHeaderProfile"
+          aria-label="美咲のトップページへ"
         >
-          {notificationPermission !==
-            "granted" &&
-            notificationPermission !==
-              "unsupported" && (
-              <button
-                onClick={
-                  requestNotificationPermission
-                }
-                disabled={
-                  loading
-                }
-                style={{
-                  border:
-                    "none",
-                  background:
-                    "#ff6b81",
-                  color:
-                    "#ffffff",
-                  borderRadius:
-                    "999px",
-                  padding:
-                    "7px 10px",
-                  fontSize:
-                    "12px",
-                  cursor:
-                    "pointer",
-                }}
-              >
-                通知をON
-              </button>
-            )}
+          <div className="avatar">
+            <img
+              src="/icon-192.png"
+              alt="美咲"
+            />
+          </div>
 
+          <div className="misakiHeaderText">
+            <div className="misakiNameRow">
+              <h1>
+                美咲
+              </h1>
+
+              <span className="misakiAge">
+                38
+              </span>
+            </div>
+
+            <p>
+              日常に、もうひとつの会話を。
+            </p>
+          </div>
+        </a>
+
+        <div className="misakiHeaderRight">
           {notificationPermission ===
             "granted" && (
             <span
-              style={{
-                fontSize:
-                  "12px",
-                opacity:
-                  0.6,
-              }}
-            >
-              通知ON
-            </span>
+              className="notificationDot"
+              title="通知ON"
+            />
           )}
 
           <button
+            className="menuButton"
             onClick={() =>
-              setShowMemory(
-                (prev) =>
-                  !prev
+              setShowMenu(
+                (prev) => !prev
               )
             }
-            disabled={
-              loading
+            aria-label="メニュー"
+            aria-expanded={
+              showMenu
             }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
-              opacity:
-                0.7,
-            }}
           >
-            美咲の記憶
-          </button>
-
-          <button
-            onClick={
-              resetChat
-            }
-            disabled={
-              loading
-            }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
-              opacity:
-                0.6,
-            }}
-          >
-            会話をリセット
+            <span />
+            <span />
+            <span />
           </button>
         </div>
-      </section>
+
+        {showMenu && (
+          <>
+            <button
+              className="menuBackdrop"
+              aria-label="メニューを閉じる"
+              onClick={() =>
+                setShowMenu(
+                  false
+                )
+              }
+            />
+
+            <div className="misakiMenu">
+              <div className="misakiMenuTop">
+                <span className="misakiMenuTitle">
+                  美咲
+                </span>
+
+                <span className="misakiMenuSignature">
+                  Misaki
+                </span>
+              </div>
+
+              {notificationPermission !==
+                "granted" &&
+                notificationPermission !==
+                  "unsupported" && (
+                <button
+                  className="menuItem"
+                  onClick={async () => {
+                    await requestNotificationPermission();
+                    setShowMenu(
+                      false
+                    );
+                  }}
+                  disabled={
+                    loading
+                  }
+                >
+                  <span className="menuIcon">
+                    ♡
+                  </span>
+
+                  <span>
+                    <strong>
+                      通知をON
+                    </strong>
+
+                    <small>
+                      美咲からのメッセージを受け取る
+                    </small>
+                  </span>
+                </button>
+              )}
+
+              {notificationPermission ===
+                "granted" && (
+                <div className="menuItem menuItemStatic">
+                  <span className="menuIcon">
+                    ♡
+                  </span>
+
+                  <span>
+                    <strong>
+                      通知ON
+                    </strong>
+
+                    <small>
+                      美咲からの通知を受け取れます
+                    </small>
+                  </span>
+                </div>
+              )}
+
+              <button
+                className="menuItem"
+                onClick={() => {
+                  setShowMemory(
+                    (prev) =>
+                      !prev
+                  );
+
+                  setShowMenu(
+                    false
+                  );
+                }}
+                disabled={
+                  loading
+                }
+              >
+                <span className="menuIcon">
+                  ◌
+                </span>
+
+                <span>
+                  <strong>
+                    美咲の記憶
+                  </strong>
+
+                  <small>
+                    覚えていることを見る
+                  </small>
+                </span>
+              </button>
+
+              <button
+                className="menuItem"
+                onClick={() => {
+                  setShowMenu(
+                    false
+                  );
+
+                  resetChat();
+                }}
+                disabled={
+                  loading
+                }
+              >
+                <span className="menuIcon">
+                  ↻
+                </span>
+
+                <span>
+                  <strong>
+                    会話をリセット
+                  </strong>
+
+                  <small>
+                    今までのチャットだけを消す
+                  </small>
+                </span>
+              </button>
+
+              <a
+                href="/"
+                className="menuItem"
+              >
+                <span className="menuIcon">
+                  ←
+                </span>
+
+                <span>
+                  <strong>
+                    美咲のページへ
+                  </strong>
+
+                  <small>
+                    トップページに戻る
+                  </small>
+                </span>
+              </a>
+            </div>
+          </>
+        )}
+      </header>
+
+      {/* =========================
+          MEMORY
+      ========================== */}
 
       {showMemory && (
-        <section
-          style={{
-            margin:
-              "12px 0",
-            padding:
-              "14px",
-            borderRadius:
-              "14px",
-            background:
-              "rgba(255,255,255,0.8)",
-            boxShadow:
-              "0 2px 10px rgba(0,0,0,0.06)",
-          }}
-        >
-          <div
-            style={{
-              display:
-                "flex",
-              alignItems:
-                "center",
-              justifyContent:
-                "space-between",
-              marginBottom:
-                "10px",
-            }}
-          >
-            <strong>
-              美咲が覚えていること
-            </strong>
+        <section className="memoryPanel">
+          <div className="memoryPanelHeader">
+            <div>
+              <span className="memoryEyebrow">
+                MEMORY
+              </span>
 
-            {memory.length >
-              0 && (
-              <button
-                onClick={
-                  resetMemory
-                }
-                style={{
-                  border:
-                    "none",
-                  background:
-                    "transparent",
-                  fontSize:
-                    "12px",
-                  cursor:
-                    "pointer",
-                  opacity:
-                    0.6,
-                }}
-              >
-                すべて削除
-              </button>
-            )}
+              <h2>
+                美咲が覚えていること
+              </h2>
+            </div>
+
+            <button
+              className="panelClose"
+              onClick={() =>
+                setShowMemory(
+                  false
+                )
+              }
+              aria-label="閉じる"
+            >
+              ×
+            </button>
           </div>
 
           {memory.length ===
           0 ? (
-            <p
-              style={{
-                fontSize:
-                  "14px",
-                opacity:
-                  0.6,
-                margin: 0,
-              }}
-            >
-              まだ覚えていることはないよ。
-            </p>
-          ) : (
-            <div
-              style={{
-                display:
-                  "flex",
-                flexDirection:
-                  "column",
-                gap:
-                  "8px",
-              }}
-            >
-              {memory.map(
-                (
-                  item,
-                  index
-                ) => (
-                  <div
-                    key={`${item}-${index}`}
-                    style={{
-                      display:
-                        "flex",
-                      gap:
-                        "8px",
-                      alignItems:
-                        "center",
-                      padding:
-                        "10px",
-                      borderRadius:
-                        "10px",
-                      background:
-                        "rgba(255,255,255,0.9)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        fontSize:
-                          "14px",
-                        lineHeight:
-                          1.5,
-                      }}
-                    >
-                      {item}
-                    </div>
+            <div className="emptyMemory">
+              <span className="emptyMemoryHeart">
+                ♡
+              </span>
 
-                    <button
-                      onClick={() =>
-                        deleteMemory(
-                          index
-                        )
-                      }
-                      style={{
-                        border:
-                          "none",
-                        background:
-                          "transparent",
-                        cursor:
-                          "pointer",
-                        fontSize:
-                          "12px",
-                        opacity:
-                          0.6,
-                      }}
-                    >
-                      削除
-                    </button>
-                  </div>
-                )
-              )}
+              <p>
+                まだ覚えていることはないよ。
+              </p>
+
+              <small>
+                話していくうちに、
+                少しずつ増えていきます。
+              </small>
             </div>
+          ) : (
+            <>
+              <div className="memoryList">
+                {memory.map(
+                  (
+                    item,
+                    index
+                  ) => (
+                    <div
+                      key={`${item}-${index}`}
+                      className="memoryItem"
+                    >
+                      <span className="memoryBullet">
+                        ♡
+                      </span>
+
+                      <div className="memoryText">
+                        {item}
+                      </div>
+
+                      <button
+                        className="memoryDelete"
+                        onClick={() =>
+                          deleteMemory(
+                            index
+                          )
+                        }
+                      >
+                        ×
+                      </button>
+                    </div>
+                  )
+                )}
+              </div>
+
+              <button
+                className="resetMemoryButton"
+                onClick={
+                  resetMemory
+                }
+              >
+                すべての記憶を削除
+              </button>
+            </>
           )}
         </section>
       )}
 
+      {/* =========================
+          SAFETY
+      ========================== */}
+
       <section className="notice">
-        運転中の画面操作はしないでね。安全な場所に停車してから話そう。
+        運転中の画面操作はしないでね。
+        安全な場所に停車してから話そう。
       </section>
 
-      <section
-        style={{
-          display:
-            "flex",
-          justifyContent:
-            "space-between",
-          alignItems:
-            "center",
-          gap:
-            "10px",
-          margin:
-            "8px 12px 10px",
-          fontSize:
-            "12px",
-          opacity:
-            0.7,
-        }}
-      >
-        <span>
-          {!accountLoaded
-            ? "プラン確認中..."
-            : isPremium
-              ? "プレミアム利用中"
-              : `無料版・今日あと${freeRemaining}回`}
-        </span>
+      {/* =========================
+          PLAN
+      ========================== */}
+
+      <section className="planBar">
+        <div className="planStatus">
+          <span
+            className={`planDot ${
+              isPremium
+                ? "premium"
+                : ""
+            }`}
+          />
+
+          <span>
+            {!accountLoaded
+              ? "プラン確認中..."
+              : isPremium
+                ? "美咲プレミアム"
+                : `無料版・今日あと${freeRemaining}回`}
+          </span>
+        </div>
 
         {!isPremium && (
           <button
+            className="premiumLink"
             onClick={
               openPremium
             }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              padding: 0,
-              fontSize:
-                "12px",
-              fontWeight:
-                700,
-              cursor:
-                "pointer",
-              textDecoration:
-                "underline",
-            }}
           >
             プレミアム
           </button>
         )}
       </section>
 
+      {/* =========================
+          PREMIUM
+      ========================== */}
+
       {showPremium &&
         !isPremium && (
-        <section
-          style={{
-            margin:
-              "10px 12px 14px",
-            padding:
-              "18px",
-            borderRadius:
-              "18px",
-            background:
-              "#ffffff",
-            boxShadow:
-              "0 4px 18px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div
-            style={{
-              display:
-                "flex",
-              justifyContent:
-                "space-between",
-              gap:
-                "12px",
-              alignItems:
-                "flex-start",
-            }}
-          >
-            <div>
-              <strong
-                style={{
-                  fontSize:
-                    "17px",
-                }}
-              >
-                美咲プレミアム
-              </strong>
+          <section className="premiumPanel">
+            <div className="premiumPanelTop">
+              <div>
+                <p className="premiumEyebrow">
+                  MISAKI PREMIUM
+                </p>
 
-              <p
-                style={{
-                  margin:
-                    "8px 0 0",
-                  fontSize:
-                    "14px",
-                  lineHeight:
-                    1.6,
-                }}
+                <h2>
+                  もっと、
+                  <br />
+                  美咲と話したい日に。
+                </h2>
+              </div>
+
+              <button
+                className="panelClose"
+                onClick={() =>
+                  setShowPremium(
+                    false
+                  )
+                }
               >
-                もっと美咲と話したい人向けのプランです。
-                会話回数を気にせず、美咲との関係を続けられるようにします。
-              </p>
+                ×
+              </button>
             </div>
 
-            <button
-              onClick={() =>
-                setShowPremium(
-                  false
-                )
-              }
-              style={{
-                border:
-                  "none",
-                background:
-                  "transparent",
-                cursor:
-                  "pointer",
-                fontSize:
-                  "18px",
-              }}
-            >
-              ×
-            </button>
-          </div>
-
-          {freeLimitReached && (
-            <p
-              style={{
-                margin:
-                  "14px 0 0",
-                fontSize:
-                  "13px",
-                fontWeight:
-                  700,
-              }}
-            >
-              今日は無料分の20回まで話したよ。
+            <p className="premiumDescription">
+              会話回数を気にせず、
+              美咲との毎日の続きを
+              楽しめるようにするプランです。
             </p>
-          )}
 
-          <button
-            onClick={
-              startPremium
-            }
-            style={{
-              width:
-                "100%",
-              marginTop:
-                "16px",
-              border:
-                "none",
-              borderRadius:
-                "14px",
-              padding:
-                "13px 16px",
-              background:
-                "#ff6b81",
-              color:
-                "#ffffff",
-              fontSize:
-                "15px",
-              fontWeight:
-                700,
-              cursor:
-                "pointer",
-            }}
-          >
-            プレミアムを始める
-          </button>
+            {freeLimitReached && (
+              <div className="premiumLimitMessage">
+                今日は無料分の20回まで話したよ。
+              </div>
+            )}
 
-          <p
-            style={{
-              margin:
-                "9px 0 0",
-              textAlign:
-                "center",
-              fontSize:
-                "11px",
-              opacity:
-                0.55,
-            }}
-          >
-            現在はテスト中のため、まだ料金は発生しません。
-          </p>
-        </section>
-      )}
+            <button
+              className="premiumButton"
+              onClick={
+                startPremium
+              }
+            >
+              プレミアムを始める
+            </button>
+
+            <p className="premiumNote">
+              現在はテスト中のため、
+              まだ料金は発生しません。
+            </p>
+          </section>
+        )}
+
+      {/* =========================
+          CHAT
+      ========================== */}
 
       <section className="chat">
+        {messages.length ===
+          0 &&
+          !loading && (
+            <div className="emptyConversation">
+              <img
+                src="/icon-192.png"
+                alt=""
+              />
+
+              <p>
+                なんでもない話でいいよ。
+              </p>
+
+              <span>
+                Misaki
+              </span>
+            </div>
+          )}
+
         {messages.map(
           (
             item,
             index
           ) => (
             <div
-              key={
-                index
-              }
+              key={index}
               className={`bubble ${
                 item.role ===
                 "user"
@@ -2174,12 +2160,16 @@ export default function ChatPage() {
 
         {loading && (
           <div className="bubble typingBubble">
-            <span></span>
-            <span></span>
-            <span></span>
+            <span />
+            <span />
+            <span />
           </div>
         )}
       </section>
+
+      {/* =========================
+          INPUT
+      ========================== */}
 
       <section className="inputArea">
         <input
@@ -2190,8 +2180,7 @@ export default function ChatPage() {
             e
           ) =>
             setMessage(
-              e.target
-                .value
+              e.target.value
             )
           }
           onKeyDown={(
@@ -2219,6 +2208,12 @@ export default function ChatPage() {
         />
 
         <button
+          className="sendButton"
+          aria-label={
+            freeLimitReached
+              ? "続きを話す"
+              : "送信"
+          }
           onClick={
             freeLimitReached
               ? openPremium
@@ -2230,14 +2225,531 @@ export default function ChatPage() {
           }
         >
           {!accountLoaded
-            ? "準備中"
+            ? "…"
             : loading
-              ? "入力中"
+              ? "…"
               : freeLimitReached
-                ? "続きを話す"
-                : "送信"}
+                ? "続き"
+                : "↑"}
         </button>
       </section>
+
+      {/* =========================
+          PAGE-SPECIFIC STYLE
+      ========================== */}
+
+      <style jsx>{`
+        .misakiChatHeader {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          min-height: 78px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding:
+            calc(10px + env(safe-area-inset-top))
+            14px
+            10px;
+          background: rgba(255, 250, 250, 0.95);
+          border-bottom:
+            1px solid
+            rgba(108, 92, 98, 0.08);
+          box-shadow:
+            0 5px 24px
+            rgba(82, 55, 64, 0.055);
+          backdrop-filter: blur(18px);
+          -webkit-backdrop-filter: blur(18px);
+        }
+
+        .misakiHeaderProfile {
+          min-width: 0;
+          display: flex;
+          align-items: center;
+          gap: 11px;
+          color: inherit;
+          text-decoration: none;
+        }
+
+        .misakiHeaderText {
+          min-width: 0;
+        }
+
+        .misakiNameRow {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+        }
+
+        .misakiNameRow h1 {
+          margin: 0;
+          color: #49383e;
+          font-size: 18px;
+          line-height: 1.15;
+          font-weight: 800;
+          letter-spacing: 0.05em;
+        }
+
+        .misakiAge {
+          min-width: 25px;
+          height: 18px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 999px;
+          background: #ffd5de;
+          color: #a45365;
+          font-size: 9px;
+          font-weight: 700;
+        }
+
+        .misakiHeaderText p {
+          margin: 4px 0 0;
+          color: #9a8b90;
+          font-size: 10px;
+          white-space: nowrap;
+        }
+
+        .misakiHeaderRight {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+        }
+
+        .notificationDot {
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #ff6680;
+          box-shadow:
+            0 0 0 4px
+            rgba(255, 102, 128, 0.1);
+        }
+
+        .menuButton {
+          width: 40px;
+          height: 40px;
+          padding: 0;
+          border: 0;
+          border-radius: 50%;
+          background: rgba(248, 239, 234, 0.9);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 3px;
+          cursor: pointer;
+        }
+
+        .menuButton span {
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #6c5c62;
+        }
+
+        .menuBackdrop {
+          position: fixed;
+          inset: 0;
+          z-index: 70;
+          padding: 0;
+          border: 0;
+          background:
+            rgba(54, 38, 44, 0.12);
+          backdrop-filter: blur(2px);
+          -webkit-backdrop-filter:
+            blur(2px);
+        }
+
+        .misakiMenu {
+          position: absolute;
+          z-index: 80;
+          top:
+            calc(
+              64px +
+              env(safe-area-inset-top)
+            );
+          right: 12px;
+          width: 285px;
+          overflow: hidden;
+          border:
+            1px solid
+            rgba(108, 92, 98, 0.08);
+          border-radius: 23px;
+          background:
+            rgba(255, 250, 250, 0.99);
+          box-shadow:
+            0 24px 60px
+            rgba(67, 44, 52, 0.18);
+        }
+
+        .misakiMenuTop {
+          padding: 17px 18px 13px;
+          display: flex;
+          align-items: center;
+          justify-content:
+            space-between;
+          border-bottom:
+            1px solid
+            rgba(108, 92, 98, 0.07);
+        }
+
+        .misakiMenuTitle {
+          color: #49383e;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .misakiMenuSignature {
+          color: #ff6680;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 17px;
+          transform: rotate(-4deg);
+        }
+
+        .menuItem {
+          width: 100%;
+          min-height: 59px;
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 10px 16px;
+          border: 0;
+          border-bottom:
+            1px solid
+            rgba(108, 92, 98, 0.055);
+          background: transparent;
+          color: #6c5c62;
+          text-align: left;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .menuItem:last-child {
+          border-bottom: 0;
+        }
+
+        .menuItem:active {
+          background:
+            rgba(255, 213, 222, 0.18);
+        }
+
+        .menuItemStatic {
+          cursor: default;
+        }
+
+        .menuIcon {
+          width: 31px;
+          height: 31px;
+          flex: 0 0 31px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          background: #fff0f3;
+          color: #e95872;
+          font-size: 15px;
+        }
+
+        .menuItem strong {
+          display: block;
+          color: #55454b;
+          font-size: 13px;
+          font-weight: 700;
+        }
+
+        .menuItem small {
+          display: block;
+          margin-top: 3px;
+          color: #a09297;
+          font-size: 9px;
+          line-height: 1.35;
+        }
+
+        .memoryPanel,
+        .premiumPanel {
+          margin: 12px 12px 5px;
+          padding: 18px;
+          border:
+            1px solid
+            rgba(108, 92, 98, 0.06);
+          border-radius: 22px;
+          background:
+            rgba(255, 255, 255, 0.91);
+          box-shadow:
+            0 13px 35px
+            rgba(75, 52, 60, 0.07);
+        }
+
+        .memoryPanelHeader,
+        .premiumPanelTop {
+          display: flex;
+          align-items: flex-start;
+          justify-content:
+            space-between;
+          gap: 15px;
+        }
+
+        .memoryEyebrow,
+        .premiumEyebrow {
+          display: block;
+          margin: 0 0 5px;
+          color: #ff6680;
+          font-size: 8px;
+          line-height: 1;
+          font-weight: 900;
+          letter-spacing: 0.18em;
+        }
+
+        .memoryPanel h2,
+        .premiumPanel h2 {
+          margin: 0;
+          color: #49383e;
+          font-size: 17px;
+          line-height: 1.45;
+        }
+
+        .panelClose {
+          width: 32px;
+          height: 32px;
+          flex: 0 0 32px;
+          border: 0;
+          border-radius: 50%;
+          background: #f8efea;
+          color: #85757b;
+          font-size: 18px;
+          cursor: pointer;
+        }
+
+        .emptyMemory {
+          padding: 30px 10px 16px;
+          text-align: center;
+        }
+
+        .emptyMemoryHeart {
+          display: block;
+          color: #ff9eaf;
+          font-size: 25px;
+        }
+
+        .emptyMemory p {
+          margin: 10px 0 0;
+          color: #66565c;
+          font-size: 13px;
+        }
+
+        .emptyMemory small {
+          display: block;
+          margin-top: 5px;
+          color: #a09297;
+          font-size: 9px;
+        }
+
+        .memoryList {
+          margin-top: 15px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+        }
+
+        .memoryItem {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          padding: 11px 10px;
+          border-radius: 13px;
+          background: #fff7f8;
+        }
+
+        .memoryBullet {
+          flex: 0 0 auto;
+          color: #ff8195;
+          font-size: 13px;
+        }
+
+        .memoryText {
+          flex: 1;
+          min-width: 0;
+          color: #67575d;
+          font-size: 12px;
+          line-height: 1.55;
+        }
+
+        .memoryDelete {
+          width: 25px;
+          height: 25px;
+          flex: 0 0 auto;
+          border: 0;
+          border-radius: 50%;
+          background: transparent;
+          color: #ab9ca1;
+          cursor: pointer;
+        }
+
+        .resetMemoryButton {
+          margin-top: 15px;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: #a09297;
+          font-size: 10px;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+
+        .planBar {
+          margin: 7px 14px 5px;
+          display: flex;
+          align-items: center;
+          justify-content:
+            space-between;
+          gap: 10px;
+          color: #96878c;
+          font-size: 10px;
+        }
+
+        .planStatus {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .planDot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #d0c4c7;
+        }
+
+        .planDot.premium {
+          background: #ff6680;
+          box-shadow:
+            0 0 0 3px
+            rgba(255, 102, 128, 0.1);
+        }
+
+        .premiumLink {
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: #e95872;
+          font-size: 10px;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .premiumDescription {
+          margin: 14px 0 0;
+          color: #78686e;
+          font-size: 12px;
+          line-height: 1.75;
+        }
+
+        .premiumLimitMessage {
+          margin-top: 14px;
+          padding: 10px 12px;
+          border-radius: 12px;
+          background: #fff0f3;
+          color: #a35364;
+          font-size: 11px;
+          font-weight: 700;
+        }
+
+        .premiumButton {
+          width: 100%;
+          margin-top: 16px;
+          padding: 13px 15px;
+          border: 0;
+          border-radius: 15px;
+          background: #ff6680;
+          color: white;
+          font-size: 14px;
+          font-weight: 800;
+          box-shadow:
+            0 10px 23px
+            rgba(255, 102, 128, 0.2);
+          cursor: pointer;
+        }
+
+        .premiumNote {
+          margin: 9px 0 0;
+          color: #a6989d;
+          text-align: center;
+          font-size: 9px;
+        }
+
+        .emptyConversation {
+          margin: auto;
+          padding:
+            40px 20px 90px;
+          text-align: center;
+        }
+
+        .emptyConversation img {
+          width: 69px;
+          height: 69px;
+          margin: 0 auto;
+          border:
+            3px solid white;
+          border-radius: 50%;
+          box-shadow:
+            0 9px 25px
+            rgba(92, 61, 72, 0.12);
+        }
+
+        .emptyConversation p {
+          margin: 17px 0 0;
+          color: #78656d;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            "Hiragino Sans",
+            sans-serif;
+          font-size: 16px;
+          letter-spacing: 0.03em;
+        }
+
+        .emptyConversation span {
+          display: inline-block;
+          margin-top: 7px;
+          color: #ff6680;
+          font-family:
+            "Bradley Hand",
+            "Segoe Script",
+            cursive;
+          font-size: 17px;
+          transform: rotate(-4deg);
+        }
+
+        .sendButton {
+          width: 43px !important;
+          min-width: 43px !important;
+          padding: 0 !important;
+          font-size: 17px !important;
+        }
+
+        @media (max-width: 390px) {
+          .misakiChatHeader {
+            padding-left: 11px;
+            padding-right: 11px;
+          }
+
+          .misakiHeaderText p {
+            font-size: 9px;
+          }
+
+          .misakiMenu {
+            right: 8px;
+            width:
+              calc(100vw - 16px);
+            max-width: 285px;
+          }
+        }
+      `}</style>
     </main>
   );
 }
