@@ -2,6 +2,7 @@ export type TokyoLifeEvent = {
   type:
     | "earthquake"
     | "weather_warning"
+    | "weather_forecast"
     | "train"
     | "haneda";
   title: string;
@@ -25,7 +26,20 @@ const HANEDA_DOMESTIC_URL =
 const HANEDA_INTERNATIONAL_URL =
   "https://tokyo-haneda.com/flight/int_search.html";
 
-const MAX_EVENTS = 8;
+/*
+ * 美咲の生活圏。
+ *
+ * ユーザーの現在地ではなく、
+ * 美咲が普段生活している場所として
+ * 江東区周辺の代表座標を固定で使う。
+ */
+const MISAKI_LATITUDE =
+  35.6728;
+
+const MISAKI_LONGITUDE =
+  139.8174;
+
+const MAX_EVENTS = 9;
 
 const TOKYO_JR_LINES = [
   "山手線",
@@ -52,12 +66,30 @@ function decodeXmlText(
   value: string
 ) {
   return value
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&amp;/g, "&")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ");
+    .replace(
+      /&lt;/g,
+      "<"
+    )
+    .replace(
+      /&gt;/g,
+      ">"
+    )
+    .replace(
+      /&amp;/g,
+      "&"
+    )
+    .replace(
+      /&quot;/g,
+      '"'
+    )
+    .replace(
+      /&#39;/g,
+      "'"
+    )
+    .replace(
+      /&nbsp;/g,
+      " "
+    );
 }
 
 function stripTags(
@@ -69,7 +101,10 @@ function stripTags(
       " "
     )
   )
-    .replace(/\s+/g, " ")
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 }
 
@@ -77,9 +112,18 @@ function normalizeText(
   value: string
 ) {
   return value
-    .replace(/\r/g, "")
-    .replace(/\n+/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(
+      /\r/g,
+      ""
+    )
+    .replace(
+      /\n+/g,
+      " "
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 }
 
@@ -94,10 +138,14 @@ function getTag(
     );
 
   const match =
-    xml.match(pattern);
+    xml.match(
+      pattern
+    );
 
   return match
-    ? stripTags(match[1])
+    ? stripTags(
+        match[1]
+      )
     : "";
 }
 
@@ -119,7 +167,10 @@ function getLink(
       /<link[^>]+href=["']([^"']+)["'][^>]*\/?>/i
     );
 
-  return match?.[1] ?? "";
+  return (
+    match?.[1] ??
+    ""
+  );
 }
 
 async function fetchText(
@@ -128,20 +179,26 @@ async function fetchText(
 ) {
   try {
     const response =
-      await fetch(url, {
-        next: {
-          revalidate,
-        },
+      await fetch(
+        url,
+        {
+          next: {
+            revalidate,
+          },
 
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0",
-          "Accept-Language":
-            "ja,en;q=0.8",
-        },
-      });
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0",
 
-    if (!response.ok) {
+            "Accept-Language":
+              "ja,en;q=0.8",
+          },
+        }
+      );
+
+    if (
+      !response.ok
+    ) {
       console.error(
         "TOKYO EVENT FETCH ERROR:",
         url,
@@ -163,6 +220,45 @@ async function fetchText(
   }
 }
 
+async function fetchJson<T>(
+  url: string,
+  revalidate = 300
+): Promise<T | null> {
+  try {
+    const response =
+      await fetch(
+        url,
+        {
+          next: {
+            revalidate,
+          },
+        }
+      );
+
+    if (
+      !response.ok
+    ) {
+      console.error(
+        "WEATHER FORECAST ERROR:",
+        response.status
+      );
+
+      return null;
+    }
+
+    return (
+      await response.json()
+    ) as T;
+  } catch (error) {
+    console.error(
+      "WEATHER FORECAST ERROR:",
+      error
+    );
+
+    return null;
+  }
+}
+
 function isRecent(
   dateText: string,
   maxHours: number
@@ -177,13 +273,16 @@ function isRecent(
     ).getTime();
 
   if (
-    !Number.isFinite(time)
+    !Number.isFinite(
+      time
+    )
   ) {
     return true;
   }
 
   return (
-    Date.now() - time <=
+    Date.now() -
+      time <=
     maxHours *
       60 *
       60 *
@@ -216,14 +315,41 @@ function affectsTokyo(
   );
 }
 
+function affectsKoto(
+  text: string
+) {
+  return (
+    text.includes(
+      "江東区"
+    ) ||
+    text.includes(
+      "東京都２３区"
+    ) ||
+    text.includes(
+      "東京都23区"
+    ) ||
+    text.includes(
+      "東京地方"
+    ) ||
+    text.includes(
+      "東京都"
+    ) ||
+    text.includes(
+      "２３区"
+    )
+  );
+}
+
 /*
- * ---------------------------
+ * ===========================
  * 地震
- * ---------------------------
+ * ===========================
  */
 
 async function getEarthquakeEvents():
-  Promise<TokyoLifeEvent[]> {
+  Promise<
+    TokyoLifeEvent[]
+  > {
   const feed =
     await fetchText(
       JMA_EARTHQUAKE_FEED,
@@ -235,7 +361,9 @@ async function getEarthquakeEvents():
   }
 
   const entries =
-    getEntries(feed);
+    getEntries(
+      feed
+    );
 
   const candidates =
     entries.filter(
@@ -264,10 +392,12 @@ async function getEarthquakeEvents():
     TokyoLifeEvent[] = [];
 
   for (
-    const entry of candidates
+    const entry
+    of candidates
   ) {
     if (
-      results.length >= 2
+      results.length >=
+      2
     ) {
       break;
     }
@@ -288,9 +418,13 @@ async function getEarthquakeEvents():
     }
 
     const detailUrl =
-      getLink(entry);
+      getLink(
+        entry
+      );
 
-    if (!detailUrl) {
+    if (
+      !detailUrl
+    ) {
       continue;
     }
 
@@ -300,7 +434,9 @@ async function getEarthquakeEvents():
         300
       );
 
-    if (!detailXml) {
+    if (
+      !detailXml
+    ) {
       continue;
     }
 
@@ -330,38 +466,13 @@ async function getEarthquakeEvents():
     }
 
     const meaningful =
-      combined.includes(
-        "震度３"
-      ) ||
-      combined.includes(
-        "震度3"
-      ) ||
-      combined.includes(
-        "震度４"
-      ) ||
-      combined.includes(
-        "震度4"
-      ) ||
-      combined.includes(
-        "震度５"
-      ) ||
-      combined.includes(
-        "震度5"
-      ) ||
-      combined.includes(
-        "震度６"
-      ) ||
-      combined.includes(
-        "震度6"
-      ) ||
-      combined.includes(
-        "震度７"
-      ) ||
-      combined.includes(
-        "震度7"
+      /震度[３3４4５5６6７7]/.test(
+        combined
       );
 
-    if (!meaningful) {
+    if (
+      !meaningful
+    ) {
       continue;
     }
 
@@ -389,9 +500,9 @@ async function getEarthquakeEvents():
 }
 
 /*
- * ---------------------------
+ * ===========================
  * 気象警報
- * ---------------------------
+ * ===========================
  */
 
 function isRelevantWarningTitle(
@@ -417,13 +528,11 @@ function isCancelledWarning(
   text: string
 ) {
   const normalized =
-    normalizeText(text);
+    normalizeText(
+      text
+    );
 
-  /*
-   * 解除された情報だけを
-   * 現在の警報として扱わない。
-   */
-  if (
+  return (
     normalized.includes(
       "すべて解除"
     ) ||
@@ -439,24 +548,13 @@ function isCancelledWarning(
     normalized.includes(
       "解除しました"
     )
-  ) {
-    return true;
-  }
-
-  return false;
+  );
 }
 
 function createWarningDetail(
   title: string,
   headline: string
 ) {
-  /*
-   * Geminiに曖昧な
-   * 「警報がいろいろ」
-   * と言わせないため、
-   * 種類を明示して渡す。
-   */
-
   if (
     title.includes(
       "土砂災害警戒情報"
@@ -497,7 +595,9 @@ function createWarningDetail(
 }
 
 async function getWeatherWarningEvents():
-  Promise<TokyoLifeEvent[]> {
+  Promise<
+    TokyoLifeEvent[]
+  > {
   const feed =
     await fetchText(
       JMA_EXTRA_FEED,
@@ -509,7 +609,9 @@ async function getWeatherWarningEvents():
   }
 
   const entries =
-    getEntries(feed);
+    getEntries(
+      feed
+    );
 
   const candidates =
     entries.filter(
@@ -535,10 +637,12 @@ async function getWeatherWarningEvents():
     new Set<string>();
 
   for (
-    const entry of candidates
+    const entry
+    of candidates
   ) {
     if (
-      results.length >= 3
+      results.length >=
+      3
     ) {
       break;
     }
@@ -549,10 +653,6 @@ async function getWeatherWarningEvents():
         "updated"
       );
 
-    /*
-     * 古い警報を現在情報として
-     * 長時間残さない。
-     */
     if (
       !isRecent(
         updated,
@@ -563,9 +663,13 @@ async function getWeatherWarningEvents():
     }
 
     const detailUrl =
-      getLink(entry);
+      getLink(
+        entry
+      );
 
-    if (!detailUrl) {
+    if (
+      !detailUrl
+    ) {
       continue;
     }
 
@@ -575,7 +679,9 @@ async function getWeatherWarningEvents():
         300
       );
 
-    if (!detailXml) {
+    if (
+      !detailXml
+    ) {
       continue;
     }
 
@@ -585,7 +691,7 @@ async function getWeatherWarningEvents():
       );
 
     if (
-      !affectsTokyo(
+      !affectsKoto(
         plainText
       )
     ) {
@@ -615,17 +721,17 @@ async function getWeatherWarningEvents():
       continue;
     }
 
-    /*
-     * タイトルが同じ情報を
-     * 何件もGeminiへ渡さない。
-     */
     if (
-      seen.has(title)
+      seen.has(
+        title
+      )
     ) {
       continue;
     }
 
-    seen.add(title);
+    seen.add(
+      title
+    );
 
     results.push({
       type:
@@ -651,9 +757,494 @@ async function getWeatherWarningEvents():
 }
 
 /*
- * ---------------------------
+ * ===========================
+ * 江東区周辺
+ * 今後6時間の天気
+ * ===========================
+ */
+
+type OpenMeteoHourly = {
+  time?: string[];
+
+  precipitation_probability?:
+    number[];
+
+  precipitation?:
+    number[];
+
+  rain?:
+    number[];
+
+  weather_code?:
+    number[];
+};
+
+type OpenMeteoResponse = {
+  hourly?:
+    OpenMeteoHourly;
+};
+
+type HourlyWeather = {
+  time: string;
+
+  probability:
+    number;
+
+  precipitation:
+    number;
+
+  rain:
+    number;
+
+  weatherCode:
+    number;
+};
+
+function weatherCodeToText(
+  code: number
+) {
+  if (
+    code === 0
+  ) {
+    return "晴れ";
+  }
+
+  if (
+    code === 1 ||
+    code === 2
+  ) {
+    return (
+      "晴れ時々くもり"
+    );
+  }
+
+  if (
+    code === 3
+  ) {
+    return "くもり";
+  }
+
+  if (
+    code === 45 ||
+    code === 48
+  ) {
+    return "霧";
+  }
+
+  if (
+    code >= 51 &&
+    code <= 57
+  ) {
+    return "霧雨";
+  }
+
+  if (
+    code >= 61 &&
+    code <= 67
+  ) {
+    return "雨";
+  }
+
+  if (
+    code >= 71 &&
+    code <= 77
+  ) {
+    return "雪";
+  }
+
+  if (
+    code >= 80 &&
+    code <= 82
+  ) {
+    return "にわか雨";
+  }
+
+  if (
+    code >= 85 &&
+    code <= 86
+  ) {
+    return "にわか雪";
+  }
+
+  if (
+    code >= 95
+  ) {
+    return "雷雨";
+  }
+
+  return "不明";
+}
+
+function formatHour(
+  value: string
+) {
+  const match =
+    value.match(
+      /T(\d{2}):(\d{2})/
+    );
+
+  if (
+    !match
+  ) {
+    return value;
+  }
+
+  return `${Number(
+    match[1]
+  )}時`;
+}
+
+function buildHourlyWeather(
+  hourly:
+    OpenMeteoHourly
+) {
+  const times =
+    hourly.time ??
+    [];
+
+  const probabilities =
+    hourly
+      .precipitation_probability ??
+    [];
+
+  const precipitation =
+    hourly.precipitation ??
+    [];
+
+  const rain =
+    hourly.rain ??
+    [];
+
+  const codes =
+    hourly.weather_code ??
+    [];
+
+  const result:
+    HourlyWeather[] =
+    [];
+
+  for (
+    let i = 0;
+    i < times.length;
+    i += 1
+  ) {
+    const time =
+      times[i];
+
+    if (
+      !time
+    ) {
+      continue;
+    }
+
+    result.push({
+      time,
+
+      probability:
+        typeof probabilities[
+          i
+        ] === "number"
+          ? probabilities[i]
+          : 0,
+
+      precipitation:
+        typeof precipitation[
+          i
+        ] === "number"
+          ? precipitation[i]
+          : 0,
+
+      rain:
+        typeof rain[
+          i
+        ] === "number"
+          ? rain[i]
+          : 0,
+
+      weatherCode:
+        typeof codes[
+          i
+        ] === "number"
+          ? codes[i]
+          : 0,
+    });
+  }
+
+  return result;
+}
+
+function hasMeaningfulWeather(
+  points:
+    HourlyWeather[]
+) {
+  return points.some(
+    (point) =>
+      point.probability >=
+        40 ||
+      point.precipitation >=
+        0.2 ||
+      point.rain >=
+        0.2 ||
+      point.weatherCode >=
+        95
+  );
+}
+
+function createForecastDetail(
+  points:
+    HourlyWeather[]
+) {
+  const rainy =
+    points.filter(
+      (point) =>
+        point.probability >=
+          40 ||
+        point.precipitation >=
+          0.2 ||
+        point.rain >=
+          0.2
+    );
+
+  const thunder =
+    points.filter(
+      (point) =>
+        point.weatherCode >=
+        95
+    );
+
+  const maxProbability =
+    points.reduce(
+      (
+        current,
+        point
+      ) =>
+        Math.max(
+          current,
+          point.probability
+        ),
+      0
+    );
+
+  const maxRain =
+    points.reduce(
+      (
+        current,
+        point
+      ) =>
+        Math.max(
+          current,
+          point.rain,
+          point.precipitation
+        ),
+      0
+    );
+
+  const parts:
+    string[] = [];
+
+  if (
+    rainy.length > 0
+  ) {
+    const first =
+      rainy[0];
+
+    const last =
+      rainy[
+        rainy.length -
+          1
+      ];
+
+    if (
+      first &&
+      last
+    ) {
+      if (
+        first.time ===
+        last.time
+      ) {
+        parts.push(
+          `${formatHour(
+            first.time
+          )}ごろに雨の可能性があります。`
+        );
+      } else {
+        parts.push(
+          `${formatHour(
+            first.time
+          )}ごろから${formatHour(
+            last.time
+          )}ごろにかけて雨の可能性があります。`
+        );
+      }
+    }
+  }
+
+  if (
+    maxProbability >=
+    40
+  ) {
+    parts.push(
+      `今後6時間の最大降水確率は約${Math.round(
+        maxProbability
+      )}%です。`
+    );
+  }
+
+  if (
+    maxRain >= 0.2
+  ) {
+    parts.push(
+      `時間帯によっては1時間あたり約${maxRain.toFixed(
+        1
+      )}mm程度の降水が見込まれます。`
+    );
+  }
+
+  if (
+    thunder.length >
+    0
+  ) {
+    parts.push(
+      `${formatHour(
+        thunder[0].time
+      )}ごろを中心に雷雨の可能性があります。`
+    );
+  }
+
+  /*
+   * WMOコードの数字が一番大きいものを
+   * 「強い状態」の目安として使う。
+   */
+  let strongest =
+    points[0];
+
+  for (
+    const point
+    of points
+  ) {
+    if (
+      !strongest ||
+      point.weatherCode >
+        strongest.weatherCode
+    ) {
+      strongest =
+        point;
+    }
+  }
+
+  if (
+    strongest
+  ) {
+    parts.push(
+      `主な予報状態は「${weatherCodeToText(
+        strongest.weatherCode
+      )}」です。`
+    );
+  }
+
+  return parts.join(
+    " "
+  );
+}
+
+async function getKotoWeatherForecastEvents():
+  Promise<
+    TokyoLifeEvent[]
+  > {
+  const hourly =
+    [
+      "precipitation_probability",
+      "precipitation",
+      "rain",
+      "weather_code",
+    ].join(
+      ","
+    );
+
+  const url =
+    "https://api.open-meteo.com/v1/forecast" +
+    `?latitude=${MISAKI_LATITUDE}` +
+    `&longitude=${MISAKI_LONGITUDE}` +
+    `&hourly=${hourly}` +
+    "&forecast_hours=6" +
+    "&timezone=Asia%2FTokyo";
+
+  const data =
+    await fetchJson<
+      OpenMeteoResponse
+    >(
+      url,
+      300
+    );
+
+  if (
+    !data?.hourly
+  ) {
+    return [];
+  }
+
+  const points =
+    buildHourlyWeather(
+      data.hourly
+    ).slice(
+      0,
+      6
+    );
+
+  if (
+    points.length ===
+    0
+  ) {
+    return [];
+  }
+
+  /*
+   * 晴れ・くもりだけなら
+   * わざわざイベントとして
+   * Geminiへ渡さない。
+   *
+   * 雨や雷など、
+   * 会話に意味がある時だけ渡す。
+   */
+  if (
+    !hasMeaningfulWeather(
+      points
+    )
+  ) {
+    return [];
+  }
+
+  const detail =
+    createForecastDetail(
+      points
+    );
+
+  if (
+    !detail
+  ) {
+    return [];
+  }
+
+  return [
+    {
+      type:
+        "weather_forecast",
+
+      title:
+        "江東区周辺の今後6時間の天気変化",
+
+      detail,
+
+      source:
+        "Open-Meteo",
+    },
+  ];
+}
+
+/*
+ * ===========================
  * JR東日本
- * ---------------------------
+ * ===========================
  */
 
 function getTrainSection(
@@ -665,32 +1256,27 @@ function getTrainSection(
       lineName
     );
 
-  if (start < 0) {
+  if (
+    start < 0
+  ) {
     return null;
   }
 
-  /*
-   * 固定500文字ではなく、
-   * 次の対象路線名までを
-   * この路線の範囲として扱う。
-   *
-   * これで隣の路線の遅延を
-   * 誤って拾いにくくする。
-   */
   let end =
     pageText.length;
 
   for (
-    const otherLine of
-      TOKYO_JR_LINES
+    const otherLine
+    of TOKYO_JR_LINES
   ) {
     if (
-      otherLine === lineName
+      otherLine ===
+      lineName
     ) {
       continue;
     }
 
-    const otherIndex =
+    const index =
       pageText.indexOf(
         otherLine,
         start +
@@ -698,19 +1284,14 @@ function getTrainSection(
       );
 
     if (
-      otherIndex > start &&
-      otherIndex < end
+      index > start &&
+      index < end
     ) {
       end =
-        otherIndex;
+        index;
     }
   }
 
-  /*
-   * HTML構造変更などで
-   * 次路線が見つからない場合も
-   * 無制限に後ろを見ない。
-   */
   end =
     Math.min(
       end,
@@ -733,11 +1314,13 @@ function findTrainProblem(
       lineName
     );
 
-  if (!nearby) {
+  if (
+    !nearby
+  ) {
     return null;
   }
 
-  const importantWords = [
+  const words = [
     "運転見合わせ",
     "一部列車運休",
     "直通運転中止",
@@ -748,22 +1331,19 @@ function findTrainProblem(
   ];
 
   const matched =
-    importantWords.find(
+    words.find(
       (word) =>
         nearby.includes(
           word
         )
     );
 
-  if (!matched) {
+  if (
+    !matched
+  ) {
     return null;
   }
 
-  /*
-   * この路線の範囲内で
-   * 平常運転しか出ていないなら
-   * イベントにしない。
-   */
   if (
     nearby.includes(
       "平常運転"
@@ -794,28 +1374,35 @@ function findTrainProblem(
 }
 
 async function getTrainEvents():
-  Promise<TokyoLifeEvent[]> {
+  Promise<
+    TokyoLifeEvent[]
+  > {
   const html =
     await fetchText(
       JR_EAST_KANTO_URL,
       180
     );
 
-  if (!html) {
+  if (
+    !html
+  ) {
     return [];
   }
 
   const pageText =
     normalizeText(
-      stripTags(html)
+      stripTags(
+        html
+      )
     );
 
   const results:
-    TokyoLifeEvent[] = [];
+    TokyoLifeEvent[] =
+    [];
 
   for (
-    const line of
-      TOKYO_JR_LINES
+    const line
+    of TOKYO_JR_LINES
   ) {
     const problem =
       findTrainProblem(
@@ -823,7 +1410,9 @@ async function getTrainEvents():
         line
       );
 
-    if (!problem) {
+    if (
+      !problem
+    ) {
       continue;
     }
 
@@ -842,7 +1431,8 @@ async function getTrainEvents():
     });
 
     if (
-      results.length >= 3
+      results.length >=
+      3
     ) {
       break;
     }
@@ -852,9 +1442,9 @@ async function getTrainEvents():
 }
 
 /*
- * ---------------------------
+ * ===========================
  * 羽田空港
- * ---------------------------
+ * ===========================
  */
 
 function hasHanedaDisruption(
@@ -862,25 +1452,14 @@ function hasHanedaDisruption(
 ) {
   const text =
     normalizeText(
-      stripTags(html)
+      stripTags(
+        html
+      )
     );
 
   /*
-   * 重要：
-   *
-   * ページ内部には
-   * モーダルやテンプレート用の
-   *
-   * 「遅延欠航が発生しています」
-   * 「遅延・欠航が発生しています」
-   *
-   * という固定文言が含まれることがある。
-   *
-   * それを現在の運航乱れと
-   * 誤認しない。
-   *
-   * 実際にページ上部へ出る
-   * 現在状態の告知だけを使う。
+   * ページ内の固定テンプレート文章ではなく、
+   * 現在状態として表示される文章だけを見る。
    */
   return (
     text.includes(
@@ -893,7 +1472,9 @@ function hasHanedaDisruption(
 }
 
 async function getHanedaEvents():
-  Promise<TokyoLifeEvent[]> {
+  Promise<
+    TokyoLifeEvent[]
+  > {
   const [
     domesticHtml,
     internationalHtml,
@@ -931,7 +1512,8 @@ async function getHanedaEvents():
     return [];
   }
 
-  let detail = "";
+  let detail =
+    "";
 
   if (
     domesticProblem &&
@@ -966,30 +1548,39 @@ async function getHanedaEvents():
 }
 
 /*
- * ---------------------------
+ * ===========================
  * 全イベント取得
- * ---------------------------
+ * ===========================
  */
 
 export async function getTokyoLifeEvents():
-  Promise<TokyoLifeEvent[]> {
+  Promise<
+    TokyoLifeEvent[]
+  > {
   try {
     const [
       earthquakes,
       warnings,
+      weatherForecast,
       trains,
       haneda,
     ] =
       await Promise.all([
         getEarthquakeEvents(),
+
         getWeatherWarningEvents(),
+
+        getKotoWeatherForecastEvents(),
+
         getTrainEvents(),
+
         getHanedaEvents(),
       ]);
 
     return [
       ...earthquakes,
       ...warnings,
+      ...weatherForecast,
       ...trains,
       ...haneda,
     ].slice(
@@ -1003,24 +1594,27 @@ export async function getTokyoLifeEvents():
     );
 
     /*
-     * 外部情報の取得失敗だけで
-     * チャット自体を止めない。
+     * 外部情報の取得エラーで
+     * 美咲とのチャットそのものを
+     *止めない。
      */
     return [];
   }
 }
 
 /*
- * ---------------------------
+ * ===========================
  * Geminiへ渡すガイド
- * ---------------------------
+ * ===========================
  */
 
 export function createTokyoLifeEventsGuide(
-  events: TokyoLifeEvent[]
+  events:
+    TokyoLifeEvent[]
 ) {
   if (
-    events.length === 0
+    events.length ===
+    0
   ) {
     return `
 【東京のリアルな生活イベント】
@@ -1041,6 +1635,7 @@ export function createTokyoLifeEventsGuide(
 また、
 
 「特に何もない」
+
 と断定する必要もありません。
 
 情報がない出来事を
@@ -1060,10 +1655,73 @@ export function createTokyoLifeEventsGuide(
   const eventText =
     events
       .map(
-        (event) =>
+        (
+          event
+        ) =>
           `・${event.title}：${event.detail}（情報元：${event.source}）`
       )
-      .join("\n");
+      .join(
+        "\n"
+      );
+
+  const hasWeatherForecast =
+    events.some(
+      (
+        event
+      ) =>
+        event.type ===
+        "weather_forecast"
+    );
+
+  const weatherGuide =
+    hasWeatherForecast
+      ? `
+【江東区周辺のこれからの天気】
+
+上の
+「江東区周辺の今後6時間の天気変化」
+は、
+
+美咲自身が生活している
+江東区周辺の
+これからの天気として扱ってください。
+
+美咲は天気予報士ではありません。
+
+数字をそのまま全部読み上げず、
+日常会話として使ってください。
+
+自然な例：
+
+「このあと雨ちょっと強くなりそう」
+
+「夕方くらい雨きそうだね☔️」
+
+「雷くるかも。やだなー笑」
+
+「このあと雨っぽいから気をつけてね」
+
+「今はそんなでもないけど、
+あとで降りそうだよ」
+
+ユーザーが乗務中なら、
+
+「このあと雨強くなるなら、
+少し動き出るかもね」
+
+くらいなら自然です。
+
+ただし、
+
+「絶対忙しくなる」
+
+「確実に需要が増える」
+
+「羽田でロングが出る」
+
+などと断定しないでください。
+`.trim()
+      : "";
 
   return `
 【東京のリアルな生活イベント】
@@ -1072,6 +1730,8 @@ export function createTokyoLifeEventsGuide(
 東京の生活情報です。
 
 ${eventText}
+
+${weatherGuide}
 
 非常に重要：
 
@@ -1083,7 +1743,9 @@ ${eventText}
 特に、
 
 「警報がいろいろ出てる」
+
 「注意報がたくさん出てる」
+
 「かなり警報が出てる」
 
 など、
@@ -1097,10 +1759,12 @@ ${eventText}
 種類だけを使ってください。
 
 例えば上に
+
 「竜巻注意情報」
+
 とだけある場合は、
 
-「竜巻の注意情報が出てるみたい」
+「竜巻の注意情報出てるみたい」
 
 程度にしてください。
 
@@ -1120,9 +1784,13 @@ ${eventText}
 禁止例：
 
 「ニュースで見た」
+
 「スマホで見た」
+
 「テレビで見た」
+
 「ネットに書いてあった」
+
 「通知が来た」
 
 自然な例：
@@ -1136,7 +1804,18 @@ ${eventText}
 上にある具体的な種類に合わせて、
 
 「大雨の警報出てるみたい」
+
 「竜巻の注意情報出てるみたい」
+
+など。
+
+天気なら、
+
+「このあと雨強くなりそう」
+
+「雷くるかも」
+
+「夕方くらい降りそうだね」
 
 など。
 
@@ -1160,18 +1839,22 @@ ${eventText}
 ・鉄道の大規模な運転見合わせ
 ・羽田の運航乱れ
 ・大雨
+・雷雨
 ・地震
 
 などは、
+
 ユーザーの仕事にも
 関係する可能性があります。
 
 ただし、
 
 「今日は絶対タクシー需要が増える」
+
 「羽田で確実にロングが出る」
 
 など、
+
 タクシー需要を
 断定してはいけません。
 
@@ -1183,24 +1866,52 @@ ${eventText}
 「羽田ちょっと乱れてるみたい。
 あっちバタバタしてそう」
 
+「このあと雨強くなるなら、
+少し動き出るかもね」
+
 程度にしてください。
 
 【絶対ルール】
 
 ・毎回ニュースの話をしない
+
+・毎回天気予報をしない
+
 ・情報一覧を読み上げない
+
 ・ニュース記事のように説明しない
+
 ・存在しない事故や災害を作らない
-・取得できていない情報を知っているふりをしない
-・古い出来事を今起きたように話さない
-・警報や注意報の数を勝手に増やさない
-・「いろいろ出てる」と曖昧にまとめない
-・ユーザーを不必要に怖がらせない
-・情報をどうやって知ったか作らない
+
+・取得できていない情報を
+知っているふりをしない
+
+・古い出来事を
+今起きたように話さない
+
+・警報や注意報の数を
+勝手に増やさない
+
+・「いろいろ出てる」と
+曖昧にまとめない
+
+・ユーザーを
+不必要に怖がらせない
+
+・情報をどうやって知ったか
+作らない
+
 ・タクシー需要を断定しない
-・通常の交通や天気の話だけで「大丈夫？」と聞かない
+
+・通常の交通や天気の話だけで
+毎回「大丈夫？」と聞かない
+
+・降水確率や雨量などの数字は
+ユーザーから聞かれない限り
+毎回読み上げない
 
 普通の38歳の彼女として、
-必要なときだけ自然に使ってください。
+必要なときだけ
+自然に使ってください。
 `.trim();
 }
