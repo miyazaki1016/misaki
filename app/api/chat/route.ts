@@ -16,6 +16,7 @@ type ChatMessage = {
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
+  relativeHumidity: number | null;
   precipitation: number | null;
   rain: number | null;
   weatherCode: number | null;
@@ -308,6 +309,51 @@ function weatherCodeToText(
   return "不明";
 }
 
+function getHumidityFeel(
+  weather: TokyoWeather
+) {
+  const humidity =
+    weather.relativeHumidity;
+
+  const temperature =
+    weather.temperature;
+
+  if (
+    humidity === null ||
+    temperature === null
+  ) {
+    return null;
+  }
+
+  if (
+    temperature >= 27 &&
+    humidity >= 75
+  ) {
+    return "かなり蒸し暑く感じやすい";
+  }
+
+  if (
+    temperature >= 24 &&
+    humidity >= 65
+  ) {
+    return "やや蒸し暑く感じやすい";
+  }
+
+  if (
+    humidity >= 75
+  ) {
+    return "湿気を感じやすい";
+  }
+
+  if (
+    humidity <= 40
+  ) {
+    return "空気はやや乾燥気味";
+  }
+
+  return "湿度は特に極端ではない";
+}
+
 async function getTokyoWeather():
   Promise<TokyoWeather | null> {
   try {
@@ -319,6 +365,7 @@ async function getTokyoWeather():
       [
         "temperature_2m",
         "apparent_temperature",
+        "relative_humidity_2m",
         "precipitation",
         "rain",
         "weather_code",
@@ -372,6 +419,12 @@ async function getTokyoWeather():
         typeof current.apparent_temperature ===
         "number"
           ? current.apparent_temperature
+          : null,
+
+      relativeHumidity:
+        typeof current.relative_humidity_2m ===
+        "number"
+          ? current.relative_humidity_2m
           : null,
 
       precipitation:
@@ -448,6 +501,15 @@ function createWeatherGuide(
   }
 
   if (
+    weather.relativeHumidity !==
+    null
+  ) {
+    lines.push(
+      `相対湿度：${weather.relativeHumidity}%`
+    );
+  }
+
+  if (
     weather.rain !== null
   ) {
     lines.push(
@@ -468,6 +530,17 @@ function createWeatherGuide(
   ) {
     lines.push(
       `風速：${weather.windSpeed}km/h`
+    );
+  }
+
+  const humidityFeel =
+    getHumidityFeel(
+      weather
+    );
+
+  if (humidityFeel) {
+    lines.push(
+      `湿度と気温から見た体感：${humidityFeel}`
     );
   }
 
@@ -495,7 +568,43 @@ ${lines
 ・天気予報士のように説明しない
 ・天気情報の入手方法を説明しない
 
+【湿度・蒸し暑さ】
+
+湿度と気温のデータがある場合は、
+
+「ちょっと蒸し暑い」
+「湿気あるね」
+「今日はわりとカラッとしてる」
+
+など、
+自然な体感表現に使って構いません。
+
 ただし、
+
+湿度データがない場合に
+「蒸し暑い」
+「湿気がすごい」
+「カラッとしてる」
+
+などと想像で作らないでください。
+
+数値を毎回答える必要はありません。
+
+恋人同士の普通の会話では、
+
+「湿度72％だよ」
+
+より、
+
+「ちょっと蒸しっとしてる」
+
+のような自然な言い方を優先してください。
+
+ただしユーザーが
+具体的な湿度を聞いた場合は、
+数値で答えて構いません。
+
+【会話履歴と天気】
 
 直前の会話履歴の中で
 美咲自身が実際に天気について話していた場合は、
@@ -906,6 +1015,8 @@ function hasRealtimeTopic(
     "曇",
     "どんより",
     "晴",
+    "湿度",
+    "蒸し",
   ];
 
   return words.some(
@@ -932,6 +1043,8 @@ function isWeatherText(
     "暑",
     "寒",
     "蒸し",
+    "湿気",
+    "湿度",
     "風",
   ];
 
@@ -1037,6 +1150,9 @@ function userAskedMisakiWeather(
     "暑い",
     "寒い",
     "気温",
+    "湿度",
+    "湿気",
+    "蒸し暑",
     "どんより",
     "晴れ",
     "曇り",
@@ -1570,9 +1686,12 @@ function createAuthenticatedSupabase(
       },
 
       auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
+        persistSession:
+          false,
+        autoRefreshToken:
+          false,
+        detectSessionInUrl:
+          false,
       },
     }
   );
@@ -1906,7 +2025,9 @@ export async function POST(
               (item) =>
                 `・${item}`
             )
-            .join("\n")
+            .join(
+              "\n"
+            )
         : "まだ長期記憶はありません。";
 
     const misakiLife =
@@ -1965,7 +2086,9 @@ export async function POST(
               (text) =>
                 `・${text}`
             )
-            .join("\n")
+            .join(
+              "\n"
+            )
         : "なし";
 
     const hasRecentWeather =
@@ -2144,55 +2267,26 @@ ${tokyoLifeEventsGuide}
 その発言を覚えている恋人として
 現在との比較はできます。
 
-たとえば、
+湿度データがある場合は、
 
-前の美咲：
-「今は晴れてるよ」
+「ちょっと蒸し暑い」
+「湿気あるね」
+「今日はわりとカラッとしてる」
 
-今回も現在観測が晴れなら：
-
-「さっきと変わらず晴れてるよ」
-
-は自然です。
+など、
+自然な生活感として使って構いません。
 
 ただし、
-
-「さっきからずっと晴れてる」
-「朝からずっと晴れてる」
-
-は、
-その時間全体を確認できていないので禁止です。
+湿度と気温の情報に反する表現はしないでください。
 
 今後について話す場合は、
 短時間予報で確認できている範囲だけにしてください。
 
-「このあとしばらく」
-「夕方くらいまで」
+短時間予報より先まで
+安定・悪化すると
+広く断定しないでください。
 
-など、
-確認できている時間範囲を限定した言い方を
-優先してください。
-
-短時間予報だけから、
-
-「極端に崩れることはなさそう」
-「大きく崩れることはなさそう」
-「荒れることはなさそう」
-「今日は荒れなさそう」
-「今日は大丈夫そう」
-「一日安定しそう」
-
-など、
-その後も含めて広く保証する言い方は禁止です。
-
-ユーザーが、
-
-「そっち天気どう？」
-「そっちは雨？」
-「このあと雨降りそう？」
-
-など、
-美咲側の天気を聞いた場合は、
+ユーザーが美咲側の天気を聞いた場合は、
 
 美咲側の現在天気と
 短時間予報だけに答えてください。
@@ -2271,7 +2365,8 @@ ${memoryText}
 `.trim();
 
     async function generateReply(
-      retryProblems?: string[]
+      retryProblems?:
+        string[]
     ) {
       const retryGuide =
         retryProblems &&
@@ -2299,6 +2394,10 @@ ${retryProblems
 短時間予報と、
 直前の会話履歴を
 区別してください。
+
+湿度や蒸し暑さについては、
+与えられた現在の湿度と気温を
+根拠にしてください。
 
 直前の美咲の天気発言がある場合だけ、
 
@@ -2343,15 +2442,16 @@ ${retryProblems
 
             body:
               JSON.stringify({
-                system_instruction: {
-                  parts: [
-                    {
-                      text:
-                        baseSystemPrompt +
-                        retryGuide,
-                    },
-                  ],
-                },
+                system_instruction:
+                  {
+                    parts: [
+                      {
+                        text:
+                          baseSystemPrompt +
+                          retryGuide,
+                      },
+                    ],
+                  },
 
                 contents: [
                   ...contents,
@@ -2369,10 +2469,11 @@ ${retryProblems
                   },
                 ],
 
-                generationConfig: {
-                  responseMimeType:
-                    "application/json",
-                },
+                generationConfig:
+                  {
+                    responseMimeType:
+                      "application/json",
+                  },
               }),
           }
         );
