@@ -484,17 +484,46 @@ ${lines
   )
   .join("\n")}
 
-この情報は、
-美咲自身が普通に生活していて
-感じている現在の天気として扱ってください。
+この情報は
+「今現在」の気象情報です。
 
 重要：
 
-・これは現在の観測情報です
-・現在情報から過去の天気経過を作らない
+・現在観測と会話履歴は別の根拠です
+・現在観測だけから過去の天気経過を作らない
 ・短時間予報より先の天気を断定しない
 ・天気予報士のように説明しない
 ・天気情報の入手方法を説明しない
+
+ただし、
+
+直前の会話履歴の中で
+美咲自身が実際に天気について話していた場合は、
+
+「さっきと変わらず」
+「さっきと同じくらい」
+「さっきより少し曇ってきた」
+
+など、
+
+直前の美咲自身の発言と
+現在情報を比較する自然な会話はできます。
+
+これは天気APIが過去を観測したという意味ではなく、
+会話履歴を覚えているという意味です。
+
+一方で、
+
+直前の会話に根拠がないのに、
+
+「さっきから雨」
+「朝から雨」
+「ずっと雨」
+「降ったり止んだり」
+「また降ってきた」
+
+など、
+時間経過を想像で作ることは禁止です。
 
 今後の天気について話す場合は、
 与えられている短時間予報の範囲だけを
@@ -502,9 +531,9 @@ ${lines
 
 「このあとしばらく」
 「夕方くらいまで」
+
 など、
-確認できている時間範囲が分かる言い方を
-優先してください。
+確認できている時間範囲を限定してください。
 
 短時間予報だけから、
 
@@ -516,62 +545,33 @@ ${lines
 「一日安定しそう」
 
 など、
-その後も含めて天候が安定すると
-広く保証するような言い方は禁止です。
+その後まで広く保証する言い方は禁止です。
 
-天気・予報について、
+また、
 
 「天気予報だと」
 「予報で言ってた」
-「天気予報で言ってた」
 「予報を見たら」
-「天気予報を見たら」
+「スマホで天気を見たら」
 
 など、
-美咲が天気予報を実際に見聞きしたような
-情報入手経路を作らないでください。
+架空の情報入手経路を作らないでください。
 
-単純に、
-
-「今は晴れてるよ」
-「夕方くらいから雨ありそう」
-「このあと少し降るかも」
-
-のように話してください。
-
-現在情報だけから、
-
-「さっきから」
-「さっきまで」
-「少し前から」
-「朝から」
-「昼から」
-「ずっと雨」
-「ずっと曇ってる」
-「降ったり止んだり」
-「また降ってきた」
-
-などと言わないでください。
-
-また、
 ユーザーが美咲側の天気を
 聞いただけの場合、
 
-「傘持っていったほうがいいよ」
+「そっちは？」
+「そっちはどう？」
+
+と質問し返さないでください。
+
+「傘持ったほうがいいよ」
 「折り畳み傘持ったほうがいいよ」
-「傘忘れないで」
 「濡れないようにしてね」
 
 など、
-ユーザーへの行動アドバイスを
+ユーザー向け行動アドバイスも
 勝手に追加しないでください。
-
-ユーザーの現在地が
-美咲と同じ場所とは限りません。
-
-ユーザー自身の場所の天気について
-具体的に相談された場合だけ、
-必要に応じて答えてください。
 `.trim();
 }
 
@@ -595,8 +595,7 @@ function createMisakiLife(
 
   const dayTypes = [
     {
-      type:
-        "仕事の日",
+      type: "仕事の日",
       morning:
         "朝は少し眠そうに支度していた",
       daytime:
@@ -607,8 +606,7 @@ function createMisakiLife(
         "家でくつろいでいて、少し眠くなってきている",
     },
     {
-      type:
-        "仕事の日",
+      type: "仕事の日",
       morning:
         "朝はバタバタしながら出かける準備をしていた",
       daytime:
@@ -619,8 +617,7 @@ function createMisakiLife(
         "お風呂も済ませて家でだらだらしている",
     },
     {
-      type:
-        "休みの日",
+      type: "休みの日",
       morning:
         "少し遅めに起きてのんびりしていた",
       daytime:
@@ -631,8 +628,7 @@ function createMisakiLife(
         "ソファでだらだらしながらスマホを見ている",
     },
     {
-      type:
-        "休みの日",
+      type: "休みの日",
       morning:
         "ゆっくり起きてのんびりしていた",
       daytime:
@@ -682,8 +678,7 @@ function createMisakiLife(
         smallThings.length
     ];
 
-  let currentSituation =
-    "";
+  let currentSituation = "";
 
   if (
     hour >= 5 &&
@@ -729,8 +724,7 @@ function createMisakiLife(
 }
 
 function createTodayMemoryGuide(
-  todayMemory:
-    MisakiTodayMemory,
+  todayMemory: MisakiTodayMemory,
   currentDate: string
 ) {
   if (
@@ -920,6 +914,48 @@ function hasRealtimeTopic(
         word
       )
   );
+}
+
+function isWeatherText(
+  text: string
+) {
+  const weatherWords = [
+    "天気",
+    "雨",
+    "霧雨",
+    "雷",
+    "降",
+    "晴",
+    "曇",
+    "どんより",
+    "気温",
+    "暑",
+    "寒",
+    "蒸し",
+    "風",
+  ];
+
+  return weatherWords.some(
+    (word) =>
+      text.includes(
+        word
+      )
+  );
+}
+
+function hasRecentMisakiWeatherContext(
+  history: ChatMessage[]
+) {
+  return history
+    .slice(-8)
+    .some(
+      (item) =>
+        item.role ===
+          "misaki" &&
+        isWeatherText(
+          item.text
+        )
+    );
 }
 
 function userIsActuallyInDanger(
@@ -1112,8 +1148,8 @@ function removeUnsupportedWeatherForecast(
       /[^。！？!?]+[。！？!?]?/gu
     ) ?? [reply];
 
-  const filtered =
-    parts.filter(
+  return parts
+    .filter(
       (part) =>
         !unsupportedPatterns.some(
           (pattern) =>
@@ -1121,9 +1157,7 @@ function removeUnsupportedWeatherForecast(
               pattern
             )
         )
-    );
-
-  return filtered
+    )
     .join("")
     .trim();
 }
@@ -1156,14 +1190,17 @@ function cleanFinalReply(
       );
   }
 
-  return cleaned ||
-    reply.trim();
+  return (
+    cleaned ||
+    reply.trim()
+  );
 }
 
 function getReplyProblems(
   reply: string,
   message: string,
-  currentTime: string
+  currentTime: string,
+  history: ChatMessage[]
 ) {
   const problems:
     string[] = [];
@@ -1171,6 +1208,11 @@ function getReplyProblems(
   const realtime =
     hasRealtimeTopic(
       reply
+    );
+
+  const hasRecentWeatherContext =
+    hasRecentMisakiWeatherContext(
+      history
     );
 
   if (realtime) {
@@ -1194,7 +1236,6 @@ function getReplyProblems(
       "今知った",
       "って書いてあった",
       "と書いてあった",
-
       "天気予報だと",
       "天気予報では",
       "天気予報で言って",
@@ -1218,7 +1259,7 @@ function getReplyProblems(
       );
     }
 
-    const unsupportedWeatherHistoryPatterns = [
+    const alwaysUnsupportedHistoryPatterns = [
       "さっきから",
       "さっきまで",
       "少し前から",
@@ -1237,7 +1278,7 @@ function getReplyProblems(
     ];
 
     if (
-      unsupportedWeatherHistoryPatterns.some(
+      alwaysUnsupportedHistoryPatterns.some(
         (pattern) =>
           reply.includes(
             pattern
@@ -1245,7 +1286,29 @@ function getReplyProblems(
       )
     ) {
       problems.push(
-        "現在の気象情報だけから過去の天気経過を作っている"
+        "現在情報や一度の会話だけでは確認できない天気の時間経過を作っている"
+      );
+    }
+
+    const comparisonPatterns = [
+      "さっきと変わらず",
+      "さっきと同じ",
+      "さっきより",
+      "前と変わらず",
+      "前と同じ",
+    ];
+
+    if (
+      !hasRecentWeatherContext &&
+      comparisonPatterns.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "直前の美咲の天気発言がないのに過去との天気比較をしている"
       );
     }
 
@@ -1256,7 +1319,6 @@ function getReplyProblems(
       "一日中雨",
       "夜まで降り続",
       "明日まで降り",
-
       "極端に崩れることはなさそう",
       "極端に崩れなさそう",
       "大きく崩れることはなさそう",
@@ -1332,7 +1394,7 @@ function getReplyProblems(
       )
     ) {
       problems.push(
-        "美咲側の天気を聞かれただけなのにユーザー向けの傘などの行動アドバイスを追加している"
+        "美咲側の天気を聞かれただけなのにユーザー向け行動アドバイスを追加している"
       );
     }
   }
@@ -1508,12 +1570,9 @@ function createAuthenticatedSupabase(
       },
 
       auth: {
-        persistSession:
-          false,
-        autoRefreshToken:
-          false,
-        detectSessionInUrl:
-          false,
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
       },
     }
   );
@@ -1847,9 +1906,7 @@ export async function POST(
               (item) =>
                 `・${item}`
             )
-            .join(
-              "\n"
-            )
+            .join("\n")
         : "まだ長期記憶はありません。";
 
     const misakiLife =
@@ -1908,10 +1965,55 @@ export async function POST(
               (text) =>
                 `・${text}`
             )
-            .join(
-              "\n"
-            )
+            .join("\n")
         : "なし";
+
+    const hasRecentWeather =
+      hasRecentMisakiWeatherContext(
+        safeHistory
+      );
+
+    const weatherHistoryGuide =
+      hasRecentWeather
+        ? `
+【直前の天気会話について】
+
+直近の会話履歴に
+美咲自身の天気発言があります。
+
+その発言を根拠に、
+
+「さっきと変わらず」
+「さっきと同じ」
+「さっきより少し〜」
+
+など、
+会話上の比較表現は使って構いません。
+
+ただし、
+
+「さっきからずっと」
+「降ったり止んだり」
+「朝からずっと」
+
+など、
+履歴から確認できない継続時間まで
+勝手に作らないでください。
+`.trim()
+        : `
+【直前の天気会話について】
+
+直近の会話履歴に
+美咲自身の天気発言はありません。
+
+「さっきと変わらず」
+「さっきと同じ」
+「さっきより」
+
+など、
+過去との比較表現を
+勝手に作らないでください。
+`.trim();
 
     const contents =
       safeHistory.map(
@@ -2019,15 +2121,47 @@ ${timeGuide}
 
 ${weatherGuide}
 
+${weatherHistoryGuide}
+
 ${tokyoLifeEventsGuide}
 
 【天気についての最重要ルール】
 
-現在の観測と
-短時間予報を区別してください。
+天気について使える根拠は
+次の3つを区別してください。
 
-現在観測だけから
-過去の天気経過を作らないでください。
+1. 現在の気象観測
+2. 短時間予報
+3. 直前の会話履歴
+
+現在観測だけから、
+過去の天気経過を作ってはいけません。
+
+一方、
+直前の会話履歴に
+美咲自身の天気発言があるなら、
+
+その発言を覚えている恋人として
+現在との比較はできます。
+
+たとえば、
+
+前の美咲：
+「今は晴れてるよ」
+
+今回も現在観測が晴れなら：
+
+「さっきと変わらず晴れてるよ」
+
+は自然です。
+
+ただし、
+
+「さっきからずっと晴れてる」
+「朝からずっと晴れてる」
+
+は、
+その時間全体を確認できていないので禁止です。
 
 今後について話す場合は、
 短時間予報で確認できている範囲だけにしてください。
@@ -2049,8 +2183,7 @@ ${tokyoLifeEventsGuide}
 「一日安定しそう」
 
 など、
-その後も含めて天候が安定すると
-広く保証する言い方は禁止です。
+その後も含めて広く保証する言い方は禁止です。
 
 ユーザーが、
 
@@ -2081,9 +2214,6 @@ ${tokyoLifeEventsGuide}
 など、
 ユーザー側への行動アドバイスも
 勝手に付けないでください。
-
-ユーザーの現在地が
-美咲と同じ場所とは限りません。
 
 【東京タクシー】
 
@@ -2141,8 +2271,7 @@ ${memoryText}
 `.trim();
 
     async function generateReply(
-      retryProblems?:
-        string[]
+      retryProblems?: string[]
     ) {
       const retryGuide =
         retryProblems &&
@@ -2166,16 +2295,31 @@ ${retryProblems
 天気について、
 架空の情報入手経路は作らないでください。
 
+現在観測と、
+短時間予報と、
+直前の会話履歴を
+区別してください。
+
+直前の美咲の天気発言がある場合だけ、
+
+「さっきと変わらず」
+「さっきと同じ」
+「さっきより」
+
+のような会話上の比較を使えます。
+
+ただし、
+
+「さっきからずっと」
+「朝からずっと」
+「降ったり止んだり」
+
+など、
+確認できない時間経過は作らないでください。
+
 短時間予報より先まで
 天気が安定・悪化すると
 広く断定しないでください。
-
-「極端に崩れない」
-「大きく崩れない」
-「荒れなさそう」
-「一日安定しそう」
-
-などは禁止です。
 
 美咲側の天気を聞かれた場合は、
 質問返しや、
@@ -2199,16 +2343,15 @@ ${retryProblems
 
             body:
               JSON.stringify({
-                system_instruction:
-                  {
-                    parts: [
-                      {
-                        text:
-                          baseSystemPrompt +
-                          retryGuide,
-                      },
-                    ],
-                  },
+                system_instruction: {
+                  parts: [
+                    {
+                      text:
+                        baseSystemPrompt +
+                        retryGuide,
+                    },
+                  ],
+                },
 
                 contents: [
                   ...contents,
@@ -2226,11 +2369,10 @@ ${retryProblems
                   },
                 ],
 
-                generationConfig:
-                  {
-                    responseMimeType:
-                      "application/json",
-                  },
+                generationConfig: {
+                  responseMimeType:
+                    "application/json",
+                },
               }),
           }
         );
@@ -2296,7 +2438,8 @@ ${retryProblems
       getReplyProblems(
         reply,
         message,
-        safeCurrentTime
+        safeCurrentTime,
+        safeHistory
       );
 
     if (
@@ -2334,11 +2477,6 @@ ${retryProblems
       }
     }
 
-    //
-    // Geminiの再生成後にも
-    // NG表現が残った場合は、
-    // 最後にコード側で確実に除去する。
-    //
     reply =
       cleanFinalReply(
         reply,
@@ -2349,7 +2487,8 @@ ${retryProblems
       getReplyProblems(
         reply,
         message,
-        safeCurrentTime
+        safeCurrentTime,
+        safeHistory
       );
 
     if (
