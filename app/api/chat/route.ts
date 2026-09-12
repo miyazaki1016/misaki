@@ -52,6 +52,9 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
 
+const MISAKI_LATITUDE = 35.6728;
+const MISAKI_LONGITUDE = 139.8174;
+
 function hashText(text: string) {
   let hash = 0;
 
@@ -313,8 +316,8 @@ async function getTokyoWeather():
   try {
     const url =
       "https://api.open-meteo.com/v1/forecast" +
-      "?latitude=35.6762" +
-      "&longitude=139.6503" +
+      `?latitude=${MISAKI_LATITUDE}` +
+      `&longitude=${MISAKI_LONGITUDE}` +
       "&current=" +
       [
         "temperature_2m",
@@ -411,7 +414,7 @@ function createWeatherGuide(
 ) {
   if (!weather) {
     return `
-【美咲のいる東京の現在の天気】
+【美咲のいる江東区周辺の現在の天気】
 
 現在、天気情報を取得できていません。
 
@@ -469,11 +472,11 @@ function createWeatherGuide(
   }
 
   return `
-【美咲のいる東京の現在の天気】
+【美咲のいる江東区周辺の現在の天気】
 
-美咲は東京で生活しています。
+美咲は江東区周辺で生活しています。
 
-現在の東京の気象情報：
+現在の江東区周辺の気象情報：
 
 ${lines
   .map(
@@ -492,6 +495,11 @@ ${lines
 ・毎回天気を話題にしない
 ・生活感として自然に使う
 ・実際の情報と矛盾しない
+・現在の天気だけから、過去の天気を作らない
+・「ずっと雨」「ずっと曇ってる」など、いつから続いているか分からない表現を勝手に使わない
+・今後6時間の予報に書かれていない先の天気を予想しない
+・「回復は期待できなさそう」「今日はもうずっとこの天気」「夜まで降り続く」など、確認できていない先の天気を断定しない
+・現在の観測と今後の予報を区別する
 
 雨なら、
 
@@ -506,6 +514,12 @@ ${lines
 寒ければ、
 
 「今日ちょっと寒い」
+
+今後の予報については、
+
+「今は霧雨っぽいね」
+「このあともしばらく雨ありそう☔️」
+「夕方くらいまた降りそう」
 
 くらいの自然なLINEにしてください。
 `.trim();
@@ -1105,6 +1119,49 @@ function getReplyProblems(
     ) {
       problems.push(
         "リアルタイム情報について、与えられていない情報入手経路を作っている"
+      );
+    }
+
+    const unsupportedWeatherHistoryPatterns = [
+      "ずっと雨",
+      "ずっと降って",
+      "ずっと曇",
+      "ずっとどんより",
+      "朝から雨",
+      "朝からずっと",
+    ];
+
+    if (
+      unsupportedWeatherHistoryPatterns.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "現在の気象情報だけから、過去から天気が続いていたような表現を作っている"
+      );
+    }
+
+    const unsupportedLongForecastPatterns = [
+      "回復は期待できなさそう",
+      "今日はもうずっと",
+      "一日中降り",
+      "夜まで降り続",
+      "明日まで降り",
+    ];
+
+    if (
+      unsupportedLongForecastPatterns.some(
+        (pattern) =>
+          reply.includes(
+            pattern
+          )
+      )
+    ) {
+      problems.push(
+        "取得している短時間予報より先の天気を断定している"
       );
     }
   }
