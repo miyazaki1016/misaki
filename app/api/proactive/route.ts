@@ -443,17 +443,15 @@ ${lines
 美咲が実際に予報を見聞きしたような
 架空の情報入手経路も作らないでください。
 
-単純に、
-
-「今こっち雨降ってる☔️」
-「今日はちょっとどんよりしてる」
-「今は晴れてるよ」
-
-くらいで構いません。
-
 今後の天気については、
 別に与えられる短時間予報に
 書かれている範囲だけを使ってください。
+
+「このあとしばらく」
+「夕方くらいまで」
+
+など、
+確認できる時間範囲に限定してください。
 
 予報範囲外について、
 
@@ -462,6 +460,10 @@ ${lines
 「一日中雨」
 「明日まで雨」
 「回復は期待できなさそう」
+「極端に崩れることはなさそう」
+「大きく崩れることはなさそう」
+「荒れなさそう」
+「一日安定しそう」
 
 などと断定しないでください。
 `.trim();
@@ -971,8 +973,6 @@ function getReplyProblems(
     "って出てた",
     "って出てる",
 
-    // 天気予報を見聞きしたという
-    // 架空の情報入手経路も禁止
     "天気予報だと",
     "天気予報では",
     "天気予報によると",
@@ -1048,6 +1048,15 @@ function getReplyProblems(
       "一日中雨",
       "夜まで降り続",
       "明日まで降り",
+
+      "極端に崩れることはなさそう",
+      "極端に崩れなさそう",
+      "大きく崩れることはなさそう",
+      "大きく崩れなさそう",
+      "荒れることはなさそう",
+      "荒れなさそう",
+      "一日安定しそう",
+      "一日中安定しそう",
     ];
 
   if (
@@ -1117,7 +1126,7 @@ function getReplyProblems(
       )
     ) {
       problems.push(
-        "曜日・週末・休日という情報だけから、ユーザーも休みで自由に過ごせると勝手に推測している"
+        "曜日・週末・休日だけからユーザーも休みだと推測している"
       );
     }
   }
@@ -1145,9 +1154,6 @@ export async function POST(
       );
     }
 
-    //
-    // Supabase認証
-    //
     const authorization =
       request.headers.get(
         "authorization"
@@ -1221,9 +1227,6 @@ export async function POST(
       );
     }
 
-    //
-    // リクエスト本文
-    //
     const {
       history,
       memory,
@@ -1351,4 +1354,859 @@ export async function POST(
             item.role ===
             "misaki"
         )
-        .
+        .slice(-8)
+        .map(
+          (item) =>
+            item.text
+        );
+
+    const recentMisakiText =
+      recentMisakiMessages.join(
+        "\n"
+      );
+
+    const userContextText = [
+      ...safeHistory
+        .filter(
+          (item) =>
+            item.role ===
+            "user"
+        )
+        .slice(-20)
+        .map(
+          (item) =>
+            item.text
+        ),
+
+      ...safeMemory,
+    ].join("\n");
+
+    const memoryText =
+      safeMemory.length > 0
+        ? safeMemory
+            .map(
+              (item) =>
+                `・${item}`
+            )
+            .join("\n")
+        : "まだ長期記憶はありません。";
+
+    const relationshipGuide =
+      createRelationshipGuide(
+        safeRelationshipPoints
+      );
+
+    const misakiLifeGuide =
+      createMisakiLife(
+        safeCurrentTime
+      );
+
+    const timeGuide =
+      createTimeGuide(
+        safeCurrentTime
+      );
+
+    const todayMemoryGuide =
+      createTodayMemoryGuide(
+        safeTodayMemory,
+        currentDate
+      );
+
+    const proactiveTheme =
+      createProactiveTheme(
+        safeCurrentTime,
+        recentMisakiText
+      );
+
+    const [
+      tokyoWeather,
+      tokyoLifeEvents,
+    ] =
+      await Promise.all([
+        getTokyoWeather(),
+        getTokyoLifeEvents(),
+      ]);
+
+    const weatherGuide =
+      createWeatherGuide(
+        tokyoWeather
+      );
+
+    const tokyoLifeEventsGuide =
+      createTokyoLifeEventsGuide(
+        tokyoLifeEvents
+      );
+
+    const contents =
+      safeHistory.map(
+        (item) => ({
+          role:
+            item.role ===
+            "user"
+              ? "user"
+              : "model",
+
+          parts: [
+            {
+              text:
+                item.text,
+            },
+          ],
+        })
+      );
+
+    const systemPrompt = `
+あなたは「美咲」という38歳の日本人女性です。
+
+ユーザーとは
+すでに付き合っている恋人です。
+
+今回はユーザーから
+話しかけられたのではありません。
+
+美咲のほうから
+自然にLINEしてください。
+
+【最重要】
+
+これは自発メッセージです。
+
+会話を成立させるために
+無理に質問してはいけません。
+
+美咲自身に
+「今これを送りたくなった」
+という理由がある
+メッセージにしてください。
+
+方向性：
+
+${proactiveTheme}
+
+【美咲】
+
+・38歳
+・日本人女性
+・東京都江東区・塩浜周辺で生活している
+・明るい
+・少し甘えん坊
+・少し嫉妬することがある
+・たまに拗ねる
+・軽くからかう
+・母親やカウンセラーにはならない
+・ユーザーにかなり心を許している
+
+【二人の関係】
+
+${relationshipGuide}
+
+【話し方】
+
+・自然なタメ口
+・日本人女性のLINE
+・基本1〜2文
+・一言だけでもよい
+・説明口調は禁止
+・丁寧語を多用しない
+・質問なしで終わってよい
+・毎回質問で終わらせない
+・複数の質問は禁止
+・絵文字は時々使う
+
+「何してる？」
+「今どこ？」
+「まだ仕事？」
+「忙しい？」
+「大丈夫？」
+
+などを
+会話を始めるためだけに
+安易に使わないでください。
+
+【AIっぽい気遣い禁止】
+
+普通の日常会話で、
+
+「無理しないでね」
+「気をつけてね」
+「大丈夫？」
+「平気？」
+「ちゃんと休んでね」
+「頑張りすぎないで」
+「安全第一で」
+
+などを
+自動で付けないでください。
+
+【ユーザーについて勝手に作らない】
+
+ユーザーが現在、
+
+・仕事中
+・休憩中
+・運転中
+・羽田にいる
+・家にいる
+・寝ている
+・起きている
+・疲れている
+・今日は仕事なのか
+・今日は休みなのか
+・今日は乗務なのか
+・今日は明けなのか
+・自由にのんびりできるのか
+
+などと
+勝手に決めつけないでください。
+
+会話履歴や長期記憶に
+明確にある場合だけ使ってください。
+
+土曜日・日曜日・週末・祝日
+だからという理由だけで、
+
+「今日は休み」
+「今日はのんびりできる」
+「今日はゆっくりできる」
+
+と決めつけないでください。
+
+ユーザーは
+東京のタクシードライバーです。
+
+土日・祝日でも
+乗務することがあります。
+
+【現在日時】
+
+${safeCurrentTime}
+
+${timeGuide}
+
+【美咲のいる塩浜周辺の天気】
+
+${weatherGuide}
+
+【東京のリアルな生活イベント】
+
+${tokyoLifeEventsGuide}
+
+地震・警報・鉄道障害・羽田の乱れ・
+塩浜周辺の短時間の雨予報などが
+実際に上の情報にあり、
+
+美咲から今LINEする理由として
+自然なら話題にして構いません。
+
+ただし、
+
+「ニュースを見た」
+「SNSで見た」
+「テレビで見た」
+「スマホを見た」
+「ネットで見た」
+「サイトで見た」
+「通知が来た」
+「友達から聞いた」
+「天気予報だと」
+「予報で言ってた」
+「〜って書いてあった」
+「〜って載ってた」
+
+など、
+美咲がどこでその情報を知ったかという
+情報入手経路を
+勝手に作らないでください。
+
+リアルタイム情報は
+美咲が自然に知っている
+生活上の状況としてだけ
+話してください。
+
+現在天気しか確認できていないのに、
+
+「さっきから」
+「さっきまで」
+「降ったり止んだり」
+「ずっと雨」
+「ずっと曇ってる」
+
+などの
+過去の経過を作らないでください。
+
+短時間予報だけから、
+
+「今日はもうずっと雨」
+「夜まで雨」
+「明日まで雨」
+「回復は期待できなさそう」
+「極端に崩れることはなさそう」
+「大きく崩れることはなさそう」
+「荒れなさそう」
+「一日安定しそう」
+
+など、
+予報範囲より先を断定しないでください。
+
+【東京タクシー】
+
+ユーザーは
+東京で働くタクシードライバーです。
+
+美咲は恋人として
+次の言葉を自然に理解しています。
+
+・乗務
+・明け
+・青タン
+・ロング
+・万収
+・営収
+・流し
+・付け待ち
+・羽田
+・回送
+・休憩消化
+・迎車
+・無線
+・実車
+・空車
+・高速
+・首都高
+
+ただし、
+ユーザーの現在の勤務状態は
+勝手に決めつけないでください。
+
+【美咲自身の今日】
+
+${misakiLifeGuide}
+
+${todayMemoryGuide}
+
+美咲には
+ユーザーとは別に
+自分自身の生活があります。
+
+自発メッセージでは、
+美咲自身の日常を話すことを
+積極的に使って構いません。
+
+ただし、
+今日の記憶と矛盾する
+出来事は作らないでください。
+
+【直近の美咲の発言】
+
+${
+  recentMisakiMessages.length >
+  0
+    ? recentMisakiMessages
+        .map(
+          (text) =>
+            `・${text}`
+        )
+        .join("\n")
+    : "なし"
+}
+
+同じ話題・同じ言い回しを
+繰り返さないでください。
+
+【長期記憶】
+
+${memoryText}
+
+必要なときだけ
+自然に使ってください。
+
+【美咲の今日の記憶更新】
+
+今回、美咲自身について
+今日の後の会話でも
+覚えていた方が自然な
+具体的な出来事を話した場合だけ、
+
+misakiTodayMemory に
+追加してください。
+
+・返事全文を保存しない
+・事実だけ短く
+・天気や交通状況は保存しない
+・最大${MAX_TODAY_MEMORY}件
+
+【長期記憶更新】
+
+今回の自発メッセージでは、
+原則として
+ユーザーについての新しい長期記憶は
+増やさないでください。
+
+現在の memory を
+そのまま返してください。
+
+【出力】
+
+必ずJSONだけを返してください。
+
+{
+  "reply": "美咲の自発LINE",
+  "memory": ["長期記憶"],
+  "misakiTodayMemory": {
+    "date": "${currentDate}",
+    "items": ["今日の美咲の出来事"]
+  }
+}
+
+Markdownや説明文は禁止です。
+`.trim();
+
+    async function generateReply(
+      retryProblems?: string[]
+    ) {
+      const retryGuide =
+        retryProblems &&
+        retryProblems.length > 0
+          ? `
+
+【前の返答は不採用】
+
+問題：
+
+${retryProblems
+  .map(
+    (problem) =>
+      `・${problem}`
+  )
+  .join("\n")}
+
+同じ問題を繰り返さず、
+自然な恋人の自発LINEを
+最初から作り直してください。
+
+質問で会話を無理に始めず、
+美咲自身から送りたくなった
+一言を優先してください。
+
+架空の情報入手経路は
+絶対に作らないでください。
+
+「スマホ見てたら」
+「ネットで見た」
+「ニュースで見た」
+「天気予報だと」
+「予報で言ってた」
+「〜って書いてあった」
+
+のような表現は禁止です。
+
+現在の天気しか確認できていない場合は、
+
+「さっきから」
+「さっきまで」
+「降ったり止んだり」
+
+などの過去経過を作らないでください。
+
+短時間予報より先まで、
+
+「ずっと雨」
+「荒れなさそう」
+「大きく崩れなさそう」
+「一日安定しそう」
+
+などと広く断定しないでください。
+
+ユーザー自身が
+危険だと明確に分かっていない限り、
+
+「大丈夫？」
+「そっちは大丈夫？」
+「影響ない？」
+
+なども付けないでください。
+
+曜日・週末・祝日だけから、
+
+「今日は休み」
+「今日はのんびりできる」
+「今日はゆっくりできる」
+
+などと
+ユーザーの勤務状況を
+勝手に決めないでください。
+
+必ずJSONだけを返してください。
+`
+          : "";
+
+      const response =
+        await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
+
+            body:
+              JSON.stringify({
+                system_instruction: {
+                  parts: [
+                    {
+                      text:
+                        systemPrompt +
+                        retryGuide,
+                    },
+                  ],
+                },
+
+                contents: [
+                  ...contents,
+
+                  {
+                    role: "user",
+
+                    parts: [
+                      {
+                        text:
+                          "美咲から自然な自発LINEを1通送ってください。",
+                      },
+                    ],
+                  },
+                ],
+
+                generationConfig: {
+                  responseMimeType:
+                    "application/json",
+                },
+              }),
+          }
+        );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        console.error(
+          "PROACTIVE GEMINI ERROR:",
+          data
+        );
+
+        return null;
+      }
+
+      const rawText =
+        data?.candidates?.[0]
+          ?.content?.parts?.[0]
+          ?.text;
+
+      return parseGeminiText(
+        rawText
+      );
+    }
+
+    //
+    // ここではまだ
+    // 自発メッセージ枠を消費しない
+    //
+    let parsed =
+      await generateReply();
+
+    if (!parsed) {
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "generation_failed",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    let reply =
+      typeof parsed.reply ===
+      "string"
+        ? parsed.reply.trim()
+        : "";
+
+    if (!reply) {
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "generation_empty",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const firstProblems =
+      getReplyProblems(
+        reply,
+        userContextText
+      );
+
+    if (
+      firstProblems.length >
+      0
+    ) {
+      const retryParsed =
+        await generateReply(
+          firstProblems
+        );
+
+      if (retryParsed) {
+        const retryReply =
+          typeof retryParsed.reply ===
+          "string"
+            ? retryParsed.reply.trim()
+            : "";
+
+        if (retryReply) {
+          const retryProblems =
+            getReplyProblems(
+              retryReply,
+              userContextText
+            );
+
+          if (
+            retryProblems.length ===
+            0
+          ) {
+            parsed =
+              retryParsed;
+
+            reply =
+              retryReply;
+          }
+        }
+      }
+    }
+
+    //
+    // 再生成してもNGなら
+    // 問題のある自発メッセージは
+    // ユーザーへ送らない
+    //
+    const finalProblems =
+      getReplyProblems(
+        reply,
+        userContextText
+      );
+
+    if (
+      finalProblems.length >
+      0
+    ) {
+      console.warn(
+        "PROACTIVE REPLY REJECTED:",
+        finalProblems,
+        reply
+      );
+
+      return Response.json({
+        sent: false,
+
+        reason:
+          "generation_rejected",
+      });
+    }
+
+    const updatedMemory =
+      Array.isArray(
+        parsed.memory
+      )
+        ? parsed.memory
+            .filter(
+              (item) =>
+                typeof item ===
+                  "string" &&
+                item
+                  .trim()
+                  .length >
+                  0
+            )
+            .map(
+              (item) =>
+                item.trim()
+            )
+            .slice(
+              -MAX_MEMORY
+            )
+        : safeMemory;
+
+    const parsedTodayItems =
+      Array.isArray(
+        parsed
+          .misakiTodayMemory
+          ?.items
+      )
+        ? parsed
+            .misakiTodayMemory!
+            .items!
+            .filter(
+              (item) =>
+                typeof item ===
+                  "string" &&
+                item
+                  .trim()
+                  .length >
+                  0
+            )
+            .map(
+              (item) =>
+                item.trim()
+            )
+        : safeTodayMemory.items;
+
+    const updatedTodayMemory:
+      MisakiTodayMemory = {
+      date:
+        currentDate,
+
+      items:
+        Array.from(
+          new Set(
+            parsedTodayItems
+          )
+        ).slice(
+          -MAX_TODAY_MEMORY
+        ),
+    };
+
+    //
+    // 最終チェック通過後にだけ
+    // 自発メッセージ枠を消費
+    //
+    const {
+      data: proactiveData,
+      error: proactiveError,
+    } =
+      await supabase.rpc(
+        "consume_proactive_message"
+      );
+
+    if (proactiveError) {
+      console.error(
+        "PROACTIVE USAGE ERROR:",
+        proactiveError
+      );
+
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "usage_check_failed",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    const proactiveUsage =
+      getFirstRow<ProactiveUsageResult>(
+        proactiveData
+      );
+
+    if (!proactiveUsage) {
+      return Response.json(
+        {
+          sent: false,
+          reason:
+            "usage_result_empty",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
+
+    if (
+      proactiveUsage.allowed !==
+      true
+    ) {
+      return Response.json({
+        sent: false,
+
+        reason:
+          proactiveUsage.retry_after_seconds &&
+          proactiveUsage.retry_after_seconds >
+            0
+            ? "cooldown"
+            : "daily_limit",
+
+        proactive: {
+          count:
+            typeof proactiveUsage.message_count ===
+            "number"
+              ? proactiveUsage.message_count
+              : 0,
+
+          remaining:
+            typeof proactiveUsage.remaining ===
+            "number"
+              ? proactiveUsage.remaining
+              : 0,
+
+          retryAfterSeconds:
+            typeof proactiveUsage.retry_after_seconds ===
+            "number"
+              ? proactiveUsage.retry_after_seconds
+              : 0,
+        },
+      });
+    }
+
+    return Response.json({
+      sent: true,
+
+      reply,
+
+      memory:
+        updatedMemory,
+
+      misakiTodayMemory:
+        updatedTodayMemory,
+
+      proactive: {
+        count:
+          typeof proactiveUsage.message_count ===
+          "number"
+            ? proactiveUsage.message_count
+            : 0,
+
+        remaining:
+          typeof proactiveUsage.remaining ===
+          "number"
+            ? proactiveUsage.remaining
+            : 0,
+
+        retryAfterSeconds: 0,
+      },
+    });
+  } catch (error) {
+    console.error(
+      "PROACTIVE ROUTE ERROR:",
+      error
+    );
+
+    return Response.json(
+      {
+        sent: false,
+        error:
+          "Proactive message failed.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}
