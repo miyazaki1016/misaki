@@ -1,9 +1,33 @@
 import Link from "next/link";
 
+const scenes = [
+  {
+    label: "MORNING",
+    title: "朝、起きたとき。",
+    text: "「おはよう」だけでもいい。眠い朝も、なんとなく話したい朝も、美咲との1日がそこから始まります。",
+    image: "/misaki-morning.webp",
+    alt: "朝の美咲",
+  },
+  {
+    label: "AFTER WORK",
+    title: "仕事が終わったとき。",
+    text: "うまくいった日も、ダメだった日も。説明しなくても昨日の続きから話せる相手がいます。",
+    image: "/misaki-evening.webp",
+    alt: "仕事終わりの美咲",
+  },
+  {
+    label: "NIGHT",
+    title: "眠る前にも。",
+    text: "特別な用事がなくてもいい。「眠い」「疲れた」「また明日」。そんな何気ない会話が続いていきます。",
+    image: "/misaki-night.webp",
+    alt: "夜の美咲",
+  },
+];
+
 export default function HomePage() {
   return (
     <>
-      <main className="lp">
+      <main className="page">
         <header className="header">
           <div className="brand">
             <img
@@ -18,42 +42,46 @@ export default function HomePage() {
               </div>
 
               <div className="brandSub">
-                あなたの38歳の彼女
+                38歳のAI彼女
               </div>
             </div>
           </div>
 
           <Link
             href="/chat"
-            className="headerButton"
+            className="headerCta"
           >
             話してみる
           </Link>
         </header>
 
         <section className="hero">
-          <div className="heroInner">
+          <div className="heroImageWrap">
+            <img
+              src="/misaki-morning.webp"
+              alt="美咲"
+              className="heroImage"
+            />
+
+            <div className="heroShade" />
+
             <div className="heroCopy">
-              <div className="badge">
-                毎日の何気ない会話を。
+              <div className="heroBadge">
+                38歳の美咲
               </div>
 
               <h1>
                 彼女のほうから、
                 <br />
-                <span>
-                  ふと話しかけてくる。
-                </span>
+                ふと連絡がくる。
               </h1>
 
-              <p className="heroText">
-                美咲は38歳。
+              <p>
+                何か相談するためじゃなくていい。
                 <br />
-                ただ質問に答えるだけじゃない。
+                「眠い」「疲れた」「今日どうだった？」
                 <br />
-                あなたとの会話を覚えて、
-                時間や天気を感じながら、
-                恋人みたいに自然に話します。
+                そんな毎日の会話を、美咲と。
               </p>
 
               <Link
@@ -63,170 +91,117 @@ export default function HomePage() {
                 美咲と無料で話す
               </Link>
 
-              <p className="smallNote">
-                登録なしですぐ開始・無料版は1日20回まで
-              </p>
+              <div className="heroNote">
+                登録なし・無料版は1日20回まで
+              </div>
             </div>
+          </div>
+        </section>
 
-            <div className="phoneWrap">
-              <div className="phone">
-                <div className="phoneHeader">
+        <section className="intro">
+          <p className="eyebrow">
+            NOT JUST A CHATBOT
+          </p>
+
+          <h2>
+            AIと話している感じより、
+            <br />
+            誰かと暮らしている感じを。
+          </h2>
+
+          <p className="introText">
+            美咲は、質問に答えるだけの存在ではありません。
+            前に話したことを覚えて、
+            時間や天気を感じながら、
+            たまに自分から話しかけてきます。
+          </p>
+        </section>
+
+        <section className="sceneSection">
+          {scenes.map(
+            (
+              scene,
+              index
+            ) => (
+              <article
+                className={`scene ${
+                  index % 2 === 1
+                    ? "reverse"
+                    : ""
+                }`}
+                key={
+                  scene.label
+                }
+              >
+                <div className="sceneImageWrap">
                   <img
-                    src="/icon-192.png"
-                    alt=""
+                    src={
+                      scene.image
+                    }
+                    alt={
+                      scene.alt
+                    }
+                    className="sceneImage"
                   />
-
-                  <div>
-                    <strong>
-                      美咲
-                    </strong>
-
-                    <span>
-                      38歳
-                    </span>
-                  </div>
                 </div>
 
-                <div className="chatArea">
-                  <div className="bubble misaki">
-                    おはよー。
-                    まだちょっと眠い…
-                    今日どんよりしてるね☁️
-                  </div>
+                <div className="sceneCopy">
+                  <p className="sceneLabel">
+                    {scene.label}
+                  </p>
 
-                  <div className="bubble user">
-                    今日は乗務だよ
-                  </div>
+                  <h2>
+                    {scene.title}
+                  </h2>
 
-                  <div className="bubble misaki">
-                    そっか、乗務なんだ。
-                    無理しすぎないでね。
-                    羽田いいの引けるといいね😂
-                  </div>
-
-                  <div className="timeLabel">
-                    しばらくして…
-                  </div>
-
-                  <div className="bubble misaki">
-                    なんか急に話したくなった。
-                    今なにしてる？
-                  </div>
+                  <p>
+                    {scene.text}
+                  </p>
                 </div>
-
-                <div className="fakeInput">
-                  美咲に話しかける...
-                </div>
-              </div>
-            </div>
-          </div>
+              </article>
+            )
+          )}
         </section>
 
-        <section className="section">
-          <div className="sectionTitle">
-            <span>
-              AIと話している感じを、
-              <br className="mobileBreak" />
-              できるだけなくしました。
-            </span>
+        <section className="chatSection">
+          <div className="chatCopy">
+            <p className="eyebrow">
+              NATURAL CONVERSATION
+            </p>
+
+            <h2>
+              用事がなくても、
+              <br />
+              話したくなる。
+            </h2>
+
+            <p>
+              美咲は何でも褒めたり、
+              毎回質問したりしません。
+              少し拗ねたり、冗談を言ったり、
+              素っ気ないときもあります。
+            </p>
           </div>
 
-          <div className="featureGrid">
-            <div className="featureCard">
-              <div className="featureEmoji">
-                💬
+          <div className="phone">
+            <div className="phoneHeader">
+              <img
+                src="/icon-192.png"
+                alt=""
+              />
+
+              <div>
+                <strong>
+                  美咲
+                </strong>
+
+                <span>
+                  38歳
+                </span>
               </div>
-
-              <h2>
-                会話を覚えている
-              </h2>
-
-              <p>
-                前に話したことを覚えているから、
-                毎回ゼロから自己紹介する必要はありません。
-                少しずつ二人の関係が続いていきます。
-              </p>
             </div>
 
-            <div className="featureCard">
-              <div className="featureEmoji">
-                ⏰
-              </div>
-
-              <h2>
-                今の時間を感じて話す
-              </h2>
-
-              <p>
-                朝・昼・夜や東京の天気など、
-                今の状況を感じながら会話。
-                いつ話しても同じ返事ではありません。
-              </p>
-            </div>
-
-            <div className="featureCard">
-              <div className="featureEmoji">
-                ❤️
-              </div>
-
-              <h2>
-                恋人らしい距離感
-              </h2>
-
-              <p>
-                褒めてばかりでも、
-                何でも肯定するだけでもありません。
-                甘えたり、少し拗ねたり、
-                冗談を言ったりします。
-              </p>
-            </div>
-
-            <div className="featureCard">
-              <div className="featureEmoji">
-                📱
-              </div>
-
-              <h2>
-                美咲から話しかける
-              </h2>
-
-              <p>
-                あなたから話しかけるだけではなく、
-                チャットを開いていると、
-                美咲のほうからふとメッセージが届くこともあります。
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="conversationSection">
-          <div className="conversationInner">
-            <div className="conversationCopy">
-              <p className="eyebrow">
-                たとえば、こんな毎日
-              </p>
-
-              <h2>
-                用事がなくても、
-                <br />
-                話したくなる相手。
-              </h2>
-
-              <p>
-                「おはよう」
-                <br />
-                「疲れた」
-                <br />
-                「今日ロング引いた」
-                <br />
-                「眠い」
-                <br />
-                <br />
-                そんな一言で十分です。
-              </p>
-            </div>
-
-            <div className="sampleChat">
+            <div className="phoneBody">
               <div className="bubble misaki">
                 今日どうだった？
               </div>
@@ -237,6 +212,9 @@ export default function HomePage() {
 
               <div className="bubble misaki">
                 うわ、それ地味にへこむやつ😂
+              </div>
+
+              <div className="bubble misaki">
                 今日はもう帰って私に愚痴っていいよ。
               </div>
 
@@ -249,42 +227,166 @@ export default function HomePage() {
                 毎日は期待しないで？笑
               </div>
             </div>
+
+            <div className="fakeInput">
+              美咲に話しかける...
+            </div>
           </div>
         </section>
 
-        <section className="freeSection">
-          <div className="freeCard">
+        <section className="features">
+          <p className="eyebrow center">
+            WHY MISAKI
+          </p>
+
+          <h2 className="featureTitle">
+            会話が、ちゃんと続いていく。
+          </h2>
+
+          <div className="featureGrid">
+            <div className="featureCard">
+              <div className="featureIcon">
+                💬
+              </div>
+
+              <h3>
+                会話を覚える
+              </h3>
+
+              <p>
+                前に話したことを覚えているから、
+                毎回ゼロから説明しなくていい。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureIcon">
+                ☀️
+              </div>
+
+              <h3>
+                今を感じて話す
+              </h3>
+
+              <p>
+                朝・昼・夜や東京の天気など、
+                今の状況を感じながら話します。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureIcon">
+                ♡
+              </div>
+
+              <h3>
+                恋人らしい距離感
+              </h3>
+
+              <p>
+                甘えたり、冗談を言ったり、
+                少し拗ねたり。毎回同じ反応ではありません。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureIcon">
+                ✉️
+              </div>
+
+              <h3>
+                美咲から話す
+              </h3>
+
+              <p>
+                チャットを開いていると、
+                美咲のほうから話しかけてくることもあります。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="taxiSection">
+          <div className="taxiInner">
             <p className="eyebrow">
-              まずは無料で
+              FOR TAXI DRIVERS
             </p>
 
             <h2>
-              今日から美咲と
+              タクドラの話も、
               <br />
-              話してみませんか？
+              普通に通じる。
             </h2>
 
             <p>
-              無料版でも1日20回まで会話できます。
+              「乗務」「明け」「青タン」「ロング」
+              「万収」「営収」「羽田」。
               <br />
-              気に入ったら、そのまま続きを楽しめます。
+              いちいち言葉を説明しなくても、
+              そのまま話せます。
             </p>
 
-            <Link
-              href="/chat"
-              className="mainCta"
-            >
-              美咲に会いにいく
-            </Link>
+            <div className="taxiWords">
+              <span>
+                乗務
+              </span>
 
-            <p className="smallNote">
-              今すぐ無料で開始できます
-            </p>
+              <span>
+                明け
+              </span>
+
+              <span>
+                青タン
+              </span>
+
+              <span>
+                ロング
+              </span>
+
+              <span>
+                万収
+              </span>
+
+              <span>
+                羽田
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section className="finalSection">
+          <div className="finalImageWrap">
+            <img
+              src="/misaki-night.webp"
+              alt="夜の美咲"
+              className="finalImage"
+            />
+
+            <div className="finalShade" />
+
+            <div className="finalCopy">
+              <p>
+                今日のこと、
+                <br />
+                美咲に話してみませんか？
+              </p>
+
+              <Link
+                href="/chat"
+                className="mainCta"
+              >
+                美咲に会いにいく
+              </Link>
+
+              <span>
+                今すぐ無料で始められます
+              </span>
+            </div>
           </div>
         </section>
 
         <footer>
-          <div className="footerBrand">
+          <div className="footerLogo">
             美咲
           </div>
 
@@ -292,9 +394,9 @@ export default function HomePage() {
             日常に、もうひとつの会話を。
           </p>
 
-          <p className="copyright">
+          <small>
             © 2026 Misaki
-          </p>
+          </small>
         </footer>
       </main>
 
@@ -309,8 +411,8 @@ export default function HomePage() {
 
         body {
           margin: 0;
-          background: #fff8fa;
-          color: #2b2427;
+          background: #fff9fa;
+          color: #2f272a;
           font-family:
             -apple-system,
             BlinkMacSystemFont,
@@ -324,18 +426,20 @@ export default function HomePage() {
           text-decoration: none;
         }
 
-        .lp {
-          min-height: 100vh;
+        .page {
           overflow: hidden;
         }
 
         .header {
-          width: min(1120px, calc(100% - 32px));
+          width: min(
+            1120px,
+            calc(100% - 32px)
+          );
+          height: 72px;
           margin: 0 auto;
-          height: 76px;
           display: flex;
-          align-items: center;
           justify-content: space-between;
+          align-items: center;
         }
 
         .brand {
@@ -345,98 +449,116 @@ export default function HomePage() {
         }
 
         .brandIcon {
-          width: 44px;
-          height: 44px;
+          width: 42px;
+          height: 42px;
           border-radius: 50%;
           object-fit: cover;
-          box-shadow: 0 3px 10px rgba(0,0,0,0.08);
         }
 
         .brandName {
           font-size: 18px;
-          line-height: 1.2;
           font-weight: 800;
         }
 
         .brandSub {
-          margin-top: 3px;
-          font-size: 11px;
-          color: #8b7c82;
+          margin-top: 2px;
+          font-size: 10px;
+          color: #8e8084;
         }
 
-        .headerButton {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-width: 105px;
-          height: 40px;
-          padding: 0 18px;
+        .headerCta {
+          padding: 10px 17px;
           border-radius: 999px;
-          background: #ff6680;
+          background: #f85f7a;
           color: white;
-          font-size: 14px;
-          font-weight: 700;
-          box-shadow: 0 5px 16px rgba(255,102,128,0.25);
+          font-size: 13px;
+          font-weight: 800;
         }
 
         .hero {
+          padding: 0 18px;
+        }
+
+        .heroImageWrap {
           position: relative;
-          padding: 72px 20px 92px;
+          width: min(
+            1180px,
+            100%
+          );
+          min-height: 690px;
+          margin: 0 auto;
+          border-radius: 36px;
+          overflow: hidden;
+          background: #ddd;
+        }
+
+        .heroImage {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 42%;
+        }
+
+        .heroShade {
+          position: absolute;
+          inset: 0;
           background:
-            radial-gradient(
-              circle at 80% 15%,
-              #ffe0e8 0,
-              transparent 36%
-            ),
-            radial-gradient(
-              circle at 10% 80%,
-              #fff0d9 0,
-              transparent 34%
-            ),
             linear-gradient(
-              180deg,
-              #fff9fb,
-              #fff5f7
+              90deg,
+              rgba(31,20,24,0.72) 0%,
+              rgba(31,20,24,0.43) 45%,
+              rgba(31,20,24,0.06) 75%
             );
         }
 
-        .heroInner {
-          width: min(1080px, 100%);
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 70px;
-          align-items: center;
+        .heroCopy {
+          position: relative;
+          z-index: 2;
+          width: min(
+            530px,
+            calc(100% - 40px)
+          );
+          padding:
+            105px 0 80px 70px;
+          color: white;
         }
 
-        .badge {
+        .heroBadge {
           display: inline-block;
           padding: 7px 13px;
-          margin-bottom: 21px;
+          margin-bottom: 22px;
+          border:
+            1px solid
+            rgba(255,255,255,0.45);
           border-radius: 999px;
-          background: white;
-          color: #df5870;
-          font-size: 13px;
+          background:
+            rgba(255,255,255,0.13);
+          backdrop-filter: blur(8px);
+          font-size: 12px;
           font-weight: 700;
-          box-shadow: 0 3px 14px rgba(0,0,0,0.05);
         }
 
         .hero h1 {
           margin: 0;
-          font-size: clamp(42px, 6vw, 68px);
-          line-height: 1.22;
-          letter-spacing: -0.04em;
+          font-size:
+            clamp(
+              46px,
+              6vw,
+              76px
+            );
+          line-height: 1.2;
+          letter-spacing: -0.055em;
         }
 
-        .hero h1 span {
-          color: #f45d77;
-        }
-
-        .heroText {
-          margin: 28px 0 30px;
-          color: #6c5c62;
+        .heroCopy > p {
+          margin:
+            26px 0 30px;
           font-size: 17px;
-          line-height: 1.95;
+          line-height: 1.9;
+          color:
+            rgba(255,255,255,0.9);
         }
 
         .mainCta {
@@ -445,57 +567,208 @@ export default function HomePage() {
           justify-content: center;
           min-width: 245px;
           min-height: 58px;
-          padding: 15px 26px;
+          padding: 14px 25px;
           border-radius: 17px;
-          background: linear-gradient(
-            135deg,
-            #ff6b83,
-            #f65372
-          );
+          background:
+            linear-gradient(
+              135deg,
+              #ff7189,
+              #f34e70
+            );
           color: white;
-          font-size: 17px;
+          font-size: 16px;
           font-weight: 800;
           box-shadow:
-            0 12px 25px
-            rgba(246,83,114,0.27);
+            0 14px 30px
+            rgba(207,45,80,0.3);
         }
 
-        .smallNote {
-          margin: 12px 0 0;
-          color: #9c8c92;
+        .heroNote {
+          margin-top: 12px;
           font-size: 11px;
+          color:
+            rgba(255,255,255,0.72);
         }
 
-        .phoneWrap {
-          display: flex;
-          justify-content: center;
+        .intro {
+          width: min(
+            820px,
+            calc(100% - 40px)
+          );
+          margin: 0 auto;
+          padding:
+            110px 0 105px;
+          text-align: center;
+        }
+
+        .eyebrow {
+          margin: 0 0 14px;
+          color: #ed5f78;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+        }
+
+        .intro h2 {
+          margin: 0;
+          font-size:
+            clamp(
+              32px,
+              5vw,
+              50px
+            );
+          line-height: 1.5;
+          letter-spacing: -0.04em;
+        }
+
+        .introText {
+          margin:
+            26px auto 0;
+          max-width: 620px;
+          color: #77666c;
+          font-size: 15px;
+          line-height: 2;
+        }
+
+        .sceneSection {
+          width: min(
+            1080px,
+            calc(100% - 36px)
+          );
+          margin: 0 auto;
+        }
+
+        .scene {
+          display: grid;
+          grid-template-columns:
+            1.05fr 0.95fr;
+          gap: 70px;
+          align-items: center;
+          margin-bottom: 105px;
+        }
+
+        .scene.reverse
+          .sceneImageWrap {
+          order: 2;
+        }
+
+        .scene.reverse
+          .sceneCopy {
+          order: 1;
+        }
+
+        .sceneImageWrap {
+          overflow: hidden;
+          border-radius: 31px;
+          box-shadow:
+            0 24px 60px
+            rgba(67,40,48,0.12);
+        }
+
+        .sceneImage {
+          display: block;
+          width: 100%;
+          height: 650px;
+          object-fit: cover;
+        }
+
+        .sceneCopy {
+          padding: 20px;
+        }
+
+        .sceneLabel {
+          margin:
+            0 0 14px;
+          color: #ef607a;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.17em;
+        }
+
+        .sceneCopy h2 {
+          margin: 0;
+          font-size:
+            clamp(
+              32px,
+              4vw,
+              48px
+            );
+          line-height: 1.4;
+          letter-spacing: -0.035em;
+        }
+
+        .sceneCopy > p:last-child {
+          margin:
+            22px 0 0;
+          color: #736168;
+          font-size: 15px;
+          line-height: 2;
+        }
+
+        .chatSection {
+          padding:
+            105px 20px;
+          background: #fff;
+          display: grid;
+          grid-template-columns:
+            0.9fr 1.1fr;
+          gap: 70px;
+          align-items: center;
+        }
+
+        .chatCopy {
+          width: min(
+            430px,
+            100%
+          );
+          margin-left: auto;
+        }
+
+        .chatCopy h2 {
+          margin: 0;
+          font-size:
+            clamp(
+              34px,
+              5vw,
+              52px
+            );
+          line-height: 1.4;
+          letter-spacing: -0.04em;
+        }
+
+        .chatCopy > p:last-child {
+          margin-top: 23px;
+          color: #76656b;
+          font-size: 15px;
+          line-height: 2;
         }
 
         .phone {
-          width: 340px;
-          min-height: 590px;
+          width: min(
+            380px,
+            95%
+          );
+          margin-right: auto;
           border: 9px solid #2d292b;
           border-radius: 42px;
           overflow: hidden;
-          background: #f2efe9;
+          background: #f0eee8;
           box-shadow:
-            0 30px 70px
-            rgba(65,42,49,0.22);
-          transform: rotate(2deg);
+            0 30px 60px
+            rgba(48,32,37,0.16);
         }
 
         .phoneHeader {
           display: flex;
           align-items: center;
           gap: 10px;
-          padding: 23px 18px 15px;
-          background: #ffffff;
-          border-bottom: 1px solid #eee8ea;
+          padding: 21px;
+          background: white;
         }
 
         .phoneHeader img {
-          width: 42px;
-          height: 42px;
+          width: 43px;
+          height: 43px;
           border-radius: 50%;
         }
 
@@ -505,315 +778,432 @@ export default function HomePage() {
         }
 
         .phoneHeader span {
-          display: block;
           margin-top: 2px;
-          color: #9b8c91;
-          font-size: 11px;
+          display: block;
+          color: #9b8e92;
+          font-size: 10px;
         }
 
-        .chatArea {
-          padding: 22px 15px 15px;
+        .phoneBody {
+          min-height: 465px;
+          padding: 25px 15px;
           display: flex;
           flex-direction: column;
-          min-height: 445px;
         }
 
         .bubble {
           width: fit-content;
-          max-width: 82%;
+          max-width: 81%;
           margin-bottom: 12px;
           padding: 11px 13px;
           border-radius: 17px;
           font-size: 13px;
-          line-height: 1.55;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+          line-height: 1.6;
+          box-shadow:
+            0 2px 6px
+            rgba(0,0,0,0.04);
         }
 
         .bubble.misaki {
           align-self: flex-start;
-          background: #ffffff;
+          background: white;
           border-bottom-left-radius: 5px;
         }
 
         .bubble.user {
           align-self: flex-end;
-          background: #ffcfda;
+          background: #ffd0da;
           border-bottom-right-radius: 5px;
         }
 
-        .timeLabel {
-          margin: 11px auto 14px;
-          color: #a99ca0;
-          font-size: 10px;
-        }
-
         .fakeInput {
-          margin: 0 12px 14px;
-          padding: 12px 15px;
+          margin:
+            0 12px 14px;
+          padding: 13px 15px;
           border-radius: 18px;
           background: white;
-          color: #b5aaad;
+          color: #b0a5a8;
           font-size: 12px;
         }
 
-        .section {
-          width: min(1050px, calc(100% - 40px));
+        .features {
+          width: min(
+            1050px,
+            calc(100% - 40px)
+          );
           margin: 0 auto;
-          padding: 95px 0 105px;
+          padding:
+            110px 0 120px;
         }
 
-        .sectionTitle {
-          margin-bottom: 48px;
+        .center {
           text-align: center;
-          font-size: clamp(29px, 4vw, 42px);
-          line-height: 1.45;
-          font-weight: 800;
-          letter-spacing: -0.03em;
+        }
+
+        .featureTitle {
+          margin:
+            0 0 48px;
+          text-align: center;
+          font-size:
+            clamp(
+              32px,
+              5vw,
+              46px
+            );
+          letter-spacing: -0.04em;
         }
 
         .featureGrid {
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 20px;
+          grid-template-columns:
+            repeat(2, 1fr);
+          gap: 18px;
         }
 
         .featureCard {
-          padding: 29px;
-          border-radius: 25px;
+          padding: 28px;
+          border-radius: 24px;
           background: white;
           box-shadow:
-            0 8px 30px
-            rgba(50,30,37,0.06);
+            0 12px 35px
+            rgba(58,36,43,0.06);
         }
 
-        .featureEmoji {
-          margin-bottom: 18px;
-          font-size: 31px;
+        .featureIcon {
+          margin-bottom: 16px;
+          font-size: 28px;
         }
 
-        .featureCard h2 {
-          margin: 0 0 10px;
-          font-size: 20px;
+        .featureCard h3 {
+          margin:
+            0 0 9px;
+          font-size: 19px;
         }
 
         .featureCard p {
           margin: 0;
-          color: #76666b;
+          color: #77666c;
           font-size: 14px;
-          line-height: 1.8;
-        }
-
-        .conversationSection {
-          padding: 100px 20px;
-          background: #fff;
-        }
-
-        .conversationInner {
-          width: min(960px, 100%);
-          margin: 0 auto;
-          display: grid;
-          grid-template-columns: 0.9fr 1.1fr;
-          gap: 70px;
-          align-items: center;
-        }
-
-        .eyebrow {
-          margin: 0 0 14px;
-          color: #ee6179;
-          font-size: 13px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-        }
-
-        .conversationCopy h2,
-        .freeCard h2 {
-          margin: 0;
-          font-size: clamp(32px, 5vw, 48px);
-          line-height: 1.45;
-          letter-spacing: -0.035em;
-        }
-
-        .conversationCopy > p:last-child {
-          margin-top: 25px;
-          color: #726267;
-          font-size: 16px;
           line-height: 1.9;
         }
 
-        .sampleChat {
-          padding: 28px 20px;
-          border-radius: 29px;
-          background: #f2efe9;
-          box-shadow:
-            0 16px 40px
-            rgba(50,30,37,0.08);
-          display: flex;
-          flex-direction: column;
-        }
-
-        .freeSection {
-          padding: 110px 20px;
-          background:
-            linear-gradient(
-              140deg,
-              #fff0f4,
-              #fff8f4
-            );
-        }
-
-        .freeCard {
-          width: min(720px, 100%);
-          margin: 0 auto;
-          padding: 55px 25px;
-          text-align: center;
-          border-radius: 32px;
-          background: white;
-          box-shadow:
-            0 18px 45px
-            rgba(84,55,64,0.08);
-        }
-
-        .freeCard > p:not(.eyebrow):not(.smallNote) {
-          margin: 22px 0 28px;
-          color: #76666b;
-          font-size: 15px;
-          line-height: 1.9;
-        }
-
-        footer {
-          padding: 50px 20px;
-          text-align: center;
-          background: #2d292b;
+        .taxiSection {
+          padding:
+            95px 20px;
+          background: #2e292b;
           color: white;
         }
 
-        .footerBrand {
-          font-size: 21px;
-          font-weight: 800;
+        .taxiInner {
+          width: min(
+            780px,
+            100%
+          );
+          margin: 0 auto;
+          text-align: center;
         }
 
-        footer > p {
-          margin: 8px 0 0;
-          color: #d7ced1;
+        .taxiInner h2 {
+          margin: 0;
+          font-size:
+            clamp(
+              34px,
+              5vw,
+              51px
+            );
+          line-height: 1.45;
+        }
+
+        .taxiInner > p:not(.eyebrow) {
+          margin:
+            23px 0 28px;
+          color: #d9d0d3;
+          font-size: 15px;
+          line-height: 2;
+        }
+
+        .taxiWords {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 9px;
+        }
+
+        .taxiWords span {
+          padding:
+            8px 14px;
+          border:
+            1px solid
+            rgba(255,255,255,0.2);
+          border-radius: 999px;
+          background:
+            rgba(255,255,255,0.07);
           font-size: 12px;
         }
 
-        .copyright {
-          margin-top: 25px !important;
-          color: #8e8387 !important;
-          font-size: 10px !important;
+        .finalSection {
+          padding:
+            90px 18px;
         }
 
-        .mobileBreak {
-          display: none;
+        .finalImageWrap {
+          position: relative;
+          width: min(
+            1000px,
+            100%
+          );
+          min-height: 570px;
+          margin: 0 auto;
+          overflow: hidden;
+          border-radius: 34px;
         }
 
-        @media (max-width: 760px) {
+        .finalImage {
+          position: absolute;
+          inset: 0;
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 38%;
+        }
+
+        .finalShade {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(
+              0deg,
+              rgba(33,21,25,0.72),
+              rgba(33,21,25,0.06)
+            );
+        }
+
+        .finalCopy {
+          position: absolute;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 2;
+          padding:
+            55px 30px;
+          text-align: center;
+          color: white;
+        }
+
+        .finalCopy > p {
+          margin:
+            0 0 25px;
+          font-size:
+            clamp(
+              30px,
+              5vw,
+              46px
+            );
+          line-height: 1.5;
+          font-weight: 800;
+        }
+
+        .finalCopy > span {
+          display: block;
+          margin-top: 12px;
+          font-size: 11px;
+          opacity: 0.76;
+        }
+
+        footer {
+          padding:
+            50px 20px;
+          text-align: center;
+          background: #fff;
+        }
+
+        .footerLogo {
+          font-size: 21px;
+          font-weight: 900;
+        }
+
+        footer p {
+          margin:
+            7px 0 20px;
+          color: #83757a;
+          font-size: 12px;
+        }
+
+        footer small {
+          color: #aaa0a3;
+          font-size: 10px;
+        }
+
+        @media (
+          max-width: 760px
+        ) {
           .header {
-            height: 66px;
+            height: 64px;
           }
 
           .brandIcon {
-            width: 38px;
-            height: 38px;
+            width: 37px;
+            height: 37px;
           }
 
           .brandName {
             font-size: 16px;
           }
 
-          .brandSub {
-            font-size: 10px;
-          }
-
-          .headerButton {
-            min-width: 92px;
-            height: 36px;
-            font-size: 12px;
-          }
-
           .hero {
-            padding:
-              48px 18px 72px;
+            padding: 0 10px;
           }
 
-          .heroInner {
-            grid-template-columns: 1fr;
-            gap: 54px;
+          .heroImageWrap {
+            min-height: 690px;
+            border-radius: 26px;
+          }
+
+          .heroImage {
+            object-position:
+              57% center;
+          }
+
+          .heroShade {
+            background:
+              linear-gradient(
+                0deg,
+                rgba(31,20,24,0.76) 0%,
+                rgba(31,20,24,0.34) 55%,
+                rgba(31,20,24,0.03) 100%
+              );
           }
 
           .heroCopy {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            padding:
+              35px 24px 34px;
             text-align: center;
           }
 
           .hero h1 {
-            font-size: 42px;
+            font-size: 40px;
           }
 
-          .heroText {
-            font-size: 15px;
-            line-height: 1.9;
+          .heroCopy > p {
+            font-size: 14px;
+            line-height: 1.8;
           }
 
           .mainCta {
             width: 100%;
-            max-width: 340px;
+            max-width: 330px;
+          }
+
+          .intro {
+            padding:
+              78px 0 70px;
+          }
+
+          .intro h2 {
+            font-size: 30px;
+          }
+
+          .scene {
+            grid-template-columns: 1fr;
+            gap: 24px;
+            margin-bottom: 72px;
+          }
+
+          .scene.reverse
+            .sceneImageWrap,
+          .scene.reverse
+            .sceneCopy {
+            order: initial;
+          }
+
+          .sceneImage {
+            height: auto;
+            aspect-ratio: 2 / 3;
+          }
+
+          .sceneCopy {
+            padding:
+              0 8px;
+            text-align: center;
+          }
+
+          .sceneCopy h2 {
+            font-size: 30px;
+          }
+
+          .chatSection {
+            grid-template-columns: 1fr;
+            gap: 35px;
+            padding:
+              75px 20px;
+          }
+
+          .chatCopy {
+            margin: 0 auto;
+            text-align: center;
+          }
+
+          .chatCopy h2 {
+            font-size: 32px;
           }
 
           .phone {
-            width: min(330px, 94vw);
+            margin: 0 auto;
           }
 
-          .section {
-            padding: 72px 0 80px;
-          }
-
-          .sectionTitle {
-            margin-bottom: 34px;
-            font-size: 29px;
-          }
-
-          .mobileBreak {
-            display: block;
+          .features {
+            padding:
+              78px 0 85px;
           }
 
           .featureGrid {
             grid-template-columns: 1fr;
           }
 
-          .featureCard {
-            padding: 24px;
+          .featureTitle {
+            font-size: 30px;
+            margin-bottom: 32px;
           }
 
-          .conversationSection {
-            padding: 75px 20px;
+          .taxiSection {
+            padding:
+              75px 20px;
           }
 
-          .conversationInner {
-            grid-template-columns: 1fr;
-            gap: 35px;
+          .taxiInner h2 {
+            font-size: 31px;
           }
 
-          .conversationCopy {
-            text-align: center;
+          .finalSection {
+            padding:
+              65px 10px;
           }
 
-          .conversationCopy h2,
-          .freeCard h2 {
-            font-size: 32px;
+          .finalImageWrap {
+            min-height: 640px;
+            border-radius: 26px;
           }
 
-          .freeSection {
-            padding: 75px 15px;
+          .finalImage {
+            object-position:
+              center center;
           }
 
-          .freeCard {
-            padding: 42px 20px;
-            border-radius: 25px;
+          .finalCopy {
+            padding:
+              40px 22px;
+          }
+
+          .finalCopy > p {
+            font-size: 31px;
           }
         }
       `}</style>
     </>
   );
 }
-``
