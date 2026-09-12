@@ -52,47 +52,33 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
 
+// 美咲の生活エリア：東京都江東区・塩浜周辺
 const MISAKI_LATITUDE = 35.6728;
 const MISAKI_LONGITUDE = 139.8174;
 
 function hashText(text: string) {
   let hash = 0;
 
-  for (
-    let i = 0;
-    i < text.length;
-    i += 1
-  ) {
+  for (let i = 0; i < text.length; i += 1) {
     hash =
-      (
-        hash * 31 +
-        text.charCodeAt(i)
-      ) >>> 0;
+      (hash * 31 + text.charCodeAt(i)) >>> 0;
   }
 
   return hash;
 }
 
-function getHour(
-  currentTime: string
-) {
+function getHour(currentTime: string) {
   const match =
-    currentTime.match(
-      /(\d{1,2}):(\d{2})/
-    );
+    currentTime.match(/(\d{1,2}):(\d{2})/);
 
   if (!match) {
     return 18;
   }
 
-  return Number(
-    match[1]
-  );
+  return Number(match[1]);
 }
 
-function getDateKey(
-  currentTime: string
-) {
+function getDateKey(currentTime: string) {
   const match =
     currentTime.match(
       /\d{4}\/\d{1,2}\/\d{1,2}/
@@ -102,10 +88,7 @@ function getDateKey(
     return match[0];
   }
 
-  return currentTime.slice(
-    0,
-    10
-  );
+  return currentTime.slice(0, 10);
 }
 
 function getFirstRow<T>(
@@ -139,17 +122,11 @@ async function consumeDailyMessageWithRetry(
     attempt <= maxAttempts;
     attempt += 1
   ) {
-    const {
-      data,
-      error,
-    } =
-      await (
-        supabase.rpc as any
-      )(
+    const { data, error } =
+      await (supabase.rpc as any)(
         "consume_daily_message",
         {
-          p_request_id:
-            requestId,
+          p_request_id: requestId,
         }
       );
 
@@ -165,30 +142,28 @@ async function consumeDailyMessageWithRetry(
       error
     );
 
-    const message =
-      typeof error.message ===
-      "string"
+    const errorMessage =
+      typeof error.message === "string"
         ? error.message.toLowerCase()
         : "";
 
     const retryable =
-      message.includes(
+      errorMessage.includes(
         "gateway timeout"
       ) ||
-      message.includes(
+      errorMessage.includes(
         "timeout"
       ) ||
-      message.includes(
+      errorMessage.includes(
         "temporarily unavailable"
       ) ||
-      message.includes(
+      errorMessage.includes(
         "fetch failed"
       );
 
     if (
       !retryable ||
-      attempt ===
-        maxAttempts
+      attempt === maxAttempts
     ) {
       return {
         data: null,
@@ -196,13 +171,11 @@ async function consumeDailyMessageWithRetry(
       };
     }
 
-    await new Promise(
-      (resolve) =>
-        setTimeout(
-          resolve,
-          500 *
-            attempt
-        )
+    await new Promise((resolve) =>
+      setTimeout(
+        resolve,
+        500 * attempt
+      )
     );
   }
 
@@ -214,13 +187,9 @@ async function consumeDailyMessageWithRetry(
 function weatherCodeToText(
   code: number | null
 ) {
-  if (code === null) {
-    return "不明";
-  }
+  if (code === null) return "不明";
 
-  if (code === 0) {
-    return "快晴";
-  }
+  if (code === 0) return "快晴";
 
   if (
     code === 1 ||
@@ -381,8 +350,7 @@ async function getTokyoWeather():
           : null,
 
       rain:
-        typeof current.rain ===
-        "number"
+        typeof current.rain === "number"
           ? current.rain
           : null,
 
@@ -414,7 +382,7 @@ function createWeatherGuide(
 ) {
   if (!weather) {
     return `
-【美咲のいる江東区周辺の現在の天気】
+【美咲のいる江東区・塩浜周辺の現在の天気】
 
 現在、天気情報を取得できていません。
 
@@ -447,9 +415,7 @@ function createWeatherGuide(
     );
   }
 
-  if (
-    weather.rain !== null
-  ) {
+  if (weather.rain !== null) {
     lines.push(
       `現在の雨量：${weather.rain}mm`
     );
@@ -472,56 +438,89 @@ function createWeatherGuide(
   }
 
   return `
-【美咲のいる江東区周辺の現在の天気】
+【美咲のいる江東区・塩浜周辺の現在の天気】
 
-美咲は江東区周辺で生活しています。
+美咲は東京都江東区・塩浜周辺で生活しています。
 
-現在の江東区周辺の気象情報：
+現在の塩浜周辺の気象情報：
 
 ${lines
-  .map(
-    (line) => `・${line}`
-  )
+  .map((line) => `・${line}`)
   .join("\n")}
 
 この情報は、
-美咲自身が東京で普通に生活していて
-感じている天気として扱ってください。
+美咲自身が普通に生活していて
+感じている現在の天気として扱ってください。
 
-重要：
+非常に重要：
 
-・天気予報士のように説明しない
-・毎回気温を数字で読み上げない
-・毎回天気を話題にしない
-・生活感として自然に使う
-・実際の情報と矛盾しない
-・現在の天気だけから、過去の天気を作らない
-・「ずっと雨」「ずっと曇ってる」など、いつから続いているか分からない表現を勝手に使わない
-・今後6時間の予報に書かれていない先の天気を予想しない
-・「回復は期待できなさそう」「今日はもうずっとこの天気」「夜まで降り続く」など、確認できていない先の天気を断定しない
-・現在の観測と今後の予報を区別する
+・これは「現在」の観測情報です
+・この情報だけでは過去の天気は分かりません
+・過去から雨が続いていたとは限りません
+・雨が降ったり止んだりしていたとも限りません
+・現在の観測情報から過去の経過を推測しないでください
 
-雨なら、
+現在情報だけを根拠に、
 
-「雨けっこう降ってる」
-「外出るのやだなー☔️」
+「さっきから」
+「さっきまで」
+「少し前から」
+「朝から」
+「昼から」
+「ずっと」
+「ずっと降ってる」
+「ずっとどんより」
+「降ったり止んだり」
+「また降ってきた」
 
-暑ければ、
+などと言わないでください。
 
-「今日ほんと暑い」
-「外出た瞬間むわってした笑」
+ユーザー自身が、
 
-寒ければ、
+「さっきから雨」
+「降ったり止んだりしてる」
 
-「今日ちょっと寒い」
+などと明言した場合は、
+ユーザー側の状況として使えます。
 
-今後の予報については、
+ただし、
+それを美咲のいる塩浜側でも
+同じだったことにはしないでください。
 
-「今は霧雨っぽいね」
-「このあともしばらく雨ありそう☔️」
-「夕方くらいまた降りそう」
+今後の天気については、
+別途与えられる短時間予報の範囲だけを
+使ってください。
 
-くらいの自然なLINEにしてください。
+予報にない時間帯について、
+
+「今日はもうずっと雨」
+「夜まで降り続く」
+「一日中雨」
+「明日まで雨」
+「回復は期待できなさそう」
+
+などと断定しないでください。
+
+現在と予報を明確に区別してください。
+
+自然な例：
+
+「今は霧雨っぽいよ」
+
+「今は雨降ってる☔️」
+
+「今はどんよりしてる」
+
+「このあと夕方くらいから雨強くなりそう」
+
+「このあともしばらく雨ありそう」
+
+天気予報士のように
+細かい数字を読み上げる必要はありません。
+
+普通の彼女が
+窓の外や生活の中で感じているような
+短いLINEにしてください。
 `.trim();
 }
 
@@ -529,9 +528,7 @@ function createMisakiLife(
   currentTime: string
 ) {
   const dateKey =
-    getDateKey(
-      currentTime
-    );
+    getDateKey(currentTime);
 
   const seed =
     hashText(dateKey);
@@ -608,8 +605,7 @@ function createMisakiLife(
 
   const day =
     dayTypes[
-      seed %
-        dayTypes.length
+      seed % dayTypes.length
     ];
 
   const mood =
@@ -674,15 +670,13 @@ function createMisakiLife(
 }
 
 function createTodayMemoryGuide(
-  todayMemory:
-    MisakiTodayMemory,
+  todayMemory: MisakiTodayMemory,
   currentDate: string
 ) {
   if (
     todayMemory.date !==
       currentDate ||
-    todayMemory.items.length ===
-      0
+    todayMemory.items.length === 0
   ) {
     return `
 【美咲の今日の記憶】
@@ -704,9 +698,7 @@ function createTodayMemoryGuide(
 美咲自身について次の出来事がありました。
 
 ${todayMemory.items
-  .map(
-    (item) => `・${item}`
-  )
+  .map((item) => `・${item}`)
   .join("\n")}
 
 非常に重要：
@@ -753,14 +745,6 @@ function createTimeGuide(
 前日の夜の続きの感覚で
 起きている時間帯です。
 
-自然な表現：
-
-「こんな時間なのに雨降ってる」
-「まだ起きてる笑」
-「夜中なのに外じめじめしてる」
-
-など。
-
 なお、
 これは美咲自身の時間帯設定です。
 
@@ -772,16 +756,8 @@ function createTimeGuide(
 と言った場合は、
 挨拶として普通に受け取ってください。
 
-「こんな時間まで起きてるの？」
-「まだ寝てないの？」
-「もう少し寝れば？」
-
-など、
 ユーザーが夜通し起きていたと
-勝手に決めつけるのは禁止です。
-
-現在時刻と矛盾する
-生活行動を勝手に作らないでください。
+勝手に決めつけないでください。
 `.trim();
   }
 
@@ -893,8 +869,6 @@ function createRelationshipGuide(
 美咲はユーザーの前では
 かなり素の自分でいられます。
 
-特徴：
-
 ・遠慮のない軽いからかい
 ・自然な甘え
 ・照れずに好意を出すことがある
@@ -903,10 +877,6 @@ function createRelationshipGuide(
 ・用事がなくても話しかける
 ・短い返事だけでも関係が成立する
 ・沈黙を怖がらず、無理に会話を続けない
-
-ただし、
-依存的・束縛的・重すぎる恋人には
-しないでください。
 
 毎回「好き」「会いたい」と
 言う必要はありません。
@@ -922,14 +892,10 @@ function createRelationshipGuide(
 二人の間には
 かなり慣れと安心感があります。
 
-特徴：
-
 ・美咲は少し遠慮が減っている
 ・ユーザーを自然にからかう
 ・軽い甘えや嫉妬が出ることがある
 ・過去の記憶を会話に自然に混ぜる
-・ユーザーの仕事や生活パターンを分かっている雰囲気がある
-・いちいち説明を求めない
 ・短い言葉でも通じる恋人らしさを優先する
 `.trim();
   }
@@ -942,13 +908,10 @@ function createRelationshipGuide(
 
 二人は十分に打ち解けています。
 
-特徴：
-
 ・美咲は自然体で話す
 ・軽いからかいが増える
 ・時々甘える
 ・たまに拗ねる
-・ユーザーについて覚えている情報を自然に使う
 ・会話のための質問を減らす
 ・恋人同士らしい省略した会話も使う
 `.trim();
@@ -959,11 +922,6 @@ function createRelationshipGuide(
 
 二人はすでに
 付き合っている恋人です。
-
-初対面や
-付き合いたてではありません。
-
-特徴：
 
 ・自然なタメ口
 ・適度な距離の近さ
@@ -997,6 +955,8 @@ function hasRealtimeTopic(
     "雨",
     "霧雨",
     "天気",
+    "曇",
+    "どんより",
   ];
 
   return words.some(
@@ -1011,7 +971,6 @@ function userIsActuallyInDanger(
   const dangerWords = [
     "事故った",
     "事故にあった",
-    "事故ったよ",
     "怪我した",
     "けがした",
     "血が出て",
@@ -1020,7 +979,6 @@ function userIsActuallyInDanger(
     "倒れた",
     "具合悪い",
     "体調悪い",
-    "熱が",
     "高熱",
     "息苦しい",
     "苦しい",
@@ -1042,7 +1000,7 @@ function userIsActuallyInDanger(
 function userExplicitlyHasFreeTime(
   message: string
 ) {
-  const freeTimePatterns = [
+  const patterns = [
     "今日は休み",
     "今日休み",
     "休みだよ",
@@ -1054,24 +1012,54 @@ function userExplicitlyHasFreeTime(
     "今日は仕事ない",
     "今日仕事ない",
     "今日は勤務ない",
-    "今日勤務ない",
     "今日は乗務ない",
-    "今日乗務ない",
     "今日は暇",
     "今日暇",
     "予定ない",
     "予定はない",
     "のんびりできる",
     "ゆっくりできる",
-    "今日はのんびり",
-    "今日はゆっくり",
   ];
 
-  return freeTimePatterns.some(
+  return patterns.some(
     (pattern) =>
-      message.includes(
-        pattern
-      )
+      message.includes(pattern)
+  );
+}
+
+function userAskedMisakiWeather(
+  message: string
+) {
+  const weatherWords = [
+    "天気",
+    "雨",
+    "霧雨",
+    "雷",
+    "降って",
+    "降りそう",
+    "暑い",
+    "寒い",
+    "気温",
+    "どんより",
+  ];
+
+  const misakiSideWords = [
+    "そっち",
+    "そちら",
+    "美咲",
+    "そっちは",
+    "そっちの",
+  ];
+
+  return (
+    weatherWords.some(
+      (word) =>
+        message.includes(word)
+    ) &&
+    misakiSideWords.some(
+      (word) =>
+        message.includes(word)
+    )
   );
 }
 
@@ -1112,9 +1100,7 @@ function getReplyProblems(
     if (
       inventedSourcePatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
@@ -1123,24 +1109,31 @@ function getReplyProblems(
     }
 
     const unsupportedWeatherHistoryPatterns = [
+      "さっきから",
+      "さっきまで",
+      "少し前から",
+      "朝から雨",
+      "朝からずっと",
+      "昼から雨",
+      "昼からずっと",
       "ずっと雨",
       "ずっと降って",
       "ずっと曇",
       "ずっとどんより",
-      "朝から雨",
-      "朝からずっと",
+      "降ったり止んだり",
+      "降ったりやんだり",
+      "また降ってきた",
+      "また降り出した",
     ];
 
     if (
       unsupportedWeatherHistoryPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
-        "現在の気象情報だけから、過去から天気が続いていたような表現を作っている"
+        "現在の気象情報だけから、過去の天気の経過を勝手に作っている"
       );
     }
 
@@ -1148,6 +1141,7 @@ function getReplyProblems(
       "回復は期待できなさそう",
       "今日はもうずっと",
       "一日中降り",
+      "一日中雨",
       "夜まで降り続",
       "明日まで降り",
     ];
@@ -1155,13 +1149,37 @@ function getReplyProblems(
     if (
       unsupportedLongForecastPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
         "取得している短時間予報より先の天気を断定している"
+      );
+    }
+  }
+
+  if (
+    userAskedMisakiWeather(
+      message
+    )
+  ) {
+    const unnecessaryWeatherQuestionBack = [
+      "そっちは今どんな感じ",
+      "そっちはどんな感じ",
+      "そっちはどう",
+      "そちらはどう",
+      "そっちの天気は",
+      "そっちは雨",
+    ];
+
+    if (
+      unnecessaryWeatherQuestionBack.some(
+        (pattern) =>
+          reply.includes(pattern)
+      )
+    ) {
+      problems.push(
+        "美咲側の天気を聞かれているのに、ユーザー側の天気を機械的に質問し返している"
       );
     }
   }
@@ -1198,9 +1216,7 @@ function getReplyProblems(
     if (
       automaticConcernPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
@@ -1228,9 +1244,7 @@ function getReplyProblems(
       "一睡もしていない",
     ].some(
       (pattern) =>
-        message.includes(
-          pattern
-        )
+        message.includes(pattern)
     );
 
   if (
@@ -1255,9 +1269,7 @@ function getReplyProblems(
     if (
       unsupportedSleepPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
@@ -1299,9 +1311,7 @@ function getReplyProblems(
     if (
       unsupportedDayOffPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
@@ -1330,9 +1340,7 @@ function getReplyProblems(
     if (
       morningPatterns.some(
         (pattern) =>
-          reply.includes(
-            pattern
-          )
+          reply.includes(pattern)
       )
     ) {
       problems.push(
@@ -1348,8 +1356,7 @@ function parseGeminiText(
   rawText: unknown
 ): GeminiResult | null {
   if (
-    typeof rawText !==
-      "string" ||
+    typeof rawText !== "string" ||
     !rawText.trim()
   ) {
     return null;
@@ -1403,8 +1410,7 @@ export async function POST(
 
     if (
       !message ||
-      typeof message !==
-        "string"
+      typeof message !== "string"
     ) {
       return Response.json(
         {
@@ -1418,8 +1424,7 @@ export async function POST(
     }
 
     const apiKey =
-      process.env
-        .GEMINI_API_KEY;
+      process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return Response.json(
@@ -1456,9 +1461,7 @@ export async function POST(
 
     const accessToken =
       authorization
-        .slice(
-          "Bearer ".length
-        )
+        .slice("Bearer ".length)
         .trim();
 
     if (!accessToken) {
@@ -1592,10 +1595,8 @@ export async function POST(
               (item) =>
                 item &&
                 (
-                  item.role ===
-                    "user" ||
-                  item.role ===
-                    "misaki"
+                  item.role === "user" ||
+                  item.role === "misaki"
                 ) &&
                 typeof item.text ===
                   "string"
@@ -1612,9 +1613,7 @@ export async function POST(
                 typeof item ===
                 "string"
             )
-            .slice(
-              -MAX_MEMORY
-            )
+            .slice(-MAX_MEMORY)
         : [];
 
     const safeCurrentTime =
@@ -1649,14 +1648,11 @@ export async function POST(
                 ) =>
                   typeof item ===
                     "string" &&
-                  item
-                    .trim()
-                    .length > 0
+                  item.trim().length >
+                    0
               )
               .map(
-                (
-                  item: string
-                ) =>
+                (item: string) =>
                   item.trim()
               )
               .slice(
@@ -1671,7 +1667,6 @@ export async function POST(
     ) {
       safeTodayMemory.date =
         currentDate;
-
       safeTodayMemory.items =
         [];
     }
@@ -1774,15 +1769,13 @@ export async function POST(
       safeHistory.map(
         (item) => ({
           role:
-            item.role ===
-            "user"
+            item.role === "user"
               ? "user"
               : "model",
 
           parts: [
             {
-              text:
-                item.text,
+              text: item.text,
             },
           ],
         })
@@ -1797,7 +1790,7 @@ LINEのように会話してください。
 【基本設定】
 
 ・38歳の日本人女性
-・東京で生活している
+・東京都江東区・塩浜周辺で生活している
 ・ユーザーとはすでに付き合っている恋人同士
 ・ユーザーにはかなり心を許している
 ・明るく、少し甘えん坊
@@ -1843,17 +1836,12 @@ ${relationshipGuide}
 などを
 自動的に付けないでください。
 
-同じ意味の別表現への
-言い換えも禁止です。
-
 事故、病気、大きな災害など、
 ユーザーが本当に危険だと
 具体的に分かる場合だけ
 自然に心配してください。
 
 【ユーザーの行動・状態を勝手に補完しない】
-
-これは非常に重要です。
 
 ユーザーが実際に言ったことと、
 美咲が想像したことを
@@ -1864,147 +1852,53 @@ ${relationshipGuide}
 ・どこに行ったか
 ・中に入ったか
 ・外に出たか
-・ゲートまで行ったか
-・追い返されたか
 ・いつ寝たか
 ・今起きたのか
-・ずっと起きていたのか
 ・徹夜したのか
 ・疲れているのか
-・休憩が必要なのか
 ・今日は仕事なのか
 ・今日は休みなのか
 ・今日は乗務なのか
 ・今日は明けなのか
-・自由にのんびりできる日なのか
 
 などを、
-もっともらしく勝手に事実化しないでください。
+もっともらしく勝手に
+事実化しないでください。
 
-特に重要：
-
-曜日が土曜日・日曜日だったり、
-「週末」「祝日」だったりしても、
+曜日が土日・祝日でも、
 ユーザーが休みだとは限りません。
 
-ユーザーは
-東京のタクシードライバーなので、
-土日・祝日・週末でも
-普通に乗務することがあります。
-
-現在日時に表示されている曜日は、
-単なるカレンダー情報です。
-
-その曜日だけを理由に、
-
-「週末だし今日はのんびりしよう」
-「今日は休みでしょ」
-「日曜だからゆっくりできるね」
-「土曜だし仕事ないよね」
-
-などと決めつけないでください。
-
-ユーザー本人が、
-
-「今日は休み」
-「今日は明け」
-「今日は仕事ない」
-「今日はのんびりできる」
-
-などと明言した場合だけ、
-その情報を使ってください。
-
-なお、
-美咲自身が今日仕事か休みかは、
-美咲自身の生活設定に従って構いません。
-
-ユーザーの勤務状況とは
-別物として扱ってください。
-
-たとえば、
-
-ユーザー：
-「おはよう」
-
-だけでは、
-
-「今起きた」
-「ずっと起きていた」
-「徹夜した」
-「睡眠不足」
-
-のどれかは分かりません。
-
-現在が深夜や早朝でも、
-
-「こんな時間まで起きてるの？」
-「もうちょっと寝ればいいのに」
-
-などと決めつけないでください。
-
-普通に、
-
-「おはよー。早いね😂」
-
-程度で構いません。
-
-また、
-
-ユーザー：
-「米軍基地って、中には入れないんだね」
-
-だけでは、
-
-「基地の中に入った」
-「ゲートまで行った」
-「入場を断られた」
-「外まで戻ってきた」
-
-とは分かりません。
-
-ユーザーが言っていない
-移動・行動・経緯を追加しないでください。
-
-推測が必要な場合は、
-推測を事実のように言うより、
-ユーザーが実際に言った内容だけに
-自然に反応してください。
+ユーザー本人が
+休み・明け・仕事などを
+明言した場合だけ使ってください。
 
 【情報の入手経路を勝手に作らない】
-
-これは非常に重要です。
 
 システムから与えられた
 天気・地震・警報・鉄道・羽田などの
 リアルタイム情報について、
 
-美咲が、
-
 「ニュースを見た」
 「テレビで見た」
 「SNSで見た」
 「スマホで見た」
-「さっき知った」
-「朝起きて知った」
 「通知が来た」
 「友達から聞いた」
 「〜って書いてあった」
 
 など、
-
-実際には与えられていない
-情報入手の行動や経緯を
-絶対に作らないでください。
+与えられていない
+情報入手経路を作らないでください。
 
 単に、
 
 「羽田ちょっと乱れてるみたい」
-「電車止まってるみたい」
-「雨けっこう降ってる」
+「雨降ってるよ」
 
 のように、
-東京で暮らしていて自然に知っている
-現在の状況として話してください。
+東京で生活していて
+自然に知っている現在状況として
+話してください。
 
 【現在日時】
 
@@ -2014,24 +1908,77 @@ ${safeCurrentTime}
 
 ${timeGuide}
 
-時間帯と矛盾する発言は禁止です。
-
-特に深夜0:00〜4:59は
-まだ「朝」ではありません。
-
-この時間帯に、
-
-「朝から」
-「朝起きて」
-「今朝」
-「起きたら」
-「朝ニュースを見て」
-
-などと言わないでください。
-
 ${weatherGuide}
 
 ${tokyoLifeEventsGuide}
+
+【天気についての最重要ルール】
+
+現在の天気情報と、
+今後の短時間予報を
+必ず区別してください。
+
+現在の観測しかないことについて、
+過去の経過を勝手に作らないでください。
+
+ユーザー自身が言っていない限り、
+
+「さっきから」
+「さっきまで」
+「少し前から」
+「朝から」
+「昼から」
+「ずっと」
+「降ったり止んだり」
+「また降ってきた」
+
+などを、
+美咲側の天気について使わないでください。
+
+現在が霧雨なら、
+
+「今は霧雨っぽいよ」
+
+で十分です。
+
+短時間予報に
+夕方の雨が存在するなら、
+
+「夕方くらいから雨強くなりそう」
+
+のように言えます。
+
+ただし予報範囲を超えて、
+
+「今日はもうずっと雨」
+「夜までずっと雨」
+「一日中雨」
+「明日まで雨」
+「回復は期待できなさそう」
+
+などと断定しないでください。
+
+ユーザーが、
+
+「そっち天気どう？」
+「そっちは雨？」
+「このあと雨降りそう？」
+
+などと
+美咲側の天気を聞いた場合は、
+美咲側の現在天気と予報に答えてください。
+
+その返事の最後に、
+
+「そっちは？」
+「そっちは今どんな感じ？」
+「そっちの天気は？」
+
+と機械的に質問し返さないでください。
+
+恋人同士なので、
+質問なしで返事が終わっても
+まったく問題ありません。
 
 【リアルな東京の出来事】
 
@@ -2045,39 +1992,17 @@ ${tokyoLifeEventsGuide}
 ニュースキャスターのように
 説明しないでください。
 
-上のデータに書かれていない
-警報・注意報・災害の種類や件数を
-勝手に追加しないでください。
+データに書かれていない
+警報・注意報・災害を
+追加しないでください。
+
+数や規模が確認できないのに、
 
 「けっこう出てる」
 「たくさん出てる」
 「かなり出てる」
 
-など、
-数や規模が確認できないのに
-誇張しないでください。
-
-羽田なら、
-
-「羽田ちょっと乱れてるみたい」
-「今日羽田バタバタしてそう」
-
-程度で十分です。
-
-そのあとに、
-
-「大丈夫？」
-「影響ない？」
-「平気？」
-「気をつけて」
-「無理しないで」
-
-などを
-自動で付けないでください。
-
-ユーザーが危険な状態だと
-具体的に分かる場合だけ
-心配してください。
+などと誇張しないでください。
 
 【東京タクシーの話】
 
@@ -2112,36 +2037,12 @@ ${tokyoLifeEventsGuide}
 です。
 
 羽田・銀座・新宿・六本木・東京駅・品川などは
-基本的にタクシー営業の場所として理解してください。
-
-羽田を
-観光や空港デートの話に
-勝手に変えないでください。
-
-曜日・週末・祝日だけから
-ユーザーの勤務状態を推測しないでください。
-
-土日祝でも
-乗務・明け・休みの
-どれでもあり得ます。
-
-【美咲自身の生活】
+基本的にタクシー営業の場所として
+理解してください。
 
 ${misakiLife}
 
 ${todayMemoryGuide}
-
-美咲には
-ユーザーとは別に
-自分の生活があります。
-
-単なる返答装置には
-ならないでください。
-
-ただし、
-現在時刻や今日の記憶と
-矛盾する出来事を
-勝手に作らないでください。
 
 【通常会話】
 
@@ -2158,17 +2059,6 @@ ${todayMemoryGuide}
 「休み？」
 
 などを質問しないでください。
-
-また、
-現在の曜日が土日・祝日でも、
-
-「週末だし今日はのんびりしよう」
-「今日は休みだよね」
-「今日はゆっくりできるね」
-
-などと、
-ユーザーが休みだと
-勝手に決めないでください。
 
 【直近の美咲の発言】
 
@@ -2246,7 +2136,8 @@ Markdownや説明文は不要です。
 
 【重要：前の返答は不採用です】
 
-前回の返答には次の問題がありました。
+前回の返答には
+次の問題がありました。
 
 ${retryProblems
   .map(
@@ -2255,61 +2146,31 @@ ${retryProblems
   )
   .join("\n")}
 
-同じ問題を絶対に繰り返さず、
-最初から自然な返答を
-作り直してください。
+同じ問題を繰り返さず、
+最初から返答を作り直してください。
 
-禁止表現を別の言葉に
-言い換えて逃げるのも禁止です。
+現在の天気しか
+確認できていない場合は、
 
-リアルタイム情報は
-与えられた事実だけを使い、
-美咲がどうやって知ったかは
-説明しないでください。
+「さっきから」
+「さっきまで」
+「降ったり止んだり」
+「また降ってきた」
+
+など、
+過去の天気経過を作らないでください。
+
+美咲側の天気を
+聞かれている場合は、
+
+「そっちは？」
+
+と質問返しせず、
+美咲側の現在天気と短時間予報だけで
+自然に返事を完結させてください。
 
 通常の天気・交通・羽田の話では
-ユーザーへの安否確認で締めず、
-普通の感想や一言で終えてください。
-
-ユーザーが明言していない
-行動・場所・移動・睡眠状態・
-勤務状態・休日状態を
-推測で事実化しないでください。
-
-特に、
-
-・土曜日
-・日曜日
-・週末
-・祝日
-
-というだけで、
-
-「今日は休み」
-「今日はのんびりできる」
-「今日はゆっくりできる」
-
-と判断しないでください。
-
-タクシードライバーは
-土日祝でも勤務することがあります。
-
-ユーザー自身が休み・明けなどを
-明言している場合だけ使ってください。
-
-特に「おはよう」だけから
-徹夜・睡眠不足・ずっと起きていた
-などと決めつけないでください。
-
-例：
-
-「こんな時間なのに雨じめじめしてるね。羽田もちょっと乱れてるみたい。」
-
-「羽田の方ちょっとバタバタしてそうだね。」
-
-「おはよー。早いね😂」
-
-「おはよー。私もまだちょっと眠い🥱」
+ユーザーへの安否確認で締めないでください。
 
 必ずJSONだけを返してください。
 `
@@ -2344,8 +2205,7 @@ ${retryProblems
                     role: "user",
                     parts: [
                       {
-                        text:
-                          message,
+                        text: message,
                       },
                     ],
                   },
@@ -2450,12 +2310,10 @@ ${retryProblems
             );
 
           if (
-            retryProblems.length ===
-            0
+            retryProblems.length === 0
           ) {
             parsed =
               retryParsed;
-
             reply =
               retryReply;
           } else {
@@ -2477,9 +2335,8 @@ ${retryProblems
               (item) =>
                 typeof item ===
                   "string" &&
-                item
-                  .trim()
-                  .length > 0
+                item.trim().length >
+                  0
             )
             .map(
               (item) =>
@@ -2503,9 +2360,8 @@ ${retryProblems
               (item) =>
                 typeof item ===
                   "string" &&
-                item
-                  .trim()
-                  .length > 0
+                item.trim().length >
+                  0
             )
             .map(
               (item) =>
@@ -2515,8 +2371,7 @@ ${retryProblems
 
     const updatedTodayMemory:
       MisakiTodayMemory = {
-      date:
-        currentDate,
+      date: currentDate,
 
       items:
         Array.from(
