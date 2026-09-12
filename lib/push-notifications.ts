@@ -73,18 +73,19 @@ async function getVapidPublicKey() {
       }
     );
 
-  if (!response.ok) {
-    const text =
-      await response.text();
+  const data =
+    await response
+      .json()
+      .catch(
+        () => ({})
+      );
 
+  if (!response.ok) {
     throw new Error(
-      text ||
+      data?.error ||
         "VAPID公開鍵を取得できませんでした。"
     );
   }
-
-  const data =
-    await response.json();
 
   if (
     !data ||
@@ -100,7 +101,43 @@ async function getVapidPublicKey() {
   return data.publicKey;
 }
 
+async function getCurrentUser() {
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .auth
+      .getSession();
+
+  if (error) {
+    throw error;
+  }
+
+  const user =
+    data
+      .session
+      ?.user;
+
+  if (!user) {
+    throw new Error(
+      "ログイン情報を確認できませんでした。ページを再読み込みしてね。"
+    );
+  }
+
+  return user;
+}
+
 export async function registerPushSubscription() {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
+    throw new Error(
+      "Push通知はブラウザ上でのみ設定できます。"
+    );
+  }
+
   if (
     !(
       "serviceWorker" in
@@ -123,28 +160,29 @@ export async function registerPushSubscription() {
     );
   }
 
-  const {
-    data:
-      sessionData,
-    error:
-      sessionError,
-  } =
-    await supabase.auth.getSession();
+  if (
+    !(
+      "Notification" in
+      window
+    )
+  ) {
+    throw new Error(
+      "このブラウザは通知機能に対応していません。"
+    );
+  }
 
-  if (sessionError) {
-    throw sessionError;
+  if (
+    Notification
+      .permission !==
+    "granted"
+  ) {
+    throw new Error(
+      "通知がまだ許可されていません。"
+    );
   }
 
   const user =
-    sessionData
-      .session
-      ?.user;
-
-  if (!user) {
-    throw new Error(
-      "ログイン情報を確認できませんでした。"
-    );
-  }
+    await getCurrentUser();
 
   const registration =
     await navigator
@@ -175,8 +213,9 @@ export async function registerPushSubscription() {
   }
 
   const json =
-    subscription.toJSON() as
-      PushSubscriptionJson;
+    subscription
+      .toJSON() as
+        PushSubscriptionJson;
 
   const endpoint =
     json.endpoint;
@@ -197,6 +236,10 @@ export async function registerPushSubscription() {
     );
   }
 
+  const now =
+    new Date()
+      .toISOString();
+
   const {
     error,
   } =
@@ -216,15 +259,14 @@ export async function registerPushSubscription() {
           auth,
 
           user_agent:
-            navigator.userAgent,
+            navigator
+              .userAgent,
 
           updated_at:
-            new Date()
-              .toISOString(),
+            now,
 
           last_used_at:
-            new Date()
-              .toISOString(),
+            now,
         },
         {
           onConflict:
@@ -233,20 +275,119 @@ export async function registerPushSubscription() {
       );
 
   if (error) {
-    throw error;
+    console.error(
+      "Push subscription save failed:",
+      error
+    );
+
+    throw new Error(
+      "通知端末の登録に失敗しました。"
+    );
   }
 
   return subscription;
 }
 
+export async function getPushSubscription() {
+  if (
+    typeof window ===
+    "undefined" ||
+    !(
+      "serviceWorker" in
+      navigator
+    ) ||
+    !(
+      "PushManager" in
+      window
+    )
+  ) {
+    return null;
+  }
+
+  const registration =
+    await navigator
+      .serviceWorker
+      .ready;
+
+  return registration
+    .pushManager
+    .getSubscription();
+}
+
+export async function unregisterPushSubscription() {
+  if (
+    typeof window ===
+    "undefined"
+  ) {
+    return;
+  }
+
+  const subscription =
+    await getPushSubscription();
+
+  if (!subscription) {
+    return;
+  }
+
+  const endpoint =
+    subscription
+      .endpoint;
+
+  try {
+    const user =
+      await getCurrentUser();
+
+    const {
+      error,
+    } =
+      await supabase
+        .from(
+          "push_subscriptions"
+        )
+        .delete()
+        .eq(
+          "user_id",
+          user.id
+        )
+        .eq(
+          "endpoint",
+          endpoint
+        );
+
+    if (error) {
+      console.error(
+        "Push subscription delete failed:",
+        error
+      );
+    }
+  } catch (error) {
+    console.error(
+      "Push subscription user lookup failed:",
+      error
+    );
+  }
+
+  try {
+    await subscription
+      .unsubscribe();
+  } catch (error) {
+    console.error(
+      "Browser push unsubscribe failed:",
+      error
+    );
+  }
+}
+
 export async function sendTestPushNotification(
-  accessToken: string
+  accessToken:
+    string
 ) {
   const response =
     await fetch(
       "/api/push/test",
       {
-        method: "POST",
+        method:
+          "POST",
 
         headers: {
           "Content-Type":
