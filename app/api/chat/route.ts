@@ -1,4 +1,7 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 import {
   createTokyoLifeEventsGuide,
   getTokyoLifeEvents,
@@ -123,9 +126,7 @@ function getFirstRow<T>(
 }
 
 async function consumeDailyMessageWithRetry(
-  supabase: ReturnType<
-    typeof createClient
-  >,
+  supabase: SupabaseClient,
   requestId: string
 ) {
   const maxAttempts = 3;
@@ -139,7 +140,9 @@ async function consumeDailyMessageWithRetry(
       data,
       error,
     } =
-      await supabase.rpc(
+      await (
+        supabase.rpc as any
+      )(
         "consume_daily_message",
         {
           p_request_id:
