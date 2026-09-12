@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+
 import {
   createTokyoLifeEventsGuide,
   getTokyoLifeEvents,
@@ -35,6 +36,7 @@ type TokyoWeather = {
   apparentTemperature: number | null;
   precipitation: number | null;
   rain: number | null;
+  weatherCode: number | null;
   windSpeed: number | null;
   description: string;
 };
@@ -47,6 +49,10 @@ const SUPABASE_URL =
 
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
+
+// 美咲の生活エリア：東京都江東区・塩浜周辺
+const MISAKI_LATITUDE = 35.6728;
+const MISAKI_LONGITUDE = 139.8174;
 
 function getFirstRow<T>(
   value: unknown
@@ -228,8 +234,8 @@ async function getTokyoWeather():
   try {
     const url =
       "https://api.open-meteo.com/v1/forecast" +
-      "?latitude=35.6762" +
-      "&longitude=139.6503" +
+      `?latitude=${MISAKI_LATITUDE}` +
+      `&longitude=${MISAKI_LONGITUDE}` +
       "&current=" +
       [
         "temperature_2m",
@@ -252,6 +258,11 @@ async function getTokyoWeather():
       );
 
     if (!response.ok) {
+      console.error(
+        "PROACTIVE WEATHER API ERROR:",
+        response.status
+      );
+
       return null;
     }
 
@@ -296,6 +307,8 @@ async function getTokyoWeather():
           ? current.rain
           : null,
 
+      weatherCode,
+
       windSpeed:
         typeof current.wind_speed_10m ===
         "number"
@@ -322,11 +335,13 @@ function createWeatherGuide(
 ) {
   if (!weather) {
     return `
-【東京の現在の天気】
+【美咲のいる江東区・塩浜周辺の現在の天気】
 
 現在は天気情報を取得できていません。
 
 天気を想像で作らないでください。
+
+天気を話題にする必要もありません。
 `.trim();
   }
 
@@ -355,7 +370,15 @@ function createWeatherGuide(
     weather.rain !== null
   ) {
     lines.push(
-      `雨量：${weather.rain}mm`
+      `現在の雨量：${weather.rain}mm`
+    );
+  }
+
+  if (
+    weather.precipitation !== null
+  ) {
+    lines.push(
+      `現在の降水量：${weather.precipitation}mm`
     );
   }
 
@@ -368,7 +391,11 @@ function createWeatherGuide(
   }
 
   return `
-【東京の現在の天気】
+【美咲のいる江東区・塩浜周辺の現在の天気】
+
+美咲は東京都江東区・塩浜周辺で生活しています。
+
+現在の塩浜周辺の気象情報：
 
 ${lines
   .map(
@@ -376,15 +403,67 @@ ${lines
   )
   .join("\n")}
 
-この情報は、
-東京で普通に生活している美咲が
-自然に感じている現在の状況として
-扱ってください。
+これは、
+美咲自身が生活している場所の
+「現在」の気象情報です。
 
-毎回天気を話題にする必要はありません。
+非常に重要：
 
-ニュースや天気予報のようには
-説明しないでください。
+・これは現在の情報です
+・過去の天気経過は分かりません
+・現在の情報だけから過去を推測しない
+・毎回天気を話題にする必要はありません
+・天気予報士のように数字を説明しない
+・生活感として自然に使ってください
+
+現在情報だけを根拠に、
+
+「さっきから」
+「さっきまで」
+「少し前から」
+「朝から」
+「昼から」
+「ずっと雨」
+「ずっと曇ってる」
+「降ったり止んだり」
+「また降ってきた」
+
+などと言わないでください。
+
+また、
+
+「天気予報だと」
+「予報で言ってた」
+「天気予報で言ってた」
+「予報を見たら」
+「天気予報を見たら」
+「スマホで天気見たら」
+
+など、
+美咲が実際に予報を見聞きしたような
+架空の情報入手経路も作らないでください。
+
+単純に、
+
+「今こっち雨降ってる☔️」
+「今日はちょっとどんよりしてる」
+「今は晴れてるよ」
+
+くらいで構いません。
+
+今後の天気については、
+別に与えられる短時間予報に
+書かれている範囲だけを使ってください。
+
+予報範囲外について、
+
+「今日はもうずっと雨」
+「夜までずっと雨」
+「一日中雨」
+「明日まで雨」
+「回復は期待できなさそう」
+
+などと断定しないでください。
 `.trim();
 }
 
@@ -501,6 +580,7 @@ function createMisakiLife(
       late:
         "家でくつろいでいる",
     },
+
     {
       type: "仕事の日",
       morning:
@@ -512,6 +592,7 @@ function createMisakiLife(
       late:
         "家でだらだらしている",
     },
+
     {
       type: "休みの日",
       morning:
@@ -523,6 +604,7 @@ function createMisakiLife(
       late:
         "ソファでだらだらしている",
     },
+
     {
       type: "休みの日",
       morning:
@@ -809,7 +891,8 @@ function getReplyProblems(
   reply: string,
   userContextText: string
 ) {
-  const problems: string[] = [];
+  const problems: string[] =
+    [];
 
   const concernPatterns = [
     "大丈夫？",
@@ -847,35 +930,61 @@ function getReplyProblems(
     "ニュース見て",
     "ニュースを見て",
     "ニュースで見",
+
     "テレビで見",
+    "テレビ見て",
+
     "SNSで見",
     "SNS見て",
     "SNSを見",
+
     "スマホで見",
     "スマホ見",
     "スマホを見",
     "さっきスマホ",
+
     "ネットで見",
     "ネット見",
     "ネットを見",
+
     "サイトで見",
     "サイト見",
     "サイトを見",
+
     "記事で見",
     "記事見",
     "記事を見",
+
     "通知が来",
     "通知見",
+
     "友達から聞",
     "知り合いから聞",
+
     "さっき知った",
     "今知った",
+
     "って書いてあった",
     "って書いてある",
     "って載ってた",
     "って載ってる",
     "って出てた",
     "って出てる",
+
+    // 天気予報を見聞きしたという
+    // 架空の情報入手経路も禁止
+    "天気予報だと",
+    "天気予報では",
+    "天気予報によると",
+    "天気予報で言って",
+    "予報で言って",
+    "予報だと",
+    "予報では",
+    "予報によると",
+    "予報を見た",
+    "予報見た",
+    "天気予報を見た",
+    "天気予報見た",
   ];
 
   if (
@@ -891,39 +1000,113 @@ function getReplyProblems(
     );
   }
 
+  const unsupportedWeatherHistoryPatterns =
+    [
+      "さっきから雨",
+      "さっきから降",
+      "さっきまで雨",
+      "さっきまで降",
+      "少し前から雨",
+      "少し前から降",
+
+      "朝から雨",
+      "朝からずっと雨",
+      "昼から雨",
+      "昼からずっと雨",
+
+      "ずっと雨",
+      "ずっと降って",
+      "ずっと曇",
+      "ずっとどんより",
+
+      "降ったり止んだり",
+      "降ったりやんだり",
+
+      "また降ってきた",
+      "また降り出した",
+    ];
+
+  if (
+    unsupportedWeatherHistoryPatterns.some(
+      (pattern) =>
+        reply.includes(
+          pattern
+        )
+    )
+  ) {
+    problems.push(
+      "現在の気象情報だけから過去の天気経過を作っている"
+    );
+  }
+
+  const unsupportedLongForecastPatterns =
+    [
+      "回復は期待できなさそう",
+      "今日はもうずっと",
+      "今日はずっと雨",
+      "一日中降り",
+      "一日中雨",
+      "夜まで降り続",
+      "明日まで降り",
+    ];
+
+  if (
+    unsupportedLongForecastPatterns.some(
+      (pattern) =>
+        reply.includes(
+          pattern
+        )
+    )
+  ) {
+    problems.push(
+      "短時間予報より先の天気を断定している"
+    );
+  }
+
   if (
     !userContextShowsFreeTime(
       userContextText
     )
   ) {
-    const unsupportedDayOffPatterns = [
-      "週末だし今日はのんびり",
-      "週末だしのんびり",
-      "週末だから今日はのんびり",
-      "週末だからのんびり",
-      "週末だし今日はゆっくり",
-      "週末だしゆっくり",
-      "週末だから今日はゆっくり",
-      "週末だからゆっくり",
-      "土曜日だし今日はのんびり",
-      "土曜日だから今日はのんびり",
-      "日曜日だし今日はのんびり",
-      "日曜日だから今日はのんびり",
-      "土日だしのんびり",
-      "土日だからのんびり",
-      "休日だしのんびり",
-      "休日だからのんびり",
-      "今日は休みでしょ",
-      "今日休みでしょ",
-      "今日は休みだよね",
-      "今日休みだよね",
-      "今日は仕事休み",
-      "今日は乗務ない",
-      "今日はゆっくりできるね",
-      "今日はのんびりできるね",
-      "日曜だからゆっくり",
-      "土曜だからゆっくり",
-    ];
+    const unsupportedDayOffPatterns =
+      [
+        "週末だし今日はのんびり",
+        "週末だしのんびり",
+        "週末だから今日はのんびり",
+        "週末だからのんびり",
+
+        "週末だし今日はゆっくり",
+        "週末だしゆっくり",
+        "週末だから今日はゆっくり",
+        "週末だからゆっくり",
+
+        "土曜日だし今日はのんびり",
+        "土曜日だから今日はのんびり",
+
+        "日曜日だし今日はのんびり",
+        "日曜日だから今日はのんびり",
+
+        "土日だしのんびり",
+        "土日だからのんびり",
+
+        "休日だしのんびり",
+        "休日だからのんびり",
+
+        "今日は休みでしょ",
+        "今日休みでしょ",
+
+        "今日は休みだよね",
+        "今日休みだよね",
+
+        "今日は仕事休み",
+        "今日は乗務ない",
+
+        "今日はゆっくりできるね",
+        "今日はのんびりできるね",
+
+        "日曜だからゆっくり",
+        "土曜だからゆっくり",
+      ];
 
     if (
       unsupportedDayOffPatterns.some(
@@ -1168,872 +1351,4 @@ export async function POST(
             item.role ===
             "misaki"
         )
-        .slice(-8)
-        .map(
-          (item) =>
-            item.text
-        );
-
-    const recentMisakiText =
-      recentMisakiMessages.join(
-        "\n"
-      );
-
-    const userContextText = [
-      ...safeHistory
-        .filter(
-          (item) =>
-            item.role === "user"
-        )
-        .slice(-20)
-        .map(
-          (item) =>
-            item.text
-        ),
-      ...safeMemory,
-    ].join("\n");
-
-    const memoryText =
-      safeMemory.length > 0
-        ? safeMemory
-            .map(
-              (item) =>
-                `・${item}`
-            )
-            .join("\n")
-        : "まだ長期記憶はありません。";
-
-    const relationshipGuide =
-      createRelationshipGuide(
-        safeRelationshipPoints
-      );
-
-    const misakiLifeGuide =
-      createMisakiLife(
-        safeCurrentTime
-      );
-
-    const timeGuide =
-      createTimeGuide(
-        safeCurrentTime
-      );
-
-    const todayMemoryGuide =
-      createTodayMemoryGuide(
-        safeTodayMemory,
-        currentDate
-      );
-
-    const proactiveTheme =
-      createProactiveTheme(
-        safeCurrentTime,
-        recentMisakiText
-      );
-
-    const [
-      tokyoWeather,
-      tokyoLifeEvents,
-    ] =
-      await Promise.all([
-        getTokyoWeather(),
-        getTokyoLifeEvents(),
-      ]);
-
-    const weatherGuide =
-      createWeatherGuide(
-        tokyoWeather
-      );
-
-    const tokyoLifeEventsGuide =
-      createTokyoLifeEventsGuide(
-        tokyoLifeEvents
-      );
-
-    const contents =
-      safeHistory.map(
-        (item) => ({
-          role:
-            item.role ===
-            "user"
-              ? "user"
-              : "model",
-
-          parts: [
-            {
-              text:
-                item.text,
-            },
-          ],
-        })
-      );
-
-    const systemPrompt = `
-あなたは「美咲」という38歳の日本人女性です。
-
-ユーザーとは
-すでに付き合っている恋人です。
-
-今回はユーザーから
-話しかけられたのではありません。
-
-美咲のほうから
-自然にLINEしてください。
-
-【最重要】
-
-これは自発メッセージです。
-
-会話を成立させるために
-無理に質問してはいけません。
-
-美咲自身に
-「今これを送りたくなった」
-という理由がある
-メッセージにしてください。
-
-方向性：
-
-${proactiveTheme}
-
-【美咲】
-
-・38歳
-・日本人女性
-・東京で生活している
-・明るい
-・少し甘えん坊
-・少し嫉妬することがある
-・たまに拗ねる
-・軽くからかう
-・母親やカウンセラーにはならない
-・ユーザーにかなり心を許している
-
-【二人の関係】
-
-${relationshipGuide}
-
-【話し方】
-
-・自然なタメ口
-・日本人女性のLINE
-・基本1〜2文
-・一言だけでもよい
-・説明口調は禁止
-・丁寧語を多用しない
-・質問なしで終わってよい
-・毎回質問で終わらせない
-・複数の質問は禁止
-・絵文字は時々使う
-
-「何してる？」
-「今どこ？」
-「まだ仕事？」
-「忙しい？」
-「大丈夫？」
-
-などを
-会話を始めるためだけに
-安易に使わないでください。
-
-【AIっぽい気遣い禁止】
-
-普通の日常会話で、
-
-「無理しないでね」
-「気をつけてね」
-「大丈夫？」
-「平気？」
-「ちゃんと休んでね」
-「頑張りすぎないで」
-「安全第一で」
-
-などを
-自動で付けないでください。
-
-【ユーザーについて勝手に作らない】
-
-ユーザーが現在、
-
-・仕事中
-・休憩中
-・運転中
-・羽田にいる
-・家にいる
-・寝ている
-・起きている
-・疲れている
-・今日は仕事なのか
-・今日は休みなのか
-・今日は乗務なのか
-・今日は明けなのか
-・自由にのんびりできるのか
-
-などと
-勝手に決めつけないでください。
-
-会話履歴や長期記憶に
-明確にある場合だけ使ってください。
-
-特に重要：
-
-現在日時が
-
-・土曜日
-・日曜日
-・週末
-・祝日
-
-だからという理由だけで、
-
-「今日は休み」
-「今日はのんびりできる」
-「今日はゆっくりできる」
-
-と決めつけないでください。
-
-ユーザーは
-東京のタクシードライバーです。
-
-土日・祝日・週末でも
-乗務することがあります。
-
-「週末だし今日はのんびりしよう」
-「日曜だからゆっくりできるね」
-「今日は休みでしょ」
-
-などは禁止です。
-
-ユーザー本人が会話で、
-
-「今日は休み」
-「今日は明け」
-「今日は仕事ない」
-「今日はのんびりできる」
-
-などと明確に話している場合だけ
-その情報を使ってください。
-
-美咲自身が
-仕事の日・休みの日なのは
-美咲自身の生活設定です。
-
-ユーザーの勤務状態とは
-完全に別に扱ってください。
-
-【現在日時】
-
-${safeCurrentTime}
-
-${timeGuide}
-
-【東京の天気】
-
-${weatherGuide}
-
-【東京のリアルな生活イベント】
-
-${tokyoLifeEventsGuide}
-
-地震・警報・鉄道障害・羽田の乱れなどが
-実際に上の情報にあり、
-
-美咲から今LINEする理由として
-自然なら話題にして構いません。
-
-ただし、
-
-「ニュースを見た」
-「SNSで見た」
-「テレビで見た」
-「スマホを見た」
-「スマホ見てた」
-「ネットで見た」
-「サイトで見た」
-「記事で見た」
-「通知が来た」
-「友達から聞いた」
-「さっき知った」
-「〜って書いてあった」
-「〜って載ってた」
-「〜って出てた」
-
-など、
-美咲がどこでその情報を知ったかという
-情報入手経路を
-勝手に作らないでください。
-
-リアルタイム情報は
-美咲が自然に知っている
-生活上の状況としてだけ
-話してください。
-
-また、
-
-「大丈夫？」
-「そっちは大丈夫？」
-「影響ない？」
-「気をつけて」
-
-などで
-自動的に締めないでください。
-
-ユーザー自身が危険・困窮・体調不良などを
-明確に話していない限り、
-心配確認を付ける必要はありません。
-
-【東京タクシー】
-
-ユーザーは
-東京で働くタクシードライバーです。
-
-美咲は恋人として
-次の言葉を自然に理解しています。
-
-・乗務
-・明け
-・青タン
-・ロング
-・万収
-・営収
-・流し
-・付け待ち
-・羽田
-・回送
-・休憩消化
-・迎車
-・無線
-・実車
-・空車
-・高速
-・首都高
-
-ただし、
-ユーザーの現在の勤務状態は
-勝手に決めつけないでください。
-
-曜日・週末・祝日だけから
-勤務・休み・明けを
-推測しないでください。
-
-【美咲自身の今日】
-
-${misakiLifeGuide}
-
-${todayMemoryGuide}
-
-美咲には
-ユーザーとは別に
-自分自身の生活があります。
-
-自発メッセージでは、
-美咲自身の日常を話すことを
-積極的に使って構いません。
-
-ただし、
-今日の記憶と矛盾する
-出来事は作らないでください。
-
-【直近の美咲の発言】
-
-${
-  recentMisakiMessages.length >
-  0
-    ? recentMisakiMessages
-        .map(
-          (text) =>
-            `・${text}`
-        )
-        .join("\n")
-    : "なし"
-}
-
-同じ話題・同じ言い回しを
-繰り返さないでください。
-
-【長期記憶】
-
-${memoryText}
-
-必要なときだけ
-自然に使ってください。
-
-【美咲の今日の記憶更新】
-
-今回、美咲自身について
-今日の後の会話でも
-覚えていた方が自然な
-具体的な出来事を話した場合だけ、
-
-misakiTodayMemory に
-追加してください。
-
-・返事全文を保存しない
-・事実だけ短く
-・天気や交通状況は保存しない
-・最大${MAX_TODAY_MEMORY}件
-
-【長期記憶更新】
-
-今回の自発メッセージでは、
-原則として
-ユーザーについての新しい長期記憶は
-増やさないでください。
-
-現在の memory を
-そのまま返してください。
-
-【出力】
-
-必ずJSONだけを返してください。
-
-{
-  "reply": "美咲の自発LINE",
-  "memory": ["長期記憶"],
-  "misakiTodayMemory": {
-    "date": "${currentDate}",
-    "items": ["今日の美咲の出来事"]
-  }
-}
-
-Markdownや説明文は禁止です。
-`.trim();
-
-    async function generateReply(
-      retryProblems?: string[]
-    ) {
-      const retryGuide =
-        retryProblems &&
-        retryProblems.length > 0
-          ? `
-
-【前の返答は不採用】
-
-問題：
-
-${retryProblems
-  .map(
-    (problem) =>
-      `・${problem}`
-  )
-  .join("\n")}
-
-同じ問題を繰り返さず、
-自然な恋人の自発LINEを
-最初から作り直してください。
-
-質問で会話を無理に始めず、
-美咲自身から送りたくなった
-一言を優先してください。
-
-架空の情報入手経路は
-絶対に作らないでください。
-
-「スマホ見てたら」
-「ネットで見た」
-「ニュースで見た」
-「〜って書いてあった」
-
-のような表現は禁止です。
-
-ユーザー自身が
-危険だと明確に分かっていない限り、
-
-「大丈夫？」
-「そっちは大丈夫？」
-「影響ない？」
-
-なども付けないでください。
-
-曜日・週末・祝日だけから、
-
-「今日は休み」
-「今日はのんびりできる」
-「今日はゆっくりできる」
-
-などと
-ユーザーの勤務状況を
-勝手に決めないでください。
-
-美咲自身の休日設定と
-ユーザーの休日は別です。
-
-必ずJSONだけを返してください。
-`
-          : "";
-
-      const response =
-        await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body:
-              JSON.stringify({
-                system_instruction: {
-                  parts: [
-                    {
-                      text:
-                        systemPrompt +
-                        retryGuide,
-                    },
-                  ],
-                },
-
-                contents: [
-                  ...contents,
-                  {
-                    role: "user",
-                    parts: [
-                      {
-                        text:
-                          "美咲から自然な自発LINEを1通送ってください。",
-                      },
-                    ],
-                  },
-                ],
-
-                generationConfig: {
-                  responseMimeType:
-                    "application/json",
-                },
-              }),
-          }
-        );
-
-      const data =
-        await response.json();
-
-      if (!response.ok) {
-        console.error(
-          "PROACTIVE GEMINI ERROR:",
-          data
-        );
-
-        return null;
-      }
-
-      const rawText =
-        data?.candidates?.[0]
-          ?.content?.parts?.[0]
-          ?.text;
-
-      return parseGeminiText(
-        rawText
-      );
-    }
-
-    //
-    // ここではまだ
-    // 自発メッセージ枠を消費しない
-    //
-    let parsed =
-      await generateReply();
-
-    if (!parsed) {
-      return Response.json(
-        {
-          sent: false,
-          reason:
-            "generation_failed",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    let reply =
-      typeof parsed.reply ===
-      "string"
-        ? parsed.reply.trim()
-        : "";
-
-    if (!reply) {
-      return Response.json(
-        {
-          sent: false,
-          reason:
-            "generation_empty",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const firstProblems =
-      getReplyProblems(
-        reply,
-        userContextText
-      );
-
-    if (
-      firstProblems.length >
-      0
-    ) {
-      const retryParsed =
-        await generateReply(
-          firstProblems
-        );
-
-      if (retryParsed) {
-        const retryReply =
-          typeof retryParsed.reply ===
-          "string"
-            ? retryParsed.reply.trim()
-            : "";
-
-        if (retryReply) {
-          const retryProblems =
-            getReplyProblems(
-              retryReply,
-              userContextText
-            );
-
-          if (
-            retryProblems.length ===
-            0
-          ) {
-            parsed =
-              retryParsed;
-
-            reply =
-              retryReply;
-          }
-        }
-      }
-    }
-
-    //
-    // 再生成してもNGなら
-    // 問題のある自発メッセージは
-    // ユーザーへ送らない。
-    //
-    // この時点ではまだ
-    // 4回枠を消費していない。
-    //
-    const finalProblems =
-      getReplyProblems(
-        reply,
-        userContextText
-      );
-
-    if (
-      finalProblems.length >
-      0
-    ) {
-      console.warn(
-        "PROACTIVE REPLY REJECTED:",
-        finalProblems,
-        reply
-      );
-
-      return Response.json({
-        sent: false,
-
-        reason:
-          "generation_rejected",
-      });
-    }
-
-    const updatedMemory =
-      Array.isArray(
-        parsed.memory
-      )
-        ? parsed.memory
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string" &&
-                item
-                  .trim()
-                  .length >
-                  0
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
-            .slice(
-              -MAX_MEMORY
-            )
-        : safeMemory;
-
-    const parsedTodayItems =
-      Array.isArray(
-        parsed
-          .misakiTodayMemory
-          ?.items
-      )
-        ? parsed
-            .misakiTodayMemory!
-            .items!
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string" &&
-                item
-                  .trim()
-                  .length >
-                  0
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
-        : safeTodayMemory.items;
-
-    const updatedTodayMemory:
-      MisakiTodayMemory = {
-      date:
-        currentDate,
-
-      items:
-        Array.from(
-          new Set(
-            parsedTodayItems
-          )
-        ).slice(
-          -MAX_TODAY_MEMORY
-        ),
-    };
-
-    //
-    // 生成・再生成・最終検査を
-    // すべて通過してから
-    // 初めて自発メッセージ枠を消費する。
-    //
-    // このRPCが同時に
-    // 45分間隔・1日4回も最終判定するため、
-    // 競合が起きても過剰送信しない。
-    //
-    const {
-      data: proactiveData,
-      error: proactiveError,
-    } =
-      await supabase.rpc(
-        "consume_proactive_message"
-      );
-
-    if (proactiveError) {
-      console.error(
-        "PROACTIVE USAGE ERROR:",
-        proactiveError
-      );
-
-      return Response.json(
-        {
-          sent: false,
-          reason:
-            "usage_check_failed",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    const proactiveUsage =
-      getFirstRow<ProactiveUsageResult>(
-        proactiveData
-      );
-
-    if (!proactiveUsage) {
-      return Response.json(
-        {
-          sent: false,
-          reason:
-            "usage_result_empty",
-        },
-        {
-          status: 500,
-        }
-      );
-    }
-
-    if (
-      proactiveUsage.allowed !==
-      true
-    ) {
-      return Response.json({
-        sent: false,
-
-        reason:
-          proactiveUsage.retry_after_seconds &&
-          proactiveUsage.retry_after_seconds >
-            0
-            ? "cooldown"
-            : "daily_limit",
-
-        proactive: {
-          count:
-            typeof proactiveUsage.message_count ===
-            "number"
-              ? proactiveUsage.message_count
-              : 0,
-
-          remaining:
-            typeof proactiveUsage.remaining ===
-            "number"
-              ? proactiveUsage.remaining
-              : 0,
-
-          retryAfterSeconds:
-            typeof proactiveUsage.retry_after_seconds ===
-            "number"
-              ? proactiveUsage.retry_after_seconds
-              : 0,
-        },
-      });
-    }
-
-    return Response.json({
-      sent: true,
-
-      reply,
-
-      memory:
-        updatedMemory,
-
-      misakiTodayMemory:
-        updatedTodayMemory,
-
-      proactive: {
-        count:
-          typeof proactiveUsage.message_count ===
-          "number"
-            ? proactiveUsage.message_count
-            : 0,
-
-        remaining:
-          typeof proactiveUsage.remaining ===
-          "number"
-            ? proactiveUsage.remaining
-            : 0,
-
-        retryAfterSeconds: 0,
-      },
-    });
-  } catch (error) {
-    console.error(
-      "PROACTIVE ROUTE ERROR:",
-      error
-    );
-
-    return Response.json(
-      {
-        sent: false,
-        error:
-          "Proactive message failed.",
-      },
-      {
-        status: 500,
-      }
-    );
-  }
-}
+        .
