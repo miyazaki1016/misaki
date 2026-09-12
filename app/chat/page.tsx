@@ -1,7 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { supabase } from "../../lib/supabase";
+import {
+  useEffect,
+  useState,
+} from "react";
+
+import {
+  supabase,
+} from "../../lib/supabase";
+
+import {
+  registerPushSubscription,
+  sendTestPushNotification,
+} from "../../lib/push-notifications";
 
 type ChatMessage = {
   role: "misaki" | "user";
@@ -18,7 +29,9 @@ type MisakiTodayMemory = {
   items: string[];
 };
 
-type Plan = "free" | "premium";
+type Plan =
+  | "free"
+  | "premium";
 
 type UsageRpcResult = {
   message_count?: number;
@@ -32,10 +45,18 @@ type ApiUsage = {
   isPremium?: boolean;
 };
 
-const STORAGE_KEY = "misaki-chat-history";
-const MEMORY_KEY = "misaki-long-term-memory";
-const PROACTIVE_KEY = "misaki-proactive-state";
-const RELATIONSHIP_KEY = "misaki-relationship-points";
+const STORAGE_KEY =
+  "misaki-chat-history";
+
+const MEMORY_KEY =
+  "misaki-long-term-memory";
+
+const PROACTIVE_KEY =
+  "misaki-proactive-state";
+
+const RELATIONSHIP_KEY =
+  "misaki-relationship-points";
+
 const MISAKI_TODAY_MEMORY_KEY =
   "misaki-today-memory";
 
@@ -60,10 +81,11 @@ const PROACTIVE_MAX_DELAY_MS =
   3.5 * 60 * 60 * 1000;
 
 // 1日最大4回
-const MAX_PROACTIVE_PER_DAY = 4;
+const MAX_PROACTIVE_PER_DAY =
+  4;
 
-const INITIAL_MESSAGES: ChatMessage[] =
-  [];
+const INITIAL_MESSAGES:
+  ChatMessage[] = [];
 
 function getRandomProactiveDelayMs() {
   return Math.floor(
@@ -77,53 +99,88 @@ function getRandomProactiveDelayMs() {
 }
 
 function getJapanDateKey() {
-  return new Date().toLocaleDateString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  );
+  return new Date()
+    .toLocaleDateString(
+      "ja-JP",
+      {
+        timeZone:
+          "Asia/Tokyo",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+      }
+    );
 }
 
 function getJapanCurrentTime() {
-  return new Date().toLocaleString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  );
+  return new Date()
+    .toLocaleString(
+      "ja-JP",
+      {
+        timeZone:
+          "Asia/Tokyo",
+
+        year:
+          "numeric",
+
+        month:
+          "2-digit",
+
+        day:
+          "2-digit",
+
+        weekday:
+          "short",
+
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit",
+
+        hour12:
+          false,
+      }
+    );
 }
 
 function createEmptyTodayMemory():
   MisakiTodayMemory {
   return {
-    date: getJapanDateKey(),
+    date:
+      getJapanDateKey(),
+
     items: [],
   };
 }
 
 function isPremiumActive(
-  plan: string | null | undefined,
+  plan:
+    | string
+    | null
+    | undefined,
+
   premiumUntil:
     | string
     | null
     | undefined
 ) {
-  if (plan !== "premium") {
+  if (
+    plan !==
+    "premium"
+  ) {
     return false;
   }
 
-  if (!premiumUntil) {
+  if (
+    !premiumUntil
+  ) {
     return true;
   }
 
@@ -140,22 +197,29 @@ function isPremiumActive(
     return false;
   }
 
-  return expiresAt > Date.now();
+  return (
+    expiresAt >
+    Date.now()
+  );
 }
 
 function getFirstRpcRow<T>(
   value: unknown
 ): T | null {
   if (
-    Array.isArray(value) &&
-    value.length > 0
+    Array.isArray(
+      value
+    ) &&
+    value.length >
+      0
   ) {
     return value[0] as T;
   }
 
   if (
     value &&
-    typeof value === "object"
+    typeof value ===
+      "object"
   ) {
     return value as T;
   }
@@ -167,92 +231,131 @@ export default function ChatPage() {
   const [
     message,
     setMessage,
-  ] = useState("");
+  ] =
+    useState("");
 
   const [
     messages,
     setMessages,
   ] =
-    useState<ChatMessage[]>(
+    useState<
+      ChatMessage[]
+    >(
       INITIAL_MESSAGES
     );
 
   const [
     memory,
     setMemory,
-  ] = useState<string[]>([]);
+  ] =
+    useState<
+      string[]
+    >([]);
 
   const [
     misakiTodayMemory,
     setMisakiTodayMemory,
   ] =
-    useState<MisakiTodayMemory>(
+    useState<
+      MisakiTodayMemory
+    >(
       createEmptyTodayMemory()
     );
 
   const [
     relationshipPoints,
     setRelationshipPoints,
-  ] = useState(0);
+  ] =
+    useState(0);
 
   const [
     dailyUsage,
     setDailyUsage,
   ] =
-    useState<DailyUsage>({
+    useState<
+      DailyUsage
+    >({
       date:
         getJapanDateKey(),
-      count: 0,
+
+      count:
+        0,
     });
 
   const [
     plan,
     setPlan,
   ] =
-    useState<Plan>("free");
+    useState<
+      Plan
+    >(
+      "free"
+    );
 
   const [
     accountLoaded,
     setAccountLoaded,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     showPremium,
     setShowPremium,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     showMemory,
     setShowMemory,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     showMenu,
     setShowMenu,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     loading,
     setLoading,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     loaded,
     setLoaded,
-  ] = useState(false);
+  ] =
+    useState(
+      false
+    );
 
   const [
     notificationPermission,
     setNotificationPermission,
-  ] = useState<
-    | "default"
-    | "granted"
-    | "denied"
-    | "unsupported"
-  >("default");
+  ] =
+    useState<
+      | "default"
+      | "granted"
+      | "denied"
+      | "unsupported"
+    >(
+      "default"
+    );
 
   const isPremium =
-    plan === "premium";
+    plan ===
+    "premium";
 
   const today =
     getJapanDateKey();
@@ -276,627 +379,764 @@ export default function ChatPage() {
     usageCountToday >=
       FREE_DAILY_LIMIT;
 
-  useEffect(() => {
-    let active = true;
+  useEffect(
+    () => {
+      let active =
+        true;
 
-    async function loadEntitlement(
-      userId: string
-    ) {
-      for (
-        let attempt = 0;
-        attempt < 5;
-        attempt += 1
+      async function loadEntitlement(
+        userId:
+          string
       ) {
+        for (
+          let attempt =
+            0;
+          attempt <
+            5;
+          attempt +=
+            1
+        ) {
+          const {
+            data,
+            error,
+          } =
+            await supabase
+              .from(
+                "user_entitlements"
+              )
+              .select(
+                "plan,premium_until"
+              )
+              .eq(
+                "user_id",
+                userId
+              )
+              .maybeSingle();
+
+          if (
+            error
+          ) {
+            throw error;
+          }
+
+          if (
+            data
+          ) {
+            return isPremiumActive(
+              data.plan,
+              data.premium_until
+            );
+          }
+
+          await new Promise(
+            (
+              resolve
+            ) =>
+              window.setTimeout(
+                resolve,
+                350
+              )
+          );
+        }
+
+        return false;
+      }
+
+      async function loadDailyUsage() {
         const {
           data,
           error,
         } =
-          await supabase
-            .from(
-              "user_entitlements"
-            )
-            .select(
-              "plan,premium_until"
-            )
-            .eq(
-              "user_id",
-              userId
-            )
-            .maybeSingle();
+          await supabase.rpc(
+            "get_daily_message_usage"
+          );
 
-        if (error) {
+        if (
+          error
+        ) {
           throw error;
         }
 
-        if (data) {
-          return isPremiumActive(
-            data.plan,
-            data.premium_until
+        const usage =
+          getFirstRpcRow<
+            UsageRpcResult
+          >(
+            data
           );
-        }
 
-        await new Promise(
-          (resolve) =>
-            window.setTimeout(
-              resolve,
-              350
-            )
-        );
-      }
-
-      return false;
-    }
-
-    async function loadDailyUsage() {
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_daily_message_usage"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-      const usage =
-        getFirstRpcRow<UsageRpcResult>(
-          data
-        );
-
-      return {
-        count:
-          typeof usage?.message_count ===
-          "number"
-            ? Math.max(
-                0,
-                Math.floor(
-                  usage.message_count
+        return {
+          count:
+            typeof usage
+              ?.message_count ===
+              "number"
+              ? Math.max(
+                  0,
+                  Math.floor(
+                    usage
+                      .message_count
+                  )
                 )
-              )
-            : 0,
+              : 0,
 
-        isPremium:
-          usage?.is_premium ===
-          true,
-      };
-    }
+          isPremium:
+            usage
+              ?.is_premium ===
+            true,
+        };
+      }
 
-    async function initializeAccount() {
-      try {
-        const {
-          data:
-            sessionData,
-          error:
-            sessionError,
-        } =
-          await supabase.auth.getSession();
-
-        if (
-          sessionError
-        ) {
-          throw sessionError;
-        }
-
-        let user =
-          sessionData
-            .session
-            ?.user ??
-          null;
-
-        if (!user) {
+      async function initializeAccount() {
+        try {
           const {
             data:
-              signInData,
+              sessionData,
             error:
-              signInError,
+              sessionError,
           } =
-            await supabase.auth.signInAnonymously();
+            await supabase
+              .auth
+              .getSession();
 
           if (
-            signInError
+            sessionError
           ) {
-            throw signInError;
+            throw sessionError;
           }
 
-          user =
-            signInData.user ??
+          let user =
+            sessionData
+              .session
+              ?.user ??
             null;
-        }
 
-        if (!user) {
-          throw new Error(
-            "Supabase user was not created."
-          );
-        }
+          if (
+            !user
+          ) {
+            const {
+              data:
+                signInData,
+              error:
+                signInError,
+            } =
+              await supabase
+                .auth
+                .signInAnonymously();
 
-        const [
-          entitlementPremium,
-          usage,
-        ] =
-          await Promise.all([
-            loadEntitlement(
-              user.id
-            ),
-            loadDailyUsage(),
-          ]);
+            if (
+              signInError
+            ) {
+              throw signInError;
+            }
 
-        if (!active) {
-          return;
-        }
+            user =
+              signInData
+                .user ??
+              null;
+          }
 
-        const premium =
-          entitlementPremium ||
-          usage.isPremium;
+          if (
+            !user
+          ) {
+            throw new Error(
+              "Supabase user was not created."
+            );
+          }
 
-        setPlan(
-          premium
-            ? "premium"
-            : "free"
-        );
+          const [
+            entitlementPremium,
+            usage,
+          ] =
+            await Promise
+              .all([
+                loadEntitlement(
+                  user.id
+                ),
 
-        setDailyUsage({
-          date:
-            getJapanDateKey(),
-          count:
-            usage.count,
-        });
-      } catch (error) {
-        console.error(
-          "Supabase account initialization failed:",
-          error
-        );
+                loadDailyUsage(),
+              ]);
 
-        if (active) {
+          if (
+            !active
+          ) {
+            return;
+          }
+
+          const premium =
+            entitlementPremium ||
+            usage
+              .isPremium;
+
           setPlan(
-            "free"
+            premium
+              ? "premium"
+              : "free"
           );
 
           setDailyUsage({
             date:
               getJapanDateKey(),
-            count: 0,
+
+            count:
+              usage.count,
           });
-        }
-      } finally {
-        if (active) {
-          setAccountLoaded(
-            true
+        } catch (
+          error
+        ) {
+          console.error(
+            "Supabase account initialization failed:",
+            error
           );
+
+          if (
+            active
+          ) {
+            setPlan(
+              "free"
+            );
+
+            setDailyUsage({
+              date:
+                getJapanDateKey(),
+
+              count:
+                0,
+            });
+          }
+        } finally {
+          if (
+            active
+          ) {
+            setAccountLoaded(
+              true
+            );
+          }
         }
       }
-    }
 
-    initializeAccount();
+      initializeAccount();
 
-    return () => {
-      active = false;
-    };
-  }, []);
+      return () => {
+        active =
+          false;
+      };
+    },
+    []
+  );
 
-  useEffect(() => {
-    if (
-      !accountLoaded
-    ) {
-      return;
-    }
-
-    if (isPremium) {
-      setShowPremium(
-        false
-      );
-
-      return;
-    }
-
-    if (
-      usageCountToday >=
-      FREE_DAILY_LIMIT
-    ) {
-      setShowPremium(
-        true
-      );
-    }
-  }, [
-    accountLoaded,
-    isPremium,
-    usageCountToday,
-  ]);
-
-  useEffect(() => {
-    if (
-      "serviceWorker" in
-      navigator
-    ) {
-      navigator
-        .serviceWorker
-        .register(
-          "/sw.js"
-        )
-        .then(
-          (
-            registration
-          ) => {
-            console.log(
-              "Service Worker registered:",
-              registration
-            );
-          }
-        )
-        .catch(
-          (error) => {
-            console.error(
-              "Service Worker registration failed:",
-              error
-            );
-          }
-        );
-    }
-  }, []);
-
-  useEffect(() => {
-    if (
-      !(
-        "Notification" in
-        window
-      )
-    ) {
-      setNotificationPermission(
-        "unsupported"
-      );
-
-      return;
-    }
-
-    setNotificationPermission(
-      Notification.permission
-    );
-  }, []);
-
-  useEffect(() => {
-    try {
-      const savedMessages =
-        localStorage.getItem(
-          STORAGE_KEY
-        );
-
-      const savedMemory =
-        localStorage.getItem(
-          MEMORY_KEY
-        );
-
-      const savedRelationship =
-        localStorage.getItem(
-          RELATIONSHIP_KEY
-        );
-
-      const savedTodayMemory =
-        localStorage.getItem(
-          MISAKI_TODAY_MEMORY_KEY
-        );
-
-      let parsedMessages:
-        | ChatMessage[]
-        | null = null;
+  useEffect(
+    () => {
+      if (
+        !accountLoaded
+      ) {
+        return;
+      }
 
       if (
-        savedMessages
+        isPremium
       ) {
-        const parsed =
-          JSON.parse(
-            savedMessages
+        setShowPremium(
+          false
+        );
+
+        return;
+      }
+
+      if (
+        usageCountToday >=
+        FREE_DAILY_LIMIT
+      ) {
+        setShowPremium(
+          true
+        );
+      }
+    },
+    [
+      accountLoaded,
+      isPremium,
+      usageCountToday,
+    ]
+  );
+
+  useEffect(
+    () => {
+      if (
+        "serviceWorker" in
+        navigator
+      ) {
+        navigator
+          .serviceWorker
+          .register(
+            "/sw.js"
+          )
+          .then(
+            (
+              registration
+            ) => {
+              console.log(
+                "Service Worker registered:",
+                registration
+              );
+            }
+          )
+          .catch(
+            (
+              error
+            ) => {
+              console.error(
+                "Service Worker registration failed:",
+                error
+              );
+            }
           );
+      }
+    },
+    []
+  );
+
+  useEffect(
+    () => {
+      if (
+        !(
+          "Notification" in
+          window
+        )
+      ) {
+        setNotificationPermission(
+          "unsupported"
+        );
+
+        return;
+      }
+
+      setNotificationPermission(
+        Notification
+          .permission
+      );
+    },
+    []
+  );
+
+  useEffect(
+    () => {
+      try {
+        const savedMessages =
+          localStorage
+            .getItem(
+              STORAGE_KEY
+            );
+
+        const savedMemory =
+          localStorage
+            .getItem(
+              MEMORY_KEY
+            );
+
+        const savedRelationship =
+          localStorage
+            .getItem(
+              RELATIONSHIP_KEY
+            );
+
+        const savedTodayMemory =
+          localStorage
+            .getItem(
+              MISAKI_TODAY_MEMORY_KEY
+            );
+
+        let parsedMessages:
+          | ChatMessage[]
+          | null =
+          null;
 
         if (
-          Array.isArray(
-            parsed
-          )
+          savedMessages
         ) {
-          parsedMessages =
-            parsed
+          const parsed =
+            JSON.parse(
+              savedMessages
+            );
+
+          if (
+            Array.isArray(
+              parsed
+            )
+          ) {
+            parsedMessages =
+              parsed
+                .filter(
+                  (
+                    item
+                  ) =>
+                    item &&
+                    (
+                      item
+                        .role ===
+                        "user" ||
+                      item
+                        .role ===
+                        "misaki"
+                    ) &&
+                    typeof item
+                      .text ===
+                      "string"
+                )
+                .slice(
+                  -MAX_MESSAGES
+                );
+
+            setMessages(
+              parsedMessages
+            );
+          }
+        }
+
+        if (
+          savedMemory
+        ) {
+          const parsedMemory =
+            JSON.parse(
+              savedMemory
+            );
+
+          if (
+            Array.isArray(
+              parsedMemory
+            )
+          ) {
+            setMemory(
+              parsedMemory
+                .filter(
+                  (
+                    item
+                  ) =>
+                    typeof item ===
+                    "string"
+                )
+            );
+          }
+        }
+
+        if (
+          savedRelationship
+        ) {
+          const parsedPoints =
+            Number(
+              savedRelationship
+            );
+
+          if (
+            Number
+              .isFinite(
+                parsedPoints
+              ) &&
+            parsedPoints >=
+              0
+          ) {
+            setRelationshipPoints(
+              Math.floor(
+                parsedPoints
+              )
+            );
+          }
+        } else if (
+          parsedMessages
+        ) {
+          const previousUserMessages =
+            parsedMessages
               .filter(
                 (
                   item
                 ) =>
-                  item &&
-                  (
-                    item.role ===
-                      "user" ||
-                    item.role ===
-                      "misaki"
-                  ) &&
-                  typeof item.text ===
-                    "string"
+                  item.role ===
+                  "user"
               )
-              .slice(
-                -MAX_MESSAGES
-              );
+              .length;
 
-          setMessages(
-            parsedMessages
-          );
-        }
-      }
-
-      if (
-        savedMemory
-      ) {
-        const parsedMemory =
-          JSON.parse(
-            savedMemory
-          );
-
-        if (
-          Array.isArray(
-            parsedMemory
-          )
-        ) {
-          setMemory(
-            parsedMemory.filter(
-              (
-                item
-              ) =>
-                typeof item ===
-                "string"
-            )
-          );
-        }
-      }
-
-      if (
-        savedRelationship
-      ) {
-        const parsedPoints =
-          Number(
-            savedRelationship
-          );
-
-        if (
-          Number.isFinite(
-            parsedPoints
-          ) &&
-          parsedPoints >= 0
-        ) {
           setRelationshipPoints(
-            Math.floor(
-              parsedPoints
-            )
+            previousUserMessages
           );
         }
-      } else if (
-        parsedMessages
-      ) {
-        const previousUserMessages =
-          parsedMessages.filter(
-            (
-              item
-            ) =>
-              item.role ===
-              "user"
-          ).length;
 
-        setRelationshipPoints(
-          previousUserMessages
-        );
-      }
-
-      const currentDate =
-        getJapanDateKey();
-
-      if (
-        savedTodayMemory
-      ) {
-        const parsedTodayMemory =
-          JSON.parse(
-            savedTodayMemory
-          );
+        const currentDate =
+          getJapanDateKey();
 
         if (
-          parsedTodayMemory &&
-          parsedTodayMemory.date ===
-            currentDate &&
-          Array.isArray(
-            parsedTodayMemory.items
-          )
+          savedTodayMemory
         ) {
+          const parsedTodayMemory =
+            JSON.parse(
+              savedTodayMemory
+            );
+
+          if (
+            parsedTodayMemory &&
+            parsedTodayMemory
+              .date ===
+              currentDate &&
+            Array.isArray(
+              parsedTodayMemory
+                .items
+            )
+          ) {
+            setMisakiTodayMemory({
+              date:
+                currentDate,
+
+              items:
+                parsedTodayMemory
+                  .items
+                  .filter(
+                    (
+                      item:
+                        unknown
+                    ) =>
+                      typeof item ===
+                        "string" &&
+                      item
+                        .trim()
+                        .length >
+                        0
+                  )
+                  .map(
+                    (
+                      item:
+                        string
+                    ) =>
+                      item
+                        .trim()
+                  )
+                  .slice(
+                    -12
+                  ),
+            });
+          } else {
+            setMisakiTodayMemory({
+              date:
+                currentDate,
+
+              items:
+                [],
+            });
+          }
+        } else {
           setMisakiTodayMemory({
             date:
               currentDate,
 
             items:
-              parsedTodayMemory.items
-                .filter(
-                  (
-                    item:
-                      unknown
-                  ) =>
-                    typeof item ===
-                      "string" &&
-                    item
-                      .trim()
-                      .length >
-                      0
-                )
-                .map(
-                  (
-                    item:
-                      string
-                  ) =>
-                    item.trim()
-                )
-                .slice(
-                  -12
-                ),
-          });
-        } else {
-          setMisakiTodayMemory({
-            date:
-              currentDate,
-            items: [],
+              [],
           });
         }
-      } else {
+      } catch (
+        error
+      ) {
+        console.error(
+          "Failed to load saved data:",
+          error
+        );
+
+        const currentDate =
+          getJapanDateKey();
+
         setMisakiTodayMemory({
           date:
             currentDate,
-          items: [],
+
+          items:
+            [],
         });
-      }
-    } catch (error) {
-      console.error(
-        "Failed to load saved data:",
-        error
-      );
-
-      const currentDate =
-        getJapanDateKey();
-
-      setMisakiTodayMemory({
-        date:
-          currentDate,
-        items: [],
-      });
-    } finally {
-      setLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      const limitedMessages =
-        messages.slice(
-          -MAX_MESSAGES
+      } finally {
+        setLoaded(
+          true
         );
+      }
+    },
+    []
+  );
 
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(
-          limitedMessages
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save chat history:",
-        error
-      );
-    }
-  }, [
-    messages,
-    loaded,
-  ]);
-
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(
-        MEMORY_KEY,
-        JSON.stringify(
-          memory
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save memory:",
-        error
-      );
-    }
-  }, [
-    memory,
-    loaded,
-  ]);
-
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      const currentDate =
-        getJapanDateKey();
-
-      const safeTodayMemory =
-        misakiTodayMemory.date ===
-        currentDate
-          ? misakiTodayMemory
-          : {
-              date:
-                currentDate,
-              items: [],
-            };
-
-      localStorage.setItem(
-        MISAKI_TODAY_MEMORY_KEY,
-        JSON.stringify(
-          safeTodayMemory
-        )
-      );
-
+  useEffect(
+    () => {
       if (
-        misakiTodayMemory.date !==
-        currentDate
+        !loaded
       ) {
-        setMisakiTodayMemory(
-          safeTodayMemory
+        return;
+      }
+
+      try {
+        const limitedMessages =
+          messages
+            .slice(
+              -MAX_MESSAGES
+            );
+
+        localStorage
+          .setItem(
+            STORAGE_KEY,
+
+            JSON.stringify(
+              limitedMessages
+            )
+          );
+      } catch (
+        error
+      ) {
+        console.error(
+          "Failed to save chat history:",
+          error
         );
       }
-    } catch (error) {
-      console.error(
-        "Failed to save Misaki today memory:",
-        error
-      );
-    }
-  }, [
-    misakiTodayMemory,
-    loaded,
-  ]);
+    },
+    [
+      messages,
+      loaded,
+    ]
+  );
 
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (
+        !loaded
+      ) {
+        return;
+      }
 
-    try {
-      localStorage.setItem(
-        RELATIONSHIP_KEY,
-        String(
-          relationshipPoints
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save relationship points:",
+      try {
+        localStorage
+          .setItem(
+            MEMORY_KEY,
+
+            JSON.stringify(
+              memory
+            )
+          );
+      } catch (
         error
-      );
-    }
-  }, [
-    relationshipPoints,
-    loaded,
-  ]);
+      ) {
+        console.error(
+          "Failed to save memory:",
+          error
+        );
+      }
+    },
+    [
+      memory,
+      loaded,
+    ]
+  );
+
+  useEffect(
+    () => {
+      if (
+        !loaded
+      ) {
+        return;
+      }
+
+      try {
+        const currentDate =
+          getJapanDateKey();
+
+        const safeTodayMemory =
+          misakiTodayMemory
+            .date ===
+            currentDate
+            ? misakiTodayMemory
+            : {
+                date:
+                  currentDate,
+
+                items:
+                  [],
+              };
+
+        localStorage
+          .setItem(
+            MISAKI_TODAY_MEMORY_KEY,
+
+            JSON.stringify(
+              safeTodayMemory
+            )
+          );
+
+        if (
+          misakiTodayMemory
+            .date !==
+          currentDate
+        ) {
+          setMisakiTodayMemory(
+            safeTodayMemory
+          );
+        }
+      } catch (
+        error
+      ) {
+        console.error(
+          "Failed to save Misaki today memory:",
+          error
+        );
+      }
+    },
+    [
+      misakiTodayMemory,
+      loaded,
+    ]
+  );
+
+  useEffect(
+    () => {
+      if (
+        !loaded
+      ) {
+        return;
+      }
+
+      try {
+        localStorage
+          .setItem(
+            RELATIONSHIP_KEY,
+
+            String(
+              relationshipPoints
+            )
+          );
+      } catch (
+        error
+      ) {
+        console.error(
+          "Failed to save relationship points:",
+          error
+        );
+      }
+    },
+    [
+      relationshipPoints,
+      loaded,
+    ]
+  );
 
   async function getAccessToken() {
     const {
       data,
       error,
     } =
-      await supabase.auth.getSession();
+      await supabase
+        .auth
+        .getSession();
 
-    if (error) {
+    if (
+      error
+    ) {
       throw error;
     }
 
     const accessToken =
-      data.session
+      data
+        .session
         ?.access_token;
 
-    if (!accessToken) {
+    if (
+      !accessToken
+    ) {
       throw new Error(
         "ログイン情報を確認できませんでした。ページを再読み込みしてね。"
       );
@@ -906,7 +1146,8 @@ export default function ChatPage() {
   }
 
   function applyApiUsage(
-    value: unknown
+    value:
+      unknown
   ) {
     if (
       !value ||
@@ -917,10 +1158,12 @@ export default function ChatPage() {
     }
 
     const usage =
-      value as ApiUsage;
+      value as
+        ApiUsage;
 
     if (
-      usage.isPremium ===
+      usage
+        .isPremium ===
       true
     ) {
       setPlan(
@@ -929,10 +1172,12 @@ export default function ChatPage() {
     }
 
     if (
-      typeof usage.messageCount ===
+      typeof usage
+        .messageCount ===
         "number" &&
       Number.isFinite(
-        usage.messageCount
+        usage
+          .messageCount
       )
     ) {
       setDailyUsage({
@@ -942,8 +1187,10 @@ export default function ChatPage() {
         count:
           Math.max(
             0,
+
             Math.floor(
-              usage.messageCount
+              usage
+                .messageCount
             )
           ),
       });
@@ -978,15 +1225,38 @@ export default function ChatPage() {
         "この環境では通知機能を利用できません。"
       );
 
+      setNotificationPermission(
+        "unsupported"
+      );
+
+      return;
+    }
+
+    if (
+      !(
+        "PushManager" in
+        window
+      )
+    ) {
+      alert(
+        "このブラウザはPush通知に対応していません。"
+      );
+
+      setNotificationPermission(
+        "unsupported"
+      );
+
       return;
     }
 
     try {
       await navigator
-        .serviceWorker.ready;
+        .serviceWorker
+        .ready;
 
       const permission =
-        await Notification.requestPermission();
+        await Notification
+          .requestPermission();
 
       setNotificationPermission(
         permission
@@ -994,102 +1264,164 @@ export default function ChatPage() {
 
       if (
         permission ===
-        "granted"
-      ) {
-        alert(
-          "通知を許可しました。美咲から通知を受け取れる準備ができました。"
-        );
-      }
-
-      if (
-        permission ===
         "denied"
       ) {
         alert(
-          "通知が許可されませんでした。iPhoneの設定から通知を許可してください。"
+          "通知が許可されませんでした。端末の設定から美咲の通知を許可してください。"
+        );
+
+        return;
+      }
+
+      if (
+        permission !==
+        "granted"
+      ) {
+        return;
+      }
+
+      await registerPushSubscription();
+
+      const accessToken =
+        await getAccessToken();
+
+      try {
+        await sendTestPushNotification(
+          accessToken
+        );
+
+        alert(
+          "通知をONにしました。今、美咲からテスト通知を送ったよ。"
+        );
+      } catch (
+        testError
+      ) {
+        console.error(
+          "Test push notification failed:",
+          testError
+        );
+
+        alert(
+          "通知端末の登録はできました。テスト通知だけ送信できませんでした。"
         );
       }
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
-        "Notification permission error:",
+        "Push notification setup error:",
         error
       );
 
+      const errorMessage =
+        error instanceof
+        Error
+          ? error.message
+          : "通知の設定に失敗しました。";
+
       alert(
-        "通知の設定に失敗しました。"
+        errorMessage
       );
     }
   }
 
   function resetChat() {
     const confirmed =
-      window.confirm(
-        "美咲との会話履歴をリセットしますか？"
-      );
+      window
+        .confirm(
+          "美咲との会話履歴をリセットしますか？"
+        );
 
-    if (!confirmed) {
+    if (
+      !confirmed
+    ) {
       return;
     }
 
-    localStorage.removeItem(
-      STORAGE_KEY
+    localStorage
+      .removeItem(
+        STORAGE_KEY
+      );
+
+    setMessages(
+      []
     );
 
-    setMessages([]);
-    setMessage("");
-    setShowMenu(false);
+    setMessage(
+      ""
+    );
+
+    setShowMenu(
+      false
+    );
   }
 
   function deleteMemory(
-    index: number
+    index:
+      number
   ) {
     const confirmed =
-      window.confirm(
-        "この記憶を削除しますか？"
-      );
+      window
+        .confirm(
+          "この記憶を削除しますか？"
+        );
 
-    if (!confirmed) {
+    if (
+      !confirmed
+    ) {
       return;
     }
 
     setMemory(
-      (prev) =>
-        prev.filter(
-          (
-            _,
-            i
-          ) =>
-            i !==
-            index
-        )
+      (
+        prev
+      ) =>
+        prev
+          .filter(
+            (
+              _,
+              i
+            ) =>
+              i !==
+              index
+          )
     );
   }
 
   function resetMemory() {
     if (
-      memory.length === 0
+      memory.length ===
+      0
     ) {
       return;
     }
 
     const confirmed =
-      window.confirm(
-        "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
-      );
+      window
+        .confirm(
+          "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
+        );
 
-    if (!confirmed) {
+    if (
+      !confirmed
+    ) {
       return;
     }
 
-    localStorage.removeItem(
-      MEMORY_KEY
-    );
+    localStorage
+      .removeItem(
+        MEMORY_KEY
+      );
 
-    setMemory([]);
+    setMemory(
+      []
+    );
   }
 
   function openPremium() {
-    if (isPremium) {
+    if (
+      isPremium
+    ) {
       return;
     }
 
@@ -1105,7 +1437,8 @@ export default function ChatPage() {
   }
 
   function applyTodayMemory(
-    value: unknown
+    value:
+      unknown
   ) {
     if (
       !value ||
@@ -1117,8 +1450,11 @@ export default function ChatPage() {
 
     const data =
       value as {
-        date?: unknown;
-        items?: unknown;
+        date?:
+          unknown;
+
+        items?:
+          unknown;
       };
 
     const currentDate =
@@ -1135,7 +1471,8 @@ export default function ChatPage() {
     }
 
     const items =
-      data.items
+      data
+        .items
         .filter(
           (
             item:
@@ -1154,7 +1491,8 @@ export default function ChatPage() {
           ) =>
             (
               item as string
-            ).trim()
+            )
+              .trim()
         )
         .slice(
           -12
@@ -1175,7 +1513,8 @@ export default function ChatPage() {
 
   async function sendMessage() {
     const text =
-      message.trim();
+      message
+        .trim();
 
     if (
       !text ||
@@ -1200,7 +1539,9 @@ export default function ChatPage() {
       return;
     }
 
-    setLoading(true);
+    setLoading(
+      true
+    );
 
     try {
       const accessToken =
@@ -1208,7 +1549,9 @@ export default function ChatPage() {
 
       const userMessage:
         ChatMessage = {
-          role: "user",
+          role:
+            "user",
+
           text,
         };
 
@@ -1216,15 +1559,18 @@ export default function ChatPage() {
         [
           ...messages,
           userMessage,
-        ].slice(
-          -MAX_MESSAGES
-        );
+        ]
+          .slice(
+            -MAX_MESSAGES
+          );
 
       setMessages(
         newMessages
       );
 
-      setMessage("");
+      setMessage(
+        ""
+      );
 
       const nextRelationshipPoints =
         relationshipPoints +
@@ -1234,13 +1580,16 @@ export default function ChatPage() {
         getJapanCurrentTime();
 
       const todayMemoryForRequest =
-        misakiTodayMemory.date ===
-        currentDate
+        misakiTodayMemory
+          .date ===
+          currentDate
           ? misakiTodayMemory
           : {
               date:
                 currentDate,
-              items: [],
+
+              items:
+                [],
             };
 
       const res =
@@ -1264,9 +1613,10 @@ export default function ChatPage() {
                   text,
 
                 history:
-                  messages.slice(
-                    -MAX_MESSAGES
-                  ),
+                  messages
+                    .slice(
+                      -MAX_MESSAGES
+                    ),
 
                 memory,
 
@@ -1282,7 +1632,8 @@ export default function ChatPage() {
         );
 
       const data =
-        await res.json();
+        await res
+          .json();
 
       applyApiUsage(
         data?.usage
@@ -1297,28 +1648,33 @@ export default function ChatPage() {
         );
 
         setMessages(
-          (prev) =>
-            prev.filter(
-              (
-                item,
-                index
-              ) =>
-                !(
-                  index ===
-                    prev.length -
-                      1 &&
-                  item.role ===
-                    "user" &&
-                  item.text ===
-                    text
-                )
-            )
+          (
+            prev
+          ) =>
+            prev
+              .filter(
+                (
+                  item,
+                  index
+                ) =>
+                  !(
+                    index ===
+                      prev.length -
+                        1 &&
+                    item.role ===
+                      "user" &&
+                    item.text ===
+                      text
+                  )
+              )
         );
 
         return;
       }
 
-      if (!res.ok) {
+      if (
+        !res.ok
+      ) {
         throw new Error(
           data?.error ||
             "通信に失敗しました"
@@ -1331,19 +1687,21 @@ export default function ChatPage() {
         )
       ) {
         setMemory(
-          data.memory.filter(
-            (
-              item:
-                unknown
-            ) =>
-              typeof item ===
-              "string"
-          )
+          data.memory
+            .filter(
+              (
+                item:
+                  unknown
+              ) =>
+                typeof item ===
+                "string"
+            )
         );
       }
 
       applyTodayMemory(
-        data.misakiTodayMemory
+        data
+          .misakiTodayMemory
       );
 
       setRelationshipPoints(
@@ -1351,9 +1709,12 @@ export default function ChatPage() {
       );
 
       setMessages(
-        (prev) =>
+        (
+          prev
+        ) =>
           [
             ...prev,
+
             {
               role:
                 "misaki" as const,
@@ -1362,31 +1723,40 @@ export default function ChatPage() {
                 data.reply ||
                 "返事を取得できませんでした。",
             },
-          ].slice(
-            -MAX_MESSAGES
-          )
+          ]
+            .slice(
+              -MAX_MESSAGES
+            )
       );
     } catch (
-      error: any
+      error:
+        any
     ) {
       setMessages(
-        (prev) =>
+        (
+          prev
+        ) =>
           [
             ...prev,
+
             {
               role:
                 "misaki" as const,
 
               text:
-                error?.message ||
+                error
+                  ?.message ||
                 "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
             },
-          ].slice(
-            -MAX_MESSAGES
-          )
+          ]
+            .slice(
+              -MAX_MESSAGES
+            )
       );
     } finally {
-      setLoading(false);
+      setLoading(
+        false
+      );
     }
   }
 
@@ -1400,7 +1770,8 @@ export default function ChatPage() {
     }
 
     if (
-      document.visibilityState !==
+      document
+        .visibilityState !==
       "visible"
     ) {
       return;
@@ -1424,18 +1795,27 @@ export default function ChatPage() {
     let state = {
       date:
         currentDate,
-      count: 0,
-      lastSentAt: 0,
-      nextAttemptAt: 0,
+
+      count:
+        0,
+
+      lastSentAt:
+        0,
+
+      nextAttemptAt:
+        0,
     };
 
     try {
       const saved =
-        localStorage.getItem(
-          PROACTIVE_KEY
-        );
+        localStorage
+          .getItem(
+            PROACTIVE_KEY
+          );
 
-      if (saved) {
+      if (
+        saved
+      ) {
         const parsed =
           JSON.parse(
             saved
@@ -1451,26 +1831,33 @@ export default function ChatPage() {
               currentDate,
 
             count:
-              typeof parsed.count ===
-              "number"
+              typeof parsed
+                .count ===
+                "number"
                 ? parsed.count
                 : 0,
 
             lastSentAt:
-              typeof parsed.lastSentAt ===
-              "number"
-                ? parsed.lastSentAt
+              typeof parsed
+                .lastSentAt ===
+                "number"
+                ? parsed
+                    .lastSentAt
                 : 0,
 
             nextAttemptAt:
-              typeof parsed.nextAttemptAt ===
-              "number"
-                ? parsed.nextAttemptAt
+              typeof parsed
+                .nextAttemptAt ===
+                "number"
+                ? parsed
+                    .nextAttemptAt
                 : 0,
           };
         }
       }
-    } catch (error) {
+    } catch (
+      error
+    ) {
       console.error(
         "Failed to load proactive state:",
         error
@@ -1502,13 +1889,16 @@ export default function ChatPage() {
         now +
         getRandomProactiveDelayMs();
 
-      localStorage.setItem(
-        PROACTIVE_KEY,
-        JSON.stringify({
-          ...state,
-          nextAttemptAt,
-        })
-      );
+      localStorage
+        .setItem(
+          PROACTIVE_KEY,
+
+          JSON.stringify({
+            ...state,
+
+            nextAttemptAt,
+          })
+        );
 
       return;
     }
@@ -1528,13 +1918,16 @@ export default function ChatPage() {
         getJapanCurrentTime();
 
       const todayMemoryForRequest =
-        misakiTodayMemory.date ===
-        currentDate
+        misakiTodayMemory
+          .date ===
+          currentDate
           ? misakiTodayMemory
           : {
               date:
                 currentDate,
-              items: [],
+
+              items:
+                [],
             };
 
       const res =
@@ -1555,9 +1948,10 @@ export default function ChatPage() {
             body:
               JSON.stringify({
                 history:
-                  messages.slice(
-                    -MAX_MESSAGES
-                  ),
+                  messages
+                    .slice(
+                      -MAX_MESSAGES
+                    ),
 
                 memory,
 
@@ -1572,9 +1966,12 @@ export default function ChatPage() {
         );
 
       const data =
-        await res.json();
+        await res
+          .json();
 
-      if (!res.ok) {
+      if (
+        !res.ok
+      ) {
         console.error(
           "Proactive message failed:",
           data
@@ -1592,7 +1989,8 @@ export default function ChatPage() {
 
       if (
         !data.reply ||
-        typeof data.reply !==
+        typeof data
+          .reply !==
           "string"
       ) {
         return;
@@ -1604,25 +2002,30 @@ export default function ChatPage() {
         )
       ) {
         setMemory(
-          data.memory.filter(
-            (
-              item:
-                unknown
-            ) =>
-              typeof item ===
-              "string"
-          )
+          data.memory
+            .filter(
+              (
+                item:
+                  unknown
+              ) =>
+                typeof item ===
+                "string"
+            )
         );
       }
 
       applyTodayMemory(
-        data.misakiTodayMemory
+        data
+          .misakiTodayMemory
       );
 
       setMessages(
-        (prev) =>
+        (
+          prev
+        ) =>
           [
             ...prev,
+
             {
               role:
                 "misaki" as const,
@@ -1630,9 +2033,10 @@ export default function ChatPage() {
               text:
                 data.reply,
             },
-          ].slice(
-            -MAX_MESSAGES
-          )
+          ]
+            .slice(
+              -MAX_MESSAGES
+            )
       );
 
       const nextState = {
@@ -1640,7 +2044,8 @@ export default function ChatPage() {
           currentDate,
 
         count:
-          state.count + 1,
+          state.count +
+          1,
 
         lastSentAt:
           now,
@@ -1650,13 +2055,17 @@ export default function ChatPage() {
           getRandomProactiveDelayMs(),
       };
 
-      localStorage.setItem(
-        PROACTIVE_KEY,
-        JSON.stringify(
-          nextState
-        )
-      );
-    } catch (error) {
+      localStorage
+        .setItem(
+          PROACTIVE_KEY,
+
+          JSON.stringify(
+            nextState
+          )
+        );
+    } catch (
+      error
+    ) {
       console.error(
         "Proactive message error:",
         error
@@ -1664,66 +2073,84 @@ export default function ChatPage() {
     }
   }
 
-  useEffect(() => {
-    if (
-      !loaded ||
-      !accountLoaded
-    ) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (
+        !loaded ||
+        !accountLoaded
+      ) {
+        return;
+      }
 
-    sendProactiveMessage();
+      sendProactiveMessage();
 
-    const timer =
-      window.setInterval(
-        () => {
-          sendProactiveMessage();
-        },
-        PROACTIVE_CHECK_MS
-      );
+      const timer =
+        window
+          .setInterval(
+            () => {
+              sendProactiveMessage();
+            },
 
-    return () => {
-      window.clearInterval(
-        timer
-      );
-    };
-  }, [
-    loaded,
-    accountLoaded,
-    loading,
-    message,
-    messages,
-    memory,
-    misakiTodayMemory,
-    relationshipPoints,
-  ]);
+            PROACTIVE_CHECK_MS
+          );
+
+      return () => {
+        window
+          .clearInterval(
+            timer
+          );
+      };
+    },
+    [
+      loaded,
+      accountLoaded,
+      loading,
+      message,
+      messages,
+      memory,
+      misakiTodayMemory,
+      relationshipPoints,
+    ]
+  );
 
   return (
-    <main className="shell">
+    <main
+      className="shell"
+    >
       {/* =========================
           BRAND HEADER
       ========================== */}
 
-      <header className="misakiChatHeader">
+      <header
+        className="misakiChatHeader"
+      >
         <a
           href="/"
           className="misakiHeaderProfile"
           aria-label="美咲のトップページへ"
         >
-          <div className="avatar">
+          <div
+            className="avatar"
+          >
             <img
               src="/icon-192.png"
               alt="美咲"
             />
           </div>
 
-          <div className="misakiHeaderText">
-            <div className="misakiNameRow">
+          <div
+            className="misakiHeaderText"
+          >
+            <div
+              className="misakiNameRow"
+            >
               <h1>
                 美咲
               </h1>
 
-              <span className="misakiAge">
+              <span
+                className="misakiAge"
+              >
                 38
               </span>
             </div>
@@ -1734,7 +2161,9 @@ export default function ChatPage() {
           </div>
         </a>
 
-        <div className="misakiHeaderRight">
+        <div
+          className="misakiHeaderRight"
+        >
           {notificationPermission ===
             "granted" && (
             <span
@@ -1747,7 +2176,10 @@ export default function ChatPage() {
             className="menuButton"
             onClick={() =>
               setShowMenu(
-                (prev) => !prev
+                (
+                  prev
+                ) =>
+                  !prev
               )
             }
             aria-label="メニュー"
@@ -1773,13 +2205,21 @@ export default function ChatPage() {
               }
             />
 
-            <div className="misakiMenu">
-              <div className="misakiMenuTop">
-                <span className="misakiMenuTitle">
+            <div
+              className="misakiMenu"
+            >
+              <div
+                className="misakiMenuTop"
+              >
+                <span
+                  className="misakiMenuTitle"
+                >
                   美咲
                 </span>
 
-                <span className="misakiMenuSignature">
+                <span
+                  className="misakiMenuSignature"
+                >
                   Misaki
                 </span>
               </div>
@@ -1790,17 +2230,22 @@ export default function ChatPage() {
                   "unsupported" && (
                 <button
                   className="menuItem"
-                  onClick={async () => {
-                    await requestNotificationPermission();
-                    setShowMenu(
-                      false
-                    );
-                  }}
+                  onClick={
+                    async () => {
+                      await requestNotificationPermission();
+
+                      setShowMenu(
+                        false
+                      );
+                    }
+                  }
                   disabled={
                     loading
                   }
                 >
-                  <span className="menuIcon">
+                  <span
+                    className="menuIcon"
+                  >
                     ♡
                   </span>
 
@@ -1818,8 +2263,12 @@ export default function ChatPage() {
 
               {notificationPermission ===
                 "granted" && (
-                <div className="menuItem menuItemStatic">
-                  <span className="menuIcon">
+                <div
+                  className="menuItem menuItemStatic"
+                >
+                  <span
+                    className="menuIcon"
+                  >
                     ♡
                   </span>
 
@@ -1839,7 +2288,9 @@ export default function ChatPage() {
                 className="menuItem"
                 onClick={() => {
                   setShowMemory(
-                    (prev) =>
+                    (
+                      prev
+                    ) =>
                       !prev
                   );
 
@@ -1851,7 +2302,9 @@ export default function ChatPage() {
                   loading
                 }
               >
-                <span className="menuIcon">
+                <span
+                  className="menuIcon"
+                >
                   ◌
                 </span>
 
@@ -1879,7 +2332,9 @@ export default function ChatPage() {
                   loading
                 }
               >
-                <span className="menuIcon">
+                <span
+                  className="menuIcon"
+                >
                   ↻
                 </span>
 
@@ -1898,7 +2353,9 @@ export default function ChatPage() {
                 href="/"
                 className="menuItem"
               >
-                <span className="menuIcon">
+                <span
+                  className="menuIcon"
+                >
                   ←
                 </span>
 
@@ -1922,10 +2379,16 @@ export default function ChatPage() {
       ========================== */}
 
       {showMemory && (
-        <section className="memoryPanel">
-          <div className="memoryPanelHeader">
+        <section
+          className="memoryPanel"
+        >
+          <div
+            className="memoryPanelHeader"
+          >
             <div>
-              <span className="memoryEyebrow">
+              <span
+                className="memoryEyebrow"
+              >
                 MEMORY
               </span>
 
@@ -1949,8 +2412,12 @@ export default function ChatPage() {
 
           {memory.length ===
           0 ? (
-            <div className="emptyMemory">
-              <span className="emptyMemoryHeart">
+            <div
+              className="emptyMemory"
+            >
+              <span
+                className="emptyMemoryHeart"
+              >
                 ♡
               </span>
 
@@ -1965,7 +2432,9 @@ export default function ChatPage() {
             </div>
           ) : (
             <>
-              <div className="memoryList">
+              <div
+                className="memoryList"
+              >
                 {memory.map(
                   (
                     item,
@@ -1975,11 +2444,15 @@ export default function ChatPage() {
                       key={`${item}-${index}`}
                       className="memoryItem"
                     >
-                      <span className="memoryBullet">
+                      <span
+                        className="memoryBullet"
+                      >
                         ♡
                       </span>
 
-                      <div className="memoryText">
+                      <div
+                        className="memoryText"
+                      >
                         {item}
                       </div>
 
@@ -2015,7 +2488,9 @@ export default function ChatPage() {
           SAFETY
       ========================== */}
 
-      <section className="notice">
+      <section
+        className="notice"
+      >
         運転中の画面操作はしないでね。
         安全な場所に停車してから話そう。
       </section>
@@ -2024,8 +2499,12 @@ export default function ChatPage() {
           PLAN
       ========================== */}
 
-      <section className="planBar">
-        <div className="planStatus">
+      <section
+        className="planBar"
+      >
+        <div
+          className="planStatus"
+        >
           <span
             className={`planDot ${
               isPremium
@@ -2061,10 +2540,16 @@ export default function ChatPage() {
 
       {showPremium &&
         !isPremium && (
-          <section className="premiumPanel">
-            <div className="premiumPanelTop">
+          <section
+            className="premiumPanel"
+          >
+            <div
+              className="premiumPanelTop"
+            >
               <div>
-                <p className="premiumEyebrow">
+                <p
+                  className="premiumEyebrow"
+                >
                   MISAKI PREMIUM
                 </p>
 
@@ -2087,14 +2572,18 @@ export default function ChatPage() {
               </button>
             </div>
 
-            <p className="premiumDescription">
+            <p
+              className="premiumDescription"
+            >
               会話回数を気にせず、
               美咲との毎日の続きを
               楽しめるようにするプランです。
             </p>
 
             {freeLimitReached && (
-              <div className="premiumLimitMessage">
+              <div
+                className="premiumLimitMessage"
+              >
                 今日は無料分の20回まで話したよ。
               </div>
             )}
@@ -2108,7 +2597,9 @@ export default function ChatPage() {
               プレミアムを始める
             </button>
 
-            <p className="premiumNote">
+            <p
+              className="premiumNote"
+            >
               現在はテスト中のため、
               まだ料金は発生しません。
             </p>
@@ -2119,11 +2610,15 @@ export default function ChatPage() {
           CHAT
       ========================== */}
 
-      <section className="chat">
+      <section
+        className="chat"
+      >
         {messages.length ===
           0 &&
           !loading && (
-            <div className="emptyConversation">
+            <div
+              className="emptyConversation"
+            >
               <img
                 src="/icon-192.png"
                 alt=""
@@ -2145,7 +2640,9 @@ export default function ChatPage() {
             index
           ) => (
             <div
-              key={index}
+              key={
+                index
+              }
               className={`bubble ${
                 item.role ===
                 "user"
@@ -2159,7 +2656,9 @@ export default function ChatPage() {
         )}
 
         {loading && (
-          <div className="bubble typingBubble">
+          <div
+            className="bubble typingBubble"
+          >
             <span />
             <span />
             <span />
@@ -2171,7 +2670,9 @@ export default function ChatPage() {
           INPUT
       ========================== */}
 
-      <section className="inputArea">
+      <section
+        className="inputArea"
+      >
         <input
           value={
             message
@@ -2180,7 +2681,8 @@ export default function ChatPage() {
             e
           ) =>
             setMessage(
-              e.target.value
+              e.target
+                .value
             )
           }
           onKeyDown={(
@@ -2249,18 +2751,45 @@ export default function ChatPage() {
           justify-content: space-between;
           gap: 12px;
           padding:
-            calc(10px + env(safe-area-inset-top))
+            calc(
+              10px +
+              env(
+                safe-area-inset-top
+              )
+            )
             14px
             10px;
-          background: rgba(255, 250, 250, 0.95);
+          background:
+            rgba(
+              255,
+              250,
+              250,
+              0.95
+            );
           border-bottom:
             1px solid
-            rgba(108, 92, 98, 0.08);
+            rgba(
+              108,
+              92,
+              98,
+              0.08
+            );
           box-shadow:
             0 5px 24px
-            rgba(82, 55, 64, 0.055);
-          backdrop-filter: blur(18px);
-          -webkit-backdrop-filter: blur(18px);
+            rgba(
+              82,
+              55,
+              64,
+              0.055
+            );
+          backdrop-filter:
+            blur(
+              18px
+            );
+          -webkit-backdrop-filter:
+            blur(
+              18px
+            );
         }
 
         .misakiHeaderProfile {
@@ -2269,7 +2798,8 @@ export default function ChatPage() {
           align-items: center;
           gap: 11px;
           color: inherit;
-          text-decoration: none;
+          text-decoration:
+            none;
         }
 
         .misakiHeaderText {
@@ -2278,475 +2808,828 @@ export default function ChatPage() {
 
         .misakiNameRow {
           display: flex;
-          align-items: center;
+          align-items:
+            center;
           gap: 7px;
         }
 
         .misakiNameRow h1 {
           margin: 0;
-          color: #49383e;
-          font-size: 18px;
-          line-height: 1.15;
-          font-weight: 800;
-          letter-spacing: 0.05em;
+          color:
+            #49383e;
+          font-size:
+            18px;
+          line-height:
+            1.15;
+          font-weight:
+            800;
+          letter-spacing:
+            0.05em;
         }
 
         .misakiAge {
-          min-width: 25px;
-          height: 18px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 999px;
-          background: #ffd5de;
-          color: #a45365;
-          font-size: 9px;
-          font-weight: 700;
+          min-width:
+            25px;
+          height:
+            18px;
+          display:
+            inline-flex;
+          align-items:
+            center;
+          justify-content:
+            center;
+          border-radius:
+            999px;
+          background:
+            #ffd5de;
+          color:
+            #a45365;
+          font-size:
+            9px;
+          font-weight:
+            700;
         }
 
         .misakiHeaderText p {
-          margin: 4px 0 0;
-          color: #9a8b90;
-          font-size: 10px;
-          white-space: nowrap;
+          margin:
+            4px 0 0;
+          color:
+            #9a8b90;
+          font-size:
+            10px;
+          white-space:
+            nowrap;
         }
 
         .misakiHeaderRight {
-          display: flex;
-          align-items: center;
-          gap: 9px;
+          display:
+            flex;
+          align-items:
+            center;
+          gap:
+            9px;
         }
 
         .notificationDot {
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #ff6680;
+          width:
+            7px;
+          height:
+            7px;
+          border-radius:
+            50%;
+          background:
+            #ff6680;
           box-shadow:
             0 0 0 4px
-            rgba(255, 102, 128, 0.1);
+            rgba(
+              255,
+              102,
+              128,
+              0.1
+            );
         }
 
         .menuButton {
-          width: 40px;
-          height: 40px;
-          padding: 0;
-          border: 0;
-          border-radius: 50%;
-          background: rgba(248, 239, 234, 0.9);
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 3px;
-          cursor: pointer;
+          width:
+            40px;
+          height:
+            40px;
+          padding:
+            0;
+          border:
+            0;
+          border-radius:
+            50%;
+          background:
+            rgba(
+              248,
+              239,
+              234,
+              0.9
+            );
+          display:
+            flex;
+          flex-direction:
+            column;
+          align-items:
+            center;
+          justify-content:
+            center;
+          gap:
+            3px;
+          cursor:
+            pointer;
         }
 
         .menuButton span {
-          width: 4px;
-          height: 4px;
-          border-radius: 50%;
-          background: #6c5c62;
+          width:
+            4px;
+          height:
+            4px;
+          border-radius:
+            50%;
+          background:
+            #6c5c62;
         }
 
         .menuBackdrop {
-          position: fixed;
-          inset: 0;
-          z-index: 70;
-          padding: 0;
-          border: 0;
+          position:
+            fixed;
+          inset:
+            0;
+          z-index:
+            70;
+          padding:
+            0;
+          border:
+            0;
           background:
-            rgba(54, 38, 44, 0.12);
-          backdrop-filter: blur(2px);
+            rgba(
+              54,
+              38,
+              44,
+              0.12
+            );
+          backdrop-filter:
+            blur(
+              2px
+            );
           -webkit-backdrop-filter:
-            blur(2px);
+            blur(
+              2px
+            );
         }
 
         .misakiMenu {
-          position: absolute;
-          z-index: 80;
+          position:
+            absolute;
+          z-index:
+            80;
           top:
             calc(
               64px +
-              env(safe-area-inset-top)
+              env(
+                safe-area-inset-top
+              )
             );
-          right: 12px;
-          width: 285px;
-          overflow: hidden;
+          right:
+            12px;
+          width:
+            285px;
+          overflow:
+            hidden;
           border:
             1px solid
-            rgba(108, 92, 98, 0.08);
-          border-radius: 23px;
+            rgba(
+              108,
+              92,
+              98,
+              0.08
+            );
+          border-radius:
+            23px;
           background:
-            rgba(255, 250, 250, 0.99);
+            rgba(
+              255,
+              250,
+              250,
+              0.99
+            );
           box-shadow:
-            0 24px 60px
-            rgba(67, 44, 52, 0.18);
+            0 24px
+            60px
+            rgba(
+              67,
+              44,
+              52,
+              0.18
+            );
         }
 
         .misakiMenuTop {
-          padding: 17px 18px 13px;
-          display: flex;
-          align-items: center;
+          padding:
+            17px
+            18px
+            13px;
+          display:
+            flex;
+          align-items:
+            center;
           justify-content:
             space-between;
           border-bottom:
             1px solid
-            rgba(108, 92, 98, 0.07);
+            rgba(
+              108,
+              92,
+              98,
+              0.07
+            );
         }
 
         .misakiMenuTitle {
-          color: #49383e;
-          font-size: 13px;
-          font-weight: 800;
+          color:
+            #49383e;
+          font-size:
+            13px;
+          font-weight:
+            800;
         }
 
         .misakiMenuSignature {
-          color: #ff6680;
+          color:
+            #ff6680;
           font-family:
             "Bradley Hand",
             "Segoe Script",
             cursive;
-          font-size: 17px;
-          transform: rotate(-4deg);
+          font-size:
+            17px;
+          transform:
+            rotate(
+              -4deg
+            );
         }
 
         .menuItem {
-          width: 100%;
-          min-height: 59px;
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 10px 16px;
-          border: 0;
+          width:
+            100%;
+          min-height:
+            59px;
+          display:
+            flex;
+          align-items:
+            center;
+          gap:
+            12px;
+          padding:
+            10px
+            16px;
+          border:
+            0;
           border-bottom:
             1px solid
-            rgba(108, 92, 98, 0.055);
-          background: transparent;
-          color: #6c5c62;
-          text-align: left;
-          text-decoration: none;
-          cursor: pointer;
+            rgba(
+              108,
+              92,
+              98,
+              0.055
+            );
+          background:
+            transparent;
+          color:
+            #6c5c62;
+          text-align:
+            left;
+          text-decoration:
+            none;
+          cursor:
+            pointer;
         }
 
         .menuItem:last-child {
-          border-bottom: 0;
+          border-bottom:
+            0;
         }
 
         .menuItem:active {
           background:
-            rgba(255, 213, 222, 0.18);
+            rgba(
+              255,
+              213,
+              222,
+              0.18
+            );
         }
 
         .menuItemStatic {
-          cursor: default;
+          cursor:
+            default;
         }
 
         .menuIcon {
-          width: 31px;
-          height: 31px;
-          flex: 0 0 31px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          background: #fff0f3;
-          color: #e95872;
-          font-size: 15px;
+          width:
+            31px;
+          height:
+            31px;
+          flex:
+            0 0 31px;
+          display:
+            flex;
+          align-items:
+            center;
+          justify-content:
+            center;
+          border-radius:
+            50%;
+          background:
+            #fff0f3;
+          color:
+            #e95872;
+          font-size:
+            15px;
         }
 
         .menuItem strong {
-          display: block;
-          color: #55454b;
-          font-size: 13px;
-          font-weight: 700;
+          display:
+            block;
+          color:
+            #55454b;
+          font-size:
+            13px;
+          font-weight:
+            700;
         }
 
         .menuItem small {
-          display: block;
-          margin-top: 3px;
-          color: #a09297;
-          font-size: 9px;
-          line-height: 1.35;
+          display:
+            block;
+          margin-top:
+            3px;
+          color:
+            #a09297;
+          font-size:
+            9px;
+          line-height:
+            1.35;
         }
 
         .memoryPanel,
         .premiumPanel {
-          margin: 12px 12px 5px;
-          padding: 18px;
+          margin:
+            12px
+            12px
+            5px;
+          padding:
+            18px;
           border:
             1px solid
-            rgba(108, 92, 98, 0.06);
-          border-radius: 22px;
+            rgba(
+              108,
+              92,
+              98,
+              0.06
+            );
+          border-radius:
+            22px;
           background:
-            rgba(255, 255, 255, 0.91);
+            rgba(
+              255,
+              255,
+              255,
+              0.91
+            );
           box-shadow:
-            0 13px 35px
-            rgba(75, 52, 60, 0.07);
+            0 13px
+            35px
+            rgba(
+              75,
+              52,
+              60,
+              0.07
+            );
         }
 
         .memoryPanelHeader,
         .premiumPanelTop {
-          display: flex;
-          align-items: flex-start;
+          display:
+            flex;
+          align-items:
+            flex-start;
           justify-content:
             space-between;
-          gap: 15px;
+          gap:
+            15px;
         }
 
         .memoryEyebrow,
         .premiumEyebrow {
-          display: block;
-          margin: 0 0 5px;
-          color: #ff6680;
-          font-size: 8px;
-          line-height: 1;
-          font-weight: 900;
-          letter-spacing: 0.18em;
+          display:
+            block;
+          margin:
+            0 0 5px;
+          color:
+            #ff6680;
+          font-size:
+            8px;
+          line-height:
+            1;
+          font-weight:
+            900;
+          letter-spacing:
+            0.18em;
         }
 
         .memoryPanel h2,
         .premiumPanel h2 {
-          margin: 0;
-          color: #49383e;
-          font-size: 17px;
-          line-height: 1.45;
+          margin:
+            0;
+          color:
+            #49383e;
+          font-size:
+            17px;
+          line-height:
+            1.45;
         }
 
         .panelClose {
-          width: 32px;
-          height: 32px;
-          flex: 0 0 32px;
-          border: 0;
-          border-radius: 50%;
-          background: #f8efea;
-          color: #85757b;
-          font-size: 18px;
-          cursor: pointer;
+          width:
+            32px;
+          height:
+            32px;
+          flex:
+            0 0 32px;
+          border:
+            0;
+          border-radius:
+            50%;
+          background:
+            #f8efea;
+          color:
+            #85757b;
+          font-size:
+            18px;
+          cursor:
+            pointer;
         }
 
         .emptyMemory {
-          padding: 30px 10px 16px;
-          text-align: center;
+          padding:
+            30px
+            10px
+            16px;
+          text-align:
+            center;
         }
 
         .emptyMemoryHeart {
-          display: block;
-          color: #ff9eaf;
-          font-size: 25px;
+          display:
+            block;
+          color:
+            #ff9eaf;
+          font-size:
+            25px;
         }
 
         .emptyMemory p {
-          margin: 10px 0 0;
-          color: #66565c;
-          font-size: 13px;
+          margin:
+            10px
+            0 0;
+          color:
+            #66565c;
+          font-size:
+            13px;
         }
 
         .emptyMemory small {
-          display: block;
-          margin-top: 5px;
-          color: #a09297;
-          font-size: 9px;
+          display:
+            block;
+          margin-top:
+            5px;
+          color:
+            #a09297;
+          font-size:
+            9px;
         }
 
         .memoryList {
-          margin-top: 15px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
+          margin-top:
+            15px;
+          display:
+            flex;
+          flex-direction:
+            column;
+          gap:
+            8px;
         }
 
         .memoryItem {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          padding: 11px 10px;
-          border-radius: 13px;
-          background: #fff7f8;
+          display:
+            flex;
+          align-items:
+            center;
+          gap:
+            9px;
+          padding:
+            11px
+            10px;
+          border-radius:
+            13px;
+          background:
+            #fff7f8;
         }
 
         .memoryBullet {
-          flex: 0 0 auto;
-          color: #ff8195;
-          font-size: 13px;
+          flex:
+            0 0 auto;
+          color:
+            #ff8195;
+          font-size:
+            13px;
         }
 
         .memoryText {
-          flex: 1;
-          min-width: 0;
-          color: #67575d;
-          font-size: 12px;
-          line-height: 1.55;
+          flex:
+            1;
+          min-width:
+            0;
+          color:
+            #67575d;
+          font-size:
+            12px;
+          line-height:
+            1.55;
         }
 
         .memoryDelete {
-          width: 25px;
-          height: 25px;
-          flex: 0 0 auto;
-          border: 0;
-          border-radius: 50%;
-          background: transparent;
-          color: #ab9ca1;
-          cursor: pointer;
+          width:
+            25px;
+          height:
+            25px;
+          flex:
+            0 0 auto;
+          border:
+            0;
+          border-radius:
+            50%;
+          background:
+            transparent;
+          color:
+            #ab9ca1;
+          cursor:
+            pointer;
         }
 
         .resetMemoryButton {
-          margin-top: 15px;
-          padding: 0;
-          border: 0;
-          background: transparent;
-          color: #a09297;
-          font-size: 10px;
-          text-decoration: underline;
-          cursor: pointer;
+          margin-top:
+            15px;
+          padding:
+            0;
+          border:
+            0;
+          background:
+            transparent;
+          color:
+            #a09297;
+          font-size:
+            10px;
+          text-decoration:
+            underline;
+          cursor:
+            pointer;
         }
 
         .planBar {
-          margin: 7px 14px 5px;
-          display: flex;
-          align-items: center;
+          margin:
+            7px
+            14px
+            5px;
+          display:
+            flex;
+          align-items:
+            center;
           justify-content:
             space-between;
-          gap: 10px;
-          color: #96878c;
-          font-size: 10px;
+          gap:
+            10px;
+          color:
+            #96878c;
+          font-size:
+            10px;
         }
 
         .planStatus {
-          display: flex;
-          align-items: center;
-          gap: 6px;
+          display:
+            flex;
+          align-items:
+            center;
+          gap:
+            6px;
         }
 
         .planDot {
-          width: 5px;
-          height: 5px;
-          border-radius: 50%;
-          background: #d0c4c7;
+          width:
+            5px;
+          height:
+            5px;
+          border-radius:
+            50%;
+          background:
+            #d0c4c7;
         }
 
         .planDot.premium {
-          background: #ff6680;
+          background:
+            #ff6680;
           box-shadow:
             0 0 0 3px
-            rgba(255, 102, 128, 0.1);
+            rgba(
+              255,
+              102,
+              128,
+              0.1
+            );
         }
 
         .premiumLink {
-          padding: 0;
-          border: 0;
-          background: transparent;
-          color: #e95872;
-          font-size: 10px;
-          font-weight: 700;
-          cursor: pointer;
+          padding:
+            0;
+          border:
+            0;
+          background:
+            transparent;
+          color:
+            #e95872;
+          font-size:
+            10px;
+          font-weight:
+            700;
+          cursor:
+            pointer;
         }
 
         .premiumDescription {
-          margin: 14px 0 0;
-          color: #78686e;
-          font-size: 12px;
-          line-height: 1.75;
+          margin:
+            14px
+            0 0;
+          color:
+            #78686e;
+          font-size:
+            12px;
+          line-height:
+            1.75;
         }
 
         .premiumLimitMessage {
-          margin-top: 14px;
-          padding: 10px 12px;
-          border-radius: 12px;
-          background: #fff0f3;
-          color: #a35364;
-          font-size: 11px;
-          font-weight: 700;
+          margin-top:
+            14px;
+          padding:
+            10px
+            12px;
+          border-radius:
+            12px;
+          background:
+            #fff0f3;
+          color:
+            #a35364;
+          font-size:
+            11px;
+          font-weight:
+            700;
         }
 
         .premiumButton {
-          width: 100%;
-          margin-top: 16px;
-          padding: 13px 15px;
-          border: 0;
-          border-radius: 15px;
-          background: #ff6680;
-          color: white;
-          font-size: 14px;
-          font-weight: 800;
+          width:
+            100%;
+          margin-top:
+            16px;
+          padding:
+            13px
+            15px;
+          border:
+            0;
+          border-radius:
+            15px;
+          background:
+            #ff6680;
+          color:
+            white;
+          font-size:
+            14px;
+          font-weight:
+            800;
           box-shadow:
-            0 10px 23px
-            rgba(255, 102, 128, 0.2);
-          cursor: pointer;
+            0 10px
+            23px
+            rgba(
+              255,
+              102,
+              128,
+              0.2
+            );
+          cursor:
+            pointer;
         }
 
         .premiumNote {
-          margin: 9px 0 0;
-          color: #a6989d;
-          text-align: center;
-          font-size: 9px;
+          margin:
+            9px
+            0 0;
+          color:
+            #a6989d;
+          text-align:
+            center;
+          font-size:
+            9px;
         }
 
         .emptyConversation {
-          margin: auto;
+          margin:
+            auto;
           padding:
-            40px 20px 90px;
-          text-align: center;
+            40px
+            20px
+            90px;
+          text-align:
+            center;
         }
 
         .emptyConversation img {
-          width: 69px;
-          height: 69px;
-          margin: 0 auto;
+          width:
+            69px;
+          height:
+            69px;
+          margin:
+            0 auto;
           border:
-            3px solid white;
-          border-radius: 50%;
+            3px solid
+            white;
+          border-radius:
+            50%;
           box-shadow:
-            0 9px 25px
-            rgba(92, 61, 72, 0.12);
+            0 9px
+            25px
+            rgba(
+              92,
+              61,
+              72,
+              0.12
+            );
         }
 
         .emptyConversation p {
-          margin: 17px 0 0;
-          color: #78656d;
+          margin:
+            17px
+            0 0;
+          color:
+            #78656d;
           font-family:
             "Bradley Hand",
             "Segoe Script",
             "Hiragino Sans",
             sans-serif;
-          font-size: 16px;
-          letter-spacing: 0.03em;
+          font-size:
+            16px;
+          letter-spacing:
+            0.03em;
         }
 
         .emptyConversation span {
-          display: inline-block;
-          margin-top: 7px;
-          color: #ff6680;
+          display:
+            inline-block;
+          margin-top:
+            7px;
+          color:
+            #ff6680;
           font-family:
             "Bradley Hand",
             "Segoe Script",
             cursive;
-          font-size: 17px;
-          transform: rotate(-4deg);
+          font-size:
+            17px;
+          transform:
+            rotate(
+              -4deg
+            );
         }
 
         .sendButton {
-          width: 43px !important;
-          min-width: 43px !important;
-          padding: 0 !important;
-          font-size: 17px !important;
+          width:
+            43px !important;
+          min-width:
+            43px !important;
+          padding:
+            0 !important;
+          font-size:
+            17px !important;
         }
 
-        @media (max-width: 390px) {
+        @media (
+          max-width:
+            390px
+        ) {
           .misakiChatHeader {
-            padding-left: 11px;
-            padding-right: 11px;
+            padding-left:
+              11px;
+            padding-right:
+              11px;
           }
 
           .misakiHeaderText p {
-            font-size: 9px;
+            font-size:
+              9px;
           }
 
           .misakiMenu {
-            right: 8px;
+            right:
+              8px;
             width:
-              calc(100vw - 16px);
-            max-width: 285px;
+              calc(
+                100vw -
+                16px
+              );
+            max-width:
+              285px;
           }
         }
       `}</style>
