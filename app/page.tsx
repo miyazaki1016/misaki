@@ -1,2287 +1,819 @@
-"use client";
+import Link from "next/link";
 
-import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
-
-type ChatMessage = {
-  role: "misaki" | "user";
-  text: string;
-};
-
-type DailyUsage = {
-  date: string;
-  count: number;
-};
-
-type MisakiTodayMemory = {
-  date: string;
-  items: string[];
-};
-
-type Plan = "free" | "premium";
-
-type UsageRpcResult = {
-  message_count?: number;
-  remaining?: number;
-  is_premium?: boolean;
-};
-
-type ApiUsage = {
-  messageCount?: number;
-  remaining?: number;
-  isPremium?: boolean;
-};
-
-const STORAGE_KEY = "misaki-chat-history";
-const MEMORY_KEY = "misaki-long-term-memory";
-const PROACTIVE_KEY = "misaki-proactive-state";
-const RELATIONSHIP_KEY = "misaki-relationship-points";
-const MISAKI_TODAY_MEMORY_KEY =
-  "misaki-today-memory";
-
-const MAX_MESSAGES = 60;
-
-// 無料版は1日20往復まで
-const FREE_DAILY_LIMIT = 20;
-
-// 5分ごとに、自発メッセージの予定時刻になったか確認
-const PROACTIVE_CHECK_MS =
-  5 * 60 * 1000;
-
-// 自発メッセージ同士は最低45分空ける
-const PROACTIVE_COOLDOWN_MS =
-  45 * 60 * 1000;
-
-// 次の自発メッセージは
-// 45分〜3時間30分の間でランダム
-const PROACTIVE_MIN_DELAY_MS =
-  45 * 60 * 1000;
-
-const PROACTIVE_MAX_DELAY_MS =
-  3.5 * 60 * 60 * 1000;
-
-// 1日最大4回
-const MAX_PROACTIVE_PER_DAY = 4;
-
-const INITIAL_MESSAGES: ChatMessage[] =
-  [];
-
-function getRandomProactiveDelayMs() {
-  return Math.floor(
-    PROACTIVE_MIN_DELAY_MS +
-      Math.random() *
-        (
-          PROACTIVE_MAX_DELAY_MS -
-          PROACTIVE_MIN_DELAY_MS
-        )
-  );
-}
-
-function getJapanDateKey() {
-  return new Date().toLocaleDateString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-    }
-  );
-}
-
-function getJapanCurrentTime() {
-  return new Date().toLocaleString(
-    "ja-JP",
-    {
-      timeZone: "Asia/Tokyo",
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      weekday: "short",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }
-  );
-}
-
-function createEmptyTodayMemory():
-  MisakiTodayMemory {
-  return {
-    date: getJapanDateKey(),
-    items: [],
-  };
-}
-
-function isPremiumActive(
-  plan: string | null | undefined,
-  premiumUntil:
-    | string
-    | null
-    | undefined
-) {
-  if (plan !== "premium") {
-    return false;
-  }
-
-  if (!premiumUntil) {
-    return true;
-  }
-
-  const expiresAt =
-    new Date(
-      premiumUntil
-    ).getTime();
-
-  if (
-    !Number.isFinite(
-      expiresAt
-    )
-  ) {
-    return false;
-  }
-
-  return expiresAt > Date.now();
-}
-
-function getFirstRpcRow<T>(
-  value: unknown
-): T | null {
-  if (
-    Array.isArray(value) &&
-    value.length > 0
-  ) {
-    return value[0] as T;
-  }
-
-  if (
-    value &&
-    typeof value === "object"
-  ) {
-    return value as T;
-  }
-
-  return null;
-}
-
-export default function Home() {
-  const [
-    message,
-    setMessage,
-  ] = useState("");
-
-  const [
-    messages,
-    setMessages,
-  ] =
-    useState<ChatMessage[]>(
-      INITIAL_MESSAGES
-    );
-
-  const [
-    memory,
-    setMemory,
-  ] = useState<string[]>([]);
-
-  const [
-    misakiTodayMemory,
-    setMisakiTodayMemory,
-  ] =
-    useState<MisakiTodayMemory>(
-      createEmptyTodayMemory()
-    );
-
-  const [
-    relationshipPoints,
-    setRelationshipPoints,
-  ] = useState(0);
-
-  const [
-    dailyUsage,
-    setDailyUsage,
-  ] =
-    useState<DailyUsage>({
-      date:
-        getJapanDateKey(),
-      count: 0,
-    });
-
-  const [
-    plan,
-    setPlan,
-  ] =
-    useState<Plan>("free");
-
-  const [
-    accountLoaded,
-    setAccountLoaded,
-  ] = useState(false);
-
-  const [
-    showPremium,
-    setShowPremium,
-  ] = useState(false);
-
-  const [
-    showMemory,
-    setShowMemory,
-  ] = useState(false);
-
-  const [
-    loading,
-    setLoading,
-  ] = useState(false);
-
-  const [
-    loaded,
-    setLoaded,
-  ] = useState(false);
-
-  const [
-    notificationPermission,
-    setNotificationPermission,
-  ] = useState<
-    | "default"
-    | "granted"
-    | "denied"
-    | "unsupported"
-  >("default");
-
-  const isPremium =
-    plan === "premium";
-
-  const today =
-    getJapanDateKey();
-
-  const usageCountToday =
-    dailyUsage.date ===
-    today
-      ? dailyUsage.count
-      : 0;
-
-  const freeRemaining =
-    Math.max(
-      0,
-      FREE_DAILY_LIMIT -
-        usageCountToday
-    );
-
-  const freeLimitReached =
-    accountLoaded &&
-    !isPremium &&
-    usageCountToday >=
-      FREE_DAILY_LIMIT;
-
-  //
-  // Supabaseユーザー初期化
-  //
-  useEffect(() => {
-    let active = true;
-
-    async function loadEntitlement(
-      userId: string
-    ) {
-      for (
-        let attempt = 0;
-        attempt < 5;
-        attempt += 1
-      ) {
-        const {
-          data,
-          error,
-        } =
-          await supabase
-            .from(
-              "user_entitlements"
-            )
-            .select(
-              "plan,premium_until"
-            )
-            .eq(
-              "user_id",
-              userId
-            )
-            .maybeSingle();
-
-        if (error) {
-          throw error;
-        }
-
-        if (data) {
-          return isPremiumActive(
-            data.plan,
-            data.premium_until
-          );
-        }
-
-        await new Promise(
-          (resolve) =>
-            window.setTimeout(
-              resolve,
-              350
-            )
-        );
-      }
-
-      return false;
-    }
-
-    async function loadDailyUsage() {
-      const {
-        data,
-        error,
-      } =
-        await supabase.rpc(
-          "get_daily_message_usage"
-        );
-
-      if (error) {
-        throw error;
-      }
-
-      const usage =
-        getFirstRpcRow<UsageRpcResult>(
-          data
-        );
-
-      return {
-        count:
-          typeof usage?.message_count ===
-          "number"
-            ? Math.max(
-                0,
-                Math.floor(
-                  usage.message_count
-                )
-              )
-            : 0,
-
-        isPremium:
-          usage?.is_premium ===
-          true,
-      };
-    }
-
-    async function initializeAccount() {
-      try {
-        const {
-          data:
-            sessionData,
-          error:
-            sessionError,
-        } =
-          await supabase.auth.getSession();
-
-        if (
-          sessionError
-        ) {
-          throw sessionError;
-        }
-
-        let user =
-          sessionData
-            .session
-            ?.user ??
-          null;
-
-        if (!user) {
-          const {
-            data:
-              signInData,
-            error:
-              signInError,
-          } =
-            await supabase.auth.signInAnonymously();
-
-          if (
-            signInError
-          ) {
-            throw signInError;
-          }
-
-          user =
-            signInData.user ??
-            null;
-        }
-
-        if (!user) {
-          throw new Error(
-            "Supabase user was not created."
-          );
-        }
-
-        const [
-          entitlementPremium,
-          usage,
-        ] =
-          await Promise.all([
-            loadEntitlement(
-              user.id
-            ),
-            loadDailyUsage(),
-          ]);
-
-        if (!active) {
-          return;
-        }
-
-        const premium =
-          entitlementPremium ||
-          usage.isPremium;
-
-        setPlan(
-          premium
-            ? "premium"
-            : "free"
-        );
-
-        setDailyUsage({
-          date:
-            getJapanDateKey(),
-          count:
-            usage.count,
-        });
-      } catch (error) {
-        console.error(
-          "Supabase account initialization failed:",
-          error
-        );
-
-        if (active) {
-          setPlan(
-            "free"
-          );
-
-          setDailyUsage({
-            date:
-              getJapanDateKey(),
-            count: 0,
-          });
-        }
-      } finally {
-        if (active) {
-          setAccountLoaded(
-            true
-          );
-        }
-      }
-    }
-
-    initializeAccount();
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  //
-  // プレミアム状態
-  //
-  useEffect(() => {
-    if (
-      !accountLoaded
-    ) {
-      return;
-    }
-
-    if (isPremium) {
-      setShowPremium(
-        false
-      );
-      return;
-    }
-
-    if (
-      usageCountToday >=
-      FREE_DAILY_LIMIT
-    ) {
-      setShowPremium(
-        true
-      );
-    }
-  }, [
-    accountLoaded,
-    isPremium,
-    usageCountToday,
-  ]);
-
-  //
-  // Service Worker
-  //
-  useEffect(() => {
-    if (
-      "serviceWorker" in
-      navigator
-    ) {
-      navigator
-        .serviceWorker
-        .register(
-          "/sw.js"
-        )
-        .then(
-          (
-            registration
-          ) => {
-            console.log(
-              "Service Worker registered:",
-              registration
-            );
-          }
-        )
-        .catch(
-          (error) => {
-            console.error(
-              "Service Worker registration failed:",
-              error
-            );
-          }
-        );
-    }
-  }, []);
-
-  //
-  // 通知権限確認
-  //
-  useEffect(() => {
-    if (
-      !(
-        "Notification" in
-        window
-      )
-    ) {
-      setNotificationPermission(
-        "unsupported"
-      );
-      return;
-    }
-
-    setNotificationPermission(
-      Notification.permission
-    );
-  }, []);
-
-  //
-  // 保存データ読み込み
-  //
-  useEffect(() => {
-    try {
-      const savedMessages =
-        localStorage.getItem(
-          STORAGE_KEY
-        );
-
-      const savedMemory =
-        localStorage.getItem(
-          MEMORY_KEY
-        );
-
-      const savedRelationship =
-        localStorage.getItem(
-          RELATIONSHIP_KEY
-        );
-
-      const savedTodayMemory =
-        localStorage.getItem(
-          MISAKI_TODAY_MEMORY_KEY
-        );
-
-      let parsedMessages:
-        | ChatMessage[]
-        | null = null;
-
-      if (
-        savedMessages
-      ) {
-        const parsed =
-          JSON.parse(
-            savedMessages
-          );
-
-        if (
-          Array.isArray(
-            parsed
-          )
-        ) {
-          parsedMessages =
-            parsed
-              .filter(
-                (
-                  item
-                ) =>
-                  item &&
-                  (item.role ===
-                    "user" ||
-                    item.role ===
-                      "misaki") &&
-                  typeof item.text ===
-                    "string"
-              )
-              .slice(
-                -MAX_MESSAGES
-              );
-
-          setMessages(
-            parsedMessages
-          );
-        }
-      }
-
-      if (
-        savedMemory
-      ) {
-        const parsedMemory =
-          JSON.parse(
-            savedMemory
-          );
-
-        if (
-          Array.isArray(
-            parsedMemory
-          )
-        ) {
-          setMemory(
-            parsedMemory.filter(
-              (
-                item
-              ) =>
-                typeof item ===
-                "string"
-            )
-          );
-        }
-      }
-
-      if (
-        savedRelationship
-      ) {
-        const parsedPoints =
-          Number(
-            savedRelationship
-          );
-
-        if (
-          Number.isFinite(
-            parsedPoints
-          ) &&
-          parsedPoints >= 0
-        ) {
-          setRelationshipPoints(
-            Math.floor(
-              parsedPoints
-            )
-          );
-        }
-      } else if (
-        parsedMessages
-      ) {
-        const previousUserMessages =
-          parsedMessages.filter(
-            (
-              item
-            ) =>
-              item.role ===
-              "user"
-          ).length;
-
-        setRelationshipPoints(
-          previousUserMessages
-        );
-      }
-
-      const currentDate =
-        getJapanDateKey();
-
-      if (
-        savedTodayMemory
-      ) {
-        const parsedTodayMemory =
-          JSON.parse(
-            savedTodayMemory
-          );
-
-        if (
-          parsedTodayMemory &&
-          parsedTodayMemory.date ===
-            currentDate &&
-          Array.isArray(
-            parsedTodayMemory.items
-          )
-        ) {
-          setMisakiTodayMemory({
-            date:
-              currentDate,
-            items:
-              parsedTodayMemory.items
-                .filter(
-                  (
-                    item:
-                      unknown
-                  ) =>
-                    typeof item ===
-                      "string" &&
-                    item
-                      .trim()
-                      .length >
-                      0
-                )
-                .map(
-                  (
-                    item:
-                      string
-                  ) =>
-                    item.trim()
-                )
-                .slice(
-                  -12
-                ),
-          });
-        } else {
-          setMisakiTodayMemory({
-            date:
-              currentDate,
-            items: [],
-          });
-        }
-      } else {
-        setMisakiTodayMemory({
-          date:
-            currentDate,
-          items: [],
-        });
-      }
-    } catch (error) {
-      console.error(
-        "Failed to load saved data:",
-        error
-      );
-
-      const currentDate =
-        getJapanDateKey();
-
-      setMisakiTodayMemory({
-        date:
-          currentDate,
-        items: [],
-      });
-    } finally {
-      setLoaded(true);
-    }
-  }, []);
-
-  //
-  // 会話履歴保存
-  //
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      const limitedMessages =
-        messages.slice(
-          -MAX_MESSAGES
-        );
-
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify(
-          limitedMessages
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save chat history:",
-        error
-      );
-    }
-  }, [
-    messages,
-    loaded,
-  ]);
-
-  //
-  // 長期記憶保存
-  //
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(
-        MEMORY_KEY,
-        JSON.stringify(
-          memory
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save memory:",
-        error
-      );
-    }
-  }, [
-    memory,
-    loaded,
-  ]);
-
-  //
-  // 美咲の今日の記憶保存
-  //
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      const currentDate =
-        getJapanDateKey();
-
-      const safeTodayMemory =
-        misakiTodayMemory.date ===
-        currentDate
-          ? misakiTodayMemory
-          : {
-              date:
-                currentDate,
-              items: [],
-            };
-
-      localStorage.setItem(
-        MISAKI_TODAY_MEMORY_KEY,
-        JSON.stringify(
-          safeTodayMemory
-        )
-      );
-
-      if (
-        misakiTodayMemory.date !==
-        currentDate
-      ) {
-        setMisakiTodayMemory(
-          safeTodayMemory
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Failed to save Misaki today memory:",
-        error
-      );
-    }
-  }, [
-    misakiTodayMemory,
-    loaded,
-  ]);
-
-  //
-  // 関係性ポイント保存
-  //
-  useEffect(() => {
-    if (!loaded) {
-      return;
-    }
-
-    try {
-      localStorage.setItem(
-        RELATIONSHIP_KEY,
-        String(
-          relationshipPoints
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to save relationship points:",
-        error
-      );
-    }
-  }, [
-    relationshipPoints,
-    loaded,
-  ]);
-
-  async function getAccessToken() {
-    const {
-      data,
-      error,
-    } =
-      await supabase.auth.getSession();
-
-    if (error) {
-      throw error;
-    }
-
-    const accessToken =
-      data.session
-        ?.access_token;
-
-    if (!accessToken) {
-      throw new Error(
-        "ログイン情報を確認できませんでした。ページを再読み込みしてね。"
-      );
-    }
-
-    return accessToken;
-  }
-
-  function applyApiUsage(
-    value: unknown
-  ) {
-    if (
-      !value ||
-      typeof value !==
-        "object"
-    ) {
-      return;
-    }
-
-    const usage =
-      value as ApiUsage;
-
-    if (
-      usage.isPremium ===
-      true
-    ) {
-      setPlan(
-        "premium"
-      );
-    }
-
-    if (
-      typeof usage.messageCount ===
-        "number" &&
-      Number.isFinite(
-        usage.messageCount
-      )
-    ) {
-      setDailyUsage({
-        date:
-          getJapanDateKey(),
-        count:
-          Math.max(
-            0,
-            Math.floor(
-              usage.messageCount
-            )
-          ),
-      });
-    }
-  }
-
-  async function requestNotificationPermission() {
-    if (
-      !(
-        "Notification" in
-        window
-      )
-    ) {
-      alert(
-        "この環境では通知機能を利用できません。"
-      );
-
-      setNotificationPermission(
-        "unsupported"
-      );
-
-      return;
-    }
-
-    if (
-      !(
-        "serviceWorker" in
-        navigator
-      )
-    ) {
-      alert(
-        "この環境では通知機能を利用できません。"
-      );
-
-      return;
-    }
-
-    try {
-      await navigator
-        .serviceWorker.ready;
-
-      const permission =
-        await Notification.requestPermission();
-
-      setNotificationPermission(
-        permission
-      );
-
-      if (
-        permission ===
-        "granted"
-      ) {
-        alert(
-          "通知を許可しました。美咲から通知を受け取れる準備ができました。"
-        );
-      }
-
-      if (
-        permission ===
-        "denied"
-      ) {
-        alert(
-          "通知が許可されませんでした。iPhoneの設定から通知を許可してください。"
-        );
-      }
-    } catch (error) {
-      console.error(
-        "Notification permission error:",
-        error
-      );
-
-      alert(
-        "通知の設定に失敗しました。"
-      );
-    }
-  }
-
-  function resetChat() {
-    const confirmed =
-      window.confirm(
-        "美咲との会話履歴をリセットしますか？"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    localStorage.removeItem(
-      STORAGE_KEY
-    );
-
-    setMessages([]);
-    setMessage("");
-  }
-
-  function deleteMemory(
-    index: number
-  ) {
-    const confirmed =
-      window.confirm(
-        "この記憶を削除しますか？"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    setMemory(
-      (prev) =>
-        prev.filter(
-          (
-            _,
-            i
-          ) =>
-            i !==
-            index
-        )
-    );
-  }
-
-  function resetMemory() {
-    if (
-      memory.length === 0
-    ) {
-      return;
-    }
-
-    const confirmed =
-      window.confirm(
-        "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
-      );
-
-    if (!confirmed) {
-      return;
-    }
-
-    localStorage.removeItem(
-      MEMORY_KEY
-    );
-
-    setMemory([]);
-  }
-
-  function openPremium() {
-    if (isPremium) {
-      return;
-    }
-
-    setShowPremium(
-      true
-    );
-  }
-
-  function startPremium() {
-    alert(
-      "プレミアム決済は次の工程で接続します。今はまだ料金は発生しません。"
-    );
-  }
-
-  function applyTodayMemory(
-    value: unknown
-  ) {
-    if (
-      !value ||
-      typeof value !==
-        "object"
-    ) {
-      return;
-    }
-
-    const data =
-      value as {
-        date?: unknown;
-        items?: unknown;
-      };
-
-    const currentDate =
-      getJapanDateKey();
-
-    if (
-      data.date !==
-        currentDate ||
-      !Array.isArray(
-        data.items
-      )
-    ) {
-      return;
-    }
-
-    const items =
-      data.items
-        .filter(
-          (
-            item:
-              unknown
-          ) =>
-            typeof item ===
-              "string" &&
-            item
-              .trim()
-              .length >
-              0
-        )
-        .map(
-          (
-            item
-          ) =>
-            (
-              item as string
-            ).trim()
-        )
-        .slice(
-          -12
-        );
-
-    setMisakiTodayMemory({
-      date:
-        currentDate,
-      items:
-        Array.from(
-          new Set(
-            items
-          )
-        ),
-    });
-  }
-
-  async function sendMessage() {
-    const text =
-      message.trim();
-
-    if (
-      !text ||
-      loading ||
-      !accountLoaded
-    ) {
-      return;
-    }
-
-    const currentDate =
-      getJapanDateKey();
-
-    if (
-      !isPremium &&
-      usageCountToday >=
-        FREE_DAILY_LIMIT
-    ) {
-      setShowPremium(
-        true
-      );
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const accessToken =
-        await getAccessToken();
-
-      const userMessage:
-        ChatMessage = {
-          role: "user",
-          text,
-        };
-
-      const newMessages =
-        [
-          ...messages,
-          userMessage,
-        ].slice(
-          -MAX_MESSAGES
-        );
-
-      setMessages(
-        newMessages
-      );
-
-      setMessage("");
-
-      const nextRelationshipPoints =
-        relationshipPoints +
-        1;
-
-      const currentTime =
-        getJapanCurrentTime();
-
-      const todayMemoryForRequest =
-        misakiTodayMemory.date ===
-        currentDate
-          ? misakiTodayMemory
-          : {
-              date:
-                currentDate,
-              items: [],
-            };
-
-      const res =
-        await fetch(
-          "/api/chat",
-          {
-            method:
-              "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-
-              Authorization:
-                `Bearer ${accessToken}`,
-            },
-
-            body:
-              JSON.stringify({
-                message:
-                  text,
-
-                history:
-                  messages.slice(
-                    -MAX_MESSAGES
-                  ),
-
-                memory,
-
-                misakiTodayMemory:
-                  todayMemoryForRequest,
-
-                currentTime,
-
-                relationshipPoints:
-                  nextRelationshipPoints,
-              }),
-          }
-        );
-
-      const data =
-        await res.json();
-
-      applyApiUsage(
-        data?.usage
-      );
-
-      if (
-        res.status ===
-        429
-      ) {
-        setShowPremium(
-          true
-        );
-
-        setMessages(
-          (prev) =>
-            prev.filter(
-              (
-                item,
-                index
-              ) =>
-                !(
-                  index ===
-                    prev.length -
-                      1 &&
-                  item.role ===
-                    "user" &&
-                  item.text ===
-                    text
-                )
-            )
-        );
-
-        return;
-      }
-
-      if (!res.ok) {
-        throw new Error(
-          data?.error ||
-            "通信に失敗しました"
-        );
-      }
-
-      if (
-        Array.isArray(
-          data.memory
-        )
-      ) {
-        setMemory(
-          data.memory.filter(
-            (
-              item:
-                unknown
-            ) =>
-              typeof item ===
-              "string"
-          )
-        );
-      }
-
-      applyTodayMemory(
-        data.misakiTodayMemory
-      );
-
-      setRelationshipPoints(
-        nextRelationshipPoints
-      );
-
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                data.reply ||
-                "返事を取得できませんでした。",
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
-      );
-    } catch (
-      error: any
-    ) {
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                error?.message ||
-                "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function sendProactiveMessage() {
-    if (
-      loading ||
-      !loaded ||
-      !accountLoaded
-    ) {
-      return;
-    }
-
-    if (
-      document.visibilityState !==
-      "visible"
-    ) {
-      return;
-    }
-
-    if (
-      message
-        .trim()
-        .length >
-      0
-    ) {
-      return;
-    }
-
-    const now =
-      Date.now();
-
-    const currentDate =
-      getJapanDateKey();
-
-    let state = {
-      date:
-        currentDate,
-      count: 0,
-      lastSentAt: 0,
-      nextAttemptAt: 0,
-    };
-
-    try {
-      const saved =
-        localStorage.getItem(
-          PROACTIVE_KEY
-        );
-
-      if (saved) {
-        const parsed =
-          JSON.parse(
-            saved
-          );
-
-        if (
-          parsed &&
-          parsed.date ===
-            currentDate
-        ) {
-          state = {
-            date:
-              currentDate,
-
-            count:
-              typeof parsed.count ===
-              "number"
-                ? parsed.count
-                : 0,
-
-            lastSentAt:
-              typeof parsed.lastSentAt ===
-              "number"
-                ? parsed.lastSentAt
-                : 0,
-
-            nextAttemptAt:
-              typeof parsed.nextAttemptAt ===
-              "number"
-                ? parsed.nextAttemptAt
-                : 0,
-          };
-        }
-      }
-    } catch (error) {
-      console.error(
-        "Failed to load proactive state:",
-        error
-      );
-    }
-
-    if (
-      state.count >=
-      MAX_PROACTIVE_PER_DAY
-    ) {
-      return;
-    }
-
-    if (
-      state.lastSentAt >
-        0 &&
-      now -
-        state.lastSentAt <
-        PROACTIVE_COOLDOWN_MS
-    ) {
-      return;
-    }
-
-    //
-    // 次の予定時刻がまだ決まっていなければ、
-    // 45分〜3時間30分後をランダムで予約
-    //
-    if (
-      state.nextAttemptAt <=
-      0
-    ) {
-      const nextAttemptAt =
-        now +
-        getRandomProactiveDelayMs();
-
-      localStorage.setItem(
-        PROACTIVE_KEY,
-        JSON.stringify({
-          ...state,
-          nextAttemptAt,
-        })
-      );
-
-      return;
-    }
-
-    //
-    // まだランダム予定時刻になっていなければ
-    // 何もしない
-    //
-    if (
-      now <
-      state.nextAttemptAt
-    ) {
-      return;
-    }
-
-    try {
-      const accessToken =
-        await getAccessToken();
-
-      const currentTime =
-        getJapanCurrentTime();
-
-      const todayMemoryForRequest =
-        misakiTodayMemory.date ===
-        currentDate
-          ? misakiTodayMemory
-          : {
-              date:
-                currentDate,
-              items: [],
-            };
-
-      const res =
-        await fetch(
-          "/api/proactive",
-          {
-            method:
-              "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-
-              Authorization:
-                `Bearer ${accessToken}`,
-            },
-
-            body:
-              JSON.stringify({
-                history:
-                  messages.slice(
-                    -MAX_MESSAGES
-                  ),
-
-                memory,
-
-                misakiTodayMemory:
-                  todayMemoryForRequest,
-
-                currentTime,
-
-                relationshipPoints,
-              }),
-          }
-        );
-
-      const data =
-        await res.json();
-
-      if (!res.ok) {
-        console.error(
-          "Proactive message failed:",
-          data
-        );
-
-        return;
-      }
-
-      if (
-        data.sent ===
-        false
-      ) {
-        return;
-      }
-
-      if (
-        !data.reply ||
-        typeof data.reply !==
-          "string"
-      ) {
-        return;
-      }
-
-      if (
-        Array.isArray(
-          data.memory
-        )
-      ) {
-        setMemory(
-          data.memory.filter(
-            (
-              item:
-                unknown
-            ) =>
-              typeof item ===
-              "string"
-          )
-        );
-      }
-
-      applyTodayMemory(
-        data.misakiTodayMemory
-      );
-
-      setMessages(
-        (prev) =>
-          [
-            ...prev,
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                data.reply,
-            },
-          ].slice(
-            -MAX_MESSAGES
-          )
-      );
-
-      //
-      // 送信に成功したら、
-      // 次回のランダム予定時刻を決める
-      //
-      const nextState = {
-        date:
-          currentDate,
-
-        count:
-          state.count + 1,
-
-        lastSentAt:
-          now,
-
-        nextAttemptAt:
-          now +
-          getRandomProactiveDelayMs(),
-      };
-
-      localStorage.setItem(
-        PROACTIVE_KEY,
-        JSON.stringify(
-          nextState
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Proactive message error:",
-        error
-      );
-    }
-  }
-
-  useEffect(() => {
-    if (
-      !loaded ||
-      !accountLoaded
-    ) {
-      return;
-    }
-
-    //
-    // 最初の予定時刻を
-    // ページ表示後すぐに決める。
-    // 実際の送信は45分〜3時間30分後。
-    //
-    sendProactiveMessage();
-
-    const timer =
-      window.setInterval(
-        () => {
-          sendProactiveMessage();
-        },
-        PROACTIVE_CHECK_MS
-      );
-
-    return () => {
-      window.clearInterval(
-        timer
-      );
-    };
-  }, [
-    loaded,
-    accountLoaded,
-    loading,
-    message,
-    messages,
-    memory,
-    misakiTodayMemory,
-    relationshipPoints,
-  ]);
-
+export default function HomePage() {
   return (
-    <main className="shell">
-      <section className="card">
-        <div className="avatar">
-          <img
-            src="/icon-192.png"
-            alt="美咲"
-          />
-        </div>
+    <>
+      <main className="lp">
+        <header className="header">
+          <div className="brand">
+            <img
+              src="/icon-192.png"
+              alt="美咲"
+              className="brandIcon"
+            />
 
-        <div>
-          <h1>美咲</h1>
+            <div>
+              <div className="brandName">
+                美咲
+              </div>
 
-          <p>
-            タクドラの彼女・38歳
-          </p>
-        </div>
-
-        <div
-          style={{
-            marginLeft:
-              "auto",
-            display:
-              "flex",
-            gap:
-              "8px",
-            alignItems:
-              "center",
-            flexWrap:
-              "wrap",
-            justifyContent:
-              "flex-end",
-          }}
-        >
-          {notificationPermission !==
-            "granted" &&
-            notificationPermission !==
-              "unsupported" && (
-              <button
-                onClick={
-                  requestNotificationPermission
-                }
-                disabled={
-                  loading
-                }
-                style={{
-                  border:
-                    "none",
-                  background:
-                    "#ff6b81",
-                  color:
-                    "#ffffff",
-                  borderRadius:
-                    "999px",
-                  padding:
-                    "7px 10px",
-                  fontSize:
-                    "12px",
-                  cursor:
-                    "pointer",
-                }}
-              >
-                通知をON
-              </button>
-            )}
-
-          {notificationPermission ===
-            "granted" && (
-            <span
-              style={{
-                fontSize:
-                  "12px",
-                opacity:
-                  0.6,
-              }}
-            >
-              通知ON
-            </span>
-          )}
-
-          <button
-            onClick={() =>
-              setShowMemory(
-                (prev) =>
-                  !prev
-              )
-            }
-            disabled={
-              loading
-            }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
-              opacity:
-                0.7,
-            }}
-          >
-            美咲の記憶
-          </button>
-
-          <button
-            onClick={
-              resetChat
-            }
-            disabled={
-              loading
-            }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              fontSize:
-                "12px",
-              cursor:
-                "pointer",
-              opacity:
-                0.6,
-            }}
-          >
-            会話をリセット
-          </button>
-        </div>
-      </section>
-
-      {showMemory && (
-        <section
-          style={{
-            margin:
-              "12px 0",
-            padding:
-              "14px",
-            borderRadius:
-              "14px",
-            background:
-              "rgba(255,255,255,0.8)",
-            boxShadow:
-              "0 2px 10px rgba(0,0,0,0.06)",
-          }}
-        >
-          <div
-            style={{
-              display:
-                "flex",
-              alignItems:
-                "center",
-              justifyContent:
-                "space-between",
-              marginBottom:
-                "10px",
-            }}
-          >
-            <strong>
-              美咲が覚えていること
-            </strong>
-
-            {memory.length >
-              0 && (
-              <button
-                onClick={
-                  resetMemory
-                }
-                style={{
-                  border:
-                    "none",
-                  background:
-                    "transparent",
-                  fontSize:
-                    "12px",
-                  cursor:
-                    "pointer",
-                  opacity:
-                    0.6,
-                }}
-              >
-                すべて削除
-              </button>
-            )}
+              <div className="brandSub">
+                あなたの38歳の彼女
+              </div>
+            </div>
           </div>
 
-          {memory.length ===
-          0 ? (
-            <p
-              style={{
-                fontSize:
-                  "14px",
-                opacity:
-                  0.6,
-                margin: 0,
-              }}
-            >
-              まだ覚えていることはないよ。
-            </p>
-          ) : (
-            <div
-              style={{
-                display:
-                  "flex",
-                flexDirection:
-                  "column",
-                gap:
-                  "8px",
-              }}
-            >
-              {memory.map(
-                (
-                  item,
-                  index
-                ) => (
-                  <div
-                    key={`${item}-${index}`}
-                    style={{
-                      display:
-                        "flex",
-                      gap:
-                        "8px",
-                      alignItems:
-                        "center",
-                      padding:
-                        "10px",
-                      borderRadius:
-                        "10px",
-                      background:
-                        "rgba(255,255,255,0.9)",
-                    }}
-                  >
-                    <div
-                      style={{
-                        flex: 1,
-                        fontSize:
-                          "14px",
-                        lineHeight:
-                          1.5,
-                      }}
-                    >
-                      {item}
-                    </div>
-
-                    <button
-                      onClick={() =>
-                        deleteMemory(
-                          index
-                        )
-                      }
-                      style={{
-                        border:
-                          "none",
-                        background:
-                          "transparent",
-                        cursor:
-                          "pointer",
-                        fontSize:
-                          "12px",
-                        opacity:
-                          0.6,
-                      }}
-                    >
-                      削除
-                    </button>
-                  </div>
-                )
-              )}
-            </div>
-          )}
-        </section>
-      )}
-
-      <section className="notice">
-        運転中の画面操作はしないでね。安全な場所に停車してから話そう。
-      </section>
-
-      <section
-        style={{
-          display:
-            "flex",
-          justifyContent:
-            "space-between",
-          alignItems:
-            "center",
-          gap:
-            "10px",
-          margin:
-            "8px 12px 10px",
-          fontSize:
-            "12px",
-          opacity:
-            0.7,
-        }}
-      >
-        <span>
-          {!accountLoaded
-            ? "プラン確認中..."
-            : isPremium
-              ? "プレミアム利用中"
-              : `無料版・今日あと${freeRemaining}回`}
-        </span>
-
-        {!isPremium && (
-          <button
-            onClick={
-              openPremium
-            }
-            style={{
-              border:
-                "none",
-              background:
-                "transparent",
-              padding: 0,
-              fontSize:
-                "12px",
-              fontWeight:
-                700,
-              cursor:
-                "pointer",
-              textDecoration:
-                "underline",
-            }}
+          <Link
+            href="/chat"
+            className="headerButton"
           >
-            プレミアム
-          </button>
-        )}
-      </section>
+            話してみる
+          </Link>
+        </header>
 
-      {showPremium &&
-        !isPremium && (
-        <section
-          style={{
-            margin:
-              "10px 12px 14px",
-            padding:
-              "18px",
-            borderRadius:
-              "18px",
-            background:
-              "#ffffff",
-            boxShadow:
-              "0 4px 18px rgba(0,0,0,0.08)",
-          }}
-        >
-          <div
-            style={{
-              display:
-                "flex",
-              justifyContent:
-                "space-between",
-              gap:
-                "12px",
-              alignItems:
-                "flex-start",
-            }}
-          >
-            <div>
-              <strong
-                style={{
-                  fontSize:
-                    "17px",
-                }}
-              >
-                美咲プレミアム
-              </strong>
+        <section className="hero">
+          <div className="heroInner">
+            <div className="heroCopy">
+              <div className="badge">
+                毎日の何気ない会話を。
+              </div>
 
-              <p
-                style={{
-                  margin:
-                    "8px 0 0",
-                  fontSize:
-                    "14px",
-                  lineHeight:
-                    1.6,
-                }}
+              <h1>
+                彼女のほうから、
+                <br />
+                <span>
+                  ふと話しかけてくる。
+                </span>
+              </h1>
+
+              <p className="heroText">
+                美咲は38歳。
+                <br />
+                ただ質問に答えるだけじゃない。
+                <br />
+                あなたとの会話を覚えて、
+                時間や天気を感じながら、
+                恋人みたいに自然に話します。
+              </p>
+
+              <Link
+                href="/chat"
+                className="mainCta"
               >
-                もっと美咲と話したい人向けのプランです。
-                会話回数を気にせず、美咲との関係を続けられるようにします。
+                美咲と無料で話す
+              </Link>
+
+              <p className="smallNote">
+                登録なしですぐ開始・無料版は1日20回まで
               </p>
             </div>
 
-            <button
-              onClick={() =>
-                setShowPremium(
-                  false
-                )
-              }
-              style={{
-                border:
-                  "none",
-                background:
-                  "transparent",
-                cursor:
-                  "pointer",
-                fontSize:
-                  "18px",
-              }}
-            >
-              ×
-            </button>
-          </div>
+            <div className="phoneWrap">
+              <div className="phone">
+                <div className="phoneHeader">
+                  <img
+                    src="/icon-192.png"
+                    alt=""
+                  />
 
-          {freeLimitReached && (
-            <p
-              style={{
-                margin:
-                  "14px 0 0",
-                fontSize:
-                  "13px",
-                fontWeight:
-                  700,
-              }}
-            >
-              今日は無料分の20回まで話したよ。
-            </p>
-          )}
+                  <div>
+                    <strong>
+                      美咲
+                    </strong>
 
-          <button
-            onClick={
-              startPremium
-            }
-            style={{
-              width:
-                "100%",
-              marginTop:
-                "16px",
-              border:
-                "none",
-              borderRadius:
-                "14px",
-              padding:
-                "13px 16px",
-              background:
-                "#ff6b81",
-              color:
-                "#ffffff",
-              fontSize:
-                "15px",
-              fontWeight:
-                700,
-              cursor:
-                "pointer",
-            }}
-          >
-            プレミアムを始める
-          </button>
+                    <span>
+                      38歳
+                    </span>
+                  </div>
+                </div>
 
-          <p
-            style={{
-              margin:
-                "9px 0 0",
-              textAlign:
-                "center",
-              fontSize:
-                "11px",
-              opacity:
-                0.55,
-            }}
-          >
-            現在はテスト中のため、まだ料金は発生しません。
-          </p>
-        </section>
-      )}
+                <div className="chatArea">
+                  <div className="bubble misaki">
+                    おはよー。
+                    まだちょっと眠い…
+                    今日どんよりしてるね☁️
+                  </div>
 
-      <section className="chat">
-        {messages.map(
-          (
-            item,
-            index
-          ) => (
-            <div
-              key={
-                index
-              }
-              className={`bubble ${
-                item.role ===
-                "user"
-                  ? "user"
-                  : ""
-              }`}
-            >
-              {item.text}
+                  <div className="bubble user">
+                    今日は乗務だよ
+                  </div>
+
+                  <div className="bubble misaki">
+                    そっか、乗務なんだ。
+                    無理しすぎないでね。
+                    羽田いいの引けるといいね😂
+                  </div>
+
+                  <div className="timeLabel">
+                    しばらくして…
+                  </div>
+
+                  <div className="bubble misaki">
+                    なんか急に話したくなった。
+                    今なにしてる？
+                  </div>
+                </div>
+
+                <div className="fakeInput">
+                  美咲に話しかける...
+                </div>
+              </div>
             </div>
-          )
-        )}
-
-        {loading && (
-          <div className="bubble typingBubble">
-            <span></span>
-            <span></span>
-            <span></span>
           </div>
-        )}
-      </section>
+        </section>
 
-      <section className="inputArea">
-        <input
-          value={
-            message
-          }
-          onChange={(
-            e
-          ) =>
-            setMessage(
-              e.target
-                .value
-            )
-          }
-          onKeyDown={(
-            e
-          ) => {
-            if (
-              e.key ===
-              "Enter"
-            ) {
-              sendMessage();
-            }
-          }}
-          placeholder={
-            !accountLoaded
-              ? "準備中..."
-              : freeLimitReached
-                ? "今日は無料分を使い切りました"
-                : "美咲に話しかける..."
-          }
-          disabled={
-            loading ||
-            !accountLoaded ||
-            freeLimitReached
-          }
-        />
+        <section className="section">
+          <div className="sectionTitle">
+            <span>
+              AIと話している感じを、
+              <br className="mobileBreak" />
+              できるだけなくしました。
+            </span>
+          </div>
 
-        <button
-          onClick={
-            freeLimitReached
-              ? openPremium
-              : sendMessage
+          <div className="featureGrid">
+            <div className="featureCard">
+              <div className="featureEmoji">
+                💬
+              </div>
+
+              <h2>
+                会話を覚えている
+              </h2>
+
+              <p>
+                前に話したことを覚えているから、
+                毎回ゼロから自己紹介する必要はありません。
+                少しずつ二人の関係が続いていきます。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureEmoji">
+                ⏰
+              </div>
+
+              <h2>
+                今の時間を感じて話す
+              </h2>
+
+              <p>
+                朝・昼・夜や東京の天気など、
+                今の状況を感じながら会話。
+                いつ話しても同じ返事ではありません。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureEmoji">
+                ❤️
+              </div>
+
+              <h2>
+                恋人らしい距離感
+              </h2>
+
+              <p>
+                褒めてばかりでも、
+                何でも肯定するだけでもありません。
+                甘えたり、少し拗ねたり、
+                冗談を言ったりします。
+              </p>
+            </div>
+
+            <div className="featureCard">
+              <div className="featureEmoji">
+                📱
+              </div>
+
+              <h2>
+                美咲から話しかける
+              </h2>
+
+              <p>
+                あなたから話しかけるだけではなく、
+                チャットを開いていると、
+                美咲のほうからふとメッセージが届くこともあります。
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="conversationSection">
+          <div className="conversationInner">
+            <div className="conversationCopy">
+              <p className="eyebrow">
+                たとえば、こんな毎日
+              </p>
+
+              <h2>
+                用事がなくても、
+                <br />
+                話したくなる相手。
+              </h2>
+
+              <p>
+                「おはよう」
+                <br />
+                「疲れた」
+                <br />
+                「今日ロング引いた」
+                <br />
+                「眠い」
+                <br />
+                <br />
+                そんな一言で十分です。
+              </p>
+            </div>
+
+            <div className="sampleChat">
+              <div className="bubble misaki">
+                今日どうだった？
+              </div>
+
+              <div className="bubble user">
+                青タン全然ダメだった笑
+              </div>
+
+              <div className="bubble misaki">
+                うわ、それ地味にへこむやつ😂
+                今日はもう帰って私に愚痴っていいよ。
+              </div>
+
+              <div className="bubble user">
+                やさしいじゃん
+              </div>
+
+              <div className="bubble misaki">
+                たまにはね。
+                毎日は期待しないで？笑
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="freeSection">
+          <div className="freeCard">
+            <p className="eyebrow">
+              まずは無料で
+            </p>
+
+            <h2>
+              今日から美咲と
+              <br />
+              話してみませんか？
+            </h2>
+
+            <p>
+              無料版でも1日20回まで会話できます。
+              <br />
+              気に入ったら、そのまま続きを楽しめます。
+            </p>
+
+            <Link
+              href="/chat"
+              className="mainCta"
+            >
+              美咲に会いにいく
+            </Link>
+
+            <p className="smallNote">
+              今すぐ無料で開始できます
+            </p>
+          </div>
+        </section>
+
+        <footer>
+          <div className="footerBrand">
+            美咲
+          </div>
+
+          <p>
+            日常に、もうひとつの会話を。
+          </p>
+
+          <p className="copyright">
+            © 2026 Misaki
+          </p>
+        </footer>
+      </main>
+
+      <style>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        html {
+          scroll-behavior: smooth;
+        }
+
+        body {
+          margin: 0;
+          background: #fff8fa;
+          color: #2b2427;
+          font-family:
+            -apple-system,
+            BlinkMacSystemFont,
+            "Hiragino Sans",
+            "Yu Gothic",
+            "Meiryo",
+            sans-serif;
+        }
+
+        a {
+          text-decoration: none;
+        }
+
+        .lp {
+          min-height: 100vh;
+          overflow: hidden;
+        }
+
+        .header {
+          width: min(1120px, calc(100% - 32px));
+          margin: 0 auto;
+          height: 76px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .brandIcon {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          object-fit: cover;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .brandName {
+          font-size: 18px;
+          line-height: 1.2;
+          font-weight: 800;
+        }
+
+        .brandSub {
+          margin-top: 3px;
+          font-size: 11px;
+          color: #8b7c82;
+        }
+
+        .headerButton {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 105px;
+          height: 40px;
+          padding: 0 18px;
+          border-radius: 999px;
+          background: #ff6680;
+          color: white;
+          font-size: 14px;
+          font-weight: 700;
+          box-shadow: 0 5px 16px rgba(255,102,128,0.25);
+        }
+
+        .hero {
+          position: relative;
+          padding: 72px 20px 92px;
+          background:
+            radial-gradient(
+              circle at 80% 15%,
+              #ffe0e8 0,
+              transparent 36%
+            ),
+            radial-gradient(
+              circle at 10% 80%,
+              #fff0d9 0,
+              transparent 34%
+            ),
+            linear-gradient(
+              180deg,
+              #fff9fb,
+              #fff5f7
+            );
+        }
+
+        .heroInner {
+          width: min(1080px, 100%);
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 70px;
+          align-items: center;
+        }
+
+        .badge {
+          display: inline-block;
+          padding: 7px 13px;
+          margin-bottom: 21px;
+          border-radius: 999px;
+          background: white;
+          color: #df5870;
+          font-size: 13px;
+          font-weight: 700;
+          box-shadow: 0 3px 14px rgba(0,0,0,0.05);
+        }
+
+        .hero h1 {
+          margin: 0;
+          font-size: clamp(42px, 6vw, 68px);
+          line-height: 1.22;
+          letter-spacing: -0.04em;
+        }
+
+        .hero h1 span {
+          color: #f45d77;
+        }
+
+        .heroText {
+          margin: 28px 0 30px;
+          color: #6c5c62;
+          font-size: 17px;
+          line-height: 1.95;
+        }
+
+        .mainCta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 245px;
+          min-height: 58px;
+          padding: 15px 26px;
+          border-radius: 17px;
+          background: linear-gradient(
+            135deg,
+            #ff6b83,
+            #f65372
+          );
+          color: white;
+          font-size: 17px;
+          font-weight: 800;
+          box-shadow:
+            0 12px 25px
+            rgba(246,83,114,0.27);
+        }
+
+        .smallNote {
+          margin: 12px 0 0;
+          color: #9c8c92;
+          font-size: 11px;
+        }
+
+        .phoneWrap {
+          display: flex;
+          justify-content: center;
+        }
+
+        .phone {
+          width: 340px;
+          min-height: 590px;
+          border: 9px solid #2d292b;
+          border-radius: 42px;
+          overflow: hidden;
+          background: #f2efe9;
+          box-shadow:
+            0 30px 70px
+            rgba(65,42,49,0.22);
+          transform: rotate(2deg);
+        }
+
+        .phoneHeader {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 23px 18px 15px;
+          background: #ffffff;
+          border-bottom: 1px solid #eee8ea;
+        }
+
+        .phoneHeader img {
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+        }
+
+        .phoneHeader strong {
+          display: block;
+          font-size: 15px;
+        }
+
+        .phoneHeader span {
+          display: block;
+          margin-top: 2px;
+          color: #9b8c91;
+          font-size: 11px;
+        }
+
+        .chatArea {
+          padding: 22px 15px 15px;
+          display: flex;
+          flex-direction: column;
+          min-height: 445px;
+        }
+
+        .bubble {
+          width: fit-content;
+          max-width: 82%;
+          margin-bottom: 12px;
+          padding: 11px 13px;
+          border-radius: 17px;
+          font-size: 13px;
+          line-height: 1.55;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+
+        .bubble.misaki {
+          align-self: flex-start;
+          background: #ffffff;
+          border-bottom-left-radius: 5px;
+        }
+
+        .bubble.user {
+          align-self: flex-end;
+          background: #ffcfda;
+          border-bottom-right-radius: 5px;
+        }
+
+        .timeLabel {
+          margin: 11px auto 14px;
+          color: #a99ca0;
+          font-size: 10px;
+        }
+
+        .fakeInput {
+          margin: 0 12px 14px;
+          padding: 12px 15px;
+          border-radius: 18px;
+          background: white;
+          color: #b5aaad;
+          font-size: 12px;
+        }
+
+        .section {
+          width: min(1050px, calc(100% - 40px));
+          margin: 0 auto;
+          padding: 95px 0 105px;
+        }
+
+        .sectionTitle {
+          margin-bottom: 48px;
+          text-align: center;
+          font-size: clamp(29px, 4vw, 42px);
+          line-height: 1.45;
+          font-weight: 800;
+          letter-spacing: -0.03em;
+        }
+
+        .featureGrid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+        }
+
+        .featureCard {
+          padding: 29px;
+          border-radius: 25px;
+          background: white;
+          box-shadow:
+            0 8px 30px
+            rgba(50,30,37,0.06);
+        }
+
+        .featureEmoji {
+          margin-bottom: 18px;
+          font-size: 31px;
+        }
+
+        .featureCard h2 {
+          margin: 0 0 10px;
+          font-size: 20px;
+        }
+
+        .featureCard p {
+          margin: 0;
+          color: #76666b;
+          font-size: 14px;
+          line-height: 1.8;
+        }
+
+        .conversationSection {
+          padding: 100px 20px;
+          background: #fff;
+        }
+
+        .conversationInner {
+          width: min(960px, 100%);
+          margin: 0 auto;
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 70px;
+          align-items: center;
+        }
+
+        .eyebrow {
+          margin: 0 0 14px;
+          color: #ee6179;
+          font-size: 13px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+        }
+
+        .conversationCopy h2,
+        .freeCard h2 {
+          margin: 0;
+          font-size: clamp(32px, 5vw, 48px);
+          line-height: 1.45;
+          letter-spacing: -0.035em;
+        }
+
+        .conversationCopy > p:last-child {
+          margin-top: 25px;
+          color: #726267;
+          font-size: 16px;
+          line-height: 1.9;
+        }
+
+        .sampleChat {
+          padding: 28px 20px;
+          border-radius: 29px;
+          background: #f2efe9;
+          box-shadow:
+            0 16px 40px
+            rgba(50,30,37,0.08);
+          display: flex;
+          flex-direction: column;
+        }
+
+        .freeSection {
+          padding: 110px 20px;
+          background:
+            linear-gradient(
+              140deg,
+              #fff0f4,
+              #fff8f4
+            );
+        }
+
+        .freeCard {
+          width: min(720px, 100%);
+          margin: 0 auto;
+          padding: 55px 25px;
+          text-align: center;
+          border-radius: 32px;
+          background: white;
+          box-shadow:
+            0 18px 45px
+            rgba(84,55,64,0.08);
+        }
+
+        .freeCard > p:not(.eyebrow):not(.smallNote) {
+          margin: 22px 0 28px;
+          color: #76666b;
+          font-size: 15px;
+          line-height: 1.9;
+        }
+
+        footer {
+          padding: 50px 20px;
+          text-align: center;
+          background: #2d292b;
+          color: white;
+        }
+
+        .footerBrand {
+          font-size: 21px;
+          font-weight: 800;
+        }
+
+        footer > p {
+          margin: 8px 0 0;
+          color: #d7ced1;
+          font-size: 12px;
+        }
+
+        .copyright {
+          margin-top: 25px !important;
+          color: #8e8387 !important;
+          font-size: 10px !important;
+        }
+
+        .mobileBreak {
+          display: none;
+        }
+
+        @media (max-width: 760px) {
+          .header {
+            height: 66px;
           }
-          disabled={
-            loading ||
-            !accountLoaded
+
+          .brandIcon {
+            width: 38px;
+            height: 38px;
           }
-        >
-          {!accountLoaded
-            ? "準備中"
-            : loading
-              ? "入力中"
-              : freeLimitReached
-                ? "続きを話す"
-                : "送信"}
-        </button>
-      </section>
-    </main>
+
+          .brandName {
+            font-size: 16px;
+          }
+
+          .brandSub {
+            font-size: 10px;
+          }
+
+          .headerButton {
+            min-width: 92px;
+            height: 36px;
+            font-size: 12px;
+          }
+
+          .hero {
+            padding:
+              48px 18px 72px;
+          }
+
+          .heroInner {
+            grid-template-columns: 1fr;
+            gap: 54px;
+          }
+
+          .heroCopy {
+            text-align: center;
+          }
+
+          .hero h1 {
+            font-size: 42px;
+          }
+
+          .heroText {
+            font-size: 15px;
+            line-height: 1.9;
+          }
+
+          .mainCta {
+            width: 100%;
+            max-width: 340px;
+          }
+
+          .phone {
+            width: min(330px, 94vw);
+          }
+
+          .section {
+            padding: 72px 0 80px;
+          }
+
+          .sectionTitle {
+            margin-bottom: 34px;
+            font-size: 29px;
+          }
+
+          .mobileBreak {
+            display: block;
+          }
+
+          .featureGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .featureCard {
+            padding: 24px;
+          }
+
+          .conversationSection {
+            padding: 75px 20px;
+          }
+
+          .conversationInner {
+            grid-template-columns: 1fr;
+            gap: 35px;
+          }
+
+          .conversationCopy {
+            text-align: center;
+          }
+
+          .conversationCopy h2,
+          .freeCard h2 {
+            font-size: 32px;
+          }
+
+          .freeSection {
+            padding: 75px 15px;
+          }
+
+          .freeCard {
+            padding: 42px 20px;
+            border-radius: 25px;
+          }
+        }
+      `}</style>
+    </>
   );
 }
+``
