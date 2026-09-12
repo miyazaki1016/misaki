@@ -122,6 +122,89 @@ function getFirstRow<T>(
   return null;
 }
 
+async function consumeDailyMessageWithRetry(
+  supabase: ReturnType<
+    typeof createClient
+  >,
+  requestId: string
+) {
+  const maxAttempts = 3;
+
+  for (
+    let attempt = 1;
+    attempt <= maxAttempts;
+    attempt += 1
+  ) {
+    const {
+      data,
+      error,
+    } =
+      await supabase.rpc(
+        "consume_daily_message",
+        {
+          p_request_id:
+            requestId,
+        }
+      );
+
+    if (!error) {
+      return {
+        data,
+        error: null,
+      };
+    }
+
+    console.error(
+      `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,
+      error
+    );
+
+    const message =
+      typeof error.message ===
+      "string"
+        ? error.message.toLowerCase()
+        : "";
+
+    const retryable =
+      message.includes(
+        "gateway timeout"
+      ) ||
+      message.includes(
+        "timeout"
+      ) ||
+      message.includes(
+        "temporarily unavailable"
+      ) ||
+      message.includes(
+        "fetch failed"
+      );
+
+    if (
+      !retryable ||
+      attempt ===
+        maxAttempts
+    ) {
+      return {
+        data: null,
+        error,
+      };
+    }
+
+    await new Promise(
+      (resolve) =>
+        setTimeout(
+          resolve,
+          500 *
+            attempt
+        )
+    );
+  }
+
+  throw new Error(
+    "Usage retry loop ended unexpectedly"
+  );
+}
+
 function weatherCodeToText(
   code: number | null
 ) {
@@ -1363,21 +1446,21 @@ export async function POST(
       );
     }
 
-    //
-    // 通常チャットは毎回
-    // Supabase側で1回消費する
-    //
+    const usageRequestId =
+      crypto.randomUUID();
+
     const {
       data: usageData,
       error: usageError,
     } =
-      await supabase.rpc(
-        "consume_daily_message"
+      await consumeDailyMessageWithRetry(
+        supabase,
+        usageRequestId
       );
 
     if (usageError) {
       console.error(
-        "USAGE RPC ERROR:",
+        "USAGE RPC FINAL ERROR:",
         usageError
       );
 
