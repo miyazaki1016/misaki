@@ -56,26 +56,19 @@ export default function HomePage() {
 
         <section className="hero">
           <div className="heroVisual">
-            <img src="/misaki-final.webp" alt="眠る美咲" className="heroImage" />
+            <img src="/misaki-hero.webp" alt="美咲" className="heroImage" />
             <div className="heroShade" />
-
-            <div className="heroHand">
-              おやすみ♡<br />
-              また明日<br />
-              いっぱい話そうね
-            </div>
-
             <div className="heroCopy">
-              <p className="eyebrow heroEyebrow">MISAKI</p>
-              <h1>
-                日常に、<br />
-                <span>もうひとつの会話を。</span>
-              </h1>
+              <p className="heroSmall">あなたの38歳の彼女</p>
+              <h1>なんでもない話を、<br /><span>ちゃんと覚えてるよ。</span></h1>
               <p className="heroLead">
-                大した話じゃなくていい。<br />
-                今日あったことを、美咲に少し話してみませんか？
+                仕事のこと。<br />
+                疲れたこと。<br />
+                うまくいかなかったこと。<br />
+                嬉しかったこと。<br /><br />
+                なんでも話してね。
               </p>
-              <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
+              <Link href="/chat" className="mainCta">美咲と無料で話す <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
@@ -292,7 +285,7 @@ export default function HomePage() {
         .headerCta{min-height:44px;padding:10px 24px;border-radius:999px;font-size:14px}
         .mainCta,.profileCta{min-height:62px;padding:15px 30px;border-radius:18px;font-size:17px}
 
-        .hero{padding:0 18px}.heroVisual{position:relative;width:min(1080px,100%);aspect-ratio:2/3;margin:auto;overflow:hidden;border-radius:42px;background:#f8efea;box-shadow:0 22px 55px rgba(86,58,68,.08)}.heroImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 39%}.heroShade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,250,249,0) 0%,rgba(255,250,249,0) 55%,rgba(255,250,249,.14) 61%,rgba(255,250,249,.78) 70%,rgba(255,250,249,.96) 78%,#fffafa 86%,#fffafa 100%)}.heroHand{position:absolute;z-index:2;top:3.3%;left:5.2%;color:#f62f67;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(34px,5vw,62px);font-weight:600;line-height:1.48;letter-spacing:.01em;transform:rotate(-7deg);text-shadow:0 1px 0 rgba(255,255,255,.24)}.heroCopy{position:absolute;z-index:2;left:5.4%;right:5.4%;top:56.5%;width:auto;padding:0}.heroEyebrow{margin-bottom:2.3%;font-size:clamp(12px,1.5vw,20px);letter-spacing:.22em}.hero h1{margin:0;color:#49383e;font-size:clamp(46px,6.4vw,78px);font-weight:900;line-height:1.22;letter-spacing:-.045em}.hero h1 span{color:#f43e6d}.heroLead{margin:3.1% 0 4.3%;color:#5e5055;font-size:clamp(17px,2vw,25px);line-height:1.7}.hero .mainCta{width:100%;min-height:clamp(72px,8.6vw,112px);border-radius:28px;font-size:clamp(20px,2.6vw,31px);box-shadow:0 17px 32px rgba(255,72,113,.22)}.heroNote{margin:2.4% 0 0;color:#988a8f;font-size:clamp(12px,1.55vw,19px);text-align:center}
+        .hero{padding:0 18px}.heroVisual{position:relative;width:min(1160px,100%);min-height:790px;margin:auto;overflow:hidden;border-radius:34px;background:#f8efea}.heroImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.heroShade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,250,249,.97),rgba(255,250,249,.75) 38%,rgba(255,250,249,0) 72%)}.heroCopy{position:relative;z-index:2;width:580px;padding:280px 0 70px 65px}.heroSmall{display:inline-flex;padding:7px 16px;border-radius:999px;background:#fff4f7;color:var(--main-dark);font-size:13px;font-weight:900}.hero h1{margin:0;color:var(--title);font-size:clamp(48px,5.2vw,68px);line-height:1.27}.hero h1 span{color:var(--main-dark)}.heroLead{font-size:17px;line-height:1.85}.heroNote{margin:13px 0 0;color:#988a8f;font-size:11px;text-align:center}
 
         .intro{width:min(840px,calc(100% - 40px));margin:auto;padding:110px 0}.intro h2,.featureHeading h2,.faqHeading h2,.realChatHeading h2,.installCopy h2{margin:0;color:var(--title);font-size:clamp(35px,5vw,50px);line-height:1.5}.intro h2 span,.realChatHeading h2 span,.installCopy h2 span{color:var(--main-dark)}.introText{max-width:670px;font-size:16px;line-height:2}.handCopy{width:fit-content;margin-top:34px;padding:14px 22px;background:#fff0f4;border-radius:5px 20px;font-family:"Yu Mincho",serif;font-size:20px}
 
@@ -323,7 +316,7 @@ export default function HomePage() {
 
         @media(max-width:760px){
           .header{height:72px;width:calc(100% - 26px)}.brandIcon{width:42px;height:42px}.brandSub{display:none}.headerCta{min-height:42px;padding:9px 18px}
-          .hero{padding:0 9px}.heroVisual{width:100%;aspect-ratio:2/3;min-height:0;border-radius:28px;box-shadow:0 12px 30px rgba(86,58,68,.07)}.heroImage{height:100%;object-position:center 39%}.heroShade{background:linear-gradient(180deg,transparent 0%,transparent 54%,rgba(255,250,249,.12) 60%,rgba(255,250,249,.76) 69%,rgba(255,250,249,.96) 78%,#fffafa 86%,#fffafa 100%)}.heroHand{top:3.2%;left:5.5%;font-size:clamp(27px,8vw,38px);line-height:1.46}.heroCopy{left:5.6%;right:5.6%;top:56.2%;bottom:auto;width:auto;padding:0}.heroEyebrow{margin-bottom:2.1%;font-size:11px}.hero h1{font-size:clamp(35px,10.7vw,48px);line-height:1.22}.heroLead{margin:3% 0 4.1%;font-size:clamp(14px,4.25vw,18px);line-height:1.65}.hero .mainCta{width:100%;min-height:clamp(62px,18vw,78px);font-size:clamp(18px,5.4vw,23px);border-radius:20px}.heroNote{margin-top:2.2%;font-size:12px}.mainCta,.profileCta{width:100%;font-size:18px}
+          .hero{padding:0 8px}.heroVisual{min-height:830px;border-radius:26px}.heroImage{height:64%;object-position:center top}.heroShade{background:linear-gradient(180deg,transparent 0%,transparent 35%,rgba(255,250,249,.25) 51%,rgba(255,250,249,.93) 64%,#fffafa 76%)}.heroCopy{position:absolute;left:0;right:0;bottom:0;width:auto;padding:0 24px 28px}.hero h1{font-size:36px}.heroLead{font-size:16px}.mainCta,.profileCta{width:100%;font-size:18px}
           .intro{padding:76px 0}.intro h2,.featureHeading h2,.faqHeading h2,.realChatHeading h2,.installCopy h2{font-size:32px}
           .profileSection{padding:18px 0 72px;background:#fffafa}.profileMagazine{width:100%;border-radius:0;box-shadow:none}.profileHero{min-height:1100px}.profileImage{object-position:57% center}.profileImageShade{background:linear-gradient(180deg,rgba(255,250,248,.95) 0%,rgba(255,250,248,.68) 21%,rgba(255,250,248,.12) 37%,transparent 56%,rgba(255,250,248,.05) 72%,rgba(255,250,248,.92) 100%)}.profileHeadline{left:28px;right:20px;top:28px;width:auto}.profileHello{font-size:34px}.profileHeadline h2{font-size:44px}.profileHeadline h2 span{font-size:60px}.profileSignature{font-size:22px}.profileHand{font-size:21px}.profileSideHand{right:18px;top:206px;font-size:20px}
           .profileStoryOverlay{left:28px;right:28px;bottom:30px;width:auto}.profileStoryOverlay p{font-size:17px;line-height:1.85}.profileStoryOverlay .profileLead{font-size:18px}.profileTags{display:none}
