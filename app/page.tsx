@@ -168,7 +168,7 @@ export default function HomePage() {
               </div>
               <div className="profileBottomRight">
                 <div className="profileNote"><span>“</span> なんでも話してね。<br />…待ってるよ。 ♡</div>
-                <Link href="/chat" className="profileCta">美咲と無料で話す <span>→</span></Link>
+                <Link href="/chat" className="profileCta">美咲と話してみる <span>→</span></Link>
                 <p>無料版は1日20回まで</p>
               </div>
             </div>
@@ -403,7 +403,7 @@ export default function HomePage() {
           inset:0;
           background:linear-gradient(90deg,rgba(255,250,249,.97),rgba(255,250,249,.75) 38%,rgba(255,250,249,0) 72%)
         }
-        .heroCopy{position:relative;z-index:2;width:500px;padding:245px 0 70px 42px}
+        .heroCopy{position:relative;z-index:2;width:455px;padding:215px 0 70px 28px}
         .heroSmall{
           display:inline-flex;
           padding:7px 16px;
@@ -413,7 +413,7 @@ export default function HomePage() {
           font-size:13px;
           font-weight:900
         }
-        .hero h1{margin:0;color:var(--title);font-size:clamp(44px,4.6vw,58px);line-height:1.27}
+        .hero h1{margin:0;color:var(--title);font-size:clamp(40px,4.1vw,52px);line-height:1.24}
         .hero h1 span{color:var(--main-dark)}
         .heroLead{font-size:17px;line-height:1.85}
         .heroNote{margin:13px 0 0;color:#988a8f;font-size:11px;text-align:center}
