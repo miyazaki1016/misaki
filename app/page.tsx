@@ -48,7 +48,7 @@ export default function HomePage() {
             <img src="/icon-192.png" alt="美咲" className="brandIcon" />
             <div>
               <div className="brandName">美咲</div>
-              <div className="brandSub">あなたの38歳の彼女</div>
+              <div className="brandSub"><span className="brandSubDesktop">あなたの38歳の彼女</span><span className="brandSubMobile">いつでも話してね♡</span></div>
             </div>
           </Link>
           <Link href="/chat" className="headerCta">話してみる</Link>
@@ -292,7 +292,7 @@ export default function HomePage() {
         .page{overflow:hidden}
         .eyebrow{margin:0 0 14px;color:var(--main);font-size:12px;font-weight:900;letter-spacing:.22em}
         .header{width:min(1120px,calc(100% - 36px));height:78px;margin:auto;display:flex;align-items:center;justify-content:space-between}
-        .brand{display:flex;align-items:center;gap:12px}.brandIcon{width:47px;height:47px;border-radius:50%;object-fit:cover}.brandName{color:var(--title);font-size:19px;font-weight:900}.brandSub{font-size:11px;color:#97888d}
+        .brand{display:flex;align-items:center;gap:12px}.brandIcon{width:47px;height:47px;border-radius:50%;object-fit:cover}.brandName{color:var(--title);font-size:19px;font-weight:900}.brandSub{font-size:11px;color:#97888d}.brandSubMobile{display:none}
         .headerCta,.mainCta,.profileCta{display:inline-flex;align-items:center;justify-content:center;gap:18px;background:linear-gradient(135deg,#ff6680,#ff4770);color:#fff;font-weight:900;box-shadow:0 12px 28px rgba(255,102,128,.23)}
         .headerCta{min-height:44px;padding:10px 24px;border-radius:999px;font-size:14px}
         .mainCta,.profileCta{min-height:62px;padding:15px 30px;border-radius:18px;font-size:17px}
@@ -327,7 +327,7 @@ export default function HomePage() {
         footer{width:min(1100px,calc(100% - 40px));margin:auto;padding:20px 0 45px;display:flex;align-items:center;justify-content:space-between}.footerBrand{display:flex;align-items:center;gap:10px}.footerBrand img{width:42px;height:42px;border-radius:50%}.footerBrand strong,.footerBrand span{display:block}.footerBrand span{font-size:10px;color:#998d91}footer small{font-size:10px;color:#aaa0a3}
 
         @media(max-width:760px){
-          .header{height:72px;width:calc(100% - 26px)}.brandIcon{width:42px;height:42px}.brandSub{display:none}.headerCta{min-height:42px;padding:9px 18px}
+          .header{height:96px;width:100%;padding:0 24px;background:#fffafa}.brand{gap:12px}.brandIcon{width:48px;height:48px}.brandName{font-size:21px;line-height:1.15}.brandSub{display:block;margin-top:5px;font-size:12px;line-height:1.2;color:#8f8589}.brandSubDesktop{display:none}.brandSubMobile{display:inline}.headerCta{min-height:48px;padding:11px 24px;font-size:16px}
           .hero{padding:0}.heroVisual{min-height:0;border-radius:0;overflow:visible;background:#fffafa}.heroImage,.heroShade,.heroCopy{display:none}.heroMobileComposite{display:block;width:100%;height:auto}.heroMobileAction{display:block;padding:18px 24px 26px;background:#fffafa}.heroMobileAction .mainCta{width:100%;font-size:18px}.heroMobileAction .heroNote{margin-top:13px}.profileCta{width:100%;font-size:18px}
           .intro{padding:76px 0}.intro h2,.featureHeading h2,.faqHeading h2,.realChatHeading h2,.installCopy h2{font-size:32px}
           .profileSection{padding:18px 0 72px;background:#fffafa}.profileMagazine{width:100%;border-radius:0;box-shadow:none}.profileHero{min-height:1100px}.profileImage{object-position:57% center}.profileImageShade{background:linear-gradient(180deg,rgba(255,250,248,.95) 0%,rgba(255,250,248,.68) 21%,rgba(255,250,248,.12) 37%,transparent 56%,rgba(255,250,248,.05) 72%,rgba(255,250,248,.92) 100%)}.profileHeadline{left:28px;right:20px;top:28px;width:auto}.profileHello{font-size:34px}.profileHeadline h2{font-size:44px}.profileHeadline h2 span{font-size:60px}.profileSignature{font-size:22px}.profileHand{font-size:21px}.profileSideHand{right:18px;top:206px;font-size:20px}
