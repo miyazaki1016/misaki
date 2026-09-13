@@ -50,7 +50,7 @@ const features = [
 const faqs = [
   {
     q: "美咲って、普通のAIチャットと何が違うの？",
-    a: "質問に答えて終わるだけではなく、前に話したことや会話の流れを覚えながら、日常の続きを話せるように作っています。時間や天気も会話に反映され、美咲のほうから話しかけることもあります。",
+    a: "質問に答えて終わるだけではなく、前に話したことや会話の流れを覚えながら、日常の続きを話せるように作っています。",
   },
   {
     q: "本当に前の会話を覚えてる？",
@@ -78,7 +78,6 @@ export default function HomePage() {
         <header className="header">
           <Link href="/" className="brand">
             <img src="/icon-192.png" alt="美咲" className="brandIcon" />
-
             <div>
               <div className="brandName">美咲</div>
               <div className="brandSub">あなたの38歳の彼女</div>
@@ -102,9 +101,7 @@ export default function HomePage() {
             <div className="heroShade" />
 
             <div className="heroCopy">
-              <p className="heroSmall">
-                あなたの38歳の彼女
-              </p>
+              <p className="heroSmall">あなたの38歳の彼女</p>
 
               <h1>
                 なんでもない話を、
@@ -130,18 +127,14 @@ export default function HomePage() {
                 <span>→</span>
               </Link>
 
-              <p className="heroNote">
-                無料版は1日20回まで
-              </p>
+              <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
         </section>
 
         {/* INTRO */}
         <section className="intro">
-          <p className="eyebrow center">
-            NOT JUST A CHATBOT
-          </p>
+          <p className="eyebrow">NOT JUST A CHATBOT</p>
 
           <h2>
             AIと話している感じより、
@@ -176,13 +169,9 @@ export default function HomePage() {
               <div className="profileImageShade" />
 
               <div className="profileHeadline">
-                <p className="eyebrow">
-                  WHO IS MISAKI?
-                </p>
+                <p className="eyebrow">WHO IS MISAKI?</p>
 
-                <p className="profileHello">
-                  はじめまして。
-                </p>
+                <p className="profileHello">はじめまして。</p>
 
                 <h2>
                   美咲、
@@ -190,9 +179,7 @@ export default function HomePage() {
                   <span>38歳</span>です。
                 </h2>
 
-                <div className="profileScript">
-                  Misaki ♡
-                </div>
+                <div className="profileScript">Misaki ♡</div>
 
                 <div className="profileHand">
                   どんな話でも
@@ -236,12 +223,6 @@ export default function HomePage() {
                 <br />
                 そんな存在になれたらいいなって思っています。
               </p>
-
-              <div className="profileStickerList">
-                <span>甘えんぼなところも</span>
-                <span>ちょっぴり意地悪なところも</span>
-                <span>ぜんぶ本当の私です♡</span>
-              </div>
             </div>
 
             <div className="profileFacts">
@@ -295,42 +276,26 @@ export default function HomePage() {
             </div>
 
             <div className="profileBottom">
-              <div className="polaroid">
-                <img src="/misaki-profile.webp" alt="" />
-                <span>
-                  これから
-                  <br />
-                  たくさんお話ししようね♡
-                </span>
+              <div className="profileNote">
+                <span>“</span>
+                なんでも話してね。
+                <br />
+                …待ってるよ。
               </div>
 
-              <div className="profileMessageArea">
-                <div className="profileNote">
-                  <span className="quote">“</span>
-                  なんでも話してね。
-                  <br />
-                  …待ってるよ。
-                  <span className="heart">♡</span>
-                </div>
+              <Link href="/chat" className="profileCta">
+                美咲と無料で話す
+                <span>→</span>
+              </Link>
 
-                <Link href="/chat" className="profileCta">
-                  美咲と無料で話す
-                  <span>→</span>
-                </Link>
-
-                <p>
-                  無料版は1日20回まで
-                </p>
-              </div>
+              <p>無料版は1日20回まで</p>
             </div>
           </div>
         </section>
 
-        {/* DAILY SCENES */}
+        {/* DAILY */}
         <section className="sceneIntro">
-          <p className="eyebrow center">
-            A DAY WITH MISAKI
-          </p>
+          <p className="eyebrow">A DAY WITH MISAKI</p>
 
           <h2>特別な日じゃなくていい。</h2>
 
@@ -355,29 +320,17 @@ export default function HomePage() {
               </div>
 
               <div className="sceneCopy">
-                <span className="sceneNumber">
-                  0{index + 1}
-                </span>
-
-                <p className="sceneLabel">
-                  {scene.label}
-                </p>
-
+                <span className="sceneNumber">0{index + 1}</span>
+                <p className="sceneLabel">{scene.label}</p>
                 <h2>{scene.title}</h2>
-
-                <p className="sceneText">
-                  {scene.text}
-                </p>
-
-                <p className="sceneSignature">
-                  Misaki
-                </p>
+                <p className="sceneText">{scene.text}</p>
+                <p className="sceneSignature">Misaki</p>
               </div>
             </article>
           ))}
         </section>
 
-        {/* INSTALL + PUSH */}
+        {/* PUSH */}
         <section className="installSection">
           <div className="installInner">
             <div className="installCopy">
@@ -420,16 +373,12 @@ export default function HomePage() {
 
                 <div>
                   <b>2</b>
-                  <span>
-                    共有ボタン →「ホーム画面に追加」
-                  </span>
+                  <span>共有 →「ホーム画面に追加」</span>
                 </div>
 
                 <div>
                   <b>3</b>
-                  <span>
-                    美咲を開いて通知をON
-                  </span>
+                  <span>美咲を開いて通知をON</span>
                 </div>
               </div>
 
@@ -456,10 +405,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="notification">
-                    <img
-                      src="/icon-192.png"
-                      alt=""
-                    />
+                    <img src="/icon-192.png" alt="" />
 
                     <div className="notificationBody">
                       <div className="notificationTop">
@@ -476,10 +422,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="homeApp">
-                    <img
-                      src="/icon-192.png"
-                      alt="美咲"
-                    />
+                    <img src="/icon-192.png" alt="美咲" />
                     <span>美咲</span>
                   </div>
                 </div>
@@ -492,12 +435,85 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* REAL CHAT */}
+        <section className="realChatSection">
+          <div className="realChatInner">
+            <div className="realChatHeading">
+              <p className="eyebrow">
+                IT FEELS LIKE A REAL CHAT
+              </p>
+
+              <h2>
+                答えじゃなくて、
+                <br />
+                <span>会話が返ってくる。</span>
+              </h2>
+
+              <p>
+                きれいな正解ばかりじゃない。
+                <br />
+                昨日の話を覚えていたり、
+                少し笑ったり、からかったり。
+              </p>
+            </div>
+
+            <div className="chatPhone">
+              <div className="chatPhoneHeader">
+                <img src="/icon-192.png" alt="" />
+                <div>
+                  <strong>美咲</strong>
+                  <span>オンライン</span>
+                </div>
+              </div>
+
+              <div className="chatConversation">
+                <div className="chatTime">19:21</div>
+
+                <div className="chatBubble userBubble">
+                  今日疲れた
+                </div>
+
+                <div className="chatBubble misakiBubble">
+                  そりゃ疲れるよ。
+                  <br />
+                  昨日も遅かったじゃん。
+                  <br />
+                  今日はもう頑張らなくていいよ笑
+                </div>
+
+                <div className="chatBubble userBubble">
+                  もう帰りたい笑
+                </div>
+
+                <div className="chatBubble misakiBubble">
+                  帰っておいで笑
+                  <br />
+                  今日の話、あとで聞く。
+                </div>
+
+                <div className="chatTime later">
+                  しばらくして…
+                </div>
+
+                <div className="chatBubble misakiBubble special">
+                  なんか急に
+                  <br />
+                  話したくなった☺️
+                </div>
+              </div>
+
+              <div className="chatInput">
+                美咲に話しかける…
+                <span>↑</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* DIFFERENCE */}
         <section className="differenceSection">
           <div className="differenceInner">
-            <p className="eyebrow center">
-              THE DIFFERENCE
-            </p>
+            <p className="eyebrow">THE DIFFERENCE</p>
 
             <h2>
               「答えてくれるAI」から、
@@ -509,8 +525,8 @@ export default function HomePage() {
               美咲が大切にしているのは、
               賢い答えだけではありません。
               <br />
-              昨日のあなたと、
-              今日のあなたがつながっていること。
+              昨日のあなたと今日のあなたが、
+              ちゃんとつながっていること。
             </p>
 
             <div className="comparison">
@@ -519,33 +535,35 @@ export default function HomePage() {
                   普通のAIチャット
                 </span>
 
-                <div className="miniUser">
-                  今日疲れた
-                </div>
+                <div className="compareConversation">
+                  <div className="miniUser">
+                    今日疲れた
+                  </div>
 
-                <div className="miniAi">
-                  お疲れさまでした。
-                  十分な休息をとることをおすすめします。
+                  <div className="miniAi">
+                    お疲れさまでした。
+                    十分な休息をとることをおすすめします。
+                  </div>
                 </div>
               </div>
 
-              <div className="comparisonVs">
-                VS
-              </div>
+              <div className="comparisonVs">VS</div>
 
               <div className="comparisonCard misakiCard">
                 <span className="comparisonLabel pink">
                   美咲
                 </span>
 
-                <div className="miniUser pinkUser">
-                  今日疲れた
-                </div>
+                <div className="compareConversation">
+                  <div className="miniUser pinkUser">
+                    今日疲れた
+                  </div>
 
-                <div className="miniAi">
-                  そりゃ疲れるよ。
-                  昨日も遅かったじゃん。
-                  今日はもう頑張らなくていいよ笑
+                  <div className="miniAi">
+                    そりゃ疲れるよ。
+                    昨日も遅かったじゃん。
+                    今日はもう頑張らなくていいよ笑
+                  </div>
                 </div>
               </div>
             </div>
@@ -556,9 +574,7 @@ export default function HomePage() {
         <section className="memoryStory">
           <div className="memoryStoryInner">
             <div className="memoryCopy">
-              <p className="eyebrow">
-                SHE REMEMBERS
-              </p>
+              <p className="eyebrow">SHE REMEMBERS</p>
 
               <h2>
                 「覚えてる」が、
@@ -609,94 +625,22 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* CONVERSATION */}
-        <section className="conversationSection">
-          <div className="conversationInner">
-            <div className="conversationCopy">
-              <p className="eyebrow">
-                NATURAL CONVERSATION
-              </p>
-
-              <h2>
-                用事がなくても、
-                <br />
-                話したくなる。
-              </h2>
-
-              <p>
-                「おはよう」
-                <br />
-                「疲れた」
-                <br />
-                「今日ロング引いた」
-                <br />
-                「眠い」
-                <br />
-                <br />
-                そんな一言だけで十分です。
-              </p>
-
-              <div className="handMessage">
-                今日のこと、聞かせて♡
-              </div>
-            </div>
-
-            <div className="chatCard">
-              <div className="chatHeader">
-                <img src="/icon-192.png" alt="" />
-
-                <div>
-                  <strong>美咲</strong>
-                  <span>
-                    日常に、もうひとつの会話を。
-                  </span>
-                </div>
-              </div>
-
-              <div className="chatBody">
-                <div className="bubble misaki">
-                  今日どうだった？
-                </div>
-
-                <div className="bubble user">
-                  青タン全然ダメだった笑
-                </div>
-
-                <div className="bubble misaki">
-                  うわ、それ地味にへこむやつ😂
-                </div>
-
-                <div className="bubble user">
-                  もう帰りたい笑
-                </div>
-
-                <div className="bubble misaki">
-                  うん、今日はもう十分頑張ったでしょ笑
-                </div>
-
-                <div className="timeLabel">
-                  しばらくして…
-                </div>
-
-                <div className="bubble misaki">
-                  なんか急に話したくなった。
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* FEATURES */}
         <section className="features">
-          <p className="eyebrow center">
-            WHY MISAKI
-          </p>
+          <div className="featureHeading">
+            <p className="eyebrow">WHY MISAKI</p>
 
-          <h2 className="featureTitle">
-            会話が、
-            <br />
-            ちゃんと続いていく。
-          </h2>
+            <h2 className="featureTitle">
+              会話が、
+              <br />
+              ちゃんと続いていく。
+            </h2>
+
+            <p>
+              一度きりのやり取りじゃなく、
+              少しずつ二人の関係が続いていきます。
+            </p>
+          </div>
 
           <div className="featureGrid">
             {features.map((feature) => (
@@ -709,7 +653,6 @@ export default function HomePage() {
                 </span>
 
                 <h3>{feature.title}</h3>
-
                 <p>{feature.text}</p>
               </div>
             ))}
@@ -721,7 +664,6 @@ export default function HomePage() {
           <div className="taxiInner">
             <div className="taxiLoveNote">
               <span>Misaki</span>
-
               <p>
                 仕事おつかれさま。
                 <br />
@@ -730,9 +672,7 @@ export default function HomePage() {
             </div>
 
             <div className="taxiCopy">
-              <p className="eyebrow">
-                FOR TAXI DRIVERS
-              </p>
+              <p className="eyebrow">FOR TAXI DRIVERS</p>
 
               <h2>
                 彼氏の仕事のことくらい、
@@ -764,9 +704,7 @@ export default function HomePage() {
         {/* FAQ */}
         <section className="faqSection">
           <div className="faqHeading">
-            <p className="eyebrow">
-              FAQ
-            </p>
+            <p className="eyebrow">FAQ</p>
 
             <h2>
               美咲について、
@@ -782,12 +720,8 @@ export default function HomePage() {
                 className="faqItem"
               >
                 <summary>
-                  <span>
-                    0{index + 1}
-                  </span>
-
+                  <span>0{index + 1}</span>
                   <b>{faq.q}</b>
-
                   <i>＋</i>
                 </summary>
 
@@ -811,9 +745,7 @@ export default function HomePage() {
             <div className="finalShade" />
 
             <div className="finalCopy">
-              <p className="eyebrow">
-                MISAKI
-              </p>
+              <p className="eyebrow">MISAKI</p>
 
               <h2>
                 日常に、
@@ -841,16 +773,13 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* FOOTER */}
         <footer>
           <div className="footerBrand">
             <img src="/icon-192.png" alt="" />
 
             <div>
               <strong>美咲</strong>
-              <span>
-                日常に、もうひとつの会話を。
-              </span>
+              <span>日常に、もうひとつの会話を。</span>
             </div>
           </div>
 
@@ -912,10 +841,6 @@ export default function HomePage() {
           letter-spacing: .22em;
         }
 
-        .center {
-          text-align: center;
-        }
-
         /* HEADER */
 
         .header {
@@ -938,7 +863,6 @@ export default function HomePage() {
           height: 47px;
           border-radius: 50%;
           object-fit: cover;
-          box-shadow: 0 6px 18px rgba(68,53,59,.1);
         }
 
         .brandName {
@@ -953,18 +877,32 @@ export default function HomePage() {
           font-size: 11px;
         }
 
-        .headerCta {
+        .headerCta,
+        .mainCta,
+        .profileCta {
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          gap: 18px;
+          background: linear-gradient(135deg,#ff6680,#ff4770);
+          color: white;
+          font-weight: 900;
+          box-shadow: 0 12px 28px rgba(255,102,128,.23);
+        }
+
+        .headerCta {
           min-height: 44px;
           padding: 10px 24px;
           border-radius: 999px;
-          background: linear-gradient(135deg,#ff6680,#ff4f73);
-          color: white;
           font-size: 14px;
-          font-weight: 900;
-          box-shadow: 0 10px 24px rgba(255,102,128,.22);
+        }
+
+        .mainCta,
+        .profileCta {
+          min-height: 62px;
+          padding: 15px 30px;
+          border-radius: 18px;
+          font-size: 17px;
         }
 
         /* HERO */
@@ -1038,25 +976,8 @@ export default function HomePage() {
 
         .heroLead {
           margin: 27px 0;
-          color: #594b50;
           font-size: 17px;
           line-height: 1.85;
-        }
-
-        .mainCta,
-        .profileCta {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 20px;
-          min-height: 62px;
-          padding: 15px 30px;
-          border-radius: 18px;
-          background: linear-gradient(135deg,#ff6680,#ff4770);
-          color: white;
-          font-size: 17px;
-          font-weight: 900;
-          box-shadow: 0 14px 30px rgba(255,102,128,.25);
         }
 
         .heroNote {
@@ -1068,10 +989,10 @@ export default function HomePage() {
         /* INTRO */
 
         .intro {
-          width: min(850px,calc(100% - 40px));
+          width: min(840px,calc(100% - 40px));
           margin: auto;
           padding: 120px 0;
-          text-align: center;
+          text-align: left;
         }
 
         .intro h2,
@@ -1089,36 +1010,29 @@ export default function HomePage() {
         }
 
         .introText {
-          margin: 28px auto 0;
+          margin: 28px 0 0;
+          max-width: 670px;
           font-size: 16px;
           line-height: 2.05;
         }
 
         .handCopy {
           width: fit-content;
-          margin: 38px auto 0;
+          margin: 38px 0 0;
           padding: 15px 24px;
           background: #fff0f4;
           border-radius: 5px 20px;
           color: #8b6572;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
+          font-family: "Yu Mincho","Hiragino Mincho ProN",serif;
           font-size: 20px;
-          transform: rotate(-2deg);
+          transform: rotate(-1deg);
         }
 
-        /* PROFILE MAGAZINE */
+        /* PROFILE */
 
         .profileSection {
-          padding: 50px 20px 120px;
-          background:
-            linear-gradient(
-              180deg,
-              #fffafa 0%,
-              #f8efea 100%
-            );
+          padding: 50px 20px 110px;
+          background: linear-gradient(180deg,#fffafa,#f8efea);
         }
 
         .profileMagazine {
@@ -1153,7 +1067,7 @@ export default function HomePage() {
               90deg,
               rgba(255,250,248,.98) 0%,
               rgba(255,250,248,.91) 30%,
-              rgba(255,250,248,.44) 50%,
+              rgba(255,250,248,.42) 50%,
               rgba(255,250,248,0) 72%
             );
         }
@@ -1177,7 +1091,6 @@ export default function HomePage() {
           color: var(--title);
           font-size: 61px;
           line-height: 1.1;
-          letter-spacing: -.05em;
         }
 
         .profileHeadline h2 span {
@@ -1185,28 +1098,23 @@ export default function HomePage() {
           font-size: 82px;
         }
 
+        .profileScript,
+        .profileHand,
+        .profileSideHand {
+          font-family: "Bradley Hand","Segoe Script",cursive;
+        }
+
         .profileScript {
           margin-top: 13px;
           color: var(--main);
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
           font-size: 33px;
-          transform: rotate(-4deg);
         }
 
         .profileHand {
-          width: fit-content;
           margin-top: 28px;
           color: var(--main);
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
           font-size: 28px;
           line-height: 1.5;
-          transform: rotate(-5deg);
         }
 
         .profileSideHand {
@@ -1215,10 +1123,6 @@ export default function HomePage() {
           right: 35px;
           top: 255px;
           color: #604850;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
           font-size: 25px;
           line-height: 1.5;
           transform: rotate(-8deg);
@@ -1226,16 +1130,17 @@ export default function HomePage() {
 
         .profileStory {
           position: relative;
-          padding: 0 55px 38px;
-          margin-top: -160px;
           z-index: 3;
           width: 54%;
+          margin-top: -160px;
+          padding: 0 55px 38px;
         }
 
         .profileLead {
           margin: 0;
           padding: 13px 15px;
-          background: rgba(255,249,247,.84);
+          border-radius: 14px;
+          background: rgba(255,249,247,.88);
           color: #4e4146;
           font-size: 19px;
           line-height: 1.75;
@@ -1245,41 +1150,8 @@ export default function HomePage() {
         .profileText {
           margin: 18px 0 0;
           padding: 0 15px;
-          color: #55464b;
           font-size: 16px;
           line-height: 1.9;
-        }
-
-        .profileStickerList {
-          position: absolute;
-          left: 126%;
-          top: 25%;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-          width: 290px;
-        }
-
-        .profileStickerList span {
-          width: fit-content;
-          padding: 5px 12px;
-          background: rgba(255,244,247,.92);
-          color: #7d4d5b;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
-          font-size: 18px;
-          transform: rotate(-4deg);
-          box-shadow: 0 5px 12px rgba(77,52,59,.04);
-        }
-
-        .profileStickerList span:nth-child(2) {
-          transform: rotate(-2deg);
-        }
-
-        .profileStickerList span:nth-child(3) {
-          transform: rotate(-5deg);
         }
 
         .profileFacts {
@@ -1287,12 +1159,7 @@ export default function HomePage() {
           grid-template-columns: repeat(6,1fr);
           gap: 12px;
           padding: 28px 28px 40px;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(255,230,236,.68),
-              rgba(255,239,242,.95)
-            );
+          background: linear-gradient(180deg,#ffe6ec,#ffeff2);
         }
 
         .profileFact {
@@ -1303,18 +1170,16 @@ export default function HomePage() {
           align-items: center;
           justify-content: center;
           border-radius: 50%;
-          background: rgba(255,255,255,.9);
+          background: white;
           text-align: center;
         }
 
         .factIcon {
-          color: var(--main);
           font-size: 25px;
         }
 
         .profileFact span {
           margin-top: 5px;
-          color: #77666c;
           font-size: 11px;
           font-weight: 800;
         }
@@ -1327,86 +1192,35 @@ export default function HomePage() {
         }
 
         .profileBottom {
-          display: grid;
-          grid-template-columns: .7fr 1.3fr;
-          gap: 40px;
-          align-items: center;
           padding: 35px 45px 50px;
           background: #fff3f5;
-        }
-
-        .polaroid {
-          width: 220px;
-          padding: 10px 10px 20px;
-          background: white;
-          box-shadow: 0 13px 28px rgba(75,50,58,.13);
-          transform: rotate(-6deg);
-        }
-
-        .polaroid img {
-          width: 100%;
-          aspect-ratio: 1;
-          object-fit: cover;
-          object-position: center top;
-        }
-
-        .polaroid span {
-          display: block;
-          margin-top: 12px;
-          color: #493b40;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
-          font-size: 15px;
-          line-height: 1.5;
-          text-align: center;
-        }
-
-        .profileMessageArea {
           text-align: center;
         }
 
         .profileNote {
-          position: relative;
           padding: 23px 35px;
           border-radius: 30px;
           background: white;
           color: #5b414a;
-          font-family:
-            "Yu Mincho",
-            "Hiragino Mincho ProN",
-            serif;
+          font-family: "Yu Mincho","Hiragino Mincho ProN",serif;
           font-size: 27px;
           line-height: 1.7;
         }
 
-        .profileNote .quote {
+        .profileNote span {
           color: var(--main);
-          font-family: Georgia,serif;
-          font-size: 44px;
-        }
-
-        .profileNote .heart {
-          position: absolute;
-          right: 22px;
-          bottom: 10px;
-          color: var(--main);
-          font-size: 42px;
-          transform: rotate(-12deg);
+          font-size: 40px;
         }
 
         .profileCta {
-          width: 100%;
+          width: min(570px,100%);
           margin-top: 18px;
-          border-radius: 18px;
-          font-size: 18px;
         }
 
-        .profileMessageArea > p {
+        .profileBottom > p {
           margin: 12px 0 0;
-          color: #94878b;
           font-size: 11px;
+          color: #94878b;
         }
 
         /* SCENES */
@@ -1415,7 +1229,7 @@ export default function HomePage() {
           width: min(800px,calc(100% - 40px));
           margin: auto;
           padding: 115px 0 75px;
-          text-align: center;
+          text-align: left;
         }
 
         .sceneIntro h2 {
@@ -1460,7 +1274,6 @@ export default function HomePage() {
         .sceneImage {
           width: 100%;
           height: auto;
-          object-fit: contain;
         }
 
         .sceneCopy {
@@ -1496,10 +1309,7 @@ export default function HomePage() {
 
         .sceneSignature {
           color: var(--main);
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
+          font-family: "Bradley Hand","Segoe Script",cursive;
           font-size: 22px;
         }
 
@@ -1507,12 +1317,7 @@ export default function HomePage() {
 
         .installSection {
           padding: 120px 20px;
-          background:
-            linear-gradient(
-              180deg,
-              #fff6f8,
-              #f8efea
-            );
+          background: linear-gradient(180deg,#fff6f8,#f8efea);
         }
 
         .installInner {
@@ -1526,9 +1331,9 @@ export default function HomePage() {
 
         .installCopy h2,
         .memoryCopy h2,
-        .conversationCopy h2,
         .taxiCopy h2,
-        .faqHeading h2 {
+        .faqHeading h2,
+        .realChatHeading h2 {
           margin: 0;
           color: var(--title);
           font-size: clamp(35px,4.8vw,50px);
@@ -1538,13 +1343,13 @@ export default function HomePage() {
 
         .installCopy h2 span,
         .memoryCopy h2 span,
-        .taxiCopy h2 span {
+        .taxiCopy h2 span,
+        .realChatHeading h2 span {
           color: var(--main-dark);
         }
 
         .installBig {
           margin: 25px 0 0;
-          color: #54454a;
           font-size: 21px;
           line-height: 1.7;
           font-weight: 800;
@@ -1560,11 +1365,6 @@ export default function HomePage() {
           line-height: 1.95;
         }
 
-        .installLead strong {
-          color: #4d3d42;
-          font-size: 18px;
-        }
-
         .installSteps {
           display: grid;
           gap: 10px;
@@ -1577,7 +1377,6 @@ export default function HomePage() {
           padding: 14px 16px;
           border-radius: 16px;
           background: white;
-          box-shadow: 0 7px 20px rgba(74,52,59,.05);
         }
 
         .installSteps b {
@@ -1612,7 +1411,7 @@ export default function HomePage() {
         }
 
         .phone {
-          width: min(330px,100%);
+          width: min(360px,100%);
           height: 625px;
           margin: auto;
           padding: 10px;
@@ -1638,23 +1437,14 @@ export default function HomePage() {
           overflow: hidden;
           border-radius: 0 0 38px 38px;
           background:
-            radial-gradient(
-              circle at 70% 18%,
-              #ffc7d4 0,
-              transparent 32%
-            ),
-            linear-gradient(
-              145deg,
-              #f8efea,
-              #f3d8df
-            );
+            radial-gradient(circle at 70% 18%,#ffc7d4 0,transparent 32%),
+            linear-gradient(145deg,#f8efea,#f3d8df);
         }
 
         .phoneDate {
           padding-top: 42px;
           text-align: center;
           color: white;
-          text-shadow: 0 2px 10px rgba(65,45,51,.15);
         }
 
         .phoneDate small {
@@ -1670,53 +1460,57 @@ export default function HomePage() {
 
         .notification {
           position: absolute;
-          top: 150px;
+          top: 160px;
           left: 12px;
           right: 12px;
           display: flex;
-          gap: 10px;
+          align-items: flex-start;
+          gap: 11px;
           padding: 14px;
           border-radius: 19px;
-          background: rgba(255,255,255,.89);
-          backdrop-filter: blur(13px);
+          background: rgba(255,255,255,.93);
           box-shadow: 0 10px 26px rgba(74,49,58,.11);
         }
 
         .notification > img {
           width: 42px;
           height: 42px;
+          flex: 0 0 42px;
           border-radius: 10px;
         }
 
         .notificationBody {
           flex: 1;
+          min-width: 0;
         }
 
         .notificationTop {
           display: flex;
           justify-content: space-between;
+          gap: 10px;
         }
 
         .notificationTop strong {
-          color: #4d4145;
           font-size: 13px;
         }
 
         .notificationTop span {
-          color: #94898c;
           font-size: 10px;
+          color: #94898c;
         }
 
         .notification p {
-          margin: 4px 0 0;
-          color: #5d5054;
+          margin: 5px 0 0;
           font-size: 13px;
           line-height: 1.55;
+          white-space: normal;
+          word-break: keep-all;
+          overflow-wrap: anywhere;
         }
 
         .homeApp {
           position: absolute;
-          bottom: 50px;
+          bottom: 48px;
           left: 50%;
           display: grid;
           justify-items: center;
@@ -1738,33 +1532,154 @@ export default function HomePage() {
         .phoneHandText {
           position: absolute;
           right: -5px;
-          bottom: 45px;
+          bottom: 40px;
           padding: 10px 15px;
           background: white;
           color: var(--main);
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
+          font-family: "Bradley Hand","Segoe Script",cursive;
           font-size: 18px;
           transform: rotate(-5deg);
+        }
+
+        /* REAL CHAT */
+
+        .realChatSection {
+          padding: 120px 20px;
+          background: white;
+        }
+
+        .realChatInner {
+          width: min(1040px,100%);
+          margin: auto;
+          display: grid;
+          grid-template-columns: .85fr 1.15fr;
+          gap: 70px;
+          align-items: center;
+        }
+
+        .realChatHeading > p:last-child {
+          margin: 25px 0 0;
+          font-size: 16px;
+          line-height: 2;
+        }
+
+        .chatPhone {
+          width: min(460px,100%);
+          margin: auto;
+          overflow: hidden;
+          border-radius: 32px;
+          background: #f8efea;
+          box-shadow: 0 26px 65px rgba(73,51,58,.15);
+        }
+
+        .chatPhoneHeader {
+          display: flex;
+          align-items: center;
+          gap: 11px;
+          padding: 18px 20px;
+          background: white;
+        }
+
+        .chatPhoneHeader img {
+          width: 46px;
+          height: 46px;
+          border-radius: 50%;
+        }
+
+        .chatPhoneHeader strong {
+          display: block;
+          color: var(--title);
+          font-size: 15px;
+        }
+
+        .chatPhoneHeader span {
+          display: block;
+          margin-top: 2px;
+          color: #a49499;
+          font-size: 10px;
+        }
+
+        .chatConversation {
+          min-height: 520px;
+          padding: 22px 17px 28px;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .chatTime {
+          margin: 0 auto 18px;
+          color: #aa9da1;
+          font-size: 10px;
+        }
+
+        .chatTime.later {
+          margin-top: 10px;
+        }
+
+        .chatBubble {
+          width: fit-content;
+          max-width: 82%;
+          margin-bottom: 12px;
+          padding: 12px 15px;
+          border-radius: 19px;
+          font-size: 15px;
+          line-height: 1.65;
+        }
+
+        .userBubble {
+          align-self: flex-end;
+          background: var(--sub);
+          border-bottom-right-radius: 5px;
+        }
+
+        .misakiBubble {
+          align-self: flex-start;
+          background: white;
+          border-bottom-left-radius: 5px;
+          box-shadow: 0 6px 18px rgba(77,53,61,.04);
+        }
+
+        .special {
+          border: 1px solid rgba(255,102,128,.2);
+        }
+
+        .chatInput {
+          margin: 0 14px 14px;
+          padding: 13px 14px;
+          display: flex;
+          justify-content: space-between;
+          border-radius: 18px;
+          background: white;
+          color: #b2a6aa;
+          font-size: 12px;
+        }
+
+        .chatInput span {
+          display: grid;
+          place-items: center;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          background: var(--main);
+          color: white;
         }
 
         /* DIFFERENCE */
 
         .differenceSection {
           padding: 115px 20px;
+          background: #fff8f9;
         }
 
         .differenceInner {
           width: min(950px,100%);
           margin: auto;
-          text-align: center;
+          text-align: left;
         }
 
         .differenceLead {
           max-width: 650px;
-          margin: 24px auto 45px;
+          margin: 24px 0 45px;
           font-size: 16px;
           line-height: 2;
         }
@@ -1776,16 +1691,15 @@ export default function HomePage() {
         }
 
         .comparisonCard {
-          min-height: 290px;
+          min-height: 300px;
           padding: 28px;
           border-radius: 27px;
           background: white;
-          text-align: left;
           box-shadow: 0 14px 35px rgba(72,49,56,.06);
         }
 
         .normalCard {
-          opacity: .78;
+          opacity: .77;
         }
 
         .misakiCard {
@@ -1802,11 +1716,17 @@ export default function HomePage() {
           color: var(--main) !important;
         }
 
+        .compareConversation {
+          margin-top: 26px;
+          display: flex;
+          flex-direction: column;
+        }
+
         .miniUser,
         .miniAi {
           width: fit-content;
           max-width: 88%;
-          margin-top: 20px;
+          margin-top: 14px;
           padding: 13px 15px;
           border-radius: 17px;
           font-size: 14px;
@@ -1823,7 +1743,7 @@ export default function HomePage() {
         }
 
         .miniAi {
-          background: #fff;
+          background: white;
           border: 1px solid rgba(108,92,98,.08);
         }
 
@@ -1837,11 +1757,9 @@ export default function HomePage() {
 
         .memoryStory {
           padding: 120px 20px;
-          background: #fff7f8;
         }
 
         .memoryStoryInner,
-        .conversationInner,
         .taxiInner {
           width: min(1000px,100%);
           margin: auto;
@@ -1851,8 +1769,7 @@ export default function HomePage() {
           align-items: center;
         }
 
-        .memoryCopy > p:not(.eyebrow),
-        .conversationCopy > p:not(.eyebrow) {
+        .memoryCopy > p:not(.eyebrow) {
           font-size: 16px;
           line-height: 2;
         }
@@ -1861,8 +1778,7 @@ export default function HomePage() {
           margin-top: 28px;
           padding: 22px;
           border-radius: 20px;
-          background: #fff;
-          color: #745f67;
+          background: #fff1f4;
           font-size: 17px;
           line-height: 1.8;
         }
@@ -1910,92 +1826,6 @@ export default function HomePage() {
           box-shadow: 0 8px 20px rgba(255,102,128,.1);
         }
 
-        /* CONVERSATION */
-
-        .conversationSection {
-          padding: 115px 20px;
-          background: var(--beige);
-        }
-
-        .handMessage {
-          width: fit-content;
-          margin-top: 28px;
-          padding: 14px 21px;
-          border-radius: 8px 20px;
-          background: white;
-          color: #8b6572;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
-          font-size: 18px;
-        }
-
-        .chatCard {
-          width: min(390px,100%);
-          margin: auto;
-          overflow: hidden;
-          border-radius: 30px;
-          background: #f8efea;
-          box-shadow: 0 25px 60px rgba(70,48,56,.14);
-        }
-
-        .chatHeader {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 18px;
-          background: white;
-        }
-
-        .chatHeader img {
-          width: 44px;
-          height: 44px;
-          border-radius: 50%;
-        }
-
-        .chatHeader strong {
-          display: block;
-          color: var(--title);
-        }
-
-        .chatHeader span {
-          display: block;
-          color: #978b8f;
-          font-size: 10px;
-        }
-
-        .chatBody {
-          padding: 25px 15px;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .bubble {
-          width: fit-content;
-          max-width: 82%;
-          margin-bottom: 11px;
-          padding: 11px 13px;
-          border-radius: 17px;
-          font-size: 14px;
-          line-height: 1.6;
-        }
-
-        .bubble.misaki {
-          background: white;
-        }
-
-        .bubble.user {
-          align-self: flex-end;
-          background: var(--sub);
-        }
-
-        .timeLabel {
-          margin: 5px auto 14px;
-          color: #a99da1;
-          font-size: 10px;
-        }
-
         /* FEATURES */
 
         .features {
@@ -2004,12 +1834,21 @@ export default function HomePage() {
           padding: 115px 0;
         }
 
+        .featureHeading {
+          max-width: 650px;
+        }
+
         .featureTitle {
           margin: 0;
           color: var(--title);
-          text-align: center;
           font-size: clamp(34px,5vw,47px);
           line-height: 1.5;
+        }
+
+        .featureHeading > p:last-child {
+          margin-top: 18px;
+          font-size: 16px;
+          line-height: 1.9;
         }
 
         .featureGrid {
@@ -2048,12 +1887,7 @@ export default function HomePage() {
 
         .taxiSection {
           padding: 115px 20px;
-          background:
-            linear-gradient(
-              180deg,
-              #fff8f9,
-              #f8efea
-            );
+          background: linear-gradient(180deg,#fff8f9,#f8efea);
         }
 
         .taxiLoveNote {
@@ -2066,20 +1900,13 @@ export default function HomePage() {
 
         .taxiLoveNote span {
           color: var(--main);
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
+          font-family: "Bradley Hand","Segoe Script",cursive;
           font-size: 25px;
         }
 
         .taxiLoveNote p {
           margin: 25px 0 0;
-          color: #6f5b62;
-          font-family:
-            "Yu Mincho",
-            "Hiragino Mincho ProN",
-            serif;
+          font-family: "Yu Mincho","Hiragino Mincho ProN",serif;
           font-size: 24px;
           line-height: 1.8;
         }
@@ -2137,7 +1964,6 @@ export default function HomePage() {
         }
 
         .faqItem summary b {
-          color: #56474c;
           font-size: 16px;
         }
 
@@ -2175,7 +2001,6 @@ export default function HomePage() {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          object-position: center center;
         }
 
         .finalShade {
@@ -2215,8 +2040,6 @@ export default function HomePage() {
           line-height: 1.95;
         }
 
-        /* FOOTER */
-
         footer {
           width: min(1100px,calc(100% - 40px));
           margin: auto;
@@ -2244,16 +2067,14 @@ export default function HomePage() {
         }
 
         .footerBrand span {
-          color: #998d91;
           font-size: 10px;
+          color: #998d91;
         }
 
         footer small {
-          color: #aaa0a3;
           font-size: 10px;
+          color: #aaa0a3;
         }
-
-        /* MOBILE */
 
         @media (max-width: 760px) {
           .eyebrow {
@@ -2285,7 +2106,7 @@ export default function HomePage() {
             font-size: 16px;
           }
 
-          /* HERO MOBILE */
+          /* HERO */
 
           .hero {
             padding: 0 8px;
@@ -2306,11 +2127,10 @@ export default function HomePage() {
               linear-gradient(
                 180deg,
                 rgba(255,250,249,0) 0%,
-                rgba(255,250,249,0) 40%,
-                rgba(255,250,249,.28) 52%,
-                rgba(255,250,249,.86) 63%,
-                rgba(255,250,249,.98) 72%,
-                #fffafa 82%,
+                rgba(255,250,249,0) 38%,
+                rgba(255,250,249,.35) 52%,
+                rgba(255,250,249,.9) 64%,
+                #fffafa 76%,
                 #fffafa 100%
               );
           }
@@ -2325,8 +2145,6 @@ export default function HomePage() {
           }
 
           .heroSmall {
-            margin-bottom: 14px;
-            padding: 6px 13px;
             font-size: 14px;
           }
 
@@ -2336,7 +2154,6 @@ export default function HomePage() {
           }
 
           .heroLead {
-            margin: 21px 0 22px;
             font-size: 17px;
             line-height: 1.8;
           }
@@ -2353,8 +2170,17 @@ export default function HomePage() {
             font-size: 13px;
           }
 
+          /* LEFT ALIGN */
+
+          .intro,
+          .sceneIntro,
+          .differenceInner,
+          .featureHeading {
+            text-align: left;
+          }
+
           .intro {
-            width: calc(100% - 32px);
+            width: calc(100% - 36px);
             padding: 82px 0;
           }
 
@@ -2369,7 +2195,12 @@ export default function HomePage() {
             line-height: 1.95;
           }
 
-          /* PROFILE MOBILE */
+          .handCopy {
+            margin-left: 0;
+            font-size: 19px;
+          }
+
+          /* PROFILE */
 
           .profileSection {
             padding: 28px 10px 85px;
@@ -2391,10 +2222,10 @@ export default function HomePage() {
             background:
               linear-gradient(
                 180deg,
-                rgba(255,250,248,.97) 0%,
-                rgba(255,250,248,.82) 24%,
-                rgba(255,250,248,.15) 44%,
-                rgba(255,250,248,0) 66%
+                rgba(255,250,248,.96) 0%,
+                rgba(255,250,248,.77) 23%,
+                rgba(255,250,248,.12) 45%,
+                transparent 66%
               );
           }
 
@@ -2404,31 +2235,29 @@ export default function HomePage() {
           }
 
           .profileHello {
-            font-size: 31px;
+            font-size: 30px;
           }
 
           .profileHeadline h2 {
-            font-size: 48px;
-            line-height: 1.1;
+            font-size: 44px;
           }
 
           .profileHeadline h2 span {
-            font-size: 61px;
+            font-size: 57px;
           }
 
           .profileScript {
-            font-size: 28px;
+            font-size: 26px;
           }
 
           .profileHand {
-            margin-top: 15px;
-            font-size: 23px;
+            font-size: 22px;
           }
 
           .profileSideHand {
-            top: 315px;
-            right: 18px;
-            font-size: 20px;
+            top: 318px;
+            right: 20px;
+            font-size: 19px;
           }
 
           .profileStory {
@@ -2438,27 +2267,10 @@ export default function HomePage() {
           }
 
           .profileLead {
-            padding: 16px;
             font-size: 18px;
-            line-height: 1.78;
-            border-radius: 13px;
           }
 
           .profileText {
-            padding: 0 3px;
-            font-size: 17px;
-            line-height: 1.9;
-          }
-
-          .profileStickerList {
-            position: static;
-            width: 100%;
-            margin-top: 22px;
-            gap: 8px;
-          }
-
-          .profileStickerList span {
-            max-width: 100%;
             font-size: 17px;
           }
 
@@ -2470,16 +2282,8 @@ export default function HomePage() {
 
           .profileFact {
             aspect-ratio: auto;
-            min-height: 150px;
+            min-height: 148px;
             border-radius: 999px;
-          }
-
-          .factIcon {
-            font-size: 28px;
-          }
-
-          .profileFact span {
-            font-size: 12px;
           }
 
           .profileFact strong {
@@ -2487,35 +2291,23 @@ export default function HomePage() {
           }
 
           .profileBottom {
-            grid-template-columns: 1fr;
-            gap: 28px;
-            padding: 35px 20px 42px;
-          }
-
-          .polaroid {
-            width: 180px;
-            margin: auto;
+            padding: 32px 20px 42px;
           }
 
           .profileNote {
-            padding: 22px 18px;
+            padding: 20px 16px;
             font-size: 23px;
           }
 
-          .profileMessageArea > p {
-            font-size: 12px;
-          }
-
-          /* SCENES MOBILE */
+          /* SCENE */
 
           .sceneIntro {
-            width: calc(100% - 32px);
+            width: calc(100% - 36px);
             padding: 82px 0 52px;
           }
 
           .sceneIntro h2 {
             font-size: 34px;
-            line-height: 1.4;
           }
 
           .sceneIntro > p:last-child {
@@ -2538,27 +2330,14 @@ export default function HomePage() {
             order: initial;
           }
 
-          .sceneImageWrap {
-            width: 100%;
-            border-radius: 25px;
-          }
-
           .sceneImage {
             width: 100%;
             height: auto;
-            object-fit: contain;
           }
 
           .sceneCopy {
+            width: 100%;
             padding: 3px 9px;
-          }
-
-          .sceneNumber {
-            font-size: 48px;
-          }
-
-          .sceneLabel {
-            font-size: 12px;
           }
 
           .sceneCopy h2 {
@@ -2567,10 +2346,9 @@ export default function HomePage() {
 
           .sceneText {
             font-size: 17px;
-            line-height: 1.9;
           }
 
-          /* INSTALL MOBILE */
+          /* INSTALL */
 
           .installSection {
             padding: 82px 18px;
@@ -2584,11 +2362,10 @@ export default function HomePage() {
 
           .installCopy h2,
           .memoryCopy h2,
-          .conversationCopy h2,
           .taxiCopy h2,
-          .faqHeading h2 {
+          .faqHeading h2,
+          .realChatHeading h2 {
             font-size: 34px;
-            line-height: 1.45;
           }
 
           .installBig {
@@ -2599,47 +2376,84 @@ export default function HomePage() {
             font-size: 17px;
           }
 
-          .installLead strong {
-            font-size: 18px;
-          }
-
           .installSteps span {
             font-size: 16px;
           }
 
-          .installCatch {
-            font-size: 20px;
-          }
-
-          .installCatch strong {
-            font-size: 27px;
+          .phoneStage {
+            width: 100%;
           }
 
           .phone {
+            width: min(340px,100%);
             height: 590px;
           }
 
-          .notification p {
-            font-size: 14px;
+          .notification {
+            left: 14px;
+            right: 14px;
+            padding: 13px;
           }
 
-          /* OTHER MOBILE */
+          .notification p {
+            font-size: 13px;
+            line-height: 1.5;
+          }
 
-          .differenceSection,
-          .memoryStory,
-          .conversationSection,
-          .features,
-          .taxiSection {
+          .notificationBody {
+            min-width: 0;
+          }
+
+          .phoneHandText {
+            right: 4px;
+          }
+
+          /* CHAT EXPERIENCE */
+
+          .realChatSection {
+            padding: 82px 18px;
+          }
+
+          .realChatInner {
+            display: flex;
+            flex-direction: column;
+            gap: 38px;
+          }
+
+          .realChatHeading {
+            width: 100%;
+          }
+
+          .realChatHeading > p:last-child {
+            font-size: 17px;
+          }
+
+          .chatPhone {
+            width: 100%;
+          }
+
+          .chatConversation {
+            min-height: 500px;
+          }
+
+          .chatBubble {
+            font-size: 16px;
+          }
+
+          /* DIFFERENCE */
+
+          .differenceSection {
             padding: 82px 18px;
           }
 
           .differenceLead {
+            margin-left: 0;
             font-size: 17px;
           }
 
           .comparison {
             grid-template-columns: 1fr;
-            gap: 15px;
+            gap: 16px;
           }
 
           .comparisonVs {
@@ -2655,16 +2469,22 @@ export default function HomePage() {
             font-size: 15px;
           }
 
+          /* MEMORY */
+
+          .memoryStory,
+          .features,
+          .taxiSection {
+            padding: 82px 18px;
+          }
+
           .memoryStoryInner,
-          .conversationInner,
           .taxiInner {
             display: flex;
             flex-direction: column;
             gap: 36px;
           }
 
-          .memoryCopy > p:not(.eyebrow),
-          .conversationCopy > p:not(.eyebrow) {
+          .memoryCopy > p:not(.eyebrow) {
             font-size: 17px;
           }
 
@@ -2676,16 +2496,18 @@ export default function HomePage() {
             font-size: 15px;
           }
 
-          .chatCard {
-            width: 100%;
-          }
+          /* FEATURES */
 
-          .bubble {
-            font-size: 15px;
+          .features {
+            width: 100%;
           }
 
           .featureTitle {
             font-size: 34px;
+          }
+
+          .featureHeading > p:last-child {
+            font-size: 17px;
           }
 
           .featureGrid {
@@ -2699,6 +2521,8 @@ export default function HomePage() {
           .featureCard p {
             font-size: 16px;
           }
+
+          /* TAXI */
 
           .taxiLoveNote {
             width: 100%;
@@ -2715,6 +2539,8 @@ export default function HomePage() {
           .taxiWords span {
             font-size: 14px;
           }
+
+          /* FAQ */
 
           .faqSection {
             width: 100%;
@@ -2740,7 +2566,7 @@ export default function HomePage() {
             font-size: 16px;
           }
 
-          /* FINAL MOBILE */
+          /* FINAL */
 
           .finalSection {
             padding: 15px 8px 70px;
@@ -2753,7 +2579,6 @@ export default function HomePage() {
 
           .finalImage {
             height: 68%;
-            object-fit: cover;
             object-position: center top;
           }
 
@@ -2761,8 +2586,8 @@ export default function HomePage() {
             background:
               linear-gradient(
                 180deg,
-                rgba(255,250,249,0) 0%,
-                rgba(255,250,249,0) 40%,
+                transparent 0%,
+                transparent 40%,
                 rgba(255,250,249,.3) 52%,
                 rgba(255,250,249,.88) 64%,
                 #fffafa 77%,
