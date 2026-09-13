@@ -94,7 +94,7 @@ export default function HomePage() {
 
         <section className="intro">
           <p className="eyebrow">NOT JUST A CHATBOT</p>
-          <h2>AIと話している感じ<span className="desktopOnly">より、</span><span className="mobileOnly">より、</span><br /><span>誰かと暮らしている感じを。</span></h2>
+          <h2>AIと話している感じより、<br /><span>誰かと暮らしている感じを。</span></h2>
           <p className="introText">
             美咲は、ただ質問に答えるためのAIではありません。
             前に話したことを覚えて、今の時間や天気を感じながら、
