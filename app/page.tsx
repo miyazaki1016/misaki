@@ -187,15 +187,15 @@ export default function HomePage() {
         <section className="sceneSection">
           {scenes.map((scene, index) => (
             <article key={scene.label} className={`scene ${index % 2 ? "reverse" : ""}`}>
-              <div className="sceneImageWrap">
-                <img src={scene.image} alt={scene.alt} className="sceneImage" />
-              </div>
               <div className="sceneCopy">
                 <span className="sceneNumber">0{index + 1}</span>
                 <p className="sceneLabel">{scene.label}</p>
                 <h2>{scene.title}</h2>
                 <p className="sceneText">{scene.text}</p>
                 <p className="sceneSignature">Misaki</p>
+              </div>
+              <div className="sceneImageWrap">
+                <img src={scene.image} alt={scene.alt} className="sceneImage" />
               </div>
             </article>
           ))}
@@ -822,7 +822,8 @@ export default function HomePage() {
             gap:0!important;
             margin:0 0 46px!important;
           }
-          .sceneImageWrap{margin:0 0 24px!important}
+          .scene.reverse .sceneImageWrap{order:initial!important}
+          .sceneImageWrap{margin:26px 0 0!important}
           .sceneImage{border-radius:26px!important}
           .sceneCopy{width:100%!important;padding:0 14px!important}
           .sceneNumber{font-size:56px!important;line-height:1!important;margin:0 0 16px!important}
