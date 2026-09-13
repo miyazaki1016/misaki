@@ -903,15 +903,17 @@ export default function HomePage() {
           footer{width:auto!important;padding:28px 22px 34px!important}
         }
 
-      `}
-        @media (max-width: 768px) {
-          .dailyConversationLine {
-            font-size: 0.86em;
-            white-space: nowrap;
-            letter-spacing: -0.02em;
+
+        @media(max-width:900px){
+          .dailyConversationLine{
+            display:block;
+            font-size:.86em;
+            white-space:nowrap;
+            letter-spacing:-.02em;
           }
         }
-</style>
+
+      `}</style>
     </>
   );
 }
