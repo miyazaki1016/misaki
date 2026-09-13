@@ -18,6 +18,10 @@ import {
   loadPersonaPrompt,
 } from "../../../lib/persona/persona-store";
 
+import {
+  runUserEvolutionAnalysis,
+} from "../../../lib/persona/evolution-runner";
+
 type MisakiTodayMemory = {
   date: string;
   items: string[];
@@ -1876,6 +1880,30 @@ export async function POST(
       }
     );
 
+    const evolutionAnalysisPromise =
+      runUserEvolutionAnalysis(
+        supabase,
+        userData.user.id,
+        apiKey,
+        safeHistory,
+        safeMemory
+      ).catch(
+        (error) => {
+          console.error(
+            "PROACTIVE EVOLUTION ANALYSIS ERROR:",
+            error
+          );
+
+          return {
+            analyzed: false,
+            skipped: false,
+            reason:
+              "analysis_failed" as const,
+            saved: 0,
+          };
+        }
+      );
+
     const misakiLifeContext =
       createMisakiLife(
         safeCurrentTime
@@ -2442,6 +2470,14 @@ AIっぽい心配や質問返しも不要です。
           -MAX_TODAY_MEMORY
         ),
     };
+
+    const evolutionAnalysis =
+      await evolutionAnalysisPromise;
+
+    console.log(
+      "PROACTIVE EVOLUTION ANALYSIS:",
+      evolutionAnalysis
+    );
 
     const {
       data: proactiveData,
