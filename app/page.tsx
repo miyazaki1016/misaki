@@ -772,6 +772,119 @@ export default function HomePage() {
 
           footer{width:calc(100% - 36px)}
         }
+
+        @media(max-width:900px){
+          /* MOBILE REFINEMENT PASS */
+          .header{padding:18px 22px;gap:12px}
+          .brandIcon{width:50px;height:50px}
+          .brandName{font-size:20px}
+          .brandSub{font-size:12px}
+          .headerCta{padding:15px 24px;font-size:18px;border-radius:999px}
+
+          .heroMobileAction{padding:24px 22px 30px!important}
+          .mainCta{min-height:64px;font-size:19px!important}
+          .heroNote{margin-top:10px!important;font-size:13px!important}
+
+          .intro{padding:64px 22px 56px!important}
+          .intro .eyebrow{margin-bottom:20px!important}
+          .intro h2{
+            font-size:clamp(30px,8.6vw,39px)!important;
+            line-height:1.34!important;
+            letter-spacing:-.035em!important;
+            word-break:keep-all!important;
+            overflow-wrap:normal!important;
+          }
+          .intro h2 span{display:block;margin-top:6px}
+          .introText{margin-top:26px!important;font-size:16px!important;line-height:1.9!important}
+          .handCopy{margin-top:24px!important;padding:18px 14px!important;font-size:22px!important}
+
+          .profileSection{padding-bottom:42px!important}
+
+          .sceneIntro{width:auto!important;padding:64px 22px 38px!important}
+          .sceneIntro h2{
+            font-size:clamp(31px,8.6vw,39px)!important;
+            line-height:1.28!important;
+            word-break:keep-all!important;
+          }
+          .sceneIntro>p:last-child{margin-top:18px!important;font-size:16px!important;line-height:1.75!important}
+
+          .sceneSection{width:auto!important;padding:0 20px 26px!important}
+          .scene,.scene.reverse{
+            display:flex!important;
+            flex-direction:column!important;
+            gap:0!important;
+            margin:0 0 46px!important;
+          }
+          .sceneImageWrap{margin:0 0 24px!important}
+          .sceneImage{border-radius:26px!important}
+          .sceneCopy{width:100%!important;padding:0 14px!important}
+          .sceneNumber{font-size:56px!important;line-height:1!important;margin:0 0 16px!important}
+          .sceneLabel{margin-bottom:14px!important}
+          .sceneCopy h2{
+            font-size:31px!important;
+            line-height:1.28!important;
+            margin-bottom:18px!important;
+            word-break:keep-all!important;
+          }
+          .sceneText{font-size:16px!important;line-height:1.85!important}
+          .sceneSignature{margin-top:18px!important}
+
+          .installSection{padding:62px 22px 56px!important}
+          .installInner{gap:34px!important}
+          .installCopy h2{
+            font-size:clamp(31px,8.6vw,39px)!important;
+            line-height:1.3!important;
+            word-break:keep-all!important;
+          }
+          .installBig{margin-top:24px!important;font-size:20px!important;line-height:1.7!important}
+          .installLead{margin-top:18px!important;font-size:15px!important;line-height:1.85!important}
+          .installSteps{margin-top:24px!important;gap:12px!important}
+          .installSteps div{min-height:66px!important;padding:12px 16px!important}
+          .installSteps b{width:40px!important;height:40px!important;font-size:19px!important}
+          .installSteps span{font-size:16px!important}
+          .phone{width:min(84vw,390px)!important;margin:0 auto!important}
+
+          .realChatSection{padding:62px 22px 58px!important}
+          .realChatHeading h2{
+            font-size:clamp(31px,8.6vw,39px)!important;
+            line-height:1.3!important;
+            word-break:keep-all!important;
+          }
+          .realChatHeading>p:last-child{font-size:15px!important;line-height:1.75!important}
+          .chatPhone{margin-top:34px!important;width:min(84vw,380px)!important}
+
+          .features{width:auto!important;padding:64px 22px 56px!important}
+          .featureHeading{margin-bottom:30px!important}
+          .featureHeading h2{
+            font-size:clamp(31px,8.6vw,39px)!important;
+            line-height:1.3!important;
+            word-break:keep-all!important;
+          }
+          .featureGrid{gap:14px!important}
+          .featureCard{min-height:auto!important;padding:26px 26px 28px!important;border-radius:26px!important}
+          .featureNumber{font-size:46px!important;margin-bottom:20px!important}
+          .featureCard h3{font-size:21px!important;line-height:1.4!important;margin-bottom:14px!important}
+          .featureCard p{font-size:15px!important;line-height:1.8!important}
+
+          .faqSection{width:auto!important;padding:64px 22px 54px!important}
+          .faqHeading{margin-bottom:26px!important}
+          .faqHeading h2{
+            font-size:clamp(32px,8.8vw,40px)!important;
+            line-height:1.32!important;
+            word-break:keep-all!important;
+          }
+          .faqList{margin-top:22px!important}
+          .faqItem summary{padding:20px 0!important}
+          .faqItem summary b{font-size:17px!important;line-height:1.5!important}
+          .faqAnswer{padding:0 0 20px 47px!important;font-size:14px!important;line-height:1.8!important}
+
+          .finalSection{padding:0!important}
+          .finalMobileAction{padding:24px 22px 28px!important}
+          .finalMobileAction .mainCta{min-height:64px!important}
+
+          footer{width:auto!important;padding:28px 22px 34px!important}
+        }
+
       `}</style>
     </>
   );
