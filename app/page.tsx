@@ -60,13 +60,14 @@ export default function HomePage() {
         {/* HERO */}
         <section className="hero">
           <div className="heroVisual">
-            <img src="/misaki-hero.webp" alt="美咲" className="heroImage" />
-
-            <img
-              src="/misaki-hero-mobile.png"
-              alt="いつでも、どんな話でも。待ってるよ。"
-              className="heroMobileComposite"
-            />
+            <picture className="heroPicture">
+              <source media="(max-width: 900px)" srcSet="/misaki-hero-mobile.png?v=2" />
+              <img
+                src="/misaki-hero.webp"
+                alt="いつでも、どんな話でも。待ってるよ。"
+                className="heroResponsiveImage"
+              />
+            </picture>
 
             <div className="heroShade" />
 
@@ -80,12 +81,12 @@ export default function HomePage() {
                 嬉しかったこと。<br /><br />
                 なんでも話してね。
               </p>
-              <Link href="/chat" className="mainCta">美咲と無料で話す <span>→</span></Link>
+              <Link href="/chat" className="mainCta">美咲と話してみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
             <div className="heroMobileAction">
-              <Link href="/chat" className="mainCta">美咲と無料で話す <span>→</span></Link>
+              <Link href="/chat" className="mainCta">美咲と話してみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
@@ -104,11 +105,14 @@ export default function HomePage() {
 
         {/* PROFILE */}
         <section className="profileSection">
-          <img
-            src="/misaki-profile-mobile.png"
-            alt="はじめまして。美咲、38歳です。"
-            className="profileMobileComposite"
-          />
+          <picture className="profileMobilePicture">
+            <source media="(max-width: 900px)" srcSet="/misaki-profile-mobile.png?v=2" />
+            <img
+              src="/misaki-profile.webp"
+              alt="はじめまして。美咲、38歳です。"
+              className="profileMobileFallback"
+            />
+          </picture>
 
           <div className="profileMagazine profileDesktopContent">
             <div className="profileHero">
@@ -284,12 +288,14 @@ export default function HomePage() {
         {/* FINAL CTA */}
         <section className="finalSection">
           <div className="finalVisual">
-            <img src="/misaki-cta.webp" alt="美咲" className="finalImage" />
-            <img
-              src="/misaki-cta-mobile.png"
-              alt="また、話そう？ 今日のことも、言えなかったことも。どんな話でもちゃんと聞くよ。"
-              className="finalMobileComposite"
-            />
+            <picture className="finalPicture">
+              <source media="(max-width: 900px)" srcSet="/misaki-cta-mobile.png?v=2" />
+              <img
+                src="/misaki-cta.webp"
+                alt="また、話そう？ 今日のことも、言えなかったことも。どんな話でもちゃんと聞くよ。"
+                className="finalResponsiveImage"
+              />
+            </picture>
 
             <div className="finalShade" />
 
@@ -377,7 +383,7 @@ export default function HomePage() {
         .headerCta{min-height:44px;padding:10px 24px;border-radius:999px;font-size:14px}
         .mainCta,.profileCta{min-height:62px;padding:15px 30px;border-radius:18px;font-size:17px}
 
-        .heroMobileComposite,.heroMobileAction{display:none}
+        .heroMobileAction{display:none}.heroPicture{position:absolute;inset:0;display:block;width:100%;height:100%}.heroResponsiveImage{width:100%;height:100%;object-fit:cover}
         .hero{padding:0 18px}
         .heroVisual{
           position:relative;
@@ -388,7 +394,7 @@ export default function HomePage() {
           border-radius:34px;
           background:#f8efea
         }
-        .heroImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+        
         .heroShade{
           position:absolute;
           inset:0;
@@ -425,7 +431,7 @@ export default function HomePage() {
           font-size:20px
         }
 
-        .profileMobileComposite{display:none}
+        .profileMobilePicture{display:none}.profileMobileFallback{width:100%;height:auto}
         .profileSection{padding:40px 20px 110px;background:linear-gradient(180deg,#fffafa,#f8efea)}
         .profileMagazine{
           width:min(1080px,100%);
@@ -633,7 +639,7 @@ export default function HomePage() {
         .faqItem summary span{color:var(--main);font-weight:900}
         .faqAnswer{padding:0 0 24px 54px;line-height:1.9}
 
-        .finalMobileComposite,.finalMobileAction{display:none}
+        .finalMobileAction{display:none}.finalPicture{position:absolute;inset:0;display:block;width:100%;height:100%}.finalResponsiveImage{width:100%;height:100%;object-fit:cover;object-position:center}
         .finalSection{padding:28px 18px 90px;background:#fff}
         .finalVisual{
           position:relative;
@@ -645,7 +651,7 @@ export default function HomePage() {
           background:#f8efea;
           box-shadow:0 22px 55px rgba(86,58,68,.08)
         }
-        .finalImage{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+        
         .finalShade{
           position:absolute;
           inset:0;
@@ -697,7 +703,7 @@ export default function HomePage() {
         .footerBrand span{font-size:10px;color:#998d91}
         footer small{font-size:10px;color:#aaa0a3}
 
-        @media(max-width:760px){
+        @media(max-width:900px){
           .header{
             height:96px;
             width:100%;
@@ -714,8 +720,9 @@ export default function HomePage() {
 
           .hero{padding:0}
           .heroVisual{min-height:0;border-radius:0;overflow:visible;background:#fffafa}
-          .heroImage,.heroShade,.heroCopy{display:none}
-          .heroMobileComposite{display:block;width:100%;height:auto}
+          .heroShade,.heroCopy{display:none!important}
+          .heroPicture{position:relative!important;inset:auto!important;width:100%!important;height:auto!important}
+          .heroResponsiveImage{display:block!important;width:100%!important;height:auto!important;object-fit:contain!important}
           .heroMobileAction{display:block;padding:18px 24px 26px;background:#fffafa}
           .heroMobileAction .mainCta{width:100%;font-size:18px}
           .heroMobileAction .heroNote{margin-top:13px}
@@ -724,8 +731,9 @@ export default function HomePage() {
           .intro h2,.featureHeading h2,.faqHeading h2,.realChatHeading h2,.installCopy h2{font-size:32px}
 
           .profileSection{padding:0 0 72px;background:#fffafa}
-          .profileDesktopContent{display:none}
-          .profileMobileComposite{display:block;width:100%;height:auto}
+          .profileDesktopContent{display:none!important}
+          .profileMobilePicture{display:block!important;width:100%!important}
+          .profileMobileFallback{display:block!important;width:100%!important;height:auto!important}
 
           .sceneIntro,.features,.faqSection{width:calc(100% - 36px);padding:78px 0}
           .sceneIntro h2{font-size:34px}
@@ -755,8 +763,9 @@ export default function HomePage() {
             box-shadow:none;
             background:#fffafa
           }
-          .finalImage,.finalShade,.finalHand,.finalCopy{display:none}
-          .finalMobileComposite{display:block;width:100%;height:auto}
+          .finalShade,.finalHand,.finalCopy{display:none!important}
+          .finalPicture{position:relative!important;inset:auto!important;width:100%!important;height:auto!important}
+          .finalResponsiveImage{display:block!important;width:100%!important;height:auto!important;object-fit:contain!important}
           .finalMobileAction{display:block;padding:18px 24px 8px;background:#fffafa}
           .finalMobileAction .mainCta{width:100%;font-size:18px}
           .finalMobileAction .heroNote{margin-top:13px}
