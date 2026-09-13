@@ -94,7 +94,7 @@ export default function HomePage() {
 
         <section className="intro">
           <p className="eyebrow">NOT JUST A CHATBOT</p>
-          <h2>AIと話している感じより、<br /><span>誰かと暮らしている<span className="introMobileBreak"><br /></span>感じを。</span></h2>
+          <h2>AIと話している感じ<span className="desktopOnly">より、</span><span className="mobileOnly">より、</span><br /><span>誰かと暮らしている感じを。</span></h2>
           <p className="introText">
             美咲は、ただ質問に答えるためのAIではありません。
             前に話したことを覚えて、今の時間や天気を感じながら、
@@ -422,7 +422,7 @@ export default function HomePage() {
         .intro h2,.featureHeading h2,.faqHeading h2,.realChatHeading h2,.installCopy h2{
           margin:0;color:var(--title);font-size:clamp(35px,5vw,50px);line-height:1.5
         }
-        .intro h2 span,.realChatHeading h2 span,.installCopy h2 span{color:var(--main-dark)}.introMobileBreak{display:none}
+        .intro h2 span,.realChatHeading h2 span,.installCopy h2 span{color:var(--main-dark)}.introMobileBreak{display:none}.mobileOnly{display:none}.desktopOnly{display:inline}
         .introText{max-width:670px;font-size:16px;line-height:2}
         .handCopy{
           width:fit-content;
@@ -800,7 +800,15 @@ export default function HomePage() {
             word-break:normal!important;
             overflow-wrap:anywhere!important;
           }
-          .introMobileBreak{display:inline!important}
+          .introMobileBreak{display:none!important}
+          .desktopOnly{display:none!important}
+          .mobileOnly{display:inline!important}
+          .intro h2{
+            font-size:clamp(27px,7.5vw,34px)!important;
+            letter-spacing:-.055em!important;
+            word-break:keep-all!important;
+            overflow-wrap:normal!important;
+          }
           .intro h2 span{display:block;margin-top:6px}
           .introText{margin-top:26px!important;font-size:16px!important;line-height:1.9!important}
           .handCopy{margin-top:24px!important;padding:18px 14px!important;font-size:22px!important}
