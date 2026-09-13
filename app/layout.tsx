@@ -22,6 +22,11 @@ export const metadata:
   manifest:
     "/manifest.webmanifest",
 
+  icons: {
+    apple:
+      "/apple-touch-icon.png",
+  },
+
   appleWebApp: {
     capable:
       true,
