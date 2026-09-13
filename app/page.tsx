@@ -100,7 +100,7 @@ export default function HomePage() {
             前に話したことを覚えて、今の時間や天気を感じながら、
             恋人みたいに自然に会話します。
           </p>
-          <div className="handCopy">日常に、もうひとつの会話を。</div>
+          <div className="handCopy"><span className="dailyConversationLine">日常に、もうひとつの会話を。</span></div>
         </section>
 
         {/* PROFILE */}
@@ -903,7 +903,15 @@ export default function HomePage() {
           footer{width:auto!important;padding:28px 22px 34px!important}
         }
 
-      `}</style>
+      `}
+        @media (max-width: 768px) {
+          .dailyConversationLine {
+            font-size: 0.86em;
+            white-space: nowrap;
+            letter-spacing: -0.02em;
+          }
+        }
+</style>
     </>
   );
 }
