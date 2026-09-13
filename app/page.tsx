@@ -179,6 +179,9 @@ export default function HomePage() {
           <p className="eyebrow">A DAY WITH MISAKI</p>
           <h2>特別な日じゃなくていい。</h2>
           <p>いつもの一日の中に、<br />美咲との会話があります。</p>
+          <div className="sceneIntroImageWrap">
+            <img src="/misaki-day-intro.webp" alt="いつもの一日を過ごす美咲" className="sceneIntroImage" />
+          </div>
         </section>
 
         <section className="sceneSection">
@@ -549,6 +552,8 @@ export default function HomePage() {
 
         .sceneIntro,.features,.faqSection{width:min(1000px,calc(100% - 40px));margin:auto;padding:100px 0}
         .sceneIntro h2{margin:0;color:var(--title);font-size:44px}
+        .sceneIntroImageWrap{margin-top:46px;overflow:hidden;border-radius:30px}
+        .sceneIntroImage{display:block;width:100%;height:auto}
         .sceneSection{width:min(1070px,calc(100% - 36px));margin:auto}
         .scene{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center;margin-bottom:100px}
         .scene.reverse .sceneImageWrap{order:2}
@@ -806,7 +811,9 @@ export default function HomePage() {
             line-height:1.28!important;
             word-break:keep-all!important;
           }
-          .sceneIntro>p:last-child{margin-top:18px!important;font-size:16px!important;line-height:1.75!important}
+          .sceneIntro>p:not(.eyebrow){margin-top:18px!important;font-size:16px!important;line-height:1.75!important}
+          .sceneIntroImageWrap{margin-top:32px!important;border-radius:26px!important}
+          .sceneIntroImage{width:100%!important;height:auto!important}
 
           .sceneSection{width:auto!important;padding:0 20px 26px!important}
           .scene,.scene.reverse{
