@@ -194,7 +194,7 @@ export default function HomePage() {
           <div className="profileInner">
             <div className="profilePortrait">
               <img
-                src="/misaki-morning.webp"
+                src="/misaki-profile.webp"
                 alt="美咲"
               />
 
