@@ -2706,6 +2706,43 @@ AIっぽい心配や質問返しも不要です。
       );
     }
 
+    const {
+      error:
+        proactiveHistoryError,
+    } =
+      await supabase.rpc(
+        "append_proactive_to_conversation_state",
+        {
+          p_message:
+            reply,
+        }
+      );
+
+    if (
+      proactiveHistoryError
+    ) {
+      console.error(
+        "PROACTIVE HISTORY APPEND ERROR:",
+        proactiveHistoryError
+      );
+
+      return Response.json(
+        {
+          sent:
+            false,
+
+          reason:
+            "history_append_failed",
+
+          delivery,
+        },
+        {
+          status:
+            500,
+        }
+      );
+    }
+
     return Response.json({
       sent: true,
 
