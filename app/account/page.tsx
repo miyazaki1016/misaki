@@ -241,8 +241,6 @@ export default function AccountPage() {
         name: error?.name,
       });
 
-      // すでに本アカウントで使われているメールなら、
-      // エラー表示だけで終わらせずログイン側へ安全に誘導する。
       if (isExistingAccountError(error)) {
         setMode("login");
         setEmail(nextEmail);
@@ -354,7 +352,7 @@ export default function AccountPage() {
     setMessage("");
 
     try {
-      const { error } = await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut({ scope: "local" });
       if (error) throw error;
 
       setUser(null);
@@ -362,7 +360,7 @@ export default function AccountPage() {
       setOtp("");
 
       setMessage(
-        "ログアウトしました。別の保存済み美咲を呼び戻す場合は「既存アカウントでログイン」を使ってください。"
+        "この端末だけログアウトしました。別の保存済み美咲を呼び戻す場合は「既存アカウントでログイン」を使ってください。"
       );
     } catch (error: any) {
       setMessage(
@@ -417,7 +415,7 @@ export default function AccountPage() {
               disabled={working}
               style={styles.secondaryButton}
             >
-              ログアウト
+              この端末だけログアウト
             </button>
           </>
         ) : (
