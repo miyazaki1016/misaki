@@ -91,7 +91,7 @@ export default function AccountMenuLink() {
       Object.assign(title.style, {
         display: "block",
         color: "#49383e",
-        fontSize: "17px",
+        fontSize: "15px",
         lineHeight: "1.35",
         fontWeight: "800",
         textDecoration: "none",
