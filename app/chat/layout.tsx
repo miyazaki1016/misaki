@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import ConversationHistorySync from "./conversation-history-sync";
 import AccountMenuLink from "./account-menu-link";
+import ProactivePhotoDisplay from "./proactive-photo-display";
 
 export default function ChatLayout({
   children,
@@ -11,6 +12,7 @@ export default function ChatLayout({
     <>
       <ConversationHistorySync />
       <AccountMenuLink />
+      <ProactivePhotoDisplay />
       {children}
     </>
   );
