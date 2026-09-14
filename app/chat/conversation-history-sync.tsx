@@ -6,6 +6,7 @@ import { supabase } from "../../lib/supabase";
 const CHAT_HISTORY_KEY = "misaki-chat-history";
 const LONG_MEMORY_KEY = "misaki-long-term-memory";
 const RESTORE_GUARD_KEY = "misaki-server-history-restored-user";
+const MEMORY_BASELINE_PREFIX = "misaki-server-memory-baseline:";
 const SYNC_INTERVAL_MS = 10_000;
 
 type ChatMessage = {
@@ -63,13 +64,18 @@ function sanitizeHistory(value: unknown): ChatMessage[] {
 function sanitizeMemory(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
 
-  return value
-    .filter(
-      (item): item is string =>
-        typeof item === "string" && item.trim().length > 0
-    )
-    .map((item) => item.trim().slice(0, 500))
-    .slice(-30);
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const item of value) {
+    if (typeof item !== "string") continue;
+    const normalized = item.trim().slice(0, 500);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    result.push(normalized);
+  }
+
+  return result.slice(-30);
 }
 
 function mergeHistory(
@@ -79,7 +85,6 @@ function mergeHistory(
   const merged: ChatMessage[] = [];
   const seen = new Set<string>();
 
-  // まず本アカウント側の履歴を土台にし、その後に端末側の履歴を足す。
   for (const item of [...serverHistory, ...localHistory]) {
     const key = `${item.role}\u0000${item.text}`;
     if (seen.has(key)) continue;
@@ -90,35 +95,52 @@ function mergeHistory(
   return merged.slice(-60);
 }
 
-function mergeMemory(
-  serverMemory: string[],
-  localMemory: string[]
-): string[] {
-  const merged: string[] = [];
-  const seen = new Set<string>();
-
-  // サーバー側の長期記憶を必ず優先して残す。
-  for (const item of [...serverMemory, ...localMemory]) {
-    const normalized = item.trim();
-    if (!normalized || seen.has(normalized)) continue;
-    seen.add(normalized);
-    merged.push(normalized);
-  }
-
-  return merged.slice(-30);
+function arraysEqual(a: unknown[], b: unknown[]) {
+  return JSON.stringify(a) === JSON.stringify(b);
 }
 
-function fingerprint(history: ChatMessage[], memory: string[]) {
+function memoryBaselineKey(userId: string) {
+  return `${MEMORY_BASELINE_PREFIX}${userId}`;
+}
+
+function readMemoryBaseline(userId: string): string[] | null {
+  const key = memoryBaselineKey(userId);
+  const raw = localStorage.getItem(key);
+  if (raw === null) return null;
+
+  try {
+    return sanitizeMemory(JSON.parse(raw));
+  } catch {
+    return null;
+  }
+}
+
+function writeMemoryBaseline(userId: string, memory: string[]) {
+  localStorage.setItem(
+    memoryBaselineKey(userId),
+    JSON.stringify(memory)
+  );
+}
+
+function writeLocalMemory(memory: string[]) {
+  if (memory.length > 0) {
+    localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(memory));
+  } else {
+    localStorage.removeItem(LONG_MEMORY_KEY);
+  }
+}
+
+function fingerprint(
+  history: ChatMessage[],
+  memory: string[],
+  shouldPushMemory: boolean
+) {
   const recent = history
     .slice(-20)
     .map((item) => `${item.role}:${item.text}`)
     .join("\n");
 
-  return `${history.length}|${memory.length}|${recent}|${memory.join("\n")}`;
-}
-
-function arraysEqual(a: unknown[], b: unknown[]) {
-  return JSON.stringify(a) === JSON.stringify(b);
+  return `${history.length}|${recent}|${shouldPushMemory ? "M" : "H"}|${memory.join("\n")}`;
 }
 
 async function getAuthContext(): Promise<AuthContext> {
@@ -147,9 +169,7 @@ async function getAuthContext(): Promise<AuthContext> {
   return { accessToken, userId };
 }
 
-async function fetchServerState(
-  token: string
-): Promise<ServerState> {
+async function fetchServerState(token: string): Promise<ServerState> {
   const response = await fetch("/api/persona/history", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -175,7 +195,7 @@ export default function ConversationHistorySync() {
     let stopped = false;
     let syncing = false;
 
-    const restoreAndMergeFromServer = async () => {
+    const prepareSyncState = async () => {
       const auth = await getAuthContext();
 
       const localHistory = sanitizeHistory(
@@ -185,34 +205,41 @@ export default function ConversationHistorySync() {
         readJsonArray(LONG_MEMORY_KEY)
       );
 
-      const serverState = await fetchServerState(
-        auth.accessToken
-      );
+      const serverState = await fetchServerState(auth.accessToken);
+      const serverHistory = sanitizeHistory(serverState.history);
+      const serverMemory = sanitizeMemory(serverState.memory);
+      const mergedHistory = mergeHistory(serverHistory, localHistory);
 
-      const serverHistory = sanitizeHistory(
-        serverState.history
-      );
-      const serverMemory = sanitizeMemory(
-        serverState.memory
-      );
+      const baseline = readMemoryBaseline(auth.userId);
+      let canonicalMemory = serverMemory;
+      let shouldPushMemory = false;
 
-      const mergedHistory = mergeHistory(
-        serverHistory,
-        localHistory
-      );
-      const mergedMemory = mergeMemory(
-        serverMemory,
-        localMemory
-      );
+      if (!serverState.exists) {
+        // First save for a new account: local memory becomes the initial canonical set.
+        canonicalMemory = localMemory;
+        shouldPushMemory = true;
+      } else if (baseline === null) {
+        // First time this browser sees this account: server wins.
+        // This prevents stale browser storage from resurrecting old memories.
+        canonicalMemory = serverMemory;
+      } else {
+        const localChanged = !arraysEqual(localMemory, baseline);
+        const serverChanged = !arraysEqual(serverMemory, baseline);
 
-      const historyChanged = !arraysEqual(
-        localHistory,
-        mergedHistory
-      );
-      const memoryChanged = !arraysEqual(
-        localMemory,
-        mergedMemory
-      );
+        if (localChanged && !serverChanged) {
+          // The active chat changed memory locally (add/update/delete/forget).
+          // Send the complete canonical list to the server.
+          canonicalMemory = localMemory;
+          shouldPushMemory = true;
+        } else {
+          // Server changed elsewhere, or both sides changed concurrently.
+          // Prefer server so a stale browser cannot re-add deleted memory.
+          canonicalMemory = serverMemory;
+        }
+      }
+
+      const historyChanged = !arraysEqual(localHistory, mergedHistory);
+      const memoryChanged = !arraysEqual(localMemory, canonicalMemory);
 
       if (mergedHistory.length > 0) {
         localStorage.setItem(
@@ -221,116 +248,90 @@ export default function ConversationHistorySync() {
         );
       }
 
-      // ここが重要:
-      // 端末側memoryが空でも、サーバー側に記憶があれば必ず復元する。
-      if (mergedMemory.length > 0) {
-        localStorage.setItem(
-          LONG_MEMORY_KEY,
-          JSON.stringify(mergedMemory)
-        );
-      } else {
-        localStorage.removeItem(LONG_MEMORY_KEY);
-      }
+      writeLocalMemory(canonicalMemory);
 
       const restoredUserId =
         sessionStorage.getItem(RESTORE_GUARD_KEY);
 
-      // ユーザーが変わった直後、またはサーバーから新しい内容を復元した時だけ
-      // 1回リロードして ChatPage に確実に読み直させる。
       if (
         (historyChanged || memoryChanged) &&
         restoredUserId !== auth.userId
       ) {
-        sessionStorage.setItem(
-          RESTORE_GUARD_KEY,
-          auth.userId
-        );
-
+        sessionStorage.setItem(RESTORE_GUARD_KEY, auth.userId);
+        writeMemoryBaseline(auth.userId, canonicalMemory);
         window.location.reload();
+
         return {
           reloaded: true,
           auth,
           history: mergedHistory,
-          memory: mergedMemory,
+          memory: canonicalMemory,
+          shouldPushMemory: false,
         };
       }
 
-      sessionStorage.setItem(
-        RESTORE_GUARD_KEY,
-        auth.userId
-      );
+      sessionStorage.setItem(RESTORE_GUARD_KEY, auth.userId);
 
       return {
         reloaded: false,
         auth,
         history: mergedHistory,
-        memory: mergedMemory,
+        memory: canonicalMemory,
+        shouldPushMemory,
       };
     };
 
     const sync = async () => {
       if (stopped || syncing) return;
-
       syncing = true;
 
       try {
-        const restored =
-          await restoreAndMergeFromServer();
+        const state = await prepareSyncState();
 
-        if (restored.reloaded || stopped) {
-          return;
-        }
-
-        const history = restored.history;
-        const memory = restored.memory;
-
-        if (history.length === 0) return;
+        if (state.reloaded || stopped) return;
+        if (state.history.length === 0) return;
 
         const nextFingerprint = fingerprint(
-          history,
-          memory
+          state.history,
+          state.memory,
+          state.shouldPushMemory
         );
 
-        if (
-          nextFingerprint ===
-          lastFingerprintRef.current
-        ) {
-          return;
+        if (nextFingerprint === lastFingerprintRef.current) return;
+
+        const body: {
+          history: ChatMessage[];
+          memory?: string[];
+        } = {
+          history: state.history,
+        };
+
+        if (state.shouldPushMemory) {
+          body.memory = state.memory;
         }
 
-        const response = await fetch(
-          "/api/persona/history",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${restored.auth.accessToken}`,
-            },
-            body: JSON.stringify({
-              history,
-              memory,
-            }),
-          }
-        );
+        const response = await fetch("/api/persona/history", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${state.auth.accessToken}`,
+          },
+          body: JSON.stringify(body),
+        });
 
         if (!response.ok) {
-          const data = await response
-            .json()
-            .catch(() => null);
-
+          const data = await response.json().catch(() => null);
           throw new Error(
-            data?.error ||
-              "Conversation history sync failed."
+            data?.error || "Conversation history sync failed."
           );
         }
 
-        lastFingerprintRef.current =
-          nextFingerprint;
+        // After a successful canonical memory write (or history-only sync),
+        // this browser's baseline is exactly the memory it now sees.
+        writeMemoryBaseline(state.auth.userId, state.memory);
+        lastFingerprintRef.current = nextFingerprint;
       } catch (error) {
-        console.error(
-          "CONVERSATION HISTORY SYNC ERROR:",
-          error
-        );
+        console.error("CONVERSATION HISTORY SYNC ERROR:", error);
       } finally {
         syncing = false;
       }
@@ -343,60 +344,37 @@ export default function ConversationHistorySync() {
     }, SYNC_INTERVAL_MS);
 
     const handleVisibility = () => {
-      if (
-        document.visibilityState === "visible"
-      ) {
+      if (document.visibilityState === "visible") {
         void sync();
       }
     };
 
     window.addEventListener("focus", sync);
-    document.addEventListener(
-      "visibilitychange",
-      handleVisibility
-    );
+    document.addEventListener("visibilitychange", handleVisibility);
 
-    const { data: authListener } =
-      supabase.auth.onAuthStateChange(
-        (_event, session) => {
-          lastFingerprintRef.current = "";
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        lastFingerprintRef.current = "";
 
-          // ログイン先のユーザーが変わったら、
-          // 次のsyncで必ずサーバー状態と統合し直す。
-          const nextUserId =
-            session?.user?.id ?? "";
+        const nextUserId = session?.user?.id ?? "";
+        const restoredUserId =
+          sessionStorage.getItem(RESTORE_GUARD_KEY);
 
-          const restoredUserId =
-            sessionStorage.getItem(
-              RESTORE_GUARD_KEY
-            );
-
-          if (
-            !nextUserId ||
-            restoredUserId !== nextUserId
-          ) {
-            sessionStorage.removeItem(
-              RESTORE_GUARD_KEY
-            );
-          }
-
-          window.setTimeout(() => {
-            void sync();
-          }, 100);
+        if (!nextUserId || restoredUserId !== nextUserId) {
+          sessionStorage.removeItem(RESTORE_GUARD_KEY);
         }
-      );
+
+        window.setTimeout(() => {
+          void sync();
+        }, 100);
+      }
+    );
 
     return () => {
       stopped = true;
       window.clearInterval(intervalId);
-      window.removeEventListener(
-        "focus",
-        sync
-      );
-      document.removeEventListener(
-        "visibilitychange",
-        handleVisibility
-      );
+      window.removeEventListener("focus", sync);
+      document.removeEventListener("visibilitychange", handleVisibility);
       authListener.subscription.unsubscribe();
     };
   }, []);
