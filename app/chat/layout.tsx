@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import ConversationHistorySync from "./conversation-history-sync";
+import AccountMenuLink from "./account-menu-link";
 
 export default function ChatLayout({
   children,
@@ -9,6 +10,7 @@ export default function ChatLayout({
   return (
     <>
       <ConversationHistorySync />
+      <AccountMenuLink />
       {children}
     </>
   );
