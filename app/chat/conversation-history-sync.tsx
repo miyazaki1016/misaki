@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { supabase } from "../../lib/supabase";
 
 const CHAT_HISTORY_KEY = "misaki-chat-history";
 const LONG_MEMORY_KEY = "misaki-long-term-memory";
 const RESTORE_GUARD_KEY = "misaki-server-history-restored-user";
 const MEMORY_BASELINE_PREFIX = "misaki-server-memory-baseline:";
+const MEMORY_DIRTY_KEY = "misaki-memory-dirty";
 const SYNC_INTERVAL_MS = 10_000;
 
 type ChatMessage = {
@@ -27,6 +28,12 @@ type AuthContext = {
   accessToken: string;
   userId: string;
 };
+
+declare global {
+  interface Window {
+    __misakiMemorySyncApplying?: boolean;
+  }
+}
 
 function readJsonArray(key: string): unknown[] {
   try {
@@ -104,8 +111,7 @@ function memoryBaselineKey(userId: string) {
 }
 
 function readMemoryBaseline(userId: string): string[] | null {
-  const key = memoryBaselineKey(userId);
-  const raw = localStorage.getItem(key);
+  const raw = localStorage.getItem(memoryBaselineKey(userId));
   if (raw === null) return null;
 
   try {
@@ -122,11 +128,23 @@ function writeMemoryBaseline(userId: string, memory: string[]) {
   );
 }
 
+function readMemoryDirty() {
+  return localStorage.getItem(MEMORY_DIRTY_KEY) === "1";
+}
+
+function clearMemoryDirty() {
+  localStorage.removeItem(MEMORY_DIRTY_KEY);
+}
+
 function writeLocalMemory(memory: string[]) {
-  if (memory.length > 0) {
-    localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(memory));
-  } else {
-    localStorage.removeItem(LONG_MEMORY_KEY);
+  window.__misakiMemorySyncApplying = true;
+  try {
+    localStorage.setItem(
+      LONG_MEMORY_KEY,
+      JSON.stringify(memory)
+    );
+  } finally {
+    window.__misakiMemorySyncApplying = false;
   }
 }
 
@@ -140,7 +158,9 @@ function fingerprint(
     .map((item) => `${item.role}:${item.text}`)
     .join("\n");
 
-  return `${history.length}|${recent}|${shouldPushMemory ? "M" : "H"}|${memory.join("\n")}`;
+  return `${history.length}|${recent}|${
+    shouldPushMemory ? "M" : "H"
+  }|${memory.join("\n")}`;
 }
 
 async function getAuthContext(): Promise<AuthContext> {
@@ -169,7 +189,9 @@ async function getAuthContext(): Promise<AuthContext> {
   return { accessToken, userId };
 }
 
-async function fetchServerState(token: string): Promise<ServerState> {
+async function fetchServerState(
+  token: string
+): Promise<ServerState> {
   const response = await fetch("/api/persona/history", {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -190,6 +212,66 @@ async function fetchServerState(token: string): Promise<ServerState> {
 
 export default function ConversationHistorySync() {
   const lastFingerprintRef = useRef("");
+  const hydrationWriteIgnoredRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const originalSetItem = Storage.prototype.setItem;
+    const originalRemoveItem = Storage.prototype.removeItem;
+
+    Storage.prototype.setItem = function (
+      key: string,
+      value: string
+    ) {
+      if (
+        this === localStorage &&
+        key === LONG_MEMORY_KEY &&
+        !window.__misakiMemorySyncApplying
+      ) {
+        const current =
+          localStorage.getItem(LONG_MEMORY_KEY);
+
+        // page.tsx は初回hydrate後に現在値を書き戻す。
+        // localStorage が無い状態で [] を最初に書くケースは
+        // 「ユーザーが全部忘れさせた」と誤判定しない。
+        if (
+          !hydrationWriteIgnoredRef.current &&
+          current === null
+        ) {
+          hydrationWriteIgnoredRef.current = true;
+        } else if (current !== value) {
+          originalSetItem.call(
+            localStorage,
+            MEMORY_DIRTY_KEY,
+            "1"
+          );
+        }
+      }
+
+      return originalSetItem.call(this, key, value);
+    };
+
+    Storage.prototype.removeItem = function (key: string) {
+      if (
+        this === localStorage &&
+        key === LONG_MEMORY_KEY &&
+        !window.__misakiMemorySyncApplying &&
+        localStorage.getItem(LONG_MEMORY_KEY) !== null
+      ) {
+        originalSetItem.call(
+          localStorage,
+          MEMORY_DIRTY_KEY,
+          "1"
+        );
+      }
+
+      return originalRemoveItem.call(this, key);
+    };
+
+    return () => {
+      Storage.prototype.setItem = originalSetItem;
+      Storage.prototype.removeItem = originalRemoveItem;
+    };
+  }, []);
 
   useEffect(() => {
     let stopped = false;
@@ -205,41 +287,67 @@ export default function ConversationHistorySync() {
         readJsonArray(LONG_MEMORY_KEY)
       );
 
-      const serverState = await fetchServerState(auth.accessToken);
-      const serverHistory = sanitizeHistory(serverState.history);
-      const serverMemory = sanitizeMemory(serverState.memory);
-      const mergedHistory = mergeHistory(serverHistory, localHistory);
+      const serverState = await fetchServerState(
+        auth.accessToken
+      );
+      const serverHistory = sanitizeHistory(
+        serverState.history
+      );
+      const serverMemory = sanitizeMemory(
+        serverState.memory
+      );
+      const mergedHistory = mergeHistory(
+        serverHistory,
+        localHistory
+      );
 
       const baseline = readMemoryBaseline(auth.userId);
+      const memoryDirty = readMemoryDirty();
+
       let canonicalMemory = serverMemory;
       let shouldPushMemory = false;
 
       if (!serverState.exists) {
-        // First save for a new account: local memory becomes the initial canonical set.
         canonicalMemory = localMemory;
-        shouldPushMemory = true;
+        shouldPushMemory =
+          localMemory.length > 0 || memoryDirty;
       } else if (baseline === null) {
-        // First time this browser sees this account: server wins.
-        // This prevents stale browser storage from resurrecting old memories.
+        // 初見ブラウザでは必ずサーバー正本を採用。
         canonicalMemory = serverMemory;
       } else {
-        const localChanged = !arraysEqual(localMemory, baseline);
-        const serverChanged = !arraysEqual(serverMemory, baseline);
+        const localChanged = !arraysEqual(
+          localMemory,
+          baseline
+        );
+        const serverChanged = !arraysEqual(
+          serverMemory,
+          baseline
+        );
 
-        if (localChanged && !serverChanged) {
-          // The active chat changed memory locally (add/update/delete/forget).
-          // Send the complete canonical list to the server.
+        if (
+          memoryDirty &&
+          localChanged &&
+          !serverChanged
+        ) {
+          // AI返答やユーザー操作による実変更だけを
+          // canonical memory としてサーバーへ送る。
           canonicalMemory = localMemory;
           shouldPushMemory = true;
         } else {
-          // Server changed elsewhere, or both sides changed concurrently.
-          // Prefer server so a stale browser cannot re-add deleted memory.
+          // 別ブラウザ更新・競合・hydrate由来の差分は
+          // サーバー正本を優先する。
           canonicalMemory = serverMemory;
         }
       }
 
-      const historyChanged = !arraysEqual(localHistory, mergedHistory);
-      const memoryChanged = !arraysEqual(localMemory, canonicalMemory);
+      const historyChanged = !arraysEqual(
+        localHistory,
+        mergedHistory
+      );
+      const memoryChanged = !arraysEqual(
+        localMemory,
+        canonicalMemory
+      );
 
       if (mergedHistory.length > 0) {
         localStorage.setItem(
@@ -248,17 +356,22 @@ export default function ConversationHistorySync() {
         );
       }
 
+      // [] も正しいcanonical状態なので、キー削除ではなく
+      // 明示的に [] として保存する。
       writeLocalMemory(canonicalMemory);
 
-      const restoredUserId =
-        sessionStorage.getItem(RESTORE_GUARD_KEY);
+      if (memoryChanged && !shouldPushMemory) {
+        writeMemoryBaseline(
+          auth.userId,
+          canonicalMemory
+        );
+        clearMemoryDirty();
+        sessionStorage.setItem(
+          RESTORE_GUARD_KEY,
+          auth.userId
+        );
 
-      if (
-        (historyChanged || memoryChanged) &&
-        restoredUserId !== auth.userId
-      ) {
-        sessionStorage.setItem(RESTORE_GUARD_KEY, auth.userId);
-        writeMemoryBaseline(auth.userId, canonicalMemory);
+        // page.tsx のReact stateにも確実に反映させる。
         window.location.reload();
 
         return {
@@ -270,7 +383,36 @@ export default function ConversationHistorySync() {
         };
       }
 
-      sessionStorage.setItem(RESTORE_GUARD_KEY, auth.userId);
+      const restoredUserId =
+        sessionStorage.getItem(RESTORE_GUARD_KEY);
+
+      if (
+        historyChanged &&
+        restoredUserId !== auth.userId
+      ) {
+        sessionStorage.setItem(
+          RESTORE_GUARD_KEY,
+          auth.userId
+        );
+        writeMemoryBaseline(
+          auth.userId,
+          canonicalMemory
+        );
+        window.location.reload();
+
+        return {
+          reloaded: true,
+          auth,
+          history: mergedHistory,
+          memory: canonicalMemory,
+          shouldPushMemory: false,
+        };
+      }
+
+      sessionStorage.setItem(
+        RESTORE_GUARD_KEY,
+        auth.userId
+      );
 
       return {
         reloaded: false,
@@ -297,7 +439,12 @@ export default function ConversationHistorySync() {
           state.shouldPushMemory
         );
 
-        if (nextFingerprint === lastFingerprintRef.current) return;
+        if (
+          nextFingerprint ===
+          lastFingerprintRef.current
+        ) {
+          return;
+        }
 
         const body: {
           history: ChatMessage[];
@@ -310,28 +457,46 @@ export default function ConversationHistorySync() {
           body.memory = state.memory;
         }
 
-        const response = await fetch("/api/persona/history", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${state.auth.accessToken}`,
-          },
-          body: JSON.stringify(body),
-        });
+        const response = await fetch(
+          "/api/persona/history",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization:
+                `Bearer ${state.auth.accessToken}`,
+            },
+            body: JSON.stringify(body),
+          }
+        );
 
         if (!response.ok) {
-          const data = await response.json().catch(() => null);
+          const data = await response
+            .json()
+            .catch(() => null);
+
           throw new Error(
-            data?.error || "Conversation history sync failed."
+            data?.error ||
+              "Conversation history sync failed."
           );
         }
 
-        // After a successful canonical memory write (or history-only sync),
-        // this browser's baseline is exactly the memory it now sees.
-        writeMemoryBaseline(state.auth.userId, state.memory);
-        lastFingerprintRef.current = nextFingerprint;
+        writeMemoryBaseline(
+          state.auth.userId,
+          state.memory
+        );
+
+        if (state.shouldPushMemory) {
+          clearMemoryDirty();
+        }
+
+        lastFingerprintRef.current =
+          nextFingerprint;
       } catch (error) {
-        console.error("CONVERSATION HISTORY SYNC ERROR:", error);
+        console.error(
+          "CONVERSATION HISTORY SYNC ERROR:",
+          error
+        );
       } finally {
         syncing = false;
       }
@@ -344,37 +509,57 @@ export default function ConversationHistorySync() {
     }, SYNC_INTERVAL_MS);
 
     const handleVisibility = () => {
-      if (document.visibilityState === "visible") {
+      if (
+        document.visibilityState === "visible"
+      ) {
         void sync();
       }
     };
 
     window.addEventListener("focus", sync);
-    document.addEventListener("visibilitychange", handleVisibility);
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        lastFingerprintRef.current = "";
-
-        const nextUserId = session?.user?.id ?? "";
-        const restoredUserId =
-          sessionStorage.getItem(RESTORE_GUARD_KEY);
-
-        if (!nextUserId || restoredUserId !== nextUserId) {
-          sessionStorage.removeItem(RESTORE_GUARD_KEY);
-        }
-
-        window.setTimeout(() => {
-          void sync();
-        }, 100);
-      }
+    document.addEventListener(
+      "visibilitychange",
+      handleVisibility
     );
+
+    const { data: authListener } =
+      supabase.auth.onAuthStateChange(
+        (_event, session) => {
+          lastFingerprintRef.current = "";
+
+          const nextUserId =
+            session?.user?.id ?? "";
+          const restoredUserId =
+            sessionStorage.getItem(
+              RESTORE_GUARD_KEY
+            );
+
+          if (
+            !nextUserId ||
+            restoredUserId !== nextUserId
+          ) {
+            sessionStorage.removeItem(
+              RESTORE_GUARD_KEY
+            );
+          }
+
+          window.setTimeout(() => {
+            void sync();
+          }, 100);
+        }
+      );
 
     return () => {
       stopped = true;
       window.clearInterval(intervalId);
-      window.removeEventListener("focus", sync);
-      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener(
+        "focus",
+        sync
+      );
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibility
+      );
       authListener.subscription.unsubscribe();
     };
   }, []);
