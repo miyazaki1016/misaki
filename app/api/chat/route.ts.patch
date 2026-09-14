@@ -43,6 +43,8 @@
      const safeRelationshipPoints =
        typeof relationshipPoints ===
          "number" &&
+       Number.isFinite(
+         relationshipPoints
 @@
          : userMessageCount;
 
@@ -82,6 +84,15 @@
          safeMemory
        );
 @@
+     const activityEvidence =
+       buildActivityEvidence(
+-        safeHistory,
++        memoryRecallMode
++          ? []
++          : safeHistory,
+         safeTodayMemory
+       );
+@@
      const recentMisakiMessages =
 -      safeHistory
 -        .filter(
@@ -103,6 +114,15 @@
 +            .map(
 +              (item) => item.text
 +            );
+@@
+     const weatherHistoryGuide =
+-      hasRecentMisakiWeatherContext(
+-        safeHistory
+-      )
++      !memoryRecallMode &&
++      hasRecentMisakiWeatherContext(
++        safeHistory
++      )
 @@
      const contents =
 -      safeHistory.map(
@@ -144,32 +164,27 @@
 +  ? `
 +【記憶確認モード】
 +
-+今回は、ユーザーが
-+「美咲が現在何を覚えているか」
-+を確認しています。
++今回はユーザーが、
++美咲が「現在」何を覚えているかを確認しています。
 +
-+この返答では、
-+上の【長期記憶】だけを
++この返答では上の【長期記憶】だけを、
 +ユーザーについて覚えている事実の根拠にしてください。
 +
-+過去の会話履歴は
-+この返答用コンテキストから除外されています。
++会話履歴は回答コンテキストから除外されています。
 +
-+長期記憶にない情報については、
++長期記憶にない情報は、
 +「今は覚えていない」
 +「今の記憶には残っていない」
 +と自然に答えてください。
 +
-+削除済み・訂正済みの内容、
-+それを削除したという出来事、
++削除済み・訂正済みの具体的内容を復元しないでください。
++また、
 +「前に忘れてと言われた」
-+といったメタ情報も
-+自発的に言わないでください。
++「さっき忘れろと言った」
++など、削除した出来事自体も持ち出さないでください。
 +
-+ユーザーが今この発言の中で
-+具体的な内容を提示していない限り、
-+長期記憶にない具体名を
-+推測・復元・再掲しないでください。
++ユーザーが現在のメッセージ内で具体名を提示していない限り、
++長期記憶にない具体名を推測・再掲しないでください。
 +`.trim()
 +  : ""}
 +
