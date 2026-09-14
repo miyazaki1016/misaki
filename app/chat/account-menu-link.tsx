@@ -17,97 +17,68 @@ export default function AccountMenuLink() {
           `[${ACCOUNT_LINK_ATTR}="true"]`
         );
 
-      if (oldLink) {
-        oldLink.remove();
-      }
+      if (oldLink) oldLink.remove();
 
-      const accountLink =
-        document.createElement("a");
-
+      const accountLink = document.createElement("a");
       accountLink.href = "/account";
-      accountLink.setAttribute(
-        ACCOUNT_LINK_ATTR,
-        "true"
-      );
-      accountLink.setAttribute(
-        "aria-label",
-        "アカウント・ログイン画面へ"
-      );
+      accountLink.className = "menuItem";
+      accountLink.setAttribute(ACCOUNT_LINK_ATTR, "true");
+      accountLink.setAttribute("aria-label", "アカウント・ログイン画面へ");
 
-      // page.tsx のメニューCSSはReact側の要素にだけ効くため、
-      // この追加項目は既存メニューと同じ見た目をinline styleで再現する。
       Object.assign(accountLink.style, {
+        width: "100%",
+        minHeight: "59px",
         display: "flex",
         alignItems: "center",
-        gap: "18px",
-        width: "100%",
-        minHeight: "82px",
-        padding: "14px 28px",
-        background: "transparent",
+        gap: "12px",
+        padding: "10px 16px",
         border: "0",
-        borderTop: "1px solid rgba(108, 92, 98, 0.10)",
-        color: "#49383e",
-        textDecoration: "none",
+        borderBottom: "1px solid rgba(108, 92, 98, 0.055)",
+        background: "transparent",
+        color: "#6c5c62",
         textAlign: "left",
+        textDecoration: "none",
+        cursor: "pointer",
         boxSizing: "border-box",
         WebkitTapHighlightColor: "transparent",
       });
 
-      const icon =
-        document.createElement("span");
-
+      const icon = document.createElement("span");
+      icon.className = "menuIcon";
       icon.textContent = "◎";
-
       Object.assign(icon.style, {
-        width: "48px",
-        height: "48px",
-        flex: "0 0 48px",
+        width: "31px",
+        height: "31px",
+        flex: "0 0 31px",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         borderRadius: "50%",
         background: "#fff0f3",
-        color: "#ff6680",
-        fontSize: "25px",
-        lineHeight: "1",
+        color: "#e95872",
+        fontSize: "15px",
       });
 
-      const text =
-        document.createElement("span");
-
-      Object.assign(text.style, {
-        minWidth: "0",
-        display: "flex",
-        flexDirection: "column",
-        gap: "4px",
-      });
-
-      const title =
-        document.createElement("strong");
-
-      title.textContent =
-        "アカウント・ログイン";
-
+      const text = document.createElement("span");
+      const title = document.createElement("strong");
+      title.textContent = "アカウント・ログイン";
       Object.assign(title.style, {
         display: "block",
-        color: "#49383e",
-        fontSize: "14px",
-        lineHeight: "1.35",
+        color: "#55454b",
+        fontSize: "13px",
         fontWeight: "700",
+        lineHeight: "normal",
         textDecoration: "none",
       });
 
-      const description =
-        document.createElement("small");
-
-      description.textContent =
-        "美咲の保存・ログイン・端末引き継ぎ";
-
+      const description = document.createElement("small");
+      description.textContent = "美咲の保存・ログイン・端末引き継ぎ";
       Object.assign(description.style, {
         display: "block",
-        color: "#9a8b90",
-        fontSize: "12px",
-        lineHeight: "1.45",
+        marginTop: "3px",
+        color: "#a09297",
+        fontSize: "9px",
+        lineHeight: "1.35",
         fontWeight: "400",
         textDecoration: "none",
       });
@@ -116,20 +87,11 @@ export default function AccountMenuLink() {
       accountLink.append(icon, text);
 
       const topPageLink =
-        Array.from(
-          menu.querySelectorAll<HTMLAnchorElement>(
-            ":scope > a"
-          )
-        ).find(
-          (link) =>
-            link.getAttribute("href") === "/"
-        );
+        Array.from(menu.querySelectorAll<HTMLAnchorElement>(":scope > a"))
+          .find((link) => link.getAttribute("href") === "/");
 
       if (topPageLink) {
-        menu.insertBefore(
-          accountLink,
-          topPageLink
-        );
+        menu.insertBefore(accountLink, topPageLink);
       } else {
         menu.appendChild(accountLink);
       }
@@ -137,29 +99,22 @@ export default function AccountMenuLink() {
 
     ensureAccountLink();
 
-    const observer =
-      new MutationObserver(() => {
-        const menu =
-          document.querySelector(".misakiMenu");
-
-        if (
-          menu &&
-          !menu.querySelector(
-            `[${ACCOUNT_LINK_ATTR}="true"]`
-          )
-        ) {
-          ensureAccountLink();
-        }
-      });
+    const observer = new MutationObserver(() => {
+      const menu = document.querySelector(".misakiMenu");
+      if (
+        menu &&
+        !menu.querySelector(`[${ACCOUNT_LINK_ATTR}="true"]`)
+      ) {
+        ensureAccountLink();
+      }
+    });
 
     observer.observe(document.body, {
       childList: true,
       subtree: true,
     });
 
-    return () => {
-      observer.disconnect();
-    };
+    return () => observer.disconnect();
   }, []);
 
   return null;
