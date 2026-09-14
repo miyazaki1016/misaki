@@ -1,0 +1,181 @@
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
+
+type ChatMessage = {
+  role: "user" | "misaki";
+  text: string;
+};
+
+function createAuthenticatedSupabase(accessToken: string) {
+  return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+}
+
+function getBearerToken(request: Request) {
+  const authorization = request.headers.get("authorization") ?? "";
+  if (!authorization.startsWith("Bearer ")) {
+    return null;
+  }
+
+  const token = authorization.slice("Bearer ".length).trim();
+  return token || null;
+}
+
+function sanitizeHistory(value: unknown): ChatMessage[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter(
+      (item: any) =>
+        item &&
+        (item.role === "user" || item.role === "misaki") &&
+        typeof item.text === "string" &&
+        item.text.trim()
+    )
+    .map((item: any) => ({
+      role: item.role as "user" | "misaki",
+      text: item.text.trim().slice(0, 2000),
+    }))
+    .slice(-60);
+}
+
+function sanitizeMemory(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .filter(
+      (item: unknown): item is string =>
+        typeof item === "string" && item.trim().length > 0
+    )
+    .map((item) => item.trim().slice(0, 500))
+    .slice(-30);
+}
+
+async function getAuthenticatedClient(request: Request) {
+  const accessToken = getBearerToken(request);
+  if (!accessToken) {
+    return { error: "Authentication required." as const };
+  }
+
+  const supabase = createAuthenticatedSupabase(accessToken);
+  const { data, error } = await supabase.auth.getUser(accessToken);
+
+  if (error || !data.user) {
+    return { error: "Authentication required." as const };
+  }
+
+  return {
+    supabase,
+    userId: data.user.id,
+  };
+}
+
+export async function GET(request: Request) {
+  try {
+    const auth = await getAuthenticatedClient(request);
+    if ("error" in auth) {
+      return Response.json({ error: auth.error }, { status: 401 });
+    }
+
+    const { data, error } = await auth.supabase
+      .from("misaki_user_conversation_state")
+      .select(
+        "history,memory,message_count,user_message_count,updated_at"
+      )
+      .eq("user_id", auth.userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error("CONVERSATION STATE GET ERROR:", error);
+      return Response.json(
+        { error: "Conversation state could not be loaded." },
+        { status: 500 }
+      );
+    }
+
+    const history = sanitizeHistory(data?.history);
+    const memory = sanitizeMemory(data?.memory);
+
+    return Response.json({
+      exists: Boolean(data),
+      history,
+      memory,
+      messageCount:
+        typeof data?.message_count === "number"
+          ? data.message_count
+          : history.length,
+      userMessageCount:
+        typeof data?.user_message_count === "number"
+          ? data.user_message_count
+          : history.filter((item) => item.role === "user").length,
+      memoryCount: memory.length,
+      updatedAt: data?.updated_at ?? null,
+    });
+  } catch (error) {
+    console.error("CONVERSATION STATE GET ROUTE ERROR:", error);
+    return Response.json(
+      { error: "Conversation state could not be loaded." },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const auth = await getAuthenticatedClient(request);
+    if ("error" in auth) {
+      return Response.json({ error: auth.error }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const history = sanitizeHistory(body?.history);
+    const memory = sanitizeMemory(body?.memory);
+
+    if (history.length === 0) {
+      return Response.json(
+        { error: "Conversation history is empty." },
+        { status: 400 }
+      );
+    }
+
+    const { data, error } = await auth.supabase.rpc(
+      "sync_user_conversation_state",
+      {
+        p_history: history,
+        p_memory: memory,
+      }
+    );
+
+    if (error) {
+      console.error("CONVERSATION STATE SYNC RPC ERROR:", error);
+      return Response.json(
+        { error: "Conversation history could not be synchronized." },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({
+      synced: true,
+      result: data,
+    });
+  } catch (error) {
+    console.error("CONVERSATION STATE POST ROUTE ERROR:", error);
+    return Response.json(
+      { error: "Conversation history could not be synchronized." },
+      { status: 500 }
+    );
+  }
+}

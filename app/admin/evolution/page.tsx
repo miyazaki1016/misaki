@@ -33,6 +33,19 @@ type AnalyzeResult = {
   reason?: string;
   saved?: number;
   error?: string;
+  historySource?: "browser" | "server";
+  historyCount?: number;
+  userMessageCount?: number;
+  memoryCount?: number;
+};
+
+type ServerHistoryState = {
+  exists?: boolean;
+  messageCount?: number;
+  userMessageCount?: number;
+  memoryCount?: number;
+  updatedAt?: string | null;
+  error?: string;
 };
 
 const CHAT_HISTORY_KEY = "misaki-chat-history";
@@ -102,6 +115,10 @@ export default function EvolutionAdminPage() {
   const [historyCount, setHistoryCount] = useState(0);
   const [userMessageCount, setUserMessageCount] = useState(0);
   const [memoryCount, setMemoryCount] = useState(0);
+  const [serverHistoryCount, setServerHistoryCount] = useState(0);
+  const [serverUserMessageCount, setServerUserMessageCount] = useState(0);
+  const [serverMemoryCount, setServerMemoryCount] = useState(0);
+  const [serverUpdatedAt, setServerUpdatedAt] = useState<string | null>(null);
 
   const refreshStorageCounts = useCallback(() => {
     const history = readJsonStorage(CHAT_HISTORY_KEY) as ChatMessage[];
@@ -116,6 +133,42 @@ export default function EvolutionAdminPage() {
       ).length
     );
     setMemoryCount(memory.length);
+  }, []);
+
+  const loadServerHistoryState = useCallback(async () => {
+    try {
+      const token = await getAccessToken();
+      const response = await fetch("/api/persona/history", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = (await response.json()) as ServerHistoryState;
+
+      if (!response.ok) {
+        throw new Error(data?.error || "サーバー履歴を確認できませんでした。");
+      }
+
+      setServerHistoryCount(
+        typeof data.messageCount === "number" ? data.messageCount : 0
+      );
+      setServerUserMessageCount(
+        typeof data.userMessageCount === "number"
+          ? data.userMessageCount
+          : 0
+      );
+      setServerMemoryCount(
+        typeof data.memoryCount === "number" ? data.memoryCount : 0
+      );
+      setServerUpdatedAt(data.updatedAt ?? null);
+    } catch (error) {
+      console.error("Server history state load failed:", error);
+      setServerHistoryCount(0);
+      setServerUserMessageCount(0);
+      setServerMemoryCount(0);
+      setServerUpdatedAt(null);
+    }
   }, []);
 
   const loadCandidates = useCallback(async (targetStatus: CandidateStatus) => {
@@ -144,8 +197,14 @@ export default function EvolutionAdminPage() {
 
   useEffect(() => {
     refreshStorageCounts();
+    loadServerHistoryState();
     loadCandidates(status);
-  }, [status, loadCandidates, refreshStorageCounts]);
+  }, [
+    status,
+    loadCandidates,
+    loadServerHistoryState,
+    refreshStorageCounts,
+  ]);
 
   const pendingCount = useMemo(
     () => (status === "pending" ? candidates.length : null),
@@ -209,15 +268,21 @@ export default function EvolutionAdminPage() {
     setUserMessageCount(userCount);
     setMemoryCount(memory.length);
 
-    if (history.length === 0 || userCount === 0) {
-      setMessage(
-        "このブラウザには美咲との会話履歴がありません。普段、美咲と会話している同じブラウザでこの画面を開いてください。"
-      );
-      return;
-    }
-
     setAnalyzing(true);
-    setMessage(`分析中です… 会話 ${history.length}件（あなた ${userCount}件）を読み込みました。`);
+
+    if (history.length > 0 && userCount > 0) {
+      setMessage(
+        `分析中です… このブラウザの会話 ${history.length}件（あなた ${userCount}件）を読み込みました。`
+      );
+    } else if (serverUserMessageCount > 0) {
+      setMessage(
+        `分析中です… サーバー保存済みの会話 ${serverHistoryCount}件（あなた ${serverUserMessageCount}件）を使います。`
+      );
+    } else {
+      setMessage(
+        "分析中です… このブラウザには履歴がないため、サーバー保存履歴を確認しています。"
+      );
+    }
 
     try {
       const token = await getAccessToken();
@@ -236,13 +301,35 @@ export default function EvolutionAdminPage() {
       }
 
       const saved = typeof data.saved === "number" ? data.saved : 0;
-      setMessage(
-        saved > 0
-          ? `分析完了。${saved}件の進化候補を作成しました。`
-          : "分析完了。今回は承認待ちにするほど強い進化候補はありませんでした。"
-      );
+      const sourceLabel =
+        data.historySource === "server" ? "サーバー保存履歴" : "このブラウザ";
+      const analyzedHistoryCount =
+        typeof data.historyCount === "number" ? data.historyCount : 0;
+      const analyzedUserCount =
+        typeof data.userMessageCount === "number"
+          ? data.userMessageCount
+          : 0;
+
+      if (
+        data.skipped &&
+        data.reason === "insufficient_history"
+      ) {
+        setMessage(
+          "分析できる会話履歴が見つかりませんでした。この匿名ログインには、まだサーバー保存履歴がありません。"
+        );
+      } else {
+        setMessage(
+          saved > 0
+            ? `分析完了。${sourceLabel}の会話 ${analyzedHistoryCount}件（あなた ${analyzedUserCount}件）から、${saved}件の進化候補を作成しました。`
+            : `分析完了。${sourceLabel}の会話 ${analyzedHistoryCount}件（あなた ${analyzedUserCount}件）を確認しましたが、今回は承認待ちにするほど強い進化候補はありませんでした。`
+        );
+      }
+
       setStatus("pending");
-      await loadCandidates("pending");
+      await Promise.all([
+        loadCandidates("pending"),
+        loadServerHistoryState(),
+      ]);
     } catch (error) {
       console.error("Evolution manual analysis failed:", error);
       setMessage(
