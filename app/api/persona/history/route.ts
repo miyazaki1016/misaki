@@ -26,10 +26,7 @@ function createAuthenticatedSupabase(accessToken: string) {
 
 function getBearerToken(request: Request) {
   const authorization = request.headers.get("authorization") ?? "";
-  if (!authorization.startsWith("Bearer ")) {
-    return null;
-  }
-
+  if (!authorization.startsWith("Bearer ")) return null;
   const token = authorization.slice("Bearer ".length).trim();
   return token || null;
 }
@@ -92,9 +89,7 @@ export async function GET(request: Request) {
 
     const { data, error } = await auth.supabase
       .from("misaki_user_conversation_state")
-      .select(
-        "history,memory,message_count,user_message_count,updated_at"
-      )
+      .select("history,memory,message_count,user_message_count,updated_at")
       .eq("user_id", auth.userId)
       .maybeSingle();
 
@@ -142,7 +137,11 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const history = sanitizeHistory(body?.history);
-    const memory = sanitizeMemory(body?.memory);
+    const memoryWasProvided = Object.prototype.hasOwnProperty.call(
+      body ?? {},
+      "memory"
+    );
+    const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;
 
     if (history.length === 0) {
       return Response.json(
