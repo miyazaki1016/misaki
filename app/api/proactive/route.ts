@@ -22,6 +22,10 @@ import {
   runUserEvolutionAnalysis,
 } from "../../../lib/persona/evolution-runner";
 
+import {
+  selectMisakiProactivePhoto,
+} from "../../../lib/proactive-photo";
+
 type MisakiTodayMemory = {
   date: string;
   items: string[];
@@ -2559,10 +2563,166 @@ AIっぽい心配や質問返しも不要です。
       });
     }
 
+    const {
+      data: recentPhotoRows,
+      error: recentPhotoError,
+    } =
+      await supabase
+        .from(
+          "misaki_proactive_deliveries"
+        )
+        .select(
+          "photo_id"
+        )
+        .eq(
+          "user_id",
+          userData.user.id
+        )
+        .not(
+          "photo_id",
+          "is",
+          null
+        )
+        .order(
+          "created_at",
+          {
+            ascending:
+              false,
+          }
+        )
+        .limit(
+          8
+        );
+
+    if (
+      recentPhotoError
+    ) {
+      console.error(
+        "PROACTIVE RECENT PHOTO ERROR:",
+        recentPhotoError
+      );
+    }
+
+    const recentPhotoIds =
+      Array.isArray(
+        recentPhotoRows
+      )
+        ? recentPhotoRows
+            .map(
+              (row) =>
+                typeof row?.photo_id ===
+                  "string"
+                  ? row.photo_id
+                  : ""
+            )
+            .filter(
+              Boolean
+            )
+        : [];
+
+    const selectedPhoto =
+      selectMisakiProactivePhoto(
+        {
+          currentTime:
+            safeCurrentTime,
+
+          relationshipPoints:
+            safeRelationshipPoints,
+
+          reply,
+
+          recentPhotoIds,
+        }
+      );
+
+    const {
+      data: delivery,
+      error: deliveryError,
+    } =
+      await supabase
+        .from(
+          "misaki_proactive_deliveries"
+        )
+        .insert(
+          {
+            user_id:
+              userData.user.id,
+
+            message:
+              reply,
+
+            photo_id:
+              selectedPhoto?.id ??
+              null,
+
+            photo_src:
+              selectedPhoto?.src ??
+              null,
+
+            photo_context: {
+              currentTime:
+                safeCurrentTime,
+
+              relationshipPoints:
+                safeRelationshipPoints,
+
+              selectorVersion:
+                1,
+            },
+
+            status:
+              "delivered",
+
+            delivered_at:
+              new Date()
+                .toISOString(),
+          }
+        )
+        .select(
+          "id,message,photo_id,photo_src,status,created_at,delivered_at"
+        )
+        .single();
+
+    if (
+      deliveryError
+    ) {
+      console.error(
+        "PROACTIVE DELIVERY SAVE ERROR:",
+        deliveryError
+      );
+
+      return Response.json(
+        {
+          sent:
+            false,
+
+          reason:
+            "delivery_save_failed",
+        },
+        {
+          status:
+            500,
+        }
+      );
+    }
+
     return Response.json({
       sent: true,
 
       reply,
+
+      photo:
+        selectedPhoto
+          ? {
+              id:
+                selectedPhoto.id,
+
+              src:
+                selectedPhoto.src,
+            }
+          : null,
+
+      delivery,
 
       memory:
         updatedMemory,
