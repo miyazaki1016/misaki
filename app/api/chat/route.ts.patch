@@ -1,99 +1,138 @@
 *** Begin Patch
 *** Update File: app/api/chat/route.ts
 @@
- function createTodayMemoryGuide(
-   todayMemory: MisakiTodayMemory,
-   currentDate: string
+ function containsAny(
+   text: string,
+   patterns: string[]
  ) {
-@@
+   return patterns.some(
+     (pattern) =>
+       text.includes(pattern)
+   );
  }
 
-+function createMemoryAuthorityGuide(
++function isMemoryRecallQuestion(
 +  message: string
 +) {
-+  const asksRecall =
-+    containsAny(
-+      message,
-+      [
-+        "覚えてる",
-+        "覚えている",
-+        "覚えてた",
-+        "何覚えて",
-+        "なに覚えて",
-+        "記憶してる",
-+        "記憶している",
-+        "私のこと",
-+        "俺のこと",
-+        "好み覚えて",
-+      ]
-+    );
++  const normalized =
++    message.replace(/\s+/g, "");
 +
-+  return `
-+【長期記憶の正本ルール】
-+
-+長期記憶欄に現在入っている内容を、
-+ユーザーについて「今も覚えている事実」の唯一の正本として扱ってください。
-+
-+会話履歴は会話の流れを理解するためには使えますが、
-+長期記憶に存在しない過去のプロフィール・好み・属性を、
-+「覚えている情報」として復元してはいけません。
-+
-+特に、過去の会話履歴に
-+「忘れて」「もう覚えなくていい」「違う」「今は〜」
-+などの訂正・削除・更新がある場合、
-+削除前・訂正前の内容を自発的に口に出さないでください。
-+
-+削除済みの内容を、
-+「前に○○って言ってたよね」
-+「○○を忘れてって言われた」
-+「さっき○○も忘れた」
-+のように、削除対象そのものを再掲することも避けてください。
-+
-+ただし、ユーザーが現在の発言で
-+その内容そのものを明示的に再び話題にした場合は、
-+その現在の発言への返答として扱って構いません。
-+
-+${
-+  asksRecall
-+    ? `
-+今回はユーザーが「美咲が何を覚えているか」を確認しています。
-+
-+この質問への回答では、
-+長期記憶欄だけを根拠にしてください。
-+
-+長期記憶欄にない好み・属性・過去情報を、
-+会話履歴から拾って答えないでください。
-+
-+該当する情報が長期記憶欄にない場合は、
-+「今はそのことは覚えてないよ」
-+「今の記憶には残ってないよ」
-+のように自然に答えてください。
-+
-+忘れた内容そのものの名前や中身を、
-+確認のために言い直さないでください。
-+`
-+    : ""
-+}
-+`.trim();
++  return containsAny(
++    normalized,
++    [
++      "覚えてる",
++      "覚えている",
++      "覚えてた",
++      "何覚えてる",
++      "なに覚えてる",
++      "何を覚えてる",
++      "なにを覚えてる",
++      "記憶してる",
++      "記憶している",
++      "私のこと覚えて",
++      "俺のこと覚えて",
++      "僕のこと覚えて",
++      "好み覚えて",
++      "何知ってる",
++      "なに知ってる",
++    ]
++  );
 +}
 +
- function buildActivityEvidence(
-   history: ChatMessage[],
-   todayMemory: MisakiTodayMemory
- ): ActivityEvidence {
 @@
-     const memoryText =
-       safeMemory.length > 0
-         ? safeMemory
+     const safeRelationshipPoints =
+       typeof relationshipPoints ===
+         "number" &&
 @@
-             .join("\n")
-         : "まだ長期記憶はありません。";
+         : userMessageCount;
 
-+    const memoryAuthorityGuide =
-+      createMemoryAuthorityGuide(
++    const memoryRecallMode =
++      isMemoryRecallQuestion(
 +        message
 +      );
 +
+     const relationshipGuide =
+       createRelationshipGuide(
+         safeRelationshipPoints
+       );
+
+     const userProfile =
+       buildUserProfile(
+-        [
+-          ...safeHistory,
+-          {
+-            role: "user",
+-            text: message,
+-          },
+-        ],
++        memoryRecallMode
++          ? [
++              {
++                role: "user",
++                text: message,
++              },
++            ]
++          : [
++              ...safeHistory,
++              {
++                role: "user",
++                text: message,
++              },
++            ],
+         safeMemory
+       );
+@@
+     const recentMisakiMessages =
+-      safeHistory
+-        .filter(
+-          (item) =>
+-            item.role === "misaki"
+-        )
+-        .slice(-8)
+-        .map(
+-          (item) => item.text
+-        );
++      memoryRecallMode
++        ? []
++        : safeHistory
++            .filter(
++              (item) =>
++                item.role === "misaki"
++            )
++            .slice(-8)
++            .map(
++              (item) => item.text
++            );
+@@
+     const contents =
+-      safeHistory.map(
+-        (item) => ({
+-          role:
+-            item.role === "user"
+-              ? "user"
+-              : "model",
+-          parts: [
+-            {
+-              text: item.text,
+-            },
+-          ],
+-        })
+-      );
++      memoryRecallMode
++        ? []
++        : safeHistory.map(
++            (item) => ({
++              role:
++                item.role === "user"
++                  ? "user"
++                  : "model",
++              parts: [
++                {
++                  text: item.text,
++                },
++              ],
++            })
++          );
 @@
  【長期記憶】
 
@@ -101,7 +140,38 @@
 
  必要なときだけ自然に使ってください。
 
-+${memoryAuthorityGuide}
++${memoryRecallMode
++  ? `
++【記憶確認モード】
++
++今回は、ユーザーが
++「美咲が現在何を覚えているか」
++を確認しています。
++
++この返答では、
++上の【長期記憶】だけを
++ユーザーについて覚えている事実の根拠にしてください。
++
++過去の会話履歴は
++この返答用コンテキストから除外されています。
++
++長期記憶にない情報については、
++「今は覚えていない」
++「今の記憶には残っていない」
++と自然に答えてください。
++
++削除済み・訂正済みの内容、
++それを削除したという出来事、
++「前に忘れてと言われた」
++といったメタ情報も
++自発的に言わないでください。
++
++ユーザーが今この発言の中で
++具体的な内容を提示していない限り、
++長期記憶にない具体名を
++推測・復元・再掲しないでください。
++`.trim()
++  : ""}
 +
  【今日の記憶に保存するルール】
 *** End Patch
