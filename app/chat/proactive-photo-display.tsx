@@ -1,248 +1,438 @@
 "use client";
 
-import { useEffect } from "react";
-import { selectMisakiProactivePhoto } from "../../lib/proactive-photo";
+import {
+  useEffect,
+} from "react";
 
-const PROACTIVE_KEY = "misaki-proactive-state";
-const RELATIONSHIP_KEY = "misaki-relationship-points";
-const PHOTO_STATE_KEY = "misaki-proactive-photo-state";
-const RECENT_PHOTO_KEY = "misaki-recent-proactive-photo-ids";
+import {
+  supabase,
+} from "../../lib/supabase";
 
-type ProactiveState = {
-  lastSentAt?: number;
+type ProactiveDelivery = {
+  id: string;
+  message: string;
+  photo_id: string | null;
+  photo_src: string | null;
+  status: string;
+  created_at: string;
+  delivered_at: string | null;
 };
 
-type PhotoState = {
-  lastSentAt: number;
-  photoId: string;
-  src: string;
-};
+const POLL_MS =
+  5_000;
 
-function getLastMisakiBubble() {
-  const bubbles = Array.from(
+function getMisakiBubbles() {
+  return Array.from(
     document.querySelectorAll<HTMLElement>(
       ".chat .bubble:not(.user):not(.typingBubble)"
     )
   );
-
-  return bubbles.at(-1) ?? null;
 }
 
-function loadJson<T>(key: string): T | null {
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    return JSON.parse(raw) as T;
-  } catch {
-    return null;
-  }
-}
+function createPhotoElement(
+  delivery: ProactiveDelivery
+) {
+  const wrapper =
+    document.createElement(
+      "div"
+    );
 
-function readRelationshipPoints() {
-  const raw = localStorage.getItem(RELATIONSHIP_KEY);
-  const value = Number(raw);
-
-  return Number.isFinite(value) && value >= 0
-    ? Math.floor(value)
-    : 0;
-}
-
-function readRecentPhotoIds() {
-  const parsed = loadJson<unknown>(RECENT_PHOTO_KEY);
-
-  return Array.isArray(parsed)
-    ? parsed.filter(
-        (item): item is string =>
-          typeof item === "string" && item.trim().length > 0
-      ).slice(-4)
-    : [];
-}
-
-function saveRecentPhotoId(photoId: string) {
-  const next = [
-    ...readRecentPhotoIds().filter((id) => id !== photoId),
-    photoId,
-  ].slice(-4);
-
-  localStorage.setItem(
-    RECENT_PHOTO_KEY,
-    JSON.stringify(next)
+  wrapper.setAttribute(
+    "data-misaki-proactive-photo",
+    "true"
   );
-}
 
-function createPhotoElement(src: string, photoId: string) {
-  const wrapper = document.createElement("div");
-  wrapper.setAttribute("data-misaki-proactive-photo", "true");
-  wrapper.setAttribute("data-photo-id", photoId);
+  wrapper.setAttribute(
+    "data-delivery-id",
+    delivery.id
+  );
 
-  Object.assign(wrapper.style, {
-    width: "min(72%, 330px)",
-    margin: "6px 0 14px 0",
-    borderRadius: "18px",
-    overflow: "hidden",
-    boxShadow: "0 8px 24px rgba(73, 56, 62, 0.10)",
-  });
+  if (
+    delivery.photo_id
+  ) {
+    wrapper.setAttribute(
+      "data-photo-id",
+      delivery.photo_id
+    );
+  }
 
-  const image = document.createElement("img");
-  image.src = src;
-  image.alt = "美咲";
-  image.loading = "lazy";
+  Object.assign(
+    wrapper.style,
+    {
+      width:
+        "min(72%, 330px)",
 
-  Object.assign(image.style, {
-    display: "block",
-    width: "100%",
-    height: "auto",
-  });
+      margin:
+        "6px 0 14px 0",
 
-  wrapper.appendChild(image);
+      borderRadius:
+        "18px",
+
+      overflow:
+        "hidden",
+
+      boxShadow:
+        "0 8px 24px rgba(73, 56, 62, 0.10)",
+    }
+  );
+
+  const image =
+    document.createElement(
+      "img"
+    );
+
+  image.src =
+    delivery.photo_src ?? "";
+
+  image.alt =
+    "美咲";
+
+  image.loading =
+    "lazy";
+
+  Object.assign(
+    image.style,
+    {
+      display:
+        "block",
+
+      width:
+        "100%",
+
+      height:
+        "auto",
+    }
+  );
+
+  wrapper.appendChild(
+    image
+  );
 
   return wrapper;
 }
 
-export default function ProactivePhotoDisplay() {
-  useEffect(() => {
-    let timer = 0;
-
-    const renderIfNeeded = () => {
-      const proactive =
-        loadJson<ProactiveState>(PROACTIVE_KEY);
-
-      const lastSentAt =
-        typeof proactive?.lastSentAt === "number"
-          ? proactive.lastSentAt
-          : 0;
-
-      if (!lastSentAt) {
-        return;
-      }
-
-      // 直近2分以内の自発メッセージだけ対象。
-      // 通常会話や古い履歴への誤挿入を防ぐ。
-      if (Date.now() - lastSentAt > 2 * 60 * 1000) {
-        return;
-      }
-
-      const savedPhoto =
-        loadJson<PhotoState>(PHOTO_STATE_KEY);
-
-      if (
-        savedPhoto?.lastSentAt === lastSentAt &&
-        document.querySelector(
-          `[data-misaki-proactive-photo="true"][data-photo-id="${savedPhoto.photoId}"]`
-        )
-      ) {
-        return;
-      }
-
-      const bubble = getLastMisakiBubble();
-
-      if (!bubble) {
-        return;
-      }
-
-      const reply = bubble.textContent?.trim() ?? "";
-
-      if (!reply) {
-        return;
-      }
-
-      let selected =
-        savedPhoto?.lastSentAt === lastSentAt
-          ? {
-              id: savedPhoto.photoId,
-              src: savedPhoto.src,
-            }
-          : null;
-
-      if (!selected) {
-        selected = selectMisakiProactivePhoto({
-          currentTime: new Date().toLocaleString("ja-JP", {
-            timeZone: "Asia/Tokyo",
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: false,
-          }),
-          relationshipPoints: readRelationshipPoints(),
-          reply,
-          recentPhotoIds: readRecentPhotoIds(),
-        });
-
-        if (!selected) {
-          localStorage.setItem(
-            PHOTO_STATE_KEY,
-            JSON.stringify({
-              lastSentAt,
-              photoId: "",
-              src: "",
-            })
-          );
-          return;
-        }
-
-        const state: PhotoState = {
-          lastSentAt,
-          photoId: selected.id,
-          src: selected.src,
-        };
-
-        localStorage.setItem(
-          PHOTO_STATE_KEY,
-          JSON.stringify(state)
-        );
-
-        saveRecentPhotoId(selected.id);
-      }
-
-      if (!selected.id || !selected.src) {
-        return;
-      }
-
-      document
-        .querySelectorAll(
-          '[data-misaki-proactive-photo="true"]'
-        )
-        .forEach((node) => node.remove());
-
-      const photoElement = createPhotoElement(
-        selected.src,
-        selected.id
-      );
-
-      bubble.insertAdjacentElement(
-        "afterend",
-        photoElement
-      );
-    };
-
-    renderIfNeeded();
-
-    const observer = new MutationObserver(() => {
-      window.clearTimeout(timer);
-      timer = window.setTimeout(
-        renderIfNeeded,
-        120
-      );
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    const interval = window.setInterval(
-      renderIfNeeded,
-      1000
+function renderDeliveries(
+  deliveries:
+    ProactiveDelivery[]
+) {
+  document
+    .querySelectorAll(
+      '[data-misaki-proactive-photo="true"]'
+    )
+    .forEach(
+      (node) =>
+        node.remove()
     );
 
-    return () => {
-      observer.disconnect();
-      window.clearInterval(interval);
-      window.clearTimeout(timer);
-    };
-  }, []);
+  const bubbles =
+    getMisakiBubbles();
+
+  if (
+    bubbles.length ===
+    0
+  ) {
+    return;
+  }
+
+  const used =
+    new Set<number>();
+
+  const newestFirst =
+    [...deliveries]
+      .filter(
+        (delivery) =>
+          typeof delivery
+            .photo_src ===
+            "string" &&
+          delivery
+            .photo_src
+            .trim()
+            .length >
+            0
+      )
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          new Date(
+            b.created_at
+          ).getTime() -
+          new Date(
+            a.created_at
+          ).getTime()
+      );
+
+  for (
+    const delivery
+    of newestFirst
+  ) {
+    let matchedIndex =
+      -1;
+
+    for (
+      let index =
+        bubbles.length -
+        1;
+      index >= 0;
+      index -=
+        1
+    ) {
+      if (
+        used.has(
+          index
+        )
+      ) {
+        continue;
+      }
+
+      const text =
+        bubbles[
+          index
+        ]
+          .textContent
+          ?.trim() ??
+        "";
+
+      if (
+        text ===
+        delivery.message
+          .trim()
+      ) {
+        matchedIndex =
+          index;
+
+        break;
+      }
+    }
+
+    if (
+      matchedIndex <
+      0
+    ) {
+      continue;
+    }
+
+    used.add(
+      matchedIndex
+    );
+
+    const bubble =
+      bubbles[
+        matchedIndex
+      ];
+
+    const photo =
+      createPhotoElement(
+        delivery
+      );
+
+    bubble
+      .insertAdjacentElement(
+        "afterend",
+        photo
+      );
+  }
+}
+
+async function loadDeliveries() {
+  const {
+    data:
+      sessionData,
+  } =
+    await supabase
+      .auth
+      .getSession();
+
+  if (
+    !sessionData
+      .session
+  ) {
+    return [];
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from(
+        "misaki_proactive_deliveries"
+      )
+      .select(
+        "id,message,photo_id,photo_src,status,created_at,delivered_at"
+      )
+      .order(
+        "created_at",
+        {
+          ascending:
+            false,
+        }
+      )
+      .limit(
+        20
+      );
+
+  if (
+    error
+  ) {
+    console.error(
+      "PROACTIVE DELIVERY LOAD ERROR:",
+      error
+    );
+
+    return [];
+  }
+
+  return (
+    Array.isArray(
+      data
+    )
+      ? data
+      : []
+  ) as
+    ProactiveDelivery[];
+}
+
+export default function ProactivePhotoDisplay() {
+  useEffect(
+    () => {
+      let active =
+        true;
+
+      let renderTimer =
+        0;
+
+      const refresh =
+        async () => {
+          const deliveries =
+            await loadDeliveries();
+
+          if (
+            !active
+          ) {
+            return;
+          }
+
+          renderDeliveries(
+            deliveries
+          );
+        };
+
+      const scheduleRender =
+        () => {
+          window.clearTimeout(
+            renderTimer
+          );
+
+          renderTimer =
+            window.setTimeout(
+              () => {
+                void refresh();
+              },
+              150
+            );
+        };
+
+      void refresh();
+
+      const observer =
+        new MutationObserver(
+          scheduleRender
+        );
+
+      observer.observe(
+        document.body,
+        {
+          childList:
+            true,
+
+          subtree:
+            true,
+        }
+      );
+
+      const interval =
+        window.setInterval(
+          () => {
+            void refresh();
+          },
+          POLL_MS
+        );
+
+      const onFocus =
+        () => {
+          void refresh();
+        };
+
+      const onVisibility =
+        () => {
+          if (
+            document.visibilityState ===
+            "visible"
+          ) {
+            void refresh();
+          }
+        };
+
+      window.addEventListener(
+        "focus",
+        onFocus
+      );
+
+      document.addEventListener(
+        "visibilitychange",
+        onVisibility
+      );
+
+      const {
+        data:
+          authListener,
+      } =
+        supabase
+          .auth
+          .onAuthStateChange(
+            () => {
+              window.setTimeout(
+                () => {
+                  void refresh();
+                },
+                0
+              );
+            }
+          );
+
+      return () => {
+        active =
+          false;
+
+        observer.disconnect();
+
+        window.clearInterval(
+          interval
+        );
+
+        window.clearTimeout(
+          renderTimer
+        );
+
+        window.removeEventListener(
+          "focus",
+          onFocus
+        );
+
+        document.removeEventListener(
+          "visibilitychange",
+          onVisibility
+        );
+
+        authListener
+          .subscription
+          .unsubscribe();
+      };
+    },
+    []
+  );
 
   return null;
 }
