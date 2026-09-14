@@ -1,4 +1,42 @@
+import { createClient } from "@supabase/supabase-js";
 import { POST as baseChatPost } from "../chat/route";
+
+const SUPABASE_URL =
+  "https://tzozajnwznxqgxnjikoy.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
+
+const MAX_MEMORY = 30;
+
+function createAuthenticatedSupabase(accessToken: string) {
+  return createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
+      global: {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      },
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+        detectSessionInUrl: false,
+      },
+    }
+  );
+}
+
+function sanitizeMemory(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.trim())
+        .filter(Boolean)
+        .slice(-MAX_MEMORY)
+    : [];
+}
 
 function isMemoryRecallQuestion(message: unknown) {
   if (typeof message !== "string") return false;
@@ -30,16 +68,64 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
+    const authorization = request.headers.get("authorization") ?? "";
+
+    if (!authorization.startsWith("Bearer ")) {
+      return Response.json(
+        {
+          error:
+            "ログイン情報を確認できませんでした。ページを再読み込みしてね。",
+        },
+        { status: 401 }
+      );
+    }
+
+    const accessToken = authorization
+      .slice("Bearer ".length)
+      .trim();
+
+    const supabase = createAuthenticatedSupabase(accessToken);
+
+    const { data: userData, error: userError } =
+      await supabase.auth.getUser(accessToken);
+
+    if (userError || !userData.user) {
+      return Response.json(
+        {
+          error:
+            "ログイン情報を確認できませんでした。ページを再読み込みしてね。",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Supabase の memory を唯一の正本として読む。
+    // ブラウザから届いた body.memory は回答生成の根拠にしない。
+    const { data: state, error: stateError } = await supabase
+      .from("misaki_user_conversation_state")
+      .select("memory")
+      .eq("user_id", userData.user.id)
+      .maybeSingle();
+
+    if (stateError) {
+      console.error("CANONICAL MEMORY READ ERROR:", stateError);
+      return Response.json(
+        {
+          error:
+            "美咲の記憶を確認できませんでした。少ししてからもう一度話しかけてね。",
+        },
+        { status: 500 }
+      );
+    }
+
+    const canonicalMemory = sanitizeMemory(state?.memory);
     const recallMode = isMemoryRecallQuestion(body?.message);
 
-    const safeBody = recallMode
-      ? {
-          ...body,
-          // 記憶確認時は過去会話をGeminiへ渡さない。
-          // 現在のmemoryだけを「覚えている情報」の根拠にする。
-          history: [],
-        }
-      : body;
+    const safeBody = {
+      ...body,
+      memory: canonicalMemory,
+      ...(recallMode ? { history: [] } : {}),
+    };
 
     const forwarded = new Request(request.url, {
       method: "POST",
@@ -47,7 +133,54 @@ export async function POST(request: Request) {
       body: JSON.stringify(safeBody),
     });
 
-    return baseChatPost(forwarded);
+    const baseResponse = await baseChatPost(forwarded);
+
+    if (!baseResponse.ok) {
+      return baseResponse;
+    }
+
+    const result = await baseResponse.json();
+    const returnedMemory = sanitizeMemory(result?.memory);
+
+    // 記憶確認だけでは memory を変更させない。
+    // 通常会話では Gemini が返した完全な canonical list を保存する。
+    const nextMemory = recallMode
+      ? canonicalMemory
+      : returnedMemory;
+
+    const historyForSync =
+      typeof body?.message === "string" &&
+      typeof result?.reply === "string"
+        ? [
+            { role: "user", text: body.message },
+            { role: "misaki", text: result.reply },
+          ]
+        : [];
+
+    const { error: syncError } = await (supabase.rpc as any)(
+      "sync_user_conversation_state",
+      {
+        p_history: historyForSync,
+        p_memory: nextMemory,
+      }
+    );
+
+    if (syncError) {
+      console.error("CANONICAL MEMORY WRITE ERROR:", syncError);
+      return Response.json(
+        {
+          error:
+            "美咲の記憶を保存できませんでした。もう一度話しかけてね。",
+        },
+        { status: 500 }
+      );
+    }
+
+    return Response.json({
+      ...result,
+      memory: nextMemory,
+      memorySynced: true,
+    });
   } catch (error) {
     console.error("CHAT PROXY ERROR:", error);
 
@@ -56,9 +189,7 @@ export async function POST(request: Request) {
         error:
           "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }
