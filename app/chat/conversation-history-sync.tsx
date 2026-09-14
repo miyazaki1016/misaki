@@ -89,17 +89,54 @@ function mergeHistory(
   serverHistory: ChatMessage[],
   localHistory: ChatMessage[]
 ): ChatMessage[] {
-  const merged: ChatMessage[] = [];
-  const seen = new Set<string>();
-
-  for (const item of [...serverHistory, ...localHistory]) {
-    const key = `${item.role}\u0000${item.text}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    merged.push(item);
+  if (serverHistory.length === 0) {
+    return localHistory.slice(-60);
   }
 
-  return merged.slice(-60);
+  if (localHistory.length === 0) {
+    return serverHistory.slice(-60);
+  }
+
+  // server末尾とlocal先頭の「連続した重なり」だけを
+  // 同期上の重複として除外する。
+  // 同じ role/text が別の時点で再登場した場合は、
+  // 本当に繰り返された発言として残す。
+  const maxOverlap = Math.min(
+    serverHistory.length,
+    localHistory.length
+  );
+
+  let overlap = 0;
+
+  for (let size = maxOverlap; size >= 1; size -= 1) {
+    let matches = true;
+
+    for (let i = 0; i < size; i += 1) {
+      const serverItem =
+        serverHistory[
+          serverHistory.length - size + i
+        ];
+      const localItem = localHistory[i];
+
+      if (
+        serverItem.role !== localItem.role ||
+        serverItem.text !== localItem.text
+      ) {
+        matches = false;
+        break;
+      }
+    }
+
+    if (matches) {
+      overlap = size;
+      break;
+    }
+  }
+
+  return [
+    ...serverHistory,
+    ...localHistory.slice(overlap),
+  ].slice(-60);
 }
 
 function arraysEqual(a: unknown[], b: unknown[]) {
