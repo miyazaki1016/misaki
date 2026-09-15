@@ -214,7 +214,12 @@ async function appendConversation(
 
   if (error) throw error;
 
-  const history = safeHistory(data ? data.history : null);
+  const conversationState = data as {
+    history?: unknown;
+    message_count?: number | null;
+  } | null;
+
+  const history = safeHistory(conversationState?.history ?? null);
   const sentAt = new Date().toISOString();
 
   const nextHistory = [
@@ -229,7 +234,10 @@ async function appendConversation(
         user_id: userId,
         history: nextHistory,
         message_count:
-          Math.max(0, Number(data?.message_count) || history.length) + 1,
+          Math.max(
+            0,
+            Number(conversationState?.message_count) || history.length
+          ) + 1,
         updated_at: sentAt,
       },
       { onConflict: "user_id" }
