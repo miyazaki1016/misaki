@@ -214,7 +214,7 @@ async function appendConversation(
 
   if (error) throw error;
 
-  const history = safeHistory(data?.history ?? null);
+  const history = safeHistory(data ? data.history : null);
   const sentAt = new Date().toISOString();
 
   const nextHistory = [
