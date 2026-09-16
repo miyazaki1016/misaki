@@ -4,6 +4,7 @@ import ConversationHistorySync from "./conversation-history-sync";
 import AccountMenuLink from "./account-menu-link";
 import ProactivePhotoDisplay from "./proactive-photo-display";
 import ChatTimestampDisplay from "./chat-timestamp-display";
+import InitialChatScroll from "./initial-chat-scroll";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       <AccountMenuLink />
       <ProactivePhotoDisplay />
       <ChatTimestampDisplay />
+      <InitialChatScroll />
 
       <style>{`
         .shell .chat [data-misaki-proactive-photo="true"] {
