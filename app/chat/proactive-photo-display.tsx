@@ -186,13 +186,10 @@ function renderDeliveries(
         continue;
       }
 
-      const text =
-        bubbles[
-          index
-        ]
-          .textContent
-          ?.trim() ??
-        "";
+      const messageOnly = bubbles[index].cloneNode(true) as HTMLElement;
+      messageOnly.querySelectorAll('[data-misaki-message-time="true"]')
+        .forEach((node) => node.remove());
+      const text = messageOnly.textContent?.trim() ?? "";
 
       if (
         text ===
@@ -336,10 +333,14 @@ export default function ProactivePhotoDisplay() {
 
       void refresh();
 
-      const observer =
-        new MutationObserver(
-          scheduleRender
+      const observer = new MutationObserver((mutations) => {
+        const decorationSelector = '[data-misaki-proactive-photo="true"], [data-misaki-message-time="true"], [data-misaki-date-divider="true"]';
+        const onlyDecorations = mutations.every((mutation) =>
+          [...Array.from(mutation.addedNodes), ...Array.from(mutation.removedNodes)]
+            .every((node) => node instanceof HTMLElement && node.matches(decorationSelector))
         );
+        if (!onlyDecorations) scheduleRender();
+      });
 
       observer.observe(
         document.body,

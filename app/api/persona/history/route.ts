@@ -7,6 +7,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 type ChatMessage = {
   role: "user" | "misaki";
   text: string;
+  sentAt?: string;
 };
 
 function createAuthenticatedSupabase(accessToken: string) {
@@ -45,6 +46,9 @@ function sanitizeHistory(value: unknown): ChatMessage[] {
     .map((item: any) => ({
       role: item.role as "user" | "misaki",
       text: item.text.trim().slice(0, 2000),
+      ...(typeof item.sentAt === "string" && Number.isFinite(Date.parse(item.sentAt))
+        ? { sentAt: new Date(item.sentAt).toISOString() }
+        : {}),
     }))
     .slice(-60);
 }
