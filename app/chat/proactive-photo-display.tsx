@@ -144,19 +144,39 @@ function alignPhotoToBubble(
     `calc(100% - ${leftOffset}px)`;
 }
 
+function getExistingPhotos() {
+  const photos =
+    new Map<string, HTMLElement>();
+
+  document
+    .querySelectorAll<HTMLElement>(
+      '[data-misaki-proactive-photo="true"][data-delivery-id]'
+    )
+    .forEach(
+      (node) => {
+        const deliveryId =
+          node.getAttribute(
+            "data-delivery-id"
+          );
+
+        if (
+          deliveryId
+        ) {
+          photos.set(
+            deliveryId,
+            node
+          );
+        }
+      }
+    );
+
+  return photos;
+}
+
 function renderDeliveries(
   deliveries:
     ProactiveDelivery[]
 ) {
-  document
-    .querySelectorAll(
-      '[data-misaki-proactive-photo="true"]'
-    )
-    .forEach(
-      (node) =>
-        node.remove()
-    );
-
   const bubbles =
     getMisakiBubbles();
 
@@ -166,6 +186,9 @@ function renderDeliveries(
   ) {
     return;
   }
+
+  const existingPhotos =
+    getExistingPhotos();
 
   const used =
     new Set<number>();
@@ -219,10 +242,26 @@ function renderDeliveries(
         continue;
       }
 
-      const messageOnly = bubbles[index].cloneNode(true) as HTMLElement;
-      messageOnly.querySelectorAll('[data-misaki-message-time="true"]')
-        .forEach((node) => node.remove());
-      const text = messageOnly.textContent?.trim() ?? "";
+      const messageOnly =
+        bubbles[index]
+          .cloneNode(
+            true
+          ) as HTMLElement;
+
+      messageOnly
+        .querySelectorAll(
+          '[data-misaki-message-time="true"]'
+        )
+        .forEach(
+          (node) =>
+            node.remove()
+        );
+
+      const text =
+        messageOnly
+          .textContent
+          ?.trim() ??
+        "";
 
       if (
         text ===
@@ -252,16 +291,34 @@ function renderDeliveries(
         matchedIndex
       ];
 
-    const photo =
-      createPhotoElement(
-        delivery
+    let photo =
+      existingPhotos.get(
+        delivery.id
       );
 
-    bubble
-      .insertAdjacentElement(
-        "afterend",
-        photo
-      );
+    if (
+      !photo
+    ) {
+      photo =
+        createPhotoElement(
+          delivery
+        );
+
+      bubble
+        .insertAdjacentElement(
+          "afterend",
+          photo
+        );
+    } else if (
+      bubble.nextElementSibling !==
+      photo
+    ) {
+      bubble
+        .insertAdjacentElement(
+          "afterend",
+          photo
+        );
+    }
 
     alignPhotoToBubble(
       photo,
@@ -371,14 +428,38 @@ export default function ProactivePhotoDisplay() {
 
       void refresh();
 
-      const observer = new MutationObserver((mutations) => {
-        const decorationSelector = '[data-misaki-proactive-photo="true"], [data-misaki-message-time="true"], [data-misaki-date-divider="true"]';
-        const onlyDecorations = mutations.every((mutation) =>
-          [...Array.from(mutation.addedNodes), ...Array.from(mutation.removedNodes)]
-            .every((node) => node instanceof HTMLElement && node.matches(decorationSelector))
+      const observer =
+        new MutationObserver(
+          (mutations) => {
+            const decorationSelector =
+              '[data-misaki-proactive-photo="true"], [data-misaki-message-time="true"], [data-misaki-date-divider="true"]';
+
+            const onlyDecorations =
+              mutations.every(
+                (mutation) =>
+                  [
+                    ...Array.from(
+                      mutation.addedNodes
+                    ),
+                    ...Array.from(
+                      mutation.removedNodes
+                    ),
+                  ].every(
+                    (node) =>
+                      node instanceof HTMLElement &&
+                      node.matches(
+                        decorationSelector
+                      )
+                  )
+              );
+
+            if (
+              !onlyDecorations
+            ) {
+              scheduleRender();
+            }
+          }
         );
-        if (!onlyDecorations) scheduleRender();
-      });
 
       observer.observe(
         document.body,
