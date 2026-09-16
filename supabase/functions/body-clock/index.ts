@@ -178,10 +178,12 @@ ${recent || "なし"}
 
 async function relayPush(deliveryId: string) {
   const timestamp = String(Date.now());
-  const encoder = new TextEncoder();
-  const key = await crypto.subtle.importKey("raw", encoder.encode(Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!), {name:"HMAC",hash:"SHA-256"}, false, ["sign"]);
-  const signature = new Uint8Array(await crypto.subtle.sign("HMAC",key,encoder.encode(`misaki-body-clock-push:v1\n${timestamp}\n${deliveryId}`)));
-  const hex = [...signature].map(x=>x.toString(16).padStart(2,"0")).join("");
+  const signer = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+    auth: {persistSession:false,autoRefreshToken:false},
+    global: {fetch:(input,init)=>fetch(input,{...init,signal:AbortSignal.timeout(10000)})},
+  });
+  const {data:hex,error} = await signer.rpc("sign_misaki_body_clock_relay", {p_timestamp:timestamp,p_delivery_id:deliveryId});
+  if (error || typeof hex !== "string" || !/^[a-f0-9]{64}$/.test(hex)) throw new Error("relay_signing_unavailable");
   const response = await fetch("https://misaki38-ai.com/api/push/body-clock", {
     method:"POST", redirect:"error", signal:AbortSignal.timeout(45000),
     headers:{"Content-Type":"application/json","x-body-clock-time":timestamp,"x-body-clock-signature":hex},

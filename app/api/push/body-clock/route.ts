@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { timingSafeEqual } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 
@@ -21,7 +21,15 @@ export async function POST(request: Request) {
   if (typeof deliveryId !== "string" || (deliveryId !== "health" && !/^[a-f0-9-]{36}$/i.test(deliveryId))) {
     return Response.json({ error: "invalid_delivery" }, { status: 400 });
   }
-  const expected = createHmac("sha256", key).update(`misaki-body-clock-push:v1\n${timestamp}\n${deliveryId}`).digest();
+  const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tzozajnwznxqgxnjikoy.supabase.co", key, {
+    auth: { persistSession: false, autoRefreshToken: false },
+    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
+  });
+  const { data: signed, error: signError } = await db.rpc("sign_misaki_body_clock_relay", { p_timestamp: timestamp, p_delivery_id: deliveryId });
+  if (signError || typeof signed !== "string" || !/^[a-f0-9]{64}$/.test(signed)) {
+    return Response.json({ error: "relay_auth_unavailable" }, { status: 503 });
+  }
+  const expected = Buffer.from(signed, "hex");
   if (!timingSafeEqual(expected, Buffer.from(signature, "hex"))) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
@@ -30,10 +38,6 @@ export async function POST(request: Request) {
   if (!publicKey || !privateKey) return Response.json({ error: "vapid_missing" }, { status: 503 });
   if (deliveryId === "health") return Response.json({ ok: true, vapid: true });
 
-  const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || "https://tzozajnwznxqgxnjikoy.supabase.co", key, {
-    auth: { persistSession: false, autoRefreshToken: false },
-    global: { fetch: (input, init) => fetch(input, { ...init, signal: AbortSignal.timeout(10000) }) },
-  });
   try {
     const { data: delivery, error } = await db.from("misaki_proactive_deliveries")
       .select("id,user_id,message,photo_context,delivered_at,status").eq("id", deliveryId).single();

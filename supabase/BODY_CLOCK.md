@@ -7,9 +7,10 @@ and the daily count (maximum 4, Asia/Tokyo). Notifications-disabled users still
 receive saved conversation deliveries, matching the original body-clock route.
 
 Push is relayed to `https://misaki38-ai.com/api/push/body-clock`. The existing
-VAPID private key stays in Vercel. A timestamped, purpose-bound HMAC signed with
-the existing shared Supabase service-role key authenticates the delivery ID;
-the key itself is never transmitted. The relay loads message and recipient
+VAPID private key stays in Vercel. A timestamped, purpose-bound HMAC authenticates
+the delivery ID. A dedicated encrypted Vault key signs via a service-role-only
+RPC; each server uses its own valid Supabase admin credential. The signing key
+never leaves Vault. The relay loads message and recipient
 from the saved delivery. `misaki_body_clock_push_attempts` prevents replays from
 sending duplicates. It records one attempt per delivery; uncertain/time-out
 attempts are not automatically retried, to avoid duplicate notifications.
@@ -18,10 +19,12 @@ attempts are not automatically retried, to avoid duplicate notifications.
 
 - Supabase: `GEMINI_API_KEY`; built-in `SUPABASE_URL` and
   `SUPABASE_SERVICE_ROLE_KEY`.
-- Vercel: the existing matching `SUPABASE_SERVICE_ROLE_KEY`,
+- Vercel: the existing valid `SUPABASE_SERVICE_ROLE_KEY`,
   `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, optional `VAPID_SUBJECT`.
 - Cron auth: `misaki_body_clock_cron` in encrypted Supabase Vault. Created
   inside the migration without printing or embedding the generated value.
+- Relay signing: `misaki_body_clock_relay` in Vault, initialized by
+  `body-clock-relay-signing.sql` (also applied as a database migration).
 
 `POST body-clock?mode=health` with Cron auth checks Gemini configuration and
 the authenticated Vercel relay without generating a message or sending Push.

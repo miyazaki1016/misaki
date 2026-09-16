@@ -1,4 +1,4 @@
--- Run only after authenticated health check confirms all three required keys.
+-- Run only after authenticated health check confirms Gemini and Push relay readiness.
 -- Official pg_cron + pg_net + Vault pattern; no secret values in job text.
 select cron.alter_job(jobid, active := false)
 from cron.job where jobname = 'misaki-background-push';
