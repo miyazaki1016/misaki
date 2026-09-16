@@ -5,19 +5,30 @@ export type MisakiPhotoTime =
   | "night"
   | "any";
 
-export type MisakiPhotoMood =
+export type MisakiPhotoTag =
   | "soft"
   | "cheerful"
   | "calm"
   | "romantic"
   | "sleepy"
-  | "casual";
+  | "casual"
+  | "affectionate"
+  | "miss_you"
+  | "relax"
+  | "playful"
+  | "encouraging"
+  | "check_in"
+  | "selfie";
+
+export type MisakiProactiveContext = {
+  tags: MisakiPhotoTag[];
+};
 
 export type MisakiPhoto = {
   id: string;
   src: string;
   times: MisakiPhotoTime[];
-  moods: MisakiPhotoMood[];
+  tags: MisakiPhotoTag[];
   minRelationshipPoints: number;
   weight: number;
 };
@@ -26,6 +37,7 @@ export type SelectMisakiPhotoInput = {
   currentTime: string;
   relationshipPoints: number;
   reply: string;
+  context?: MisakiProactiveContext;
   recentPhotoIds?: string[];
 };
 
@@ -36,7 +48,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "morning-01",
     src: "/misaki-morning.webp",
     times: ["morning"],
-    moods: ["soft", "cheerful", "casual"],
+    tags: ["soft", "cheerful", "casual", "check_in", "selfie"],
     minRelationshipPoints: 0,
     weight: 5,
   },
@@ -44,7 +56,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "day-01",
     src: "/misaki-day-intro.webp",
     times: ["day"],
-    moods: ["cheerful", "casual", "soft"],
+    tags: ["cheerful", "casual", "soft", "playful", "selfie"],
     minRelationshipPoints: 0,
     weight: 5,
   },
@@ -52,7 +64,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "evening-01",
     src: "/misaki-evening.webp",
     times: ["evening"],
-    moods: ["calm", "soft", "romantic"],
+    tags: ["calm", "soft", "romantic", "affectionate", "relax", "selfie"],
     minRelationshipPoints: 10,
     weight: 5,
   },
@@ -60,7 +72,16 @@ const PHOTOS: MisakiPhoto[] = [
     id: "night-01",
     src: "/misaki-night.webp",
     times: ["night"],
-    moods: ["calm", "romantic", "sleepy", "soft"],
+    tags: [
+      "calm",
+      "romantic",
+      "sleepy",
+      "soft",
+      "affectionate",
+      "miss_you",
+      "relax",
+      "selfie",
+    ],
     minRelationshipPoints: 20,
     weight: 5,
   },
@@ -111,40 +132,88 @@ function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
   return "night";
 }
 
-function inferMood(reply: string): MisakiPhotoMood {
+function inferTags(reply: string): MisakiPhotoTag[] {
   const text = reply.toLowerCase();
+  const tags = new Set<MisakiPhotoTag>();
 
-  if (
-    /眠|ねむ|おやすみ|寝/.test(text)
-  ) {
-    return "sleepy";
+  if (/眠|ねむ|おやすみ|寝/.test(text)) {
+    tags.add("sleepy");
+    tags.add("calm");
   }
 
-  if (
-    /好き|会いた|ぎゅ|甘え|寂し|さみし/.test(text)
-  ) {
-    return "romantic";
+  if (/好き|会いた|ぎゅ|甘え|寂し|さみし/.test(text)) {
+    tags.add("romantic");
+    tags.add("affectionate");
   }
 
-  if (
-    /笑|ふふ|えへ|嬉|うれし|やった|元気/.test(text)
-  ) {
-    return "cheerful";
+  if (/会いた|顔が浮か|思い出し/.test(text)) {
+    tags.add("miss_you");
   }
 
-  if (
-    /落ち着|ゆっくり|のんびり|ほっと/.test(text)
-  ) {
-    return "calm";
+  if (/笑|ふふ|えへ|嬉|うれし|やった|元気/.test(text)) {
+    tags.add("cheerful");
   }
 
-  if (
-    /ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)
-  ) {
-    return "casual";
+  if (/落ち着|ゆっくり|のんびり|ほっと|まったり/.test(text)) {
+    tags.add("calm");
+    tags.add("relax");
   }
 
-  return "soft";
+  if (/がんば|頑張|お疲れ|おつかれ|応援/.test(text)) {
+    tags.add("encouraging");
+  }
+
+  if (/どうしてる|元気\?|大丈夫\?|何してる|なにしてる/.test(text)) {
+    tags.add("check_in");
+  }
+
+  if (/からか|冗談|笑|ふふ|いたずら/.test(text)) {
+    tags.add("playful");
+  }
+
+  if (/ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)) {
+    tags.add("casual");
+  }
+
+  if (tags.size === 0) {
+    tags.add("soft");
+  }
+
+  return [...tags];
+}
+
+function normalizeContextTags(
+  context: MisakiProactiveContext | undefined,
+  reply: string
+) {
+  const explicit = Array.isArray(context?.tags)
+    ? context.tags.filter((tag): tag is MisakiPhotoTag =>
+        [
+          "soft",
+          "cheerful",
+          "calm",
+          "romantic",
+          "sleepy",
+          "casual",
+          "affectionate",
+          "miss_you",
+          "relax",
+          "playful",
+          "encouraging",
+          "check_in",
+          "selfie",
+        ].includes(tag)
+      )
+    : [];
+
+  return explicit.length > 0 ? explicit : inferTags(reply);
+}
+
+function scorePhoto(photo: MisakiPhoto, tags: MisakiPhotoTag[]) {
+  return tags.reduce(
+    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),
+    0
+  );
 }
 
 function weightedPick(
@@ -182,6 +251,7 @@ export function selectMisakiProactivePhoto(
     currentTime,
     relationshipPoints,
     reply,
+    context,
     recentPhotoIds = [],
   } = input;
 
@@ -189,36 +259,40 @@ export function selectMisakiProactivePhoto(
     return null;
   }
 
+  const tags = normalizeContextTags(context, reply);
   const seed = hashText(
-    `${currentTime}|${relationshipPoints}|${reply}`
+    `${currentTime}|${relationshipPoints}|${reply}|${tags.join(",")}`
   );
 
-  const attachThreshold = Math.floor(
-    PHOTO_ATTACH_RATE * 10000
-  );
+  const attachThreshold = Math.floor(PHOTO_ATTACH_RATE * 10000);
 
   if (seed % 10000 >= attachThreshold) {
     return null;
   }
 
   const timeBucket = getTimeBucket(currentTime);
-  const mood = inferMood(reply);
 
   let candidates = PHOTOS.filter(
     (photo) =>
       relationshipPoints >= photo.minRelationshipPoints &&
-      (photo.times.includes(timeBucket) ||
-        photo.times.includes("any"))
+      (photo.times.includes(timeBucket) || photo.times.includes("any"))
   );
 
-  const moodMatched = candidates.filter(
-    (photo) =>
-      photo.moods.includes(mood) ||
-      photo.moods.includes("soft")
-  );
+  if (candidates.length === 0) {
+    return null;
+  }
 
-  if (moodMatched.length > 0) {
-    candidates = moodMatched;
+  const scored = candidates.map((photo) => ({
+    photo,
+    score: scorePhoto(photo, tags),
+  }));
+
+  const bestScore = Math.max(...scored.map((item) => item.score));
+
+  if (bestScore > 0) {
+    candidates = scored
+      .filter((item) => item.score === bestScore)
+      .map((item) => item.photo);
   }
 
   const withoutRecent = candidates.filter(
@@ -231,7 +305,7 @@ export function selectMisakiProactivePhoto(
 
   return weightedPick(
     candidates,
-    hashText(`${seed}|${mood}|${timeBucket}`)
+    hashText(`${seed}|${tags.join("|")}|${timeBucket}`)
   );
 }
 
