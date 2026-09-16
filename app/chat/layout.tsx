@@ -23,16 +23,10 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           margin-left: 45px !important;
         }
 
-        @media (display-mode: browser) {
-          .shell .chat {
-            padding-bottom: 106px !important;
-          }
-        }
-
-        @media (display-mode: standalone) {
-          .shell .chat {
-            padding-bottom: 126px !important;
-          }
+        .shell .misakiMenu {
+          position: fixed !important;
+          top: calc(64px + env(safe-area-inset-top)) !important;
+          right: 12px !important;
         }
 
         @media (min-width: 700px) and (max-width: 1399px) {
@@ -53,6 +47,10 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
             width: min(460px, calc(100% - 45px)) !important;
             max-width: calc(100% - 45px) !important;
           }
+
+          .shell .misakiMenu {
+            right: calc((100vw - min(90vw, 1040px)) / 2 + 12px) !important;
+          }
         }
 
         @media (min-width: 1400px) {
@@ -72,6 +70,10 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           .shell .chat [data-misaki-proactive-photo="true"] {
             width: min(500px, calc(100% - 45px)) !important;
             max-width: calc(100% - 45px) !important;
+          }
+
+          .shell .misakiMenu {
+            right: calc((100vw - 820px) / 2 + 12px) !important;
           }
         }
       `}</style>
