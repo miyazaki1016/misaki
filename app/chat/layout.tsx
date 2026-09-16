@@ -23,6 +23,18 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           margin-left: 45px !important;
         }
 
+        @media (display-mode: browser) {
+          .shell .chat {
+            padding-bottom: 106px !important;
+          }
+        }
+
+        @media (display-mode: standalone) {
+          .shell .chat {
+            padding-bottom: 126px !important;
+          }
+        }
+
         @media (min-width: 700px) and (max-width: 1399px) {
           .shell {
             max-width: min(90vw, 1040px) !important;
