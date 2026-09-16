@@ -5,6 +5,7 @@ import AccountMenuLink from "./account-menu-link";
 import ProactivePhotoDisplay from "./proactive-photo-display";
 import ChatTimestampDisplay from "./chat-timestamp-display";
 import InitialChatScroll from "./initial-chat-scroll";
+import FloatingMenuButton from "./floating-menu-button";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       <ProactivePhotoDisplay />
       <ChatTimestampDisplay />
       <InitialChatScroll />
+      <FloatingMenuButton />
 
       <style>{`
         .shell .chat [data-misaki-proactive-photo="true"] {
