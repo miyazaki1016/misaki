@@ -35,6 +35,21 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           }
         }
 
+        /*
+          iOS Safari/WebKit treats fixed descendants of a backdrop-filtered
+          ancestor as if they were fixed to that ancestor. The menu lives
+          inside the sticky header, so remove containing-block effects here
+          and let the menu/backdrop anchor to the viewport.
+        */
+        .shell .misakiChatHeader {
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          filter: none !important;
+          transform: none !important;
+          perspective: none !important;
+          contain: none !important;
+        }
+
         .shell .misakiMenu {
           position: fixed !important;
           top: calc(64px + env(safe-area-inset-top)) !important;
@@ -44,6 +59,7 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
 
         .shell .menuBackdrop {
           position: fixed !important;
+          inset: 0 !important;
           z-index: 1000 !important;
         }
 
