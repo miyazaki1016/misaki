@@ -30,7 +30,9 @@ attempts are not automatically retried, to avoid duplicate notifications.
 the authenticated Vercel relay without generating a message or sending Push.
 Only enable `body-clock-enable.sql` after this returns `ok: true`.
 The former `misaki-background-push` job must stay disabled. Vercel Cron is
-removed from vercel.json. Keep the client timer until server delivery is proven.
+removed from vercel.json. The client generation timer was disabled after the
+browser-off production test saved a delivery and history and sent one Push.
+The existing delivery display polling remains active.
 
 ## Verification
 

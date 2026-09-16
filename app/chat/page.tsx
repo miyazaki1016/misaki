@@ -2073,45 +2073,8 @@ export default function ChatPage() {
     }
   }
 
-  useEffect(
-    () => {
-      if (
-        !loaded ||
-        !accountLoaded
-      ) {
-        return;
-      }
-
-      sendProactiveMessage();
-
-      const timer =
-        window
-          .setInterval(
-            () => {
-              sendProactiveMessage();
-            },
-
-            PROACTIVE_CHECK_MS
-          );
-
-      return () => {
-        window
-          .clearInterval(
-            timer
-          );
-      };
-    },
-    [
-      loaded,
-      accountLoaded,
-      loading,
-      message,
-      messages,
-      memory,
-      misakiTodayMemory,
-      relationshipPoints,
-    ]
-  );
+  // Supabase owns proactive scheduling after the browser-off delivery test.
+  // ProactivePhotoDisplay continues polling saved server deliveries.
 
   return (
     <main
