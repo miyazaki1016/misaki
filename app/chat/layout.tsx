@@ -11,6 +11,29 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       <AccountMenuLink />
       <ProactivePhotoDisplay />
       <ChatTimestampDisplay />
+
+      <style>{`
+        @media (min-width: 700px) and (max-width: 1399px) {
+          .shell {
+            max-width: min(90vw, 1040px) !important;
+          }
+
+          .shell .inputArea {
+            width: min(90vw, 1040px) !important;
+          }
+        }
+
+        @media (min-width: 1400px) {
+          .shell {
+            max-width: 820px !important;
+          }
+
+          .shell .inputArea {
+            width: 820px !important;
+          }
+        }
+      `}</style>
+
       {children}
     </>
   );
