@@ -37,13 +37,46 @@ export default function FloatingMenuButton() {
     };
   }, []);
 
+  const pinOpenedMenu = () => {
+    const menu = document.querySelector<HTMLElement>(".misakiMenu");
+    const backdrop = document.querySelector<HTMLElement>(".menuBackdrop");
+
+    if (menu) {
+      menu.style.position = "fixed";
+      menu.style.top = "calc(64px + env(safe-area-inset-top))";
+      menu.style.right = "12px";
+      menu.style.zIndex = "1001";
+    }
+
+    if (backdrop) {
+      backdrop.style.position = "fixed";
+      backdrop.style.inset = "0";
+      backdrop.style.zIndex = "1000";
+    }
+  };
+
   const openMenu = () => {
     const originalButton =
       document.querySelector<HTMLButtonElement>(
         ".misakiChatHeader .menuButton"
       );
 
-    originalButton?.click();
+    if (!originalButton) {
+      return;
+    }
+
+    originalButton.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      })
+    );
+
+    window.requestAnimationFrame(() => {
+      pinOpenedMenu();
+      window.setTimeout(pinOpenedMenu, 50);
+    });
   };
 
   if (!visible) {
@@ -59,7 +92,7 @@ export default function FloatingMenuButton() {
         position: "fixed",
         top: "calc(12px + env(safe-area-inset-top))",
         right: "max(14px, calc((100vw - min(100vw, 820px)) / 2 + 14px))",
-        zIndex: 60,
+        zIndex: 1002,
         width: 44,
         height: 44,
         padding: 0,
