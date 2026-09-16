@@ -111,6 +111,39 @@ function createPhotoElement(
   return wrapper;
 }
 
+function alignPhotoToBubble(
+  photo: HTMLElement,
+  bubble: HTMLElement
+) {
+  const parent =
+    photo.parentElement;
+
+  if (
+    !parent
+  ) {
+    return;
+  }
+
+  const bubbleRect =
+    bubble.getBoundingClientRect();
+
+  const parentRect =
+    parent.getBoundingClientRect();
+
+  const leftOffset =
+    Math.max(
+      0,
+      bubbleRect.left -
+        parentRect.left
+    );
+
+  photo.style.marginLeft =
+    `${leftOffset}px`;
+
+  photo.style.maxWidth =
+    `calc(100% - ${leftOffset}px)`;
+}
+
 function renderDeliveries(
   deliveries:
     ProactiveDelivery[]
@@ -229,6 +262,11 @@ function renderDeliveries(
         "afterend",
         photo
       );
+
+    alignPhotoToBubble(
+      photo,
+      bubble
+    );
   }
 }
 
@@ -366,6 +404,11 @@ export default function ProactivePhotoDisplay() {
           void refresh();
         };
 
+      const onResize =
+        () => {
+          scheduleRender();
+        };
+
       const onVisibility =
         () => {
           if (
@@ -379,6 +422,11 @@ export default function ProactivePhotoDisplay() {
       window.addEventListener(
         "focus",
         onFocus
+      );
+
+      window.addEventListener(
+        "resize",
+        onResize
       );
 
       document.addEventListener(
@@ -420,6 +468,11 @@ export default function ProactivePhotoDisplay() {
         window.removeEventListener(
           "focus",
           onFocus
+        );
+
+        window.removeEventListener(
+          "resize",
+          onResize
         );
 
         document.removeEventListener(
