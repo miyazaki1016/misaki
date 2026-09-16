@@ -13,6 +13,10 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       <ChatTimestampDisplay />
 
       <style>{`
+        .shell .chat [data-misaki-proactive-photo="true"] {
+          margin-left: 45px !important;
+        }
+
         @media (min-width: 700px) and (max-width: 1399px) {
           .shell {
             max-width: min(90vw, 1040px) !important;
