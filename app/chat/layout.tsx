@@ -25,6 +25,15 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           .shell .inputArea {
             width: min(90vw, 1040px) !important;
           }
+
+          .shell .chat .bubble:not(.user):not(.typingBubble) {
+            min-width: 52%;
+          }
+
+          .shell .chat [data-misaki-proactive-photo="true"] {
+            width: min(460px, calc(100% - 45px)) !important;
+            max-width: calc(100% - 45px) !important;
+          }
         }
 
         @media (min-width: 1400px) {
@@ -34,6 +43,15 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
 
           .shell .inputArea {
             width: 820px !important;
+          }
+
+          .shell .chat .bubble:not(.user):not(.typingBubble) {
+            min-width: 55%;
+          }
+
+          .shell .chat [data-misaki-proactive-photo="true"] {
+            width: min(500px, calc(100% - 45px)) !important;
+            max-width: calc(100% - 45px) !important;
           }
         }
       `}</style>
