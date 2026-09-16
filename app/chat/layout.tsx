@@ -27,7 +27,8 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           }
 
           .shell .chat .bubble:not(.user):not(.typingBubble) {
-            min-width: 52%;
+            width: 78%;
+            max-width: 78%;
           }
 
           .shell .chat [data-misaki-proactive-photo="true"] {
@@ -46,7 +47,8 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           }
 
           .shell .chat .bubble:not(.user):not(.typingBubble) {
-            min-width: 55%;
+            width: 78%;
+            max-width: 78%;
           }
 
           .shell .chat [data-misaki-proactive-photo="true"] {
