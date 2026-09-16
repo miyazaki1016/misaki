@@ -7,6 +7,9 @@ import {
 import {
   supabase,
 } from "../lib/supabase";
+import {
+  registerPushSubscription,
+} from "../lib/push-notifications";
 
 const HISTORY_KEY =
   "misaki-chat-history";
@@ -19,6 +22,9 @@ const RELATIONSHIP_KEY =
 
 const TODAY_MEMORY_KEY =
   "misaki-today-memory";
+
+let lastPushOwnerSyncedUserId:
+  string | null = null;
 
 function safeParse<T>(
   value: string | null,
@@ -115,7 +121,28 @@ async function syncBackgroundPushState() {
     data.session?.user;
 
   if (!user) {
+    lastPushOwnerSyncedUserId =
+      null;
     return;
+  }
+
+  if (
+    "Notification" in window &&
+    Notification.permission ===
+      "granted" &&
+    lastPushOwnerSyncedUserId !==
+      user.id
+  ) {
+    try {
+      await registerPushSubscription();
+      lastPushOwnerSyncedUserId =
+        user.id;
+    } catch (pushError) {
+      console.error(
+        "BACKGROUND PUSH OWNER SYNC ERROR:",
+        pushError
+      );
+    }
   }
 
   const history =
@@ -241,6 +268,19 @@ export default function BackgroundPushSync() {
 
       void run();
 
+      const {
+        data:
+          authListener,
+      } =
+        supabase.auth
+          .onAuthStateChange(
+            () => {
+              lastPushOwnerSyncedUserId =
+                null;
+              void run();
+            }
+          );
+
       const interval =
         window.setInterval(
           () => {
@@ -277,6 +317,10 @@ export default function BackgroundPushSync() {
       return () => {
         cancelled =
           true;
+
+        authListener
+          .subscription
+          .unsubscribe();
 
         window.clearInterval(
           interval
