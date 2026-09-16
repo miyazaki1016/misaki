@@ -2,7 +2,10 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 
 import { loadPersonaPrompt } from "../../../lib/persona/persona-store";
-import { selectMisakiProactivePhoto } from "../../../lib/proactive-photo";
+import {
+  selectMisakiProactivePhoto,
+  type MisakiPhotoTag,
+} from "../../../lib/proactive-photo";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -17,6 +20,22 @@ const MAX_HISTORY = 60;
 const MAX_MEMORY = 30;
 const MIN_DELAY_MINUTES = 45;
 const MAX_DELAY_MINUTES = 210;
+
+const PROACTIVE_TAGS: MisakiPhotoTag[] = [
+  "soft",
+  "cheerful",
+  "calm",
+  "romantic",
+  "sleepy",
+  "casual",
+  "affectionate",
+  "miss_you",
+  "relax",
+  "playful",
+  "encouraging",
+  "check_in",
+  "selfie",
+];
 
 type BodyClockRow = {
   user_id: string;
@@ -104,6 +123,23 @@ function safeMemory(value: unknown): string[] {
     .slice(-MAX_MEMORY);
 }
 
+function safeProactiveTags(value: unknown): MisakiPhotoTag[] {
+  if (!Array.isArray(value)) return ["soft"];
+
+  const allowed = new Set(PROACTIVE_TAGS);
+  const unique = new Set<MisakiPhotoTag>();
+
+  for (const item of value) {
+    if (typeof item === "string" && allowed.has(item as MisakiPhotoTag)) {
+      unique.add(item as MisakiPhotoTag);
+    }
+
+    if (unique.size >= 4) break;
+  }
+
+  return unique.size > 0 ? [...unique] : ["soft"];
+}
+
 function extractJsonObject(text: string) {
   const trimmed = text.trim();
   try {
@@ -137,7 +173,7 @@ ${persona}
 
 【美咲の体内時計からの自発メッセージ】
 これはユーザーから話しかけられた返答ではありません。
-美咲の側から、恋人に自然に一通だけ送る短いLINEです。
+美咲の側から、今の関係性に合った自然な短いLINEを一通だけ送ります。
 
 現在時刻（日本時間）:
 ${currentTime}
@@ -151,6 +187,27 @@ ${memory.length ? memory.map((x) => `・${x}`).join("\n") : "なし"}
 最近の会話:
 ${recent || "なし"}
 
+今回のメッセージ方向タグ:
+次の候補から、今回の雰囲気に合うタグを2〜4個選んでから、その方向性でメッセージを書いてください。
+soft=やわらかい
+cheerful=明るい
+calm=落ち着いた
+romantic=恋愛寄り
+affectionate=甘め・愛情表現
+miss_you=会いたい・思い出した
+relax=まったり
+playful=いたずらっぽい・軽い冗談
+encouraging=ねぎらい・応援
+check_in=様子を気にかける
+sleepy=眠い・おやすみ寄り
+casual=何気ない日常
+selfie=写真を添えても自然な雰囲気
+
+タグは文章を縛るためではなく、今回の方向性を決めるためのものです。
+毎回同じ組み合わせにせず、現在時刻・関係性・最近の会話を見て自然に変化させてください。
+関係が浅い場合は、romantic / affectionate / miss_you を無理に選ばず、関係性が育っている場合だけ自然に使ってください。
+写真の有無は別処理で決まるので、selfie を選んでも「写真送るね」など写真添付を断定する文章にはしないでください。
+
 最上位の事実性ルール:
 ・美咲は、ユーザーについて知らないことを「知っている事実」として話さない
 ・ユーザーの行動、発言、返信、連絡、現在地、勤務、休み、体調、予定、好み、過去の出来事を断定するには、最近の会話または長期記憶に明確な根拠が必要
@@ -162,14 +219,15 @@ ${recent || "なし"}
 
 ルール:
 ・1〜2文を基本にする
-・用事がなくても送る恋人らしい自然な一言でよい
+・用事がなくても送る自然な一言でよい
 ・毎回質問で終わらせない
-・AI、システム、通知、体内時計という言葉を出さない
+・AI、システム、通知、体内時計、タグという言葉を出さない
 ・同じ文面を機械的に繰り返さない
+・選んだタグを全部そのまま文章化する必要はない
 ・JSON以外は出力しない
 
 出力:
-{"reply":"美咲のメッセージ"}
+{"tags":["soft","casual"],"reply":"美咲のメッセージ"}
 `.trim();
 
   const response = await fetch(
@@ -200,12 +258,13 @@ ${recent || "なし"}
   const parsed = extractJsonObject(raw);
   const reply =
     typeof parsed?.reply === "string" ? parsed.reply.trim() : "";
+  const tags = safeProactiveTags(parsed?.tags);
 
   if (!reply) {
     throw new Error("Gemini reply was empty");
   }
 
-  return { reply, currentTime };
+  return { reply, currentTime, tags };
 }
 
 async function appendConversation(
@@ -341,7 +400,7 @@ async function processUser(
     "proactive"
   );
 
-  const { reply, currentTime } = await generateMessage(
+  const { reply, currentTime, tags } = await generateMessage(
     apiKey,
     persona.text,
     history,
@@ -370,6 +429,7 @@ async function processUser(
       Number(row.relationship_points) || 0
     ),
     reply,
+    context: { tags },
     recentPhotoIds,
   });
 
@@ -388,7 +448,8 @@ async function processUser(
           0,
           Number(row.relationship_points) || 0
         ),
-        selectorVersion: 1,
+        tags,
+        selectorVersion: 2,
         source: "body_clock",
       },
       status: "delivered",
@@ -429,6 +490,7 @@ async function processUser(
     userId: row.user_id,
     deliveryId: delivery?.id ?? null,
     photoId: selectedPhoto?.id ?? null,
+    tags,
     nextPushAt,
     pushesToday: nextCount,
     push,
