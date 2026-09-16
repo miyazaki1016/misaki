@@ -1,0 +1,4 @@
+[functions.body-clock]
+verify_jwt = false
+entrypoint = "./functions/body-clock/index.ts"
+import_map = "./functions/body-clock/deno.json"

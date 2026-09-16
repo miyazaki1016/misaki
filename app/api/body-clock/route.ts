@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import webpush from "web-push";
 
 import { loadPersonaPrompt } from "../../../lib/persona/persona-store";
@@ -202,7 +202,7 @@ ${recent || "なし"}
 }
 
 async function appendConversation(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   userId: string,
   reply: string
 ) {
@@ -247,7 +247,7 @@ async function appendConversation(
 }
 
 async function sendPush(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   userId: string,
   message: string
 ) {
@@ -321,7 +321,7 @@ async function sendPush(
 }
 
 async function processUser(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   apiKey: string,
   row: BodyClockRow
 ) {
