@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import AnonymousSessionGuard from "./anonymous-session-guard";
 import ConversationHistorySync from "./conversation-history-sync";
 import AccountMenuLink from "./account-menu-link";
 import ProactivePhotoDisplay from "./proactive-photo-display";
@@ -7,6 +8,7 @@ import ChatTimestampDisplay from "./chat-timestamp-display";
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
     <>
+      <AnonymousSessionGuard />
       <ConversationHistorySync />
       <AccountMenuLink />
       <ProactivePhotoDisplay />
