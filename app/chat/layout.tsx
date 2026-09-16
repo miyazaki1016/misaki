@@ -23,10 +23,28 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
           margin-left: 45px !important;
         }
 
+        @media (display-mode: browser) {
+          .shell .chat {
+            padding-bottom: 106px !important;
+          }
+        }
+
+        @media (display-mode: standalone) {
+          .shell .chat {
+            padding-bottom: 126px !important;
+          }
+        }
+
         .shell .misakiMenu {
           position: fixed !important;
           top: calc(64px + env(safe-area-inset-top)) !important;
           right: 12px !important;
+          z-index: 1001 !important;
+        }
+
+        .shell .menuBackdrop {
+          position: fixed !important;
+          z-index: 1000 !important;
         }
 
         @media (min-width: 700px) and (max-width: 1399px) {
