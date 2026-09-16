@@ -19,6 +19,33 @@ export default function InitialChatScroll() {
     let hardStopTimer = 0;
     let attempts = 0;
 
+    const imageLoadHandler = () => {
+      if (!active) return;
+
+      window.requestAnimationFrame(() => {
+        if (!active) return;
+        scrollToLatest();
+      });
+    };
+
+    const bindPendingImages = () => {
+      document
+        .querySelectorAll<HTMLImageElement>(
+          '.shell .chat img'
+        )
+        .forEach((image) => {
+          if (image.complete) {
+            return;
+          }
+
+          image.addEventListener(
+            "load",
+            imageLoadHandler,
+            { once: true }
+          );
+        });
+    };
+
     const finish = () => {
       observer?.disconnect();
       observer = null;
@@ -41,6 +68,7 @@ export default function InitialChatScroll() {
       if (bubbles.length === 0) return;
 
       attempts += 1;
+      bindPendingImages();
 
       window.requestAnimationFrame(() => {
         window.requestAnimationFrame(() => {
@@ -53,13 +81,13 @@ export default function InitialChatScroll() {
             if (!active) return;
 
             scrollToLatest();
-            finish();
           }, 350);
         });
       });
 
-      if (attempts >= 8) {
-        finish();
+      if (attempts >= 12) {
+        observer?.disconnect();
+        observer = null;
       }
     };
 
@@ -77,13 +105,25 @@ export default function InitialChatScroll() {
     hardStopTimer = window.setTimeout(() => {
       if (!active) return;
 
+      bindPendingImages();
       scrollToLatest();
       finish();
-    }, 2500);
+    }, 4000);
 
     return () => {
       active = false;
       finish();
+
+      document
+        .querySelectorAll<HTMLImageElement>(
+          '.shell .chat img'
+        )
+        .forEach((image) => {
+          image.removeEventListener(
+            "load",
+            imageLoadHandler
+          );
+        });
     };
   }, []);
 
