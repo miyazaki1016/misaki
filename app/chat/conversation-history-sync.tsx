@@ -69,6 +69,11 @@ function arraysEqual(a: unknown[], b: unknown[]) {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+function historyIsPrefix(prefix: ChatMessage[], history: ChatMessage[]) {
+  if (prefix.length > history.length) return false;
+  return arraysEqual(prefix, history.slice(0, prefix.length));
+}
+
 async function fetchServerState(token: string): Promise<ServerState> {
   const response = await fetch("/api/persona/history", {
     headers: { Authorization: `Bearer ${token}` },
@@ -80,6 +85,25 @@ async function fetchServerState(token: string): Promise<ServerState> {
     throw new Error("Invalid conversation state response.");
   }
   return state;
+}
+
+async function pushServerState(
+  token: string,
+  history: ChatMessage[],
+  memory: string[]
+) {
+  const response = await fetch("/api/persona/history", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ history, memory }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Conversation state sync failed.");
+  }
 }
 
 export default function ConversationHistorySync() {
@@ -117,7 +141,10 @@ export default function ConversationHistorySync() {
         const { data: latest } = await supabase.auth.getSession();
         if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||
             localStorage.getItem(DEVICE_USER_KEY) !== userId) return;
+
         // A chat response may have arrived while the server request was in flight.
+        // In that case the snapshot we started with is stale, so leave both sides alone
+        // and let the next sync operate on the newest local conversation.
         if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||
             !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;
 
@@ -126,6 +153,38 @@ export default function ConversationHistorySync() {
         const historyChanged = !arraysEqual(localHistory, serverHistory);
         const memoryChanged = !arraysEqual(localMemory, serverMemory);
 
+        if (!historyChanged && !memoryChanged) {
+          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {
+            localStorage.removeItem(EMAIL_SAVE_USER_KEY);
+          }
+          return;
+        }
+
+        // Chat messages are append-only. When the local history is a strict extension
+        // of the server snapshot, the user has sent or just received newer messages on
+        // this device. Push that newer snapshot instead of overwriting localStorage with
+        // the older server copy. This prevents iPhone/Safari from reloading and making
+        // the just-sent user message and Misaki reply disappear.
+        const localExtendsServer = historyIsPrefix(serverHistory, localHistory);
+        if (
+          localHistory.length > serverHistory.length &&
+          localExtendsServer
+        ) {
+          await pushServerState(
+            session.access_token,
+            localHistory,
+            localMemory
+          );
+
+          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {
+            localStorage.removeItem(EMAIL_SAVE_USER_KEY);
+          }
+          return;
+        }
+
+        // If the server has a strictly newer append-only history, restore it locally.
+        // Diverged/same-length histories keep the existing server-authoritative fallback
+        // used by account handoff so we do not merge unrelated device caches silently.
         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));
         localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));
         if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);
