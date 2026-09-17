@@ -7,6 +7,11 @@ import {
   type PersonaChannel,
 } from "./fallback-persona";
 
+import {
+  createRelationshipTimeGuide,
+  loadRelationshipTimeContext,
+} from "../relationship-time";
+
 type PromptModuleRow = {
   module_key: string;
   content: string;
@@ -200,6 +205,29 @@ ${data
 `.trim();
 }
 
+async function loadRelationshipTimeGuideSafely(
+  supabase: SupabaseClient
+) {
+  try {
+    const context =
+      await loadRelationshipTimeContext(
+        supabase,
+        false
+      );
+
+    return createRelationshipTimeGuide(
+      context
+    );
+  } catch (error) {
+    console.error(
+      "RELATIONSHIP TIME GUIDE FALLBACK:",
+      error
+    );
+
+    return "";
+  }
+}
+
 export async function loadPersonaPrompt(
   supabase: SupabaseClient,
   userId: string,
@@ -209,6 +237,7 @@ export async function loadPersonaPrompt(
     const [
       active,
       userTraits,
+      relationshipTimeGuide,
     ] =
       await Promise.all([
         loadActiveGlobalModules(
@@ -217,6 +246,9 @@ export async function loadPersonaPrompt(
         loadUserRelationshipTraits(
           supabase,
           userId
+        ),
+        loadRelationshipTimeGuideSafely(
+          supabase
         ),
       ]);
 
@@ -247,6 +279,7 @@ export async function loadPersonaPrompt(
         [
           globalText,
           userTraits,
+          relationshipTimeGuide,
         ]
           .filter(Boolean)
           .join("\n\n"),
