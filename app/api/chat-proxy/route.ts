@@ -6,6 +6,8 @@ const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
 const MAX_MEMORY = 30;
+const PARSE_ERROR_MESSAGE =
+  "美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。";
 
 function createAuthenticatedSupabase(accessToken: string) {
   return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -50,6 +52,32 @@ function isMemoryRecallQuestion(message: unknown) {
   ].some((pattern) => normalized.includes(pattern));
 }
 
+function createForwardedRequest(request: Request, body: unknown) {
+  return new Request(request.url, {
+    method: "POST",
+    headers: request.headers,
+    body: JSON.stringify(body),
+  });
+}
+
+async function callBaseChatWithParseRetry(request: Request, body: unknown) {
+  const firstResponse = await baseChatPost(createForwardedRequest(request, body));
+  if (firstResponse.ok || firstResponse.status !== 500) return firstResponse;
+
+  let retryParseFailure = false;
+  try {
+    const payload = await firstResponse.clone().json();
+    retryParseFailure = payload?.error === PARSE_ERROR_MESSAGE;
+  } catch {
+    return firstResponse;
+  }
+
+  if (!retryParseFailure) return firstResponse;
+
+  console.warn("CHAT JSON PARSE ERROR: retrying Gemini response once");
+  return baseChatPost(createForwardedRequest(request, body));
+}
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -87,13 +115,7 @@ export async function POST(request: Request) {
         ...(recallMode ? { history: [] } : {}),
       };
 
-      const forwarded = new Request(request.url, {
-        method: "POST",
-        headers: request.headers,
-        body: JSON.stringify(safeBody),
-      });
-
-      const baseResponse = await baseChatPost(forwarded);
+      const baseResponse = await callBaseChatWithParseRetry(request, safeBody);
       if (!baseResponse.ok) return baseResponse;
 
       const result = await baseResponse.json();
@@ -131,13 +153,7 @@ export async function POST(request: Request) {
     };
 
     const userMessageAt = new Date();
-    const forwarded = new Request(request.url, {
-      method: "POST",
-      headers: request.headers,
-      body: JSON.stringify(safeBody),
-    });
-
-    const baseResponse = await baseChatPost(forwarded);
+    const baseResponse = await callBaseChatWithParseRetry(request, safeBody);
     if (!baseResponse.ok) return baseResponse;
 
     const result = await baseResponse.json();
