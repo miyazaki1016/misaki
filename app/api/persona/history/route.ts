@@ -81,6 +81,7 @@ async function getAuthenticatedClient(request: Request) {
   return {
     supabase,
     userId: data.user.id,
+    isAnonymous: data.user.is_anonymous === true,
   };
 }
 
@@ -146,6 +147,21 @@ export async function POST(request: Request) {
       "memory"
     );
     const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;
+
+    if (body?.saveAnonymous === true) {
+      if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {
+        return Response.json({ error: "Anonymous account mismatch." }, { status: 409 });
+      }
+      const { data, error } = await auth.supabase.rpc("save_anonymous_conversation_state", {
+        p_history: history,
+        p_memory: memory ?? [],
+      });
+      if (error) {
+        console.error("ANONYMOUS CONVERSATION SAVE ERROR:", error);
+        return Response.json({ error: "Conversation could not be saved." }, { status: 500 });
+      }
+      return Response.json({ synced: true, result: data });
+    }
 
     if (history.length === 0) {
       return Response.json(

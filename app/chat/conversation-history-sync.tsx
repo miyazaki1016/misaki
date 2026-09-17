@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { supabase } from "../../lib/supabase";
+import { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from "../../lib/device-conversation";
 
 const CHAT_HISTORY_KEY = "misaki-chat-history";
 const LONG_MEMORY_KEY = "misaki-long-term-memory";
@@ -74,7 +75,11 @@ async function fetchServerState(token: string): Promise<ServerState> {
     cache: "no-store",
   });
   if (!response.ok) throw new Error("Conversation state load failed.");
-  return (await response.json().catch(() => null)) ?? {};
+  const state = await response.json();
+  if (!state || typeof state.exists !== "boolean" || !Array.isArray(state.history) || !Array.isArray(state.memory)) {
+    throw new Error("Invalid conversation state response.");
+  }
+  return state;
 }
 
 export default function ConversationHistorySync() {
@@ -97,29 +102,24 @@ export default function ConversationHistorySync() {
         if (!session?.access_token || !session.user || session.user.is_anonymous) {
           return;
         }
+        const userId = session.user.id;
+        if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;
 
         const localHistory = sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY));
         const localMemory = sanitizeMemory(readJsonArray(LONG_MEMORY_KEY));
-        let serverState = await fetchServerState(session.access_token);
-
-        // 匿名で話していた美咲をメール保存した直後だけ、
-        // その時点の一時会話・記憶を保存済みアカウントへ初回登録する。
-        if (!serverState.exists && (localHistory.length > 0 || localMemory.length > 0)) {
-          const bootstrap = await fetch("/api/persona/history", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              history: localHistory,
-              memory: localMemory,
-            }),
-          });
-
-          if (!bootstrap.ok) throw new Error("Initial conversation sync failed.");
-          serverState = await fetchServerState(session.access_token);
+        const serverState = await fetchServerState(session.access_token);
+        if (!serverState.exists && localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {
+          throw new Error("Saved conversation state is missing.");
         }
+
+        // Email save already persisted the snapshot before sending confirmation.
+        // Never bootstrap a signed-in account from unqualified device caches.
+        const { data: latest } = await supabase.auth.getSession();
+        if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||
+            localStorage.getItem(DEVICE_USER_KEY) !== userId) return;
+        // A chat response may have arrived while the server request was in flight.
+        if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||
+            !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;
 
         const serverHistory = sanitizeHistory(serverState.history);
         const serverMemory = sanitizeMemory(serverState.memory);
@@ -128,6 +128,7 @@ export default function ConversationHistorySync() {
 
         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));
         localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));
+        if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);
 
         if ((historyChanged || memoryChanged) && !stopped) {
           window.location.reload();
