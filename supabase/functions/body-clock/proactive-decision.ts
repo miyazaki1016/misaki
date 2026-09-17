@@ -89,6 +89,9 @@ export function deriveProactiveTags(input: {
 }): ProactiveExpressionTag[] {
   const tags = new Set<ProactiveExpressionTag>();
 
+  // Emotion describes what Misaki feels. Action describes how much of that
+  // feeling should be shown. Start from emotion, then let action shape or
+  // suppress incompatible expression tags.
   switch (input.emotion) {
     case "happy":
       tags.add("cheerful");
@@ -103,8 +106,10 @@ export function deriveProactiveTags(input: {
       break;
     case "concerned":
       tags.add("soft");
-      tags.add("check_in");
-      tags.add("encouraging");
+      if (input.lifeConfidence === "explicit") {
+        tags.add("check_in");
+        tags.add("encouraging");
+      }
       break;
     case "affectionate":
       tags.add("affectionate");
@@ -115,46 +120,78 @@ export function deriveProactiveTags(input: {
   }
 
   switch (input.action) {
+    case "WAIT":
+      // Waiting should feel gentle and slightly expectant, not detached.
+      tags.delete("calm");
+      tags.add("soft");
+      tags.add("casual");
+      break;
     case "TEASE":
       tags.add("playful");
       tags.add("cheerful");
       break;
+    case "SULK":
+      // A light pout is quieter, but should not become punishment or hostility.
+      tags.delete("cheerful");
+      tags.delete("playful");
+      tags.add("calm");
+      tags.add("casual");
+      break;
     case "CHASE":
+      // Moving one step closer does not automatically justify asking about
+      // the user's current condition. Use check-in only with explicit evidence.
       tags.add("miss_you");
-      tags.add("check_in");
+      tags.add("soft");
+      if (input.lifeConfidence === "explicit" || input.emotion === "concerned") {
+        tags.add("check_in");
+      } else {
+        tags.delete("check_in");
+        tags.delete("encouraging");
+      }
+      break;
+    case "PULL":
+      // Pull means reducing sweetness, not ignoring the user. Emotional tags
+      // that would make the message warmer than the action are suppressed.
+      tags.delete("affectionate");
+      tags.delete("romantic");
+      tags.delete("cheerful");
+      tags.delete("playful");
+      tags.delete("check_in");
+      tags.delete("encouraging");
+      tags.delete("miss_you");
+      tags.add("calm");
+      tags.add("casual");
       break;
     case "RECONNECT":
-      tags.add("miss_you");
-      tags.add("check_in");
+      // Reconnection should show relief and warmth without repeatedly forcing
+      // the gap itself into the conversation.
+      tags.delete("check_in");
+      tags.delete("encouraging");
+      tags.delete("miss_you");
       tags.add("soft");
-      break;
-    case "WAIT":
-    case "PULL":
-      tags.add("calm");
-      tags.add("soft");
-      break;
-    case "SULK":
-      tags.add("calm");
-      tags.add("soft");
+      tags.add("cheerful");
       break;
     default:
       tags.add("casual");
   }
 
-  if (input.direction === "USER" || input.direction === "MISAKI_TO_USER") {
+  if (input.direction === "USER") {
+    // USER direction is only chosen for concerned + explicit life evidence.
     tags.add("check_in");
+    tags.add("encouraging");
   }
 
   if (input.direction === "MISAKI_TO_US") {
     tags.add("affectionate");
   }
 
-  if (input.timeBand === "seven_plus_days") {
+  if (
+    input.timeBand === "seven_plus_days" &&
+    input.action !== "RECONNECT" &&
+    input.action !== "PULL" &&
+    input.action !== "SULK"
+  ) {
     tags.add("miss_you");
-  }
-
-  if (input.lifeConfidence === "explicit" && input.direction === "USER") {
-    tags.add("encouraging");
   }
 
   return [...tags];
