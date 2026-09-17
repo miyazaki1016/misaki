@@ -9,8 +9,7 @@ import FloatingMenuButton from "./floating-menu-button";
 
 export default function ChatLayout({ children }: { children: ReactNode }) {
   return (
-    <>
-      <AnonymousSessionGuard />
+    <AnonymousSessionGuard>
       <ConversationHistorySync />
       <AccountMenuLink />
       <ProactivePhotoDisplay />
@@ -113,6 +112,6 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       `}</style>
 
       {children}
-    </>
+    </AnonymousSessionGuard>
   );
 }

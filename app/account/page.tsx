@@ -3,22 +3,12 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
+import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, readDeviceArray } from "../../lib/device-conversation";
 
 type Mode = "save" | "login";
 
 function normalizeEmail(value: string) {
   return value.trim().toLowerCase();
-}
-
-function clearMisakiDeviceData() {
-  for (let i = localStorage.length - 1; i >= 0; i -= 1) {
-    const key = localStorage.key(i);
-    if (key?.startsWith("misaki-")) localStorage.removeItem(key);
-  }
-  for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {
-    const key = sessionStorage.key(i);
-    if (key?.startsWith("misaki-")) sessionStorage.removeItem(key);
-  }
 }
 
 function isExistingAccountError(error: any) {
@@ -79,6 +69,7 @@ export default function AccountPage() {
         }
 
         if (active) {
+          if (currentUser) bindDeviceUser(currentUser.id);
           setUser(currentUser);
           setMode(currentUser && !currentUser.is_anonymous ? "login" : "save");
         }
@@ -92,7 +83,10 @@ export default function AccountPage() {
 
     void load();
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (active) setUser(session?.user ?? null);
+      if (active) {
+        if (session?.user) bindDeviceUser(session.user.id);
+        setUser(session?.user ?? null);
+      }
     });
 
     return () => {
@@ -109,6 +103,30 @@ export default function AccountPage() {
     setWorking(true);
     setMessage("");
     try {
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) throw sessionError;
+      const session = sessionData.session;
+      if (!session?.user.is_anonymous || session.user.id !== user?.id ||
+          localStorage.getItem(DEVICE_USER_KEY) !== session.user.id) {
+        throw new Error("アカウント状態が変わりました。画面を開き直してください。");
+      }
+      // Save before sending the link: confirmation may open in another tab/device.
+      const saved = await fetch("/api/persona/history", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({
+          saveAnonymous: true,
+          expectedUserId: session.user.id,
+          history: readDeviceArray("misaki-chat-history"),
+          memory: readDeviceArray("misaki-long-term-memory"),
+        }),
+      });
+      if (!saved.ok) throw new Error("会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");
+      const { data: latest } = await supabase.auth.getSession();
+      if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {
+        throw new Error("アカウント状態が変わりました。画面を開き直してください。");
+      }
+      localStorage.setItem(EMAIL_SAVE_USER_KEY, session.user.id);
       const { error } = await supabase.auth.updateUser(
         { email: nextEmail },
         { emailRedirectTo: `${window.location.origin}/account` }
