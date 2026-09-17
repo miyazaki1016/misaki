@@ -6,8 +6,6 @@ const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
 const MAX_MEMORY = 30;
-const PARSE_ERROR_MESSAGE =
-  "美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。";
 const HISTORY_DIAGNOSTIC_PREFIX = "履歴診断:";
 
 function createAuthenticatedSupabase(accessToken: string) {
@@ -96,21 +94,10 @@ function createForwardedRequest(request: Request, body: unknown) {
   });
 }
 
-async function callBaseChatWithParseRetry(request: Request, body: unknown) {
-  const firstResponse = await baseChatPost(createForwardedRequest(request, body));
-  if (firstResponse.ok || firstResponse.status !== 500) return firstResponse;
-
-  let retryParseFailure = false;
-  try {
-    const payload = await firstResponse.clone().json();
-    retryParseFailure = payload?.error === PARSE_ERROR_MESSAGE;
-  } catch {
-    return firstResponse;
-  }
-
-  if (!retryParseFailure) return firstResponse;
-
-  console.warn("CHAT JSON PARSE ERROR: retrying Gemini response once");
+async function callBaseChat(request: Request, body: unknown) {
+  // base route 自身が Gemini の意味的再試行を一回の usage 消費内で処理する。
+  // proxy から base route を再度呼ぶと新しい usage request id が発行されるため、
+  // ここでは一つのブラウザ送信につき base route は一度だけ呼ぶ。
   return baseChatPost(createForwardedRequest(request, body));
 }
 
@@ -156,7 +143,7 @@ export async function POST(request: Request) {
         memory: temporaryMemory,
       };
 
-      const baseResponse = await callBaseChatWithParseRetry(request, safeBody);
+      const baseResponse = await callBaseChat(request, safeBody);
       if (!baseResponse.ok) return baseResponse;
 
       const result = await baseResponse.json();
@@ -195,7 +182,7 @@ export async function POST(request: Request) {
     };
 
     const userMessageAt = new Date();
-    const baseResponse = await callBaseChatWithParseRetry(request, safeBody);
+    const baseResponse = await callBaseChat(request, safeBody);
     if (!baseResponse.ok) return baseResponse;
 
     const result = await baseResponse.json();
