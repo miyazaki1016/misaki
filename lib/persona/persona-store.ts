@@ -12,6 +12,7 @@ import {
   loadRelationshipTimeContext,
 } from "../relationship-time";
 import { createRelationshipEmotionGuide } from "../relationship-emotion";
+import { createRelationshipActionGuide } from "../relationship-action";
 
 type PromptModuleRow = {
   module_key: string;
@@ -219,6 +220,7 @@ async function loadRelationshipContinuityGuideSafely(
     return [
       createRelationshipTimeGuide(context),
       createRelationshipEmotionGuide(context),
+      createRelationshipActionGuide(context),
     ]
       .filter(Boolean)
       .join("\n\n");
