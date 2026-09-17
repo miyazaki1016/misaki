@@ -53,6 +53,14 @@ function isMemoryRecallQuestion(message: unknown) {
   ].some((pattern) => normalized.includes(pattern));
 }
 
+function isDiagnosticHistoryItem(item: any) {
+  return (
+    typeof item?.text === "string" &&
+    (item.text.startsWith(HISTORY_DIAGNOSTIC_PREFIX) ||
+      item.text.startsWith("診断結果：history="))
+  );
+}
+
 function createRecallAwareMessage(
   message: unknown,
   history: unknown,
@@ -66,7 +74,8 @@ function createRecallAwareMessage(
           (item: any) =>
             item &&
             (item.role === "user" || item.role === "misaki") &&
-            typeof item.text === "string"
+            typeof item.text === "string" &&
+            !isDiagnosticHistoryItem(item)
         )
         .slice(-20)
         .map(
@@ -76,7 +85,7 @@ function createRecallAwareMessage(
         .join("\n")
     : "";
 
-  return `${message}\n\n【記憶確認の回答根拠】\n以下は、この質問より前に実際に交わした直近の会話です。これは参考例ではなく事実の会話履歴です。\n質問された話題と関係する発言がこの中にある場合、その具体的内容を使って自然に答えてください。\n「覚えていない」「ヒントをちょうだい」と答える前に、必ずこの履歴を確認してください。\n履歴に根拠があることを知らないふりしないでください。\n履歴にも長期記憶にも根拠がない場合だけ、知らないことを作らずに答えてください。\n\n${recentConversation || "直近の会話履歴なし"}`;
+  return `${message}\n\n【記憶確認の回答根拠】\n以下は、この質問より前に実際に交わした直近の会話です。これは参考例ではなく事実の会話履歴です。\n質問された話題と関係する発言がこの中にある場合、その具体的内容を使って自然に答えてください。\n履歴から具体的内容を答えられる場合、それは美咲が思い出せている状態です。「覚えていない」「思い出せない」「まだ何も思い出せていない」「ヒントをちょうだい」など、回答内容と矛盾する表現を絶対に続けないでください。\n過去の美咲の発言に「覚えていない」「思い出せない」があっても、今回の履歴に根拠が見つかったなら、その古い誤答を引き継がず、今は思い出せたものとして自然に答えてください。\n履歴にも長期記憶にも根拠がない場合だけ、知らないことを作らずに答えてください。\n\n${recentConversation || "直近の会話履歴なし"}`;
 }
 
 function createForwardedRequest(request: Request, body: unknown) {
@@ -84,31 +93,6 @@ function createForwardedRequest(request: Request, body: unknown) {
     method: "POST",
     headers: request.headers,
     body: JSON.stringify(body),
-  });
-}
-
-function createHistoryDiagnostic(body: any) {
-  if (typeof body?.message !== "string") return null;
-  if (!body.message.startsWith(HISTORY_DIAGNOSTIC_PREFIX)) return null;
-
-  const term = body.message.slice(HISTORY_DIAGNOSTIC_PREFIX.length).trim();
-  const history = Array.isArray(body?.history) ? body.history : [];
-  const validHistory = history.filter(
-    (item: any) =>
-      item &&
-      (item.role === "user" || item.role === "misaki") &&
-      typeof item.text === "string"
-  );
-  const matches = term
-    ? validHistory.filter((item: any) => item.text.includes(term)).length
-    : 0;
-
-  return Response.json({
-    reply: `診断結果：history=${validHistory.length}件 / 「${term || "未指定"}」を含む履歴=${matches}件`,
-    memory: sanitizeMemory(body?.memory),
-    memorySynced: false,
-    relationshipTimeSynced: false,
-    diagnostic: true,
   });
 }
 
@@ -153,9 +137,6 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
-
-    const diagnosticResponse = createHistoryDiagnostic(body);
-    if (diagnosticResponse) return diagnosticResponse;
 
     const isAnonymous = userData.user.is_anonymous === true;
     const recallMode = isMemoryRecallQuestion(body?.message);
