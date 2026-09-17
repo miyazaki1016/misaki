@@ -5,6 +5,11 @@ export type MisakiPhotoTime =
   | "night"
   | "any";
 
+/**
+ * Legacy compatibility vocabulary for the old /api/proactive path.
+ * The active Body Clock flow derives semantic expression tags from
+ * ProactiveDecisionContext instead of inferring them from generated text.
+ */
 export type MisakiPhotoTag =
   | "soft"
   | "cheerful"
@@ -132,90 +137,6 @@ function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
   return "night";
 }
 
-function inferTags(reply: string): MisakiPhotoTag[] {
-  const text = reply.toLowerCase();
-  const tags = new Set<MisakiPhotoTag>();
-
-  if (/眠|ねむ|おやすみ|寝/.test(text)) {
-    tags.add("sleepy");
-    tags.add("calm");
-  }
-
-  if (/好き|会いた|ぎゅ|甘え|寂し|さみし/.test(text)) {
-    tags.add("romantic");
-    tags.add("affectionate");
-  }
-
-  if (/会いた|顔が浮か|思い出し/.test(text)) {
-    tags.add("miss_you");
-  }
-
-  if (/笑|ふふ|えへ|嬉|うれし|やった|元気/.test(text)) {
-    tags.add("cheerful");
-  }
-
-  if (/落ち着|ゆっくり|のんびり|ほっと|まったり/.test(text)) {
-    tags.add("calm");
-    tags.add("relax");
-  }
-
-  if (/がんば|頑張|お疲れ|おつかれ|応援/.test(text)) {
-    tags.add("encouraging");
-  }
-
-  if (/どうしてる|元気\?|大丈夫\?|何してる|なにしてる/.test(text)) {
-    tags.add("check_in");
-  }
-
-  if (/からか|冗談|笑|ふふ|いたずら/.test(text)) {
-    tags.add("playful");
-  }
-
-  if (/ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)) {
-    tags.add("casual");
-  }
-
-  if (tags.size === 0) {
-    tags.add("soft");
-  }
-
-  return [...tags];
-}
-
-function normalizeContextTags(
-  context: MisakiProactiveContext | undefined,
-  reply: string
-) {
-  const explicit = Array.isArray(context?.tags)
-    ? context.tags.filter((tag): tag is MisakiPhotoTag =>
-        [
-          "soft",
-          "cheerful",
-          "calm",
-          "romantic",
-          "sleepy",
-          "casual",
-          "affectionate",
-          "miss_you",
-          "relax",
-          "playful",
-          "encouraging",
-          "check_in",
-          "selfie",
-        ].includes(tag)
-      )
-    : [];
-
-  return explicit.length > 0 ? explicit : inferTags(reply);
-}
-
-function scorePhoto(photo: MisakiPhoto, tags: MisakiPhotoTag[]) {
-  return tags.reduce(
-    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),
-    0
-  );
-}
-
 function weightedPick(
   photos: MisakiPhoto[],
   seed: number
@@ -251,7 +172,6 @@ export function selectMisakiProactivePhoto(
     currentTime,
     relationshipPoints,
     reply,
-    context,
     recentPhotoIds = [],
   } = input;
 
@@ -259,9 +179,10 @@ export function selectMisakiProactivePhoto(
     return null;
   }
 
-  const tags = normalizeContextTags(context, reply);
+  // Compatibility selector only: do not infer semantic tags from reply text here.
+  // The active Body Clock path owns semantic decisions via ProactiveDecisionContext.
   const seed = hashText(
-    `${currentTime}|${relationshipPoints}|${reply}|${tags.join(",")}`
+    `${currentTime}|${relationshipPoints}|${reply}`
   );
 
   const attachThreshold = Math.floor(PHOTO_ATTACH_RATE * 10000);
@@ -282,19 +203,6 @@ export function selectMisakiProactivePhoto(
     return null;
   }
 
-  const scored = candidates.map((photo) => ({
-    photo,
-    score: scorePhoto(photo, tags),
-  }));
-
-  const bestScore = Math.max(...scored.map((item) => item.score));
-
-  if (bestScore > 0) {
-    candidates = scored
-      .filter((item) => item.score === bestScore)
-      .map((item) => item.photo);
-  }
-
   const withoutRecent = candidates.filter(
     (photo) => !recentPhotoIds.includes(photo.id)
   );
@@ -305,7 +213,7 @@ export function selectMisakiProactivePhoto(
 
   return weightedPick(
     candidates,
-    hashText(`${seed}|${tags.join("|")}|${timeBucket}`)
+    hashText(`${seed}|${timeBucket}`)
   );
 }
 
