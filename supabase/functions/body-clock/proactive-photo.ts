@@ -1,13 +1,18 @@
-import type { ProactiveDecisionContext, ProactiveDirection, RelationshipAction, RelationshipEmotion } from "./proactive-decision.ts";
+import type {
+  ProactiveDecisionContext,
+  ProactiveDirection,
+  ProactiveExpressionTag,
+  RelationshipAction,
+  RelationshipEmotion,
+} from "./proactive-decision.ts";
 
 export type MisakiPhotoTime = "morning" | "day" | "evening" | "night" | "any";
-export type MisakiPhotoMood = "soft" | "cheerful" | "calm" | "romantic" | "sleepy" | "casual";
 
 export type MisakiPhoto = {
   id: string;
   src: string;
   times: MisakiPhotoTime[];
-  moods: MisakiPhotoMood[];
+  tags: ProactiveExpressionTag[];
   directions: ProactiveDirection[];
   actions: RelationshipAction[];
   emotions: RelationshipEmotion[];
@@ -28,15 +33,58 @@ const ALL_ACTIONS: RelationshipAction[] = ["NORMAL", "WAIT", "TEASE", "SULK", "C
 const ALL_EMOTIONS: RelationshipEmotion[] = ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"];
 
 const PHOTOS: MisakiPhoto[] = [
-  { id: "morning-01", src: "/misaki-morning.webp", times: ["morning"], moods: ["soft", "cheerful", "casual"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 0, weight: 5 },
-  { id: "day-01", src: "/misaki-day-intro.webp", times: ["day"], moods: ["cheerful", "casual", "soft"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 0, weight: 5 },
-  { id: "evening-01", src: "/misaki-evening.webp", times: ["evening"], moods: ["calm", "soft", "romantic"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 10, weight: 5 },
-  { id: "night-01", src: "/misaki-night.webp", times: ["night"], moods: ["calm", "romantic", "sleepy", "soft"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 20, weight: 5 },
+  {
+    id: "morning-01",
+    src: "/misaki-morning.webp",
+    times: ["morning"],
+    tags: ["soft", "cheerful", "casual", "check_in"],
+    directions: ALL_DIRECTIONS,
+    actions: ALL_ACTIONS,
+    emotions: ALL_EMOTIONS,
+    minRelationshipPoints: 0,
+    weight: 5,
+  },
+  {
+    id: "day-01",
+    src: "/misaki-day-intro.webp",
+    times: ["day"],
+    tags: ["cheerful", "casual", "soft", "playful", "encouraging", "check_in"],
+    directions: ALL_DIRECTIONS,
+    actions: ALL_ACTIONS,
+    emotions: ALL_EMOTIONS,
+    minRelationshipPoints: 0,
+    weight: 5,
+  },
+  {
+    id: "evening-01",
+    src: "/misaki-evening.webp",
+    times: ["evening"],
+    tags: ["calm", "soft", "romantic", "affectionate", "relax", "miss_you"],
+    directions: ALL_DIRECTIONS,
+    actions: ALL_ACTIONS,
+    emotions: ALL_EMOTIONS,
+    minRelationshipPoints: 10,
+    weight: 5,
+  },
+  {
+    id: "night-01",
+    src: "/misaki-night.webp",
+    times: ["night"],
+    tags: ["calm", "romantic", "sleepy", "soft", "affectionate", "miss_you", "relax"],
+    directions: ALL_DIRECTIONS,
+    actions: ALL_ACTIONS,
+    emotions: ALL_EMOTIONS,
+    minRelationshipPoints: 20,
+    weight: 5,
+  },
 ];
 
 function hashText(text: string) {
   let hash = 2166136261;
-  for (let i = 0; i < text.length; i += 1) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); }
+  for (let i = 0; i < text.length; i += 1) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 16777619);
+  }
   return hash >>> 0;
 }
 
@@ -49,22 +97,22 @@ function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
   return "night";
 }
 
-function inferMood(reply: string, decision: ProactiveDecisionContext): MisakiPhotoMood {
-  if (decision.emotion === "affectionate" || decision.emotion === "lonely") return "romantic";
-  if (decision.emotion === "happy" || decision.action === "TEASE") return "cheerful";
-  if (decision.emotion === "concerned") return "soft";
-  const text = reply.toLowerCase();
-  if (/眠|ねむ|おやすみ|寝/.test(text)) return "sleepy";
-  if (/落ち着|ゆっくり|のんびり|ほっと/.test(text)) return "calm";
-  if (/ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)) return "casual";
-  return "soft";
+function scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {
+  return tags.reduce(
+    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),
+    0
+  );
 }
 
 function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {
   if (!photos.length) return null;
   const total = photos.reduce((sum, photo) => sum + Math.max(1, photo.weight), 0);
   let target = seed % total;
-  for (const photo of photos) { const weight = Math.max(1, photo.weight); if (target < weight) return photo; target -= weight; }
+  for (const photo of photos) {
+    const weight = Math.max(1, photo.weight);
+    if (target < weight) return photo;
+    target -= weight;
+  }
   return photos[0] ?? null;
 }
 
@@ -72,11 +120,13 @@ export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): Misak
   const { currentTime, reply, decision, recentPhotoIds = [] } = input;
   if (!decision.shouldSend || !reply.trim()) return null;
 
-  const seed = hashText(`${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${reply}`);
+  const seed = hashText(
+    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${decision.tags.join(",")}|${reply}`
+  );
+
   if (seed % 10000 >= Math.floor(PHOTO_ATTACH_RATE * 10000)) return null;
 
   const timeBucket = getTimeBucket(currentTime);
-  const mood = inferMood(reply, decision);
   let candidates = PHOTOS.filter((photo) =>
     decision.relationshipPoints >= photo.minRelationshipPoints &&
     (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
@@ -85,12 +135,29 @@ export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): Misak
     photo.emotions.includes(decision.emotion)
   );
 
-  const moodMatched = candidates.filter((photo) => photo.moods.includes(mood) || photo.moods.includes("soft"));
-  if (moodMatched.length) candidates = moodMatched;
+  if (!candidates.length) return null;
+
+  const scored = candidates.map((photo) => ({
+    photo,
+    score: scorePhoto(photo, decision.tags),
+  }));
+  const bestScore = Math.max(...scored.map((item) => item.score));
+
+  if (bestScore > 0) {
+    candidates = scored
+      .filter((item) => item.score === bestScore)
+      .map((item) => item.photo);
+  }
+
   const withoutRecent = candidates.filter((photo) => !recentPhotoIds.includes(photo.id));
   if (withoutRecent.length) candidates = withoutRecent;
 
-  return weightedPick(candidates, hashText(`${seed}|${mood}|${timeBucket}|${decision.direction}`));
+  return weightedPick(
+    candidates,
+    hashText(`${seed}|${decision.tags.join("|")}|${timeBucket}|${decision.direction}`)
+  );
 }
 
-export function getMisakiPhotoCatalog() { return PHOTOS; }
+export function getMisakiPhotoCatalog() {
+  return PHOTOS;
+}
