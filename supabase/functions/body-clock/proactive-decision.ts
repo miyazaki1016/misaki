@@ -13,7 +13,6 @@ export type ProactiveExpressionTag =
   | "casual"
   | "affectionate"
   | "miss_you"
-  | "relax"
   | "playful"
   | "encouraging"
   | "check_in";
@@ -54,6 +53,12 @@ function timeBand(last?: string | null): ProactiveDecisionContext["timeBand"] {
   return "seven_plus_days";
 }
 
+function currentHour(currentTime: string) {
+  const match = currentTime.match(/(\d{1,2}):(\d{2})/);
+  const hour = Number(match?.[1]);
+  return Number.isFinite(hour) ? Math.max(0, Math.min(23, hour)) : 18;
+}
+
 function action(value: unknown): RelationshipAction {
   const normalized = String(value || "NORMAL").toUpperCase();
   return ["NORMAL", "WAIT", "TEASE", "SULK", "CHASE", "PULL", "RECONNECT"].includes(normalized)
@@ -86,6 +91,7 @@ export function deriveProactiveTags(input: {
   emotion: RelationshipEmotion;
   timeBand: ProactiveDecisionContext["timeBand"];
   lifeConfidence: ProactiveDecisionContext["lifeConfidence"];
+  currentTime: string;
 }): ProactiveExpressionTag[] {
   const tags = new Set<ProactiveExpressionTag>();
 
@@ -194,6 +200,21 @@ export function deriveProactiveTags(input: {
     tags.add("miss_you");
   }
 
+  // sleepy is a body-state expression, not an emotion. Keep it conservative:
+  // only deep at night, only when Misaki is not actively chasing/checking in,
+  // teasing, sulking, pulling away, or reconnecting. This lets late-night
+  // messages feel physically lived-in without making every night message sleepy.
+  const hour = currentHour(input.currentTime);
+  const sleepyEligibleEmotion = input.emotion === "neutral" || input.emotion === "lonely" || input.emotion === "affectionate";
+  const sleepyEligibleAction = input.action === "NORMAL" || input.action === "WAIT";
+  const sleepyEligibleDirection = input.direction !== "USER" && input.direction !== "MISAKI_TO_USER";
+  if (hour >= 0 && hour < 5 && sleepyEligibleEmotion && sleepyEligibleAction && sleepyEligibleDirection) {
+    tags.add("sleepy");
+    tags.add("calm");
+    tags.delete("cheerful");
+    tags.delete("playful");
+  }
+
   return [...tags];
 }
 
@@ -201,7 +222,8 @@ export async function buildProactiveDecisionContext(
   supabase: SupabaseClient,
   userId: string,
   points: number,
-  life: ProactiveLifeContext
+  life: ProactiveLifeContext,
+  currentTime: string
 ): Promise<ProactiveDecisionContext> {
   const { data, error } = await supabase
     .from("misaki_relationship_state")
@@ -222,6 +244,7 @@ export async function buildProactiveDecisionContext(
     emotion: currentEmotion,
     timeBand: currentTimeBand,
     lifeConfidence: life.confidence,
+    currentTime,
   });
 
   return {
@@ -243,5 +266,5 @@ export async function buildProactiveDecisionContext(
 }
 
 export function createProactiveDecisionGuide(context: ProactiveDecisionContext) {
-  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`;
+  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`;
 }
