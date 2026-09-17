@@ -106,13 +106,12 @@ export async function POST(request: Request) {
     const recallMode = isMemoryRecallQuestion(body?.message);
 
     // 匿名利用ではSupabaseを会話・記憶・関係時間の保存先にしない。
-    // ブラウザから届いた一時記憶だけを、そのブラウザセッション中の回答に使う。
+    // ブラウザから届いた一時記憶と直近の会話履歴を、そのブラウザセッション中の回答に使う。
     if (isAnonymous) {
       const temporaryMemory = sanitizeMemory(body?.memory);
       const safeBody = {
         ...body,
         memory: temporaryMemory,
-        ...(recallMode ? { history: [] } : {}),
       };
 
       const baseResponse = await callBaseChatWithParseRetry(request, safeBody);
@@ -131,6 +130,7 @@ export async function POST(request: Request) {
     }
 
     // 保存済みアカウントではSupabaseのmemoryを唯一の正本として使う。
+    // 記憶確認の質問でも、正本memoryに加えてブラウザから届く直近の会話履歴を文脈として残す。
     const { data: state, error: stateError } = await supabase
       .from("misaki_user_conversation_state")
       .select("memory")
@@ -149,7 +149,6 @@ export async function POST(request: Request) {
     const safeBody = {
       ...body,
       memory: canonicalMemory,
-      ...(recallMode ? { history: [] } : {}),
     };
 
     const userMessageAt = new Date();
