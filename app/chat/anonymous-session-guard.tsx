@@ -18,11 +18,19 @@ export default function AnonymousSessionGuard({ children }: { children: ReactNod
       try {
         const hadBrowserSession = sessionStorage.getItem(BROWSER_SESSION_KEY) === "1";
         const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);
+        const deviceOwner = localStorage.getItem(DEVICE_USER_KEY);
+        const pendingOwner = localStorage.getItem(EMAIL_SAVE_USER_KEY);
         const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
         if (!active) return;
         let user = data.session?.user ?? null;
-        const pendingSave = user && localStorage.getItem(EMAIL_SAVE_USER_KEY) === user.id;
+        const pendingSave = Boolean(user && pendingOwner === user.id);
+
+        // Legacy builds could leave conversation/memory behind without an owner marker.
+        // Never attach ownerless caches to a newly reconciled anonymous/permanent user.
+        if (!deviceOwner && !pendingSave) {
+          clearMisakiDeviceData();
+        }
 
         // Supabase の匿名セッション自体は localStorage に残るため、
         // ブラウザを閉じた後の新規セッションでは匿名認証も作り直す。
