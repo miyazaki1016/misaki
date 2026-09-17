@@ -5,16 +5,35 @@ export type MisakiPhotoTime =
   | "night"
   | "any";
 
-// Legacy /api/proactive compatibility shape.
-// Semantic expression tags are now derived only by the Body Clock decision engine.
+/**
+ * Legacy compatibility vocabulary for the old /api/proactive path.
+ * The active Body Clock flow derives semantic expression tags from
+ * ProactiveDecisionContext instead of inferring them from generated text.
+ */
+export type MisakiPhotoTag =
+  | "soft"
+  | "cheerful"
+  | "calm"
+  | "romantic"
+  | "sleepy"
+  | "casual"
+  | "affectionate"
+  | "miss_you"
+  | "relax"
+  | "playful"
+  | "encouraging"
+  | "check_in"
+  | "selfie";
+
 export type MisakiProactiveContext = {
-  tags?: string[];
+  tags: MisakiPhotoTag[];
 };
 
 export type MisakiPhoto = {
   id: string;
   src: string;
   times: MisakiPhotoTime[];
+  tags: MisakiPhotoTag[];
   minRelationshipPoints: number;
   weight: number;
 };
@@ -34,6 +53,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "morning-01",
     src: "/misaki-morning.webp",
     times: ["morning"],
+    tags: ["soft", "cheerful", "casual", "check_in", "selfie"],
     minRelationshipPoints: 0,
     weight: 5,
   },
@@ -41,6 +61,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "day-01",
     src: "/misaki-day-intro.webp",
     times: ["day"],
+    tags: ["cheerful", "casual", "soft", "playful", "selfie"],
     minRelationshipPoints: 0,
     weight: 5,
   },
@@ -48,6 +69,7 @@ const PHOTOS: MisakiPhoto[] = [
     id: "evening-01",
     src: "/misaki-evening.webp",
     times: ["evening"],
+    tags: ["calm", "soft", "romantic", "affectionate", "relax", "selfie"],
     minRelationshipPoints: 10,
     weight: 5,
   },
@@ -55,6 +77,16 @@ const PHOTOS: MisakiPhoto[] = [
     id: "night-01",
     src: "/misaki-night.webp",
     times: ["night"],
+    tags: [
+      "calm",
+      "romantic",
+      "sleepy",
+      "soft",
+      "affectionate",
+      "miss_you",
+      "relax",
+      "selfie",
+    ],
     minRelationshipPoints: 20,
     weight: 5,
   },
@@ -147,9 +179,8 @@ export function selectMisakiProactivePhoto(
     return null;
   }
 
-  // This selector is kept only for the legacy /api/proactive route.
-  // It deliberately does not infer semantic tags from generated text.
-  // The active Body Clock flow owns semantic decisions via ProactiveDecisionContext.
+  // Compatibility selector only: do not infer semantic tags from reply text here.
+  // The active Body Clock path owns semantic decisions via ProactiveDecisionContext.
   const seed = hashText(
     `${currentTime}|${relationshipPoints}|${reply}`
   );
