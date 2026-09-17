@@ -643,10 +643,49 @@ function createMisakiLife(
       ? "仕事の日"
       : "休みの日";
 
+  const workTimingGuide =
+    dayType !== "work"
+      ? ""
+      : hour < 10
+        ? `
+今日は仕事の日ですが、現在は朝です。
+夜勤ではありません。
+
+この時間帯は、
+「これから仕事」
+「出勤前」
+「準備している」
+程度なら自然です。
+
+「あと少しで仕事が終わる」
+「仕事終わった」
+「勤務がもうすぐ終わる」
+など、夜勤明けのような発言はしないでください。
+`.trim()
+        : hour < 17
+          ? `
+今日は仕事の日で、現在は昼間です。
+勤務中として話して構いません。
+
+ただし、具体的な業務内容や休憩状況は
+会話に根拠がない限り作らないでください。
+`.trim()
+          : `
+今日は仕事の日ですが、現在は夕方以降です。
+通常の日中勤務として扱い、
+夜勤中・夜勤明けの設定を新しく作らないでください。
+
+「まだ仕事中」
+「あと少しで仕事が終わる」
+などは、会話に明確な根拠がある場合だけ使ってください。
+`.trim();
+
   const consistency =
     dayType === "work"
       ? `
 今日は仕事の日です。
+
+${workTimingGuide}
 
 「今ちょっとゆっくりしている」
 「少し休憩したい」
@@ -1143,7 +1182,8 @@ function userIsActuallyInDanger(
 
 function findDayTypeProblems(
   reply: string,
-  dayType: MisakiDayType
+  dayType: MisakiDayType,
+  currentTime?: string
 ) {
   const problems: string[] = [];
 
@@ -1186,6 +1226,28 @@ function findDayTypeProblems(
     );
   }
 
+  if (
+    dayType === "work" &&
+    currentTime &&
+    getHour(currentTime) < 10 &&
+    containsAny(
+      reply,
+      [
+        "仕事終わる",
+        "仕事が終わる",
+        "仕事終わった",
+        "勤務が終わる",
+        "勤務終わる",
+        "あと少しで仕事",
+        "もうすぐ仕事終",
+      ]
+    )
+  ) {
+    problems.push(
+      "朝なのに、美咲が夜勤明けのように仕事の終わりを話している"
+    );
+  }
+
   return problems;
 }
 
@@ -1200,7 +1262,8 @@ function getReplyProblems(
   const problems = [
     ...findDayTypeProblems(
       reply,
-      dayType
+      dayType,
+      currentTime
     ),
   ];
 
@@ -1969,6 +2032,21 @@ ${relationshipGuide}
 ${userProfileGuide}
 
 ${taxiContextGuide}
+
+【ユーザーの今日の仕事・休みについて】
+
+ユーザーが今日仕事か休みかは、
+現在の会話・直近履歴・長期記憶に
+明確な根拠がある場合だけ使ってください。
+
+根拠がないのに、
+「今日も仕事頑張ってね」
+「お仕事お疲れ様」
+「これから仕事？」
+などと決めつけないでください。
+
+分からない場合は、
+仕事か休みかに触れず自然に返してください。
 
 ${misakiLife}
 
