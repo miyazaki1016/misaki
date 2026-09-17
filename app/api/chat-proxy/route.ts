@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { POST as baseChatPost } from "../chat/route";
+import { recordRelationshipChatTurn } from "../../../lib/relationship-time";
 
 const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
@@ -76,7 +77,7 @@ export async function POST(request: Request) {
     const isAnonymous = userData.user.is_anonymous === true;
     const recallMode = isMemoryRecallQuestion(body?.message);
 
-    // 匿名利用ではSupabaseを会話・記憶の保存先にしない。
+    // 匿名利用ではSupabaseを会話・記憶・関係時間の保存先にしない。
     // ブラウザから届いた一時記憶だけを、そのブラウザセッション中の回答に使う。
     if (isAnonymous) {
       const temporaryMemory = sanitizeMemory(body?.memory);
@@ -102,6 +103,7 @@ export async function POST(request: Request) {
         ...result,
         memory: recallMode ? temporaryMemory : returnedMemory,
         memorySynced: false,
+        relationshipTimeSynced: false,
         ephemeral: true,
       });
     }
@@ -128,6 +130,7 @@ export async function POST(request: Request) {
       ...(recallMode ? { history: [] } : {}),
     };
 
+    const userMessageAt = new Date();
     const forwarded = new Request(request.url, {
       method: "POST",
       headers: request.headers,
@@ -138,6 +141,7 @@ export async function POST(request: Request) {
     if (!baseResponse.ok) return baseResponse;
 
     const result = await baseResponse.json();
+    const misakiMessageAt = new Date();
     const returnedMemory = sanitizeMemory(result?.memory);
     const nextMemory = recallMode ? canonicalMemory : returnedMemory;
     const historyForSync =
@@ -161,10 +165,20 @@ export async function POST(request: Request) {
       );
     }
 
+    // 会話と記憶の保存が成功した後にだけ関係時間を進める。
+    // 関係時間の記録失敗で、すでに生成できた会話そのものは失敗扱いにしない。
+    await recordRelationshipChatTurn(
+      supabase,
+      false,
+      userMessageAt,
+      misakiMessageAt
+    );
+
     return Response.json({
       ...result,
       memory: nextMemory,
       memorySynced: true,
+      relationshipTimeSynced: true,
     });
   } catch (error) {
     console.error("CHAT PROXY ERROR:", error);
