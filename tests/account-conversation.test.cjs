@@ -116,6 +116,15 @@ test('ordinary expired anonymous browser session still clears all misaki caches'
   assert.equal(h.localStorage.getItem('misaki-today-memory'), null);
   assert.equal(h.localStorage.getItem('unrelated'), 'keep'); assert.equal(h.localStorage.getItem(ownerKey), 'new');
 });
+test('legacy ownerless Safari cache is discarded before binding current user', async () => {
+  const h = harness({ id: 'legacy-anon', is_anonymous: true }, { [ownerKey]: '', 'misaki-auth-kind': '', 'misaki-today-memory': 'old', unrelated: 'keep' }, { 'misaki-browser-session': '1' });
+  await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });
+  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);
+  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), null);
+  assert.equal(h.localStorage.getItem('misaki-today-memory'), null);
+  assert.equal(h.localStorage.getItem('unrelated'), 'keep');
+  assert.equal(h.localStorage.getItem(ownerKey), 'legacy-anon');
+});
 test('different permanent user clears previous conversation and memory', async () => {
   const h = harness({ id: 'b', is_anonymous: false }, { [pendingKey]: 'a' });
   await h.mount('app/chat/anonymous-session-guard.tsx');
