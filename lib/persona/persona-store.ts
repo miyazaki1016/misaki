@@ -11,6 +11,7 @@ import {
   createRelationshipTimeGuide,
   loadRelationshipTimeContext,
 } from "../relationship-time";
+import { createRelationshipEmotionGuide } from "../relationship-emotion";
 
 type PromptModuleRow = {
   module_key: string;
@@ -205,7 +206,7 @@ ${data
 `.trim();
 }
 
-async function loadRelationshipTimeGuideSafely(
+async function loadRelationshipContinuityGuideSafely(
   supabase: SupabaseClient
 ) {
   try {
@@ -215,12 +216,15 @@ async function loadRelationshipTimeGuideSafely(
         false
       );
 
-    return createRelationshipTimeGuide(
-      context
-    );
+    return [
+      createRelationshipTimeGuide(context),
+      createRelationshipEmotionGuide(context),
+    ]
+      .filter(Boolean)
+      .join("\n\n");
   } catch (error) {
     console.error(
-      "RELATIONSHIP TIME GUIDE FALLBACK:",
+      "RELATIONSHIP CONTINUITY GUIDE FALLBACK:",
       error
     );
 
@@ -237,7 +241,7 @@ export async function loadPersonaPrompt(
     const [
       active,
       userTraits,
-      relationshipTimeGuide,
+      relationshipContinuityGuide,
     ] =
       await Promise.all([
         loadActiveGlobalModules(
@@ -247,7 +251,7 @@ export async function loadPersonaPrompt(
           supabase,
           userId
         ),
-        loadRelationshipTimeGuideSafely(
+        loadRelationshipContinuityGuideSafely(
           supabase
         ),
       ]);
@@ -279,7 +283,7 @@ export async function loadPersonaPrompt(
         [
           globalText,
           userTraits,
-          relationshipTimeGuide,
+          relationshipContinuityGuide,
         ]
           .filter(Boolean)
           .join("\n\n"),
