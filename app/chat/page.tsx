@@ -333,6 +333,14 @@ export default function ChatPage() {
     );
 
   const [
+    sendError,
+    setSendError,
+  ] =
+    useState(
+      ""
+    );
+
+  const [
     loaded,
     setLoaded,
   ] =
@@ -1543,6 +1551,10 @@ export default function ChatPage() {
       true
     );
 
+    setSendError(
+      ""
+    );
+
     try {
       const accessToken =
         await getAccessToken();
@@ -1735,6 +1747,13 @@ export default function ChatPage() {
       console.error(
         "Chat message error:",
         error
+      );
+
+      setSendError(
+        error instanceof Error &&
+        error.message
+          ? error.message
+          : "返事を受け取れませんでした。もう一度送ってみてね。"
       );
     } finally {
       setLoading(
@@ -2608,6 +2627,15 @@ export default function ChatPage() {
             <span />
             <span />
             <span />
+          </div>
+        )}
+
+        {sendError && !loading && (
+          <div
+            className="sendError"
+            role="status"
+          >
+            {sendError}
           </div>
         )}
       </section>
@@ -3538,6 +3566,42 @@ export default function ChatPage() {
               -4deg
             );
         }
+        .sendError {
+          align-self:
+            center;
+          max-width:
+            88%;
+          margin:
+            4px auto 0;
+          padding:
+            8px 12px;
+          border:
+            1px solid
+            rgba(
+              180,
+              116,
+              130,
+              0.12
+            );
+          border-radius:
+            12px;
+          background:
+            rgba(
+              255,
+              255,
+              255,
+              0.75
+            );
+          color:
+            #9a6f78;
+          font-size:
+            10px;
+          line-height:
+            1.5;
+          text-align:
+            center;
+        }
+
 
         .sendButton {
           width:

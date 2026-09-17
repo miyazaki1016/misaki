@@ -249,6 +249,39 @@ async function consumeDailyMessageWithRetry(
   };
 }
 
+async function refundDailyMessage(
+  supabase: SupabaseClient,
+  requestId: string
+) {
+  const {
+    data,
+    error,
+  } = await (
+    supabase.rpc as any
+  )(
+    "refund_daily_message",
+    {
+      p_request_id:
+        requestId,
+    }
+  );
+
+  if (error) {
+    console.error(
+      "USAGE REFUND ERROR:",
+      error
+    );
+    return null;
+  }
+
+  return getFirstRow<{
+    refunded?: boolean;
+    message_count?: number;
+    remaining?: number;
+    is_premium?: boolean;
+  }>(data);
+}
+
 /* =========================================================
    WEATHER
 ========================================================= */
@@ -1440,6 +1473,31 @@ function parseGeminiText(
 export async function POST(
   request: Request
 ) {
+  let chargedRequestId:
+    string | null = null;
+  let chargedSupabase:
+    SupabaseClient | null = null;
+
+  async function refundIfCharged() {
+    if (
+      !chargedRequestId ||
+      !chargedSupabase
+    ) {
+      return null;
+    }
+
+    const refunded =
+      await refundDailyMessage(
+        chargedSupabase,
+        chargedRequestId
+      );
+
+    chargedRequestId = null;
+    chargedSupabase = null;
+
+    return refunded;
+  }
+
   try {
     const {
       message,
@@ -1539,13 +1597,16 @@ export async function POST(
       );
     }
 
+    const usageRequestId =
+      crypto.randomUUID();
+
     const {
       data: usageData,
       error: usageError,
     } =
       await consumeDailyMessageWithRetry(
         supabase,
-        crypto.randomUUID()
+        usageRequestId
       );
 
     if (usageError) {
@@ -1575,6 +1636,16 @@ export async function POST(
           status: 500,
         }
       );
+    }
+
+    if (
+      usage.allowed === true &&
+      usage.is_premium !== true
+    ) {
+      chargedRequestId =
+        usageRequestId;
+      chargedSupabase =
+        supabase;
     }
 
     if (
@@ -2113,10 +2184,25 @@ ${retryProblems
       await generateReply();
 
     if (!parsed) {
+      const refunded =
+        await refundIfCharged();
+
       return Response.json(
         {
           error:
             "美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。",
+          ...(refunded
+            ? {
+                usage: {
+                  messageCount:
+                    refunded.message_count ?? 0,
+                  remaining:
+                    refunded.remaining ?? 0,
+                  isPremium:
+                    refunded.is_premium === true,
+                },
+              }
+            : {}),
         },
         {
           status: 500,
@@ -2131,10 +2217,25 @@ ${retryProblems
         : "";
 
     if (!reply) {
+      const refunded =
+        await refundIfCharged();
+
       return Response.json(
         {
           error:
             "美咲から返事が来なかったみたい。もう一度話しかけてね。",
+          ...(refunded
+            ? {
+                usage: {
+                  messageCount:
+                    refunded.message_count ?? 0,
+                  remaining:
+                    refunded.remaining ?? 0,
+                  isPremium:
+                    refunded.is_premium === true,
+                },
+              }
+            : {}),
         },
         {
           status: 500,
@@ -2291,6 +2392,9 @@ ${retryProblems
         ),
     };
 
+    chargedRequestId = null;
+    chargedSupabase = null;
+
     return Response.json({
       reply,
       memory:
@@ -2321,10 +2425,25 @@ ${retryProblems
       error
     );
 
+    const refunded =
+      await refundIfCharged();
+
     return Response.json(
       {
         error:
           "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。",
+        ...(refunded
+          ? {
+              usage: {
+                messageCount:
+                  refunded.message_count ?? 0,
+                remaining:
+                  refunded.remaining ?? 0,
+                isPremium:
+                  refunded.is_premium === true,
+              },
+            }
+          : {}),
       },
       {
         status: 500,
