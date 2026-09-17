@@ -53,10 +53,30 @@ function isMemoryRecallQuestion(message: unknown) {
   ].some((pattern) => normalized.includes(pattern));
 }
 
-function createRecallAwareMessage(message: unknown, recallMode: boolean) {
+function createRecallAwareMessage(
+  message: unknown,
+  history: unknown,
+  recallMode: boolean
+) {
   if (!recallMode || typeof message !== "string") return message;
 
-  return `${message}\n\n【会話履歴の確認】\n回答する前に、渡されている直近の会話履歴を必ず確認してください。\n質問の答えが直近の会話履歴にある場合は、その内容を最優先で使って自然に答えてください。\n直近の会話履歴になければ長期記憶を確認し、どちらにも根拠がなければ知らないことを作らずに答えてください。`;
+  const recentConversation = Array.isArray(history)
+    ? history
+        .filter(
+          (item: any) =>
+            item &&
+            (item.role === "user" || item.role === "misaki") &&
+            typeof item.text === "string"
+        )
+        .slice(-20)
+        .map(
+          (item: any) =>
+            `${item.role === "user" ? "ユーザー" : "美咲"}: ${item.text}`
+        )
+        .join("\n")
+    : "";
+
+  return `${message}\n\n【記憶確認の回答根拠】\n以下は、この質問より前に実際に交わした直近の会話です。これは参考例ではなく事実の会話履歴です。\n質問された話題と関係する発言がこの中にある場合、その具体的内容を使って自然に答えてください。\n「覚えていない」「ヒントをちょうだい」と答える前に、必ずこの履歴を確認してください。\n履歴に根拠があることを知らないふりしないでください。\n履歴にも長期記憶にも根拠がない場合だけ、知らないことを作らずに答えてください。\n\n${recentConversation || "直近の会話履歴なし"}`;
 }
 
 function createForwardedRequest(request: Request, body: unknown) {
@@ -139,7 +159,11 @@ export async function POST(request: Request) {
 
     const isAnonymous = userData.user.is_anonymous === true;
     const recallMode = isMemoryRecallQuestion(body?.message);
-    const messageForModel = createRecallAwareMessage(body?.message, recallMode);
+    const messageForModel = createRecallAwareMessage(
+      body?.message,
+      body?.history,
+      recallMode
+    );
 
     // 匿名利用ではSupabaseを会話・記憶・関係時間の保存先にしない。
     // ブラウザから届いた一時記憶と直近の会話履歴を、そのブラウザセッション中の回答に使う。
