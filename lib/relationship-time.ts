@@ -98,8 +98,8 @@ export async function recordRelationshipChatTurn(
   isAnonymous: boolean,
   userMessageAt: Date,
   misakiMessageAt: Date
-) {
-  if (isAnonymous) return;
+): Promise<boolean> {
+  if (isAnonymous) return false;
 
   const { error } = await (supabase.rpc as any)(
     "record_relationship_chat_turn",
@@ -111,5 +111,8 @@ export async function recordRelationshipChatTurn(
 
   if (error) {
     console.error("RELATIONSHIP TURN RECORD ERROR:", error);
+    return false;
   }
+
+  return true;
 }
