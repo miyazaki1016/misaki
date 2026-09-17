@@ -6,6 +6,9 @@ import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER
 
 const AUTH_KIND_KEY = "misaki-auth-kind";
 const BROWSER_SESSION_KEY = "misaki-browser-session";
+// This marker intentionally does not use the misaki- prefix because
+// clearMisakiDeviceData() removes every misaki-* key.
+const LEGACY_OWNERLESS_CLEANUP_KEY = "legacy-ownerless-cache-cleanup-v1";
 
 export default function AnonymousSessionGuard({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
@@ -20,16 +23,21 @@ export default function AnonymousSessionGuard({ children }: { children: ReactNod
         const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);
         const deviceOwner = localStorage.getItem(DEVICE_USER_KEY);
         const pendingOwner = localStorage.getItem(EMAIL_SAVE_USER_KEY);
+        const legacyCleanupDone = localStorage.getItem(LEGACY_OWNERLESS_CLEANUP_KEY) === "1";
         const { data, error } = await supabase.auth.getSession();
         if (error) throw error;
         if (!active) return;
         let user = data.session?.user ?? null;
         const pendingSave = Boolean(user && pendingOwner === user.id);
 
-        // Legacy builds could leave conversation/memory behind without an owner marker.
-        // Never attach ownerless caches to a newly reconciled anonymous/permanent user.
-        if (!deviceOwner && !pendingSave) {
-          clearMisakiDeviceData();
+        // Old builds could leave conversation/memory behind without an owner marker.
+        // Clean that legacy state only once. After this browser has been migrated,
+        // a temporarily missing owner marker must never erase a live conversation.
+        if (!legacyCleanupDone) {
+          if (!deviceOwner && !pendingSave) {
+            clearMisakiDeviceData();
+          }
+          localStorage.setItem(LEGACY_OWNERLESS_CLEANUP_KEY, "1");
         }
 
         // Supabase の匿名セッション自体は localStorage に残るため、
