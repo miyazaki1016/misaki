@@ -52,6 +52,12 @@ function isMemoryRecallQuestion(message: unknown) {
   ].some((pattern) => normalized.includes(pattern));
 }
 
+function createRecallAwareMessage(message: unknown, recallMode: boolean) {
+  if (!recallMode || typeof message !== "string") return message;
+
+  return `${message}\n\n【会話履歴の確認】\n回答する前に、渡されている直近の会話履歴を必ず確認してください。\n質問の答えが直近の会話履歴にある場合は、その内容を最優先で使って自然に答えてください。\n直近の会話履歴になければ長期記憶を確認し、どちらにも根拠がなければ知らないことを作らずに答えてください。`;
+}
+
 function createForwardedRequest(request: Request, body: unknown) {
   return new Request(request.url, {
     method: "POST",
@@ -104,6 +110,7 @@ export async function POST(request: Request) {
 
     const isAnonymous = userData.user.is_anonymous === true;
     const recallMode = isMemoryRecallQuestion(body?.message);
+    const messageForModel = createRecallAwareMessage(body?.message, recallMode);
 
     // 匿名利用ではSupabaseを会話・記憶・関係時間の保存先にしない。
     // ブラウザから届いた一時記憶と直近の会話履歴を、そのブラウザセッション中の回答に使う。
@@ -111,6 +118,7 @@ export async function POST(request: Request) {
       const temporaryMemory = sanitizeMemory(body?.memory);
       const safeBody = {
         ...body,
+        message: messageForModel,
         memory: temporaryMemory,
       };
 
@@ -148,6 +156,7 @@ export async function POST(request: Request) {
     const canonicalMemory = sanitizeMemory(state?.memory);
     const safeBody = {
       ...body,
+      message: messageForModel,
       memory: canonicalMemory,
     };
 
