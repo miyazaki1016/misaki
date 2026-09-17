@@ -1732,26 +1732,9 @@ export default function ChatPage() {
       error:
         any
     ) {
-      setMessages(
-        (
-          prev
-        ) =>
-          [
-            ...prev,
-
-            {
-              role:
-                "misaki" as const,
-
-              text:
-                error
-                  ?.message ||
-                "今ちょっと調子が悪いみたい。もう一回話しかけてね。",
-            },
-          ]
-            .slice(
-              -MAX_MESSAGES
-            )
+      console.error(
+        "Chat message error:",
+        error
       );
     } finally {
       setLoading(
