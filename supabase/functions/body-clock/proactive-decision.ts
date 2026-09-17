@@ -1,32 +1,12 @@
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 
-export type ProactiveDirection =
-  | "MISAKI"
-  | "USER"
-  | "US"
-  | "MISAKI_TO_USER"
-  | "MISAKI_TO_US";
-
-export type RelationshipAction =
-  | "NORMAL"
-  | "WAIT"
-  | "TEASE"
-  | "SULK"
-  | "CHASE"
-  | "PULL"
-  | "RECONNECT";
-
-export type RelationshipEmotion =
-  | "neutral"
-  | "happy"
-  | "lonely"
-  | "sulky"
-  | "concerned"
-  | "affectionate";
+export type ProactiveDirection = "MISAKI" | "USER" | "US" | "MISAKI_TO_USER" | "MISAKI_TO_US";
+export type RelationshipAction = "NORMAL" | "WAIT" | "TEASE" | "SULK" | "CHASE" | "PULL" | "RECONNECT";
+export type RelationshipEmotion = "neutral" | "happy" | "lonely" | "sulky" | "concerned" | "affectionate";
 
 export type ProactiveDecisionContext = {
-  shouldSend: boolean;
-  reason: string;
+  shouldSend: true;
+  reason: "claimed_after_relationship_action_gate";
   direction: ProactiveDirection;
   action: RelationshipAction;
   emotion: RelationshipEmotion;
@@ -40,15 +20,12 @@ export type ProactiveDecisionContext = {
 
 type RelationshipRow = {
   intimacy_level?: number | null;
-  intimacy_points?: number | null;
   emotion_state?: { primary?: string; intensity?: number } | null;
   action_state?: string | null;
   last_interaction_at?: string | null;
 };
 
-function clamp(value: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, value));
-}
+function clamp(value: number, min: number, max: number) { return Math.max(min, Math.min(max, value)); }
 
 function timeBand(lastInteractionAt?: string | null): ProactiveDecisionContext["timeBand"] {
   if (!lastInteractionAt) return "unknown";
@@ -62,16 +39,12 @@ function timeBand(lastInteractionAt?: string | null): ProactiveDecisionContext["
 
 function normalizeAction(value: unknown): RelationshipAction {
   const action = String(value || "NORMAL").toUpperCase();
-  return ["NORMAL", "WAIT", "TEASE", "SULK", "CHASE", "PULL", "RECONNECT"].includes(action)
-    ? (action as RelationshipAction)
-    : "NORMAL";
+  return ["NORMAL", "WAIT", "TEASE", "SULK", "CHASE", "PULL", "RECONNECT"].includes(action) ? action as RelationshipAction : "NORMAL";
 }
 
 function normalizeEmotion(value: unknown): RelationshipEmotion {
   const emotion = String(value || "neutral").toLowerCase();
-  return ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"].includes(emotion)
-    ? (emotion as RelationshipEmotion)
-    : "neutral";
+  return ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"].includes(emotion) ? emotion as RelationshipEmotion : "neutral";
 }
 
 function chooseDirection(action: RelationshipAction, emotion: RelationshipEmotion): ProactiveDirection {
@@ -82,51 +55,28 @@ function chooseDirection(action: RelationshipAction, emotion: RelationshipEmotio
   return "MISAKI";
 }
 
-function shouldSendForAction(action: RelationshipAction, seed: number) {
-  if (action === "PULL") return false;
-  if (action === "WAIT") return seed % 100 < 25;
-  if (action === "SULK") return seed % 100 < 45;
-  return true;
-}
-
-function stableSeed(userId: string, action: string, emotion: string) {
-  const bucket = Math.floor(Date.now() / (5 * 60 * 1000));
-  let hash = 2166136261;
-  for (const char of `${userId}|${action}|${emotion}|${bucket}`) {
-    hash ^= char.charCodeAt(0);
-    hash = Math.imul(hash, 16777619);
-  }
-  return hash >>> 0;
-}
-
-export async function buildProactiveDecisionContext(
-  supabase: SupabaseClient,
-  userId: string,
-  relationshipPoints: number
-): Promise<ProactiveDecisionContext> {
+export async function buildProactiveDecisionContext(supabase: SupabaseClient, userId: string, relationshipPoints: number): Promise<ProactiveDecisionContext> {
   const { data, error } = await supabase
     .from("misaki_relationship_state")
-    .select("intimacy_level,intimacy_points,emotion_state,action_state,last_interaction_at")
+    .select("intimacy_level,emotion_state,action_state,last_interaction_at")
     .eq("user_id", userId)
     .maybeSingle();
-
   if (error) throw error;
+
   const row = (data || {}) as RelationshipRow;
   const action = normalizeAction(row.action_state);
   const emotion = normalizeEmotion(row.emotion_state?.primary);
-  const emotionIntensity = clamp(Number(row.emotion_state?.intensity) || 0, 0, 100);
-  const intimacyLevel = Math.max(0, Number(row.intimacy_level) || 0);
-  const seed = stableSeed(userId, action, emotion);
-  const shouldSend = shouldSendForAction(action, seed);
 
+  // The database claim RPC is the single source of truth for send/defer.
+  // Re-evaluating WAIT/SULK/PULL here would create contradictory decisions after a lease is claimed.
   return {
-    shouldSend,
-    reason: shouldSend ? `action_${action.toLowerCase()}_allows_send` : `action_${action.toLowerCase()}_holds_send`,
+    shouldSend: true,
+    reason: "claimed_after_relationship_action_gate",
     direction: chooseDirection(action, emotion),
     action,
     emotion,
-    emotionIntensity,
-    intimacyLevel,
+    emotionIntensity: clamp(Number(row.emotion_state?.intensity) || 0, 0, 100),
+    intimacyLevel: Math.max(0, Number(row.intimacy_level) || 0),
     relationshipPoints: Math.max(0, relationshipPoints),
     timeBand: timeBand(row.last_interaction_at),
     situation: "none",
