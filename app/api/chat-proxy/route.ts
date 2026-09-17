@@ -8,6 +8,7 @@ const SUPABASE_PUBLISHABLE_KEY =
 const MAX_MEMORY = 30;
 const PARSE_ERROR_MESSAGE =
   "美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。";
+const HISTORY_DIAGNOSTIC_PREFIX = "履歴診断:";
 
 function createAuthenticatedSupabase(accessToken: string) {
   return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
@@ -66,6 +67,31 @@ function createForwardedRequest(request: Request, body: unknown) {
   });
 }
 
+function createHistoryDiagnostic(body: any) {
+  if (typeof body?.message !== "string") return null;
+  if (!body.message.startsWith(HISTORY_DIAGNOSTIC_PREFIX)) return null;
+
+  const term = body.message.slice(HISTORY_DIAGNOSTIC_PREFIX.length).trim();
+  const history = Array.isArray(body?.history) ? body.history : [];
+  const validHistory = history.filter(
+    (item: any) =>
+      item &&
+      (item.role === "user" || item.role === "misaki") &&
+      typeof item.text === "string"
+  );
+  const matches = term
+    ? validHistory.filter((item: any) => item.text.includes(term)).length
+    : 0;
+
+  return Response.json({
+    reply: `診断結果：history=${validHistory.length}件 / 「${term || "未指定"}」を含む履歴=${matches}件`,
+    memory: sanitizeMemory(body?.memory),
+    memorySynced: false,
+    relationshipTimeSynced: false,
+    diagnostic: true,
+  });
+}
+
 async function callBaseChatWithParseRetry(request: Request, body: unknown) {
   const firstResponse = await baseChatPost(createForwardedRequest(request, body));
   if (firstResponse.ok || firstResponse.status !== 500) return firstResponse;
@@ -107,6 +133,9 @@ export async function POST(request: Request) {
         { status: 401 }
       );
     }
+
+    const diagnosticResponse = createHistoryDiagnostic(body);
+    if (diagnosticResponse) return diagnosticResponse;
 
     const isAnonymous = userData.user.is_anonymous === true;
     const recallMode = isMemoryRecallQuestion(body?.message);
