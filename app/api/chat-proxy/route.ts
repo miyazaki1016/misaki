@@ -167,7 +167,7 @@ export async function POST(request: Request) {
 
     // 会話と記憶の保存が成功した後にだけ関係時間を進める。
     // 関係時間の記録失敗で、すでに生成できた会話そのものは失敗扱いにしない。
-    await recordRelationshipChatTurn(
+    const relationshipTimeSynced = await recordRelationshipChatTurn(
       supabase,
       false,
       userMessageAt,
@@ -178,7 +178,7 @@ export async function POST(request: Request) {
       ...result,
       memory: nextMemory,
       memorySynced: true,
-      relationshipTimeSynced: true,
+      relationshipTimeSynced,
     });
   } catch (error) {
     console.error("CHAT PROXY ERROR:", error);
