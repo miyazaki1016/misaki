@@ -34,8 +34,9 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
     signInAnonymously: async () => { calls.push('signIn'); currentUser = { id: 'new', is_anonymous: true }; return { data: { user: currentUser }, error: null }; },
     updateUser: async () => { calls.push('email'); return { error: null }; },
     onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },
-  }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };
-  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON,
+  }, rpc: async (name, args) => { calls.push({ name, args });
+    return { data: name === 'admit_misaki_legacy_operation' ? { id: 'server-op', capability: 'server-cap', trackingKey: 'server-key' } : { saved: true }, error: null }; } };
+  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON, process: { env: { SUPABASE_SERVICE_ROLE_KEY: 'test-only' } },
     console: { error() {} }, fetch: (...args) => h.fetch(...args),
     window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },
       setInterval() {}, clearInterval() {}, setTimeout: fn => fn(), addEventListener() {}, removeEventListener() {} },
@@ -53,6 +54,8 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name === '@supabase/supabase-js') return { createClient: () => client };
       if (name.endsWith('/supabase')) return { supabase: client };
       if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');
+      if (name.endsWith('/legacy-browser-drain')) return load('lib/legacy-browser-drain.ts');
+      if (name.endsWith('/legacy-drain')) return load('lib/legacy-drain.ts');
       throw Error(name);
     };
     vm.runInContext(`(function(require,module,exports){${output}\n})`, context)(req, module, module.exports);
@@ -135,7 +138,9 @@ test('different permanent user clears previous conversation and memory', async (
 test('logout clears caches in both storage areas and remounts mounted chat', async () => {
   const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-browser-session': '1', 'misaki-test': 'secret' });
   await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);
-  assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
+  // The intentional once-only ownerless-cache migration marker is not user data.
+  assert.equal([...Array(h.localStorage.length)].some((_, i) => h.localStorage.key(i).startsWith('misaki-')), false);
+  assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
 });
 test('transient anonymous sign-out preserves live browser conversation and reauthenticates', async () => {
   const h = harness({ id: 'a', is_anonymous: true }, {}, { 'misaki-browser-session': '1' });
@@ -180,7 +185,7 @@ test('API rejects foreign expected user ID and accepts memory-only explicit save
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'b', history, memory: [] }))).status, 409);
   assert.equal(h.calls.length, 0);
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history: [], memory: ['remember'] }))).status, 200);
-  assert.equal(h.calls[0].name, 'save_anonymous_conversation_state');
+  assert.equal(h.calls.find(call => call.name === 'save_anonymous_conversation_state').name, 'save_anonymous_conversation_state');
   h.setUser({ id: 'a', is_anonymous: false });
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);
 });

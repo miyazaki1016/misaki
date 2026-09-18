@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { POST as baseChatPost } from "../chat/route";
 import { recordRelationshipChatTurn } from "../../../lib/relationship-time";
+import { operationClient, progressOperation, type LegacyOperation } from '../../../lib/legacy-drain';
 
 const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
@@ -102,6 +103,7 @@ async function callBaseChat(request: Request, body: unknown) {
 }
 
 export async function POST(request: Request) {
+  let operation: LegacyOperation | null = null;
   try {
     const body = await request.json();
     const authorization = request.headers.get("authorization") ?? "";
@@ -114,7 +116,7 @@ export async function POST(request: Request) {
     }
 
     const accessToken = authorization.slice("Bearer ".length).trim();
-    const supabase = createAuthenticatedSupabase(accessToken);
+    let supabase = createAuthenticatedSupabase(accessToken);
     const { data: userData, error: userError } =
       await supabase.auth.getUser(accessToken);
 
@@ -187,6 +189,9 @@ export async function POST(request: Request) {
 
     const result = await baseResponse.json();
     const misakiMessageAt = new Date();
+    operation = result.maintenanceOperation;
+    if (!operation) throw new Error('operation missing');
+    supabase = operationClient(accessToken, operation);
     const returnedMemory = sanitizeMemory(result?.memory);
     const nextMemory = recallMode ? canonicalMemory : returnedMemory;
     const historyForSync =
@@ -203,6 +208,7 @@ export async function POST(request: Request) {
     );
 
     if (syncError) {
+      await progressOperation(operation, 'unknown');
       console.error("CANONICAL MEMORY WRITE ERROR:", syncError);
       return Response.json(
         { error: "美咲の記憶を保存できませんでした。もう一度話しかけてね。" },
@@ -226,6 +232,7 @@ export async function POST(request: Request) {
       relationshipTimeSynced,
     });
   } catch (error) {
+    if (operation) await progressOperation(operation, 'unknown');
     console.error("CHAT PROXY ERROR:", error);
     return Response.json(
       { error: "今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。" },

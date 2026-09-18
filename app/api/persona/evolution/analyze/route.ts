@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { admitOperation, operationClient, progressOperation, maintenanceResponse, type LegacyOperation } from '../../../../../lib/legacy-drain';
 import { runUserEvolutionAnalysis } from "../../../../../lib/persona/evolution-runner";
 import type { ChatMessage } from "../../../../../lib/user-profile";
 
@@ -48,6 +49,8 @@ function sanitizeMemory(value: unknown): string[] {
 }
 
 export async function POST(request: Request) {
+  let operation: LegacyOperation | null = null;
+  let completed = false;
   try {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
@@ -66,7 +69,7 @@ export async function POST(request: Request) {
     }
 
     const accessToken = authorization.slice("Bearer ".length).trim();
-    const supabase = createAuthenticatedSupabase(accessToken);
+    let supabase = createAuthenticatedSupabase(accessToken);
     const { data: userData, error: userError } =
       await supabase.auth.getUser(accessToken);
 
@@ -125,6 +128,10 @@ export async function POST(request: Request) {
       });
     }
 
+    try {
+      operation = await admitOperation('evolution', userData.user.id);
+      supabase = operationClient(accessToken, operation);
+    } catch { return maintenanceResponse(); }
     const result = await runUserEvolutionAnalysis(
       supabase,
       userData.user.id,
@@ -134,6 +141,7 @@ export async function POST(request: Request) {
       { force: true }
     );
 
+    completed = await progressOperation(operation, result.reason === 'analysis_failed' ? 'unknown' : 'succeeded');
     return Response.json({
       ...result,
       historySource,
@@ -151,5 +159,7 @@ export async function POST(request: Request) {
       },
       { status: 500 }
     );
+  } finally {
+    if (operation && !completed) await progressOperation(operation, 'unknown');
   }
 }

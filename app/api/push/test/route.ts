@@ -1,6 +1,7 @@
 import {
   createClient,
 } from "@supabase/supabase-js";
+import { admitOperation, operationClient, progressOperation, maintenanceResponse, type LegacyOperation } from '../../../../lib/legacy-drain';
 
 import {
   NextResponse,
@@ -54,6 +55,9 @@ function getBearerToken(
 export async function POST(
   request: Request
 ) {
+  let operation: LegacyOperation | null = null;
+  let settled = false;
+  let uncertain = false;
   try {
     const token =
       getBearerToken(
@@ -130,7 +134,7 @@ export async function POST(
         ? body.url
         : "/chat";
 
-    const supabase =
+    let supabase =
       createClient(
         SUPABASE_URL,
         SUPABASE_PUBLISHABLE_KEY,
@@ -236,6 +240,8 @@ export async function POST(
       );
     }
 
+    try { operation = await admitOperation('push_test', userId); supabase = operationClient(token, operation); }
+    catch { return maintenanceResponse(); }
     webpush.setVapidDetails(
       subject,
       publicKey,
@@ -283,7 +289,7 @@ export async function POST(
 
         sent += 1;
 
-        await supabase
+        const saved = await supabase
           .from(
             "push_subscriptions"
           )
@@ -300,6 +306,7 @@ export async function POST(
             "user_id",
             userId
           );
+        if (saved.error) uncertain = true;
       } catch (
         pushError:
           any
@@ -321,7 +328,7 @@ export async function POST(
           statusCode ===
             410
         ) {
-          await supabase
+          const removedSubscription = await supabase
             .from(
               "push_subscriptions"
             )
@@ -334,12 +341,16 @@ export async function POST(
               "user_id",
               userId
             );
+          if (removedSubscription.error) uncertain = true;
 
           removed += 1;
+        } else {
+          uncertain = true;
         }
       }
     }
 
+    settled = await progressOperation(operation, uncertain ? 'unknown' : 'succeeded');
     if (
       sent ===
       0
@@ -376,5 +387,7 @@ export async function POST(
         status: 500,
       }
     );
+  } finally {
+    if (operation && !settled) await progressOperation(operation, 'unknown');
   }
 }

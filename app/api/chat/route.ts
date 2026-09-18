@@ -2,6 +2,7 @@ import {
   createClient,
   type SupabaseClient,
 } from "@supabase/supabase-js";
+import { admitOperation, operationClient, progressOperation, maintenanceResponse, type LegacyOperation } from '../../../lib/legacy-drain';
 
 import {
   createTokyoLifeEventsGuide,
@@ -1571,6 +1572,8 @@ function parseGeminiText(
 export async function POST(
   request: Request
 ) {
+  let operation: LegacyOperation | null = null;
+  let operationHandled = false;
   const traceId =
     crypto.randomUUID()
       .slice(0, 8);
@@ -1635,11 +1638,16 @@ export async function POST(
       return null;
     }
 
+    if (operation) await progressOperation(operation, 'refund_pending');
     const refunded =
       await refundDailyMessage(
         chargedSupabase,
         chargedRequestId
       );
+
+    if (operation) {
+      operationHandled = await progressOperation(operation, refunded ? 'refunded' : 'unknown');
+    }
 
     chargedRequestId = null;
     chargedSupabase = null;
@@ -1722,7 +1730,7 @@ export async function POST(
         )
         .trim();
 
-    const supabase =
+    let supabase =
       createAuthenticatedSupabase(
         accessToken
       );
@@ -1754,8 +1762,11 @@ export async function POST(
       );
     }
 
-    const usageRequestId =
-      crypto.randomUUID();
+    try {
+      operation = await admitOperation('chat', userData.user.id);
+      supabase = operationClient(accessToken, operation);
+    } catch { return maintenanceResponse(); }
+    const usageRequestId = operation.trackingKey;
 
     const {
       data: usageData,
@@ -1813,6 +1824,7 @@ export async function POST(
       usage.allowed !== true &&
       usage.is_premium !== true
     ) {
+      operationHandled = await progressOperation(operation, 'failed');
       return Response.json(
         {
           error:
@@ -2682,6 +2694,8 @@ ${retryProblems
         ),
     };
 
+    if (!await progressOperation(operation, 'awaiting_browser')) throw new Error('operation completion unavailable');
+    operationHandled = true;
     chargedRequestId = null;
     chargedSupabase = null;
 
@@ -2697,6 +2711,7 @@ ${retryProblems
     );
 
     return Response.json({
+      maintenanceOperation: operation,
       reply,
       memory:
         updatedMemory,
@@ -2767,5 +2782,11 @@ ${retryProblems
         status: 500,
       }
     );
+  } finally {
+    if (operation && !operationHandled) {
+      // Premium failures need no refund. A lost usage response or failed refund
+      // cannot be cleared: the DB rejects failed until its usage evidence agrees.
+      if (!await progressOperation(operation, 'failed')) await progressOperation(operation, 'unknown');
+    }
   }
 }

@@ -234,6 +234,37 @@ Free / Premium の通常会話、失敗時の利用回数返却、匿名利用�
 
 ---
 
+## 0.9 旧Production互換の先行maintenance / drain設備（2026-09-19）
+
+**maintenanceはON/OFFではなく、受付集合を確定し、未解決処理をdrainした後にfreezeする状態機械。**
+先行設備はPR #29本体から分離し、旧main schema/RPCのまま使う。
+DB正本の制御行とoperation registryを追加し、受付確認とサーバー生成operation登録を同じlockで原子化する。
+停止開始後の新規受付は拒否し、受付済み処理の継続だけをdraining中に許可する。
+
+**設計理由:** usage消費済み→Gemini生成中→freeze→成功保存/refund拒否という半端状態を作らない。
+HTTP終了だけでchatを完了扱いにせず、旧browserのhistory/記憶/background後続保存も確認する。
+Free失敗は旧refund ledgerの確定まで未解決。Premiumも生成/保存の終端確認が必要。
+クラッシュ、不明結果、応答紛失、processed=falseは自動expiryでdrainedにしない。
+
+**他機能との関連:** chat/base/proxy、history POST、匿名メールcheckpoint、旧直接RPC/背景upsert、
+emotion/action trigger、Body Clock claim/generation/delivery/relay、Push購読、evolutionの書込み境界を統一する。
+Body Clockは旧Edge batchをclaim前からrelay終了まで追跡。cron停止は別の運用操作。
+旧cron停止だけで既開始Gemini/relayが消えたとは判断しない。
+
+**壊してはいけない原則:** freezeは受付停止済み、未解決0件、旧Edgeを含むdrain確認証拠、
+必要cron inactive、relay attempt未完了0件、既DB transaction終了を同じlock下で確認した場合だけ許可する。
+最後のDB write guardを残し、旧definer RPC/service_roleも迂回させない。
+解除時に未解決記録を削除しない。maintenance応答を美咲の会話へ保存しない。
+通常writeは共有lockで別ユーザーの並列実行を保持する。
+
+旧main互換のためポイント計算/閾値、認証、匿名→email、Free/Premium/refund、記憶、emotion/action、
+写真selector 4、55–210分を変更しない。PR #29 canonical/temporary RPCを先行依存にしない。
+Preview/CI greenだけを本番安全判定にしない。稼働中旧runtimeの確認不能はBLOCKED。
+Production施工、cron操作、実snapshot/restore、PR #29 mergeは今回の対象外・実行禁止。
+
+詳細設計、全停止経路、freeze条件、operator手順、競合試験と実証限界は
+[旧Production互換maintenance/drain仕様](LEGACY_MAINTENANCE_DRAIN.md)を参照。
+
 ## 1. プロダクト原則
 
 Misaki の原点は「すべては会話の中にある」。
