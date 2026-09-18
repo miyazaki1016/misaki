@@ -22,12 +22,16 @@
 - `CHASE + concerned` では現在も `lifeConfidence === explicit || emotion === concerned` で `check_in` が入るため、総覧の「要再検討」は有効
 - 現在のBody Clock写真カタログは morning/day/evening/night 各1枚で、全 direction/action/emotion を許可している
 
-### 突き合わせで明確化した残存レガシー
+### 旧自発経路の整理
 
-- active Body Clock の `ProactiveExpressionTag` から `relax` は削除済みだが、旧 `lib/proactive-photo.ts` の互換型・旧写真カタログには `relax` と `selfie` が残っている
-- `app/api/proactive/route.ts` は現在も存在する
-- `app/chat/page.tsx` には旧 `sendProactiveMessage()` と45分系の定数が残っているが、現在のソースでは **`sendProactiveMessage()` の呼び出し箇所は存在しない**。したがってブラウザ側旧自発処理は現状 dormant
-- 旧経路は互換性・履歴上の理由で残っているため、意図を確認せず削除しない
+2026-09-18 に、実利用されていない旧ブラウザ自発経路を削除。
+
+- `app/chat/page.tsx` の旧 `sendProactiveMessage()`
+- 旧45分系ブラウザスケジューラ定数とローカル状態
+- `app/api/proactive/route.ts`
+- `lib/proactive-photo.ts`
+
+現在の自発メッセージ経路は Supabase Body Clock に一本化。
 
 ### Pushで残っているコード上の注意点
 
@@ -393,9 +397,8 @@ Safari 実機で一瞬 `Load failed` が美咲の吹き出しとして出る問�
 
 今後、各時間帯に複数候補を用意すると、感情・行動タグによる写真差分が本格的に効く。
 
-### レガシー経路 / Push
+### Push
 
-- dormant な `sendProactiveMessage()`、旧 `/api/proactive`、互換写真型をいつ整理するか
 - Preview origin でPush購読を作っても本番チャットへ戻すか、Service Workerの通知クリックURLを本番絶対URLへ固定するか
 
 ---
@@ -413,6 +416,8 @@ Safari 実機で一瞬 `Load failed` が美咲の吹き出しとして出る問�
 - #19 返答失敗時の利用回数返却 + エラーUI
 - #20 ユーザー仕事推測 / 美咲仕事時間帯の整合性修正
 - #21 直近の実装・修正総覧を追加
+- #22 総覧を最新mainソースと再照合
+- #23 旧ブラウザ自発経路を削除
 
 ---
 
