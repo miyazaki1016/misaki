@@ -67,6 +67,7 @@ type ActivityEvidence = {
 const MAX_HISTORY = 60;
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
+const GEMINI_TIMEOUT_MS = 20_000;
 
 const SUPABASE_URL =
   "https://tzozajnwznxqgxnjikoy.supabase.co";
@@ -2200,62 +2201,159 @@ ${retryProblems
 `
           : "";
 
-      const response =
-        await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-            body:
-              JSON.stringify({
-                systemInstruction: {
-                  parts: [
-                    {
-                      text:
-                        baseSystemPrompt +
-                        retryGuide,
-                    },
-                  ],
-                },
-                contents: [
-                  ...contents,
-                  {
-                    role: "user",
+      const controller =
+        new AbortController();
+      const startedAt =
+        Date.now();
+      const timeout =
+        setTimeout(
+          () =>
+            controller.abort(),
+          GEMINI_TIMEOUT_MS
+        );
+
+      const attempt =
+        retryProblems &&
+        retryProblems.length > 0
+          ? "retry"
+          : "initial";
+      const hasSupplementaryUnicode =
+        /[\uD800-\uDBFF][\uDC00-\uDFFF]/
+          .test(
+            message
+          );
+
+      console.log(
+        "GEMINI FETCH START:",
+        {
+          attempt,
+          messageLength:
+            message.length,
+          hasSupplementaryUnicode,
+        }
+      );
+
+      try {
+        const response =
+          await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json",
+              },
+              signal:
+                controller.signal,
+              body:
+                JSON.stringify({
+                  systemInstruction: {
                     parts: [
                       {
-                        text: message,
+                        text:
+                          baseSystemPrompt +
+                          retryGuide,
                       },
                     ],
                   },
-                ],
-                generationConfig: {
-                  responseMimeType:
-                    "application/json",
-                },
-              }),
+                  contents: [
+                    ...contents,
+                    {
+                      role: "user",
+                      parts: [
+                        {
+                          text: message,
+                        },
+                      ],
+                    },
+                  ],
+                  generationConfig: {
+                    responseMimeType:
+                      "application/json",
+                  },
+                }),
+            }
+          );
+
+        const elapsedMs =
+          Date.now() -
+          startedAt;
+
+        console.log(
+          "GEMINI FETCH END:",
+          {
+            attempt,
+            status:
+              response.status,
+            elapsedMs,
           }
         );
 
-      const data =
-        await response.json();
+        const data =
+          await response.json();
 
-      if (!response.ok) {
+        if (!response.ok) {
+          console.error(
+            "GEMINI API ERROR:",
+            {
+              attempt,
+              status:
+                response.status,
+              elapsedMs,
+              data,
+            }
+          );
+
+          return null;
+        }
+
+        return parseGeminiText(
+          data?.candidates?.[0]
+            ?.content?.parts?.[0]
+            ?.text
+        );
+      } catch (error) {
+        const elapsedMs =
+          Date.now() -
+          startedAt;
+
+        if (
+          error instanceof
+            Error &&
+          error.name ===
+            "AbortError"
+        ) {
+          console.error(
+            "GEMINI FETCH TIMEOUT:",
+            {
+              attempt,
+              elapsedMs,
+              messageLength:
+                message.length,
+              hasSupplementaryUnicode,
+            }
+          );
+
+          throw new Error(
+            "GEMINI_TIMEOUT"
+          );
+        }
+
         console.error(
-          "GEMINI API ERROR:",
-          data
+          "GEMINI FETCH FAILED:",
+          {
+            attempt,
+            elapsedMs,
+            error,
+          }
         );
 
-        return null;
+        throw error;
+      } finally {
+        clearTimeout(
+          timeout
+        );
       }
-
-      return parseGeminiText(
-        data?.candidates?.[0]
-          ?.content?.parts?.[0]
-          ?.text
-      );
     }
 
     let parsed =
