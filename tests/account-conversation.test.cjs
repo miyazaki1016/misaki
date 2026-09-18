@@ -92,6 +92,28 @@ test('email save checkpoints authenticated temporary state before updateUser', a
   await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
   assert.deepEqual(h.calls, ['save', 'email']); assert.equal(h.localStorage.getItem(pendingKey), 'a');
 });
+
+for (const failedEmail of [true, false]) test(`${failedEmail ? 'failed email send' : 'pending confirmation'}: saveByEmail retry preserves additional server conversation`, async () => {
+  const server = require('./server-canonical.test.cjs').harness({ anonymous: true });
+  const chat = server.load('app/api/chat/route.ts'), api = server.load('app/api/persona/history/route.ts');
+  const first = await (await chat.POST(server.request())).json();
+  const h = harness(server.user, { [ownerKey]: server.user.id }, { 'misaki-temporary-state-v1': first.temporaryState });
+  let emails = 0;
+  h.client.auth.updateUser = async () => ({ error: ++emails === 1 && failedEmail ? new Error('email transport failed') : null });
+  h.fetch = async (_url, options) => api.POST(new Request('https://test/api/persona/history', options));
+  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';
+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
+  assert.equal(emails, 1);
+  const additional = await chat.POST(server.request({ message: '保存再試行前の追加会話',
+    requestId: require('node:crypto').randomUUID(), temporaryState: first.temporaryState }));
+  assert.equal(additional.status, 200);
+  // Simulate a tab with an old display token. The server root still wins.
+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
+  assert.equal(emails, 2); server.user.is_anonymous = false;
+  const state = await server.load('lib/canonical-state.ts').loadCanonicalState(server.user.id);
+  assert.equal(state.relationshipPoints, 2);
+  assert.ok(state.history.some(item => item.text === '保存再試行前の追加会話'));
+});
 test('failed checkpoint never sends confirmation email', async () => {
   const h = harness(); h.fetch = async () => new Response('', { status: 500 });
   await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';

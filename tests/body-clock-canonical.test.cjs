@@ -21,7 +21,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     from(table) {
       const query = { select() { return query; }, eq() { return query; }, not() { return query; }, order() { return query; },
         single: async () => ({ data: { next_push_at: 'lease' }, error: null }),
-        maybeSingle: async () => ({ data: table === 'daily_message_requests' ? { temporary_result: token } : table === 'misaki_relationship_state'
+        maybeSingle: async () => ({ data: table === 'misaki_temporary_roots' ? { token, revision: 'root-generation', expires_at: new Date(Date.now() + 60000).toISOString() } : table === 'daily_message_requests' ? { temporary_result: token } : table === 'misaki_relationship_state'
           ? { intimacy_points: anonymous ? 999 : 80, intimacy_level: anonymous ? 'very_intimate' : 'intimate', action_state: 'NORMAL', emotion_state: { primary: 'happy', intensity: 34 } }
           : { history: [{ role: 'user', text: 'canonical history' }], memory: ['canonical memory'] }, error: null }),
         limit() { return query; }, then(resolve) { resolve({ data: [], error: null }); },
@@ -36,7 +36,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     },
   };
   const context = vm.createContext({ Date, JSON, Math, URL, Request, Response, AbortSignal,
-    crypto: nodeCrypto.webcrypto, TextEncoder, TextDecoder, atob, Uint8Array,
+    crypto: nodeCrypto.webcrypto, TextEncoder, TextDecoder, atob, btoa, Uint8Array,
     console, Deno: { env: { get: () => 'test' }, serve() {} },
     fetch: async (url, options) => {
       if (String(url).includes('generativelanguage')) {
@@ -80,6 +80,6 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
   assert.ok(!calls.some(call => call.name === 'complete_misaki_chat_turn'));
 }
 test('Body Clock uses canonical history/memory/points for decision, photo, delivery and push', () => verifyBodyClock());
-test('anonymous Body Clock decodes the server receipt and uses the same temporary points', () => verifyBodyClock({ anonymous: true }));
+test('anonymous Body Clock decodes the shared server root and uses the same temporary points', () => verifyBodyClock({ anonymous: true }));
 test('anonymous Body Clock skips expired temporary state before generation or delivery', () => verifyBodyClock({ anonymous: true, expired: true }));
 test('anonymous Body Clock rejects tampered temporary receipts', () => verifyBodyClock({ anonymous: true, tampered: true }));

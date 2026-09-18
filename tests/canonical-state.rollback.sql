@@ -87,24 +87,24 @@ begin
   -- Body Clock can already have created a neutral relationship row for an anon.
   insert into public.misaki_relationship_state(user_id) values(a);
   perform public.save_misaki_temporary_state(a,snapshot,'["anonymous memory"]','{"date":"","items":[]}',7);
-  perform public.save_misaki_temporary_state(a,'[]','[]','{"date":"","items":[]}',999);
-  assert (select intimacy_points from public.misaki_relationship_state where user_id=a)=7;
-  assert (select memory from public.misaki_user_conversation_state where user_id=a)='["anonymous memory"]'::jsonb;
-  assert (select user_message_count from public.misaki_user_conversation_state where user_id=a)=1;
+  perform public.save_misaki_temporary_state(a,snapshot || snapshot,'["new anonymous memory"]','{"date":"","items":[]}',8);
+  assert (select intimacy_points from public.misaki_relationship_state where user_id=a)=8;
+  assert (select memory from public.misaki_user_conversation_state where user_id=a)='["new anonymous memory"]'::jsonb;
+  assert (select user_message_count from public.misaki_user_conversation_state where user_id=a)=2;
   assert (select emotion_state->>'primary' from public.misaki_relationship_state where user_id=a)='neutral';
   update auth.users set is_anonymous=false where id=a;
-  assert (select intimacy_points from public.misaki_relationship_state where user_id=a)=7;
-  assert (select jsonb_array_length(history) from public.misaki_user_conversation_state where user_id=a)=2;
+  assert (select intimacy_points from public.misaki_relationship_state where user_id=a)=8;
+  assert (select jsonb_array_length(history) from public.misaki_user_conversation_state where user_id=a)=4;
   -- Use a different live anonymous account for temporary transport receipts.
   a:=gen_random_uuid(); insert into auth.users(id,is_anonymous) values(a,true);
   insert into public.daily_message_requests(request_id,user_id,usage_date,allowed,processed,is_premium)
     values(temporary_request,a,(now() at time zone 'Asia/Tokyo')::date,true,true,false);
-  assert public.complete_misaki_temporary_turn(a,temporary_request,'message digest','parent digest','sealed response')='sealed response';
-  assert public.complete_misaki_temporary_turn(a,temporary_request,'message digest','parent digest','different sealed response')='sealed response';
+  assert public.complete_misaki_temporary_turn(a,temporary_request,'message digest','parent digest','sealed response',null,jsonb_build_object('history',snapshot,'memory','[]'::jsonb,'todayMemory','{"date":"","items":[]}'::jsonb,'relationshipPoints',1))='sealed response';
+  assert public.complete_misaki_temporary_turn(a,temporary_request,'message digest','parent digest','different sealed response',null,jsonb_build_object('history',snapshot,'memory','[]'::jsonb,'todayMemory','{"date":"","items":[]}'::jsonb,'relationshipPoints',1))='sealed response';
   assert not exists(select 1 from public.misaki_relationship_state where user_id=a);
   assert not exists(select 1 from public.misaki_user_conversation_state where user_id=a);
   begin
-    perform public.complete_misaki_temporary_turn(a,temporary_request,'another message','parent digest','sealed response');
+    perform public.complete_misaki_temporary_turn(a,temporary_request,'another message','parent digest','sealed response',null,jsonb_build_object('history',snapshot,'memory','[]'::jsonb,'todayMemory','{"date":"","items":[]}'::jsonb,'relationshipPoints',1));
     raise exception 'temporary billed request reused';
   exception when others then
     if sqlerrm<>'request_id_message_mismatch' then raise; end if;

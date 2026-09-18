@@ -10,23 +10,29 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   const user = { id: 'account-a', is_anonymous: anonymous };
   const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };
   let points = 79, consumed = 0, refunded = 0, generated = 0;
-  const completed = new Map(), temporaryReceipts = new Map(), calls = [], prompts = [];
+  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
+  let checkpoint = false, revision = 0;
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
     from(table) {
       const filters = {};
-      const query = { select() { return query; }, eq(k, v) { filters[k] = v; return query; },
+      const query = { select() { return query; }, not() { return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
         async maybeSingle() {
           if (stateFailure) return { error: { message: 'unavailable' }, data: null };
+          if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };
           if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };
           if (table === 'misaki_user_conversation_state') return { data: rootState, error: null };
           if (table === 'misaki_relationship_events') {
+            if (filters.event_type === 'email_save_checkpoint') return { data: checkpoint ? { id: 1 } : null, error: null };
             const result = completed.get(filters.request_id);
             return { data: result ? { metadata: result } : null, error: null };
           }
-          if (table === 'daily_message_requests') return { data: temporaryReceipts.get(filters.request_id) ?? null, error: null };
+          if (table === 'daily_message_requests') return { data: filters.request_id ? temporaryReceipts.get(filters.request_id) ?? null : [...temporaryReceipts.values()].at(-1) ?? null, error: null };
           return { data: null, error: null };
         } };
+      query.single = async () => ({ data: { next_push_at: 'lease' }, error: null });
+      query.insert = async () => ({ error: null });
+      query.then = resolve => resolve({ data: [], error: null });
       return query;
     },
     async rpc(name, args) {
@@ -49,10 +55,24 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });
         return { data: result, error: null };
       }
-      if (name === 'save_misaki_temporary_state') return { data: { saved: true }, error: null };
+      if (name === 'save_misaki_temporary_state') {
+        if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale checkpoint' } };
+        checkpoint = true; points = args.p_points; rootState.history = args.p_history;
+        rootState.memory = args.p_memory; rootState.today_memory = args.p_today_memory;
+        return { data: { saved: true }, error: null };
+      }
+      if (name === 'write_misaki_temporary_root' || name === 'finish_misaki_body_clock_delivery') {
+        const result = storeRoot(name === 'write_misaki_temporary_root' ? args : {
+          ...args, p_token: args.p_temporary_token, p_state: args.p_temporary_state, p_refresh_expiry: false });
+        if (result.error) return result;
+        return { data: name === 'finish_misaki_body_clock_delivery' ? { deliveryId: 'delivery', pushesToday: 1, nextPushAt: 'next' } : 'revision', error: null };
+      }
+      if (name === 'sign_misaki_body_clock_relay') return { data: 'a'.repeat(64), error: null };
       if (name === 'complete_misaki_temporary_turn') {
         const receipt = temporaryReceipts.get(args.p_request_id);
         if (receipt) return { data: receipt.temporary_result, error: null };
+        const stored = storeRoot(args);
+        if (stored.error) return stored;
         temporaryReceipts.set(args.p_request_id, { completed_at: 'now', temporary_result: args.p_token,
           message_hash: args.p_message_hash, parent_hash: args.p_parent_hash });
         return { data: args.p_token, error: null };
@@ -60,6 +80,16 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       return { data: {}, error: null };
     },
   };
+  function storeRoot(args) {
+    if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale root' } };
+    temporaryRoots.set(user.id, { token: args.p_token, revision: `revision-${++revision}`, expires_at: args.p_refresh_expiry === false ? temporaryRoots.get(user.id).expires_at : new Date(clock + 86400000).toISOString() });
+    if (checkpoint) {
+      points = args.p_state.relationshipPoints; rootState.history = args.p_state.history;
+      rootState.memory = args.p_state.memory; rootState.today_memory = args.p_state.todayMemory;
+    }
+    return { error: null };
+  }
+  client.auth.admin = { getUserById: async () => ({ data: { user }, error: null }) };
   let clock = Date.now();
   class TestDate extends Date { static now() { return clock; } }
   const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,
@@ -91,7 +121,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
   }
-  return { advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
+  return { client, user, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
       body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },
@@ -175,3 +205,5 @@ test('both permanent devices restore same server points and memory without brows
   assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 79); assert.deepEqual(a.memory, ['server memory']);
   assert.equal((await api.POST(h.request({ history: [], memory: ['fake'], relationshipPoints: 999 }))).status, 400);
 });
+
+module.exports = { harness };

@@ -110,7 +110,8 @@ export default function AccountPage() {
           localStorage.getItem(DEVICE_USER_KEY) !== session.user.id) {
         throw new Error("アカウント状態が変わりました。画面を開き直してください。");
       }
-      // Save before sending the link: confirmation may open in another tab/device.
+      // Refresh on every retry, including while confirmation is pending.
+      // The checkpoint follows server commits until this user becomes permanent.
       const saved = await fetch("/api/persona/history", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
@@ -133,7 +134,7 @@ export default function AccountPage() {
       );
       if (error) throw error;
       setMessage(
-        "確認メールを送りました。確認が完了すると、ここまでの会話・記憶をこのメールアドレスの美咲として保存します。"
+        "確認メールを送りました。確認前に続けた会話・記憶も保存し、確認が完了するとこのメールアドレスで引き継げます。"
       );
     } catch (error: any) {
       if (isExistingAccountError(error)) {

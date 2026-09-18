@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn } from "../../../../lib/canonical-state";
+import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from "../../../../lib/canonical-state";
 
 async function authenticate(request: Request) {
   const token = request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
@@ -43,12 +43,13 @@ export async function POST(request: Request) {
         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
         if (replay) {
           const recovered = openTemporaryState(replay.temporaryState);
-          if (recovered) state = recovered.state;
+          if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);
         }
       }
       const { data, error } = await createServerSupabase().rpc("save_misaki_temporary_state", {
         p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,
         p_today_memory: state.todayMemory, p_points: state.relationshipPoints,
+        p_expected_revision: state.temporaryRevision ?? null,
       });
       if (error) throw new Error("Email checkpoint failed");
       return Response.json({ synced: true, result: data });
@@ -58,12 +59,16 @@ export async function POST(request: Request) {
         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
         if (replay) {
           const recovered = openTemporaryState(replay.temporaryState);
-          if (recovered) return Response.json({ ...responseState(recovered.state, true), temporaryState: replay.temporaryState, recoveredTurn: true });
+          if (recovered) {
+            const latest = await loadTemporaryRoot(user.id, replay.temporaryState);
+            return Response.json({ ...responseState(latest, true),
+              temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, "load") : sealTemporaryState(latest, "load"), recoveredTurn: true });
+          }
         }
       }
       const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
       return Response.json({ ...responseState(state, !!user.is_anonymous),
-        ...(user.is_anonymous ? { temporaryState: sealTemporaryState(state, "load") } : {}) });
+        ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }
     if (!["deleteMemory", "clearMemory", "clearHistory"].includes(body.action) ||
       (body.action === "deleteMemory" && typeof body.value !== "string")) {
@@ -73,7 +78,7 @@ export async function POST(request: Request) {
       const state = await loadTemporaryRoot(user.id, body.temporaryState);
       if (body.action === "clearHistory") state.history = [];
       else state.memory = body.action === "clearMemory" ? [] : state.memory.filter(item => item !== body.value);
-      return Response.json({ ...responseState(state, true), temporaryState: sealTemporaryState(state, "edit") });
+      return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });
     }
     const { error } = await createServerSupabase().rpc("edit_misaki_conversation_state", {
       p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,

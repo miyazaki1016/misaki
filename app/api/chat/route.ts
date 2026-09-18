@@ -2738,7 +2738,7 @@ ${retryProblems
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
           .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))
       }, usageRequestId, { ...completedResult, originalMessage: message });
-      completedResult = await completeTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState, token);
+      completedResult = await completeTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState, token, rootState.temporaryRevision ?? null);
     } else {
       completedResult = await completeCanonicalTurn(userData.user.id, usageRequestId, message,
         userMessageAt, generatedResult);

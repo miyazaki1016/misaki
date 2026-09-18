@@ -7,6 +7,7 @@ export type RootState = {
   todayMemory: { date: string; items: string[] };
   relationshipPoints: number;
   updatedAt?: string | null;
+  temporaryRevision?: string | null;
 };
 
 export function createServerSupabase() {
@@ -67,10 +68,20 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
 
 export async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {
   const temporary = openTemporaryState(token);
-  if (temporary) return temporary.state;
-  if (token) throw new Error("Temporary state token is invalid or expired");
+  if (token && !temporary) throw new Error("Temporary state token is invalid or expired");
+  const { data: root, error: rootError } = await createServerSupabase().from("misaki_temporary_roots")
+    .select("token,revision,expires_at").eq("user_id", userId).maybeSingle();
+  if (rootError) throw new Error("Temporary root read failed");
+  if (root) {
+    const verified = openTemporaryState(root.token);
+    if (!verified || Date.parse(root.expires_at) <= Date.now()) throw new Error("Temporary root expired");
+    return { ...verified.state, temporaryRevision: root.revision };
+  }
+  // A valid bearer state can seed a replacement Safari anonymous auth ID.
+  // Once this ID has a server root, browser snapshots cannot overwrite it.
+  if (temporary) return { ...temporary.state, temporaryRevision: null };
   // Only an explicit email checkpoint is eligible for fresh-tab restoration.
-  // Ordinary anonymous chat stays temporary and creates no database root state.
+  // Ordinary anonymous chat creates no plaintext permanent conversation root.
   const { data, error } = await createServerSupabase().from("misaki_relationship_events")
     .select("id").eq("user_id", userId).eq("event_type", "email_save_checkpoint").maybeSingle();
   if (error) throw new Error("Temporary checkpoint read failed");
@@ -118,11 +129,24 @@ export async function loadCompletedTemporaryTurn(userId: string, requestId: stri
   return temporaryResponse(data.temporary_result, message);
 }
 
-export async function completeTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown, token: string) {
+export async function completeTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown,
+  token: string, revision: string | null = null) {
+  const verified = openTemporaryState(token);
+  if (!verified) throw new Error("Temporary commit state invalid");
   const { data, error } = await createServerSupabase().rpc("complete_misaki_temporary_turn", {
     p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),
     p_parent_hash: digest(typeof parent === "string" ? parent : ""), p_token: token,
+    p_expected_revision: revision, p_state: verified.state,
   });
   if (error || typeof data !== "string") throw new Error("Temporary receipt commit failed");
   return temporaryResponse(data, message);
+}
+
+export async function editTemporaryRoot(userId: string, state: RootState, purpose = "edit") {
+  const token = sealTemporaryState(state, purpose);
+  const { error } = await createServerSupabase().rpc("write_misaki_temporary_root", {
+    p_user_id: userId, p_token: token, p_state: state, p_expected_revision: state.temporaryRevision ?? null,
+  });
+  if (error) throw new Error("Temporary edit commit failed");
+  return token;
 }
