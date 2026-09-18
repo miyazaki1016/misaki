@@ -35,7 +35,8 @@ export type ProactiveDecisionContext = {
 };
 
 type RelationshipRow = {
-  intimacy_level?: number | null;
+  intimacy_level?: string | null;
+  intimacy_points?: number | null;
   emotion_state?: { primary?: string; intensity?: number } | null;
   action_state?: string | null;
   last_interaction_at?: string | null;
@@ -221,19 +222,23 @@ export function deriveProactiveTags(input: {
 export async function buildProactiveDecisionContext(
   supabase: SupabaseClient,
   userId: string,
-  points: number,
   life: ProactiveLifeContext,
-  currentTime: string
+  currentTime: string,
+  verifiedTemporaryPoints?: number
 ): Promise<ProactiveDecisionContext> {
   const { data, error } = await supabase
     .from("misaki_relationship_state")
-    .select("intimacy_level,emotion_state,action_state,last_interaction_at")
+    .select("intimacy_level,intimacy_points,emotion_state,action_state,last_interaction_at")
     .eq("user_id", userId)
     .maybeSingle();
 
   if (error) throw error;
 
   const row = (data || {}) as RelationshipRow;
+  if (verifiedTemporaryPoints !== undefined) {
+    row.intimacy_points = verifiedTemporaryPoints;
+    row.intimacy_level = verifiedTemporaryPoints >= 160 ? "very_intimate" : verifiedTemporaryPoints >= 80 ? "intimate" : verifiedTemporaryPoints >= 30 ? "familiar" : "initial";
+  }
   const currentAction = action(row.action_state);
   const currentEmotion = emotion(row.emotion_state?.primary);
   const currentTimeBand = timeBand(row.last_interaction_at);
@@ -254,8 +259,8 @@ export async function buildProactiveDecisionContext(
     action: currentAction,
     emotion: currentEmotion,
     emotionIntensity: clamp(Number(row.emotion_state?.intensity) || 0, 0, 100),
-    intimacyLevel: Math.max(0, Number(row.intimacy_level) || 0),
-    relationshipPoints: Math.max(0, points),
+    intimacyLevel: ({ initial: 0, familiar: 1, intimate: 2, very_intimate: 3 }[row.intimacy_level || "initial"] ?? 0),
+    relationshipPoints: Math.max(0, Number(row.intimacy_points) || 0),
     timeBand: currentTimeBand,
     situation: life.situation,
     plan: life.plan,

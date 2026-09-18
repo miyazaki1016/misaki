@@ -3,7 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
-import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, readDeviceArray } from "../../lib/device-conversation";
+import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, TEMPORARY_STATE_KEY } from "../../lib/device-conversation";
 
 type Mode = "save" | "login";
 
@@ -117,8 +117,8 @@ export default function AccountPage() {
         body: JSON.stringify({
           saveAnonymous: true,
           expectedUserId: session.user.id,
-          history: readDeviceArray("misaki-chat-history"),
-          memory: readDeviceArray("misaki-long-term-memory"),
+          temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
+          pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null"),
         }),
       });
       if (!saved.ok) throw new Error("会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");

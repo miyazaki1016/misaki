@@ -36,9 +36,10 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
     onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },
   }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };
   const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON,
+    CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init?.detail; } },
     console: { error() {} }, fetch: (...args) => h.fetch(...args),
     window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },
-      setInterval() {}, clearInterval() {}, setTimeout: fn => fn(), addEventListener() {}, removeEventListener() {} },
+      setInterval() {}, clearInterval() {}, setTimeout: fn => fn(), addEventListener() {}, removeEventListener() {}, dispatchEvent() {} },
     document: { visibilityState: 'visible', addEventListener() {}, removeEventListener() {} } });
   const cache = new Map();
   function load(file) {
@@ -52,6 +53,13 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };
       if (name === '@supabase/supabase-js') return { createClient: () => client };
       if (name.endsWith('/supabase')) return { supabase: client };
+      if (name.endsWith('/canonical-state')) return {
+        createServerSupabase: () => client,
+        openTemporaryState: token => token === 'verified' ? { state: { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 } } : null,
+        loadTemporaryRoot: async (_id, token) => token === 'verified' ? { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 }
+          : { memory: [], history: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0 },
+        sealTemporaryState: () => 'verified',
+      };
       if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');
       throw Error(name);
     };
@@ -73,12 +81,12 @@ function find(tree, text) {
   for (const child of [tree.props?.children].flat(Infinity)) { const match = find(child, text); if (match) return match; }
   return null;
 }
-test('email save checkpoints history and memory before updateUser', async () => {
-  const h = harness();
+test('email save checkpoints authenticated temporary state before updateUser', async () => {
+  const h = harness(undefined, {}, { 'misaki-temporary-state-v1': 'verified' });
   h.fetch = async (_url, options) => { h.calls.push('save');
     const body = JSON.parse(options.body);
     assert.equal(body.expectedUserId, 'a'); assert.equal(body.saveAnonymous, true);
-    assert.deepEqual(body.history, history); assert.deepEqual(body.memory, ['remember']);
+    assert.equal(body.temporaryState, 'verified'); assert.equal(body.history, undefined); assert.equal(body.memory, undefined);
     return Response.json({ synced: true }); };
   await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';
   await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
@@ -135,7 +143,10 @@ test('different permanent user clears previous conversation and memory', async (
 test('logout clears caches in both storage areas and remounts mounted chat', async () => {
   const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-browser-session': '1', 'misaki-test': 'secret' });
   await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);
-  assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
+  assert.equal(h.localStorage.getItem(ownerKey), null);
+  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);
+  assert.equal(h.localStorage.getItem('legacy-ownerless-cache-cleanup-v1'), '1');
+  assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
 });
 test('transient anonymous sign-out preserves live browser conversation and reauthenticates', async () => {
   const h = harness({ id: 'a', is_anonymous: true }, {}, { 'misaki-browser-session': '1' });
@@ -173,14 +184,32 @@ test('missing or malformed saved server state cannot erase checkpoint cache', as
     assert.equal(h.localStorage.getItem(pendingKey), 'a');
   }
 });
-test('API rejects foreign expected user ID and accepts memory-only explicit save', async () => {
+test('API rejects foreign user and checkpoints verified temporary state', async () => {
   const h = harness(); const route = h.load('app/api/persona/history/route.ts');
   const request = body => new Request('https://example.test/api/persona/history', {
     method: 'POST', headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'b', history, memory: [] }))).status, 409);
   assert.equal(h.calls.length, 0);
-  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history: [], memory: ['remember'] }))).status, 200);
-  assert.equal(h.calls[0].name, 'save_anonymous_conversation_state');
+  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', temporaryState: 'verified', history: [], memory: ['forged'] }))).status, 200);
+  assert.equal(h.calls[0].name, 'save_misaki_temporary_state');
+  assert.equal(h.calls[0].args.p_points, 2); assert.deepEqual(h.calls[0].args.p_memory, ['remember']);
   h.setUser({ id: 'a', is_anonymous: false });
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);
+});
+
+test('modified display cache is never uploaded as canonical history or memory', async () => {
+  const h = harness({ id: 'a', is_anonymous: false });
+  let posts = 0;
+  h.fetch = async (_url, options) => { if (options.method === 'POST') posts++;
+    return Response.json({ exists: true, history: [], memory: ['canonical'], relationshipPoints: 10 }); };
+  await h.mount('app/chat/conversation-history-sync.tsx');
+  assert.equal(posts, 0); assert.equal(h.localStorage.getItem('misaki-long-term-memory'), '["remember"]');
+});
+test('ongoing send blocks history polling and reload', async () => {
+  const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-chat-sending': '1' });
+  let polls = 0;
+  h.fetch = async () => { polls++; throw new Error('must not poll during send'); };
+  await h.mount('app/chat/conversation-history-sync.tsx');
+  assert.ok(!h.calls.includes('reload'));
+  assert.equal(polls, 0);
 });

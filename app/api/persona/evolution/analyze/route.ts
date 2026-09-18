@@ -86,7 +86,7 @@ export async function POST(request: Request) {
       (item) => item.role === "user"
     ).length;
 
-    if (browserUserMessageCount === 0) {
+    if (userData.user.is_anonymous !== true || browserUserMessageCount === 0) {
       const { data: storedState, error: storedError } = await supabase
         .from("misaki_user_conversation_state")
         .select("history,memory")
@@ -95,11 +95,14 @@ export async function POST(request: Request) {
 
       if (storedError) {
         console.error("EVOLUTION STORED HISTORY LOAD ERROR:", storedError);
+        if (userData.user.is_anonymous !== true) return Response.json({ error: "Canonical context unavailable." }, { status: 500 });
+      } else if (!storedState && userData.user.is_anonymous !== true) {
+        safeHistory = []; safeMemory = []; historySource = "server";
       } else if (storedState) {
         const storedHistory = sanitizeHistory(storedState.history);
         const storedMemory = sanitizeMemory(storedState.memory);
 
-        if (storedHistory.some((item) => item.role === "user")) {
+        if (userData.user.is_anonymous !== true || storedHistory.some((item) => item.role === "user")) {
           safeHistory = storedHistory;
           safeMemory = storedMemory;
           historySource = "server";

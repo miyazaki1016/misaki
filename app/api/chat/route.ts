@@ -1,3 +1,5 @@
+import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
+import { loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
 import {
   createClient,
   type SupabaseClient,
@@ -1648,12 +1650,13 @@ export async function POST(
   }
 
   try {
-    const {
+    let {
       message,
       history,
       memory,
       currentTime,
-      relationshipPoints,
+      requestId,
+      temporaryState,
       misakiTodayMemory,
     } =
       await measureStage(
@@ -1754,8 +1757,36 @@ export async function POST(
       );
     }
 
-    const usageRequestId =
-      crypto.randomUUID();
+    if (requestId !== undefined && (typeof requestId !== "string" ||
+      !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(requestId))) {
+      return Response.json({ error: "Invalid request ID." }, { status: 400 });
+    }
+    const usageRequestId = requestId || crypto.randomUUID();
+    const isAnonymous = userData.user.is_anonymous === true;
+    const userMessageAt = new Date().toISOString();
+    const temporary = isAnonymous ? openTemporaryState(temporaryState) : null;
+    if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
+      const { originalMessage, ...replay } = temporary.result;
+      if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
+      return Response.json({ ...replay, temporaryState });
+    }
+    if (!isAnonymous) {
+      const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
+      if (completed) return Response.json(completed);
+    } else {
+      const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
+      if (completed) return Response.json(completed);
+    }
+    const rootState = isAnonymous
+      ? await loadTemporaryRoot(userData.user.id, temporaryState)
+      : await loadCanonicalState(userData.user.id);
+    memory = rootState.memory;
+    misakiTodayMemory = rootState.todayMemory;
+    history = "history" in rootState ? rootState.history : [];
+    const canonicalRelationshipPoints = rootState.relationshipPoints;
+    const recallMode = isMemoryRecallQuestion(message);
+    const modelMessage = createRecallAwareMessage(message, history, recallMode);
+
 
     const {
       data: usageData,
@@ -1929,19 +1960,7 @@ export async function POST(
           item.role === "user"
       ).length;
 
-    const safeRelationshipPoints =
-      typeof relationshipPoints ===
-        "number" &&
-      Number.isFinite(
-        relationshipPoints
-      )
-        ? Math.max(
-            0,
-            Math.floor(
-              relationshipPoints
-            )
-          )
-        : userMessageCount;
+    const safeRelationshipPoints = canonicalRelationshipPoints;
 
     const relationshipGuide =
       createRelationshipGuide(
@@ -2372,7 +2391,7 @@ ${retryProblems
                       role: "user",
                       parts: [
                         {
-                          text: message,
+                          text: modelMessage,
                         },
                       ],
                     },
@@ -2597,7 +2616,7 @@ ${retryProblems
     }
 
     const updatedMemory =
-      Array.isArray(
+      recallMode ? safeMemory : Array.isArray(
         parsed.memory
       )
         ? parsed.memory
@@ -2682,21 +2701,9 @@ ${retryProblems
         ),
     };
 
-    chargedRequestId = null;
-    chargedSupabase = null;
-
-    console.log(
-      "CHAT TOTAL:",
-      {
-        traceId,
-        elapsedMs:
-          Date.now() -
-          requestStartedAt,
-        ok: true,
-      }
-    );
-
-    return Response.json({
+    const generatedResult = {
+      requestId: usageRequestId,
+      rootUpdatedAt: rootState.updatedAt ?? null,
       reply,
       memory:
         updatedMemory,
@@ -2719,7 +2726,37 @@ ${retryProblems
           usage.is_premium ===
           true,
       },
-    });
+    };
+    let completedResult: Record<string, unknown>;
+    if (isAnonymous) {
+      completedResult = { ...generatedResult, relationshipPoints: canonicalRelationshipPoints + 1,
+        memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
+      const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
+        relationshipPoints: canonicalRelationshipPoints + 1,
+        history: [...(Array.isArray(history) ? history : []),
+          { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
+          { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
+          .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))
+      }, usageRequestId, { ...completedResult, originalMessage: message });
+      completedResult = await completeTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState, token);
+    } else {
+      completedResult = await completeCanonicalTurn(userData.user.id, usageRequestId, message,
+        userMessageAt, generatedResult);
+    }
+    chargedRequestId = null;
+    chargedSupabase = null;
+    console.log(
+      "CHAT TOTAL:",
+      {
+        traceId,
+        elapsedMs:
+          Date.now() -
+          requestStartedAt,
+        ok: true,
+      }
+    );
+
+    return Response.json(completedResult);
   } catch (error) {
     console.error(
       "CHAT ROUTE ERROR:",
