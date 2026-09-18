@@ -137,6 +137,27 @@ test('logout clears caches in both storage areas and remounts mounted chat', asy
   await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);
   assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
 });
+test('transient anonymous sign-out preserves live browser conversation and reauthenticates', async () => {
+  const h = harness({ id: 'a', is_anonymous: true }, {}, { 'misaki-browser-session': '1' });
+  await h.mount('app/chat/anonymous-session-guard.tsx');
+  h.setUser(null);
+  h.emit('SIGNED_OUT', null);
+  await flush();
+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);
+  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), '["remember"]');
+  assert.equal(h.localStorage.getItem(ownerKey), 'new');
+  assert.ok(h.calls.includes('signIn'));
+  assert.ok(!h.calls.includes('reload'));
+});
+test('anonymous session replacement rebinds owner without clearing live conversation', async () => {
+  const h = harness({ id: 'a', is_anonymous: true }, {}, { 'misaki-browser-session': '1' });
+  await h.mount('app/chat/anonymous-session-guard.tsx');
+  h.emit('SIGNED_IN', { id: 'b', is_anonymous: true });
+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);
+  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), '["remember"]');
+  assert.equal(h.localStorage.getItem(ownerKey), 'b');
+  assert.ok(!h.calls.includes('reload'));
+});
 test('server response after user switch cannot write old account history', async () => {
   const h = harness({ id: 'a', is_anonymous: false });
   h.fetch = async () => { h.setUser({ id: 'b', is_anonymous: false }); return Response.json({ exists: true, history: [], memory: [] }); };
