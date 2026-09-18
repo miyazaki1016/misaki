@@ -29,9 +29,10 @@
 - `app/chat/page.tsx` の旧 `sendProactiveMessage()`
 - 旧45分系ブラウザスケジューラ定数とローカル状態
 - `app/api/proactive/route.ts`
+- `app/api/body-clock/route.ts`（旧Vercel側Body Clock）
 - `lib/proactive-photo.ts`
 
-現在の自発メッセージ経路は Supabase Body Clock に一本化。
+現在の自発メッセージ経路は Supabase Edge Function の Body Clock に一本化。Vercel側は `/api/push/body-clock` のPush relayだけを残す。
 
 ### Pushで残っているコード上の注意点
 
