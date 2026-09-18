@@ -51,6 +51,17 @@ const STORAGE_KEY =
 const MEMORY_KEY =
   "misaki-long-term-memory";
 
+const RELATIONSHIP_KEY =
+  "misaki-relationship-points";
+
+const MISAKI_TODAY_MEMORY_KEY =
+  "misaki-today-memory";
+
+const MAX_MESSAGES = 60;
+
+// 無料版は1日20往復まで
+const FREE_DAILY_LIMIT = 20;
+
 const INITIAL_MESSAGES:
   ChatMessage[] = [];
 
