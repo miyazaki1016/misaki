@@ -1,5 +1,8 @@
 "use client";
 
+import { maintenanceMessage } from "../../lib/maintenance-result";
+
+import { TEMPORARY_STATE_KEY, DEVICE_USER_KEY } from "../../lib/device-conversation";
 import {
   useEffect,
   useState,
@@ -17,6 +20,7 @@ import {
 type ChatMessage = {
   role: "misaki" | "user";
   text: string;
+  requestId?: string;
 };
 
 type DailyUsage = {
@@ -693,243 +697,54 @@ export default function ChatPage() {
     []
   );
 
-  useEffect(
-    () => {
+  useEffect(() => {
+    let active = true;
+    function applyRoot(state: any) {
+      if (!active || !state) return;
+      if (Array.isArray(state.memory)) setMemory(state.memory);
+      if (typeof state.relationshipPoints === "number") setRelationshipPoints(state.relationshipPoints);
+      if (state.misakiTodayMemory) applyTodayMemory(state.misakiTodayMemory);
+    }
+    const receive = (event: Event) => applyRoot((event as CustomEvent).detail);
+    window.addEventListener("misaki-root-state", receive);
+    async function load() {
       try {
-        const savedMessages =
-          localStorage
-            .getItem(
-              STORAGE_KEY
-            );
-
-        const savedMemory =
-          localStorage
-            .getItem(
-              MEMORY_KEY
-            );
-
-        const savedRelationship =
-          localStorage
-            .getItem(
-              RELATIONSHIP_KEY
-            );
-
-        const savedTodayMemory =
-          localStorage
-            .getItem(
-              MISAKI_TODAY_MEMORY_KEY
-            );
-
-        let parsedMessages:
-          | ChatMessage[]
-          | null =
-          null;
-
-        if (
-          savedMessages
-        ) {
-          const parsed =
-            JSON.parse(
-              savedMessages
-            );
-
-          if (
-            Array.isArray(
-              parsed
-            )
-          ) {
-            parsedMessages =
-              parsed
-                .filter(
-                  (
-                    item
-                  ) =>
-                    item &&
-                    (
-                      item
-                        .role ===
-                        "user" ||
-                      item
-                        .role ===
-                        "misaki"
-                    ) &&
-                    typeof item
-                      .text ===
-                      "string"
-                )
-                .slice(
-                  -MAX_MESSAGES
-                );
-
-            setMessages(
-              parsedMessages
-            );
-          }
-        }
-
-        if (
-          savedMemory
-        ) {
-          const parsedMemory =
-            JSON.parse(
-              savedMemory
-            );
-
-          if (
-            Array.isArray(
-              parsedMemory
-            )
-          ) {
-            setMemory(
-              parsedMemory
-                .filter(
-                  (
-                    item
-                  ) =>
-                    typeof item ===
-                    "string"
-                )
-            );
-          }
-        }
-
-        if (
-          savedRelationship
-        ) {
-          const parsedPoints =
-            Number(
-              savedRelationship
-            );
-
-          if (
-            Number
-              .isFinite(
-                parsedPoints
-              ) &&
-            parsedPoints >=
-              0
-          ) {
-            setRelationshipPoints(
-              Math.floor(
-                parsedPoints
-              )
-            );
-          }
-        } else if (
-          parsedMessages
-        ) {
-          const previousUserMessages =
-            parsedMessages
-              .filter(
-                (
-                  item
-                ) =>
-                  item.role ===
-                  "user"
-              )
-              .length;
-
-          setRelationshipPoints(
-            previousUserMessages
-          );
-        }
-
-        const currentDate =
-          getJapanDateKey();
-
-        if (
-          savedTodayMemory
-        ) {
-          const parsedTodayMemory =
-            JSON.parse(
-              savedTodayMemory
-            );
-
-          if (
-            parsedTodayMemory &&
-            parsedTodayMemory
-              .date ===
-              currentDate &&
-            Array.isArray(
-              parsedTodayMemory
-                .items
-            )
-          ) {
-            setMisakiTodayMemory({
-              date:
-                currentDate,
-
-              items:
-                parsedTodayMemory
-                  .items
-                  .filter(
-                    (
-                      item:
-                        unknown
-                    ) =>
-                      typeof item ===
-                        "string" &&
-                      item
-                        .trim()
-                        .length >
-                        0
-                  )
-                  .map(
-                    (
-                      item:
-                        string
-                    ) =>
-                      item
-                        .trim()
-                  )
-                  .slice(
-                    -12
-                  ),
-            });
-          } else {
-            setMisakiTodayMemory({
-              date:
-                currentDate,
-
-              items:
-                [],
-            });
-          }
-        } else {
-          setMisakiTodayMemory({
-            date:
-              currentDate,
-
-            items:
-              [],
-          });
-        }
-      } catch (
-        error
-      ) {
-        console.error(
-          "Failed to load saved data:",
-          error
-        );
-
-        const currentDate =
-          getJapanDateKey();
-
-        setMisakiTodayMemory({
-          date:
-            currentDate,
-
-          items:
-            [],
+        // A full remount ends the previous page's in-flight UI send marker.
+        sessionStorage.removeItem("misaki-chat-sending");
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const cached = raw ? JSON.parse(raw) : [];
+        if (Array.isArray(cached)) setMessages(cached.slice(-MAX_MESSAGES));
+        const accessToken = await getAccessToken();
+        const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);
+        const response = await fetch("/api/persona/history", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify({ action: "load", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
+            pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null") }),
         });
-      } finally {
-        setLoaded(
-          true
-        );
-      }
-    },
-    []
-  );
+        if (!response.ok) {
+          const result = await response.json().catch(() => null);
+          throw new Error(maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
+        }
+        const state = await response.json();
+        const { data: latest } = await supabase.auth.getSession();
+        if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;
+        applyRoot(state);
+        const pending = JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null");
+        if (state.recoveredTurn || state.history?.some((item: any) => item.requestId === pending?.requestId)) {
+          sessionStorage.removeItem("misaki-pending-chat-turn");
+        }
+        if (typeof state.temporaryState === "string") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);
+        // Permanent history is canonical. Anonymous history remains a display cache.
+        if (active && Array.isArray(state.history) && (!state.ephemeral || state.recoveredTurn || cached.length === 0)) setMessages(state.history);
+        for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
+      } catch (error) {
+        if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
+      } finally { if (active) setLoaded(true); }
+    }
+    void load();
+    return () => { active = false; window.removeEventListener("misaki-root-state", receive); };
+  }, []);
 
   useEffect(
     () => {
@@ -965,128 +780,6 @@ export default function ChatPage() {
     },
     [
       messages,
-      loaded,
-    ]
-  );
-
-  useEffect(
-    () => {
-      if (
-        !loaded
-      ) {
-        return;
-      }
-
-      try {
-        localStorage
-          .setItem(
-            MEMORY_KEY,
-
-            JSON.stringify(
-              memory
-            )
-          );
-      } catch (
-        error
-      ) {
-        console.error(
-          "Failed to save memory:",
-          error
-        );
-      }
-    },
-    [
-      memory,
-      loaded,
-    ]
-  );
-
-  useEffect(
-    () => {
-      if (
-        !loaded
-      ) {
-        return;
-      }
-
-      try {
-        const currentDate =
-          getJapanDateKey();
-
-        const safeTodayMemory =
-          misakiTodayMemory
-            .date ===
-            currentDate
-            ? misakiTodayMemory
-            : {
-                date:
-                  currentDate,
-
-                items:
-                  [],
-              };
-
-        localStorage
-          .setItem(
-            MISAKI_TODAY_MEMORY_KEY,
-
-            JSON.stringify(
-              safeTodayMemory
-            )
-          );
-
-        if (
-          misakiTodayMemory
-            .date !==
-          currentDate
-        ) {
-          setMisakiTodayMemory(
-            safeTodayMemory
-          );
-        }
-      } catch (
-        error
-      ) {
-        console.error(
-          "Failed to save Misaki today memory:",
-          error
-        );
-      }
-    },
-    [
-      misakiTodayMemory,
-      loaded,
-    ]
-  );
-
-  useEffect(
-    () => {
-      if (
-        !loaded
-      ) {
-        return;
-      }
-
-      try {
-        localStorage
-          .setItem(
-            RELATIONSHIP_KEY,
-
-            String(
-              relationshipPoints
-            )
-          );
-      } catch (
-        error
-      ) {
-        console.error(
-          "Failed to save relationship points:",
-          error
-        );
-      }
-    },
-    [
-      relationshipPoints,
       loaded,
     ]
   );
@@ -1302,97 +995,41 @@ export default function ChatPage() {
     }
   }
 
-  function resetChat() {
-    const confirmed =
-      window
-        .confirm(
-          "美咲との会話履歴をリセットしますか？"
-        );
-
-    if (
-      !confirmed
-    ) {
-      return;
+  async function changeStoredState(action: string, value?: string) {
+    if (loading || sessionStorage.getItem("misaki-pending-chat-turn")) throw new Error("返信を確認してから変更してください。未受信の場合は再読み込みで確認できます。");
+    const accessToken = await getAccessToken();
+    const { data: owner } = await supabase.auth.getSession();
+    const expectedOwner = owner.session?.user.id;
+    const response = await fetch("/api/persona/history", {
+      method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ action, value, temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY) }),
+    });
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
     }
-
-    localStorage
-      .removeItem(
-        STORAGE_KEY
-      );
-
-    setMessages(
-      []
-    );
-
-    setMessage(
-      ""
-    );
-
-    setShowMenu(
-      false
-    );
+    const state = await response.json();
+    const { data: latest } = await supabase.auth.getSession();
+    if (!expectedOwner || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) throw new Error("アカウントが変更されました。");
+    if (Array.isArray(state.memory)) setMemory(state.memory);
+    if (typeof state.temporaryState === "string") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);
   }
-
-  function deleteMemory(
-    index:
-      number
-  ) {
-    const confirmed =
-      window
-        .confirm(
-          "この記憶を削除しますか？"
-        );
-
-    if (
-      !confirmed
-    ) {
-      return;
-    }
-
-    setMemory(
-      (
-        prev
-      ) =>
-        prev
-          .filter(
-            (
-              _,
-              i
-            ) =>
-              i !==
-              index
-          )
-    );
+  async function resetChat() {
+    if (!window.confirm("美咲との会話履歴をリセットしますか？")) return;
+    try {
+      await changeStoredState("clearHistory");
+      localStorage.removeItem(STORAGE_KEY); setMessages([]); setMessage(""); setShowMenu(false);
+    } catch (error) { setSendError((error as Error).message); }
   }
-
-  function resetMemory() {
-    if (
-      memory.length ===
-      0
-    ) {
-      return;
-    }
-
-    const confirmed =
-      window
-        .confirm(
-          "美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。"
-        );
-
-    if (
-      !confirmed
-    ) {
-      return;
-    }
-
-    localStorage
-      .removeItem(
-        MEMORY_KEY
-      );
-
-    setMemory(
-      []
-    );
+  async function deleteMemory(index: number) {
+    if (!window.confirm("この記憶を削除しますか？")) return;
+    try { await changeStoredState("deleteMemory", memory[index]); }
+    catch (error) { setSendError((error as Error).message); }
+  }
+  async function resetMemory() {
+    if (!memory.length || !window.confirm("美咲の長期記憶をすべて削除しますか？\n会話履歴は残ります。")) return;
+    try { await changeStoredState("clearMemory"); }
+    catch (error) { setSendError((error as Error).message); }
   }
 
   function openPremium() {
@@ -1496,7 +1133,7 @@ export default function ChatPage() {
     if (
       !text ||
       loading ||
-      !accountLoaded
+      !accountLoaded || !loaded
     ) {
       return;
     }
@@ -1524,22 +1161,34 @@ export default function ChatPage() {
       ""
     );
 
+    let receivedResponse = false;
+    let activeRequestId: string | null = null;
     try {
-      const accessToken =
-        await getAccessToken();
+      const accessToken = await getAccessToken();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const expectedOwner = sessionData.session?.user.id;
+      const expectedAnonymous = sessionData.session?.user.is_anonymous === true;
+      const pending = JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null");
+      if (pending?.owner === expectedOwner && pending.message !== text) throw new Error("前の返信を確認できていません。同じメッセージを再送するか、再読み込みで確認してください。");
+      const reuse = pending?.message === text && pending?.owner === expectedOwner;
+      const requestId = reuse ? pending.requestId : crypto.randomUUID();
+      activeRequestId = requestId;
+      const temporaryState = reuse ? pending.temporaryState : sessionStorage.getItem(TEMPORARY_STATE_KEY);
+      sessionStorage.setItem("misaki-pending-chat-turn", JSON.stringify({ requestId, message: text, owner: expectedOwner, temporaryState }));
+      sessionStorage.setItem("misaki-chat-sending", requestId);
 
       const userMessage:
         ChatMessage = {
           role:
             "user",
 
-          text,
+          text, requestId,
         };
 
       const newMessages =
         [
           ...messages,
-          userMessage,
+          ...(reuse && messages.some(item => item.requestId === requestId) ? [] : [userMessage]),
         ]
           .slice(
             -MAX_MESSAGES
@@ -1553,9 +1202,6 @@ export default function ChatPage() {
         ""
       );
 
-      const nextRelationshipPoints =
-        relationshipPoints +
-        1;
 
       const currentTime =
         getJapanCurrentTime();
@@ -1606,15 +1252,27 @@ export default function ChatPage() {
 
                 currentTime,
 
-                relationshipPoints:
-                  nextRelationshipPoints,
+                requestId,
+                temporaryState,
               }),
           }
         );
 
-      const data =
-        await res
-          .json();
+      const data = await res.json();
+      receivedResponse = true;
+      const { data: latest } = await supabase.auth.getSession();
+      if (latest.session?.user.id !== expectedOwner && !(expectedAnonymous && latest.session?.user.is_anonymous)) return;
+      const maintenance = maintenanceMessage(res.status, data);
+      if (maintenance) {
+        setSendError(maintenance);
+        // A retry may have committed before its response was lost. Keep its
+        // recovery marker and history until the server can confirm the result.
+        receivedResponse = !reuse;
+        if (!reuse) setMessages(prev => prev.filter(item => item.requestId !== requestId));
+        setMessage(text);
+        return;
+      }
+      sessionStorage.removeItem("misaki-pending-chat-turn");
 
       applyApiUsage(
         data?.usage
@@ -1685,9 +1343,8 @@ export default function ChatPage() {
           .misakiTodayMemory
       );
 
-      setRelationshipPoints(
-        nextRelationshipPoints
-      );
+      if (typeof data.relationshipPoints === "number") setRelationshipPoints(data.relationshipPoints);
+      if (typeof data.temporaryState === "string") sessionStorage.setItem(TEMPORARY_STATE_KEY, data.temporaryState);
 
       setMessages(
         (
@@ -1703,6 +1360,7 @@ export default function ChatPage() {
               text:
                 data.reply ||
                 "返事を取得できませんでした。",
+              requestId,
             },
           ]
             .slice(
@@ -1725,6 +1383,8 @@ export default function ChatPage() {
           : "返事を受け取れませんでした。もう一度送ってみてね。"
       );
     } finally {
+      if (receivedResponse && JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null")?.requestId === activeRequestId) sessionStorage.removeItem("misaki-pending-chat-turn");
+      if (sessionStorage.getItem("misaki-chat-sending") === activeRequestId) sessionStorage.removeItem("misaki-chat-sending");
       setLoading(
         false
       );
@@ -2331,7 +1991,7 @@ export default function ChatPage() {
           }
           disabled={
             loading ||
-            !accountLoaded ||
+            !accountLoaded || !loaded ||
             freeLimitReached
           }
         />
@@ -2350,7 +2010,7 @@ export default function ChatPage() {
           }
           disabled={
             loading ||
-            !accountLoaded
+            !accountLoaded || !loaded
           }
         >
           {!accountLoaded

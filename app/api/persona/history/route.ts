@@ -1,200 +1,96 @@
+import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
+import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from "../../../../lib/canonical-state";
 
-const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY =
-  "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
-
-type ChatMessage = {
-  role: "user" | "misaki";
-  text: string;
-  sentAt?: string;
-};
-
-function createAuthenticatedSupabase(accessToken: string) {
-  return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-    global: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
+async function authenticate(request: Request) {
+  const token = request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
+  if (!token) return null;
+  const db = createClient("https://tzozajnwznxqgxnjikoy.supabase.co", "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1", {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
   });
+  const { data, error } = await db.auth.getUser(token);
+  return error ? null : data.user;
 }
-
-function getBearerToken(request: Request) {
-  const authorization = request.headers.get("authorization") ?? "";
-  if (!authorization.startsWith("Bearer ")) return null;
-  const token = authorization.slice("Bearer ".length).trim();
-  return token || null;
+function responseState(state: RootState, ephemeral = false) {
+  const history = state.history ?? [];
+  return { exists: true, history, memory: state.memory, relationshipPoints: state.relationshipPoints,
+    misakiTodayMemory: state.todayMemory, ephemeral, messageCount: history.length,
+    userMessageCount: history.filter((item: any) => item?.role === "user").length, memoryCount: state.memory.length, updatedAt: state.updatedAt ?? null };
 }
-
-function sanitizeHistory(value: unknown): ChatMessage[] {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .filter(
-      (item: any) =>
-        item &&
-        (item.role === "user" || item.role === "misaki") &&
-        typeof item.text === "string" &&
-        item.text.trim()
-    )
-    .map((item: any) => ({
-      role: item.role as "user" | "misaki",
-      text: item.text.trim().slice(0, 2000),
-      ...(typeof item.sentAt === "string" && Number.isFinite(Date.parse(item.sentAt))
-        ? { sentAt: new Date(item.sentAt).toISOString() }
-        : {}),
-    }))
-    .slice(-60);
-}
-
-function sanitizeMemory(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-
-  return value
-    .filter(
-      (item: unknown): item is string =>
-        typeof item === "string" && item.trim().length > 0
-    )
-    .map((item) => item.trim().slice(0, 500))
-    .slice(-30);
-}
-
-async function getAuthenticatedClient(request: Request) {
-  const accessToken = getBearerToken(request);
-  if (!accessToken) {
-    return { error: "Authentication required." as const };
-  }
-
-  const supabase = createAuthenticatedSupabase(accessToken);
-  const { data, error } = await supabase.auth.getUser(accessToken);
-
-  if (error || !data.user) {
-    return { error: "Authentication required." as const };
-  }
-
-  return {
-    supabase,
-    userId: data.user.id,
-    isAnonymous: data.user.is_anonymous === true,
-  };
-}
-
 export async function GET(request: Request) {
   try {
-    const auth = await getAuthenticatedClient(request);
-    if ("error" in auth) {
-      return Response.json({ error: auth.error }, { status: 401 });
-    }
-
-    const { data, error } = await auth.supabase
-      .from("misaki_user_conversation_state")
-      .select("history,memory,message_count,user_message_count,updated_at")
-      .eq("user_id", auth.userId)
-      .maybeSingle();
-
-    if (error) {
-      console.error("CONVERSATION STATE GET ERROR:", error);
-      return Response.json(
-        { error: "Conversation state could not be loaded." },
-        { status: 500 }
-      );
-    }
-
-    const history = sanitizeHistory(data?.history);
-    const memory = sanitizeMemory(data?.memory);
-
-    return Response.json({
-      exists: Boolean(data),
-      history,
-      memory,
-      messageCount:
-        typeof data?.message_count === "number"
-          ? data.message_count
-          : history.length,
-      userMessageCount:
-        typeof data?.user_message_count === "number"
-          ? data.user_message_count
-          : history.filter((item) => item.role === "user").length,
-      memoryCount: memory.length,
-      updatedAt: data?.updated_at ?? null,
-    });
+    const user = await authenticate(request);
+    if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
+    if (user.is_anonymous) return Response.json({ error: "Temporary state required." }, { status: 400 });
+    return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("CONVERSATION STATE GET ROUTE ERROR:", error);
-    return Response.json(
-      { error: "Conversation state could not be loaded." },
-      { status: 500 }
-    );
+    console.error("CONVERSATION STATE READ FAILED", error);
+    return Response.json({ error: "Conversation state could not be loaded." }, { status: 500 });
   }
 }
-
 export async function POST(request: Request) {
+  // Anonymous "load" renews the root, so it is a write too.
+  const maintenance = await maintenanceResponse();
+  if (maintenance) return maintenance;
   try {
-    const auth = await getAuthenticatedClient(request);
-    if ("error" in auth) {
-      return Response.json({ error: auth.error }, { status: 401 });
-    }
-
+    const user = await authenticate(request);
+    if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json();
-    const history = sanitizeHistory(body?.history);
-    const memoryWasProvided = Object.prototype.hasOwnProperty.call(
-      body ?? {},
-      "memory"
-    );
-    const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;
-
-    if (body?.saveAnonymous === true) {
-      if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {
+    if (body.saveAnonymous === true) {
+      if (!user.is_anonymous || body.expectedUserId !== user.id) {
         return Response.json({ error: "Anonymous account mismatch." }, { status: 409 });
       }
-      const { data, error } = await auth.supabase.rpc("save_anonymous_conversation_state", {
-        p_history: history,
-        p_memory: memory ?? [],
-      });
-      if (error) {
-        console.error("ANONYMOUS CONVERSATION SAVE ERROR:", error);
-        return Response.json({ error: "Conversation could not be saved." }, { status: 500 });
+      let state = await loadTemporaryRoot(user.id, body.temporaryState);
+      // A reply can have committed even if its transport response was lost.
+      if (typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
+        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
+        if (replay) {
+          const recovered = openTemporaryState(replay.temporaryState);
+          if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);
+        }
       }
+      const { data, error } = await createServerSupabase().rpc("save_misaki_temporary_state", {
+        p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,
+        p_today_memory: state.todayMemory, p_points: state.relationshipPoints,
+        p_expected_revision: state.temporaryRevision ?? null,
+      });
+      if (error) throw new Error("Email checkpoint failed");
       return Response.json({ synced: true, result: data });
     }
-
-    if (history.length === 0) {
-      return Response.json(
-        { error: "Conversation history is empty." },
-        { status: 400 }
-      );
-    }
-
-    const { data, error } = await auth.supabase.rpc(
-      "sync_user_conversation_state",
-      {
-        p_history: history,
-        p_memory: memory,
+    if (body.action === "load") {
+      if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
+        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
+        if (replay) {
+          const recovered = openTemporaryState(replay.temporaryState);
+          if (recovered) {
+            const latest = await loadTemporaryRoot(user.id, replay.temporaryState);
+            return Response.json({ ...responseState(latest, true),
+              temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, "load") : sealTemporaryState(latest, "load"), recoveredTurn: true });
+          }
+        }
       }
-    );
-
-    if (error) {
-      console.error("CONVERSATION STATE SYNC RPC ERROR:", error);
-      return Response.json(
-        { error: "Conversation history could not be synchronized." },
-        { status: 500 }
-      );
+      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
+      return Response.json({ ...responseState(state, !!user.is_anonymous),
+        ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }
-
-    return Response.json({
-      synced: true,
-      result: data,
+    if (!["deleteMemory", "clearMemory", "clearHistory"].includes(body.action) ||
+      (body.action === "deleteMemory" && typeof body.value !== "string")) {
+      return Response.json({ error: "Explicit state operation required." }, { status: 400 });
+    }
+    if (user.is_anonymous) {
+      const state = await loadTemporaryRoot(user.id, body.temporaryState);
+      if (body.action === "clearHistory") state.history = [];
+      else state.memory = body.action === "clearMemory" ? [] : state.memory.filter(item => item !== body.value);
+      return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });
+    }
+    const { error } = await createServerSupabase().rpc("edit_misaki_conversation_state", {
+      p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,
     });
+    if (error) throw new Error("Conversation edit failed");
+    return Response.json(responseState(await loadCanonicalState(user.id)));
   } catch (error) {
-    console.error("CONVERSATION STATE POST ROUTE ERROR:", error);
-    return Response.json(
-      { error: "Conversation history could not be synchronized." },
-      { status: 500 }
-    );
+    console.error("CONVERSATION STATE WRITE FAILED", error);
+    return Response.json({ error: "Conversation state could not be saved." }, { status: 500 });
   }
 }

@@ -1,344 +1,44 @@
 "use client";
-
-import {
-  useEffect,
-} from "react";
-
-import {
-  supabase,
-} from "../lib/supabase";
-import {
-  registerPushSubscription,
-} from "../lib/push-notifications";
-
-const HISTORY_KEY =
-  "misaki-chat-history";
-
-const MEMORY_KEY =
-  "misaki-long-term-memory";
-
-const RELATIONSHIP_KEY =
-  "misaki-relationship-points";
-
-const TODAY_MEMORY_KEY =
-  "misaki-today-memory";
-
-let lastPushOwnerSyncedUserId:
-  string | null = null;
-
-function safeParse<T>(
-  value: string | null,
-  fallback: T
-): T {
-  if (!value) {
-    return fallback;
-  }
-
-  try {
-    return JSON.parse(
-      value
-    ) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function getRelationshipPoints() {
-  const raw =
-    window.localStorage
-      .getItem(
-        RELATIONSHIP_KEY
-      );
-
-  if (!raw) {
-    return 0;
-  }
-
-  const directNumber =
-    Number(raw);
-
-  if (
-    Number.isFinite(
-      directNumber
-    )
-  ) {
-    return Math.max(
-      0,
-      Math.floor(
-        directNumber
-      )
-    );
-  }
-
-  const parsed =
-    safeParse<unknown>(
-      raw,
-      0
-    );
-
-  if (
-    typeof parsed ===
-      "number" &&
-    Number.isFinite(
-      parsed
-    )
-  ) {
-    return Math.max(
-      0,
-      Math.floor(
-        parsed
-      )
-    );
-  }
-
-  return 0;
-}
-
-async function syncBackgroundPushState() {
-  if (
-    typeof window ===
-    "undefined"
-  ) {
-    return;
-  }
-
-  const {
-    data,
-    error,
-  } =
-    await supabase.auth
-      .getSession();
-
-  if (error) {
-    console.error(
-      "BACKGROUND STATE SESSION ERROR:",
-      error
-    );
-    return;
-  }
-
-  const user =
-    data.session?.user;
-
-  if (!user) {
-    lastPushOwnerSyncedUserId =
-      null;
-    return;
-  }
-
-  if (
-    "Notification" in window &&
-    Notification.permission ===
-      "granted" &&
-    lastPushOwnerSyncedUserId !==
-      user.id
-  ) {
-    try {
-      await registerPushSubscription();
-      lastPushOwnerSyncedUserId =
-        user.id;
-    } catch (pushError) {
-      console.error(
-        "BACKGROUND PUSH OWNER SYNC ERROR:",
-        pushError
-      );
-    }
-  }
-
-  const history =
-    safeParse<unknown[]>(
-      window.localStorage
-        .getItem(
-          HISTORY_KEY
-        ),
-      []
-    );
-
-  const memory =
-    safeParse<unknown[]>(
-      window.localStorage
-        .getItem(
-          MEMORY_KEY
-        ),
-      []
-    );
-
-  const todayMemory =
-    safeParse<
-      Record<string, unknown>
-    >(
-      window.localStorage
-        .getItem(
-          TODAY_MEMORY_KEY
-        ),
-      {
-        date: "",
-        items: [],
-      }
-    );
-
-  const relationshipPoints =
-    getRelationshipPoints();
-
-  const recentHistory =
-    Array.isArray(
-      history
-    )
-      ? history.slice(-60)
-      : [];
-
-  const longTermMemory =
-    Array.isArray(
-      memory
-    )
-      ? memory.slice(-30)
-      : [];
-
-  const {
-    error:
-      upsertError,
-  } =
-    await supabase
-      .from(
-        "background_push_state"
-      )
-      .upsert(
-        {
-          user_id:
-            user.id,
-
-          relationship_points:
-            relationshipPoints,
-
-          long_term_memory:
-            longTermMemory,
-
-          today_memory:
-            todayMemory,
-
-          recent_history:
-            recentHistory,
-
-          notifications_enabled:
-            Notification.permission ===
-            "granted",
-
-          timezone:
-            Intl.DateTimeFormat()
-              .resolvedOptions()
-              .timeZone ||
-            "Asia/Tokyo",
-
-          updated_at:
-            new Date()
-              .toISOString(),
-        },
-        {
-          onConflict:
-            "user_id",
-        }
-      );
-
-  if (
-    upsertError
-  ) {
-    console.error(
-      "BACKGROUND STATE SYNC ERROR:",
-      upsertError
-    );
-  }
-}
+import { useEffect } from "react";
+import { supabase } from "../lib/supabase";
+import { registerPushSubscription } from "../lib/push-notifications";
 
 export default function BackgroundPushSync() {
-  useEffect(
-    () => {
-      let cancelled =
-        false;
-
-      const run =
-        async () => {
-          if (
-            cancelled
-          ) {
-            return;
-          }
-
-          await syncBackgroundPushState();
-        };
-
-      void run();
-
-      const {
-        data:
-          authListener,
-      } =
-        supabase.auth
-          .onAuthStateChange(
-            () => {
-              lastPushOwnerSyncedUserId =
-                null;
-              void run();
-            }
-          );
-
-      const interval =
-        window.setInterval(
-          () => {
-            void run();
-          },
-          60 * 1000
-        );
-
-      const handleVisibility =
-        () => {
-          if (
-            document.visibilityState ===
-            "hidden"
-          ) {
-            void run();
-          }
-        };
-
-      const handlePageHide =
-        () => {
-          void run();
-        };
-
-      document.addEventListener(
-        "visibilitychange",
-        handleVisibility
-      );
-
-      window.addEventListener(
-        "pagehide",
-        handlePageHide
-      );
-
-      return () => {
-        cancelled =
-          true;
-
-        authListener
-          .subscription
-          .unsubscribe();
-
-        window.clearInterval(
-          interval
-        );
-
-        document.removeEventListener(
-          "visibilitychange",
-          handleVisibility
-        );
-
-        window.removeEventListener(
-          "pagehide",
-          handlePageHide
-        );
-      };
-    },
-    []
-  );
-
+  useEffect(() => {
+    let stopped = false, syncing = false, pushOwner: string | null = null;
+    async function sync() {
+      if (stopped || syncing) return;
+      syncing = true;
+      try {
+        const { data, error } = await supabase.auth.getSession();
+        if (error) throw error;
+        const user = data.session?.user;
+        if (!user) { pushOwner = null; return; }
+        const permission = "Notification" in window ? Notification.permission : "unsupported";
+        if (permission === "granted" && pushOwner !== user.id) {
+          try { await registerPushSubscription(); pushOwner = user.id; }
+          catch (error) { console.error("BACKGROUND PUSH OWNER SYNC ERROR", error); }
+        }
+        if (stopped) return;
+        const { data: latest } = await supabase.auth.getSession();
+        if (latest.session?.user.id !== user.id) return;
+        // The browser owns notification preferences, never Misaki's root state.
+        const { error: writeError } = await supabase.from("background_push_state").upsert({
+          user_id: user.id, notifications_enabled: permission === "granted",
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo",
+        }, { onConflict: "user_id" });
+        if (writeError) throw writeError;
+      } catch (error) { console.error("BACKGROUND STATE SYNC ERROR", error); }
+      finally { syncing = false; }
+    }
+    const visible = () => { if (document.visibilityState === "hidden") void sync(); };
+    void sync();
+    const timer = window.setInterval(() => void sync(), 60_000);
+    const { data: listener } = supabase.auth.onAuthStateChange(() => window.setTimeout(() => void sync(), 0));
+    document.addEventListener("visibilitychange", visible);
+    window.addEventListener("pagehide", sync);
+    return () => { stopped = true; window.clearInterval(timer); listener.subscription.unsubscribe();
+      document.removeEventListener("visibilitychange", visible); window.removeEventListener("pagehide", sync); };
+  }, []);
   return null;
 }
