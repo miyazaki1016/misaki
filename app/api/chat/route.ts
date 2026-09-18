@@ -1,3 +1,4 @@
+import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
 import { loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
 import {
@@ -1573,6 +1574,8 @@ function parseGeminiText(
 export async function POST(
   request: Request
 ) {
+  const maintenance = await maintenanceResponse();
+  if (maintenance) return maintenance;
   const traceId =
     crypto.randomUUID()
       .slice(0, 8);

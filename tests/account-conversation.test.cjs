@@ -52,6 +52,7 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name === 'react') return react;
       if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };
       if (name === '@supabase/supabase-js') return { createClient: () => client };
+      if (name.endsWith('/maintenance')) return { maintenanceResponse: async () => null };
       if (name.endsWith('/supabase')) return { supabase: client };
       if (name.endsWith('/canonical-state')) return {
         createServerSupabase: () => client,
@@ -91,6 +92,15 @@ test('email save checkpoints authenticated temporary state before updateUser', a
   await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';
   await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
   assert.deepEqual(h.calls, ['save', 'email']); assert.equal(h.localStorage.getItem(pendingKey), 'a');
+});
+
+test('maintenance checkpoint response keeps email unsent and displays maintenance', async () => {
+  const h = harness(undefined, {}, { 'misaki-temporary-state-v1': 'verified' });
+  h.fetch = async () => Response.json({ maintenance: true, code: 'MAINTENANCE', error: 'メンテナンス中です。' }, { status: 503 });
+  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';
+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
+  assert.ok(!h.calls.includes('email')); assert.equal(h.localStorage.getItem(pendingKey), null);
+  assert.ok(h.states.includes('メンテナンス中です。'));
 });
 
 for (const failedEmail of [true, false]) test(`${failedEmail ? 'failed email send' : 'pending confirmation'}: saveByEmail retry preserves additional server conversation`, async () => {

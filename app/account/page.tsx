@@ -122,7 +122,10 @@ export default function AccountPage() {
           pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null"),
         }),
       });
-      if (!saved.ok) throw new Error("会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");
+      if (!saved.ok) {
+        const result = await saved.json().catch(() => null);
+        throw new Error(result?.maintenance === true ? result.error : "会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");
+      }
       const { data: latest } = await supabase.auth.getSession();
       if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {
         throw new Error("アカウント状態が変わりました。画面を開き直してください。");

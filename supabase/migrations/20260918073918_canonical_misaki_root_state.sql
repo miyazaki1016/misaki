@@ -10,6 +10,9 @@ create table public.misaki_temporary_roots (
 alter table public.misaki_temporary_roots enable row level security;
 revoke all on public.misaki_temporary_roots from public,anon,authenticated;
 grant select,insert,update,delete on public.misaki_temporary_roots to service_role;
+-- The separate maintenance prerequisite must be installed before cutover.
+create trigger aaa_misaki_maintenance before insert or update or delete or truncate
+  on public.misaki_temporary_roots for each statement execute function misaki_operations.guard_root_write();
 create unique index misaki_email_checkpoint_user_idx on public.misaki_relationship_events(user_id)
   where event_type='email_save_checkpoint';
 

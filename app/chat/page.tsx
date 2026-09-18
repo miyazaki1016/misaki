@@ -1,5 +1,7 @@
 "use client";
 
+import { maintenanceMessage } from "../../lib/maintenance-result";
+
 import { TEMPORARY_STATE_KEY, DEVICE_USER_KEY } from "../../lib/device-conversation";
 import {
   useEffect,
@@ -720,7 +722,10 @@ export default function ChatPage() {
           body: JSON.stringify({ action: "load", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
             pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null") }),
         });
-        if (!response.ok) throw new Error("美咲の状態を読み込めませんでした。");
+        if (!response.ok) {
+          const result = await response.json().catch(() => null);
+          throw new Error(maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
+        }
         const state = await response.json();
         const { data: latest } = await supabase.auth.getSession();
         if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;
@@ -999,7 +1004,10 @@ export default function ChatPage() {
       method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ action, value, temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY) }),
     });
-    if (!response.ok) throw new Error("保存できませんでした。もう一度お試しください。");
+    if (!response.ok) {
+      const result = await response.json().catch(() => null);
+      throw new Error(maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
+    }
     const state = await response.json();
     const { data: latest } = await supabase.auth.getSession();
     if (!expectedOwner || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) throw new Error("アカウントが変更されました。");
@@ -1254,6 +1262,16 @@ export default function ChatPage() {
       receivedResponse = true;
       const { data: latest } = await supabase.auth.getSession();
       if (latest.session?.user.id !== expectedOwner && !(expectedAnonymous && latest.session?.user.is_anonymous)) return;
+      const maintenance = maintenanceMessage(res.status, data);
+      if (maintenance) {
+        setSendError(maintenance);
+        // A retry may have committed before its response was lost. Keep its
+        // recovery marker and history until the server can confirm the result.
+        receivedResponse = !reuse;
+        if (!reuse) setMessages(prev => prev.filter(item => item.requestId !== requestId));
+        setMessage(text);
+        return;
+      }
       sessionStorage.removeItem("misaki-pending-chat-turn");
 
       applyApiUsage(

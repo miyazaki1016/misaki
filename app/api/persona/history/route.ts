@@ -1,3 +1,4 @@
+import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from "../../../../lib/canonical-state";
 
@@ -29,6 +30,9 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
+  // Anonymous "load" renews the root, so it is a write too.
+  const maintenance = await maintenanceResponse();
+  if (maintenance) return maintenance;
   try {
     const user = await authenticate(request);
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });

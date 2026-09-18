@@ -12,12 +12,14 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   let points = 79, consumed = 0, refunded = 0, generated = 0;
   const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
   let checkpoint = false, revision = 0;
+  let maintenance = false;
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
     from(table) {
       const filters = {};
       const query = { select() { return query; }, not() { return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
         async maybeSingle() {
+          if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };
           if (stateFailure) return { error: { message: 'unavailable' }, data: null };
           if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };
           if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };
@@ -121,7 +123,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
   }
-  return { client, user, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
+  return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
       body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },
