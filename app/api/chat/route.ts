@@ -67,7 +67,7 @@ type ActivityEvidence = {
 const MAX_HISTORY = 60;
 const MAX_MEMORY = 30;
 const MAX_TODAY_MEMORY = 12;
-const GEMINI_TIMEOUT_MS = 20_000;
+const GEMINI_TIMEOUT_MS = 30_000;
 
 const SUPABASE_URL =
   "https://tzozajnwznxqgxnjikoy.supabase.co";
@@ -1537,6 +1537,57 @@ function parseGeminiText(
 export async function POST(
   request: Request
 ) {
+  const traceId =
+    crypto.randomUUID()
+      .slice(0, 8);
+  const requestStartedAt =
+    Date.now();
+
+  async function measureStage<T>(
+    stage: string,
+    task: () => Promise<T>
+  ): Promise<T> {
+    const startedAt =
+      Date.now();
+
+    try {
+      const result =
+        await task();
+
+      console.log(
+        "CHAT STAGE:",
+        {
+          traceId,
+          stage,
+          elapsedMs:
+            Date.now() -
+            startedAt,
+          ok: true,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      console.error(
+        "CHAT STAGE:",
+        {
+          traceId,
+          stage,
+          elapsedMs:
+            Date.now() -
+            startedAt,
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : String(error),
+        }
+      );
+
+      throw error;
+    }
+  }
+
   let chargedRequestId:
     string | null = null;
   let chargedSupabase:
@@ -1571,7 +1622,11 @@ export async function POST(
       relationshipPoints,
       misakiTodayMemory,
     } =
-      await request.json();
+      await measureStage(
+        "request-json",
+        () =>
+          request.json()
+      );
 
     if (
       !message ||
@@ -1642,8 +1697,12 @@ export async function POST(
       data: userData,
       error: userError,
     } =
-      await supabase.auth.getUser(
-        accessToken
+      await measureStage(
+        "auth-get-user",
+        () =>
+          supabase.auth.getUser(
+            accessToken
+          )
       );
 
     if (
@@ -1668,9 +1727,13 @@ export async function POST(
       data: usageData,
       error: usageError,
     } =
-      await consumeDailyMessageWithRetry(
-        supabase,
-        usageRequestId
+      await measureStage(
+        "usage-consume",
+        () =>
+          consumeDailyMessageWithRetry(
+            supabase,
+            usageRequestId
+          )
       );
 
     if (usageError) {
@@ -1874,10 +1937,14 @@ export async function POST(
       );
 
     const loadedPersona =
-      await loadPersonaPrompt(
-        supabase,
-        userData.user.id,
-        "chat"
+      await measureStage(
+        "persona-load",
+        () =>
+          loadPersonaPrompt(
+            supabase,
+            userData.user.id,
+            "chat"
+          )
       );
 
     const personaPrompt =
@@ -1941,8 +2008,16 @@ export async function POST(
       tokyoLifeEvents,
     ] =
       await Promise.all([
-        getTokyoWeather(),
-        getTokyoLifeEvents(),
+        measureStage(
+          "weather",
+          () =>
+            getTokyoWeather()
+        ),
+        measureStage(
+          "life-events",
+          () =>
+            getTokyoLifeEvents()
+        ),
       ]);
 
     const weatherGuide =
@@ -2226,6 +2301,7 @@ ${retryProblems
       console.log(
         "GEMINI FETCH START:",
         {
+          traceId,
           attempt,
           messageLength:
             message.length,
@@ -2282,6 +2358,7 @@ ${retryProblems
         console.log(
           "GEMINI FETCH END:",
           {
+            traceId,
             attempt,
             status:
               response.status,
@@ -2296,6 +2373,7 @@ ${retryProblems
           console.error(
             "GEMINI API ERROR:",
             {
+              traceId,
               attempt,
               status:
                 response.status,
@@ -2326,6 +2404,7 @@ ${retryProblems
           console.error(
             "GEMINI FETCH TIMEOUT:",
             {
+              traceId,
               attempt,
               elapsedMs,
               messageLength:
@@ -2342,6 +2421,7 @@ ${retryProblems
         console.error(
           "GEMINI FETCH FAILED:",
           {
+            traceId,
             attempt,
             elapsedMs,
             error,
@@ -2571,6 +2651,17 @@ ${retryProblems
     chargedRequestId = null;
     chargedSupabase = null;
 
+    console.log(
+      "CHAT TOTAL:",
+      {
+        traceId,
+        elapsedMs:
+          Date.now() -
+          requestStartedAt,
+        ok: true,
+      }
+    );
+
     return Response.json({
       reply,
       memory:
@@ -2598,11 +2689,28 @@ ${retryProblems
   } catch (error) {
     console.error(
       "CHAT ROUTE ERROR:",
-      error
+      {
+        traceId,
+        elapsedMs:
+          Date.now() -
+          requestStartedAt,
+        error,
+      }
     );
 
     const refunded =
       await refundIfCharged();
+
+    console.log(
+      "CHAT TOTAL:",
+      {
+        traceId,
+        elapsedMs:
+          Date.now() -
+          requestStartedAt,
+        ok: false,
+      }
+    );
 
     return Response.json(
       {
