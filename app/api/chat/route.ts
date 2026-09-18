@@ -2217,21 +2217,11 @@ ${retryProblems
         retryProblems.length > 0
           ? "retry"
           : "initial";
-      const codePointLength =
-        Array.from(
-          message
-        ).length;
       const hasSupplementaryUnicode =
-        Array.from(
-          message
-        ).some(
-          (char) =>
-            (
-              char.codePointAt(
-                0
-              ) ?? 0
-            ) > 0xffff
-        );
+        /[\uD800-\uDBFF][\uDC00-\uDFFF]/
+          .test(
+            message
+          );
 
       console.log(
         "GEMINI FETCH START:",
@@ -2239,7 +2229,6 @@ ${retryProblems
           attempt,
           messageLength:
             message.length,
-          codePointLength,
           hasSupplementaryUnicode,
         }
       );
@@ -2341,7 +2330,6 @@ ${retryProblems
               elapsedMs,
               messageLength:
                 message.length,
-              codePointLength,
               hasSupplementaryUnicode,
             }
           );
