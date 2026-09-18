@@ -178,6 +178,60 @@ expression tags（どう表現するか）
 
 localStorage を書き換えることで親密度MAX、恋人化、感情変更、記憶変更などが起きる設計へ戻さない。Body Clock、通常返信、写真、将来のハートUIは、同じサーバー側の美咲状態から派生させる。
 
+### Work 引き渡し前の基礎工事仕様（2026-09-18）
+
+今回の第1段階は、関係性の新しい加点 / 減算ロジックやハートUIを実装することではない。**既存挙動を保ったまま、美咲の根本状態をサーバー正本へ寄せることだけ**を目的とする。
+
+正本の責務は以下に整理する。
+
+- public.misaki_relationship_state: 関係性・emotion・action の唯一の正本。intimacy_points を現在の relationshipPoints の後継値とする
+- public.misaki_relationship_events: 関係状態変更の監査 / 理由履歴。正本値そのものは持たない
+- public.misaki_user_conversation_state: 会話履歴・長期記憶のサーバー正本
+- public.background_push_state: Push / Body Clock の配送・スケジュール状態と、Body Clock 用の会話スナップショットを担当。relationship_points は最終的に正本として扱わず、misaki_relationship_state.intimacy_points を参照する
+- localStorage: チャット表示キャッシュのみ。relationshipPoints、長期記憶、today memory など美咲の根本状態を正本として残さない
+
+#### 第1段階で守る互換動作
+
+現行の「送信成功1回につき基本 +1」と 30 / 80 / 160 の距離感は、この基礎工事では意図的に変更しない。新しい6段階閾値、内容ベースの加点 / 減算、恋愛感情モデル、ハートUIは別工程とする。これにより、保存場所の変更と関係ロジック変更を同時に行わず、障害時の原因を切り分けられる。
+
+ポイント更新はクライアント計算値を信用せず、認証済みユーザーIDを基準にサーバー側で原子的に行う。再送・二重実行で同じチャットターンが二重加点されないよう、既存 request_id 等と結び付けた冪等性を持たせる。チャット生成失敗時は関係ポイントを進めない。
+
+通常チャットのプロンプトへ渡す距離感も、クライアントから送られた relationshipPoints ではなくサーバー正本を読む。Body Clock も同じ intimacy_points を参照し、通常返信と自発行動で別の親密度を持たせない。
+
+#### 既存ユーザー移行
+
+既存ユーザーを0へリセットしない。移行前に、サーバー側で確認できる既存値と現行クライアント由来値の扱いを明示し、初回移行は一度だけ行える方式にする。移行完了後は localStorage 値を再びサーバーへ上書きできないようにする。ブラウザの値を自由に改変して親密度を上げられる経路を残さない。
+
+匿名利用は恒久アカウントと同じ永続的な関係正本を前提にせず、現在の匿名→メール保存フローを壊さない。メール保存時に、保存対象となった会話・記憶と整合する関係状態を恒久アカウント側へ一度だけ引き継ぐ方式を実装時に既存認証フローへ合わせる。
+
+#### DB上の既存配線で注意する点
+
+misaki_user_conversation_state.history の更新には、現在 trg_relationship_emotion_from_conversation_state が接続され、キーワードベースで emotion を更新している。misaki_relationship_state.emotion_state の更新には trg_relationship_action_from_emotion が接続され action を更新する。これらは現行機能なので、今回の保存先基礎工事では独断で削除・再設計しない。内容理解型シグナルエンジンへの置換は次工程で行う。
+
+#### Work の実装境界
+
+Work は今回、正本化・移行・参照経路統一・localStorage 根本状態撤去と必要なテストまでを担当する。次の項目は今回実装しない。
+
+- 6段階の新閾値 / 5ハートUI
+- warmth / care / trust / romantic / hurtful / repair 等の新シグナル判定
+- 新しい加点 / 減算量や日次関係ポイント上限
+- 恋愛感情と交際事実の新しい状態モデル
+- emotion/action の既存キーワードtriggerの置換
+- Premium専用の親密度倍率
+
+#### 必須テスト / 完了条件
+
+Free / Premium の通常会話、失敗時の利用回数返却、匿名利用、匿名→メール保存、既存メールユーザーのログイン、別端末復元、Body Clock、自発Push、emotion/action の既存挙動に回帰がないことを確認する。特に以下を満たすこと。
+
+- localStorage の relationshipPoints 改変でサーバーの親密度が変わらない
+- ブラウザストレージを削除しても恒久アカウントの関係状態・長期記憶が消えない
+- 同一アカウントを別端末で開いても同じ関係状態を読む
+- 1成功ターンが1回だけ加点され、失敗 / 再送 / 重複同期で二重加点されない
+- 通常チャットと Body Clock が同じ intimacy_points を参照する
+- 既存ユーザーが移行によって突然0ポイント / 初対面へ戻らない
+
+機能コードの変更は通常の branch → diff確認 → test → PR → Vercel Preview Ready/Success → merge → Production Ready/Success の手順で行い、本番反映後に実機確認へ渡す。
+
 ---
 
 ## 1. プロダクト原則
