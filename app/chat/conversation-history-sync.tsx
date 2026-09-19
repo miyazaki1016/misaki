@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { flushLegacySaves } from '../../lib/legacy-browser-drain';
 import { supabase } from "../../lib/supabase";
 import { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from "../../lib/device-conversation";
 
@@ -120,6 +121,9 @@ export default function ConversationHistorySync() {
         if (error) throw error;
 
         const session = data.session;
+        // Resume exact acknowledged turns even for an anonymous browser. This
+        // does not create an email checkpoint or persist anonymous conversation.
+        if (session?.access_token) await flushLegacySaves();
 
         // 匿名利用中は会話・記憶をSupabaseへ永続化しない。
         // ブラウザ内の一時データだけで会話を続ける。

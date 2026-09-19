@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { admitOperation, operationClient, progressOperation, maintenanceResponse, type LegacyOperation } from '../../../../lib/legacy-drain';
 
 const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY =
@@ -134,6 +135,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  let operation: LegacyOperation | null = null;
+  let completed = false;
   try {
     const auth = await getAuthenticatedClient(request);
     if ("error" in auth) {
@@ -147,9 +150,19 @@ export async function POST(request: Request) {
       "memory"
     );
     const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;
+    if (body?.saveAnonymous === true && (!auth.isAnonymous || body.expectedUserId !== auth.userId)) {
+      return Response.json({ error: 'Anonymous account mismatch.' }, { status: 409 });
+    }
+
+    try {
+      operation = await admitOperation(body?.saveAnonymous === true ? 'email_checkpoint' : 'history', auth.userId);
+      const token = getBearerToken(request)!;
+      auth.supabase = operationClient(token, operation);
+    } catch { return maintenanceResponse(); }
 
     if (body?.saveAnonymous === true) {
       if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {
+        completed = await progressOperation(operation, 'failed');
         return Response.json({ error: "Anonymous account mismatch." }, { status: 409 });
       }
       const { data, error } = await auth.supabase.rpc("save_anonymous_conversation_state", {
@@ -160,10 +173,13 @@ export async function POST(request: Request) {
         console.error("ANONYMOUS CONVERSATION SAVE ERROR:", error);
         return Response.json({ error: "Conversation could not be saved." }, { status: 500 });
       }
+      completed = await progressOperation(operation, 'succeeded');
+      if (!completed) throw new Error('operation finalization failed');
       return Response.json({ synced: true, result: data });
     }
 
     if (history.length === 0) {
+      completed = await progressOperation(operation, 'failed');
       return Response.json(
         { error: "Conversation history is empty." },
         { status: 400 }
@@ -186,6 +202,8 @@ export async function POST(request: Request) {
       );
     }
 
+    completed = await progressOperation(operation, 'succeeded');
+    if (!completed) throw new Error('operation finalization failed');
     return Response.json({
       synced: true,
       result: data,
@@ -196,5 +214,7 @@ export async function POST(request: Request) {
       { error: "Conversation history could not be synchronized." },
       { status: 500 }
     );
+  } finally {
+    if (operation && !completed) await progressOperation(operation, 'unknown');
   }
 }
