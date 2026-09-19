@@ -5,6 +5,7 @@ import type {
   RelationshipAction,
   RelationshipEmotion,
 } from "./proactive-decision.ts";
+import type { ProactiveDesire } from "./proactive-urge.ts";
 
 export type MisakiPhotoTime = "morning" | "day" | "evening" | "night" | "any";
 
@@ -25,12 +26,13 @@ export type SelectMisakiPhotoInput = {
   reply: string;
   decision: ProactiveDecisionContext;
   recentPhotoIds?: string[];
+  desire: ProactiveDesire;
+  urgeStrength: number;
 };
 
-const PHOTO_ATTACH_RATE = 0.34;
 const ALL_DIRECTIONS: ProactiveDirection[] = ["MISAKI", "USER", "US", "MISAKI_TO_USER", "MISAKI_TO_US"];
 const ALL_ACTIONS: RelationshipAction[] = ["NORMAL", "WAIT", "TEASE", "SULK", "CHASE", "PULL", "RECONNECT"];
-const ALL_EMOTIONS: RelationshipEmotion[] = ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"];
+const ALL_EMOTIONS: RelationshipEmotion[] = ["neutral", "happy", "affectionate", "concerned", "hurt", "sulky", "guarded"];
 
 const PHOTOS: MisakiPhoto[] = [
   {
@@ -117,14 +119,18 @@ function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {
 }
 
 export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): MisakiPhoto | null {
-  const { currentTime, reply, decision, recentPhotoIds = [] } = input;
+  const { currentTime, reply, decision, desire, urgeStrength, recentPhotoIds = [] } = input;
   if (!decision.shouldSend || !reply.trim()) return null;
 
-  const seed = hashText(
-    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${decision.tags.join(",")}|${reply}`
-  );
+  // A photo is an action, not decoration. Generic check-ins/reconnection/space
+  // never attach one merely because a matching asset exists.
+  const photoEligible = desire === "share_photo" ||
+    ((desire === "be_playful" || desire === "be_close") && urgeStrength >= 65);
+  if (!photoEligible) return null;
 
-  if (seed % 10000 >= Math.floor(PHOTO_ATTACH_RATE * 10000)) return null;
+  const seed = hashText(
+    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${desire}|${urgeStrength}|${decision.tags.join(",")}|${reply}`
+  );
 
   const timeBucket = getTimeBucket(currentTime);
   let candidates = PHOTOS.filter((photo) =>
