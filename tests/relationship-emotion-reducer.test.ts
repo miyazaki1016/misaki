@@ -99,3 +99,30 @@ test("resolved hurt leaves a tender repair afterglow instead of snapping emotion
 
 test("concern can coexist with affection instead of erasing it",()=>{const next=reduceRelationshipEmotion({previous:{primary:"affectionate",intensity:55},signals:assessment([{name:"concern",strength:.9,confidence:.95,evidence:"大丈夫？心配だよ"}]),elapsedHours:1,intimacyLevel:"intimate"});assert.equal(next.primary,"concerned");assert.equal(next.secondary,"affectionate");});
 test("repair in progress can contain affection while hurt is still primary",()=>{const next=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:90},signals:assessment([{name:"apology",strength:.55,confidence:.8,evidence:"ごめん"},{name:"repair",strength:.55,confidence:.8,evidence:"仲直りしたい"}]),elapsedHours:1,intimacyLevel:"intimate"});assert.equal(next.primary,"hurt");assert.equal(next.secondary,"affectionate");assert.equal(next.afterglow,"repairing");});
+
+
+test("apology alone does not invent affectionate secondary emotion",()=>{
+ const result=reduceRelationshipEmotion({
+  previous:{primary:"hurt",intensity:75},
+  signals:{signals:[{name:"apology",strength:.8,confidence:.95,evidence:"ごめん"}],relationshipFacts:{mutualAffectionExplicit:false,datingEstablishedExplicit:false}},
+  elapsedHours:1,
+  intimacyLevel:"intimate"
+ });
+ assert.equal(result.reason,"repair_in_progress");
+ assert.equal(result.secondary,null);
+ assert.equal(result.afterglow,"repairing");
+});
+
+test("repair can preserve affection when current evidence actually supports it",()=>{
+ const result=reduceRelationshipEmotion({
+  previous:{primary:"hurt",intensity:75},
+  signals:{signals:[
+   {name:"repair",strength:.7,confidence:.95,evidence:"仲直りしたい"},
+   {name:"warmth",strength:.7,confidence:.95,evidence:"大切に思ってる"}
+  ],relationshipFacts:{mutualAffectionExplicit:false,datingEstablishedExplicit:false}},
+  elapsedHours:1,
+  intimacyLevel:"intimate"
+ });
+ assert.equal(result.reason,"repair_in_progress");
+ assert.equal(result.secondary,"affectionate");
+});
