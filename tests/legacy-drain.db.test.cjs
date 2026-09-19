@@ -11,6 +11,71 @@ const connection={host:'127.0.0.1',port:55438,user:'postgres',database:'misaki_d
 let operator,service,a,b;
 const read=p=>fs.readFileSync(path.join(root,p),'utf8');
 const user=randomUUID(),other=randomUUID();
+// Candidate protocols are installed ONLY in a disposable database below.
+// Neither candidate is production equipment or an accepted safety design.
+for(const lifetime of ['transaction','session-disconnect'])test(`candidate ${lifetime} barrier must reject late stale write AND admission`,async()=>{
+ const config={...connection,database:'misaki_barrier_'+randomUUID().replaceAll('-','')};
+ const boot=new Client({...config,database:'postgres'});const opened=[];
+ let holder;
+ const connect=async()=>{const c=new Client(config);await c.connect();opened.push(c);return c;};
+ try {
+  await boot.connect();await boot.query('create database '+config.database);
+  const observer=await connect();holder=await connect();
+  const fixture=read('tests/legacy-schema.fixture.sql').replace(/create role (\w+);/g,(_,r)=>`do $$begin if not exists(select 1 from pg_roles where rolname='${r}') then create role ${r};end if;end$$;`);
+  await observer.query(fixture);await observer.query(read('supabase/legacy-maintenance-drain.sql'));
+  const uid=randomUUID();await observer.query('insert into auth.users(id) values($1)',[uid]);
+  await observer.query('insert into background_push_state(user_id,relationship_points) values($1,0)',[uid]);
+  // Separate outer barrier: acquire shared before the legacy lifecycle lock.
+  // A trigger/RPC must also protect callers that did NOT cooperate before their snapshot.
+  for(const signature of ['misaki_drain.guard_write()','public.admit_misaki_legacy_operation(text,uuid)']){
+   const def=(await observer.query('select pg_get_functiondef($1::regprocedure) def',[signature])).rows[0].def;
+   assert.match(def,/\bbegin\s/i);
+   await observer.query(def.replace(/\bbegin\s/i,'begin\n perform pg_catalog.pg_advisory_xact_lock_shared(1296646475,31);\n'));
+  }
+  const writer=await connect(),admitter=await connect(),fresh=await connect();
+  for(const c of [writer,admitter,fresh])await c.query("set role service_role; set statement_timeout='3s'");
+  for(const c of [writer,admitter]){
+   await c.query('begin isolation level repeatable read');
+   await c.query('select count(*) from background_push_state');
+  }
+  const holderPid=(await holder.query('select pg_backend_pid() pid')).rows[0].pid;
+  const locks=async()=>Number((await observer.query("select count(*) n from pg_locks where pid=$1 and locktype='advisory' and classid=1296646475 and objid=31 and granted",[holderPid])).rows[0].n);
+  await holder.query('select misaki_drain.stop_admission()');
+  await holder.query("select misaki_drain.verify_body_clock('isolated candidate barrier; no runtime or external relay')");
+  await holder.query('begin');
+  await holder.query(`select pg_advisory_${lifetime==='transaction'?'xact_':''}lock(1296646475,31)`);
+  await holder.query('select misaki_drain.freeze()');assert.equal(await locks(),1);
+  await holder.query('commit');
+  if(lifetime==='session-disconnect'){
+   assert.equal(await locks(),1); // Freeze COMMIT preserves the session barrier.
+   assert.equal((await fresh.query('select pg_try_advisory_xact_lock_shared(1296646475,31) acquired')).rows[0].acquired,false);
+   await holder.query('begin');await holder.query('rollback');assert.equal(await locks(),1);
+   await holder.end();opened.splice(opened.indexOf(holder),1);holder=null;
+  }
+  assert.equal(await locks(),0);
+  const state=async()=>(await observer.query('select phase,epoch,(select count(*)::int from misaki_drain.operations) operations from misaki_drain.control')).rows[0];
+  const frozen=await state();assert.equal(frozen.phase,'writes_frozen');assert.equal(frozen.operations,0);
+  // New READ COMMITTED requests are refused, so the test is not a missing guard.
+  await assert.rejects(fresh.query('update background_push_state set relationship_points=1 where user_id=$1',[uid]),{code:'55000'});
+  await assert.rejects(fresh.query("select admit_misaki_legacy_operation('relay',null)"),{code:'55000'});
+  const result={lifetime,version:(await observer.query('show server_version')).rows[0].server_version,frozen};
+  try {result.changed=(await writer.query('update background_push_state set relationship_points=99 where user_id=$1 returning relationship_points',[uid])).rows;}
+  catch(e){result.writeError=e.code;}
+  await writer.query('rollback');
+  try {await admitter.query("select admit_misaki_legacy_operation('relay',null)");result.admitted=true;}
+  catch(e){result.admissionError=e.code;}
+  await admitter.query('rollback');
+  assert.equal((await observer.query('select relationship_points from background_push_state where user_id=$1',[uid])).rows[0].relationship_points,0);
+  assert.deepEqual(await state(),frozen);result.rollbackConfirmed=true;
+  // Timeouts are not successful rejection, and known failures are never TODO/skip.
+  assert.ok(['55000','40001'].includes(result.writeError)&&['55000','40001'].includes(result.admissionError),'CANDIDATE BARRIER BYPASS: '+JSON.stringify(result));
+ } finally {
+  for(const c of opened){await c.query('rollback').catch(()=>{});await c.end();}
+  // Retain the disposable fixture, matching the existing DB suite. Probe writes
+  // have been rolled back and verified above; cluster teardown removes fixtures.
+  await boot.end();
+ }
+});
 async function client(role='postgres',uid=user){const c=new Client(connection);await c.connect();
  if(role!=='postgres')await c.query('set role '+role);
  await c.query("select set_config('request.jwt.claims',$1,false)",[JSON.stringify({role:role==='postgres'?'service_role':role,sub:uid})]);return c;}
@@ -232,3 +297,4 @@ test('freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot'
 });
 
 }
+

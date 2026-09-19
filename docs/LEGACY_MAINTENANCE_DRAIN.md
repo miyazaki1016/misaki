@@ -226,3 +226,63 @@ PR30 `fb25649e836a3fa9681fa0bbe168cbae42018abf` から再開。main/PR29のHEAD�
 
 既知3漏れ、全surface coverage diff、停止epochに結び付くpre-gate証拠、旧browser save/refund引継ぎ、全旧Production境界の統合検証は未完了。新たなallowlistやfreeze解除策は追加しない。詳細な順序・対照試験・限界はWRITE_SURFACE_INVENTORY.mdの続行監査を参照。
 Productionはversion/profiles定義のREAD ONLY取得のみ。施工・mergeは行っていない。
+
+## 2026-09-20 GATE 1限定：barrier寿命の反例で停止
+
+**GATE 1：BLOCKED。PR #30を本番へ先行導入する準備：BLOCKED。**
+
+開始時にGitHubのmain `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR30
+`1867caed8dcd67f4d1f8bac275acd4f1834aef0c`（tree `38caf5e6faeb35374b49bf38cbb5084ef1925954`）、
+PR29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` を再確認した。
+総覧・本運用文書を再読。GATE 2以降には進んでいない。
+
+### 候補実装と実証
+
+`tests/legacy-drain.db.test.cjs` の候補2件は、隔離DBに限ってguard/admitの先頭へ
+共通のshared transaction advisory barrier `(1296646475,31)` を挿入する。
+既存の内部lock `(1296646475,30)` より先に取得し、operatorはdrain後、競合するexclusive
+barrierを取ってからfreezeする。controlはphase/epoch/監査の記録を維持する。
+これは不採用候補の最小破壊試験であり、配布用SQL・API・Edgeの実装変更ではない。
+協調callerがsnapshot前にsharedを取得する経路の完成を主張しない。
+
+非協調callerの必須攻撃を、別々の物理connectionで実行した：
+`BEGIN REPEATABLE READ → background SELECTでsnapshot確定（barrier未取得） →
+別connectionでfreezeをCOMMIT → 初めてguard/admitへ到達してshared取得`。
+
+| 候補 | 物理lockの観測 | 古いsnapshotの結果 |
+|---|---|---|
+| transaction exclusive | freeze中は保持、COMMIT後は0件 | UPDATEで99へ変更、新規operation受付も成功 |
+| session exclusive | freeze COMMIT後・別transactionのROLLBACK後も保持。別connectionのtry-sharedはfalse。保持connection切断後は0件 | phaseはwrites_frozen/epoch=1のまま、UPDATEと新規受付が成功 |
+
+新規READ COMMITTED接続からの同じUPDATE/受付はどちらも55000で拒否される。
+新規候補試験のwrite/受付はそれぞれROLLBACKし、observerでpoints=0、operations=0、
+phase/epoch不変をassertした。候補試験はCOMMIT後の永続化までは主張しない。
+既存受付回帰は引き続き合成operationのCOMMITと古いepoch=0を実証し、削除後0件を確認する。
+既存2件の拒否期待値は変更・削除していない。新候補2件も拒否を期待しFAILにする。
+
+**新しい反例はsession保持接続喪失で物理閉鎖だけが消え、古いsnapshotから両入口へ
+侵入できること。** 接続喪失を安全なresumeと扱えない。発見時停止条件に従い、
+機能修正を停止し、回帰テスト・文書・PG17比較用CIのみを残した。
+
+### 設計上の結論と未証明事項
+
+- xact exclusiveのCOMMITはfreeze期間全体の閉鎖ではない。通常SELECTのopen判定へ戻すだけでは不十分。
+- session exclusiveも接続切断後のfail-closedを証明できず不採用。専用connection維持だけで安全とはしない。
+- poolのphysical connection再利用、二重freezeの再帰lock回数、unlock漏れ、別connectionからのresume、stale operatorのepoch/所有権検査は未実装・未検証。
+- session lockはROLLBACKで解放されないため失敗したfreezeでも残り得る。今回は保持の事実だけ確認し、復旧protocolは実装していない。
+- 新barrier→既存lifecycle lockという試験順序は全体のdeadlock-free証明ではない。業務行lock、共有→排他昇格、待機transaction、deadlock/starvation、二重freeze/resumeの検証は残る。
+- backend crash/サーバー再起動は未実行。今回の接続終了は正常切断であり、強制crash試験と同一視しない。
+- SERIALIZABLE比較、snapshot前shared取得あり、freeze待機中/解除後の全組合せは停止条件により未実施。
+- controlのMVCC可視phaseを最後の安全境界に戻さない。永続的なfencing/古いtransactionの拒否と物理barrierの組合せを次回設計する。40001の自動retryをusage/refund/Pushに導入していない。
+
+根拠：[PostgreSQL 17 Explicit Locking](https://www.postgresql.org/docs/17/explicit-locking.html#ADVISORY-LOCKS)。
+session lockの寿命はtransactionから独立し、session終了で解放される。文献だけを安全証明にしない。
+
+### 検証範囲
+
+ローカルは利用可能な隔離PostgreSQL 18.4・loopbackのみ。既存52件PASS、既存安全性2件FAIL、
+候補安全性2件FAIL。17系のローカル実行環境はなく、CIに17.6/18.4の独立matrixを追加し、
+一方の失敗で他方をcancelしない。CI結果はcommit後に別途確認する。
+Productionへの接続・変更、有料branch、実Gemini/Push/emailは一切なし。
+GATE 2（既知3漏れ・全surface監査）以降、pre-gate、統合実証は未着手。
+

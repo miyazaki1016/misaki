@@ -930,3 +930,22 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - UI / 通信
 
 のどこで生じたか切り分けて修正する。
+
+## 2026-09-20 GATE 1限定：候補barrierの接続喪失反例
+
+**GATE 1：BLOCKED。PR #30を本番へ先行導入する準備：BLOCKED。**
+開始PR30 `1867caed8dcd67f4d1f8bac275acd4f1834aef0c`、main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` を再確認。
+
+**仕様/結果:** 共通shared barrierをguard/admitの先頭へ挿入した隔離DB候補を破壊試験。
+freeze側のtransaction exclusiveはCOMMITで消える。session exclusiveはCOMMIT/ROLLBACKでは残るが、保持connection切断で消える。
+後者ではcontrolがwrites_frozen/epoch=1のまま、古いREPEATABLE READ snapshotから業務UPDATEと新規operation受付が成功した。
+両方の試験writeをROLLBACKし、observerで元の値/operation 0件を確認。fresh READ COMMITTEDは同操作を拒否する。
+
+**理由:** lock取得はsnapshot refreshではなく、session保持も接続喪失時のfail-closedを保証しない。
+**関連:** admission集合・業務保存・usage/refund/Pushのfreeze境界に共通する。Serializableや自動retryで副作用を隠さない。
+**維持原則:** 新反例発見時停止に従い、機能修正は停止。配布SQLは変更せず、拒否を要求する回帰テスト2件と運用文書、PG17比較用CIを追加。既存安全性2件は弱体化しない。
+
+ローカルPG18.4では既存52件PASS、安全性は既存2件＋候補2件FAIL。PG17.6はCI matrixで確認予定。
+pool/crash/二重freeze/resume/stale operator/deadlock/starvation、全isolation・snapshot・lock取得タイミングの組合せは未証明。
+GATE 2以降とProduction操作には進んでいない。詳細・再現手順・未実施事項は[運用文書](LEGACY_MAINTENANCE_DRAIN.md#2026-09-20-gate-1限定barrier寿命の反例で停止)を参照。
+

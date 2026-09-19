@@ -8,9 +8,13 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        postgres: ['17.6', '18.4']
     services:
       postgres:
-        image: postgres:18.4
+        image: postgres:${{ matrix.postgres }}
         env:
           POSTGRES_HOST_AUTH_METHOD: trust
         ports: ['55438:5432']
@@ -30,3 +34,4 @@ jobs:
         with:
           deno-version: v2.5.6
       - run: deno check --no-config --node-modules-dir=none supabase/functions/body-clock/index.ts
+
