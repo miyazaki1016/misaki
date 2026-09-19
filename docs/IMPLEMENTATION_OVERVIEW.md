@@ -280,6 +280,25 @@ Production施工、cron操作、実snapshot/restore、PR #29 mergeは今回の�
 **維持原則:** 既存52テストgreenを凍結の完全性の証拠にしない。実schemaとの差分を省略してPASSにしない。
 依頼の「全体矛盾を見つけたらBLOCKEDで停止」に従い、この再監査では実装変更を停止し、証拠・残課題だけを追記する。2 BLOCKERは未解消。
 
+### 2026-09-19 catalog inventory追加監査：認証triggerからの凍結違反
+
+最新main/PR30/PR29を再取得し、ProductionのcatalogをREAD ONLYで機械抽出した。
+public 22テーブルに対し既存guardは12、差分10。public/private 26 routine（SECURITY DEFINER 20）、
+public/authの業務trigger 6、policy 29を確認した。全経路到達性や全旧schema再構成の完了を意味しない。
+
+新たに `auth.users INSERT → handle_new_user_entitlement() → user_entitlements INSERT` を隔離DBで再現。
+実Productionの対象table/RLS/ACL/trigger/functionを反映し、writes_frozen・registry=0でentitlementが1件作成された。
+試験はROLLBACKし0件へ戻ることを確認。auth.users自体は合成fixtureで、実signup/GoTrue試験ではない。
+新たなwrite漏れ・全体矛盾の停止条件に従い機能修正を停止。前回2漏れ、coverage自動検査、pre-gate機構は未解消。
+
+**次回実装の原則:** write surface inventoryを正本としてcoverage差分を検査する。
+SECURITY DEFINERもfreeze境界の外ではない。pre-gate証拠未確認ならfreeze禁止。
+**理由:** 手書きguardリストでは認証triggerや旧RPCを見落とし、導入前処理はregistryに現れない。
+ただしguardを全tableへ一律追加するだけでは新規認証まで失敗し得る。既存ログインと新規ユーザー作成の境界も明示する。
+
+詳細な分類、実証範囲、未実装のcoverage/pre-gate要件は[write surface inventory監査](WRITE_SURFACE_INVENTORY.md)を参照。
+既存104実テスト、TypeScript、Denoが成功しても追加の凍結違反は消えない。Production変更なし。先行導入準備はBLOCKED。
+
 ## 1. プロダクト原則
 
 Misaki の原点は「すべては会話の中にある」。

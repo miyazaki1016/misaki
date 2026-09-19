@@ -1,5 +1,17 @@
 # 旧Production互換 maintenance / drain
 
+> **最新判定：BLOCKED（2026-09-19追加inventory監査）**
+> public 22テーブルと現行guard 12の差分10を確認し、auth.usersのSECURITY DEFINER triggerから
+> user_entitlementsへwrites_frozen中に書ける新たな反例を隔離DBで実証した。
+> 下記の「認証・ログインを一律停止しない」とfreezeの境界も未解決。
+> 本文の必須9＋存在時3は現行実装の説明であり、全write surfaceの正本ではない。
+> 詳細は[write surface inventory監査](WRITE_SURFACE_INVENTORY.md)。停止条件に従い、この追加監査では機能コードを修正していない。
+
+**次回の必須設計:** write surface inventoryを正本としてcoverage差分を検査する。
+SECURITY DEFINERもfreeze境界の外ではない。pre-gate証拠未確認ならfreeze禁止。
+旧RPCや認証triggerのwriteはアプリ側の受付だけでは捕捉できず、導入前処理は新registryにも存在しないためである。
+coverage自動検査と停止epochに結び付くpre-gate証拠機構は、現時点では未実装。
+
 基点: main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`。
 比較対象: PR #29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23`。
 この設備は独立した先行設備であり、PR #29のmigration/RPCには依存しない。
