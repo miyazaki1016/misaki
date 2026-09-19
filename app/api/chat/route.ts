@@ -2687,7 +2687,30 @@ ${retryProblems
         // Keep the first pass as the canonical semantic assessment.
         // The second pass is expression-only; it must not be able to rewrite
         // the relationship evidence that caused the action decision.
-        reply = expressionParsed.reply.trim();
+        const expressionReply = cleanFinalReply(
+          expressionParsed.reply.trim(),
+          message,
+          activityEvidence,
+          misakiDayType
+        );
+        const expressionProblems = getReplyProblems(
+          expressionReply,
+          message,
+          safeCurrentTime,
+          safeHistory,
+          activityEvidence,
+          misakiDayType
+        );
+
+        if (expressionProblems.length === 0) {
+          reply = expressionReply;
+        } else {
+          console.warn(
+            "MISAKI EXPRESSION REPLY REJECTED:",
+            expressionProblems,
+            expressionReply
+          );
+        }
       }
     }
 
