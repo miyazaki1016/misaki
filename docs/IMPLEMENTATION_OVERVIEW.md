@@ -674,24 +674,26 @@ PR #29 のサーバー正本化基礎工事と PR #30 の本番切替安全装�
 
 旧 keyword emotion trigger / 旧 action trigger / silence-only mutation と v2 を本番で二重稼働させないこと。本番切替時は migration 順序・互換性・既存ユーザー状態・Body Clock をまとめて確認する。
 
-追加した回帰テストは設計上の受け入れ例をコード化しているが、**現時点でこのbranchの新規 TypeScript テスト群を実行済みとは記録しない。** merge 前に実行可能なテスト環境を確定し、typecheck / build / relevant tests を通す。
+回帰テストは GitHub Actions で実行可能な状態へ統合済み。2026-09-20 時点で **58 tests / 58 PASS / 0 FAIL** を確認し、同じ CI 上の **Next.js Production Build も PASS**。Next アプリ、Node 回帰テスト、Deno/Supabase Edge Function の型チェック領域は明示的に分離した。
+
+さらに実機前の整合性確認で以下を追加修正済み。
+- Body Clock claim RPC から silence-only emotion mutation と旧ランダム送信 gate を撤去。claim は「評価機会の lease 取得」に限定
+- 旧 keyword emotion trigger を v2 の通常経路から切り離し
+- no-action 時も lease を安全に終了して次回評価時刻へ進める
+- 「今日 / 今夜 / これから / 明日」等の相対日時を古い現在事実として再利用しない
+- 写真欲求は実際に利用可能な写真候補がある場合だけ成立可能
+- 通常返信の表現再生成も既存の reply validation を通す
+- 関係時間の chat-turn 記録を失敗時ではなく成功ターンだけに修正
+- emotion/action 永続化 RPC の reason / evidence / signal summary を DB 側でもサイズ・件数制限
 
 ### 次に進む順序
 
-1. **proactive desire の種類を増やす**
-   - 話したい
-   - 甘えたい
-   - 気にかけたい
-   - 仲直りしたい
-   - 写真を見せたい
-   - 今はそっとしておきたい
-   - 何もしない
-2. ユーザー生活文脈を「事実 / 推測 / 古さ」の確度付きで関係エンジンへ接続
+1. migration 適用順と Preview 環境の互換性を最終確認し、実機テストへ進む
+2. proactive motive を単なる直近発言ではなく relationship event / shared history の因果へ深く接続
 3. emotion の余韻・複合感情を強化し、一発の会話で不自然に全反転しないようにする
 4. relationship history に「なぜ好きか / なぜ距離があるか」という二人固有の意味を蓄積する
 5. その因果の上へ6段階 relationship level / 日次ポイント上限 / 5ハートUIを接続
-6. 写真を「添付率」中心ではなく、`写真を見せたい`という desire から選べるようにする
-7. FREE / PAID 差分と自己進化は、その後に既存原則を壊さない形で接続する
+6. FREE / PAID 差分と自己進化は、その後に既存原則を壊さない形で接続する
 
 ### 壊してはいけない原則
 
