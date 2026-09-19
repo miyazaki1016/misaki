@@ -11,6 +11,7 @@ export type RelationshipTimeContext = {
   emotionIntensity: number;
   actionState: string;
   lastInteractionAt: string | null;
+  stateUpdatedAt: string | null;
 };
 
 function numberOr(value: unknown, fallback = 0) {
@@ -54,6 +55,8 @@ export async function loadRelationshipTimeContext(
       typeof data.action_state === "string" ? data.action_state : "NORMAL",
     lastInteractionAt:
       typeof data.last_interaction_at === "string" ? data.last_interaction_at : null,
+    stateUpdatedAt:
+      typeof data.state_updated_at === "string" ? data.state_updated_at : null,
   };
 }
 
