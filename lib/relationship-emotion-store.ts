@@ -6,6 +6,7 @@ import {
   type EmotionReducerResult,
 } from "./relationship-emotion-reducer";
 import type { RelationshipSignalAssessment } from "./relationship-signal";
+import { reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer";
 
 const EMOTIONS = new Set<EmotionPrimary>([
   "neutral", "happy", "affectionate", "concerned", "hurt", "sulky", "guarded",
@@ -26,7 +27,7 @@ export async function persistRelationshipEmotionFromSignals(
   isAnonymous: boolean,
   context: RelationshipTimeContext | null,
   assessment: RelationshipSignalAssessment
-): Promise<{ applied: boolean; conflict: boolean; emotion: EmotionReducerResult }> {
+): Promise<{ applied: boolean; conflict: boolean; emotion: EmotionReducerResult; action: ActionDecision }> {
   const emotion = reduceRelationshipEmotion({
     previous: previousEmotion(context),
     signals: assessment,
@@ -34,7 +35,14 @@ export async function persistRelationshipEmotionFromSignals(
     intimacyLevel: context?.intimacyLevel ?? "initial",
   });
 
-  if (isAnonymous) return { applied: false, conflict: false, emotion };
+  const action = reduceRelationshipAction({
+    previousAction: context?.actionState ?? "NORMAL",
+    emotion,
+    signals: assessment,
+    intimacyLevel: context?.intimacyLevel ?? "initial",
+  });
+
+  if (isAnonymous) return { applied: false, conflict: false, emotion, action };
 
   const signalSummary = assessment.signals.map((signal) => ({
     name: signal.name,
@@ -43,11 +51,14 @@ export async function persistRelationshipEmotionFromSignals(
   }));
 
   const { data, error } = await (supabase.rpc as any)(
-    "apply_relationship_emotion_v2",
+    "apply_relationship_emotion_action_v2",
     {
       p_primary: emotion.primary,
       p_intensity: emotion.intensity,
-      p_reason: emotion.reason,
+      p_action: action.action,
+      p_direction: action.direction,
+      p_emotion_reason: emotion.reason,
+      p_action_reason: action.reason,
       p_evidence: emotion.evidence,
       p_signal_summary: signalSummary,
       p_expected_state_updated_at: context?.stateUpdatedAt ?? null,
@@ -56,7 +67,7 @@ export async function persistRelationshipEmotionFromSignals(
 
   if (error) {
     console.error("RELATIONSHIP EMOTION V2 WRITE ERROR:", error);
-    return { applied: false, conflict: false, emotion };
+    return { applied: false, conflict: false, emotion, action };
   }
 
   const result = data && typeof data === "object" ? data : {};
@@ -64,5 +75,6 @@ export async function persistRelationshipEmotionFromSignals(
     applied: result.ok === true,
     conflict: result.conflict === true,
     emotion,
+    action,
   };
 }
