@@ -3,7 +3,7 @@ import type { ProactiveLifeContext } from "./proactive-life-context.ts";
 
 export type ProactiveDirection = "MISAKI" | "USER" | "US" | "MISAKI_TO_USER" | "MISAKI_TO_US";
 export type RelationshipAction = "NORMAL" | "WAIT" | "TEASE" | "SULK" | "CHASE" | "PULL" | "RECONNECT";
-export type RelationshipEmotion = "neutral" | "happy" | "lonely" | "sulky" | "concerned" | "affectionate";
+export type RelationshipEmotion = "neutral" | "happy" | "affectionate" | "concerned" | "hurt" | "sulky" | "guarded";
 export type ProactiveExpressionTag =
   | "soft"
   | "cheerful"
@@ -68,7 +68,7 @@ function action(value: unknown): RelationshipAction {
 
 function emotion(value: unknown): RelationshipEmotion {
   const normalized = String(value || "neutral").toLowerCase();
-  return ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"].includes(normalized)
+  return ["neutral", "happy", "affectionate", "concerned", "hurt", "sulky", "guarded"].includes(normalized)
     ? normalized as RelationshipEmotion
     : "neutral";
 }
@@ -79,6 +79,7 @@ function direction(
   life: ProactiveLifeContext
 ): ProactiveDirection {
   if (currentEmotion === "concerned" && life.confidence === "explicit") return "USER";
+  if (currentEmotion === "hurt" || currentEmotion === "guarded" || currentAction === "PULL" || currentAction === "SULK") return "MISAKI";
   if (currentAction === "RECONNECT" || currentAction === "CHASE") return "MISAKI_TO_USER";
   if (currentAction === "TEASE" || currentEmotion === "happy") return "US";
   if (currentEmotion === "affectionate") return "MISAKI_TO_US";
@@ -102,9 +103,10 @@ export function deriveProactiveTags(input: {
     case "happy":
       tags.add("cheerful");
       break;
-    case "lonely":
-      tags.add("miss_you");
-      tags.add("romantic");
+    case "hurt":
+    case "guarded":
+      tags.add("calm");
+      tags.add("casual");
       break;
     case "sulky":
       tags.add("soft");
@@ -193,6 +195,8 @@ export function deriveProactiveTags(input: {
 
   if (
     input.timeBand === "seven_plus_days" &&
+    input.emotion !== "hurt" &&
+    input.emotion !== "guarded" &&
     input.action !== "RECONNECT" &&
     input.action !== "PULL" &&
     input.action !== "SULK"
@@ -205,7 +209,7 @@ export function deriveProactiveTags(input: {
   // teasing, sulking, pulling away, or reconnecting. This lets late-night
   // messages feel physically lived-in without making every night message sleepy.
   const hour = currentHour(input.currentTime);
-  const sleepyEligibleEmotion = input.emotion === "neutral" || input.emotion === "lonely" || input.emotion === "affectionate";
+  const sleepyEligibleEmotion = input.emotion === "neutral" || input.emotion === "affectionate";
   const sleepyEligibleAction = input.action === "NORMAL" || input.action === "WAIT";
   const sleepyEligibleDirection = input.direction !== "USER" && input.direction !== "MISAKI_TO_USER";
   if (hour >= 0 && hour < 5 && sleepyEligibleEmotion && sleepyEligibleAction && sleepyEligibleDirection) {
@@ -266,5 +270,5 @@ export async function buildProactiveDecisionContext(
 }
 
 export function createProactiveDecisionGuide(context: ProactiveDecisionContext) {
-  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`;
+  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない\n・hurt / guarded / PULL / SULK のときも、罰・無視・罪悪感を与える表現にはしない\n・長く会っていないという時間だけを理由に miss_you / romantic を作らない`;
 }
