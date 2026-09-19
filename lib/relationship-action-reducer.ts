@@ -37,6 +37,9 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   if (emotion.afterglow === "wary" && emotion.intensity >= 20) {
     return { action: "PULL", direction: "space", reason: "wary_afterglow_avoids_rushing_closeness" };
   }
+  if (emotion.afterglow === "concerned" && emotion.primary === "concerned" && emotion.intensity >= 18) {
+    return { action: "CHASE", direction: "check_in", reason: "concern_afterglow_still_invites_gentle_check_in" };
+  }
   if (emotion.primary === "concerned" && emotion.intensity >= 30) {
     return { action: "CHASE", direction: "check_in", reason: "grounded_concern_invites_check_in" };
   }
@@ -57,6 +60,9 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   }
   if (emotion.primary === "affectionate" && emotion.intensity >= 50 && close && warmth >= 0.45) {
     return { action: "TEASE", direction: "closer", reason: "grounded_affectionate_playfulness" };
+  }
+  if (emotion.afterglow === "warm" && emotion.primary === "happy" && close && warmth < 0.4) {
+    return { action: "NORMAL", direction: "gentle", reason: "warm_afterglow_keeps_soft_connection" };
   }
   if (emotion.afterglow === "tender" && emotion.primary === "affectionate" && close && warmth >= 0.25) {
     return { action: "NORMAL", direction: "gentle", reason: "tender_afterglow_prefers_gentle_closeness" };
