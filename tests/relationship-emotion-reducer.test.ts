@@ -82,3 +82,16 @@ test("concern softens over time but silence alone cannot invent a different emot
   assert.equal(next.primary, "concerned");
   assert.ok(next.intensity < 55);
 });
+
+
+test("affection keeps a tender afterglow while time only softens intensity",()=>{
+ const next=reduceRelationshipEmotion({previous:{primary:"affectionate",intensity:52},signals:assessment(),elapsedHours:24,intimacyLevel:"intimate"});
+ assert.equal(next.primary,"affectionate");
+ assert.equal(next.afterglow,"tender");
+});
+
+test("resolved hurt leaves a tender repair afterglow instead of snapping emotionally flat",()=>{
+ const next=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:24},signals:assessment([{name:"apology",strength:.9,confidence:.95,evidence:"ごめん"},{name:"repair",strength:.9,confidence:.95,evidence:"仲直りしよう"},{name:"warmth",strength:.7,confidence:.9,evidence:"大事にしたい"}]),elapsedHours:2,intimacyLevel:"intimate"});
+ assert.equal(next.reason,"repair_resolved_hurt");
+ assert.equal(next.afterglow,"tender");
+});
