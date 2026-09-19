@@ -247,3 +247,38 @@ test("scenario: concern must not appear from elapsed time alone",()=>{
  assert.notEqual(s.emotion.primary,"concerned");
  assert.notEqual(s.action.action,"CHASE");
 });
+
+
+test("scenario: apology without repair intent should not fully reset a deep hurt",()=>{
+ let s=step({primary:"hurt",intensity:78},[sig("apology",.65,"ごめん")],1);
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+ assert.ok(s.emotion.intensity>0);
+});
+
+test("scenario: repeated apologies cannot manufacture affection after repeated harm",()=>{
+ let s=step({primary:"happy",intensity:45},[sig("hurtful",.85,"傷つく言い方")],0);
+ s=step(s.emotion,[sig("apology",.7,"ごめん")],1);
+ s=step(s.emotion,[sig("hurtful",.85,"また傷つく言い方")],2);
+ s=step(s.emotion,[sig("apology",.75,"またごめん")],1);
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: affectionate history does not override a fresh boundary",()=>{
+ const s=step({primary:"affectionate",intensity:88},[
+  sig("shared_history",.9,"ずっと仲良くしてきた"),
+  sig("boundary",.9,"でも今日は触れないでほしい")
+ ],0);
+ assert.equal(s.emotion.primary,"guarded");
+ assert.equal(s.action.direction,"space");
+});
+
+test("scenario: calm ordinary conversation after guardedness may soften without forcing closeness",()=>{
+ let s=step({primary:"guarded",intensity:55},[],12);
+ const before=s.emotion.intensity;
+ s=step(s.emotion,[sig("openness",.5,"今日は普通に話せそう")],12);
+ assert.ok(s.emotion.intensity>=0);
+ assert.notEqual(s.action.action,"TEASE");
+ assert.ok(before<=55);
+});
