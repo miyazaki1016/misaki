@@ -102,3 +102,48 @@ registry=0、cron停止、timeout/lease期限、空ログを証拠の代用に�
 Productionへのmigration/deploy/merge/cron操作、実Gemini/Push/email、有料資源作成は行っていない。
 
 **PR #30を本番へ先行導入する準備：BLOCKED**
+
+## 2026-09-19 続行監査：guard済みtableの古いMVCC snapshotから凍結迂回
+
+**新しい反例を再現したためBLOCKED。機能修正は停止し、失敗する安全性回帰テストを追加した。**
+
+再取得したmainは `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR30開始HEADは `fb25649e836a3fa9681fa0bbe168cbae42018abf`、PR29は `fd4b6e78e0a79dc05ebed46f82baf205f53cca23`。総覧・本書・LEGACY_MAINTENANCE_DRAIN・PR29のSERVER_CANONICAL_STATEを再確認した。
+
+### 再現した順序と証拠
+
+`tests/legacy-drain.db.test.cjs（末尾のsnapshot回帰）` はloopback専用の使い捨てDBを作り、PR30の設備SQLをそのまま適用する。合成旧schemaのguard対象 `background_push_state` に初期値0を作る。
+
+1. service_roleの接続Aで `BEGIN ISOLATION LEVEL REPEATABLE READ`。通常のSELECTで停止前snapshotを確定する。この時点では業務writeも共有advisory lock取得もない。
+2. operator接続Bでstop_admission → 隔離fixture用verify_body_clock → freezeをそれぞれ確定。
+3. Bから `phase=writes_frozen, epoch=1, operations=0` を確認。
+4. 新しい接続Cの同じservice_role・同じtableへのUPDATEは55000で拒否される（guard存在の対照試験）。
+5. Aの古いsnapshotからのUPDATEは拒否されず、`relationship_points=99` をRETURNINGで観測。
+6. AをROLLBACKし、Bから値が0のままであることをassert。
+
+```json
+{"current":{"phase":"writes_frozen","epoch":"1","operations":0},"changed":[{"relationship_points":99}],"rollbackConfirmed":true}
+```
+
+これは未guard tableの追加漏れとは別の反例。`guard_write()` は共有advisory lock取得後、制御行を通常SELECTで読む。lock取得はMVCC snapshotを更新しないため、Aでは過去の `phase=open` が見える。停止前に書込みをしていなかったAはfreezeのlock待ち対象にもならない。
+
+### 判定・分類への影響
+
+- 既存の「guard付き12/22」は設置数であり、安全性を証明した12件という意味ではない。この反例によりguard設置・event・enabled確認だけでcoverage済みに分類するのは不十分。
+- 将来のcoverage承認には、停止前snapshot、READ COMMITTED / REPEATABLE READ / SERIALIZABLE、別sessionのstop/freeze/reopenと実writeを含むguard動作証拠が必要。
+- 制御行のlocking read等による対策は候補であり、この監査では実装も安全証明もしていない。operation検証やbrowser完了を含む全制御読取りを再点検する必要がある。
+- 実PostgRESTのtransaction isolation設定やHTTPでの到達性は未検証。今回証明したのは複数の実PostgreSQL接続・service_roleによるDB境界の反例であり、本番HTTPでの発生を主張しない。
+- Productionは17.6、今回の隔離DBは18.4。auth/users、RLS等の全Production定義再構成ではない。この反例はPR30の制御行読取りとlock順序に対する試験。
+
+### 追加取得と未完了範囲
+
+ProductionにはBEGIN READ ONLYによるversionとprofilesのcolumn/constraint/owner/ACL/RLS/policy/triggerのSELECTだけを実行。ユーザー行・秘密・会話を取得していない。profilesにはauthenticatedのDML権限と本人を条件にしたALL policy、業務triggerなしを確認したが、profiles書込みの実再現は新反例による停止後には実施していない。これを追加の実証済み違反件数へ足さない。全catalogの最新再抽出・全write surface分類は未完了。
+
+既知3反例、coverage diff自動ゲート、停止epoch付きpre-gate証拠、旧browser save/refund継承、実PostgREST/API→DB→Edge→relayの統合検証は未解消。allowlistは追加していない。
+
+### 回帰ゲートと既存検証
+
+追加テストは「拒否されるべき」をassertし、反例をPASS扱いにしない。既存CIの `node --test tests/*.test.cjs` に自動で含まれ、現在の設備ではFAILする。これは全surfaceのcoverage diff完成ではなく、今回の既知反例を見逃さないための回帰ゲート。
+
+PR30既存52件、PR29既存52実テスト（runner表示53には空module1件を含む）、TypeScript、Denoは今回も成功。DB18件には既存multi-session/concurrencyが含まれる。追加snapshot回帰は1件FAIL、ROLLBACK確認済み。実外部Gemini/Push/emailは呼ばず、Production migration/deploy/Edge/cron/merge、paid branch作成は行っていない。
+
+**PR #30を本番へ先行導入する準備：BLOCKED**

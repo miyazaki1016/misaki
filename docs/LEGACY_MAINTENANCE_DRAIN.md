@@ -196,3 +196,14 @@ PostgreSQL major versionも本番17と隔離18で異なる。完全な実旧sche
 依頼の「指定テストgreenでも全体矛盾を見つけたらBLOCKEDで停止」に該当するため、実装の追加・修正を停止。今回のbranch変更は総覧と本文書の監査記録のみ。
 Production migration/deploy/merge/cron、PR29変更、実Gemini/Push/メール、有料資源作成は実施していない。
 CI/Previewが成功しても上記反例は消えない。guard到達先の再棚卸しと2 BLOCKERの実証が終わるまで先行導入不可。
+
+## 2026-09-19 続行監査：guardのsnapshot整合性もBLOCKED
+
+PR30 `fb25649e836a3fa9681fa0bbe168cbae42018abf` から再開。main/PR29のHEADは変化なし。
+停止前のREPEATABLE READの読取りsnapshotから、freeze完了後・registry=0でもguard付きbackground_push_stateをservice_roleが更新できた。fresh snapshotの同一writeは拒否される。隔離DBでROLLBACKして初期値0へ戻ることを確認。
+
+共有advisory lock取得だけでは古いMVCC snapshotの制御行openを更新できない。guard設置数を保護済みsurface数と扱わない。停止前snapshotを含む複数sessionの実write拒否もcoverageの成立条件に追加する。
+要件の停止条件に従い機能修正は中止。追加の `tests/legacy-drain.db.test.cjs（末尾のsnapshot回帰）` は拒否を要求するため現実装でFAILし、CIの既存globにも含まれる。既存104実テストとTypeScript/Deno成功を上書きする安全性BLOCKERとして扱う。
+
+既知3漏れ、全surface coverage diff、停止epochに結び付くpre-gate証拠、旧browser save/refund引継ぎ、全旧Production境界の統合検証は未完了。新たなallowlistやfreeze解除策は追加しない。詳細な順序・対照試験・限界はWRITE_SURFACE_INVENTORY.mdの続行監査を参照。
+Productionはversion/profiles定義のREAD ONLY取得のみ。施工・mergeは行っていない。

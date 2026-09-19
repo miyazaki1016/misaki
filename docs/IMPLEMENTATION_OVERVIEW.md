@@ -299,6 +299,15 @@ SECURITY DEFINERもfreeze境界の外ではない。pre-gate証拠未確認な�
 詳細な分類、実証範囲、未実装のcoverage/pre-gate要件は[write surface inventory監査](WRITE_SURFACE_INVENTORY.md)を参照。
 既存104実テスト、TypeScript、Denoが成功しても追加の凍結違反は消えない。Production変更なし。先行導入準備はBLOCKED。
 
+## 0.9.4 2026-09-19 続行監査：guard済み経路のsnapshot凍結違反
+
+PR30開始HEAD fb25649e836a3fa9681fa0bbe168cbae42018abf、main 0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3、PR29 fd4b6e78e0a79dc05ebed46f82baf205f53cca23を再取得。
+**BLOCKED。停止前REPEATABLE READのsnapshotから、freeze後・registry=0でもguard付きbackground_push_stateを更新できた。** 隔離DBのservice_role・複数接続で再現しROLLBACK済み。fresh snapshotの同一UPDATEは拒否される。
+
+理由はguardの通常SELECTが古い制御行openを読むこと。advisory lockはMVCC snapshotを更新しない。従来のguard設置12/22は保護証明ではなく、全surface分類にはsnapshotを含む実動作証拠が必要。
+新反例発見時停止の要件に従い機能修正を停止。拒否を要求する追加回帰テストをCI対象へ残すため、既存104実テスト・TypeScript・Denoが成功してもCIの安全性回帰はFAILとなる。
+既知3漏れ、coverage diff、停止epoch付きpre-gate証拠・旧browser保存/refund継承、全旧境界の統合試験は未解消。Production変更・有料branch作成なし。詳細は[監査記録](WRITE_SURFACE_INVENTORY.md)を参照。
+
 ## 1. プロダクト原則
 
 Misaki の原点は「すべては会話の中にある」。

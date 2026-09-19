@@ -131,3 +131,60 @@ test('freeze requires separately stopped scheduler metadata and never changes it
  await operator.query("update cron.job set active=false where jobname='misaki-body-clock'");await operator.query('select misaki_drain.freeze()');
 });
 });
+
+// Kept after the existing suite: cluster roles are initialized serially.
+{
+// Safety regression: MUST reject a write from a pre-stop MVCC snapshot.
+// Disposable loopback DB only; no production connection or external services.
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+const {randomUUID}=require('node:crypto');
+const {Client}=require(process.env.MISAKI_TEST_PG_MODULE || 'pg');
+const root=path.join(__dirname,'..');
+test('freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot',async()=>{
+  const config={host:'127.0.0.1',port:55438,user:'postgres',database:'misaki_snapshot_'+Date.now()};
+  const boot=new Client({...config,database:'postgres'});
+  let operator,writer;
+  try {
+    await boot.connect();await boot.query('create database '+config.database);
+    operator=new Client(config);writer=new Client(config);
+    await operator.connect();await writer.connect();
+    const fixture=fs.readFileSync(path.join(root,'tests/legacy-schema.fixture.sql'),'utf8')
+      .replace(/create role (\w+);/g,(_,r)=>`do $$begin if not exists(select 1 from pg_roles where rolname='${r}') then create role ${r};end if;end$$;`);
+    await operator.query(fixture);
+    await operator.query(fs.readFileSync(path.join(root,'supabase/legacy-maintenance-drain.sql'),'utf8'));
+    const user=randomUUID();
+    await operator.query('insert into auth.users(id) values($1)',[user]);
+    await operator.query('insert into public.background_push_state(user_id,relationship_points) values($1,0)',[user]);
+    await writer.query('set role service_role');
+    await writer.query('begin isolation level repeatable read');
+    // An ordinary pre-stop read establishes the snapshot without a write lock.
+    await writer.query('select relationship_points from public.background_push_state');
+    await operator.query('select misaki_drain.stop_admission()');
+    await operator.query("select misaki_drain.verify_body_clock('isolated fixture only: no runtime or relay exists')");
+    await operator.query('select misaki_drain.freeze()');
+    const current=(await operator.query('select phase,epoch,(select count(*)::int from misaki_drain.operations) operations from misaki_drain.control')).rows[0];
+    assert.equal(current.phase,'writes_frozen');assert.equal(current.operations,0);
+    // Control: the same role/table on a fresh snapshot really is protected.
+    const fresh=new Client(config);await fresh.connect();
+    try {
+      await fresh.query('set role service_role');
+      await assert.rejects(fresh.query('update public.background_push_state set relationship_points=1 where user_id=$1',[user]),{code:'55000'});
+    } finally {await fresh.end();}
+    let error,changed=[];
+    try {changed=(await writer.query('update public.background_push_state set relationship_points=99 where user_id=$1 returning relationship_points',[user])).rows;}
+    catch(e){error=e;}
+    await writer.query('rollback');
+    assert.equal((await operator.query('select relationship_points from public.background_push_state where user_id=$1',[user])).rows[0].relationship_points,0);
+    assert.ok(error && ['55000','40001'].includes(error.code),
+      'FREEZE BYPASS: '+JSON.stringify({current,changed,rollbackConfirmed:true,error:error?.message}));
+  } finally {
+    if(writer){await writer.query('rollback').catch(()=>{});await writer.end();}
+    if(operator)await operator.end();
+    await boot.end();
+  }
+});
+
+}
