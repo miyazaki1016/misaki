@@ -2684,12 +2684,10 @@ ${retryProblems
         typeof expressionParsed.reply === "string" &&
         expressionParsed.reply.trim()
       ) {
-        parsed = expressionParsed;
+        // Keep the first pass as the canonical semantic assessment.
+        // The second pass is expression-only; it must not be able to rewrite
+        // the relationship evidence that caused the action decision.
         reply = expressionParsed.reply.trim();
-        relationshipSignalAssessment =
-          sanitizeRelationshipSignalAssessment(
-            expressionParsed.relationshipSignals
-          );
       }
     }
 
