@@ -123,7 +123,12 @@ export function reduceRelationshipEmotion(
         primary: previous.primary,
         intensity: remaining,
         reason: "repair_in_progress",
-        secondary: "affectionate",
+        secondary:
+          previous.primary === "affectionate" ||
+          previous.primary === "happy" ||
+          positive + romantic >= 0.45
+            ? "affectionate"
+            : null,
         afterglow: "repairing",
         evidence: evidenceFor(signals, ["apology", "repair"]),
       };
