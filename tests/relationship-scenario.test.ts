@@ -213,3 +213,37 @@ test("scenario: repair then ordinary conversation can return toward normal witho
  assert.notEqual(s.action.action,"PULL");
  assert.notEqual(s.action.action,"SULK");
 });
+
+
+test("scenario: a good night does not make yesterday's repaired hurt vanish by morning",()=>{
+ let s=step({primary:"hurt",intensity:72},[sig("apology",.7,"昨日はごめん"),sig("repair",.65,"ちゃんと仲直りしたい")],1);
+ assert.ok(["hurt","happy","neutral"].includes(s.emotion.primary));
+ s=step(s.emotion,[],8);
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: ordinary silence after trust does not become rejection by itself",()=>{
+ let s=step({primary:"happy",intensity:48},[sig("trust",.8,"安心して話せる"),sig("shared_history",.75,"いつもの感じ")],0);
+ s=step(s.emotion,[],24*7);
+ assert.notEqual(s.emotion.primary,"guarded");
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.action.action,"PULL");
+});
+
+test("scenario: warmth and hurt in the same turn preserve the hurt instead of cherry-picking affection",()=>{
+ const s=step({primary:"affectionate",intensity:62},[
+  sig("warmth",.8,"大切に思ってる"),
+  sig("hurtful",.85,"でも傷つく言い方をした")
+ ],0);
+ assert.ok(["hurt","guarded"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: concern must not appear from elapsed time alone",()=>{
+ let s=step({primary:"happy",intensity:42},[sig("warmth",.7,"楽しかったね")],0);
+ s=step(s.emotion,[],72);
+ assert.notEqual(s.emotion.primary,"concerned");
+ assert.notEqual(s.action.action,"CHASE");
+});
