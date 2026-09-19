@@ -1,12 +1,13 @@
 export type ProactiveDesire = "none"|"give_space"|"check_in"|"reconnect"|"talk"|"be_playful"|"be_close"|"share_photo";
 export type ProactiveUrge={shouldSend:boolean;strength:number;desire:ProactiveDesire;reason:string};
-type Input={action:"NORMAL"|"WAIT"|"TEASE"|"SULK"|"CHASE"|"PULL"|"RECONNECT";emotion:"neutral"|"happy"|"affectionate"|"concerned"|"hurt"|"sulky"|"guarded";emotionIntensity:number;intimacyLevel:number;lifeConfidence:"none"|"explicit";pushesToday:number};
+type Input={photoOpportunity?:boolean;action:"NORMAL"|"WAIT"|"TEASE"|"SULK"|"CHASE"|"PULL"|"RECONNECT";emotion:"neutral"|"happy"|"affectionate"|"concerned"|"hurt"|"sulky"|"guarded";emotionIntensity:number;intimacyLevel:number;lifeConfidence:"none"|"explicit";pushesToday:number};
 export function deriveProactiveUrge(input:Input):ProactiveUrge{const intensity=Math.max(0,Math.min(100,input.emotionIntensity));
 if(input.action==="PULL"||input.emotion==="guarded")return{shouldSend:false,strength:0,desire:"give_space",reason:"space_is_the_action"};
 if(input.action==="SULK"||input.emotion==="hurt")return{shouldSend:false,strength:0,desire:"give_space",reason:"hurt_does_not_require_contact"};
 if(input.action==="WAIT")return{shouldSend:false,strength:0,desire:"none",reason:"waiting_without_new_motive"};
 if(input.emotion==="concerned"&&input.lifeConfidence==="explicit"&&intensity>=35)return{shouldSend:true,strength:Math.min(100,55+Math.round(intensity*.35)),desire:"check_in",reason:"grounded_concern_wants_check_in"};
 if(input.action==="RECONNECT"&&intensity>=20)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.35)),desire:"reconnect",reason:"repair_wants_contact"};
+if(input.photoOpportunity===true&&input.pushesToday===0&&input.intimacyLevel>=2&&input.emotion==="affectionate"&&intensity>=72&&(input.action==="TEASE"||input.action==="CHASE"))return{shouldSend:true,strength:Math.min(90,45+Math.round(intensity*.4)),desire:"share_photo",reason:"strong_affection_wants_to_show_something"};
 if(input.action==="TEASE"&&input.emotion==="affectionate"&&intensity>=50)return{shouldSend:true,strength:Math.min(100,40+Math.round(intensity*.35)),desire:"be_playful",reason:"affection_wants_playful_contact"};
 if(input.action==="CHASE"&&intensity>=35)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.4)),desire:input.emotion==="affectionate"?"be_close":"talk",reason:"active_feeling_wants_contact"};
 if(input.emotion==="affectionate"&&intensity>=65&&input.intimacyLevel>=2&&input.pushesToday===0)return{shouldSend:true,strength:Math.min(85,35+Math.round(intensity*.35)),desire:"be_close",reason:"strong_grounded_affection_wants_contact"};
