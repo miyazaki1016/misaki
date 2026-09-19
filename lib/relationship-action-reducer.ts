@@ -31,6 +31,12 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   const warmth = weight(signals, ["warmth", "care", "trust", "romantic"]);
   const close = ["intimate", "very_intimate"].includes(intimacyLevel);
 
+  if (emotion.afterglow === "repairing" && ["hurt", "sulky", "guarded"].includes(emotion.primary)) {
+    return { action: "RECONNECT", direction: "repair", reason: "repair_afterglow_keeps_the_door_open" };
+  }
+  if (emotion.afterglow === "wary" && emotion.intensity >= 20) {
+    return { action: "PULL", direction: "space", reason: "wary_afterglow_avoids_rushing_closeness" };
+  }
   if (emotion.primary === "concerned" && emotion.intensity >= 30) {
     return { action: "CHASE", direction: "check_in", reason: "grounded_concern_invites_check_in" };
   }
@@ -51,6 +57,9 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   }
   if (emotion.primary === "affectionate" && emotion.intensity >= 50 && close && warmth >= 0.45) {
     return { action: "TEASE", direction: "closer", reason: "grounded_affectionate_playfulness" };
+  }
+  if (emotion.afterglow === "tender" && emotion.primary === "affectionate" && close && warmth >= 0.25) {
+    return { action: "NORMAL", direction: "gentle", reason: "tender_afterglow_prefers_gentle_closeness" };
   }
   if (["happy", "affectionate"].includes(emotion.primary) && warmth >= 0.4) {
     return { action: "NORMAL", direction: "closer", reason: "warmth_moves_naturally_closer" };
