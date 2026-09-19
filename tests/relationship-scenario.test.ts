@@ -59,3 +59,43 @@ test("scenario: rejection creates space and time alone does not turn it romantic
  assert.notEqual(s.action.direction,"closer");
  assert.notEqual(s.action.action,"TEASE");
 });
+
+
+test("scenario: deep hurt -> apology -> next morning may still be tender, not instantly playful",()=>{
+ let s=step({primary:"affectionate",intensity:70},[sig("hurtful",1,"大きく傷つく言い方をされた")],0);
+ assert.equal(s.emotion.primary,"hurt");
+ s=step(s.emotion,[sig("apology",.55,"昨日はごめん"),sig("repair",.55,"ちゃんと仲直りしたい")],8);
+ assert.ok(["hurt","neutral","happy"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"TEASE");
+ const morning=step(s.emotion,[],10);
+ assert.notEqual(morning.action.action,"TEASE");
+ assert.notEqual(morning.action.direction,"closer");
+});
+
+test("scenario: repeated warmth builds continuity without declaring dating",()=>{
+ let s=step({primary:"neutral",intensity:0},[sig("warmth",.7,"話せてうれしい")],0,"familiar");
+ s=step(s.emotion,[sig("trust",.7,"君には話せる"),sig("shared_history",.6,"前に話したこと覚えてる")],6,"familiar");
+ assert.equal(s.emotion.primary,"happy");
+ assert.notEqual(s.action.action,"TEASE");
+ assert.ok(["closer","gentle"].includes(s.action.direction));
+});
+
+test("scenario: concern -> reassurance -> quiet time should soften concern rather than invent danger",()=>{
+ let s=step({primary:"affectionate",intensity:45},[sig("concern",.9,"帰り遅いって言ってたけど大丈夫？")],0);
+ assert.equal(s.emotion.primary,"concerned");
+ const before=s.emotion.intensity;
+ s=step(s.emotion,[sig("warmth",.6,"無事着いたよ")],2);
+ assert.notEqual(s.emotion.primary,"hurt");
+ s=step(s.emotion,[],24);
+ assert.ok(s.emotion.intensity<=Math.max(before,100));
+ assert.notEqual(s.action.action,"PULL");
+});
+
+test("scenario: boundary remains space even when prior relationship was affectionate",()=>{
+ let s=step({primary:"affectionate",intensity:80},[sig("boundary",.95,"今日は一人にしてほしい")],0);
+ assert.equal(s.emotion.primary,"guarded");
+ assert.equal(s.action.direction,"space");
+ const later=step(s.emotion,[],6);
+ assert.notEqual(later.action.action,"TEASE");
+ assert.notEqual(later.action.direction,"closer");
+});
