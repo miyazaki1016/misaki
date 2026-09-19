@@ -154,7 +154,19 @@ export function reduceRelationshipEmotion(
     };
   }
 
-  // Warmth/care alone must not instantly cancel an unresolved boundary or rejection.\n  if (positive >= 0.45 && previous.primary === "guarded" && previous.intensity >= 20 && repair < 0.4) {\n    return {\n      primary: "guarded",\n      intensity: clampIntensity(Math.max(12, previous.intensity - settle - positive * 8)),\n      secondary: "happy",\n      afterglow: "wary",\n      reason: "warmth_received_while_boundary_still_active",\n      evidence: evidenceFor(signals, ["warmth", "care", "trust"]),\n    };\n  }\n\n  if (positive >= 0.45) {
+  // Warmth/care alone must not instantly cancel an unresolved boundary or rejection.
+  if (positive >= 0.45 && previous.primary === "guarded" && previous.intensity >= 20 && repair < 0.4) {
+    return {
+      primary: "guarded",
+      intensity: clampIntensity(Math.max(12, previous.intensity - settle - positive * 8)),
+      secondary: "happy",
+      afterglow: "wary",
+      reason: "warmth_received_while_boundary_still_active",
+      evidence: evidenceFor(signals, ["warmth", "care", "trust"]),
+    };
+  }
+
+  if (positive >= 0.45) {
     return {
       primary: "happy",
       intensity: clampIntensity(
