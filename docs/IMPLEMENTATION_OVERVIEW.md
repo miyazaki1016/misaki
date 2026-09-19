@@ -265,6 +265,21 @@ Production施工、cron操作、実snapshot/restore、PR #29 mergeは今回の�
 詳細設計、全停止経路、freeze条件、operator手順、競合試験と実証限界は
 [旧Production互換maintenance/drain仕様](LEGACY_MAINTENANCE_DRAIN.md)を参照。
 
+
+### 2026-09-19 再監査：凍結の抜け道を実証したためBLOCKED
+
+最新main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR #30 `69e7d5c679548f9fd4d29ff90e73850f2d643930`、PR #29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` と文書を再取得した。
+本番DBはREAD ONLYでcatalog定義だけを取得し、本番データ・migration・cron・deploy・外部送信を変更していない。
+
+**発見:** `misaki_evolution_analysis_state` と `proactive_message_usage` が先行guard対象から漏れている。
+実稼働定義の `claim_user_evolution_analysis(text,integer)` と `consume_proactive_message()` はauthenticatedにEXECUTEを許すSECURITY DEFINERであり、それぞれのテーブルへ書き込む。
+対象テーブルの実column/default/constraint/RLS/policy/ACLと実RPC本文を隔離PostgreSQLへ再現すると、`writes_frozen`・registry 0件のまま分析受付1件／旧自発usage消費1件が成立した。
+直接INSERTは権限拒否されてもdefiner RPCは通る。旧ブラウザの自発API削除はDB RPCの廃止を意味しない。
+
+**理由・関連:** 凍結対象の列挙は現行アプリだけでなく、残存公開RPCの書込み到達先まで含める必要がある。分析受付記録の変更は後続分析の待機条件に、usage変更は利用記録に影響する。
+**維持原則:** 既存52テストgreenを凍結の完全性の証拠にしない。実schemaとの差分を省略してPASSにしない。
+依頼の「全体矛盾を見つけたらBLOCKEDで停止」に従い、この再監査では実装変更を停止し、証拠・残課題だけを追記する。2 BLOCKERは未解消。
+
 ## 1. プロダクト原則
 
 Misaki の原点は「すべては会話の中にある」。

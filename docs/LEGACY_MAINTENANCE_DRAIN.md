@@ -130,3 +130,57 @@ PR #29の旧maintenance制御は別設計なので、将来併用する際は制
 これらはPostgREST実配送、旧Productionの全RLS/trigger、稼働中旧runtimeの引継ぎ確認を代替しない。
 Preview READY/CI greenだけでProductionのfreeze安全を証明しない。
 **本番へ入れる準備の最終判定には上記隔離連携と旧runtimeの引継ぎ計画の検証が必要。**
+
+
+## 2026-09-19 再監査結果：BLOCKED（実装変更を停止）
+
+### 基準と隔離実証
+
+main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR #30 `69e7d5c679548f9fd4d29ff90e73850f2d643930`、PR #29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` をGitHubから再取得。PR30公開tree `a4d5053db482a1ae270f4a85afb7c1528166b3cb` とローカル検証treeは一致。
+本番PostgreSQL 17.6のcatalogをBEGIN READ ONLYで取得。ユーザー行は取得・更新しない。隔離試験はloopbackのみのPostgreSQL18.4。
+
+公開旧RPCの到達先2テーブルが `aaa_misaki_legacy_drain` の対象にない：
+
+| RPC | 対象テーブル | 実稼働の権限 |
+|---|---|---|
+| claim_user_evolution_analysis(text,integer) | misaki_evolution_analysis_state | postgres所有SECURITY DEFINER、authenticated/service_role EXECUTE |
+| consume_proactive_message() | proactive_message_usage | postgres所有SECURITY DEFINER、authenticated/service_role EXECUTE |
+
+両テーブルはRLS有効、authenticatedはSELECT policyのみでINSERT権限なし。しかし上記RPCは所有者権限で書き込む。
+取得したcolumn/type/default、NOT NULL、PK/FK/CHECK、RLS、policy、ACL、RPC本文をこの2対象へ再現した。
+既存PR30設備をinstallし、stop_admission→fixtureのBody Clock証拠→freezeを実行。
+別のBEGINでauthenticatedの恒久ユーザーcontextを設定し、直接INSERTのpermission deniedを確認後、両RPCを呼んだ結果：
+
+```json
+{"evolution_rows":1,"consumed":1,"registered":0,"phase":"writes_frozen"}
+```
+
+観測後ROLLBACK。これは凍結違反2件の再現であり、安全性テスト2件のPASSではない。
+他のテーブル/authは既存の合成fixtureであり、PostgREST実配送・全trigger・Edge/relay連携の合格を主張しない。
+PostgreSQL major versionも本番17と隔離18で異なる。完全な実旧schema統合試験は引き続き未完了。
+
+### pre-gate引継ぎの再評価
+
+現実装は初期open／body_clock_verified=false。verify_body_clock(text)はdrainingと20文字以上の証拠だけを確認し、chat/history/email/evolution/push_testを含む網羅的なpre-gate inventoryをDBで要求しない。
+したがってregistry 0件だけでは「導入前処理が残らない」を証明できない。この再監査では新引継ぎ機構を実装・実証していない。
+
+次の設計・試験が必要（未実装、施工許可ではない）：
+
+1. 初期値未確認のpre-gate barrierと、停止epochに結び付くinventory／証拠／未解決項目を持たせる。Body Clock証拠だけで解除しない。
+2. 旧chat・browser後続保存・history/email・Edge・relay・evolution・push_testごとにruntime/deployment識別、観測区間、受付遮断の証拠、invocation/requestとusage/delivery/attemptの対応を記録する。
+3. cron inactiveは必要条件に限定。古いdeployment URLや既開始実行、ログ保持切れ／識別不能／遅延browser保存の存在可能性を除外できないときはinventory未完了のままにする。
+4. 各項目の保存・refund・配送等の実結果を確認して終了／operator reconciliationを記録する。経過時間、空のログ、lease切れを終了証拠にしない。
+5. freezeは同一lock下でpre-gate確認・未解決0・新registry・cron・attemptを確認。reopenと新たな停止で古い確認証拠を無効化する。
+6. 旧処理がdraining中にheaderなしでrefund/saveへ戻るとguardに拒否されるため、受付遮断と継続権限の安全な引継ぎ、または証拠付きoperator修復まで具体化する。証拠登録だけで失われた保存/refundを解決扱いにしない。
+
+### この再監査で完了した検証と停止理由
+
+- PR30既存52/52成功。実PostgreSQLの18件（複数接続lock競合・BEGIN/ROLLBACKを含む）、実handler＋安全stub、browser試験を再実行。
+- PR29既存52実テスト成功（Node表示53のうち1件は空module）。PR29は変更なし。
+- PR30 TypeScript、Deno check（キャッシュ利用・no-remote）成功。
+- 追加監査2件で凍結違反を再現。既存104実テストの成功と追加2反例を混同しない。
+- 実旧emotion/action/cadence trigger定義、RLS/policy/ACLは取得したが、それら全体を接続したAPI→DB→Edge→relay試験は未完了。
+
+依頼の「指定テストgreenでも全体矛盾を見つけたらBLOCKEDで停止」に該当するため、実装の追加・修正を停止。今回のbranch変更は総覧と本文書の監査記録のみ。
+Production migration/deploy/merge/cron、PR29変更、実Gemini/Push/メール、有料資源作成は実施していない。
+CI/Previewが成功しても上記反例は消えない。guard到達先の再棚卸しと2 BLOCKERの実証が終わるまで先行導入不可。
