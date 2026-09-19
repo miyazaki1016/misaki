@@ -15,3 +15,7 @@ test("strong affection needs relationship depth before initiating closeness",()=
 test("strong affection does not repeatedly initiate the same day",()=>assert.equal(deriveProactiveUrge({...base,emotion:"affectionate",emotionIntensity:80,intimacyLevel:3,pushesToday:1}).shouldSend,false));
 test("happy relationship may want to talk without manufacturing romance",()=>{const r=deriveProactiveUrge({...base,emotion:"happy",emotionIntensity:80,intimacyLevel:2});assert.equal(r.shouldSend,true);assert.equal(r.desire,"talk")});
 test("desire guides keep action intent separate from invented relationship facts",()=>{assert.match(desireGuide("be_close"),/交際事実/);assert.match(desireGuide("check_in"),/根拠/);assert.match(desireGuide("reconnect"),/強要しない/)});
+
+test("photo desire is an explicit motive, not a random attachment",()=>{const r=deriveProactiveUrge({...base,photoOpportunity:true,action:"TEASE",emotion:"affectionate",emotionIntensity:80,intimacyLevel:3});assert.equal(r.shouldSend,true);assert.equal(r.desire,"share_photo");assert.equal(r.reason,"strong_affection_wants_to_show_something")});
+test("photo opportunity alone cannot create a photo desire",()=>assert.notEqual(deriveProactiveUrge({...base,photoOpportunity:true,emotion:"neutral",emotionIntensity:90,intimacyLevel:3}).desire,"share_photo"));
+test("photo desire requires enough relationship depth",()=>assert.notEqual(deriveProactiveUrge({...base,photoOpportunity:true,action:"TEASE",emotion:"affectionate",emotionIntensity:90,intimacyLevel:1}).desire,"share_photo"));
