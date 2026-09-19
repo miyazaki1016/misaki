@@ -99,3 +99,41 @@ test("scenario: boundary remains space even when prior relationship was affectio
  assert.notEqual(later.action.action,"TEASE");
  assert.notEqual(later.action.direction,"closer");
 });
+
+
+test("scenario: long quiet period softens affection but does not erase relationship warmth into hostility",()=>{
+ let s=step({primary:"neutral",intensity:0},[sig("romantic",.9,"大好き"),sig("warmth",.8,"今日も話せて嬉しい")],0);
+ assert.equal(s.emotion.primary,"affectionate");
+ s=step(s.emotion,[],24*14);
+ assert.ok(["affectionate","neutral"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"PULL");
+ assert.notEqual(s.action.action,"SULK");
+});
+
+test("scenario: awkward joke -> repair can be accepted without pretending nothing happened",()=>{
+ let s=step({primary:"happy",intensity:45},[sig("hurtful",.6,"冗談のつもりが傷つく言い方だった")],0);
+ assert.equal(s.emotion.primary,"hurt");
+ s=step(s.emotion,[sig("apology",.65,"ごめん、冗談のつもりだった"),sig("repair",.6,"嫌な気持ちにさせたね")],1);
+ assert.match(s.emotion.reason,/^repair_/);
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: being cared for while hurt may repair gradually, not because time alone passed",()=>{
+ let s=step({primary:"hurt",intensity:70},[],24);
+ const afterTime=s.emotion.intensity;
+ assert.equal(s.emotion.primary,"hurt");
+ s=step(s.emotion,[sig("care",.8,"無理しなくていいよ"),sig("warmth",.6,"そばにいるよ")],1);
+ assert.ok(["hurt","happy"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"PULL");
+ assert.ok(afterTime<70);
+});
+
+test("scenario: explicit rejection outranks simultaneous warmth and prevents romantic escalation",()=>{
+ const s=step({primary:"affectionate",intensity:65},[
+  sig("warmth",.8,"嫌いじゃないよ"),
+  sig("rejection",.9,"でも今は恋愛っぽくしたくない")
+ ],0);
+ assert.equal(s.emotion.primary,"guarded");
+ assert.equal(s.action.direction,"space");
+ assert.notEqual(s.action.action,"TEASE");
+});
