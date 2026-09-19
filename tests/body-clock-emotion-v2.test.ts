@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { deriveProactiveTags } from "../supabase/functions/body-clock/proactive-decision.ts";
+import { deriveProactiveTags, normalizeIntimacyLevel } from "../supabase/functions/body-clock/proactive-decision.ts";
 
 const base={direction:"MISAKI" as const,action:"NORMAL" as const,timeBand:"seven_plus_days" as const,lifeConfidence:"none" as const,currentTime:"2026/09/20 18:00"};
 
@@ -24,4 +24,12 @@ test("concern only becomes check-in with grounded life evidence",()=>{
  assert.equal(tags.includes("check_in"),false);
  const grounded=deriveProactiveTags({...base,emotion:"concerned",timeBand:"same_day",lifeConfidence:"explicit"});
  assert.equal(grounded.includes("check_in"),true);
+});
+
+
+test("persisted intimacy labels map to proactive numeric levels",()=>{
+ assert.equal(normalizeIntimacyLevel("initial"),0);
+ assert.equal(normalizeIntimacyLevel("familiar"),1);
+ assert.equal(normalizeIntimacyLevel("intimate"),2);
+ assert.equal(normalizeIntimacyLevel("very_intimate"),3);
 });
