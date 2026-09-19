@@ -38,7 +38,7 @@ returns jsonb language plpgsql security definer set search_path='' as $$
 declare c misaki_drain.control%rowtype; o misaki_drain.operations%rowtype;
 begin
   perform pg_catalog.pg_advisory_xact_lock(1296646475,30);
-  select * into strict c from misaki_drain.control where id=1;
+  select * into strict c from misaki_drain.control where id=1 for share;
   if c.phase <> 'open' then raise exception 'MISAKI_MAINTENANCE' using errcode='55000'; end if;
   if p_kind in ('chat','history','email_checkpoint','evolution','push_test') and p_user_id is null then raise exception 'user required'; end if;
   insert into misaki_drain.operations(kind,user_id,epoch) values(p_kind,p_user_id,c.epoch) returning * into o;
@@ -52,7 +52,7 @@ returns misaki_drain.operations language plpgsql security definer set search_pat
 declare o misaki_drain.operations%rowtype; phase text;
 begin
   perform pg_catalog.pg_advisory_xact_lock_shared(1296646475,30);
-  select c.phase into strict phase from misaki_drain.control c where id=1;
+  select c.phase into strict phase from misaki_drain.control c where id=1 for share;
   if phase='writes_frozen' then raise exception 'MISAKI_MAINTENANCE' using errcode='55000'; end if;
   select * into o from misaki_drain.operations where id=p_id and capability=p_capability and ended_at is null;
   if not found then raise exception 'invalid or resolved operation'; end if;
@@ -94,7 +94,7 @@ language plpgsql security definer set search_path='' as $$
 declare phase text; h jsonb; o misaki_drain.operations%rowtype; role_name text;
 begin
   perform pg_catalog.pg_advisory_xact_lock_shared(1296646475,30);
-  select c.phase into strict phase from misaki_drain.control c where id=1;
+  select c.phase into strict phase from misaki_drain.control c where id=1 for share;
   if phase='writes_frozen' then raise exception 'MISAKI_MAINTENANCE' using errcode='55000'; end if;
   h:=coalesce(nullif(current_setting('request.headers',true),'')::jsonb,'{}'::jsonb);
   -- The browser-completion RPC uses transaction-local context after validation.
