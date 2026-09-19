@@ -1783,6 +1783,8 @@ export async function POST(
           status: 401,
         }
       );
+    }
+
     const isAnonymous = userData.user.is_anonymous === true;
 
     const relationshipTimeContext =
@@ -1790,8 +1792,6 @@ export async function POST(
         "relationship-time-load",
         () => loadRelationshipTimeContext(supabase, isAnonymous)
       );
-
-    }
 
     const usageRequestId =
       crypto.randomUUID();
