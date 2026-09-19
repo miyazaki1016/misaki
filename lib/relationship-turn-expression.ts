@@ -1,7 +1,7 @@
-import type { RelationshipTimeContext } from "./relationship-time";
-import type { RelationshipSignalAssessment } from "./relationship-signal";
-import { reduceRelationshipEmotion } from "./relationship-emotion-reducer";
-import { createActionDecisionGuide, reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer";
+import type { RelationshipTimeContext } from "./relationship-time.ts";
+import type { RelationshipSignalAssessment } from "./relationship-signal.ts";
+import { reduceRelationshipEmotion } from "./relationship-emotion-reducer.ts";
+import { createActionDecisionGuide, reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer.ts";
 
 export function previewRelationshipTurn(context: RelationshipTimeContext | null, signals: RelationshipSignalAssessment) {
   const allowed = new Set(["neutral","happy","affectionate","concerned","hurt","sulky","guarded"]);
