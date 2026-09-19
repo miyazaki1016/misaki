@@ -1,5 +1,41 @@
 # PR #30 write surface inventory — 2026-09-19
 
+## 2026-09-20 続行監査：freeze後の新規operation永続化
+
+**BLOCKED。新しい受付漏れを確認した時点で機能修正を停止。**
+
+GitHubでmain `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR30 `375088c0ef14d5e9dd98ae3495d03f41da1eeaf5`、PR29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` を再確認。総覧、旧設備運用文書、本書、PR29のSERVER_CANONICAL_STATEを再読した。
+
+既知の業務table guard突破と同じMVCC原因が、受付集合そのものにも及ぶことを実証した。`admit_misaki_legacy_operation`は排他transaction advisory lockを取るが、通常SELECTで古いcontrol.phase=open/epoch=0を読む。
+
+1. loopback専用の使い捨てPostgreSQL18.4へ合成旧schemaと変更なしのPR30設備を適用。
+2. service_role接続AでBEGIN REPEATABLE READし、通常SELECTで停止前snapshotを確定。業務write/共有lockはまだない。
+3. operator接続Bでstop_admission、fixture限定のverify_body_clock、freezeをそれぞれCOMMIT。writes_frozen/epoch=1/registry=0を確認。
+4. 新規接続Cのservice_role・READ COMMITTEDからrelay受付を試み、55000拒否を確認。
+5. Aから同じ公開受付RPCを実行すると成功し、そのtransactionをCOMMITできた。
+6. Bの新しいsnapshotでwrites_frozen/epoch=1のまま未解決operation=1、operation.epoch=0を確認。隔離DBの合成operationを削除し0件へ戻したことをassert。
+
+```json
+{"current":{"phase":"writes_frozen","epoch":"1","operations":0},"admitted":true,"after":{"phase":"writes_frozen","epoch":"1","unresolved":1},"staleEpoch":"0","cleanupConfirmed":true}
+```
+
+relayの外部実行は一切呼んでいない。Productionや実HTTPで発生したという主張ではない。capabilityは出力しない。この反例はROLLBACK内の観測だけでなく、別接続からCOMMIT済み登録を確認している。
+
+`tests/legacy-drain.db.test.cjs` に新規受付拒否（55000または40001）を要求する回帰を追加。突破をPASS扱いにせず、既存CI globでFAILさせる。以前の業務write snapshot回帰も保持する。
+
+### 検証と停止境界
+
+- PR30既存52件PASS（DB18件・multi-session/concurrencyを含む）、snapshot回帰2件FAIL。新しい受付反例1件と既知業務write反例1件。
+- PR29既存52実テストPASS（runnerは空moduleを含む53件）。114ファイルを最新公開treeと照合し、CRLFを正規化して全blob一致。PR29変更なし。
+- アプリTypeScript / Deno check PASS（Denoは既存cacheでno-remote）。新HEADのCI/Preview結果はPR報告で確定する。
+- 今回の隔離DBは18.4。本番の直近記録17.6との差は残る。17系、SERIALIZABLE、全isolation/race/crash/poolの追加検証は新反例による停止のため未実施。
+- Productionへの接続・変更は今回なし。実catalog再抽出、全write surface分類/coverage diff、既知3漏れの修正へ進んでいない。Production catalogの前回記録を最新取得済みと扱わない。
+- 停止epoch付きpre-gate evidence、旧browser save/refund、実Production相当統合も未完了。allowlist追加なし。
+
+共有/排他advisory lockのいずれもsnapshotを刷新しない。次回は運用文書のMVCC再設計条件に従い、全制御読取りとlock順序を同時に検討する。guard数の増加はこの不変条件の修復にならない。
+
+**PR #30を本番へ先行導入する準備：BLOCKED**
+
 **BLOCKED。これは取得済みcatalogと追加反例の監査記録であり、coverage修正の完成報告ではない。**
 
 基準をGitHubから再取得：main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR30 `f09a6b5746274ab6e863515897d17cdd5ba50474`、PR29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23`。

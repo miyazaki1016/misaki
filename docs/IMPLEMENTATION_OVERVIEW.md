@@ -236,6 +236,15 @@ Free / Premium の通常会話、失敗時の利用回数返却、匿名利用�
 
 ## 0.9 旧Production互換の先行maintenance / drain設備（2026-09-19）
 
+> **2026-09-20 続行判定：BLOCKED。** 開始HEAD `375088c0ef14d5e9dd98ae3495d03f41da1eeaf5` を再確認。
+> 古いREPEATABLE READ snapshotからは業務writeだけでなく、freeze後の新規operation受付・COMMITも通る。
+> 隔離DBで `writes_frozen / control.epoch=1 / unresolved=1 / operation.epoch=0` を確認した。
+> 排他advisory lockもsnapshotを更新しないため、受付集合確定という設計原則が成立していない。
+> 制御読取りはguardだけでなくadmit/require_operation/browser完了/運用操作を一体で再設計する必要がある。
+> 新規受付拒否を要求する回帰テストを追加し、既存snapshot回帰もFAILのまま維持。機能修正は停止した。
+> 既知3漏れ、coverage diff、停止epoch付きpre-gate証拠、旧browser save/refundは未解消。
+> 詳細・設計候補・検証限界は [運用文書](LEGACY_MAINTENANCE_DRAIN.md) と [監査記録](WRITE_SURFACE_INVENTORY.md) を参照。
+
 **maintenanceはON/OFFではなく、受付集合を確定し、未解決処理をdrainした後にfreezeする状態機械。**
 先行設備はPR #29本体から分離し、旧main schema/RPCのまま使う。
 DB正本の制御行とoperation registryを追加し、受付確認とサーバー生成operation登録を同じlockで原子化する。

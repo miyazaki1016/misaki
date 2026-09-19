@@ -143,6 +143,50 @@ const path=require('node:path');
 const {randomUUID}=require('node:crypto');
 const {Client}=require(process.env.MISAKI_TEST_PG_MODULE || 'pg');
 const root=path.join(__dirname,'..');
+test('freeze rejects new operation admission from a pre-stop REPEATABLE READ snapshot',async()=>{
+  const config={host:'127.0.0.1',port:55438,user:'postgres',database:'misaki_admission_snapshot_'+Date.now()};
+  const boot=new Client({...config,database:'postgres'});
+  let operator,writer,fresh;
+  try {
+    await boot.connect();await boot.query('create database '+config.database);
+    operator=new Client(config);writer=new Client(config);fresh=new Client(config);
+    await operator.connect();await writer.connect();await fresh.connect();
+    const fixture=fs.readFileSync(path.join(root,'tests/legacy-schema.fixture.sql'),'utf8')
+      .replace(/create role (\w+);/g,(_,r)=>`do $$begin if not exists(select 1 from pg_roles where rolname='${r}') then create role ${r};end if;end$$;`);
+    await operator.query(fixture);
+    await operator.query(fs.readFileSync(path.join(root,'supabase/legacy-maintenance-drain.sql'),'utf8'));
+    await writer.query('set role service_role');await fresh.query('set role service_role');
+    await writer.query('begin isolation level repeatable read');
+    await writer.query('select count(*) from public.background_push_state');
+    await operator.query('select misaki_drain.stop_admission()');
+    await operator.query("select misaki_drain.verify_body_clock('isolated fixture only: no runtime or relay exists')");
+    await operator.query('select misaki_drain.freeze()');
+    const current=(await operator.query('select phase,epoch,(select count(*)::int from misaki_drain.operations) operations from misaki_drain.control')).rows[0];
+    assert.equal(current.phase,'writes_frozen');assert.equal(current.operations,0);
+    await assert.rejects(fresh.query("select public.admit_misaki_legacy_operation('relay',null)"),{code:'55000'});
+    let error,admitted=false,staleEpoch;
+    try {
+      await writer.query("select public.admit_misaki_legacy_operation('relay',null)");
+      // No capability or user data is logged. Commit only synthetic local data
+      // to establish whether freeze can coexist with a newly durable operation.
+      await writer.query('commit');
+      admitted=true;
+    } catch(e){error=e;await writer.query('rollback');}
+    const after=(await operator.query('select phase,epoch,(select count(*)::int from misaki_drain.operations where ended_at is null) unresolved from misaki_drain.control')).rows[0];
+    if(admitted)staleEpoch=(await operator.query('select epoch from misaki_drain.operations')).rows[0].epoch;
+    // Remove the synthetic committed probe before asserting the safety contract.
+    await operator.query('truncate misaki_drain.operations');
+    const cleanupConfirmed=(await operator.query('select count(*)::int n from misaki_drain.operations')).rows[0].n===0;
+    assert.ok(cleanupConfirmed);
+    assert.ok(error && ['55000','40001'].includes(error.code),
+      'ADMISSION AFTER FREEZE: '+JSON.stringify({current,admitted,after,staleEpoch,cleanupConfirmed,error:error?.message}));
+  } finally {
+    if(writer){await writer.query('rollback').catch(()=>{});await writer.end();}
+    if(fresh)await fresh.end();
+    if(operator)await operator.end();
+    await boot.end();
+  }
+});
 test('freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot',async()=>{
   const config={host:'127.0.0.1',port:55438,user:'postgres',database:'misaki_snapshot_'+Date.now()};
   const boot=new Client({...config,database:'postgres'});

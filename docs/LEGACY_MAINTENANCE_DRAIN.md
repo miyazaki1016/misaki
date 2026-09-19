@@ -1,5 +1,24 @@
 # 旧Production互換 maintenance / drain
 
+> **最新判定：BLOCKED（2026-09-20 MVCC受付監査）。**
+> freeze完了後に停止前snapshotから新規operationを登録・COMMITできる反例を追加確認。
+> controlはwrites_frozen/epoch=1のまま、古いepoch=0の未解決operationが永続化する。
+> 排他advisory lockによる受付集合確定も未成立。機能修正は停止し、拒否を要求する回帰テストを追加した。
+> 既存snapshot反例と併せて安全性2件FAIL。下記の状態機械説明は保証済みの仕様ではない。
+> 詳細はWRITE_SURFACE_INVENTORY.mdの2026-09-20監査を参照。
+
+## MVCC再設計の必須条件（未実装・未証明）
+
+- guardだけでなく、admit、require_operation、browser完了の冪等読取り、freezeのregistry/attempt判定まで対象にする。
+- 候補はadvisory lock後の制御行locking read。`FOR SHARE`等はREPEATABLE READ/SERIALIZABLEでsnapshot後に更新済みの行に40001を返し得る。通常SELECTや`FOR KEY SHARE`を同等と見なさない。READ COMMITTEDの待機後再評価も検証が必要。
+- 制御行だけのlocking readでは、controlを変更せず終端化するoperationの古いsnapshotを安全に扱えると証明できない。operation状態・epoch・権限の読取りも一体で扱う。
+- 既に保護writeを実行したtransactionはtransaction advisory lockで待つ。まだwriteしていない古いsnapshotはlock待ち一覧だけでは検出できないため、次回write/受付時に拒否する仕組みが必要。pg_stat_activityの一度の走査を証明の代用にしない。
+- 共有→排他lock昇格、業務行lockとの順序、複数接続の同時BEGIN/COMMIT/ROLLBACK、starvation、接続切断・再起動、poolでのtransaction再利用、40001後のtransaction全体の再試行を検証する。今回これらの安全性を証明していない。
+- freeze完了はCOMMITを境界とする。registry=0、cron停止、timeoutだけではpre-gate処理をdrainedにしない。observable server evidenceとoperator reconciliationを停止epochへ結び付け、未確認なら拒否する要件を維持する。
+
+PostgreSQL 17の根拠：[Transaction Isolation](https://www.postgresql.org/docs/17/transaction-iso.html)、[Explicit Locking](https://www.postgresql.org/docs/17/explicit-locking.html)。
+これらは設計候補の根拠であり、Misakiの実装検証やProductionへの施工許可ではない。
+
 > **最新判定：BLOCKED（2026-09-19追加inventory監査）**
 > public 22テーブルと現行guard 12の差分10を確認し、auth.usersのSECURITY DEFINER triggerから
 > user_entitlementsへwrites_frozen中に書ける新たな反例を隔離DBで実証した。
