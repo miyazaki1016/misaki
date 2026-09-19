@@ -193,16 +193,9 @@ export function deriveProactiveTags(input: {
     tags.add("affectionate");
   }
 
-  if (
-    input.timeBand === "seven_plus_days" &&
-    input.emotion !== "hurt" &&
-    input.emotion !== "guarded" &&
-    input.action !== "RECONNECT" &&
-    input.action !== "PULL" &&
-    input.action !== "SULK"
-  ) {
-    tags.add("miss_you");
-  }
+  // Relationship time never manufactures longing by itself. If "miss_you" is
+  // appropriate, it must already be supported by persisted emotion/action or
+  // by a future grounded relationship event, not merely seven days of silence.
 
   // sleepy is a body-state expression, not an emotion. Keep it conservative:
   // only deep at night, only when Misaki is not actively chasing/checking in,
