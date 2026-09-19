@@ -90,7 +90,7 @@ function hashText(text: string) {
   return hash >>> 0;
 }
 
-function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
+export function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
   const match = currentTime.match(/(\d{1,2}):(\d{2})/);
   const hour = Math.max(0, Math.min(23, Number(match?.[1] ?? 18)));
   if (hour >= 5 && hour < 10) return "morning";
@@ -116,6 +116,18 @@ function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {
     target -= weight;
   }
   return photos[0] ?? null;
+}
+
+export function hasMisakiProactivePhotoOpportunity(input: { currentTime: string; decision: ProactiveDecisionContext }) {
+  const { currentTime, decision } = input;
+  const timeBucket = getTimeBucket(currentTime);
+  return PHOTOS.some((photo) =>
+    decision.relationshipPoints >= photo.minRelationshipPoints &&
+    (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
+    photo.directions.includes(decision.direction) &&
+    photo.actions.includes(decision.action) &&
+    photo.emotions.includes(decision.emotion)
+  );
 }
 
 export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): MisakiPhoto | null {
