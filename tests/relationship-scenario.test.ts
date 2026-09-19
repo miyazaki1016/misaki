@@ -175,3 +175,41 @@ test("scenario: care after a boundary does not cancel the boundary by itself",()
  assert.notEqual(s.action.action,"TEASE");
  assert.notEqual(s.action.direction,"closer");
 });
+
+
+test("scenario: boundary -> warmth -> explicit repair may reopen connection gradually",()=>{
+ let s=step({primary:"affectionate",intensity:65},[sig("boundary",.9,"少し距離を置きたい")],0);
+ assert.equal(s.emotion.primary,"guarded");
+ s=step(s.emotion,[sig("warmth",.7,"嫌いになったわけじゃない")],2);
+ assert.equal(s.emotion.primary,"guarded");
+ assert.equal(s.emotion.secondary,"happy");
+ s=step(s.emotion,[sig("apology",.8,"言い方きつくてごめん"),sig("repair",.85,"またゆっくり話そう")],6);
+ assert.match(s.emotion.reason,/^repair_/);
+ assert.ok(["repair","steady","gentle"].includes(s.action.direction));
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: concern without new evidence fades instead of becoming endless checking",()=>{
+ let s=step({primary:"affectionate",intensity:50},[sig("concern",.85,"帰りが遅いって言ってたから心配")],0);
+ assert.equal(s.emotion.primary,"concerned");
+ const first=s.emotion.intensity;
+ s=step(s.emotion,[],48);
+ assert.ok(s.emotion.intensity<first);
+ s=step(s.emotion,[],168);
+ assert.ok(s.emotion.intensity<first);
+ if(s.emotion.intensity===0) assert.equal(s.emotion.primary,"neutral");
+});
+
+test("scenario: one affectionate message after rejection cannot immediately restore teasing",()=>{
+ let s=step({primary:"affectionate",intensity:70},[sig("rejection",.95,"恋愛っぽいのはやめよう")],0);
+ assert.equal(s.emotion.primary,"guarded");
+ s=step(s.emotion,[sig("romantic",.55,"でも大切には思ってる")],3);
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: repair then ordinary conversation can return toward normal without forced romance",()=>{
+ let s=step({primary:"hurt",intensity:55},[sig("apology",.8,"ごめん"),sig("repair",.8,"仲直りしたい")],1);
+ s=step(s.emotion,[sig("warmth",.5,"今日は普通に話そう")],12);
+ assert.notEqual(s.action.action,"PULL");
+ assert.notEqual(s.action.action,"SULK");
+});
