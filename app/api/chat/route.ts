@@ -1668,16 +1668,6 @@ export async function POST(
         chargedRequestId
       );
 
-    await measureStage(
-      "relationship-turn-record",
-      () => recordRelationshipChatTurn(
-        supabase,
-        isAnonymous,
-        new Date(requestStartedAt),
-        new Date()
-      )
-    );
-
     chargedRequestId = null;
     chargedSupabase = null;
 
@@ -2831,6 +2821,16 @@ ${retryProblems
           -MAX_TODAY_MEMORY
         ),
     };
+
+    await measureStage(
+      "relationship-turn-record",
+      () => recordRelationshipChatTurn(
+        supabase,
+        isAnonymous,
+        new Date(requestStartedAt),
+        new Date()
+      )
+    );
 
     chargedRequestId = null;
     chargedSupabase = null;
