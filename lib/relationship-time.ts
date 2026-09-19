@@ -23,16 +23,8 @@ export async function loadRelationshipTimeContext(
 ): Promise<RelationshipTimeContext | null> {
   if (isAnonymous) return null;
 
-  // Lazily materialize the emotional effect of time that passed while the app
-  // was closed. The database function is user-scoped and refuses anonymous auth.
-  // Failure here must never block normal chat; the existing state is still usable.
-  const { error: advanceError } = await (supabase.rpc as any)(
-    "advance_relationship_silence_state"
-  );
-  if (advanceError) {
-    console.error("RELATIONSHIP SILENCE ADVANCE ERROR:", advanceError);
-  }
-
+  // v2: loading context must be read-only. Time is evidence for the reducer,
+  // not permission to mutate emotion merely because the app was closed.
   const { data, error } = await (supabase.rpc as any)(
     "get_relationship_time_context"
   );
