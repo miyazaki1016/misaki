@@ -2677,6 +2677,7 @@ ${retryProblems
       applied: relationshipEmotionWrite.applied,
       conflict: relationshipEmotionWrite.conflict,
       emotion: relationshipEmotionWrite.emotion,
+      action: relationshipEmotionWrite.action,
     });
 
     const updatedMemory =
