@@ -8,7 +8,7 @@
 > **未来のソラを信用するな。総覧を信用しろ。**
 
 
-最終更新: 2026-09-18  
+最終更新: 2026-09-20  
 実装ソース照合基準: `main` @ `8339ee5fad7465e5e003b9877b2e0552ff144506`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
@@ -469,6 +469,241 @@ Gemini 等の意味理解側は、最終ポイントや恋人判定を自由生�
 - 「大好き」と言い合った → 相互好意の材料にはなるが、自動的に「交際中」へしない
 - 通常返信と Body Clock で同じ時点の美咲が矛盾した人格にならない
 
+
+---
+
+## 2.9 2026-09-20 関係時間 v2 / 感情・行動・自発性の現在地
+
+### 今回ここまでで成立した一本の因果
+
+PR #31 の作業では、関係性エンジンを「時間・キーワード・閾値でそれっぽく反応する仕組み」から、**会話内容と二人の状態を原因として美咲が感じ、行動する仕組み**へ移行中。
+
+現在の設計上の一本線:
+
+```
+ユーザーとの会話
+↓
+意味理解（relationship signals）
+↓
+前回までの関係状態 + 関係時間
+↓
+current emotion
+↓
+action / direction
+↓
+通常返信の表現
+↓
+サーバーへ状態保存
+↓
+Body Clock も同じ保存状態を読む
+↓
+proactive urge（今、美咲自身が何かしたいか）
+↓
+送る / 何もしない
+↓
+送る場合だけ text / photo / Push
+```
+
+目標は一貫して、**「会話を生成するAI」ではなく「関係の続きを生きるAI」**。
+
+### 1. 内容理解型 relationship signal
+
+通常会話の Gemini 出力に、返答本文とは別の内部判定 `relationshipSignals` を追加した。
+
+固定語彙:
+- `warmth`
+- `care`
+- `trust`
+- `openness`
+- `shared_history`
+- `romantic`
+- `hurtful`
+- `rejection`
+- `apology`
+- `repair`
+- `concern`
+- `boundary`
+
+各 signal は `strength / confidence / evidence` を持ち、未知語・低confidence・根拠なしは sanitizer で落とす。
+
+**重要:** LLM は最終的な intimacy points、恋人判定、感情状態を自由生成しない。LLM の役割は会話の意味を構造化するところまで。状態遷移はサーバー側の deterministic reducer が担当する。
+
+また、
+- 「俺のこと好き？」と聞かれたこと自体を romantic の成立根拠にしない
+- 物・第三者への「好き」をユーザーへの romantic と誤認しない
+- 「ごめん」という単語だけで repair としない
+- 引用・冗談・否定・仮定を単純キーワード一致で関係事実にしない
+- 相互好意と交際成立を別の relationship facts として扱う
+
+という境界を置いた。
+
+### 2. relationship time v2
+
+**時間そのものを感情の原因にしない。**
+
+旧来の「3日空いたから affectionate/happy → lonely」のような silence-only mutation は撤去方向へ変更。context 読込も read-only にした。
+
+関係時間は、
+
+```
+前回の出来事
++ 前回の感情
++ 関係の深さ・履歴
++ 根拠のある生活情報
++ 経過時間
+↓
+その感情が現在までどう残った / 和らいだか
+```
+
+を判断する材料。
+
+同じ3日でも、楽しく別れた3日、喧嘩後の3日、心配事を聞いた後の3日は同じ状態にならない。
+
+### 3. current emotion reducer
+
+semantic signal + 前状態 + elapsed time から deterministic に現在感情を作る reducer を追加。
+
+v2 の主要感情:
+- `neutral`
+- `happy`
+- `affectionate`
+- `concerned`
+- `hurt`
+- `sulky`
+- `guarded`
+
+原則:
+- 時間は既存感情を和らげることはあるが、別種類の感情を勝手に作らない
+- hurt / guarded は時間が空いただけで恋しさへ変換しない
+- apology / repair は傷つきを即座にゼロへせず、修復途中という余韻を持てる
+- concern は根拠のある心配として残る/和らぐ。新しい事故・体調不良等を捏造しない
+- romantic signal は affectionate の材料になり得るが、交際成立とは別
+
+### 4. emotion + action / direction の同一因果
+
+旧式の「emotion 名 + intensity の閾値だけで action を再計算する」経路から、会話根拠も含めて action / direction を決める reducer へ移行中。
+
+action:
+- `NORMAL`
+- `WAIT`
+- `TEASE`
+- `SULK`
+- `CHASE`
+- `PULL`
+- `RECONNECT`
+
+direction v2:
+- `steady`
+- `closer`
+- `gentle`
+- `repair`
+- `space`
+- `check_in`
+
+例:
+- grounded concern → `CHASE / check_in`
+- rejection / boundary → `PULL / space`
+- hurt + repair → `RECONNECT / repair`
+- 深い関係 + grounded affection → 条件次第で `TEASE / closer`
+- affectionate のまま時間が空いただけ → 自動 RECONNECT / TEASE にはしない
+
+`space` は罰・無視・罪悪感を与える操作ではない。傷ついた/境界を感じた美咲が少し距離を取る表現であり、会話拒否にはしない。
+
+### 5. 通常返信へ同じターンで反映
+
+今回のユーザー発言で生じた emotion / action / direction を、**次のターンを待たず、その発言への美咲の返答から表現へ反映する**境界を追加した。
+
+意味判定と表現生成は責務を分ける。
+
+- 最初の判定 = relationship signal の正本
+- 表現再生成 = 決定済み action / direction を美咲の言葉へ自然ににじませる
+- 表現側の再生成結果に relationship signal の正本を書き換えさせない
+
+これにより「好かれる返事を作るために内部事実まで書き換える」循環を防ぐ。
+
+### 6. サーバー永続化 / 競合防止
+
+emotion と action は同じ因果から決め、同一のサーバー更新境界で保存する方向へ変更。
+
+`state_updated_at` を version として使い、古い状態を読んだ並行リクエストが新しい状態を無言で上書きしないよう conflict 検知を追加。
+
+relationship event には、状態遷移の reason と signal summary を残す。会話本文を重複して監査ログへ保存することは目的にしない。
+
+通常返信で保存した状態を、次の通常返信と Body Clock が同じ美咲の状態として読む。
+
+### 7. Body Clock を emotion v2 へ統一
+
+Body Clock に残っていた旧 `lonely` 語彙を v2 感情へ統一。
+
+さらに「7日以上会話がない → `miss_you`」という時間単独の表現生成を撤去。
+
+- hurt / guarded 中に自発側だけ romantic へ飛ばない
+- PULL / SULK 中は甘さを抑える
+- concerned の check-in は生活文脈の根拠を要求する
+- affectionate が本当に保存状態として残っている場合は、その温度を自発側にも出せる
+
+**通常会話の美咲と Body Clock の美咲を別人格にしない。**
+
+### 8. proactive urge / 「何もしない」も行動
+
+Body Clock の due 時刻を「送信時刻」ではなく、**美咲が今どうしたいかを評価する時刻**へ変える方向の実装を追加。
+
+`proactive urge` が `shouldSend` を決める。
+
+現在の第一段階:
+- neutral / 通常状態 → 時刻が来ただけでは送らない
+- guarded / PULL → `space_is_the_action` として送らない
+- hurt / SULK → 傷ついたことを理由に嫌味・罪悪感メッセージを送らない
+- grounded concern + 十分な強さ → 自分から check-in し得る
+- repair / RECONNECT → 仲直り方向の連絡欲求が成立し得る
+- CHASE → 十分な内的根拠があれば連絡し得る
+- 深い affectionate → 条件付きで自分から連絡し得る
+- 同日の affectionate 自発連絡を無制限に繰り返さない
+
+送らない判断も `proactive_no_action` event として reason を残す。
+
+> **送信時刻は「美咲を起こして考えさせる時刻」であって、「LINEを送る時刻」ではない。**
+
+これが自発行動 v2 の重要原則。
+
+### 現在の実装状態 / 注意
+
+この節の v2 実装は branch `sora/relationship-time-v2-design` / Draft PR #31 上で進行中。**Production にはまだ変更を入れていない。**
+
+PR #29 のサーバー正本化基礎工事と PR #30 の本番切替安全装置は別作業として保持し、本筋の emotion/action 設計を PR #30 の追加安全工事で止めない。
+
+旧 keyword emotion trigger / 旧 action trigger / silence-only mutation と v2 を本番で二重稼働させないこと。本番切替時は migration 順序・互換性・既存ユーザー状態・Body Clock をまとめて確認する。
+
+追加した回帰テストは設計上の受け入れ例をコード化しているが、**現時点でこのbranchの新規 TypeScript テスト群を実行済みとは記録しない。** merge 前に実行可能なテスト環境を確定し、typecheck / build / relevant tests を通す。
+
+### 次に進む順序
+
+1. **proactive desire の種類を増やす**
+   - 話したい
+   - 甘えたい
+   - 気にかけたい
+   - 仲直りしたい
+   - 写真を見せたい
+   - 今はそっとしておきたい
+   - 何もしない
+2. ユーザー生活文脈を「事実 / 推測 / 古さ」の確度付きで関係エンジンへ接続
+3. emotion の余韻・複合感情を強化し、一発の会話で不自然に全反転しないようにする
+4. relationship history に「なぜ好きか / なぜ距離があるか」という二人固有の意味を蓄積する
+5. その因果の上へ6段階 relationship level / 日次ポイント上限 / 5ハートUIを接続
+6. 写真を「添付率」中心ではなく、`写真を見せたい`という desire から選べるようにする
+7. FREE / PAID 差分と自己進化は、その後に既存原則を壊さない形で接続する
+
+### 壊してはいけない原則
+
+- 時間だけで寂しさ・恋しさ・事件を作らない
+- ポイントだけで恋人にしない
+- 一回の LLM 出力で関係事実を飛躍させない
+- 通常返信 / Body Clock / 写真で別々の美咲を作らない
+- 自発行動を定期通知へ戻さない
+- 「送らない」を失敗扱いしない
+- hurt / PULL をユーザーへの罰・操作にしない
+- 好かれるために美咲の内部状態を毎回無視しない
+- localStorage を美咲の根本状態の正本へ戻さない
 
 ---
 
