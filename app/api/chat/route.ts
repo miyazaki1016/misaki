@@ -39,6 +39,11 @@ import {
   persistRelationshipEmotionFromSignals,
 } from "../../../lib/relationship-emotion-store";
 
+import {
+  previewRelationshipTurn,
+  createCurrentTurnActionGuide,
+} from "../../../lib/relationship-turn-expression";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -59,6 +64,7 @@ type GeminiResult = {
   reply?: string;
   memory?: string[];
   relationshipSignals?: unknown;
+  relationshipExpression?: { reply?: string };
   misakiTodayMemory?: {
     date?: string;
     items?: string[];
@@ -2313,7 +2319,8 @@ misakiTodayMemory は、
 `.trim();
 
     async function generateReply(
-      retryProblems?: string[]
+      retryProblems?: string[],
+      supplementaryGuide = ""
     ) {
       const retryGuide =
         retryProblems &&
@@ -2411,7 +2418,8 @@ ${retryProblems
                       {
                         text:
                           baseSystemPrompt +
-                          retryGuide,
+                          retryGuide +
+                          supplementaryGuide,
                       },
                     ],
                   },
@@ -2645,8 +2653,45 @@ ${retryProblems
       );
     }
 
-    const relationshipSignalAssessment: RelationshipSignalAssessment =
+    let relationshipSignalAssessment: RelationshipSignalAssessment =
       sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+
+    // The first pass understands the user's turn. A second, expression-only
+    // pass lets the reply reflect the state caused by that same turn instead
+    // of waiting until the next message.
+    const currentTurnState =
+      previewRelationshipTurn(
+        relationshipTimeContext,
+        relationshipSignalAssessment
+      );
+
+    if (
+      relationshipSignalAssessment.signals.length > 0 ||
+      currentTurnState.action.direction !== "steady"
+    ) {
+      const expressionParsed =
+        await generateReply(
+          undefined,
+          "\n\n" +
+            createCurrentTurnActionGuide(
+              currentTurnState.action
+            ) +
+            "\n\n【再生成の目的】\n最初の判定で得た関係シグナルと今回の行動意図を反映して、replyだけを自然に作り直してください。relationshipSignals の判定は同じユーザー発言について再度行い、根拠のないシグナルを追加しないでください。"
+        );
+
+      if (
+        expressionParsed &&
+        typeof expressionParsed.reply === "string" &&
+        expressionParsed.reply.trim()
+      ) {
+        parsed = expressionParsed;
+        reply = expressionParsed.reply.trim();
+        relationshipSignalAssessment =
+          sanitizeRelationshipSignalAssessment(
+            expressionParsed.relationshipSignals
+          );
+      }
+    }
 
     console.log(
       "RELATIONSHIP SIGNALS:",
