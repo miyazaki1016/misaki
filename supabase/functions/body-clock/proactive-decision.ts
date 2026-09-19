@@ -35,7 +35,7 @@ export type ProactiveDecisionContext = {
 };
 
 type RelationshipRow = {
-  intimacy_level?: number | null;
+  intimacy_level?: string | number | null;
   emotion_state?: { primary?: string; intensity?: number } | null;
   action_state?: string | null;
   last_interaction_at?: string | null;
@@ -51,6 +51,16 @@ function timeBand(last?: string | null): ProactiveDecisionContext["timeBand"] {
   if (hours < 72) return "one_to_three_days";
   if (hours < 168) return "three_to_seven_days";
   return "seven_plus_days";
+}
+
+export function normalizeIntimacyLevel(value: unknown) {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.max(0, value);
+  switch (String(value || "initial").toLowerCase()) {
+    case "very_intimate": return 3;
+    case "intimate": return 2;
+    case "familiar": return 1;
+    default: return 0;
+  }
 }
 
 function currentHour(currentTime: string) {
@@ -251,7 +261,7 @@ export async function buildProactiveDecisionContext(
     action: currentAction,
     emotion: currentEmotion,
     emotionIntensity: clamp(Number(row.emotion_state?.intensity) || 0, 0, 100),
-    intimacyLevel: Math.max(0, Number(row.intimacy_level) || 0),
+    intimacyLevel: normalizeIntimacyLevel(row.intimacy_level),
     relationshipPoints: Math.max(0, points),
     timeBand: currentTimeBand,
     situation: life.situation,
