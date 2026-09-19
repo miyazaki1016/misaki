@@ -27,6 +27,7 @@ export type EmotionReducerInput = {
 export type EmotionReducerResult = EmotionStateV2 & {
   reason: string;
   evidence: string[];
+  secondary: EmotionPrimary | null;
   afterglow: "none" | "warm" | "tender" | "repairing" | "wary" | "concerned";
 };
 
@@ -92,6 +93,7 @@ export function reduceRelationshipEmotion(
       primary,
       intensity: clampIntensity(Math.max(previous.intensity * 0.7, 24) + harm * 34),
       reason: "relational_harm",
+      secondary: previous.primary === "affectionate" || previous.primary === "happy" ? previous.primary : null,
       afterglow: primary === "guarded" ? "wary" : "none",
       evidence: evidenceFor(signals, ["hurtful", "rejection", "boundary"]),
     };
@@ -102,6 +104,7 @@ export function reduceRelationshipEmotion(
       primary: "concerned",
       intensity: clampIntensity(Math.max(previous.primary === "concerned" ? previous.intensity : 18, 18) + concern * 30),
       reason: "grounded_concern",
+      secondary: previous.primary === "affectionate" || previous.primary === "happy" ? previous.primary : null,
       afterglow: "concerned",
       evidence: evidenceFor(signals, ["concern"]),
     };
@@ -120,6 +123,7 @@ export function reduceRelationshipEmotion(
         primary: previous.primary,
         intensity: remaining,
         reason: "repair_in_progress",
+        secondary: "affectionate",
         afterglow: "repairing",
         evidence: evidenceFor(signals, ["apology", "repair"]),
       };
@@ -129,6 +133,7 @@ export function reduceRelationshipEmotion(
       primary: positive + romantic >= 0.45 ? "happy" : "neutral",
       intensity: positive + romantic >= 0.45 ? clampIntensity(12 + (positive + romantic) * 16) : 6,
       reason: "repair_resolved_hurt",
+      secondary: null,
       afterglow: "tender",
       evidence: evidenceFor(signals, ["apology", "repair", "warmth", "romantic"]),
     };
@@ -143,6 +148,7 @@ export function reduceRelationshipEmotion(
           Math.min(positive * 8, 10)
       ),
       reason: "romantic_warmth",
+      secondary: null,
       afterglow: "tender",
       evidence: evidenceFor(signals, ["romantic", "warmth", "trust"]),
     };
@@ -156,6 +162,7 @@ export function reduceRelationshipEmotion(
           positive * 20
       ),
       reason: "relational_warmth",
+      secondary: null,
       afterglow: "warm",
       evidence: evidenceFor(signals, ["warmth", "care", "trust", "openness", "shared_history"]),
     };
@@ -173,6 +180,7 @@ export function reduceRelationshipEmotion(
     primary: intensity === 0 ? "neutral" : previous.primary,
     intensity,
     reason: passiveDecay > 0 ? "existing_emotion_settled_with_time" : "no_new_relational_evidence",
+    secondary: null,
     afterglow: intensity === 0 ? "none" : previous.primary === "affectionate" ? "tender" : previous.primary === "happy" ? "warm" : previous.primary === "guarded" ? "wary" : previous.primary === "concerned" ? "concerned" : "none",
     evidence: [],
   };
