@@ -19,6 +19,12 @@ import {
   loadPersonaPrompt,
 } from "../../../lib/persona/persona-store";
 
+import {
+  createRelationshipSignalGuide,
+  sanitizeRelationshipSignalAssessment,
+  type RelationshipSignalAssessment,
+} from "../../../lib/relationship-signal";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -38,6 +44,7 @@ type MisakiTodayMemory = {
 type GeminiResult = {
   reply?: string;
   memory?: string[];
+  relationshipSignals?: unknown;
   misakiTodayMemory?: {
     date?: string;
     items?: string[];
@@ -2139,6 +2146,8 @@ ${personaPrompt}
 
 ${relationshipGuide}
 
+${createRelationshipSignalGuide()}
+
 ${userProfileGuide}
 
 ${taxiContextGuide}
@@ -2256,6 +2265,10 @@ misakiTodayMemory は、
 {
   "reply": "美咲の返事",
   "memory": ["長期記憶"],
+  "relationshipSignals": {
+    "signals": [{"name":"warmth","strength":0.0,"confidence":0.0,"evidence":"根拠"}],
+    "relationshipFacts": {"mutualAffectionExplicit": false, "datingEstablishedExplicit": false}
+  },
   "misakiTodayMemory": {
     "date": "${currentDate}",
     "items": ["今日の美咲の出来事"]
@@ -2595,6 +2608,22 @@ ${retryProblems
         reply
       );
     }
+
+    const relationshipSignalAssessment: RelationshipSignalAssessment =
+      sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+
+    console.log(
+      "RELATIONSHIP SIGNALS:",
+      {
+        traceId,
+        signals: relationshipSignalAssessment.signals.map((signal) => ({
+          name: signal.name,
+          strength: signal.strength,
+          confidence: signal.confidence,
+        })),
+        facts: relationshipSignalAssessment.relationshipFacts,
+      }
+    );
 
     const updatedMemory =
       Array.isArray(
