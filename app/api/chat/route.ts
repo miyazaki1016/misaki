@@ -25,6 +25,20 @@ import {
   type RelationshipSignalAssessment,
 } from "../../../lib/relationship-signal";
 
+import {
+  loadRelationshipTimeContext,
+  createRelationshipTimeGuide,
+  recordRelationshipChatTurn,
+} from "../../../lib/relationship-time";
+
+import {
+  createRelationshipEmotionGuide,
+} from "../../../lib/relationship-emotion";
+
+import {
+  persistRelationshipEmotionFromSignals,
+} from "../../../lib/relationship-emotion-store";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -1648,6 +1662,16 @@ export async function POST(
         chargedRequestId
       );
 
+    await measureStage(
+      "relationship-turn-record",
+      () => recordRelationshipChatTurn(
+        supabase,
+        isAnonymous,
+        new Date(requestStartedAt),
+        new Date()
+      )
+    );
+
     chargedRequestId = null;
     chargedSupabase = null;
 
@@ -1759,6 +1783,14 @@ export async function POST(
           status: 401,
         }
       );
+    const isAnonymous = userData.user.is_anonymous === true;
+
+    const relationshipTimeContext =
+      await measureStage(
+        "relationship-time-load",
+        () => loadRelationshipTimeContext(supabase, isAnonymous)
+      );
+
     }
 
     const usageRequestId =
@@ -2145,6 +2177,10 @@ export async function POST(
 ${personaPrompt}
 
 ${relationshipGuide}
+
+${createRelationshipTimeGuide(relationshipTimeContext)}
+
+${createRelationshipEmotionGuide(relationshipTimeContext)}
 
 ${createRelationshipSignalGuide()}
 
@@ -2624,6 +2660,24 @@ ${retryProblems
         facts: relationshipSignalAssessment.relationshipFacts,
       }
     );
+
+    const relationshipEmotionWrite =
+      await measureStage(
+        "relationship-emotion-v2-write",
+        () => persistRelationshipEmotionFromSignals(
+          supabase,
+          isAnonymous,
+          relationshipTimeContext,
+          relationshipSignalAssessment
+        )
+      );
+
+    console.log("RELATIONSHIP EMOTION V2:", {
+      traceId,
+      applied: relationshipEmotionWrite.applied,
+      conflict: relationshipEmotionWrite.conflict,
+      emotion: relationshipEmotionWrite.emotion,
+    });
 
     const updatedMemory =
       Array.isArray(
