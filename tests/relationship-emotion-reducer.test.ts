@@ -95,3 +95,7 @@ test("resolved hurt leaves a tender repair afterglow instead of snapping emotion
  assert.equal(next.reason,"repair_resolved_hurt");
  assert.equal(next.afterglow,"tender");
 });
+
+
+test("concern can coexist with affection instead of erasing it",()=>{const next=reduceRelationshipEmotion({previous:{primary:"affectionate",intensity:55},signals:assessment([{name:"concern",strength:.9,confidence:.95,evidence:"大丈夫？心配だよ"}]),elapsedHours:1,intimacyLevel:"intimate"});assert.equal(next.primary,"concerned");assert.equal(next.secondary,"affectionate");});
+test("repair in progress can contain affection while hurt is still primary",()=>{const next=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:60},signals:assessment([{name:"apology",strength:.7,confidence:.9,evidence:"ごめん"},{name:"repair",strength:.7,confidence:.9,evidence:"仲直りしたい"}]),elapsedHours:1,intimacyLevel:"intimate"});assert.equal(next.primary,"hurt");assert.equal(next.secondary,"affectionate");assert.equal(next.afterglow,"repairing");});
