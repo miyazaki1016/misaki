@@ -234,6 +234,89 @@ Free / Premium の通常会話、失敗時の利用回数返却、匿名利用�
 
 ---
 
+## 0.9 旧Production互換の先行maintenance / drain設備（2026-09-19）
+
+> **2026-09-20 続行判定：BLOCKED。** 開始HEAD `375088c0ef14d5e9dd98ae3495d03f41da1eeaf5` を再確認。
+> 古いREPEATABLE READ snapshotからは業務writeだけでなく、freeze後の新規operation受付・COMMITも通る。
+> 隔離DBで `writes_frozen / control.epoch=1 / unresolved=1 / operation.epoch=0` を確認した。
+> 排他advisory lockもsnapshotを更新しないため、受付集合確定という設計原則が成立していない。
+> 制御読取りはguardだけでなくadmit/require_operation/browser完了/運用操作を一体で再設計する必要がある。
+> 新規受付拒否を要求する回帰テストを追加し、既存snapshot回帰もFAILのまま維持。機能修正は停止した。
+> 既知3漏れ、coverage diff、停止epoch付きpre-gate証拠、旧browser save/refundは未解消。
+> 詳細・設計候補・検証限界は [運用文書](LEGACY_MAINTENANCE_DRAIN.md) と [監査記録](WRITE_SURFACE_INVENTORY.md) を参照。
+
+**maintenanceはON/OFFではなく、受付集合を確定し、未解決処理をdrainした後にfreezeする状態機械。**
+先行設備はPR #29本体から分離し、旧main schema/RPCのまま使う。
+DB正本の制御行とoperation registryを追加し、受付確認とサーバー生成operation登録を同じlockで原子化する。
+停止開始後の新規受付は拒否し、受付済み処理の継続だけをdraining中に許可する。
+
+**設計理由:** usage消費済み→Gemini生成中→freeze→成功保存/refund拒否という半端状態を作らない。
+HTTP終了だけでchatを完了扱いにせず、旧browserのhistory/記憶/background後続保存も確認する。
+Free失敗は旧refund ledgerの確定まで未解決。Premiumも生成/保存の終端確認が必要。
+クラッシュ、不明結果、応答紛失、processed=falseは自動expiryでdrainedにしない。
+
+**他機能との関連:** chat/base/proxy、history POST、匿名メールcheckpoint、旧直接RPC/背景upsert、
+emotion/action trigger、Body Clock claim/generation/delivery/relay、Push購読、evolutionの書込み境界を統一する。
+Body Clockは旧Edge batchをclaim前からrelay終了まで追跡。cron停止は別の運用操作。
+旧cron停止だけで既開始Gemini/relayが消えたとは判断しない。
+
+**壊してはいけない原則:** freezeは受付停止済み、未解決0件、旧Edgeを含むdrain確認証拠、
+必要cron inactive、relay attempt未完了0件、既DB transaction終了を同じlock下で確認した場合だけ許可する。
+最後のDB write guardを残し、旧definer RPC/service_roleも迂回させない。
+解除時に未解決記録を削除しない。maintenance応答を美咲の会話へ保存しない。
+通常writeは共有lockで別ユーザーの並列実行を保持する。
+
+旧main互換のためポイント計算/閾値、認証、匿名→email、Free/Premium/refund、記憶、emotion/action、
+写真selector 4、55–210分を変更しない。PR #29 canonical/temporary RPCを先行依存にしない。
+Preview/CI greenだけを本番安全判定にしない。稼働中旧runtimeの確認不能はBLOCKED。
+Production施工、cron操作、実snapshot/restore、PR #29 mergeは今回の対象外・実行禁止。
+
+詳細設計、全停止経路、freeze条件、operator手順、競合試験と実証限界は
+[旧Production互換maintenance/drain仕様](LEGACY_MAINTENANCE_DRAIN.md)を参照。
+
+
+### 2026-09-19 再監査：凍結の抜け道を実証したためBLOCKED
+
+最新main `0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3`、PR #30 `69e7d5c679548f9fd4d29ff90e73850f2d643930`、PR #29 `fd4b6e78e0a79dc05ebed46f82baf205f53cca23` と文書を再取得した。
+本番DBはREAD ONLYでcatalog定義だけを取得し、本番データ・migration・cron・deploy・外部送信を変更していない。
+
+**発見:** `misaki_evolution_analysis_state` と `proactive_message_usage` が先行guard対象から漏れている。
+実稼働定義の `claim_user_evolution_analysis(text,integer)` と `consume_proactive_message()` はauthenticatedにEXECUTEを許すSECURITY DEFINERであり、それぞれのテーブルへ書き込む。
+対象テーブルの実column/default/constraint/RLS/policy/ACLと実RPC本文を隔離PostgreSQLへ再現すると、`writes_frozen`・registry 0件のまま分析受付1件／旧自発usage消費1件が成立した。
+直接INSERTは権限拒否されてもdefiner RPCは通る。旧ブラウザの自発API削除はDB RPCの廃止を意味しない。
+
+**理由・関連:** 凍結対象の列挙は現行アプリだけでなく、残存公開RPCの書込み到達先まで含める必要がある。分析受付記録の変更は後続分析の待機条件に、usage変更は利用記録に影響する。
+**維持原則:** 既存52テストgreenを凍結の完全性の証拠にしない。実schemaとの差分を省略してPASSにしない。
+依頼の「全体矛盾を見つけたらBLOCKEDで停止」に従い、この再監査では実装変更を停止し、証拠・残課題だけを追記する。2 BLOCKERは未解消。
+
+### 2026-09-19 catalog inventory追加監査：認証triggerからの凍結違反
+
+最新main/PR30/PR29を再取得し、ProductionのcatalogをREAD ONLYで機械抽出した。
+public 22テーブルに対し既存guardは12、差分10。public/private 26 routine（SECURITY DEFINER 20）、
+public/authの業務trigger 6、policy 29を確認した。全経路到達性や全旧schema再構成の完了を意味しない。
+
+新たに `auth.users INSERT → handle_new_user_entitlement() → user_entitlements INSERT` を隔離DBで再現。
+実Productionの対象table/RLS/ACL/trigger/functionを反映し、writes_frozen・registry=0でentitlementが1件作成された。
+試験はROLLBACKし0件へ戻ることを確認。auth.users自体は合成fixtureで、実signup/GoTrue試験ではない。
+新たなwrite漏れ・全体矛盾の停止条件に従い機能修正を停止。前回2漏れ、coverage自動検査、pre-gate機構は未解消。
+
+**次回実装の原則:** write surface inventoryを正本としてcoverage差分を検査する。
+SECURITY DEFINERもfreeze境界の外ではない。pre-gate証拠未確認ならfreeze禁止。
+**理由:** 手書きguardリストでは認証triggerや旧RPCを見落とし、導入前処理はregistryに現れない。
+ただしguardを全tableへ一律追加するだけでは新規認証まで失敗し得る。既存ログインと新規ユーザー作成の境界も明示する。
+
+詳細な分類、実証範囲、未実装のcoverage/pre-gate要件は[write surface inventory監査](WRITE_SURFACE_INVENTORY.md)を参照。
+既存104実テスト、TypeScript、Denoが成功しても追加の凍結違反は消えない。Production変更なし。先行導入準備はBLOCKED。
+
+## 0.9.4 2026-09-19 続行監査：guard済み経路のsnapshot凍結違反
+
+PR30開始HEAD fb25649e836a3fa9681fa0bbe168cbae42018abf、main 0679dfa96d71ef9a99d4cfa2f8e997b9a06291e3、PR29 fd4b6e78e0a79dc05ebed46f82baf205f53cca23を再取得。
+**BLOCKED。停止前REPEATABLE READのsnapshotから、freeze後・registry=0でもguard付きbackground_push_stateを更新できた。** 隔離DBのservice_role・複数接続で再現しROLLBACK済み。fresh snapshotの同一UPDATEは拒否される。
+
+理由はguardの通常SELECTが古い制御行openを読むこと。advisory lockはMVCC snapshotを更新しない。従来のguard設置12/22は保護証明ではなく、全surface分類にはsnapshotを含む実動作証拠が必要。
+新反例発見時停止の要件に従い機能修正を停止。拒否を要求する追加回帰テストをCI対象へ残すため、既存104実テスト・TypeScript・Denoが成功してもCIの安全性回帰はFAILとなる。
+既知3漏れ、coverage diff、停止epoch付きpre-gate証拠・旧browser保存/refund継承、全旧境界の統合試験は未解消。Production変更・有料branch作成なし。詳細は[監査記録](WRITE_SURFACE_INVENTORY.md)を参照。
+
 ## 1. プロダクト原則
 
 Misaki の原点は「すべては会話の中にある」。

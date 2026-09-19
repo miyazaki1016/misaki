@@ -1,4 +1,5 @@
 "use client";
+import { saveLegacyTurn } from '../../lib/legacy-browser-drain';
 
 import {
   useEffect,
@@ -1527,6 +1528,8 @@ export default function ChatPage() {
     try {
       const accessToken =
         await getAccessToken();
+      const sendOwner = (await supabase.auth.getSession()).data.session?.user.id;
+      if (!sendOwner) throw new Error('Authentication required');
 
       const userMessage:
         ChatMessage = {
@@ -1615,10 +1618,18 @@ export default function ChatPage() {
       const data =
         await res
           .json();
+      if ((await supabase.auth.getSession()).data.session?.user.id !== sendOwner) return;
 
       applyApiUsage(
         data?.usage
       );
+
+      if (data?.maintenance === true) {
+        setMessages(messages);
+        setMessage(text);
+        setSendError(data.error);
+        return;
+      }
 
       if (
         res.status ===
@@ -1709,6 +1720,12 @@ export default function ChatPage() {
               -MAX_MESSAGES
             )
       );
+      if (data.maintenanceOperation) {
+        await saveLegacyTurn(data.maintenanceOperation,
+          [...newMessages, { role: 'misaki', text: data.reply }],
+          Array.isArray(data.memory) ? data.memory : memory,
+          data.misakiTodayMemory ?? todayMemoryForRequest, nextRelationshipPoints, sendOwner);
+      }
     } catch (
       error:
         any
