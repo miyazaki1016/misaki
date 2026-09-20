@@ -1,4 +1,4 @@
-export type ProactiveMotive={kind:"life"|"relationship_event"|"recent_conversation"|"relationship_memory"|"internal_state";evidence:string;summary:string;evidenceAt:string|null;freshness:"fresh"|"recent"|"old"|"unknown"};
+export type ProactiveMotive={topicSource:"misaki"|"user"|"relationship"|"none";kind:"life"|"relationship_event"|"recent_conversation"|"relationship_memory"|"internal_state";evidence:string;summary:string;evidenceAt:string|null;freshness:"fresh"|"recent"|"old"|"unknown"};
 export type RelationshipEventEvidence={eventType:string;reason:string;createdAt:string;direction?:string};
 export type ProactiveFocus="self"|"user"|"relationship"|"none";
 type ChatMessage={role:"user"|"misaki";text:string;sentAt?:string};
@@ -8,20 +8,20 @@ function recentUser(history:ChatMessage[]){return[...history].reverse().find(x=>
 function usableRelationshipEvent(events:RelationshipEventEvidence[]){return events.find(e=>e.eventType==="emotion_action_v2_after_chat"&&e.reason.trim())}
 export function deriveProactiveMotive(input:{desire:string;focus?:ProactiveFocus;history:ChatMessage[];memory:string[];lifeEvidence:string[];relationshipEvents?:RelationshipEventEvidence[]}):ProactiveMotive{
  const user=recentUser(input.history),age=freshness(user?.sentAt),event=usableRelationshipEvent(input.relationshipEvents??[]),eventAge=freshness(event?.createdAt);
- if(input.focus==="user"&&input.desire==="check_in"&&input.lifeEvidence.length)return{kind:"life",evidence:clean(input.lifeEvidence.at(-1)!),summary:"本人が話した生活上の出来事が気になっている",...age};
- if(input.focus==="relationship"&&input.desire==="reconnect"&&event&&eventAge.freshness!=="old")return{kind:"relationship_event",evidence:clean(event.reason),summary:"保存された二人の関係の出来事を受けて、つなぎ直したい",...eventAge};
- if(input.focus==="relationship"&&input.desire==="reconnect"&&user)return{kind:"recent_conversation",evidence:clean(user.text),summary:"直近のやり取りを受けて関係をつなぎ直したい",...age};
+ if(input.focus==="user"&&input.desire==="check_in"&&input.lifeEvidence.length)return{topicSource:"user",kind:"life",evidence:clean(input.lifeEvidence.at(-1)!),summary:"本人が話した生活上の出来事が気になっている",...age};
+ if(input.focus==="relationship"&&input.desire==="reconnect"&&event&&eventAge.freshness!=="old")return{topicSource:"relationship",kind:"relationship_event",evidence:clean(event.reason),summary:"保存された二人の関係の出来事を受けて、つなぎ直したい",...eventAge};
+ if(input.focus==="relationship"&&input.desire==="reconnect"&&user)return{topicSource:"relationship",kind:"recent_conversation",evidence:clean(user.text),summary:"直近のやり取りを受けて関係をつなぎ直したい",...age};
  if(input.focus==="relationship"&&["talk","be_playful","be_close"].includes(input.desire)){
    if(event&&eventAge.freshness!=="old")return{kind:"relationship_event",evidence:clean(event.reason),summary:"保存された関係の変化を背景に自分から関わりたい",...eventAge};
    if(user&&age.freshness!=="old")return{kind:"recent_conversation",evidence:clean(user.text),summary:"直近の会話の続きとして自分から関わりたい",...age};
    const remembered=[...input.memory].reverse().find(x=>x.trim());
-   if(remembered)return{kind:"relationship_memory",evidence:clean(remembered),summary:"二人の記憶を背景に自分から関わりたい",evidenceAt:null,freshness:"unknown"};
+   if(remembered)return{topicSource:"relationship",kind:"relationship_memory",evidence:clean(remembered),summary:"二人の記憶を背景に自分から関わりたい",evidenceAt:null,freshness:"unknown"};
  }
- if(input.focus==="self")return{kind:"internal_state",evidence:"none",summary:"美咲自身の現在の気分や欲求から自分のことを話したい",evidenceAt:null,freshness:"unknown"};
- return{kind:"internal_state",evidence:"none",summary:"現在の内部状態以外に特定の出来事根拠はない",evidenceAt:null,freshness:"unknown"};
+ if(input.focus==="self")return{topicSource:"misaki",kind:"internal_state",evidence:"none",summary:"美咲自身の現在の気分や欲求から自分のことを話したい",evidenceAt:null,freshness:"unknown"};
+ return{topicSource:"none",kind:"internal_state",evidence:"none",summary:"現在の内部状態以外に特定の出来事根拠はない",evidenceAt:null,freshness:"unknown"};
 }
 export function motiveGuide(m:ProactiveMotive){return `【今回の自発行動の動機】
-種類: ${m.kind}
+話題の出どころ: ${m.topicSource}\n種類: ${m.kind}
 意味: ${m.summary}
 根拠: ${m.evidence}
 根拠の新しさ: ${m.freshness}
