@@ -4,6 +4,7 @@ import {
   reduceRelationshipEmotion,
   type EmotionPrimary,
   type EmotionReducerResult,
+  type RelationshipPatternContext,
 } from "./relationship-emotion-reducer";
 import type { RelationshipSignalAssessment } from "./relationship-signal";
 import { reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer";
@@ -27,15 +28,16 @@ export async function persistRelationshipEmotionFromSignals(
   supabase: SupabaseClient,
   isAnonymous: boolean,
   context: RelationshipTimeContext | null,
-  assessment: RelationshipSignalAssessment
+  assessment: RelationshipSignalAssessment,
+  patterns?: RelationshipPatternContext
 ): Promise<{ applied: boolean; conflict: boolean; emotion: EmotionReducerResult; action: ActionDecision }> {
-  const patterns = await loadRelationshipPatterns(supabase as any, isAnonymous);
+  const learnedPatterns = patterns ?? await loadRelationshipPatterns(supabase as any, isAnonymous);
   const emotion = reduceRelationshipEmotion({
     previous: previousEmotion(context),
     signals: assessment,
     elapsedHours: context?.elapsedHours ?? 0,
     intimacyLevel: context?.intimacyLevel ?? "initial",
-    patterns,
+    patterns: learnedPatterns,
   });
 
   const action = reduceRelationshipAction({
