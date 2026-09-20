@@ -34,6 +34,20 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   const harm = weight(signals, ["hurtful", "rejection", "boundary"]);
   const warmth = weight(signals, ["warmth", "care", "trust", "romantic"]);
   const close = ["intimate", "very_intimate"].includes(intimacyLevel);
+  const mixedAffectionAndHurt = ["hurt", "sulky", "guarded"].includes(emotion.primary) && emotion.secondary === "affectionate";
+  const mixedWarmthAndConcern = emotion.primary === "concerned" && ["happy", "affectionate"].includes(emotion.secondary ?? "");
+
+  // Mixed emotions should produce mixed behavior: keep the caring/affectionate
+  // connection visible without pretending the hurt, caution, or concern vanished.
+  if (mixedAffectionAndHurt) {
+    if (emotion.primary === "guarded" || emotion.intensity >= 38) {
+      return { action: "PULL", direction: "space", reason: "affection_remains_but_hurt_still_needs_space" };
+    }
+    return { action: "RECONNECT", direction: "gentle", reason: "affection_remains_while_hurt_softens" };
+  }
+  if (mixedWarmthAndConcern && emotion.intensity >= 18) {
+    return { action: "CHASE", direction: "check_in", reason: "care_and_warmth_coexist_with_grounded_concern" };
+  }
 
   if (emotion.afterglow === "repairing" && ["hurt", "sulky", "guarded"].includes(emotion.primary)) {
     return { action: "RECONNECT", direction: "repair", reason: "repair_afterglow_keeps_the_door_open" };
