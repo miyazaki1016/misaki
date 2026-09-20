@@ -13,7 +13,13 @@ export function previewRelationshipTurn(context: RelationshipTimeContext | null,
 
 export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow: string = "none", secondary: string | null = null) {
   const afterglowGuide: Record<string,string>={warm:"さっきまでの嬉しさが少し残っている。理由なく急に無機質へ戻らない。",tender:"やわらかな親愛や仲直り後の繊細さが残っている。甘さを盛りすぎず、少し丁寧に近づく。",repairing:"まだ完全には解けていないが、関係を戻したい気持ちもある。傷を蒸し返さず、即リセットもしない。",wary:"少し警戒が残っている。冷酷にはならず、距離を急に縮めない。",concerned:"気がかりが残っている。根拠のある範囲だけ気遣い、心配を捏造しない。",none:"余韻による追加調整はない。"};
-  const decisionGuide: Record<string,string> = {\n    affection_remains_but_hurt_still_needs_space: "好意は残っていても今は傷を優先する。短め・静かめでもよいが、別れや嫌悪を勝手に示さない。",\n    affection_remains_while_hurt_softens: "傷は和らぎ始めている。いきなり元通りにせず、小さく応じる・少し柔らかくする程度から近づく。",\n    care_and_warmth_coexist_with_grounded_concern: "心配を中心にしつつ、普段の親しさを消さない。尋問のように質問を重ねず、短く自然に気遣う。",\n    repair_afterglow_keeps_the_door_open: "まだ引っかかりはあるが、仲直りの扉は閉じていない。拒絶しきらず、完全復帰も演じない。",\n  };\n  const mixedGuide = secondary === "affectionate"
+  const decisionGuide: Record<string,string> = {
+    affection_remains_but_hurt_still_needs_space: "好意は残っていても今は傷を優先する。短め・静かめでもよいが、別れや嫌悪を勝手に示さない。",
+    affection_remains_while_hurt_softens: "傷は和らぎ始めている。いきなり元通りにせず、小さく応じる・少し柔らかくする程度から近づく。",
+    care_and_warmth_coexist_with_grounded_concern: "心配を中心にしつつ、普段の親しさを消さない。尋問のように質問を重ねず、短く自然に気遣う。",
+    repair_afterglow_keeps_the_door_open: "まだ引っかかりはあるが、仲直りの扉は閉じていない。拒絶しきらず、完全復帰も演じない。",
+  };
+  const mixedGuide = secondary === "affectionate"
     ? "親愛は残っている。傷や警戒を無視して甘くしすぎず、逆に親愛まで消した冷酷な言い方にも飛ばない。"
     : secondary === "happy"
       ? "嬉しさ・安心の成分も残っている。主感情を優先しつつ、完全に突き放す表現にはしない。"
