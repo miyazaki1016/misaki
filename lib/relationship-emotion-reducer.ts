@@ -17,11 +17,18 @@ export type EmotionStateV2 = {
   intensity: number;
 };
 
+export type RelationshipPatternContext = {
+  repeatedHarm?: number;
+  reliableRepair?: number;
+  sustainedCare?: number;
+};
+
 export type EmotionReducerInput = {
   previous: EmotionStateV2;
   signals: RelationshipSignalAssessment;
   elapsedHours: number;
   intimacyLevel: string;
+  patterns?: RelationshipPatternContext;
 };
 
 export type EmotionReducerResult = EmotionStateV2 & {
@@ -74,6 +81,9 @@ export function reduceRelationshipEmotion(
   input: EmotionReducerInput
 ): EmotionReducerResult {
   const { previous, signals, elapsedHours } = input;
+  const repeatedHarm = Math.max(0, input.patterns?.repeatedHarm ?? 0);
+  const reliableRepair = Math.max(0, input.patterns?.reliableRepair ?? 0);
+  const sustainedCare = Math.max(0, input.patterns?.sustainedCare ?? 0);
   const positive = weighted(signals, [
     "warmth", "care", "trust", "openness", "shared_history",
   ]);
@@ -91,7 +101,7 @@ export function reduceRelationshipEmotion(
         : "hurt";
     return {
       primary,
-      intensity: clampIntensity(Math.max(previous.intensity * 0.7, 24) + harm * 34),
+      intensity: clampIntensity(Math.max(previous.intensity * 0.7, 24) + harm * 34 + Math.min(repeatedHarm * 6, 18)),
       reason: "relational_harm",
       secondary: previous.primary === "affectionate" || previous.primary === "happy" ? previous.primary : null,
       afterglow: primary === "guarded" ? "wary" : "none",
@@ -116,7 +126,7 @@ export function reduceRelationshipEmotion(
 
   if (repairingExistingHurt) {
     const remaining = clampIntensity(
-      previous.intensity - 18 - repair * 34 + Math.min(settle, 8)
+      previous.intensity - 18 - repair * 34 + Math.min(settle, 8) + Math.min(repeatedHarm * 5, 15) - Math.min(reliableRepair * 4, 12)
     );
     if (remaining >= 22) {
       return {
@@ -188,7 +198,7 @@ export function reduceRelationshipEmotion(
       primary: "happy",
       intensity: clampIntensity(
         Math.max(previous.primary === "happy" ? previous.intensity - settle : 10, 10) +
-          positive * 20
+          positive * 20 + Math.min(sustainedCare * 3, 9)
       ),
       reason: "relational_warmth",
       secondary: null,
