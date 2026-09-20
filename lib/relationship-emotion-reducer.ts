@@ -92,6 +92,8 @@ export function reduceRelationshipEmotion(
   const repair = weighted(signals, ["apology", "repair"]);
   const concern = weighted(signals, ["concern"]);
   const settle = timeSettling(Math.max(0, elapsedHours));
+  const relationshipSafety = Math.min(sustainedCare * 2 + reliableRepair * 2, 10);
+  const learnedCaution = Math.min(repeatedHarm * 3, 9);
 
   // A current-turn relational event outranks passive passage of time.
   if (harm >= 0.45) {
@@ -172,7 +174,9 @@ export function reduceRelationshipEmotion(
       intensity: clampIntensity(
         Math.max(previous.primary === "affectionate" ? previous.intensity - settle : 16, 16) +
           romantic * 30 +
-          Math.min(positive * 8, 10)
+          Math.min(positive * 8, 10) +
+          Math.min(relationshipSafety, 6) -
+          Math.min(learnedCaution, 5)
       ),
       reason: "romantic_warmth",
       secondary: null,
@@ -198,7 +202,7 @@ export function reduceRelationshipEmotion(
       primary: "happy",
       intensity: clampIntensity(
         Math.max(previous.primary === "happy" ? previous.intensity - settle : 10, 10) +
-          positive * 20 + Math.min(sustainedCare * 3, 9)
+          positive * 20 + Math.min(sustainedCare * 3, 9) + Math.min(reliableRepair * 2, 6) - Math.min(learnedCaution, 5)
       ),
       reason: "relational_warmth",
       secondary: null,
