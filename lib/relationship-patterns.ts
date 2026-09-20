@@ -30,12 +30,21 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
   let repeatedHarm = 0;
   let reliableRepair = 0;
   let sustainedCare = 0;
-  let sawRecentRepair = false;
+  let repairAwaitingOutcome = false;
   const now = Date.now();
+  // Events are loaded newest-first. Learn trajectories oldest -> newest so a
+  // repair only earns trust after later evidence shows the relationship held.
+  const ordered = events.slice(0, 40).sort((a,b) => {
+    const ta = a.created_at ? Date.parse(a.created_at) : 0;
+    const tb = b.created_at ? Date.parse(b.created_at) : 0;
+    return ta - tb;
+  });
 
-  for (const event of events.slice(0, 40)) {
+  for (const event of ordered) {
     const signals = signalsOf(event);
-    const harm = signals.filter(s => ["hurtful","rejection","boundary"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
+    // A boundary or a rejection can be healthy and must not teach Misaki that
+    // the user is harmful. Repeated-harm learning is reserved for hurtful evidence.
+    const harm = signals.filter(s => String(s.name) === "hurtful").reduce((n,s)=>n+weight(s),0);
     const repair = signals.filter(s => ["repair"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const at = event.created_at ? Date.parse(event.created_at) : NaN;
@@ -43,14 +52,19 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
     const recency = ageDays <= 30 ? 1 : ageDays <= 90 ? .6 : ageDays <= 180 ? .3 : .1;
 
     if (harm >= .45) {
-      // A fresh recurrence after a repair matters more than an isolated old mistake.
-      repeatedHarm += recency * (sawRecentRepair ? 1.35 : 1);
+      // Harm after an attempted repair is recurrence, not proof that repair worked.
+      repeatedHarm += recency * (repairAwaitingOutcome ? 1.35 : 1);
+      repairAwaitingOutcome = false;
     }
-    if (repair >= .5 && harm < .45) {
-      reliableRepair += recency;
-      sawRecentRepair = true;
+    if (repair >= .5 && harm < .45) repairAwaitingOutcome = true;
+    if (care >= .55 && harm < .45) {
+      sustainedCare += recency;
+      // Repair becomes reliable only when a later turn supplies positive evidence.
+      if (repairAwaitingOutcome) {
+        reliableRepair += recency;
+        repairAwaitingOutcome = false;
+      }
     }
-    if (care >= .55 && harm < .45) sustainedCare += recency;
   }
 
   return {
