@@ -282,3 +282,37 @@ test("scenario: calm ordinary conversation after guardedness may soften without 
  assert.notEqual(s.action.action,"TEASE");
  assert.ok(before<=55);
 });
+
+
+test("scenario: saying I love you during an unresolved boundary does not erase the boundary",()=>{
+ let s=step({primary:"affectionate",intensity:80},[sig("boundary",.95,"今は距離を置きたい")],0);
+ s=step(s.emotion,[sig("romantic",.9,"それでも大好きだよ")],1);
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: one bad joke in a secure warm moment can hurt without deleting all attachment",()=>{
+ const s=step({primary:"affectionate",intensity:75},[sig("hurtful",.55,"冗談がちょっと刺さった")],0);
+ assert.equal(s.emotion.primary,"hurt");
+ assert.equal(s.emotion.secondary,"affectionate");
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: a quiet week after repaired warmth does not recreate the old fight",()=>{
+ let s=step({primary:"hurt",intensity:45},[
+  sig("repair",.85,"仲直りしよう"),
+  sig("warmth",.75,"大事にしたい")
+ ],1);
+ s=step(s.emotion,[],24*7);
+ assert.notEqual(s.action.action,"SULK");
+ assert.notEqual(s.action.action,"PULL");
+});
+
+test("scenario: current rejection beats nostalgic shared history",()=>{
+ const s=step({primary:"happy",intensity:55},[
+  sig("shared_history",.95,"昔からずっと仲良し"),
+  sig("rejection",.9,"でも恋愛関係にはなりたくない")
+ ],0);
+ assert.equal(s.emotion.primary,"guarded");
+ assert.equal(s.action.direction,"space");
+});
