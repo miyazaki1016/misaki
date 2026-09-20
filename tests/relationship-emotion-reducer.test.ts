@@ -148,3 +148,36 @@ test("sustained care strengthens warmth without manufacturing romance",()=>{
  assert.equal(result.primary,"happy");
  assert.notEqual(result.primary,"affectionate");
 });
+
+
+test("repeated hurt makes unresolved hurt linger longer through the same silence",()=>{
+ const signals=assessment([]);
+ const base=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:60},signals,elapsedHours:72,intimacyLevel:"intimate"});
+ const history=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:60},signals,elapsedHours:72,intimacyLevel:"intimate",patterns:{repeatedHarm:3}});
+ assert.equal(base.primary,"hurt");
+ assert.equal(history.primary,"hurt");
+ assert.ok(history.intensity>base.intensity);
+});
+
+test("shared caring history lets warmth linger without inventing a new event",()=>{
+ const signals=assessment([]);
+ const base=reduceRelationshipEmotion({previous:{primary:"happy",intensity:50},signals,elapsedHours:72,intimacyLevel:"intimate"});
+ const history=reduceRelationshipEmotion({previous:{primary:"happy",intensity:50},signals,elapsedHours:72,intimacyLevel:"intimate",patterns:{sustainedCare:3,reliableRepair:2}});
+ assert.equal(base.reason,"existing_emotion_settled_with_time");
+ assert.equal(history.reason,"existing_emotion_settled_with_time");
+ assert.ok(history.intensity>base.intensity);
+ assert.deepEqual(history.evidence,[]);
+});
+
+test("relationship history never turns silence into romance",()=>{
+ const result=reduceRelationshipEmotion({
+  previous:{primary:"neutral",intensity:0},
+  signals:assessment([]),
+  elapsedHours:168,
+  intimacyLevel:"very_intimate",
+  patterns:{sustainedCare:3,reliableRepair:3}
+ });
+ assert.equal(result.primary,"neutral");
+ assert.equal(result.intensity,0);
+ assert.equal(result.secondary,null);
+});
