@@ -218,11 +218,18 @@ export function reduceRelationshipEmotion(
       ? Math.max(settle, elapsedHours >= 24 ? 10 : 0)
       : settle;
 
-  const intensity = clampIntensity(previous.intensity - passiveDecay);
+  const historyResistance =
+    previous.primary === "hurt" || previous.primary === "guarded" || previous.primary === "sulky"
+      ? Math.min(repeatedHarm * 1.5, 4)
+      : previous.primary === "happy" || previous.primary === "affectionate"
+        ? Math.min((sustainedCare + reliableRepair) * 0.75, 3)
+        : 0;
+  const effectiveDecay = Math.max(0, passiveDecay - historyResistance);
+  const intensity = clampIntensity(previous.intensity - effectiveDecay);
   return {
     primary: intensity === 0 ? "neutral" : previous.primary,
     intensity,
-    reason: passiveDecay > 0 ? "existing_emotion_settled_with_time" : "no_new_relational_evidence",
+    reason: effectiveDecay > 0 ? "existing_emotion_settled_with_time" : "no_new_relational_evidence",
     secondary: null,
     afterglow: intensity === 0 ? "none" : previous.primary === "affectionate" ? "tender" : previous.primary === "happy" ? "warm" : previous.primary === "guarded" ? "wary" : previous.primary === "concerned" ? "concerned" : "none",
     evidence: [],
