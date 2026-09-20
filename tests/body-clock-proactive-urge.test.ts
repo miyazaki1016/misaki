@@ -28,3 +28,27 @@ test("safety-relevant grounded concern can contact even without affectionate moo
 
 test("grounded external alert can become concern input without pretending it came from the user",()=>{const r=deriveProactiveUrge({...base,action:"CHASE",emotion:"concerned",emotionIntensity:55,intimacyLevel:1,externalConcern:true});assert.equal(r.shouldSend,true);assert.equal(r.desire,"check_in");assert.equal(r.reason,"grounded_external_concern_wants_check_in")});
 test("external alert flag alone cannot create concern or contact",()=>{const r=deriveProactiveUrge({...base,externalConcern:true,emotion:"neutral",emotionIntensity:80,intimacyLevel:3});assert.equal(r.shouldSend,false);assert.equal(r.reason,"no_internal_urge")});
+
+
+test("wanting closeness shortly after contact can remain a feeling without becoming another message",()=>{
+ const r=deriveProactiveUrge({...base,emotion:"affectionate",emotionIntensity:82,intimacyLevel:3,hoursSinceLastContact:2});
+ assert.equal(r.shouldSend,false);
+ assert.equal(r.reason,"no_internal_urge");
+});
+
+test("playful urge waits when they just talked",()=>{
+ const r=deriveProactiveUrge({...base,action:"TEASE",emotion:"affectionate",emotionIntensity:72,intimacyLevel:3,hoursSinceLastContact:1});
+ assert.equal(r.shouldSend,false);
+});
+
+test("ordinary desire can act again after enough relationship time passes",()=>{
+ const r=deriveProactiveUrge({...base,emotion:"affectionate",emotionIntensity:82,intimacyLevel:3,hoursSinceLastContact:8});
+ assert.equal(r.shouldSend,true);
+ assert.equal(r.desire,"be_close");
+});
+
+test("grounded concern is not silenced by the ordinary recent-contact cooldown",()=>{
+ const r=deriveProactiveUrge({...base,action:"CHASE",emotion:"concerned",emotionIntensity:60,lifeConfidence:"explicit",hoursSinceLastContact:1});
+ assert.equal(r.shouldSend,true);
+ assert.equal(r.desire,"check_in");
+});
