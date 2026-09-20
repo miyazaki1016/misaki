@@ -17,7 +17,7 @@ test("repeated harm counts distinct persisted events",()=>{
 test("repair mixed with fresh harm is not credited as reliable repair",()=>{
  const p=deriveRelationshipPatterns([event([s("repair"),s("hurtful")]),event([s("repair")],1)]);
  assert.equal(p.reliableRepair,0);
- assert.equal(p.repeatedHarm,1.35);
+ assert.equal(p.repeatedHarm,1);
 });
 
 test("care mixed with harm is not credited as sustained care",()=>{
@@ -67,7 +67,7 @@ test("repair intent alone never becomes reliable repair, recent or old",()=>{
 });
 
 test("repair earns reliability only after a later caring outcome",()=>{
- const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1)]);
+ const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1),event([s("hurtful")],2)]);
  assert.ok((p.reliableRepair??0) > 0);
 });
 
@@ -112,3 +112,6 @@ test("three consecutive caring turns reinforce sustained care without creating r
  assert.ok((three.sustainedCare??0) > (two.sustainedCare??0));
  assert.ok((three.sustainedCare??0) <= 3);
 });
+
+
+test("repair without a preceding hurt never earns reliable repair",()=>{\n const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1)]);\n assert.equal(p.reliableRepair,0);\n});\n\ntest("care long after a repair attempt does not retroactively prove repair",()=>{\n const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],20),event([s("hurtful")],21)]);\n assert.equal(p.reliableRepair,0);\n});\n\ntest("malformed timestamps are ignored instead of receiving full recency weight",()=>{\n const p=deriveRelationshipPatterns([{event_type:"emotion_action_v2_after_chat",created_at:"not-a-date",metadata:{signal_summary:[s("hurtful")]}}]);\n assert.equal(p.repeatedHarm,0);\n});\n
