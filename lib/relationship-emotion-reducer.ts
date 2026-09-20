@@ -144,6 +144,18 @@ export function reduceRelationshipEmotion(
     };
   }
 
+  // Romantic words alone cannot cancel an unresolved boundary/rejection.
+  if (romantic >= 0.5 && previous.primary === "guarded" && previous.intensity >= 20 && repair < 0.4) {
+    return {
+      primary: "guarded",
+      intensity: clampIntensity(Math.max(12, previous.intensity - settle - romantic * 5)),
+      reason: "romance_received_while_boundary_still_active",
+      secondary: "affectionate",
+      afterglow: "wary",
+      evidence: evidenceFor(signals, ["romantic"]),
+    };
+  }
+
   if (romantic >= 0.5) {
     return {
       primary: "affectionate",
