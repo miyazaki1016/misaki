@@ -3,7 +3,10 @@ export type ProactiveUrge={shouldSend:boolean;strength:number;desire:ProactiveDe
 type Input={photoOpportunity?:boolean;action:"NORMAL"|"WAIT"|"TEASE"|"SULK"|"CHASE"|"PULL"|"RECONNECT";emotion:"neutral"|"happy"|"affectionate"|"concerned"|"hurt"|"sulky"|"guarded";emotionIntensity:number;intimacyLevel:number;lifeConfidence:"none"|"explicit";pushesToday:number};
 export function deriveProactiveUrge(input:Input):ProactiveUrge{const intensity=Math.max(0,Math.min(100,input.emotionIntensity));
 if(input.action==="PULL"||input.emotion==="guarded")return{shouldSend:false,strength:0,desire:"give_space",reason:"space_is_the_action"};
-if(input.action==="SULK"||input.emotion==="hurt")return{shouldSend:false,strength:0,desire:"give_space",reason:"hurt_does_not_require_contact"};
+if(input.action==="SULK"||input.emotion==="hurt"){
+ if(input.action==="RECONNECT"&&intensity>=20)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.35)),desire:"reconnect",reason:"repair_wants_contact"};
+ return{shouldSend:false,strength:0,desire:"give_space",reason:"hurt_does_not_require_contact"};
+}
 if(input.action==="WAIT")return{shouldSend:false,strength:0,desire:"none",reason:"waiting_without_new_motive"};
 if(input.emotion==="concerned"&&input.lifeConfidence==="explicit"&&intensity>=35)return{shouldSend:true,strength:Math.min(100,55+Math.round(intensity*.35)),desire:"check_in",reason:"grounded_concern_wants_check_in"};
 if(input.action==="RECONNECT"&&intensity>=20)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.35)),desire:"reconnect",reason:"repair_wants_contact"};
