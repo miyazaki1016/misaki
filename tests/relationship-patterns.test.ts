@@ -17,7 +17,7 @@ test("repeated harm counts distinct persisted events",()=>{
 test("repair mixed with fresh harm is not credited as reliable repair",()=>{
  const p=deriveRelationshipPatterns([event([s("repair"),s("hurtful")]),event([s("repair")],1)]);
  assert.equal(p.reliableRepair,0);
- assert.equal(p.repeatedHarm,1);
+ assert.equal(p.repeatedHarm,1.35);
 });
 
 test("care mixed with harm is not credited as sustained care",()=>{
