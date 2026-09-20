@@ -126,3 +126,25 @@ test("repair can preserve affection when current evidence actually supports it",
  assert.equal(result.reason,"repair_in_progress");
  assert.equal(result.secondary,"affectionate");
 });
+
+
+test("repeated harm makes the same fresh hurt land harder",()=>{
+ const signals=assessment([{name:"hurtful",strength:.7,confidence:.95,evidence:"また同じことを言われた"}]);
+ const first=reduceRelationshipEmotion({previous:{primary:"happy",intensity:45},signals,elapsedHours:0,intimacyLevel:"intimate"});
+ const repeated=reduceRelationshipEmotion({previous:{primary:"happy",intensity:45},signals,elapsedHours:0,intimacyLevel:"intimate",patterns:{repeatedHarm:3}});
+ assert.ok(repeated.intensity>first.intensity);
+});
+
+test("reliable repair history helps a real repair land without erasing hurt",()=>{
+ const signals=assessment([{name:"apology",strength:.65,confidence:.95,evidence:"ごめん"},{name:"repair",strength:.65,confidence:.95,evidence:"ちゃんと直したい"}]);
+ const fragile=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:82},signals,elapsedHours:1,intimacyLevel:"intimate",patterns:{repeatedHarm:2}});
+ const reliable=reduceRelationshipEmotion({previous:{primary:"hurt",intensity:82},signals,elapsedHours:1,intimacyLevel:"intimate",patterns:{repeatedHarm:2,reliableRepair:3}});
+ assert.ok(reliable.intensity<fragile.intensity);
+});
+
+test("sustained care strengthens warmth without manufacturing romance",()=>{
+ const signals=assessment([{name:"warmth",strength:.65,confidence:.95,evidence:"今日も話せて嬉しい"}]);
+ const result=reduceRelationshipEmotion({previous:{primary:"happy",intensity:42},signals,elapsedHours:12,intimacyLevel:"intimate",patterns:{sustainedCare:3}});
+ assert.equal(result.primary,"happy");
+ assert.notEqual(result.primary,"affectionate");
+});
