@@ -42,3 +42,20 @@ test("self focus remains Misaki-led even when relationship evidence exists",()=>
  assert.equal(m.kind,"internal_state");
  assert.match(m.summary,/美咲自身/);
 });
+
+
+test("topic source identifies whose material actually grounds the message",()=>{
+ const now=new Date().toISOString();
+ const self=deriveProactiveMotive({desire:"talk",focus:"self",history:[{role:"user",text:"今日は忙しい",sentAt:now}],memory:[],lifeEvidence:["今日は仕事"]});
+ const user=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:[],lifeEvidence:["今日は仕事"]});
+ const relationship=deriveProactiveMotive({desire:"reconnect",focus:"relationship",history:[],memory:[],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"repair_after_hurt",createdAt:now}]});
+ assert.equal(self.topicSource,"misaki");
+ assert.equal(user.topicSource,"user");
+ assert.equal(relationship.topicSource,"relationship");
+});
+
+test("no grounded topic remains explicitly none instead of borrowing unrelated evidence",()=>{
+ const m=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:["昔の二人の思い出"],lifeEvidence:[]});
+ assert.equal(m.topicSource,"none");
+ assert.equal(m.evidence,"none");
+});
