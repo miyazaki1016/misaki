@@ -114,4 +114,17 @@ test("three consecutive caring turns reinforce sustained care without creating r
 });
 
 
-test("repair without a preceding hurt never earns reliable repair",()=>{\n const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1)]);\n assert.equal(p.reliableRepair,0);\n});\n\ntest("care long after a repair attempt does not retroactively prove repair",()=>{\n const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],20),event([s("hurtful")],21)]);\n assert.equal(p.reliableRepair,0);\n});\n\ntest("malformed timestamps are ignored instead of receiving full recency weight",()=>{\n const p=deriveRelationshipPatterns([{event_type:"emotion_action_v2_after_chat",created_at:"not-a-date",metadata:{signal_summary:[s("hurtful")]}}]);\n assert.equal(p.repeatedHarm,0);\n});\n
+test("repair without a preceding hurt never earns reliable repair",()=>{
+ const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1)]);
+ assert.equal(p.reliableRepair,0);
+});
+
+test("care long after a repair attempt does not retroactively prove repair",()=>{
+ const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],20),event([s("hurtful")],21)]);
+ assert.equal(p.reliableRepair,0);
+});
+
+test("malformed timestamps are ignored instead of receiving full recency weight",()=>{
+ const p=deriveRelationshipPatterns([{event_type:"emotion_action_v2_after_chat",created_at:"not-a-date",metadata:{signal_summary:[s("hurtful")]}}]);
+ assert.equal(p.repeatedHarm,0);
+});
