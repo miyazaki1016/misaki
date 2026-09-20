@@ -6,9 +6,9 @@ import { reduceRelationshipAction } from "../lib/relationship-action-reducer.ts"
 const assessment=(signals:any[]=[])=>({signals,relationshipFacts:{mutualAffectionExplicit:false,datingEstablishedExplicit:false}});
 const sig=(name:string,strength:number,evidence:string)=>({name,strength,confidence:.95,evidence});
 
-function step(previous:EmotionStateV2,signals:any[],elapsedHours:number,intimacyLevel="intimate"){
+function step(previous:EmotionStateV2,signals:any[],elapsedHours:number,intimacyLevel="intimate",patterns?:{repeatedHarm?:number;reliableRepair?:number;sustainedCare?:number}){
  const a=assessment(signals);
- const emotion=reduceRelationshipEmotion({previous,signals:a,elapsedHours,intimacyLevel});
+ const emotion=reduceRelationshipEmotion({previous,signals:a,elapsedHours,intimacyLevel,patterns});
  const action=reduceRelationshipAction({previousAction:"NORMAL",emotion,signals:a,intimacyLevel});
  return {emotion,action};
 }
@@ -480,4 +480,39 @@ test("scenario: a past rejection remains history, but current explicit repair ca
  assert.notEqual(s.action.action,"PULL");
  assert.ok(["hurt","guarded","happy","neutral"].includes(s.emotion.primary));
  assert.ok(s.emotion.reason.startsWith("repair_"));
+});
+
+
+test("scenario: repeated harm teaches caution even when each incident looks small alone",()=>{
+ const incident=[sig("hurtful",.5,"また少し刺さる言い方だった")];
+ const first=step({primary:"happy",intensity:52},incident,0,"intimate",{repeatedHarm:0});
+ const learned=step({primary:"happy",intensity:52},incident,0,"intimate",{repeatedHarm:3});
+ assert.equal(first.emotion.primary,"hurt");
+ assert.equal(learned.emotion.primary,"hurt");
+ assert.ok(learned.emotion.intensity>first.emotion.intensity);
+ assert.notEqual(learned.action.direction,"closer");
+});
+
+test("scenario: repeated harm makes apology slower to repair than a one-off mistake",()=>{
+ const apology=[sig("apology",.75,"ごめん"),sig("repair",.7,"直したい")];
+ const oneOff=step({primary:"hurt",intensity:76},apology,1,"intimate",{repeatedHarm:0});
+ const repeated=step({primary:"hurt",intensity:76},apology,1,"intimate",{repeatedHarm:3});
+ assert.ok(repeated.emotion.intensity>oneOff.emotion.intensity);
+ assert.equal(repeated.emotion.reason,"repair_in_progress");
+});
+
+test("scenario: demonstrated reliable repair can rebuild trust faster than words alone",()=>{
+ const repair=[sig("apology",.72,"ごめん"),sig("repair",.72,"今度は行動で直す")];
+ const wordsOnly=step({primary:"hurt",intensity:82},repair,1,"intimate",{repeatedHarm:2,reliableRepair:0});
+ const proven=step({primary:"hurt",intensity:82},repair,1,"intimate",{repeatedHarm:2,reliableRepair:3});
+ assert.ok(proven.emotion.intensity<wordsOnly.emotion.intensity);
+ assert.notEqual(proven.action.action,"TEASE");
+});
+
+test("scenario: sustained care accumulates warmth but never substitutes for explicit romance",()=>{
+ const care=[sig("care",.7,"今日も無理しないでね"),sig("warmth",.55,"話せてうれしい")];
+ let s=step({primary:"happy",intensity:45},care,24,"very_intimate",{sustainedCare:3});
+ assert.equal(s.emotion.primary,"happy");
+ assert.equal(s.emotion.secondary,null);
+ assert.notEqual(s.emotion.reason,"romantic_warmth");
 });
