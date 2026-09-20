@@ -11,12 +11,12 @@ const s=(name:string,strength=.8,confidence=.95)=>({name,strength,confidence});
 
 test("repeated harm counts distinct persisted events",()=>{
  const p=deriveRelationshipPatterns([event([s("hurtful")]),event([s("hurtful")],1),event([s("boundary")],2)]);
- assert.equal(p.repeatedHarm,3);
+ assert.equal(p.repeatedHarm,2);
 });
 
 test("repair mixed with fresh harm is not credited as reliable repair",()=>{
  const p=deriveRelationshipPatterns([event([s("repair"),s("hurtful")]),event([s("repair")],1)]);
- assert.equal(p.reliableRepair,1);
+ assert.equal(p.reliableRepair,0);
  assert.equal(p.repeatedHarm,1);
 });
 
@@ -59,10 +59,16 @@ test("harm recurring after repair is weighted more than two unrelated hurts",()=
  assert.ok((repairedThenRelapsed.repeatedHarm??0) > (unrelated.repeatedHarm??0));
 });
 
-test("old repair evidence also fades and cannot guarantee trust forever",()=>{
+test("repair intent alone never becomes reliable repair, recent or old",()=>{
  const recent=deriveRelationshipPatterns([event([s("repair")],5)]);
  const old=deriveRelationshipPatterns([event([s("repair")],200)]);
- assert.ok((recent.reliableRepair??0) > (old.reliableRepair??0));
+ assert.equal(recent.reliableRepair,0);
+ assert.equal(old.reliableRepair,0);
+});
+
+test("repair earns reliability only after a later caring outcome",()=>{
+ const p=deriveRelationshipPatterns([event([s("care")],0),event([s("repair")],1)]);
+ assert.ok((p.reliableRepair??0) > 0);
 });
 
 test("sustained recent care outweighs a single old caring event",()=>{
