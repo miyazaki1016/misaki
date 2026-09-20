@@ -516,3 +516,33 @@ test("scenario: sustained care accumulates warmth but never substitutes for expl
  assert.equal(s.emotion.secondary,null);
  assert.notEqual(s.emotion.reason,"romantic_warmth");
 });
+
+
+test("scenario: identical apology leads to different behavior after different relationship histories",()=>{
+ const apology=[sig("repair",.9,"仲直りしたい"),sig("apology",.9,"ごめん")];
+ const fragile=step({primary:"hurt",intensity:46},apology,2,"intimate",{repeatedHarm:2.5,reliableRepair:0,sustainedCare:.2});
+ const proven=step({primary:"hurt",intensity:46},apology,2,"intimate",{repeatedHarm:1,reliableRepair:2,sustainedCare:2});
+ assert.ok(fragile.emotion.intensity >= proven.emotion.intensity);
+});
+
+test("scenario: identical warmth feels safer after sustained care but does not create dating",()=>{
+ const warmth=[sig("care",.8,"大事にする"),sig("warmth",.7,"今日も話せてよかった")];
+ const newBond=step({primary:"neutral",intensity:8},warmth,4,"familiar",{sustainedCare:0});
+ const livedBond=step({primary:"neutral",intensity:8},warmth,4,"familiar",{sustainedCare:2.7});
+ assert.ok(livedBond.emotion.intensity >= newBond.emotion.intensity);
+ assert.notEqual(livedBond.action.action,"TEASE");
+});
+
+test("scenario: fresh hurt still matters even in a history full of care",()=>{
+ const hurt=[sig("hurtful",.85,"ひどいことを言った")];
+ const r=step({primary:"happy",intensity:48},hurt,1,"very_intimate",{sustainedCare:3,reliableRepair:2.5,repeatedHarm:0});
+ assert.ok(["hurt","guarded","sulky"].includes(r.emotion.primary));
+ assert.equal(r.action.direction,"space");
+});
+
+test("scenario: learned caution can soften after reliable repair and sustained care",()=>{
+ const apology=[sig("repair",.9,"ちゃんと直したい"),sig("apology",.8,"ごめん")];
+ const stillFragile=step({primary:"hurt",intensity:42},apology,3,"intimate",{repeatedHarm:2.6,reliableRepair:0,sustainedCare:.5});
+ const rebuilt=step({primary:"hurt",intensity:42},apology,3,"intimate",{repeatedHarm:1.2,reliableRepair:2.2,sustainedCare:2.4});
+ assert.ok(rebuilt.emotion.intensity <= stillFragile.emotion.intensity);
+});
