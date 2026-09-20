@@ -316,3 +316,40 @@ test("scenario: current rejection beats nostalgic shared history",()=>{
  assert.equal(s.emotion.primary,"guarded");
  assert.equal(s.action.direction,"space");
 });
+
+
+test("scenario: two quiet weeks after affection soften intensity without rewriting love as rejection",()=>{
+ let s=step({primary:"affectionate",intensity:82},[],24*7);
+ const week=s.emotion.intensity;
+ s=step(s.emotion,[],24*7);
+ assert.ok(s.emotion.intensity<=week);
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.emotion.primary,"guarded");
+ assert.notEqual(s.action.action,"PULL");
+});
+
+test("scenario: unresolved hurt can fade across weeks but time alone cannot call it repaired",()=>{
+ let s=step({primary:"hurt",intensity:72},[],24*7);
+ const week=s.emotion.intensity;
+ assert.equal(s.emotion.primary,"hurt");
+ s=step(s.emotion,[],24*7);
+ assert.ok(s.emotion.intensity<week);
+ assert.ok(["hurt","neutral"].includes(s.emotion.primary));
+ assert.notEqual(s.emotion.reason,"repair_resolved_hurt");
+});
+
+test("scenario: concern fades over days without inventing a new bad event",()=>{
+ let s=step({primary:"concerned",intensity:68},[],48);
+ const twoDays=s.emotion.intensity;
+ s=step(s.emotion,[],120);
+ assert.ok(s.emotion.intensity<twoDays);
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.emotion.primary,"guarded");
+});
+
+test("scenario: a fresh warm reunion after a long quiet period can become happy without pretending dating",()=>{
+ let s=step({primary:"happy",intensity:50},[],24*14);
+ s=step(s.emotion,[sig("warmth",.8,"久しぶり、話せて嬉しい"),sig("shared_history",.7,"またいつもの話しよう")],0);
+ assert.equal(s.emotion.primary,"happy");
+ assert.notEqual(s.action.action,"PULL");
+});
