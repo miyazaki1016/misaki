@@ -30,22 +30,33 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
   let repeatedHarm = 0;
   let reliableRepair = 0;
   let sustainedCare = 0;
+  let sawRecentRepair = false;
+  const now = Date.now();
 
   for (const event of events.slice(0, 40)) {
     const signals = signalsOf(event);
     const harm = signals.filter(s => ["hurtful","rejection","boundary"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const repair = signals.filter(s => ["repair"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
+    const at = event.created_at ? Date.parse(event.created_at) : NaN;
+    const ageDays = Number.isFinite(at) ? Math.max(0, (now - at) / 86400000) : 0;
+    const recency = ageDays <= 30 ? 1 : ageDays <= 90 ? .6 : ageDays <= 180 ? .3 : .1;
 
-    if (harm >= .45) repeatedHarm += 1;
-    if (repair >= .5 && harm < .45) reliableRepair += 1;
-    if (care >= .55 && harm < .45) sustainedCare += 1;
+    if (harm >= .45) {
+      // A fresh recurrence after a repair matters more than an isolated old mistake.
+      repeatedHarm += recency * (sawRecentRepair ? 1.35 : 1);
+    }
+    if (repair >= .5 && harm < .45) {
+      reliableRepair += recency;
+      sawRecentRepair = true;
+    }
+    if (care >= .55 && harm < .45) sustainedCare += recency;
   }
 
   return {
-    repeatedHarm: Math.min(repeatedHarm, 3),
-    reliableRepair: Math.min(reliableRepair, 3),
-    sustainedCare: Math.min(sustainedCare, 3),
+    repeatedHarm: Math.min(Math.round(repeatedHarm * 100) / 100, 3),
+    reliableRepair: Math.min(Math.round(reliableRepair * 100) / 100, 3),
+    sustainedCare: Math.min(Math.round(sustainedCare * 100) / 100, 3),
   };
 }
 
