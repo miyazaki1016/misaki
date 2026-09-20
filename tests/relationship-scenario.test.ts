@@ -546,3 +546,34 @@ test("scenario: learned caution can soften after reliable repair and sustained c
  const rebuilt=step({primary:"hurt",intensity:42},apology,3,"intimate",{repeatedHarm:1.2,reliableRepair:2.2,sustainedCare:2.4});
  assert.ok(rebuilt.emotion.intensity <= stillFragile.emotion.intensity);
 });
+
+
+test("scenario: the same caring words land warmer in a relationship with demonstrated safety",()=>{
+ const words=[sig("care",.75,"ちゃんと大事にする"),sig("warmth",.65,"話せて嬉しい")];
+ const cautious=step({primary:"neutral",intensity:10},words,2,"intimate",{repeatedHarm:2.5,reliableRepair:0,sustainedCare:.3});
+ const safe=step({primary:"neutral",intensity:10},words,2,"intimate",{repeatedHarm:.2,reliableRepair:2.4,sustainedCare:2.7});
+ assert.ok(safe.emotion.intensity > cautious.emotion.intensity);
+});
+
+test("scenario: relationship safety never erases fresh hurt",()=>{
+ const fresh=[sig("hurtful",.9,"傷つくことを言った")];
+ const safe=step({primary:"happy",intensity:55},fresh,1,"very_intimate",{repeatedHarm:0,reliableRepair:3,sustainedCare:3});
+ assert.equal(safe.emotion.primary,"hurt");
+ assert.equal(safe.action.direction,"space");
+});
+
+test("scenario: learned caution can coexist with affection instead of deleting it",()=>{
+ const romantic=[sig("romantic",.85,"好きだよ"),sig("warmth",.55,"会えて嬉しい")];
+ const cautious=step({primary:"neutral",intensity:12},romantic,2,"intimate",{repeatedHarm:2.7,reliableRepair:.2,sustainedCare:.5});
+ assert.equal(cautious.emotion.primary,"affectionate");
+ assert.ok(cautious.emotion.intensity > 0);
+});
+
+test("scenario: reliable repair changes reception gradually, not by flipping a permanent trust switch",()=>{
+ const warmth=[sig("care",.7,"大事にする"),sig("trust",.6,"ちゃんと向き合う")];
+ const none=step({primary:"neutral",intensity:8},warmth,2,"intimate",{repeatedHarm:1.5,reliableRepair:0,sustainedCare:1});
+ const some=step({primary:"neutral",intensity:8},warmth,2,"intimate",{repeatedHarm:1.5,reliableRepair:1,sustainedCare:1});
+ const strong=step({primary:"neutral",intensity:8},warmth,2,"intimate",{repeatedHarm:1.5,reliableRepair:2.5,sustainedCare:1});
+ assert.ok(some.emotion.intensity >= none.emotion.intensity);
+ assert.ok(strong.emotion.intensity >= some.emotion.intensity);
+});
