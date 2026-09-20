@@ -46,3 +46,19 @@ test("sustained care changes the reason for closeness but does not invent romanc
  const d=reduceRelationshipAction({previousAction:"NORMAL",emotion:{primary:"happy",intensity:42,reason:"grounded_warmth",evidence:["ありがとう"],afterglow:"none"},signals:assessment([{name:"care",strength:.8,confidence:.9,evidence:"大事にしてくれた"}]),intimacyLevel:"familiar",patterns:{sustainedCare:2.4,repeatedHarm:0,reliableRepair:0}});
  assert.equal(d.action,"NORMAL"); assert.equal(d.direction,"closer"); assert.equal(d.reason,"sustained_care_supports_natural_closeness");
 });
+
+
+test("fresh hurt does not become gentle reconnection just because affection remains",()=>{
+ const d=reduceRelationshipAction({previousAction:"NORMAL",emotion:{primary:"hurt",secondary:"affectionate",intensity:30,reason:"relational_harm",evidence:["その言い方は傷つく"],afterglow:"none"},signals:assessment([{name:"hurtful",strength:.8,confidence:.9,evidence:"傷つく言い方"}]),intimacyLevel:"intimate"});
+ assert.equal(d.action,"PULL"); assert.equal(d.direction,"space");
+});
+
+test("softened old hurt with affection remaining can reconnect gently when there is no new harm",()=>{
+ const d=reduceRelationshipAction({previousAction:"PULL",emotion:{primary:"hurt",secondary:"affectionate",intensity:28,reason:"existing_emotion_settled_with_time",evidence:[],afterglow:"none"},signals:assessment(),intimacyLevel:"intimate"});
+ assert.equal(d.action,"RECONNECT"); assert.equal(d.direction,"gentle");
+});
+
+test("guarded affection still preserves space",()=>{
+ const d=reduceRelationshipAction({previousAction:"PULL",emotion:{primary:"guarded",secondary:"affectionate",intensity:24,reason:"existing_emotion_settled_with_time",evidence:[],afterglow:"wary"},signals:assessment(),intimacyLevel:"intimate"});
+ assert.equal(d.action,"PULL"); assert.equal(d.direction,"space");
+});
