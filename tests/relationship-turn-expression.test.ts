@@ -30,3 +30,23 @@ test("wording guide makes emotion implicit rather than narrated",()=>{
  assert.match(g,/感情名を説明せず/);
  assert.match(g,/少しぎこちなさを残してよい/);
 });
+
+
+test("fresh hurt with affection uses quiet distance rather than breakup language",()=>{
+ const g=createCurrentTurnActionGuide({action:"PULL",direction:"space",reason:"affection_remains_but_hurt_still_needs_space"},"none","affectionate");
+ assert.match(g,/短め・静かめ/);
+ assert.match(g,/別れや嫌悪を勝手に示さない/);
+});
+
+test("softening hurt reconnects by small changes rather than instant reset",()=>{
+ const g=createCurrentTurnActionGuide({action:"RECONNECT",direction:"gentle",reason:"affection_remains_while_hurt_softens"},"none","affectionate");
+ assert.match(g,/小さく応じる/);
+ assert.match(g,/少し柔らかくする/);
+ assert.match(g,/いきなり元通りにせず/);
+});
+
+test("warm concern stays familiar without turning into interrogation",()=>{
+ const g=createCurrentTurnActionGuide({action:"CHASE",direction:"check_in",reason:"care_and_warmth_coexist_with_grounded_concern"},"concerned","happy");
+ assert.match(g,/普段の親しさを消さない/);
+ assert.match(g,/尋問のように質問を重ねず/);
+});
