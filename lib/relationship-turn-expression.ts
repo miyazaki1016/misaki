@@ -7,7 +7,7 @@ export function previewRelationshipTurn(context: RelationshipTimeContext | null,
   const allowed = new Set(["neutral","happy","affectionate","concerned","hurt","sulky","guarded"]);
   const primary = allowed.has(context?.emotionPrimary ?? "") ? context!.emotionPrimary as any : "neutral";
   const emotion = reduceRelationshipEmotion({previous:{primary,intensity:context?.emotionIntensity ?? 0},signals,elapsedHours:context?.elapsedHours ?? 0,intimacyLevel:context?.intimacyLevel ?? "initial",patterns});
-  const action = reduceRelationshipAction({previousAction:context?.actionState ?? "NORMAL",emotion,signals,intimacyLevel:context?.intimacyLevel ?? "initial"});
+  const action = reduceRelationshipAction({previousAction:context?.actionState ?? "NORMAL",emotion,signals,intimacyLevel:context?.intimacyLevel ?? "initial",patterns});
   return {emotion,action};
 }
 
