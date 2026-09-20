@@ -45,6 +45,7 @@ export async function persistRelationshipEmotionFromSignals(
     emotion,
     signals: assessment,
     intimacyLevel: context?.intimacyLevel ?? "initial",
+    patterns: learnedPatterns,
   });
 
   if (isAnonymous) return { applied: false, conflict: false, emotion, action };
