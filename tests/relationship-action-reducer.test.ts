@@ -30,3 +30,19 @@ test("tender afterglow chooses gentle closeness instead of snapping to teasing",
 
 test("concern afterglow can keep a gentle check-in alive after intensity softens",()=>{const d=reduceRelationshipAction({previousAction:"CHASE",emotion:{primary:"concerned",intensity:22,reason:"existing_emotion_settled_with_time",evidence:[],afterglow:"concerned"},signals:assessment(),intimacyLevel:"familiar"});assert.equal(d.action,"CHASE");assert.equal(d.direction,"check_in");});
 test("warm afterglow preserves soft connection without requiring a new warmth signal",()=>{const d=reduceRelationshipAction({previousAction:"NORMAL",emotion:{primary:"happy",intensity:30,reason:"existing_emotion_settled_with_time",evidence:[],afterglow:"warm"},signals:assessment(),intimacyLevel:"intimate"});assert.equal(d.action,"NORMAL");assert.equal(d.direction,"gentle");});
+
+
+test("repeated harm without demonstrated repair keeps distance despite a new repair attempt",()=>{
+ const d=reduceRelationshipAction({previousAction:"PULL",emotion:{primary:"hurt",intensity:34,reason:"repair_in_progress",evidence:["ごめん"],afterglow:"none"},signals:assessment([{name:"repair",strength:.9,confidence:.9,evidence:"仲直りしたい"}]),intimacyLevel:"intimate",patterns:{repeatedHarm:2.4,reliableRepair:0,sustainedCare:0}});
+ assert.equal(d.action,"PULL"); assert.equal(d.direction,"space");
+});
+
+test("demonstrated repair history allows cautious reconnection after an apology",()=>{
+ const d=reduceRelationshipAction({previousAction:"PULL",emotion:{primary:"hurt",intensity:28,reason:"repair_in_progress",evidence:["ごめん"],afterglow:"none"},signals:assessment([{name:"repair",strength:.9,confidence:.9,evidence:"仲直りしたい"}]),intimacyLevel:"intimate",patterns:{repeatedHarm:2.1,reliableRepair:1.4,sustainedCare:1}});
+ assert.equal(d.action,"RECONNECT"); assert.equal(d.direction,"repair");
+});
+
+test("sustained care changes the reason for closeness but does not invent romance",()=>{
+ const d=reduceRelationshipAction({previousAction:"NORMAL",emotion:{primary:"happy",intensity:42,reason:"grounded_warmth",evidence:["ありがとう"],afterglow:"none"},signals:assessment([{name:"care",strength:.8,confidence:.9,evidence:"大事にしてくれた"}]),intimacyLevel:"familiar",patterns:{sustainedCare:2.4,repeatedHarm:0,reliableRepair:0}});
+ assert.equal(d.action,"NORMAL"); assert.equal(d.direction,"closer"); assert.equal(d.reason,"sustained_care_supports_natural_closeness");
+});
