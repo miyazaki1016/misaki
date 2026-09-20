@@ -21,3 +21,24 @@ test("self focus does not hijack a recent user message as its motive",()=>{
  assert.equal(m.kind,"internal_state");
  assert.match(m.summary,/美咲自身/);
 });
+
+
+test("user focus does not turn an unrelated relationship memory into a current reason to contact",()=>{
+ const m=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:["前に二人で映画の話をして盛り上がった"],lifeEvidence:[]});
+ assert.equal(m.kind,"internal_state");
+ assert.equal(m.evidence,"none");
+});
+
+test("relationship focus prefers a fresh shared event over a generic older memory",()=>{
+ const now=new Date().toISOString();
+ const m=deriveProactiveMotive({desire:"be_close",focus:"relationship",history:[],memory:["前に映画の話をした"],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"shared_warmth_after_chat",createdAt:now,direction:"closer"}]});
+ assert.equal(m.kind,"relationship_event");
+ assert.equal(m.evidence,"shared_warmth_after_chat");
+});
+
+test("self focus remains Misaki-led even when relationship evidence exists",()=>{
+ const now=new Date().toISOString();
+ const m=deriveProactiveMotive({desire:"talk",focus:"self",history:[{role:"user",text:"今日は忙しかった",sentAt:now}],memory:["二人の思い出"],lifeEvidence:["今日は仕事"] ,relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"warm_chat",createdAt:now}]});
+ assert.equal(m.kind,"internal_state");
+ assert.match(m.summary,/美咲自身/);
+});
