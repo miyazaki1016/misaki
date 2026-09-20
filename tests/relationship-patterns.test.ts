@@ -37,3 +37,38 @@ test("apology alone is not evidence of demonstrated reliable repair",()=>{
  const p=deriveRelationshipPatterns([event([s("apology")]),event([s("apology")],1)]);
  assert.equal(p.reliableRepair,0);
 });
+
+
+test("old hurt fades in learned pattern weight instead of becoming permanent resentment",()=>{
+ const recent=deriveRelationshipPatterns([event([s("hurtful")],5)]);
+ const old=deriveRelationshipPatterns([event([s("hurtful")],200)]);
+ assert.ok((recent.repeatedHarm??0) > (old.repeatedHarm??0));
+ assert.ok((old.repeatedHarm??0) > 0);
+});
+
+test("harm recurring after repair is weighted more than two unrelated hurts",()=>{
+ const repairedThenRelapsed=deriveRelationshipPatterns([
+  event([s("hurtful")],0),
+  event([s("repair")],1),
+  event([s("hurtful")],2),
+ ]);
+ const unrelated=deriveRelationshipPatterns([
+  event([s("hurtful")],0),
+  event([s("hurtful")],2),
+ ]);
+ assert.ok((repairedThenRelapsed.repeatedHarm??0) > (unrelated.repeatedHarm??0));
+});
+
+test("old repair evidence also fades and cannot guarantee trust forever",()=>{
+ const recent=deriveRelationshipPatterns([event([s("repair")],5)]);
+ const old=deriveRelationshipPatterns([event([s("repair")],200)]);
+ assert.ok((recent.reliableRepair??0) > (old.reliableRepair??0));
+});
+
+test("sustained recent care outweighs a single old caring event",()=>{
+ const sustained=deriveRelationshipPatterns([
+  event([s("care")],2), event([s("trust")],8), event([s("warmth")],20),
+ ]);
+ const old=deriveRelationshipPatterns([event([s("care")],200)]);
+ assert.ok((sustained.sustainedCare??0) > (old.sustainedCare??0));
+});
