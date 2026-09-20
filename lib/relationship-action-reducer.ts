@@ -40,7 +40,7 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
   // Mixed emotions should produce mixed behavior: keep the caring/affectionate
   // connection visible without pretending the hurt, caution, or concern vanished.
   if (mixedAffectionAndHurt) {
-    if (emotion.primary === "guarded" || emotion.intensity >= 38) {
+    if (harm >= 0.45 || emotion.primary === "guarded" || emotion.intensity >= 38) {
       return { action: "PULL", direction: "space", reason: "affection_remains_but_hurt_still_needs_space" };
     }
     return { action: "RECONNECT", direction: "gentle", reason: "affection_remains_while_hurt_softens" };
