@@ -11,7 +11,7 @@ const s=(name:string,strength=.8,confidence=.95)=>({name,strength,confidence});
 
 test("repeated harm counts distinct persisted events",()=>{
  const p=deriveRelationshipPatterns([event([s("hurtful")]),event([s("hurtful")],1),event([s("boundary")],2)]);
- assert.equal(p.repeatedHarm,2);
+ assert.equal(p.repeatedHarm,2.15);
 });
 
 test("repair mixed with fresh harm is not credited as reliable repair",()=>{
@@ -77,4 +77,17 @@ test("sustained recent care outweighs a single old caring event",()=>{
  ]);
  const old=deriveRelationshipPatterns([event([s("care")],200)]);
  assert.ok((sustained.sustainedCare??0) > (old.sustainedCare??0));
+});
+
+
+test("clustered recent hurts form a stronger pattern than equally many distant incidents",()=>{
+ const clustered=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("hurtful")],5)]);
+ const distant=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("hurtful")],120)]);
+ assert.ok((clustered.repeatedHarm??0) > (distant.repeatedHarm??0));
+});
+
+test("care repeated within a month becomes sustained care rather than isolated kindness",()=>{
+ const sustained=deriveRelationshipPatterns([event([s("care")],1),event([s("care")],10)]);
+ const isolated=deriveRelationshipPatterns([event([s("care")],1),event([s("care")],120)]);
+ assert.ok((sustained.sustainedCare??0) > (isolated.sustainedCare??0));
 });
