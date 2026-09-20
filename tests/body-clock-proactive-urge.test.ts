@@ -52,3 +52,17 @@ test("grounded concern is not silenced by the ordinary recent-contact cooldown",
  assert.equal(r.shouldSend,true);
  assert.equal(r.desire,"check_in");
 });
+
+
+test("proactive focus distinguishes Misaki, the user, and the relationship",()=>{
+ assert.equal(deriveProactiveUrge({...base,photoOpportunity:true,action:"TEASE",emotion:"affectionate",emotionIntensity:80,intimacyLevel:3}).focus,"self");
+ assert.equal(deriveProactiveUrge({...base,action:"CHASE",emotion:"concerned",emotionIntensity:60,lifeConfidence:"explicit"}).focus,"user");
+ assert.equal(deriveProactiveUrge({...base,action:"RECONNECT",emotion:"hurt",emotionIntensity:28,intimacyLevel:3}).focus,"relationship");
+});
+
+test("ordinary affectionate closeness is about the relationship rather than inventing a user need",()=>{
+ const r=deriveProactiveUrge({...base,emotion:"affectionate",emotionIntensity:82,intimacyLevel:3});
+ assert.equal(r.shouldSend,true);
+ assert.equal(r.desire,"be_close");
+ assert.equal(r.focus,"relationship");
+});
