@@ -33,6 +33,8 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
   let repairAwaitingOutcome = false;
   let lastHarmAt: number | null = null;
   let lastCareAt: number | null = null;
+  let consecutiveHarm = 0;
+  let consecutiveCare = 0;
   const now = Date.now();
   // Events are loaded newest-first. Learn trajectories oldest -> newest so a
   // repair only earns trust after later evidence shows the relationship held.
@@ -58,14 +60,21 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
       // Recurrence after a repair attempt matters most; repeated harm in a short
       // period also forms a pattern, but old isolated incidents should not pile up forever.
       const recurrence = repairAwaitingOutcome ? 1.35 : clustered ? 1.15 : 1;
-      repeatedHarm += recency * recurrence;
+      consecutiveHarm += 1;
+      consecutiveCare = 0;
+      repeatedHarm += recency * recurrence * (consecutiveHarm >= 3 ? 1.1 : 1);
       if (Number.isFinite(at)) lastHarmAt = at;
       repairAwaitingOutcome = false;
     }
-    if (repair >= .5 && harm < .45) repairAwaitingOutcome = true;
+    if (repair >= .5 && harm < .45) {
+      repairAwaitingOutcome = true;
+      consecutiveHarm = 0;
+    }
     if (care >= .55 && harm < .45) {
       const sustained = lastCareAt !== null && Number.isFinite(at) && at - lastCareAt <= 30 * 86400000;
-      sustainedCare += recency * (sustained ? 1.1 : 1);
+      consecutiveCare += 1;
+      consecutiveHarm = 0;
+      sustainedCare += recency * (sustained ? 1.1 : 1) * (consecutiveCare >= 3 ? 1.05 : 1);
       if (Number.isFinite(at)) lastCareAt = at;
       // Repair becomes reliable only when a later turn supplies positive evidence.
       if (repairAwaitingOutcome) {
