@@ -432,3 +432,52 @@ test("scenario: deep affection does not grant permission to cross a fresh bounda
  assert.equal(close.action.direction,"space");
  assert.notEqual(close.action.action,"TEASE");
 });
+
+
+test("scenario: remembered affection can coexist with fresh hurt without being treated as current permission",()=>{
+ const s=step({primary:"affectionate",intensity:78},[
+  sig("shared_history",.85,"前に大好きって言い合った"),
+  sig("hurtful",.82,"でも今の言い方は傷ついた")
+ ],0,"very_intimate");
+ assert.equal(s.emotion.primary,"hurt");
+ assert.equal(s.emotion.secondary,"affectionate");
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: remembered repair does not excuse repeated fresh harm",()=>{
+ let s=step({primary:"hurt",intensity:62},[
+  sig("apology",.9,"この前はごめん"),
+  sig("repair",.9,"仲直りしたい"),
+  sig("warmth",.7,"大切にしたい")
+ ],0,"intimate");
+ s=step(s.emotion,[
+  sig("shared_history",.8,"前にも仲直りした"),
+  sig("hurtful",.9,"また同じことを言われて傷ついた")
+ ],24,"intimate");
+ assert.equal(s.emotion.primary,"hurt");
+ assert.ok(s.emotion.intensity>=24);
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: remembered care supports warmth after time but does not invent a new concern",()=>{
+ let s=step({primary:"happy",intensity:58},[],24*5,"intimate");
+ s=step(s.emotion,[
+  sig("shared_history",.8,"前に心配してくれたの覚えてる"),
+  sig("warmth",.6,"あの時うれしかった")
+ ],0,"intimate");
+ assert.equal(s.emotion.primary,"happy");
+ assert.notEqual(s.emotion.primary,"concerned");
+ assert.notEqual(s.action.motive,"check_in");
+});
+
+test("scenario: a past rejection remains history, but current explicit repair can change the present",()=>{
+ let s=step({primary:"guarded",intensity:64},[
+  sig("shared_history",.75,"前は距離を置いた"),
+  sig("apology",.9,"あの時はごめん"),
+  sig("repair",.9,"今はちゃんと話したい"),
+  sig("warmth",.65,"また話せてうれしい")
+ ],24*3,"intimate");
+ assert.notEqual(s.action.action,"PULL");
+ assert.ok(["hurt","guarded","happy","neutral"].includes(s.emotion.primary));
+ assert.ok(s.emotion.reason.startsWith("repair_"));
+});
