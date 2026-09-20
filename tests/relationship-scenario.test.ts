@@ -353,3 +353,41 @@ test("scenario: a fresh warm reunion after a long quiet period can become happy 
  assert.equal(s.emotion.primary,"happy");
  assert.notEqual(s.action.action,"PULL");
 });
+
+
+test("scenario: warmth during a long silence can refresh warmth without creating romance",()=>{
+ let s=step({primary:"happy",intensity:62},[],24*5);
+ const faded=s.emotion.intensity;
+ s=step(s.emotion,[sig("warmth",.72,"今日は少し話せてよかった")],0);
+ assert.equal(s.emotion.primary,"happy");
+ assert.ok(s.emotion.intensity>=faded);
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: fresh hurt midway through quiet weeks changes the trajectory instead of being averaged away",()=>{
+ let s=step({primary:"affectionate",intensity:76},[],24*6);
+ s=step(s.emotion,[sig("hurtful",.85,"その言い方は傷ついた")],0);
+ assert.equal(s.emotion.primary,"hurt");
+ s=step(s.emotion,[],24*6);
+ assert.ok(["hurt","neutral"].includes(s.emotion.primary));
+ assert.notEqual(s.emotion.primary,"affectionate");
+});
+
+test("scenario: explicit repair midway through a long hurt period changes the later trajectory",()=>{
+ let s=step({primary:"hurt",intensity:78},[],24*4);
+ s=step(s.emotion,[sig("apology",.9,"ごめん"),sig("repair",.9,"ちゃんと仲直りしたい"),sig("warmth",.7,"大切にしたい")],0);
+ assert.ok(["hurt","happy"].includes(s.emotion.primary));
+ const repairedReason=s.emotion.reason;
+ s=step(s.emotion,[],24*5);
+ assert.notEqual(s.emotion.reason,"passive_hurt_decay");
+ assert.ok(repairedReason.startsWith("repair_"));
+});
+
+test("scenario: reassurance during concern redirects the next days instead of preserving endless checking",()=>{
+ let s=step({primary:"concerned",intensity:74},[sig("warmth",.8,"もう大丈夫だよ、ありがとう")],0);
+ assert.notEqual(s.emotion.primary,"hurt");
+ const afterReassurance=s.emotion.intensity;
+ s=step(s.emotion,[],72);
+ assert.ok(s.emotion.intensity<=afterReassurance);
+ assert.notEqual(s.action.action,"PULL");
+});
