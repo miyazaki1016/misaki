@@ -28,6 +28,9 @@ export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow
 
 【感情の余韻】
 ${afterglowGuide[afterglow]??afterglowGuide.none}
+${decisionGuide[decision.reason] ? `
+【今回の言葉の温度】
+${decisionGuide[decision.reason]}` : ""}
 ${mixedGuide ? `
 【同時に残っている感情】
 ${mixedGuide}` : ""}
