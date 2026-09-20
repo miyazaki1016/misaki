@@ -1,12 +1,12 @@
 import type { RelationshipTimeContext } from "./relationship-time.ts";
 import type { RelationshipSignalAssessment } from "./relationship-signal.ts";
-import { reduceRelationshipEmotion } from "./relationship-emotion-reducer.ts";
+import { reduceRelationshipEmotion, type RelationshipPatternContext } from "./relationship-emotion-reducer.ts";
 import { createActionDecisionGuide, reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer.ts";
 
-export function previewRelationshipTurn(context: RelationshipTimeContext | null, signals: RelationshipSignalAssessment) {
+export function previewRelationshipTurn(context: RelationshipTimeContext | null, signals: RelationshipSignalAssessment, patterns?: RelationshipPatternContext) {
   const allowed = new Set(["neutral","happy","affectionate","concerned","hurt","sulky","guarded"]);
   const primary = allowed.has(context?.emotionPrimary ?? "") ? context!.emotionPrimary as any : "neutral";
-  const emotion = reduceRelationshipEmotion({previous:{primary,intensity:context?.emotionIntensity ?? 0},signals,elapsedHours:context?.elapsedHours ?? 0,intimacyLevel:context?.intimacyLevel ?? "initial"});
+  const emotion = reduceRelationshipEmotion({previous:{primary,intensity:context?.emotionIntensity ?? 0},signals,elapsedHours:context?.elapsedHours ?? 0,intimacyLevel:context?.intimacyLevel ?? "initial",patterns});
   const action = reduceRelationshipAction({previousAction:context?.actionState ?? "NORMAL",emotion,signals,intimacyLevel:context?.intimacyLevel ?? "initial"});
   return {emotion,action};
 }
