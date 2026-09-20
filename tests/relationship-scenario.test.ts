@@ -601,3 +601,22 @@ test("scenario: ordinary good morning after unresolved hurt does not erase yeste
  assert.notEqual(s.emotion.primary,"affectionate");
  assert.notEqual(s.action.direction,"closer");
 });
+
+
+test("scenario: the same three quiet days feel different after different histories",()=>{
+ const fragile=step({primary:"hurt",intensity:60},[],72,"intimate",{repeatedHarm:3,reliableRepair:0,sustainedCare:.2});
+ const ordinary=step({primary:"hurt",intensity:60},[],72,"intimate",{repeatedHarm:0,reliableRepair:0,sustainedCare:.2});
+ assert.equal(fragile.emotion.primary,"hurt");
+ assert.equal(ordinary.emotion.primary,"hurt");
+ assert.ok(fragile.emotion.intensity>ordinary.emotion.intensity);
+ assert.notEqual(fragile.action.direction,"closer");
+});
+
+test("scenario: a warm shared history can survive a quiet weekend without creating a new feeling",()=>{
+ const lived=step({primary:"happy",intensity:48},[],72,"very_intimate",{sustainedCare:3,reliableRepair:2,repeatedHarm:0});
+ const newBond=step({primary:"happy",intensity:48},[],72,"familiar",{sustainedCare:0,reliableRepair:0,repeatedHarm:0});
+ assert.equal(lived.emotion.primary,"happy");
+ assert.equal(newBond.emotion.primary,"happy");
+ assert.ok(lived.emotion.intensity>newBond.emotion.intensity);
+ assert.equal(lived.emotion.evidence.length,0);
+});
