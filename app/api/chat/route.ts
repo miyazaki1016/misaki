@@ -43,6 +43,7 @@ import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
+import { loadRelationshipPatterns } from "../../../lib/relationship-patterns";
 
 type TokyoWeather = {
   temperature: number | null;
@@ -1789,6 +1790,12 @@ export async function POST(
         () => loadRelationshipTimeContext(supabase, isAnonymous)
       );
 
+    const relationshipPatterns =
+      await measureStage(
+        "relationship-patterns-load",
+        () => loadRelationshipPatterns(supabase as any, isAnonymous)
+      );
+
     const usageRequestId =
       crypto.randomUUID();
 
@@ -2652,7 +2659,8 @@ ${retryProblems
     const currentTurnState =
       previewRelationshipTurn(
         relationshipTimeContext,
-        relationshipSignalAssessment
+        relationshipSignalAssessment,
+        relationshipPatterns
       );
 
     if (
@@ -2725,7 +2733,8 @@ ${retryProblems
           supabase,
           isAnonymous,
           relationshipTimeContext,
-          relationshipSignalAssessment
+          relationshipSignalAssessment,
+          relationshipPatterns
         )
       );
 
