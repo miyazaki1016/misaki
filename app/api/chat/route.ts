@@ -2673,7 +2673,8 @@ ${retryProblems
           "\n\n" +
             createCurrentTurnActionGuide(
               currentTurnState.action,
-              currentTurnState.emotion.afterglow
+              currentTurnState.emotion.afterglow,
+              currentTurnState.emotion.secondary
             ) +
             "\n\n【再生成の目的】\n最初の判定で得た関係シグナルと今回の行動意図を反映して、replyだけを自然に作り直してください。relationshipSignals の判定は同じユーザー発言について再度行い、根拠のないシグナルを追加しないでください。"
         );
