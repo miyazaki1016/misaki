@@ -48,3 +48,24 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
     sustainedCare: Math.min(sustainedCare, 3),
   };
 }
+
+
+export async function loadRelationshipPatterns(
+  supabase: { from: (table: string) => any },
+  isAnonymous: boolean
+): Promise<RelationshipPatternContext> {
+  if (isAnonymous) return {};
+
+  const { data, error } = await supabase
+    .from("misaki_relationship_events")
+    .select("event_type,metadata,created_at")
+    .order("created_at", { ascending: false })
+    .limit(40);
+
+  if (error) {
+    console.error("RELATIONSHIP PATTERN LOAD ERROR:", error);
+    return {};
+  }
+
+  return deriveRelationshipPatterns(Array.isArray(data) ? data : []);
+}
