@@ -1,4 +1,4 @@
-import type { EmotionReducerResult } from "./relationship-emotion-reducer";
+import type { EmotionReducerResult, RelationshipPatternContext } from "./relationship-emotion-reducer";
 import type { RelationshipSignalAssessment } from "./relationship-signal";
 
 export type RelationshipAction =
@@ -18,6 +18,7 @@ export type ActionReducerInput = {
   emotion: EmotionReducerResult;
   signals: RelationshipSignalAssessment;
   intimacyLevel: string;
+  patterns?: RelationshipPatternContext;
 };
 
 const weight = (a: RelationshipSignalAssessment, names: string[]) =>
@@ -26,6 +27,9 @@ const weight = (a: RelationshipSignalAssessment, names: string[]) =>
 
 export function reduceRelationshipAction(input: ActionReducerInput): ActionDecision {
   const { emotion, signals, intimacyLevel } = input;
+  const repeatedHarm = Math.max(0, input.patterns?.repeatedHarm ?? 0);
+  const reliableRepair = Math.max(0, input.patterns?.reliableRepair ?? 0);
+  const sustainedCare = Math.max(0, input.patterns?.sustainedCare ?? 0);
   const repair = weight(signals, ["apology", "repair"]);
   const harm = weight(signals, ["hurtful", "rejection", "boundary"]);
   const warmth = weight(signals, ["warmth", "care", "trust", "romantic"]);
@@ -44,7 +48,10 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
     return { action: "CHASE", direction: "check_in", reason: "grounded_concern_invites_check_in" };
   }
   if (repair >= 0.4 && ["hurt", "sulky", "guarded"].includes(emotion.primary)) {
-    return { action: "RECONNECT", direction: "repair", reason: "repair_is_underway" };
+    if (repeatedHarm >= 2 && reliableRepair < 1) {
+      return { action: "PULL", direction: "space", reason: "repeated_harm_needs_consistency_before_reconnection" };
+    }
+    return { action: "RECONNECT", direction: "repair", reason: reliableRepair >= 1 ? "demonstrated_repair_supports_reconnection" : "repair_is_underway" };
   }
   if (emotion.reason === "repair_resolved_hurt") {
     return { action: "RECONNECT", direction: "repair", reason: "repair_resolved_distance" };
@@ -68,6 +75,7 @@ export function reduceRelationshipAction(input: ActionReducerInput): ActionDecis
     return { action: "NORMAL", direction: "gentle", reason: "tender_afterglow_prefers_gentle_closeness" };
   }
   if (["happy", "affectionate"].includes(emotion.primary) && warmth >= 0.4) {
+    if (sustainedCare >= 2) return { action: "NORMAL", direction: "closer", reason: "sustained_care_supports_natural_closeness" };
     return { action: "NORMAL", direction: "closer", reason: "warmth_moves_naturally_closer" };
   }
   return { action: "NORMAL", direction: "steady", reason: "no_action_pressure" };
