@@ -391,3 +391,44 @@ test("scenario: reassurance during concern redirects the next days instead of pr
  assert.ok(s.emotion.intensity<=afterReassurance);
  assert.notEqual(s.action.action,"PULL");
 });
+
+
+test("scenario: the same small hurt lands harder in a close relationship than at first meeting",()=>{
+ const signals=[sig("hurtful",.5,"その言い方は少し傷ついた")];
+ const early=step({primary:"neutral",intensity:0},signals,0,"new");
+ const close=step({primary:"affectionate",intensity:70},signals,0,"very_intimate");
+ assert.equal(early.emotion.primary,"hurt");
+ assert.equal(close.emotion.primary,"hurt");
+ assert.ok(close.emotion.intensity>early.emotion.intensity);
+ assert.equal(close.emotion.secondary,"affectionate");
+ assert.equal(early.emotion.secondary,null);
+});
+
+test("scenario: the same romantic words do not imply the same relationship history",()=>{
+ const signals=[sig("romantic",.72,"好きだよ")];
+ const early=step({primary:"neutral",intensity:0},signals,0,"new");
+ const close=step({primary:"affectionate",intensity:68},signals,0,"very_intimate");
+ assert.equal(early.emotion.primary,"affectionate");
+ assert.equal(close.emotion.primary,"affectionate");
+ assert.ok(close.emotion.intensity>early.emotion.intensity);
+});
+
+test("scenario: shared history warms an established relationship without turning a new one romantic",()=>{
+ const history=[sig("shared_history",.8,"前にも一緒に笑ったね"),sig("warmth",.5,"覚えてて嬉しい")];
+ const early=step({primary:"neutral",intensity:0},history,0,"new");
+ const close=step({primary:"happy",intensity:58},history,0,"intimate");
+ assert.equal(early.emotion.primary,"happy");
+ assert.equal(close.emotion.primary,"happy");
+ assert.notEqual(early.action.action,"TEASE");
+ assert.notEqual(close.emotion.primary,"affectionate");
+});
+
+test("scenario: deep affection does not grant permission to cross a fresh boundary",()=>{
+ const close=step({primary:"affectionate",intensity:92},[
+  sig("boundary",.95,"今日は一人にして"),
+  sig("shared_history",.8,"いつもは甘えてるけど")
+ ],0,"very_intimate");
+ assert.equal(close.emotion.primary,"guarded");
+ assert.equal(close.action.direction,"space");
+ assert.notEqual(close.action.action,"TEASE");
+});
