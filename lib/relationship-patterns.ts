@@ -30,7 +30,8 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
   let repeatedHarm = 0;
   let reliableRepair = 0;
   let sustainedCare = 0;
-  let repairAwaitingOutcome = false;
+  let repairAttemptAt: number | null = null;
+  let unresolvedHarmAt: number | null = null;
   let lastHarmAt: number | null = null;
   let lastCareAt: number | null = null;
   let consecutiveHarm = 0;
@@ -52,22 +53,25 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
     const repair = signals.filter(s => ["repair"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const at = event.created_at ? Date.parse(event.created_at) : NaN;
-    const ageDays = Number.isFinite(at) ? Math.max(0, (now - at) / 86400000) : 0;
+    if (!Number.isFinite(at)) continue;
+    const ageDays = Math.max(0, (now - at) / 86400000);
     const recency = ageDays <= 30 ? 1 : ageDays <= 90 ? .6 : ageDays <= 180 ? .3 : .1;
 
     if (harm >= .45) {
       const clustered = lastHarmAt !== null && Number.isFinite(at) && at - lastHarmAt <= 14 * 86400000;
       // Recurrence after a repair attempt matters most; repeated harm in a short
       // period also forms a pattern, but old isolated incidents should not pile up forever.
-      const recurrence = repairAwaitingOutcome ? 1.35 : clustered ? 1.15 : 1;
+      const recurrence = repairAttemptAt !== null && at - repairAttemptAt <= 14 * 86400000 ? 1.35 : clustered ? 1.15 : 1;
       consecutiveHarm += 1;
       consecutiveCare = 0;
       repeatedHarm += recency * recurrence * (consecutiveHarm >= 3 ? 1.1 : 1);
       if (Number.isFinite(at)) lastHarmAt = at;
-      repairAwaitingOutcome = false;
+      unresolvedHarmAt = at;
+      repairAttemptAt = null;
     }
     if (repair >= .5 && harm < .45) {
-      repairAwaitingOutcome = true;
+      const followsRecentHarm = unresolvedHarmAt !== null && at - unresolvedHarmAt <= 30 * 86400000;
+      repairAttemptAt = followsRecentHarm ? at : null;
       consecutiveHarm = 0;
     }
     if (care >= .55 && harm < .45) {
@@ -77,9 +81,10 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
       sustainedCare += recency * (sustained ? 1.1 : 1) * (consecutiveCare >= 3 ? 1.05 : 1);
       if (Number.isFinite(at)) lastCareAt = at;
       // Repair becomes reliable only when a later turn supplies positive evidence.
-      if (repairAwaitingOutcome) {
+      if (repairAttemptAt !== null && at >= repairAttemptAt && at - repairAttemptAt <= 14 * 86400000) {
         reliableRepair += recency;
-        repairAwaitingOutcome = false;
+        repairAttemptAt = null;
+        unresolvedHarmAt = null;
       }
     }
   }
@@ -101,6 +106,7 @@ export async function loadRelationshipPatterns(
   const { data, error } = await supabase
     .from("misaki_relationship_events")
     .select("event_type,metadata,created_at")
+    .eq("event_type", "emotion_action_v2_after_chat")
     .order("created_at", { ascending: false })
     .limit(40);
 
