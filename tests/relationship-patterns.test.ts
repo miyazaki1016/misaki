@@ -91,3 +91,24 @@ test("care repeated within a month becomes sustained care rather than isolated k
  const isolated=deriveRelationshipPatterns([event([s("care")],1),event([s("care")],120)]);
  assert.ok((sustained.sustainedCare??0) > (isolated.sustainedCare??0));
 });
+
+
+test("three consecutive hurts teach more caution than two, without unbounded growth",()=>{
+ const two=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("hurtful")],2)]);
+ const three=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("hurtful")],2),event([s("hurtful")],3)]);
+ assert.ok((three.repeatedHarm??0) > (two.repeatedHarm??0));
+ assert.ok((three.repeatedHarm??0) <= 3);
+});
+
+test("a repair attempt breaks a harm streak instead of treating all history as one run",()=>{
+ const uninterrupted=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("hurtful")],2),event([s("hurtful")],3)]);
+ const interrupted=deriveRelationshipPatterns([event([s("hurtful")],1),event([s("repair")],2),event([s("hurtful")],3)]);
+ assert.ok((uninterrupted.repeatedHarm??0) >= (interrupted.repeatedHarm??0));
+});
+
+test("three consecutive caring turns reinforce sustained care without creating romance",()=>{
+ const two=deriveRelationshipPatterns([event([s("care")],1),event([s("care")],2)]);
+ const three=deriveRelationshipPatterns([event([s("care")],1),event([s("care")],2),event([s("care")],3)]);
+ assert.ok((three.sustainedCare??0) > (two.sustainedCare??0));
+ assert.ok((three.sustainedCare??0) <= 3);
+});
