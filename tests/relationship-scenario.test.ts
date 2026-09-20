@@ -9,7 +9,7 @@ const sig=(name:string,strength:number,evidence:string)=>({name,strength,confide
 function step(previous:EmotionStateV2,signals:any[],elapsedHours:number,intimacyLevel="intimate",patterns?:{repeatedHarm?:number;reliableRepair?:number;sustainedCare?:number}){
  const a=assessment(signals);
  const emotion=reduceRelationshipEmotion({previous,signals:a,elapsedHours,intimacyLevel,patterns});
- const action=reduceRelationshipAction({previousAction:"NORMAL",emotion,signals:a,intimacyLevel});
+ const action=reduceRelationshipAction({previousAction:"NORMAL",emotion,signals:a,intimacyLevel,patterns});
  return {emotion,action};
 }
 
@@ -576,4 +576,28 @@ test("scenario: reliable repair changes reception gradually, not by flipping a p
  const strong=step({primary:"neutral",intensity:8},warmth,2,"intimate",{repeatedHarm:1.5,reliableRepair:2.5,sustainedCare:1});
  assert.ok(some.emotion.intensity >= none.emotion.intensity);
  assert.ok(strong.emotion.intensity >= some.emotion.intensity);
+});
+
+
+test("scenario: next morning after a small fight stays a little distant instead of resetting",()=>{
+ let s=step({primary:"affectionate",intensity:58},[sig("hurtful",.72,"昨日ちょっと嫌な言い方をした")],1,"intimate",{sustainedCare:2,reliableRepair:1});
+ assert.ok(["hurt","sulky","guarded"].includes(s.emotion.primary));
+ const hurt=s.emotion.intensity;
+ s=step(s.emotion,[],9,"intimate",{sustainedCare:2,reliableRepair:1});
+ assert.ok(s.emotion.intensity<=hurt);
+ assert.notEqual(s.action.direction,"closer");
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: next morning after apology can be gentle without pretending everything is reset",()=>{
+ let s=step({primary:"hurt",intensity:52},[sig("apology",.82,"昨日はごめん"),sig("repair",.8,"ちゃんと仲直りしたい")],8,"intimate",{repeatedHarm:.5,reliableRepair:1.2,sustainedCare:2});
+ assert.ok(["repairing","tender","none"].includes(s.emotion.afterglow));
+ assert.notEqual(s.action.action,"TEASE");
+ assert.ok(["repair","gentle","steady"].includes(s.action.direction));
+});
+
+test("scenario: ordinary good morning after unresolved hurt does not erase yesterday",()=>{
+ const s=step({primary:"hurt",intensity:48},[sig("warmth",.35,"おはよう")],10,"intimate",{repeatedHarm:1,reliableRepair:0,sustainedCare:1});
+ assert.notEqual(s.emotion.primary,"affectionate");
+ assert.notEqual(s.action.direction,"closer");
 });
