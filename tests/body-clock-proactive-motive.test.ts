@@ -59,3 +59,20 @@ test("no grounded topic remains explicitly none instead of borrowing unrelated e
  assert.equal(m.topicSource,"none");
  assert.equal(m.evidence,"none");
 });
+
+
+test("topic intent says why Misaki is speaking, independently from the evidence source",()=>{
+ const now=new Date().toISOString();
+ const self=deriveProactiveMotive({desire:"talk",focus:"self",history:[],memory:[],lifeEvidence:[]});
+ const care=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:[],lifeEvidence:["今日は仕事"]});
+ const bond=deriveProactiveMotive({desire:"be_close",focus:"relationship",history:[],memory:[],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"warm_chat",createdAt:now}]});
+ assert.equal(self.topicIntent,"share_self");
+ assert.equal(care.topicIntent,"care_for_user");
+ assert.equal(bond.topicIntent,"continue_relationship");
+});
+
+test("missing evidence never manufactures an intent from an unrelated memory",()=>{
+ const m=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:["二人で映画の話をした"],lifeEvidence:[]});
+ assert.equal(m.topicIntent,"none");
+ assert.equal(m.topicSource,"none");
+});
