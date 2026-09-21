@@ -12,8 +12,8 @@ export function deriveProactiveMotive(input:{desire:string;focus?:ProactiveFocus
  if(input.focus==="relationship"&&input.desire==="reconnect"&&event&&eventAge.freshness!=="old")return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"relationship_event",evidence:clean(event.reason),summary:"保存された二人の関係の出来事を受けて、つなぎ直したい",...eventAge};
  if(input.focus==="relationship"&&input.desire==="reconnect"&&user)return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"recent_conversation",evidence:clean(user.text),summary:"直近のやり取りを受けて関係をつなぎ直したい",...age};
  if(input.focus==="relationship"&&["talk","be_playful","be_close"].includes(input.desire)){
-   if(event&&eventAge.freshness!=="old")return{kind:"relationship_event",evidence:clean(event.reason),summary:"保存された関係の変化を背景に自分から関わりたい",...eventAge};
-   if(user&&age.freshness!=="old")return{kind:"recent_conversation",evidence:clean(user.text),summary:"直近の会話の続きとして自分から関わりたい",...age};
+   if(event&&eventAge.freshness!=="old")return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"relationship_event",evidence:clean(event.reason),summary:"保存された関係の変化を背景に自分から関わりたい",...eventAge};
+   if(user&&age.freshness!=="old")return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"recent_conversation",evidence:clean(user.text),summary:"直近の会話の続きとして自分から関わりたい",...age};
    const remembered=[...input.memory].reverse().find(x=>x.trim());
    if(remembered)return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"relationship_memory",evidence:clean(remembered),summary:"二人の記憶を背景に自分から関わりたい",evidenceAt:null,freshness:"unknown"};
  }
