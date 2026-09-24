@@ -642,3 +642,25 @@ test("scenario: a loving phrase during an unresolved boundary does not erase the
  assert.notEqual(s.action.direction,"closer");
  assert.notEqual(s.action.action,"TEASE");
 });
+
+
+test("scenario: reliable repair history lets a small new misunderstanding recover more gently",()=>{
+ const safe=step({primary:"hurt",intensity:42},[sig("apology",.78,"言い方悪かった、ごめん")],5,"intimate",{repeatedHarm:.2,reliableRepair:3,sustainedCare:3});
+ const fragile=step({primary:"hurt",intensity:42},[sig("apology",.78,"言い方悪かった、ごめん")],5,"intimate",{repeatedHarm:2.5,reliableRepair:0,sustainedCare:.5});
+ assert.ok(safe.emotion.intensity<=fragile.emotion.intensity);
+ assert.notEqual(fragile.action.direction,"closer");
+});
+
+test("scenario: one quiet week cools emotion but does not manufacture a breakup or romance",()=>{
+ const s=step({primary:"affectionate",intensity:55},[],168,"intimate",{repeatedHarm:0,reliableRepair:1,sustainedCare:2});
+ assert.ok(["affectionate","happy","neutral"].includes(s.emotion.primary));
+ assert.equal(s.emotion.evidence.length,0);
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.emotion.primary,"concerned");
+});
+
+test("scenario: fresh hurt outranks a warm history instead of being discounted away",()=>{
+ const s=step({primary:"affectionate",intensity:72},[sig("hurtful",.9,"ひどい言い方")],1,"very_intimate",{repeatedHarm:0,reliableRepair:3,sustainedCare:3});
+ assert.ok(["hurt","guarded","sulky"].includes(s.emotion.primary));
+ assert.notEqual(s.action.direction,"closer");
+});
