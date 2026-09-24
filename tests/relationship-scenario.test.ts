@@ -664,3 +664,24 @@ test("scenario: fresh hurt outranks a warm history instead of being discounted a
  assert.ok(["hurt","guarded","sulky"].includes(s.emotion.primary));
  assert.notEqual(s.action.direction,"closer");
 });
+
+
+test("scenario: mixed affection and hurt keeps affection from turning into instant closeness",()=>{
+ const s=step({primary:"affectionate",intensity:65},[sig("romantic",.8,"好きだよ"),sig("hurtful",.62,"でも嫌な言い方もした")],1,"intimate",{repeatedHarm:.5,reliableRepair:1,sustainedCare:2});
+ assert.ok(["hurt","guarded","sulky"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: repeated warm care can rebuild safety gradually without inventing dating",()=>{
+ let s=step({primary:"guarded",intensity:50},[sig("care",.75,"無理しないでね")],24,"familiar",{repeatedHarm:1,reliableRepair:.5,sustainedCare:2});
+ s=step(s.emotion,[sig("warmth",.7,"今日も話せてよかった")],24,"familiar",{repeatedHarm:.7,reliableRepair:1,sustainedCare:3});
+ assert.notEqual(s.emotion.primary,"guarded");
+ assert.notEqual(s.action.action,"PULL");
+});
+
+test("scenario: time alone cannot turn concern into a new romantic feeling",()=>{
+ const s=step({primary:"concerned",intensity:58},[],96,"familiar",{repeatedHarm:0,reliableRepair:1,sustainedCare:2});
+ assert.notEqual(s.emotion.primary,"affectionate");
+ assert.equal(s.emotion.evidence.length,0);
+});
