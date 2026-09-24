@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { previewRelationshipConversation } from "../lib/relationship-conversation-preview";
-import type { RelationshipTimeContext } from "../lib/relationship-time";
+import { previewRelationshipConversation } from "../lib/relationship-conversation-preview.ts";
+import type { RelationshipTimeContext } from "../lib/relationship-time.ts";
 
 const context = (overrides: Partial<RelationshipTimeContext> = {}): RelationshipTimeContext => ({
   exists: true,
