@@ -1,10 +1,10 @@
-import type { RelationshipTimeContext } from "./relationship-time";
-import type { RelationshipSignalAssessment } from "./relationship-signal";
-import type { RelationshipPatternContext } from "./relationship-emotion-reducer";
+import type { RelationshipTimeContext } from "./relationship-time.ts";
+import type { RelationshipSignalAssessment } from "./relationship-signal.ts";
+import type { RelationshipPatternContext } from "./relationship-emotion-reducer.ts";
 import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
-} from "./relationship-turn-expression";
+} from "./relationship-turn-expression.ts";
 
 export type RelationshipConversationPreview = {
   emotion: ReturnType<typeof previewRelationshipTurn>["emotion"];
