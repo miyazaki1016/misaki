@@ -25,6 +25,9 @@ ${createProactiveLifeGuide(life)}
 【美咲の今の欲求】
 ${desirePrompt}
 
+【今の気持ちが向いている先】
+${focusPrompt}
+
 ${motiveGuide(motive)}
 
 【美咲の体内時計からの自発メッセージ】
