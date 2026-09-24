@@ -620,3 +620,25 @@ test("scenario: a warm shared history can survive a quiet weekend without creati
  assert.ok(lived.emotion.intensity>newBond.emotion.intensity);
  assert.equal(lived.emotion.evidence.length,0);
 });
+
+
+test("scenario: apology after repeated hurt may soften the moment without instantly restoring closeness",()=>{
+ const s=step({primary:"hurt",intensity:68},[sig("apology",.9,"ごめん"),sig("repair",.8,"仲直りしたい")],6,"intimate",{repeatedHarm:3,reliableRepair:0,sustainedCare:.5});
+ assert.notEqual(s.emotion.primary,"affectionate");
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: concern can coexist with unresolved hurt without pretending reconciliation",()=>{
+ const s=step({primary:"hurt",intensity:55},[sig("concern",.85,"今日は大丈夫？")],4,"intimate",{repeatedHarm:1.5,reliableRepair:.5,sustainedCare:1});
+ assert.ok(["concerned","hurt","guarded"].includes(s.emotion.primary));
+ assert.notEqual(s.action.action,"TEASE");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: a loving phrase during an unresolved boundary does not erase the boundary",()=>{
+ const s=step({primary:"guarded",intensity:62},[sig("romantic",.9,"大好きだよ")],2,"intimate",{repeatedHarm:1,reliableRepair:0,sustainedCare:2});
+ assert.equal(s.emotion.primary,"guarded");
+ assert.notEqual(s.action.direction,"closer");
+ assert.notEqual(s.action.action,"TEASE");
+});
