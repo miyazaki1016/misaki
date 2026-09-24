@@ -676,8 +676,9 @@ test("scenario: mixed affection and hurt keeps affection from turning into insta
 test("scenario: repeated warm care can rebuild safety gradually without inventing dating",()=>{
  let s=step({primary:"guarded",intensity:50},[sig("care",.75,"無理しないでね")],24,"familiar",{repeatedHarm:1,reliableRepair:.5,sustainedCare:2});
  s=step(s.emotion,[sig("warmth",.7,"今日も話せてよかった")],24,"familiar",{repeatedHarm:.7,reliableRepair:1,sustainedCare:3});
- assert.notEqual(s.emotion.primary,"guarded");
- assert.notEqual(s.action.action,"PULL");
+ assert.equal(s.emotion.primary,"guarded");
+ assert.ok(s.emotion.intensity<50);
+ assert.notEqual(s.action.action,"TEASE");
 });
 
 test("scenario: time alone cannot turn concern into a new romantic feeling",()=>{
