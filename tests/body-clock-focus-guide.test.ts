@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { focusGuide } from "../supabase/functions/body-clock/index.ts";
+import { focusGuide } from "../supabase/functions/body-clock/focus-guide.ts";
 
 test("self focus keeps the proactive topic centered on Misaki",()=>{
  const g=focusGuide("self");
