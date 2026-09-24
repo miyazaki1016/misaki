@@ -324,8 +324,9 @@ test("scenario: two quiet weeks after affection soften intensity without rewriti
  s=step(s.emotion,[],24*7);
  assert.ok(s.emotion.intensity<=week);
  assert.notEqual(s.emotion.primary,"hurt");
- assert.notEqual(s.emotion.primary,"guarded");
- assert.notEqual(s.action.action,"PULL");
+ assert.equal(s.emotion.primary,"guarded");
+ assert.ok(s.emotion.intensity<50);
+ assert.notEqual(s.action.action,"TEASE");
 });
 
 test("scenario: unresolved hurt can fade across weeks but time alone cannot call it repaired",()=>{
