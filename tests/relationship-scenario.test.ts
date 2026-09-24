@@ -705,3 +705,23 @@ test("scenario: healthy shared history does not excuse a fresh boundary violatio
  assert.ok(["guarded","hurt","sulky"].includes(s.emotion.primary));
  assert.notEqual(s.action.direction,"closer");
 });
+
+
+test("scenario: after a repaired disagreement a normal greeting can be warm without jumping straight to romance",()=>{
+ const s=step({primary:"happy",intensity:38},[sig("warmth",.55,"おはよう")],10,"intimate",{repeatedHarm:.3,reliableRepair:2,sustainedCare:2});
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.emotion.primary,"guarded");
+});
+
+test("scenario: silence after rejection does not reinterpret the rejection as hidden affection",()=>{
+ const s=step({primary:"guarded",intensity:64},[],24*14,"familiar",{repeatedHarm:0,reliableRepair:0,sustainedCare:1});
+ assert.notEqual(s.emotion.primary,"affectionate");
+ assert.equal(s.emotion.evidence.length,0);
+});
+
+test("scenario: concern followed by reassurance can settle without manufacturing closeness",()=>{
+ let s=step({primary:"concerned",intensity:62},[sig("care",.65,"大丈夫？")],1,"familiar",{sustainedCare:1});
+ s=step(s.emotion,[sig("warmth",.6,"大丈夫だよ")],3,"familiar",{sustainedCare:1.5});
+ assert.notEqual(s.emotion.primary,"hurt");
+ assert.notEqual(s.action.action,"PULL");
+});
