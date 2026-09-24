@@ -5,13 +5,13 @@ import { buildProactiveDecisionContext, createProactiveDecisionGuide, type Proac
 import { buildProactiveLifeContext, createProactiveLifeGuide } from "./proactive-life-context.ts";
 import { deriveProactiveUrge, desireGuide, type ProactiveFocus } from "./proactive-urge.ts";
 import { deriveProactiveMotive, motiveGuide, type ProactiveMotive, type RelationshipEventEvidence } from "./proactive-motive.ts";
+import { hoursSinceLastContact } from "./contact-timing.ts";
 const SUPABASE_URL=Deno.env.get("SUPABASE_URL")!,MAX_PER_RUN=4,MIN_DELAY_MINUTES=55,MAX_DELAY_MINUTES=210;
 type BodyClockRow={user_id:string;relationship_points:number;long_term_memory:unknown;today_memory:unknown;recent_history:unknown;notifications_enabled:boolean;timezone:string;pushes_today:number;push_date:string|null};
 type ChatMessage={role:"user"|"misaki";text:string;sentAt?:string};
 const randomDelayMs=()=>Math.floor(MIN_DELAY_MINUTES*60000+Math.random()*((MAX_DELAY_MINUTES-MIN_DELAY_MINUTES)*60000));
 const tokyoNowText=()=>new Date().toLocaleString("ja-JP",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit",weekday:"short",hour:"2-digit",minute:"2-digit",hour12:false});
 function safeHistory(v:unknown):ChatMessage[]{return Array.isArray(v)?v.filter(x=>x&&(x.role==="user"||x.role==="misaki")&&typeof x.text==="string").map(x=>({role:x.role as "user"|"misaki",text:String(x.text).trim(),...(typeof x.sentAt==="string"?{sentAt:x.sentAt}:{})})).filter(x=>x.text).slice(-60):[]}
-export function hoursSinceLastContact(history:ChatMessage[]){const times=history.map(x=>typeof x.sentAt==="string"?new Date(x.sentAt).getTime():NaN).filter(Number.isFinite);if(!times.length)return undefined;const latest=Math.max(...times),hours=(Date.now()-latest)/3600000;return Number.isFinite(hours)?Math.max(0,hours):undefined}
 function safeMemory(v:unknown):string[]{return Array.isArray(v)?v.filter(x=>typeof x==="string"&&x.trim()).map(x=>x.trim()).slice(-30):[]}
 function extractJsonObject(t:string){const s=t.trim();try{return JSON.parse(s)}catch{const a=s.indexOf("{"),b=s.lastIndexOf("}");if(a>=0&&b>a)return JSON.parse(s.slice(a,b+1));throw new Error("Gemini returned invalid JSON")}}
 function focusGuide(focus:ProactiveFocus|undefined){switch(focus){case"self":return"今回の話題の中心は美咲自身。自分の気分・見せたいもの・話したいことから自然に始め、ユーザーへの御用聞きにしない。";case"user":return"今回の話題の中心はユーザー。根拠のある生活文脈や心配だけを扱い、監視や詮索のようにしない。";case"relationship":return"今回の話題の中心は二人の関係。共有した出来事や今の距離感を踏まえるが、存在しない交際事実や思い出を作らない。";default:return"話題の中心を無理に作らない。";}}
