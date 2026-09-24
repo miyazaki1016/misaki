@@ -79,3 +79,16 @@ test("ordinary reconnect may act after the contact cooldown",()=>{
  assert.equal(r.desire,"reconnect");
  assert.equal(r.focus,"relationship");
 });
+
+
+test("ordinary grounded concern does not nag right after contact",()=>{
+ const r=deriveProactiveUrge({...base,emotion:"concerned",emotionIntensity:60,lifeConfidence:"explicit",hoursSinceLastContact:2});
+ assert.equal(r.shouldSend,false);
+});
+
+test("new grounded external concern may break the ordinary contact cooldown",()=>{
+ const r=deriveProactiveUrge({...base,emotion:"concerned",emotionIntensity:60,externalConcern:true,hoursSinceLastContact:2});
+ assert.equal(r.shouldSend,true);
+ assert.equal(r.desire,"check_in");
+ assert.equal(r.focus,"user");
+});
