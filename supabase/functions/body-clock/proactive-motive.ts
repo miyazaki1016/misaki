@@ -25,6 +25,7 @@ export function motiveGuide(m:ProactiveMotive){const intentGuide=m.topicIntent==
 意味: ${m.summary}
 根拠: ${m.evidence}
 根拠の新しさ: ${m.freshness}
+${intentGuide}
 ・根拠は「なぜ今話しかけたいか」の背景であり、必ず本文に引用する必要はない
 ・relationship_event は保存済みの関係変化であり、そこにない会話内容を捏造しない
 ・old / unknown の根拠を現在進行形の事実として扱わない
