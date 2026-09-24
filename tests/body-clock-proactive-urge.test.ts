@@ -66,3 +66,16 @@ test("ordinary affectionate closeness is about the relationship rather than inve
  assert.equal(r.desire,"be_close");
  assert.equal(r.focus,"relationship");
 });
+
+
+test("ordinary reconnect waits when Misaki and user just talked",()=>{
+ const r=deriveProactiveUrge({...base,action:"RECONNECT",emotion:"happy",emotionIntensity:60,hoursSinceLastContact:2});
+ assert.equal(r.shouldSend,false);
+});
+
+test("ordinary reconnect may act after the contact cooldown",()=>{
+ const r=deriveProactiveUrge({...base,action:"RECONNECT",emotion:"happy",emotionIntensity:60,hoursSinceLastContact:8});
+ assert.equal(r.shouldSend,true);
+ assert.equal(r.desire,"reconnect");
+ assert.equal(r.focus,"relationship");
+});
