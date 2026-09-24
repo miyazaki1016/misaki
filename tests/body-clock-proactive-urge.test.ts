@@ -47,10 +47,9 @@ test("ordinary desire can act again after enough relationship time passes",()=>{
  assert.equal(r.desire,"be_close");
 });
 
-test("grounded concern is not silenced by the ordinary recent-contact cooldown",()=>{
+test("grounded concern with CHASE still respects ordinary recent-contact cooldown",()=>{
  const r=deriveProactiveUrge({...base,action:"CHASE",emotion:"concerned",emotionIntensity:60,lifeConfidence:"explicit",hoursSinceLastContact:1});
- assert.equal(r.shouldSend,true);
- assert.equal(r.desire,"check_in");
+ assert.equal(r.shouldSend,false);
 });
 
 
