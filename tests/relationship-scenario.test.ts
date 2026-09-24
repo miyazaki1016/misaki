@@ -686,3 +686,22 @@ test("scenario: time alone cannot turn concern into a new romantic feeling",()=>
  assert.notEqual(s.emotion.primary,"affectionate");
  assert.equal(s.emotion.evidence.length,0);
 });
+
+
+test("scenario: apology can start repair while affection stays secondary rather than erasing hurt",()=>{
+ const s=step({primary:"hurt",intensity:60},[sig("apology",.88,"ごめん"),sig("romantic",.7,"大事に思ってる")],3,"intimate",{repeatedHarm:1.5,reliableRepair:.5,sustainedCare:2});
+ assert.notEqual(s.emotion.primary,"affectionate");
+ assert.notEqual(s.action.action,"TEASE");
+});
+
+test("scenario: repeated harm keeps caution after a calm day even when the latest message is warm",()=>{
+ const s=step({primary:"guarded",intensity:58},[sig("warmth",.65,"今日は普通に話そう")],24,"intimate",{repeatedHarm:3,reliableRepair:0,sustainedCare:.5});
+ assert.equal(s.emotion.primary,"guarded");
+ assert.notEqual(s.action.direction,"closer");
+});
+
+test("scenario: healthy shared history does not excuse a fresh boundary violation",()=>{
+ const s=step({primary:"happy",intensity:70},[sig("boundary",.95,"それはやめて")],0,"very_intimate",{repeatedHarm:0,reliableRepair:3,sustainedCare:3});
+ assert.ok(["guarded","hurt","sulky"].includes(s.emotion.primary));
+ assert.notEqual(s.action.direction,"closer");
+});
