@@ -20,7 +20,7 @@ export function deriveProactiveMotive(input:{desire:string;focus?:ProactiveFocus
  if(input.focus==="self")return{topicIntent:"share_self",topicSource:"misaki",kind:"internal_state",evidence:"none",summary:"美咲自身の現在の気分や欲求から自分のことを話したい",evidenceAt:null,freshness:"unknown"};
  return{topicIntent:"none",topicSource:"none",kind:"internal_state",evidence:"none",summary:"現在の内部状態以外に特定の出来事根拠はない",evidenceAt:null,freshness:"unknown"};
 }
-export function motiveGuide(m:ProactiveMotive){return `【今回の自発行動の動機】
+export function motiveGuide(m:ProactiveMotive){const intentGuide=m.topicIntent==="share_self"?"・今回は美咲自身を少し見せることが目的。ユーザーへの質問や気遣いへ無理に変換しない":m.topicIntent==="care_for_user"?"・今回はユーザーを気にかけることが目的。美咲自身の話へ主題を奪わない":m.topicIntent==="continue_relationship"?"・今回は二人の関係の続きを作ることが目的。単なる近況確認や独り言へ逃げない":"・明確な話題意図がないなら、理由を捏造しない";return `【今回の自発行動の動機】
 話題の意図: ${m.topicIntent}\n話題の出どころ: ${m.topicSource}\n種類: ${m.kind}
 意味: ${m.summary}
 根拠: ${m.evidence}
