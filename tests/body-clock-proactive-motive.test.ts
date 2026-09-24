@@ -76,3 +76,23 @@ test("missing evidence never manufactures an intent from an unrelated memory",()
  assert.equal(m.topicIntent,"none");
  assert.equal(m.topicSource,"none");
 });
+
+
+test("motive guide protects self intent from becoming user service",()=>{
+ const m=deriveProactiveMotive({desire:"talk",focus:"self",history:[],memory:[],lifeEvidence:[]});
+ const g=motiveGuide(m);
+ assert.match(g,/美咲自身を少し見せる/);
+ assert.match(g,/質問や気遣いへ無理に変換しない/);
+});
+
+test("motive guide protects care intent from becoming a Misaki monologue",()=>{
+ const m=deriveProactiveMotive({desire:"check_in",focus:"user",history:[],memory:[],lifeEvidence:["今日は仕事"]});
+ assert.match(motiveGuide(m),/ユーザーを気にかける/);
+});
+
+test("motive guide protects relationship intent from collapsing into generic check-in",()=>{
+ const now=new Date().toISOString();
+ const m=deriveProactiveMotive({desire:"be_close",focus:"relationship",history:[],memory:[],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"warm_chat",createdAt:now}]});
+ assert.match(motiveGuide(m),/二人の関係の続きを作る/);
+ assert.match(motiveGuide(m),/単なる近況確認/);
+});
