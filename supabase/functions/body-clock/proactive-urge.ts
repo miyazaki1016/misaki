@@ -5,7 +5,7 @@ type Input={relationshipStoryMeaning?:"none"|"unresolved_hurt"|"repair_in_progre
 export function deriveProactiveUrge(input:Input):ProactiveUrge{const intensity=Math.max(0,Math.min(100,input.emotionIntensity));
 const hoursSinceLastContact=Number.isFinite(input.hoursSinceLastContact)?Math.max(0,Number(input.hoursSinceLastContact)):null;
 const contactedRecently=hoursSinceLastContact!==null&&hoursSinceLastContact<6;
-if(input.relationshipStoryMeaning==="unresolved_hurt"||input.relationshipStoryMeaning==="repeated_harm")return{shouldSend:false,strength:0,desire:"give_space",reason:"relationship_story_needs_space"};
+if(input.externalConcern===true&&input.emotion==="concerned"&&intensity>=35)return{shouldSend:true,strength:Math.min(100,55+Math.round(intensity*.35)),desire:"check_in",reason:"grounded_external_concern_wants_check_in",focus:"user"};\nif(input.relationshipStoryMeaning==="unresolved_hurt"||input.relationshipStoryMeaning==="repeated_harm")return{shouldSend:false,strength:0,desire:"give_space",reason:"relationship_story_needs_space"};
 if(input.action==="PULL"||input.emotion==="guarded")return{shouldSend:false,strength:0,desire:"give_space",reason:"space_is_the_action"};
 if(input.action==="SULK"||input.emotion==="hurt"){
  if(input.action==="RECONNECT"&&intensity>=20&&!contactedRecently)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.35)),desire:"reconnect",reason:"repair_wants_contact",focus:"relationship"};
