@@ -50,3 +50,37 @@ test("warm concern stays familiar without turning into interrogation",()=>{
  assert.match(g,/普段の親しさを消さない/);
  assert.match(g,/尋問のように質問を重ねず/);
 });
+
+
+test("unresolved relationship event keeps ordinary wording from resetting instantly",()=>{
+ const g=createCurrentTurnActionGuide(
+  {action:"NORMAL",direction:"steady",reason:"no_action_pressure"},
+  "none",
+  null,
+  {unresolvedHurt:.8,repairStage:"hurt",meaning:"unresolved_hurt",lastMeaningfulAt:"2026-09-25T00:00:00.000Z"}
+ );
+ assert.match(g,/二人の出来事の余韻/);
+ assert.match(g,/急に完全復帰した温度へ戻さない/);
+});
+
+test("demonstrated repair changes old hurt into relationship safety instead of grievance",()=>{
+ const g=createCurrentTurnActionGuide(
+  {action:"NORMAL",direction:"gentle",reason:"no_action_pressure"},
+  "warm",
+  null,
+  {unresolvedHurt:0,repairStage:"rebuilding",meaning:"repair_demonstrated",lastMeaningfulAt:"2026-09-25T00:00:00.000Z"}
+ );
+ assert.match(g,/修復できた二人/);
+ assert.match(g,/昔の傷を蒸し返さず/);
+});
+
+test("repeated harm keeps caution without instructing punishment",()=>{
+ const g=createCurrentTurnActionGuide(
+  {action:"RECONNECT",direction:"repair",reason:"repair_is_underway"},
+  "repairing",
+  null,
+  {unresolvedHurt:1.2,repairStage:"repair_attempted",meaning:"repeated_harm",lastMeaningfulAt:"2026-09-25T00:00:00.000Z"}
+ );
+ assert.match(g,/言葉だけで警戒を即解除せず/);
+ assert.match(g,/会話を拒否しない/);
+});
