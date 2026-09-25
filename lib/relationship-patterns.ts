@@ -8,6 +8,13 @@ type RelationshipEventLike = {
 
 type SignalSummary = { name?: string; strength?: number; confidence?: number };
 
+export type RelationshipStoryState = {
+  unresolvedHurt: number;
+  repairStage: "none" | "hurt" | "repair_attempted" | "rebuilding";
+  meaning: "none" | "unresolved_hurt" | "repair_in_progress" | "repair_demonstrated" | "repeated_harm";
+  lastMeaningfulAt: string | null;
+};
+
 function signalsOf(event: RelationshipEventLike): SignalSummary[] {
   const metadata = event.metadata && typeof event.metadata === "object"
     ? event.metadata as Record<string, unknown>
@@ -20,6 +27,68 @@ function weight(signal: SignalSummary) {
   const strength = Number.isFinite(signal.strength) ? Number(signal.strength) : 0;
   const confidence = Number.isFinite(signal.confidence) ? Number(signal.confidence) : 0;
   return strength * confidence;
+}
+
+function orderedEvents(events: RelationshipEventLike[]) {
+  return events.slice(0, 40).sort((a,b) => {
+    const ta = a.created_at ? Date.parse(a.created_at) : 0;
+    const tb = b.created_at ? Date.parse(b.created_at) : 0;
+    return ta - tb;
+  });
+}
+
+/**
+ * Read the same persisted relationship events as a small story trajectory.
+ * This deliberately stores meaning, not a verbatim grievance: hurt may become
+ * "we repaired this" after later evidence, while repeated harm stays cautionary.
+ */
+export function deriveRelationshipStory(events: RelationshipEventLike[]): RelationshipStoryState {
+  let unresolvedHurt = 0;
+  let repairStage: RelationshipStoryState["repairStage"] = "none";
+  let meaning: RelationshipStoryState["meaning"] = "none";
+  let lastMeaningfulAt: string | null = null;
+  let harmCount = 0;
+
+  for (const event of orderedEvents(events)) {
+    const signals = signalsOf(event);
+    const harm = signals.filter(s => String(s.name) === "hurtful").reduce((n,s)=>n+weight(s),0);
+    const repair = signals.filter(s => String(s.name) === "repair").reduce((n,s)=>n+weight(s),0);
+    const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
+
+    if (harm >= .45) {
+      harmCount += 1;
+      unresolvedHurt = Math.min(3, unresolvedHurt + harm);
+      repairStage = "hurt";
+      meaning = harmCount >= 2 ? "repeated_harm" : "unresolved_hurt";
+      lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
+      continue;
+    }
+
+    if (repair >= .5 && unresolvedHurt > 0) {
+      repairStage = "repair_attempted";
+      meaning = "repair_in_progress";
+      unresolvedHurt = Math.max(.15, unresolvedHurt - repair * .35);
+      lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
+    }
+
+    if (care >= .55 && repairStage === "repair_attempted") {
+      repairStage = "rebuilding";
+      unresolvedHurt = Math.max(0, unresolvedHurt - care * .75);
+      meaning = unresolvedHurt <= .2 ? "repair_demonstrated" : "repair_in_progress";
+      lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
+    } else if (care >= .55 && repairStage === "rebuilding") {
+      unresolvedHurt = Math.max(0, unresolvedHurt - care * .5);
+      if (unresolvedHurt <= .2) meaning = "repair_demonstrated";
+      lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
+    }
+  }
+
+  return {
+    unresolvedHurt: Math.round(unresolvedHurt * 100) / 100,
+    repairStage,
+    meaning,
+    lastMeaningfulAt,
+  };
 }
 
 /**
@@ -37,18 +106,10 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
   let consecutiveHarm = 0;
   let consecutiveCare = 0;
   const now = Date.now();
-  // Events are loaded newest-first. Learn trajectories oldest -> newest so a
-  // repair only earns trust after later evidence shows the relationship held.
-  const ordered = events.slice(0, 40).sort((a,b) => {
-    const ta = a.created_at ? Date.parse(a.created_at) : 0;
-    const tb = b.created_at ? Date.parse(b.created_at) : 0;
-    return ta - tb;
-  });
+  const ordered = orderedEvents(events);
 
   for (const event of ordered) {
     const signals = signalsOf(event);
-    // A boundary or a rejection can be healthy and must not teach Misaki that
-    // the user is harmful. Repeated-harm learning is reserved for hurtful evidence.
     const harm = signals.filter(s => String(s.name) === "hurtful").reduce((n,s)=>n+weight(s),0);
     const repair = signals.filter(s => ["repair"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
     const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
@@ -58,14 +119,12 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
     const recency = ageDays <= 30 ? 1 : ageDays <= 90 ? .6 : ageDays <= 180 ? .3 : .1;
 
     if (harm >= .45) {
-      const clustered = lastHarmAt !== null && Number.isFinite(at) && at - lastHarmAt <= 14 * 86400000;
-      // Recurrence after a repair attempt matters most; repeated harm in a short
-      // period also forms a pattern, but old isolated incidents should not pile up forever.
+      const clustered = lastHarmAt !== null && at - lastHarmAt <= 14 * 86400000;
       const recurrence = repairAttemptAt !== null && at - repairAttemptAt <= 14 * 86400000 ? 1.35 : clustered ? 1.15 : 1;
       consecutiveHarm += 1;
       consecutiveCare = 0;
       repeatedHarm += recency * recurrence * (consecutiveHarm >= 3 ? 1.1 : 1);
-      if (Number.isFinite(at)) lastHarmAt = at;
+      lastHarmAt = at;
       unresolvedHarmAt = at;
       repairAttemptAt = null;
     }
@@ -75,12 +134,11 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
       consecutiveHarm = 0;
     }
     if (care >= .55 && harm < .45) {
-      const sustained = lastCareAt !== null && Number.isFinite(at) && at - lastCareAt <= 30 * 86400000;
+      const sustained = lastCareAt !== null && at - lastCareAt <= 30 * 86400000;
       consecutiveCare += 1;
       consecutiveHarm = 0;
       sustainedCare += recency * (sustained ? 1.1 : 1) * (consecutiveCare >= 3 ? 1.05 : 1);
-      if (Number.isFinite(at)) lastCareAt = at;
-      // Repair becomes reliable only when a later turn supplies positive evidence.
+      lastCareAt = at;
       if (repairAttemptAt !== null && at >= repairAttemptAt && at - repairAttemptAt <= 14 * 86400000) {
         reliableRepair += recency;
         repairAttemptAt = null;
@@ -95,7 +153,6 @@ export function deriveRelationshipPatterns(events: RelationshipEventLike[]): Rel
     sustainedCare: Math.min(Math.round(sustainedCare * 100) / 100, 3),
   };
 }
-
 
 export async function loadRelationshipPatterns(
   supabase: { from: (table: string) => any },
