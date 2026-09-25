@@ -1,10 +1,11 @@
 export type ProactiveDesire = "none"|"give_space"|"check_in"|"reconnect"|"talk"|"be_playful"|"be_close"|"share_photo";
 export type ProactiveFocus="self"|"user"|"relationship"|"none";
 export type ProactiveUrge={shouldSend:boolean;strength:number;desire:ProactiveDesire;reason:string;focus?:ProactiveFocus};
-type Input={photoOpportunity?:boolean;externalConcern?:boolean;hoursSinceLastContact?:number;action:"NORMAL"|"WAIT"|"TEASE"|"SULK"|"CHASE"|"PULL"|"RECONNECT";emotion:"neutral"|"happy"|"affectionate"|"concerned"|"hurt"|"sulky"|"guarded";emotionIntensity:number;intimacyLevel:number;lifeConfidence:"none"|"explicit";pushesToday:number};
+type Input={relationshipStoryMeaning?:"none"|"unresolved_hurt"|"repair_in_progress"|"repair_demonstrated"|"repeated_harm";photoOpportunity?:boolean;externalConcern?:boolean;hoursSinceLastContact?:number;action:"NORMAL"|"WAIT"|"TEASE"|"SULK"|"CHASE"|"PULL"|"RECONNECT";emotion:"neutral"|"happy"|"affectionate"|"concerned"|"hurt"|"sulky"|"guarded";emotionIntensity:number;intimacyLevel:number;lifeConfidence:"none"|"explicit";pushesToday:number};
 export function deriveProactiveUrge(input:Input):ProactiveUrge{const intensity=Math.max(0,Math.min(100,input.emotionIntensity));
 const hoursSinceLastContact=Number.isFinite(input.hoursSinceLastContact)?Math.max(0,Number(input.hoursSinceLastContact)):null;
 const contactedRecently=hoursSinceLastContact!==null&&hoursSinceLastContact<6;
+if(input.relationshipStoryMeaning==="unresolved_hurt"||input.relationshipStoryMeaning==="repeated_harm")return{shouldSend:false,strength:0,desire:"give_space",reason:"relationship_story_needs_space"};
 if(input.action==="PULL"||input.emotion==="guarded")return{shouldSend:false,strength:0,desire:"give_space",reason:"space_is_the_action"};
 if(input.action==="SULK"||input.emotion==="hurt"){
  if(input.action==="RECONNECT"&&intensity>=20&&!contactedRecently)return{shouldSend:true,strength:Math.min(100,45+Math.round(intensity*.35)),desire:"reconnect",reason:"repair_wants_contact",focus:"relationship"};
