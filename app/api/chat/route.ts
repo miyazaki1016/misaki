@@ -43,7 +43,7 @@ import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
-import { loadRelationshipPatterns, loadRelationshipStory } from "../../../lib/relationship-patterns";
+import { loadRelationshipHistory } from "../../../lib/relationship-patterns";
 import {
   createLifeUnderstandingGuide,
   extractExplicitLifeFacts,
@@ -1798,17 +1798,13 @@ export async function POST(
         () => loadRelationshipTimeContext(supabase, isAnonymous)
       );
 
-    const relationshipPatterns =
+    const relationshipHistory =
       await measureStage(
-        "relationship-patterns-load",
-        () => loadRelationshipPatterns(supabase as any, isAnonymous)
+        "relationship-history-load",
+        () => loadRelationshipHistory(supabase as any, isAnonymous)
       );
-
-    const relationshipStory =
-      await measureStage(
-        "relationship-story-load",
-        () => loadRelationshipStory(supabase as any, isAnonymous)
-      );
+    const relationshipPatterns = relationshipHistory.patterns;
+    const relationshipStory = relationshipHistory.story;
 
     const usageRequestId =
       crypto.randomUUID();
