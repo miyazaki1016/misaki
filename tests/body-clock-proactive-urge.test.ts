@@ -91,3 +91,18 @@ test("new grounded external concern may break the ordinary contact cooldown",()=
  assert.equal(r.desire,"check_in");
  assert.equal(r.focus,"user");
 });
+
+
+test("unresolved relationship story blocks stale affection from initiating contact",()=>{
+ const r=deriveProactiveUrge({...base,relationshipStoryMeaning:"unresolved_hurt",action:"TEASE",emotion:"affectionate",emotionIntensity:90,intimacyLevel:3,photoOpportunity:true});
+ assert.equal(r.shouldSend,false);
+ assert.equal(r.desire,"give_space");
+ assert.equal(r.reason,"relationship_story_needs_space");
+});
+
+test("repeated harm blocks stale reconnect state from initiating contact",()=>{
+ const r=deriveProactiveUrge({...base,relationshipStoryMeaning:"repeated_harm",action:"RECONNECT",emotion:"happy",emotionIntensity:80,intimacyLevel:3,hoursSinceLastContact:8});
+ assert.equal(r.shouldSend,false);
+ assert.equal(r.desire,"give_space");
+ assert.equal(r.reason,"relationship_story_needs_space");
+});
