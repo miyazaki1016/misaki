@@ -50,7 +50,9 @@ export function storyMeaningFromEvents(events: Array<{ metadata?: unknown; creat
   let repairStage: "none" | "hurt" | "repair_attempted" | "rebuilding" = "none";
   let meaning: RelationshipStoryMeaning = "none";
   let harmCount = 0;
-  const ordered = [...events].slice(0,40).sort((a,b)=>new Date(String(a?.created_at||0)).getTime()-new Date(String(b?.created_at||0)).getTime());
+  const limited=[...events].slice(0,40);
+  const hasCompleteTimestamps=limited.every(e=>typeof e?.created_at==="string"&&Number.isFinite(new Date(e.created_at).getTime()));
+  const ordered = hasCompleteTimestamps ? limited.sort((a,b)=>new Date(a.created_at!).getTime()-new Date(b.created_at!).getTime()) : limited.reverse();
   const weight = (s: any) => { const strength=Number.isFinite(s?.strength)?Number(s.strength):0, confidence=Number.isFinite(s?.confidence)?Number(s.confidence):0; return strength*confidence; };
   for (const event of ordered) {
     const metadata = event?.metadata && typeof event.metadata === "object" ? event.metadata as any : {};
