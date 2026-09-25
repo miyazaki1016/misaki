@@ -106,3 +106,19 @@ test("repeated harm blocks stale reconnect state from initiating contact",()=>{
  assert.equal(r.desire,"give_space");
  assert.equal(r.reason,"relationship_story_needs_space");
 });
+
+
+test("grounded external safety concern may check in even while hurt remains unresolved",()=>{
+ const u=deriveProactiveUrge({relationshipStoryMeaning:"unresolved_hurt",externalConcern:true,action:"NORMAL",emotion:"concerned",emotionIntensity:60,intimacyLevel:2,lifeConfidence:"none",pushesToday:0,hoursSinceLastContact:1});
+ assert.equal(u.shouldSend,true);
+ assert.equal(u.desire,"check_in");
+ assert.equal(u.focus,"user");
+ assert.equal(u.reason,"grounded_external_concern_wants_check_in");
+});
+
+test("relationship hurt still blocks ordinary affection when there is no external safety concern",()=>{
+ const u=deriveProactiveUrge({relationshipStoryMeaning:"unresolved_hurt",action:"TEASE",emotion:"affectionate",emotionIntensity:90,intimacyLevel:3,lifeConfidence:"none",pushesToday:0,hoursSinceLastContact:8,photoOpportunity:true});
+ assert.equal(u.shouldSend,false);
+ assert.equal(u.desire,"give_space");
+ assert.equal(u.reason,"relationship_story_needs_space");
+});
