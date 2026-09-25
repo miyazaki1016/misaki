@@ -1847,3 +1847,52 @@ misaki_relationship_events
 が続けば、謝罪回数を信頼へ機械変換せず、再発という事実を現在の慎重さへ反映する。
 
 > **出来事を保存するだけでは関係にならない。その出来事が二人にとって今どういう意味になったかまで続いて初めて、関係の履歴になる。**
+
+
+### 2026-09-25 追記: Body Clock も同じ relationshipStory を読む
+
+通常会話だけでなく Body Clock の自発メッセージも、保存済み `emotion_action_v2_after_chat` イベントから同じ出来事の意味を導出し、表現温度へ反映する。
+
+これにより、通常会話ではまだ傷や修復途中を保持しているのに、自発メッセージだけ突然完全復帰した甘さになる「別人格化」を防ぐ。
+
+Body Clock でも以下を区別する。
+
+- `unresolved_hurt`: 自発メッセージだけ急に甘く戻さない
+- `repair_in_progress`: 扉は閉じないが完全復帰を演じない
+- `repair_demonstrated`: 古い傷を蒸し返さず、修復できた安心として使う
+- `repeated_harm`: 言葉だけで警戒を即解除しない。ただし罰・無視にはしない
+
+さらに修復判定を保守的にした。単なる `warmth`（甘い言葉・一時的な温かさ）だけでは深い傷を「修復済み」にしない。修復実績として進めるには、後続ターンの `care` または `trust` を要求する。
+
+具体例:
+
+```text
+傷つける
+→ 謝る
+→ 「好きだよ」
+```
+
+だけなら `repair_in_progress` のまま。
+
+```text
+傷つける
+→ 謝る
+→ その後ちゃんと気遣う
+→ 信頼につながる行動が続く
+```
+
+まで来て初めて `repair_demonstrated` へ進める。
+
+回帰テスト:
+- Body Clock が未解決の傷を保持
+- 謝罪だけで即リセットしない
+- 後続の気遣いで demonstrated repair へ進める
+- 修復後の再発を repeated harm として扱う
+- generic warmth 一回だけでは serious hurt を消さない
+
+最終確認:
+- head `41fae0f6fe01f81eec0d6461e83215c6b565af9a`
+- GitHub Actions run 378: SUCCESS
+- 257 tests / 257 PASS / 0 FAIL
+- Next.js Production Build: PASS
+- main / Production / 稼働中 Edge Function: 未変更
