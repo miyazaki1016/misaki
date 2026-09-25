@@ -45,7 +45,7 @@ type RelationshipRow = {
 };
 
 
-function storyMeaningFromEvents(events: Array<{ metadata?: unknown }>): RelationshipStoryMeaning {
+export function storyMeaningFromEvents(events: Array<{ metadata?: unknown }>): RelationshipStoryMeaning {
   let unresolvedHurt = 0;
   let repairStage: "none" | "hurt" | "repair_attempted" | "rebuilding" = "none";
   let meaning: RelationshipStoryMeaning = "none";
