@@ -2710,6 +2710,16 @@ ${retryProblems
         ),
     };
 
+    await measureStage(
+      "relationship-turn-record",
+      () => recordRelationshipChatTurn(
+        supabase,
+        isAnonymous,
+        new Date(requestStartedAt),
+        new Date()
+      )
+    );
+
     const generatedResult = {
       requestId: usageRequestId,
       rootUpdatedAt: rootState.updatedAt ?? null,
