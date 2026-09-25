@@ -1770,3 +1770,80 @@ GitHub Actions: `PR relationship v2 tests` run 344 **SUCCESS**。
 ```
 
 という会話と出来事の積み重ねから、**その二人にしか存在しない関係**が形成されることを最上位の判断基準とする。
+
+
+### 2026-09-25 実会話接続完了: relationshipStory → 言葉の温度
+
+上記の出来事軌跡を、保存・導出するだけで終わらせず、通常チャットの実返答経路へ接続した。
+
+現在の経路:
+
+```text
+misaki_relationship_events
+→ 直近40件を1回だけ読む
+→ relationshipPatterns + relationshipStory を同じ履歴から導出
+→ 現在ターンの semantic relationship signals
+→ emotion
+→ action / direction
+→ relationshipStory の未解決・修復・再発の意味を言葉の温度へ反映
+→ Geminiのexpression-only再生成
+→ 美咲の実際の返答
+```
+
+`relationshipStory` は台詞として説明しない。以下へ暗黙に反映する。
+
+- 返答の長さ
+- 距離感
+- 甘さ
+- 冗談の量
+- 踏み込み方
+- 仲直り時のぎこちなさ / 安心感
+
+意味別の扱い:
+
+- `unresolved_hurt`: 普通の話題へ移っても、急に完全復帰した温度へ戻さない。
+- `repair_in_progress`: 謝罪・修復の動きは受け取るが、一言で全部解決したようにはしない。
+- `repair_demonstrated`: 昔の傷を蒸し返さず、「修復できた二人」という安心へ意味を変える。
+- `repeated_harm`: 現在の優しさは受け取るが、言葉だけで警戒を即解除しない。罰・無視・会話拒否にはしない。
+
+通常チャットでは `relationshipPatterns` と `relationshipStory` が同じイベント集合を必要とするため、DBを二重読込せず `loadRelationshipHistory()` で一度だけ取得し、両方を導出する構造へ整理した。
+
+回帰テストでは、未解決の傷が通常文面を即リセットさせないこと、修復実績が古い傷を現在の不満として蒸し返さないこと、繰り返された傷でも罰・会話拒否へ飛躍しないことを固定した。
+
+関連コミット:
+- `f1f8c77...` story meaning を言葉の温度ガイドへ接続
+- `6de0896...` conversation preview へ story を通す
+- `bc872a0...` story wording continuity 回帰テスト
+- `389233f...` 保存イベントから story を読み、通常チャット実返答へ接続
+- `81d3717...` patterns/story 共通履歴ローダー
+- `1d182ec...` 通常チャットのイベント二重読込を解消
+
+確認:
+- `389233f...` GitHub Actions run 356 SUCCESS
+- `1d182ec...` GitHub Actions run 360 SUCCESS
+- main / Production は未変更
+
+ここで重要なのは、`relationshipStory` が新しい固定ラベルではないこと。**出来事の意味を、その後の会話と行動によって更新し続けるための現在の読み方**である。
+
+したがって、
+
+```text
+ケンカした
+→ 傷ついた
+→ 謝った
+→ 少しぎこちなかった
+→ その後ちゃんと大切にした
+→ 仲直りできた
+```
+
+という履歴は、永遠に「傷つけられた」ではなく、最終的には **「ケンカしても修復できた二人」** として現在の会話へ効く。
+
+反対に、
+
+```text
+傷つける → 謝る → また傷つける
+```
+
+が続けば、謝罪回数を信頼へ機械変換せず、再発という事実を現在の慎重さへ反映する。
+
+> **出来事を保存するだけでは関係にならない。その出来事が二人にとって今どういう意味になったかまで続いて初めて、関係の履歴になる。**
