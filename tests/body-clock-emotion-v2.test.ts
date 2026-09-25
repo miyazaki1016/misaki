@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { deriveProactiveTags, normalizeIntimacyLevel, storyMeaningFromEvents } from "../supabase/functions/body-clock/proactive-decision.ts";
+import { hasMisakiProactivePhotoOpportunity, selectMisakiProactivePhoto } from "../supabase/functions/body-clock/proactive-photo.ts";
 
 const base={direction:"MISAKI" as const,action:"NORMAL" as const,timeBand:"seven_plus_days" as const,lifeConfidence:"none" as const,currentTime:"2026/09/20 18:00"};
 
@@ -66,4 +67,14 @@ test("Body Clock preserves caution when harm repeats after repair",()=>{
   event([{name:"apology",strength:.9,confidence:.9},{name:"repair",strength:.8,confidence:.9}]),
   event([{name:"hurtful",strength:.8,confidence:.9}])
  ]),"repeated_harm");
+});
+
+
+test("unresolved or repeated hurt cannot produce a contradictory proactive photo",()=>{
+ const decision:any={shouldSend:true,direction:"US",action:"NORMAL",emotion:"happy",emotionIntensity:70,intimacyLevel:3,relationshipPoints:100,timeBand:"same_day",situation:null,plan:null,lifeEvidence:[],lifeConfidence:"none",tags:["romantic","affectionate","miss_you"],relationshipStoryMeaning:"unresolved_hurt"};
+ assert.equal(hasMisakiProactivePhotoOpportunity({currentTime:"2026/09/25 19:00",decision}),false);
+ assert.equal(selectMisakiProactivePhoto({currentTime:"2026/09/25 19:00",reply:"ちょっと話したくなった",decision,desire:"be_close",urgeStrength:90}),null);
+ const repeated={...decision,relationshipStoryMeaning:"repeated_harm"};
+ assert.equal(hasMisakiProactivePhotoOpportunity({currentTime:"2026/09/25 19:00",decision:repeated}),false);
+ assert.equal(selectMisakiProactivePhoto({currentTime:"2026/09/25 19:00",reply:"ちょっと話したくなった",decision:repeated,desire:"share_photo",urgeStrength:90}),null);
 });
