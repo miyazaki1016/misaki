@@ -2173,6 +2173,8 @@ ${relationshipGuide}
 
 ${userProfileGuide}
 
+${lifeUnderstandingGuide}
+
 ${taxiContextGuide}
 
 【ユーザーの今日の仕事・休みについて】
