@@ -126,3 +126,40 @@ export function extractExplicitLifeFacts(
 
   return facts;
 }
+
+
+const LIFE_MEMORY_PREFIX = "[life:v1]";
+
+export function encodeLifeFactMemory(fact: LifeFact) {
+  return LIFE_MEMORY_PREFIX + JSON.stringify(fact);
+}
+
+export function decodeLifeFactMemory(value: string): LifeFact | null {
+  if (!value.startsWith(LIFE_MEMORY_PREFIX)) return null;
+  try {
+    const parsed = JSON.parse(value.slice(LIFE_MEMORY_PREFIX.length));
+    if (!parsed || typeof parsed.fact !== "string") return null;
+    if (!["profile", "schedule", "routine", "situation", "preference", "concern"].includes(parsed.kind)) return null;
+    return {
+      kind: parsed.kind,
+      fact: parsed.fact.trim(),
+      observedAt: typeof parsed.observedAt === "string" ? parsed.observedAt : null,
+      validUntil: typeof parsed.validUntil === "string" ? parsed.validUntil : null,
+      confidence: typeof parsed.confidence === "number" ? parsed.confidence : 1,
+      source: parsed.source === "user" ? "user" : "memory",
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function splitLifeFactMemory(memory: string[]) {
+  const facts: LifeFact[] = [];
+  const ordinaryMemory: string[] = [];
+  for (const item of memory) {
+    const fact = decodeLifeFactMemory(item);
+    if (fact) facts.push(fact);
+    else ordinaryMemory.push(item);
+  }
+  return { facts, ordinaryMemory };
+}
