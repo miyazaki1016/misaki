@@ -80,3 +80,24 @@ test("normal chat and Body Clock derive the same meaning for canonical relations
   assert.equal(bodyClock,normal,JSON.stringify(events));
  }
 });
+
+
+test("Body Clock matches normal chat when events arrive out of order with timestamps",()=>{
+ const events=[
+  ev(4,[{name:"trust",strength:1,confidence:1}]),
+  ev(1,[{name:"hurtful",strength:.7,confidence:1}]),
+  ev(3,[{name:"care",strength:1,confidence:1}]),
+  ev(2,[{name:"repair",strength:1,confidence:1}]),
+ ];
+ assert.equal(storyMeaningFromEvents(events),deriveRelationshipStory(events).meaning);
+ assert.equal(storyMeaningFromEvents(events),"repair_demonstrated");
+});
+
+test("Body Clock accepts legacy signal_summary like normal chat",()=>{
+ const legacy=[
+  {event_type:"emotion_action_v2_after_chat",created_at:at(2),metadata:{signal_summary:[{name:"repair",strength:1,confidence:1}]}},
+  {event_type:"emotion_action_v2_after_chat",created_at:at(1),metadata:{signal_summary:[{name:"hurtful",strength:.9,confidence:1}]}},
+ ];
+ assert.equal(storyMeaningFromEvents(legacy),deriveRelationshipStory(legacy).meaning);
+ assert.equal(storyMeaningFromEvents(legacy),"repair_in_progress");
+});
