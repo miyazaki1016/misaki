@@ -44,6 +44,11 @@ import {
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
 import { loadRelationshipPatterns } from "../../../lib/relationship-patterns";
+import {
+  createLifeUnderstandingGuide,
+  selectRelevantLifeFacts,
+  type LifeFact,
+} from "../../../lib/relationship-life-context";
 
 type TokyoWeather = {
   temperature: number | null;
@@ -2007,6 +2012,19 @@ export async function POST(
         userProfile
       );
 
+    // Existing long-term memory is still the source. This adapter only exposes
+    // conservative, explicitly stated life facts; it does not infer schedules,
+    // locations, health, or mood from free text.
+    const lifeFacts: LifeFact[] = safeMemory.map((fact) => ({
+      kind: "profile",
+      fact,
+      source: "memory",
+      confidence: 1,
+    }));
+    const lifeUnderstandingGuide = createLifeUnderstandingGuide(
+      selectRelevantLifeFacts(lifeFacts, safeCurrentTime)
+    );
+
     const taxiContextGuide =
       createTaxiContextGuide(
         userProfile
@@ -2188,6 +2206,8 @@ ${createRelationshipEmotionGuide(relationshipTimeContext)}
 ${createRelationshipSignalGuide()}
 
 ${userProfileGuide}
+
+${lifeUnderstandingGuide}
 
 ${taxiContextGuide}
 
