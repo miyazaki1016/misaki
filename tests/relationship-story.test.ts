@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { deriveRelationshipStory } from "../lib/relationship-patterns.ts";
+import { storyMeaningFromEvents } from "../supabase/functions/body-clock/proactive-decision.ts";
 
 const at=(day:number)=>new Date(Date.UTC(2026,8,day)).toISOString();
 const ev=(day:number,signals:any[])=>({event_type:"emotion_action_v2_after_chat",created_at:at(day),metadata:{signals}});
@@ -60,4 +61,22 @@ test("one generic warm turn after apology does not erase serious hurt",()=>{
  ]);
  assert.equal(s.meaning,"repair_in_progress");
  assert.ok(s.unresolvedHurt>0);
+});
+
+
+test("normal chat and Body Clock derive the same meaning for canonical relationship histories",()=>{
+ const cases=[
+  [ev(1,[{name:"hurtful",strength:.9,confidence:1}])],
+  [ev(1,[{name:"hurtful",strength:.9,confidence:1}]),ev(2,[{name:"apology",strength:1,confidence:1}])],
+  [ev(1,[{name:"hurtful",strength:.9,confidence:1}]),ev(2,[{name:"repair",strength:.9,confidence:1}])],
+  [ev(1,[{name:"hurtful",strength:.7,confidence:1}]),ev(2,[{name:"repair",strength:1,confidence:1}]),ev(3,[{name:"care",strength:1,confidence:1}]),ev(4,[{name:"trust",strength:1,confidence:1}])],
+  [ev(1,[{name:"hurtful",strength:.8,confidence:1}]),ev(2,[{name:"repair",strength:1,confidence:1}]),ev(3,[{name:"care",strength:1,confidence:1}]),ev(4,[{name:"hurtful",strength:.9,confidence:1}])],
+  [ev(1,[{name:"boundary",strength:1,confidence:1}])],
+  [ev(1,[{name:"hurtful",strength:1,confidence:1}]),ev(2,[{name:"repair",strength:.9,confidence:1}]),ev(3,[{name:"warmth",strength:1,confidence:1}])],
+ ];
+ for(const events of cases){
+  const normal=deriveRelationshipStory(events).meaning;
+  const bodyClock=storyMeaningFromEvents([...events].reverse());
+  assert.equal(bodyClock,normal,JSON.stringify(events));
+ }
 });
