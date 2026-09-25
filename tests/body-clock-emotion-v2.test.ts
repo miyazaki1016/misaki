@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { deriveProactiveTags, normalizeIntimacyLevel } from "../supabase/functions/body-clock/proactive-decision.ts";
+import { deriveProactiveTags, normalizeIntimacyLevel, storyMeaningFromEvents } from "../supabase/functions/body-clock/proactive-decision.ts";
 
 const base={direction:"MISAKI" as const,action:"NORMAL" as const,timeBand:"seven_plus_days" as const,lifeConfidence:"none" as const,currentTime:"2026/09/20 18:00"};
 
@@ -32,4 +32,38 @@ test("persisted intimacy labels map to proactive numeric levels",()=>{
  assert.equal(normalizeIntimacyLevel("familiar"),1);
  assert.equal(normalizeIntimacyLevel("intimate"),2);
  assert.equal(normalizeIntimacyLevel("very_intimate"),3);
+});
+
+
+const event=(signals:any[])=>({metadata:{signals}});
+
+test("Body Clock keeps unresolved hurt instead of resetting proactive tone",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"hurtful",strength:.9,confidence:.9}])
+ ]),"unresolved_hurt");
+});
+
+test("Body Clock reads apology as repair in progress, not instant reset",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"apology",strength:.9,confidence:.9},{name:"repair",strength:.8,confidence:.9}]),
+  event([{name:"hurtful",strength:.9,confidence:.9}])
+ ]),"repair_in_progress");
+});
+
+test("Body Clock can reinterpret repaired history as demonstrated repair",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"care",strength:.9,confidence:.95}]),
+  event([{name:"care",strength:.9,confidence:.95}]),
+  event([{name:"apology",strength:.9,confidence:.9},{name:"repair",strength:.8,confidence:.9}]),
+  event([{name:"hurtful",strength:.7,confidence:.9}])
+ ]),"repair_demonstrated");
+});
+
+test("Body Clock preserves caution when harm repeats after repair",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"hurtful",strength:.9,confidence:.9}]),
+  event([{name:"care",strength:.9,confidence:.95}]),
+  event([{name:"apology",strength:.9,confidence:.9},{name:"repair",strength:.8,confidence:.9}]),
+  event([{name:"hurtful",strength:.8,confidence:.9}])
+ ]),"repeated_harm");
 });
