@@ -1,13 +1,14 @@
 export type ProactiveMotive={topicIntent:"share_self"|"care_for_user"|"continue_relationship"|"none";topicSource:"misaki"|"user"|"relationship"|"none";kind:"life"|"relationship_event"|"recent_conversation"|"relationship_memory"|"internal_state";evidence:string;summary:string;evidenceAt:string|null;freshness:"fresh"|"recent"|"old"|"unknown"};
-export type RelationshipEventEvidence={eventType:string;reason:string;createdAt:string;direction?:string};
+export type RelationshipEventEvidence={eventType:string;reason:string;createdAt:string;direction?:string;storyMeaning?:"none"|"unresolved_hurt"|"repair_in_progress"|"repair_demonstrated"|"repeated_harm"};
 export type ProactiveFocus="self"|"user"|"relationship"|"none";
 type ChatMessage={role:"user"|"misaki";text:string;sentAt?:string};
 function clean(s:string){return s.replace(/\s+/g," ").trim().slice(0,140)}
 function freshness(sentAt?:string){if(!sentAt)return{evidenceAt:null,freshness:"unknown" as const};const t=new Date(sentAt).getTime();if(!Number.isFinite(t))return{evidenceAt:null,freshness:"unknown" as const};const h=Math.max(0,(Date.now()-t)/3600000);return{evidenceAt:new Date(t).toISOString(),freshness:(h<24?"fresh":h<168?"recent":"old") as "fresh"|"recent"|"old"}}
 function recentUser(history:ChatMessage[]){return[...history].reverse().find(x=>x.role==="user"&&x.text.trim())}
 function usableRelationshipEvent(events:RelationshipEventEvidence[]){return events.find(e=>e.eventType==="emotion_action_v2_after_chat"&&e.reason.trim())}
+function storyCompatibleEvent(events:RelationshipEventEvidence[]){const current=events[0]?.storyMeaning??"none";if(current==="unresolved_hurt"||current==="repeated_harm")return null;return usableRelationshipEvent(events)}
 export function deriveProactiveMotive(input:{desire:string;focus?:ProactiveFocus;history:ChatMessage[];memory:string[];lifeEvidence:string[];relationshipEvents?:RelationshipEventEvidence[]}):ProactiveMotive{
- const user=recentUser(input.history),age=freshness(user?.sentAt),event=usableRelationshipEvent(input.relationshipEvents??[]),eventAge=freshness(event?.createdAt);
+ const user=recentUser(input.history),age=freshness(user?.sentAt),event=storyCompatibleEvent(input.relationshipEvents??[]),eventAge=freshness(event?.createdAt);
  if(input.focus==="user"&&input.desire==="check_in"&&input.lifeEvidence.length)return{topicIntent:"care_for_user",topicSource:"user",kind:"life",evidence:clean(input.lifeEvidence.at(-1)!),summary:"本人が話した生活上の出来事が気になっている",...age};
  if(input.focus==="relationship"&&input.desire==="reconnect"&&event&&eventAge.freshness!=="old")return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"relationship_event",evidence:clean(event.reason),summary:"保存された二人の関係の出来事を受けて、つなぎ直したい",...eventAge};
  if(input.focus==="relationship"&&input.desire==="reconnect"&&user)return{topicIntent:"continue_relationship",topicSource:"relationship",kind:"recent_conversation",evidence:clean(user.text),summary:"直近のやり取りを受けて関係をつなぎ直したい",...age};
