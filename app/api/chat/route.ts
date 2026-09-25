@@ -1,6 +1,7 @@
 import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
 import { loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
+import { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from "../../../lib/relationship-life-context";
 import {
   createClient,
   type SupabaseClient,
@@ -1913,6 +1914,15 @@ export async function POST(
         ? currentTime
         : "不明";
 
+    const splitMemory = splitLifeFactMemory(safeMemory);
+    const explicitLifeFacts = extractExplicitLifeFacts(message, safeCurrentTime);
+    const lifeFacts: LifeFact[] = [
+      ...splitMemory.ordinaryMemory.map((fact) => ({ kind: "profile" as const, fact, source: "memory" as const, confidence: 1 })),
+      ...splitMemory.facts,
+      ...explicitLifeFacts,
+    ];
+    const lifeUnderstandingGuide = createLifeUnderstandingGuide(selectRelevantLifeFacts(lifeFacts, safeCurrentTime));
+
     const currentDate =
       getDateKey(
         safeCurrentTime
@@ -2618,23 +2628,17 @@ ${retryProblems
       );
     }
 
-    const updatedMemory =
-      recallMode ? safeMemory : Array.isArray(
-        parsed.memory
-      )
-        ? parsed.memory
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string"
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
-            .filter(Boolean)
-            .slice(-MAX_MEMORY)
-        : safeMemory;
+    const generatedMemory =
+      recallMode ? splitMemory.ordinaryMemory : Array.isArray(parsed.memory)
+        ? parsed.memory.filter((item) => typeof item === "string").map((item) => item.trim()).filter(Boolean)
+        : splitMemory.ordinaryMemory;
+    const activeCarriedLifeFacts = selectRelevantLifeFacts(splitMemory.facts, safeCurrentTime, MAX_MEMORY);
+    const activeLifeFacts = selectRelevantLifeFacts([...activeCarriedLifeFacts, ...explicitLifeFacts], safeCurrentTime, MAX_MEMORY);
+    const encodedLifeMemory = activeLifeFacts.map((fact) => encodeLifeFactMemory(fact));
+    const updatedMemory = [
+      ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
+      ...encodedLifeMemory,
+    ].slice(-MAX_MEMORY);
 
     const parsedTodayItems =
       Array.isArray(
