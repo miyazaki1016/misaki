@@ -60,6 +60,8 @@ type MisakiTodayMemory = {
 type GeminiResult = {
   reply?: string;
   memory?: string[];
+  relationshipSignals?: unknown;
+  relationshipExpression?: { reply?: string };
   misakiTodayMemory?: {
     date?: string;
     items?: string[];
