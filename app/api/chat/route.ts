@@ -23,6 +23,24 @@ import {
   loadPersonaPrompt,
 } from "../../../lib/persona/persona-store";
 
+import {
+  createRelationshipSignalGuide,
+  sanitizeRelationshipSignalAssessment,
+  type RelationshipSignalAssessment,
+} from "../../../lib/relationship-signal";
+import {
+  loadRelationshipTimeContext,
+  createRelationshipTimeGuide,
+  recordRelationshipChatTurn,
+} from "../../../lib/relationship-time";
+import { createRelationshipEmotionGuide } from "../../../lib/relationship-emotion";
+import { persistRelationshipEmotionFromSignals } from "../../../lib/relationship-emotion-store";
+import {
+  previewRelationshipTurn,
+  createCurrentTurnActionGuide,
+} from "../../../lib/relationship-turn-expression";
+import { loadRelationshipHistory } from "../../../lib/relationship-patterns";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -1791,6 +1809,21 @@ export async function POST(
     const recallMode = isMemoryRecallQuestion(message);
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
 
+    const relationshipTimeContext = isAnonymous
+      ? null
+      : await measureStage(
+          "relationship-time-load",
+          () => loadRelationshipTimeContext(supabase, false)
+        );
+    const relationshipHistory = isAnonymous
+      ? { patterns: {}, story: { unresolvedHurt: false, repairStage: "none", meaning: "none", lastMeaningfulAt: null } }
+      : await measureStage(
+          "relationship-history-load",
+          () => loadRelationshipHistory(supabase as any, false)
+        );
+    const relationshipPatterns = relationshipHistory.patterns;
+    const relationshipStory = relationshipHistory.story;
+
 
     const {
       data: usageData,
@@ -2710,15 +2743,17 @@ ${retryProblems
         ),
     };
 
-    await measureStage(
-      "relationship-turn-record",
-      () => recordRelationshipChatTurn(
-        supabase,
-        isAnonymous,
-        new Date(requestStartedAt),
-        new Date()
-      )
-    );
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-turn-record",
+        () => recordRelationshipChatTurn(
+          supabase,
+          false,
+          new Date(requestStartedAt),
+          new Date()
+        )
+      );
+    }
 
     const generatedResult = {
       requestId: usageRequestId,
