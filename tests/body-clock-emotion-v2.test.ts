@@ -94,3 +94,13 @@ test("Body Clock generic warmth after repair stays repair in progress",()=>{
   event([{name:"hurtful",strength:1,confidence:1}])
  ]),"repair_in_progress");
 });
+
+
+test("repair in progress allows only emotionally neutral proactive photo opportunities",()=>{
+ const baseDecision:any={shouldSend:true,direction:"US",action:"TEASE",emotion:"affectionate",emotionIntensity:80,intimacyLevel:3,relationshipPoints:100,timeBand:"same_day",situation:null,plan:null,lifeEvidence:[],lifeConfidence:"none",tags:["romantic","affectionate","miss_you"],relationshipStoryMeaning:"repair_in_progress"};
+ assert.equal(hasMisakiProactivePhotoOpportunity({currentTime:"2026/09/25 19:00",decision:baseDecision}),false);
+ assert.equal(selectMisakiProactivePhoto({currentTime:"2026/09/25 19:00",reply:"これ見せたくなった",decision:baseDecision,desire:"share_photo",urgeStrength:90}),null);
+ const daytime={...baseDecision,tags:["soft","casual"]};
+ assert.equal(hasMisakiProactivePhotoOpportunity({currentTime:"2026/09/25 13:00",decision:daytime}),true);
+ assert.equal(selectMisakiProactivePhoto({currentTime:"2026/09/25 13:00",reply:"これ見せたくなった",decision:daytime,desire:"share_photo",urgeStrength:90})?.id,"day-01");
+});
