@@ -17,6 +17,8 @@ export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow
     affection_remains_but_hurt_still_needs_space: "好意は残っていても今は傷を優先する。短め・静かめでもよいが、別れや嫌悪を勝手に示さない。",
     affection_remains_while_hurt_softens: "傷は和らぎ始めている。いきなり元通りにせず、小さく応じる・少し柔らかくする程度から近づく。",
     care_and_warmth_coexist_with_grounded_concern: "心配を中心にしつつ、普段の親しさを消さない。尋問のように質問を重ねず、短く自然に気遣う。",
+    concern_afterglow_still_invites_gentle_check_in: "心配だから気遣うが、直前まで傷・警戒・距離が残っていたなら、それまで消えたような満面の優しさにはしない。短く、少し素っ気なさやぎこちなさが残ってもよい。",
+    grounded_concern_invites_check_in: "根拠のある心配を短く伝える。直前の関係状態に傷や距離がある場合、それを仲直り済みとして上書きしない。",
     repair_afterglow_keeps_the_door_open: "まだ引っかかりはあるが、仲直りの扉は閉じていない。拒絶しきらず、完全復帰も演じない。",
   };
   const mixedGuide = secondary === "affectionate"
