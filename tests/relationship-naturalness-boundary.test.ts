@@ -61,5 +61,5 @@ test("sustained care can soften guardedness gradually without instant romance", 
 
   assert.ok(result.emotion.intensity <= 44);
   assert.match(result.systemPrompt, /最初から恋人ではありません/);
-  assert.match(result.systemPrompt, /存在しない交際事実|関係事実は作らない/);
+  assert.match(result.systemPrompt, /過去から恋愛関係があったような事実を作ってはいけません|関係事実は作らない/);
 });
