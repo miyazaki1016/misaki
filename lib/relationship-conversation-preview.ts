@@ -1,6 +1,7 @@
 import type { RelationshipTimeContext } from "./relationship-time.ts";
 import type { RelationshipSignalAssessment } from "./relationship-signal.ts";
 import type { RelationshipPatternContext } from "./relationship-emotion-reducer.ts";
+import type { RelationshipStoryState } from "./relationship-patterns.ts";
 import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
@@ -19,7 +20,8 @@ export type RelationshipConversationPreview = {
 export function previewRelationshipConversation(
   context: RelationshipTimeContext | null,
   signals: RelationshipSignalAssessment,
-  patterns?: RelationshipPatternContext
+  patterns?: RelationshipPatternContext,
+  story?: RelationshipStoryState
 ): RelationshipConversationPreview {
   const state = previewRelationshipTurn(context, signals, patterns);
 
@@ -28,7 +30,8 @@ export function previewRelationshipConversation(
     expressionGuide: createCurrentTurnActionGuide(
       state.action,
       state.emotion.afterglow,
-      state.emotion.secondary
+      state.emotion.secondary,
+      story
     ),
   };
 }
