@@ -46,6 +46,7 @@ import {
 import { loadRelationshipPatterns } from "../../../lib/relationship-patterns";
 import {
   createLifeUnderstandingGuide,
+  extractExplicitLifeFacts,
   selectRelevantLifeFacts,
   type LifeFact,
 } from "../../../lib/relationship-life-context";
@@ -2015,12 +2016,15 @@ export async function POST(
     // Existing long-term memory is still the source. This adapter only exposes
     // conservative, explicitly stated life facts; it does not infer schedules,
     // locations, health, or mood from free text.
-    const lifeFacts: LifeFact[] = safeMemory.map((fact) => ({
-      kind: "profile",
-      fact,
-      source: "memory",
-      confidence: 1,
-    }));
+    const lifeFacts: LifeFact[] = [
+      ...safeMemory.map((fact) => ({
+        kind: "profile" as const,
+        fact,
+        source: "memory" as const,
+        confidence: 1,
+      })),
+      ...extractExplicitLifeFacts(message, safeCurrentTime),
+    ];
     const lifeUnderstandingGuide = createLifeUnderstandingGuide(
       selectRelevantLifeFacts(lifeFacts, safeCurrentTime)
     );
