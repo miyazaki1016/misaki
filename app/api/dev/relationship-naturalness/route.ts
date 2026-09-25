@@ -58,7 +58,7 @@ async function runNaturalnessPreview() {
 }
 
 
-// Preview限定。Vercel MCPの安全なGET取得から一度だけ実台詞検証を実行する。
+// Preview限定。Vercel MCPの安全なGET取得から実台詞検証を実行する。
 export async function GET() {
   return runNaturalnessPreview();
 }
