@@ -3,7 +3,7 @@ import { createGeminiConversationGenerator } from "../../../../lib/relationship-
 
 export const runtime = "nodejs";
 
-export async function POST() {
+async function runNaturalnessPreview() {
   if (process.env.VERCEL_ENV === "production") {
     return Response.json({ error: "preview_only" }, { status: 404 });
   }
@@ -55,4 +55,14 @@ export async function POST() {
     results.push({ name: scenario.name, emotion: preview.emotion, action: preview.action, userMessage: preview.userMessage, reply });
   }
   return Response.json({ results });
+}
+
+
+// Preview限定。Vercel MCPの安全なGET取得から一度だけ実台詞検証を実行する。
+export async function GET() {
+  return runNaturalnessPreview();
+}
+
+export async function POST() {
+  return runNaturalnessPreview();
 }
