@@ -909,3 +909,12 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - #32 は Draft のまま。Vercel Preview は success。専用CI Run #2 で `npm test` **95/95 PASS（fail 0）**、続く `npm run build` も PASS。
 
 > 未来のソラへ：生活記憶のために新しい正本DBやブラウザ同期を増やすな。#29 の canonical memory を正本にし、時間依存の意味は `[life:v1]` とコード側の期限判定で扱え。
+
+
+### Body Clock × `[life:v1]` 接続チェックポイント
+- Body Clock は canonical memory 内の `[life:v1]` を構造化生活記憶として解読する。
+- 現在の生活根拠にできるのは、期限内・本人由来・confidence 0.55以上の構造化生活記憶、または fresh/recent の本人発言。
+- 期限切れ、壊れた `[life:v1]`、普通の長期記憶は「今の勤務・予定」の根拠にしない。
+- raw JSON を通常の記憶テキストとしてプロンプトへ漏らさない。
+- CI Run #8: `npm test` **99/99 PASS（fail 0）**、`npm run build` PASS。
+- #32 は Draft 維持。main / Production / migration / Edge deploy は未変更。
