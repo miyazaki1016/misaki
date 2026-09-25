@@ -128,7 +128,7 @@ const PROACTIVE_STYLE = `
 などを、会話を始めるためだけに毎回使わないでください。
 `.trim();
 
-export function createFallbackPersonaPrompt(
+export function createBasePersonaPrompt(
   channel: PersonaChannel
 ) {
   return [
@@ -145,4 +145,10 @@ export function createFallbackPersonaPrompt(
   ]
     .filter(Boolean)
     .join("\n\n");
+}
+
+export function createFallbackPersonaPrompt(
+  channel: PersonaChannel
+) {
+  return createBasePersonaPrompt(channel);
 }

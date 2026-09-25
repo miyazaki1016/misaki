@@ -135,7 +135,10 @@ test('different permanent user clears previous conversation and memory', async (
 test('logout clears caches in both storage areas and remounts mounted chat', async () => {
   const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-browser-session': '1', 'misaki-test': 'secret' });
   await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);
-  assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
+  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);
+  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), null);
+  assert.equal(h.localStorage.getItem(ownerKey), null);
+  assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));
 });
 test('transient anonymous sign-out preserves live browser conversation and reauthenticates', async () => {
   const h = harness({ id: 'a', is_anonymous: true }, {}, { 'misaki-browser-session': '1' });

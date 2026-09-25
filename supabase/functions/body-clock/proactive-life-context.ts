@@ -1,68 +1,12 @@
-export type ProactiveLifeContext = {
-  situation: string;
-  plan: string;
-  evidence: string[];
-  confidence: "none" | "explicit";
-};
-
-type ChatMessage = { role: "user" | "misaki"; text: string; sentAt?: string };
-
-const SITUATION_PATTERNS = [
-  /(?:今日は|今夜は|今は|これから)(.{0,24}(?:仕事|勤務|乗務|夜勤|日勤|休み|休日|出勤|帰宅|帰る|寝る|休憩))/,
-  /(?:仕事|勤務|乗務|夜勤|日勤)(?:中|だよ|です|してる|している|行ってくる)/,
-  /(?:今日は|今夜は).{0,20}(?:忙しい|暇|休み|明け)/,
-];
-
-const PLAN_PATTERNS = [
-  /(?:明日|あした|今夜|今日|今週|週末|来週|これから).{0,40}(?:予定|行く|行って|仕事|勤務|乗務|休み|会う|帰る|寝る|起きる|出かけ|旅行|病院|飲み|食べ)/,
-  /(?:\d{1,2}時(?:半)?|朝|昼|夕方|夜|深夜).{0,32}(?:から|まで|に).{0,32}(?:仕事|勤務|乗務|出勤|帰る|寝る|起きる|行く|会う)/,
-];
-
-function normalize(text: string) { return text.replace(/\s+/g, " ").trim(); }
-
-function explicitUserTexts(history: ChatMessage[], memory: string[]) {
-  const recentUser = history.filter((item) => item.role === "user").slice(-16).map((item) => normalize(item.text));
-  const remembered = memory.slice(-20).map(normalize);
-  return [...remembered, ...recentUser].filter(Boolean);
-}
-
-function lastMatch(texts: string[], patterns: RegExp[]) {
-  for (let i = texts.length - 1; i >= 0; i -= 1) {
-    const text = texts[i];
-    if (patterns.some((pattern) => pattern.test(text))) return text.slice(0, 120);
-  }
-  return null;
-}
-
-export function buildProactiveLifeContext(history: ChatMessage[], memory: string[]): ProactiveLifeContext {
-  const texts = explicitUserTexts(history, memory);
-  const situation = lastMatch(texts, SITUATION_PATTERNS);
-  const plan = lastMatch(texts, PLAN_PATTERNS);
-  const evidence = [...new Set([situation, plan].filter((x): x is string => Boolean(x)))];
-  return {
-    situation: situation ?? "none",
-    plan: plan ?? "none",
-    evidence,
-    confidence: evidence.length ? "explicit" : "none",
-  };
-}
-
-export function createProactiveLifeGuide(context: ProactiveLifeContext) {
-  if (context.confidence === "none") {
-    return `【ユーザーの生活文脈】\n今回、自発メッセージで使える明示的な生活・予定の根拠はありません。\n現在地、勤務中、休み、睡眠、体調、予定を推測で補わないでください。`;
-  }
-  return `
-【ユーザーの生活文脈：本人発言ベース】
-現在の状況として参照できる発言: ${context.situation}
-予定として参照できる発言: ${context.plan}
-
-使える根拠:
-${context.evidence.map((x) => `・${x}`).join("\n")}
-
-重要:
-・これは本人の発言または保存済み記憶に実際にある内容だけです
-・古い発言を「今もそうだ」と断定しないでください
-・時刻や日付が曖昧なら、具体的な現在状況へ変換しないでください
-・根拠の範囲を越えて場所、勤務、体調、予定を作らないでください
-`.trim();
-}
+export type LifeEvidence={text:string;source:"recent_user"|"memory";sentAt:string|null;freshness:"fresh"|"recent"|"old"|"unknown"};
+export type ProactiveLifeContext={situation:string;plan:string;evidence:string[];evidenceItems:LifeEvidence[];confidence:"none"|"explicit"};
+type ChatMessage={role:"user"|"misaki";text:string;sentAt?:string};
+const SITUATION_PATTERNS=[/(?:今日は|今夜は|今は|これから)(.{0,24}(?:仕事|勤務|乗務|夜勤|日勤|休み|休日|出勤|帰宅|帰る|寝る|休憩))/,/(?:仕事|勤務|乗務|夜勤|日勤)(?:中|だよ|です|してる|している|行ってくる)/,/(?:今日は|今夜は).{0,20}(?:忙しい|暇|休み|明け)/];
+const PLAN_PATTERNS=[/(?:明日|あした|今夜|今日|今週|週末|来週|これから).{0,40}(?:予定|行く|行って|仕事|勤務|乗務|休み|会う|帰る|寝る|起きる|出かけ|旅行|病院|飲み|食べ)/,/(?:\d{1,2}時(?:半)?|朝|昼|夕方|夜|深夜).{0,32}(?:から|まで|に).{0,32}(?:仕事|勤務|乗務|出勤|帰る|寝る|起きる|行く|会う)/];
+const normalize=(t:string)=>t.replace(/\s+/g," ").trim();
+function age(sentAt?:string):LifeEvidence["freshness"]{if(!sentAt)return"unknown";const t=new Date(sentAt).getTime();if(!Number.isFinite(t))return"unknown";const h=Math.max(0,(Date.now()-t)/3600000);return h<24?"fresh":h<168?"recent":"old"}
+function items(history:ChatMessage[],memory:string[]):LifeEvidence[]{const remembered=memory.slice(-20).map(text=>({text:normalize(text),source:"memory" as const,sentAt:null,freshness:"unknown" as const}));const recent=history.filter(x=>x.role==="user").slice(-16).map(x=>({text:normalize(x.text),source:"recent_user" as const,sentAt:x.sentAt??null,freshness:age(x.sentAt)}));return[...remembered,...recent].filter(x=>x.text)}
+function lastMatch(xs:LifeEvidence[],patterns:RegExp[]){for(let i=xs.length-1;i>=0;i--){const x=xs[i];if(patterns.some(p=>p.test(x.text)))return{...x,text:x.text.slice(0,120)}}return null}
+function usable(x:LifeEvidence|null){if(!x||x.source!=="recent_user")return false;if(x.freshness!=="fresh"&&x.freshness!=="recent")return false;/* Relative day words expire quickly: a two-day-old "tomorrow" must never be treated as a current plan. */if(/(?:今日|きょう|今夜|今は|これから|明日|あした)/.test(x.text))return x.freshness==="fresh";return true}
+export function buildProactiveLifeContext(history:ChatMessage[],memory:string[]):ProactiveLifeContext{const xs=items(history,memory),s=lastMatch(xs,SITUATION_PATTERNS),p=lastMatch(xs,PLAN_PATTERNS),valid=[s,p].filter((x):x is LifeEvidence=>usable(x));const evidence=[...new Set(valid.map(x=>x.text))];return{situation:usable(s)?s!.text:"none",plan:usable(p)?p!.text:"none",evidence,evidenceItems:valid,confidence:evidence.length?"explicit":"none"}}
+export function createProactiveLifeGuide(c:ProactiveLifeContext){if(c.confidence==="none")return`【ユーザーの生活文脈】\n今回、自発メッセージで現在の生活・予定として使える新しい本人発言はありません。\n保存済み記憶や古い発言だけから、現在地、勤務中、休み、睡眠、体調、予定を推測しないでください。`;return`【ユーザーの生活文脈：本人発言ベース】\n現在の状況として参照できる発言: ${c.situation}\n予定として参照できる発言: ${c.plan}\n\n使える根拠:\n${c.evidenceItems.map(x=>`・[${x.freshness}] ${x.text}`).join("\n")}\n\n重要:\n・現在の生活状況には recent_user の fresh / recent だけを使う\n・保存済み記憶は関係の背景には使えても、現在の生活状況の証拠にはしない\n・古い発言を「今もそうだ」と断定しない\n・根拠の範囲を越えて場所、勤務、体調、予定を作らない`}

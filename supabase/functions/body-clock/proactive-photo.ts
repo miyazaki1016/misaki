@@ -5,6 +5,7 @@ import type {
   RelationshipAction,
   RelationshipEmotion,
 } from "./proactive-decision.ts";
+import type { ProactiveDesire } from "./proactive-urge.ts";
 
 export type MisakiPhotoTime = "morning" | "day" | "evening" | "night" | "any";
 
@@ -25,12 +26,13 @@ export type SelectMisakiPhotoInput = {
   reply: string;
   decision: ProactiveDecisionContext;
   recentPhotoIds?: string[];
+  desire: ProactiveDesire;
+  urgeStrength: number;
 };
 
-const PHOTO_ATTACH_RATE = 0.34;
 const ALL_DIRECTIONS: ProactiveDirection[] = ["MISAKI", "USER", "US", "MISAKI_TO_USER", "MISAKI_TO_US"];
 const ALL_ACTIONS: RelationshipAction[] = ["NORMAL", "WAIT", "TEASE", "SULK", "CHASE", "PULL", "RECONNECT"];
-const ALL_EMOTIONS: RelationshipEmotion[] = ["neutral", "happy", "lonely", "sulky", "concerned", "affectionate"];
+const ALL_EMOTIONS: RelationshipEmotion[] = ["neutral", "happy", "affectionate", "concerned", "hurt", "sulky", "guarded"];
 
 const PHOTOS: MisakiPhoto[] = [
   {
@@ -88,13 +90,17 @@ function hashText(text: string) {
   return hash >>> 0;
 }
 
-function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
+export function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "any"> {
   const match = currentTime.match(/(\d{1,2}):(\d{2})/);
   const hour = Math.max(0, Math.min(23, Number(match?.[1] ?? 18)));
   if (hour >= 5 && hour < 10) return "morning";
   if (hour >= 10 && hour < 17) return "day";
   if (hour >= 17 && hour < 21) return "evening";
   return "night";
+}
+
+function isRepairSafePhoto(photo: MisakiPhoto) {
+  return !photo.tags.some((tag) => ["romantic", "affectionate", "miss_you"].includes(tag));
 }
 
 function scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {
@@ -116,18 +122,38 @@ function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {
   return photos[0] ?? null;
 }
 
+export function hasMisakiProactivePhotoOpportunity(input: { currentTime: string; decision: ProactiveDecisionContext }) {
+  const { currentTime, decision } = input;
+  if (decision.relationshipStoryMeaning === "unresolved_hurt" || decision.relationshipStoryMeaning === "repeated_harm") return false;
+  const timeBucket = getTimeBucket(currentTime);
+  return PHOTOS.some((photo) =>
+    (decision.relationshipStoryMeaning !== "repair_in_progress" || isRepairSafePhoto(photo)) &&
+    decision.relationshipPoints >= photo.minRelationshipPoints &&
+    (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
+    photo.directions.includes(decision.direction) &&
+    photo.actions.includes(decision.action) &&
+    photo.emotions.includes(decision.emotion)
+  );
+}
+
 export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): MisakiPhoto | null {
-  const { currentTime, reply, decision, recentPhotoIds = [] } = input;
+  const { currentTime, reply, decision, desire, urgeStrength, recentPhotoIds = [] } = input;
   if (!decision.shouldSend || !reply.trim()) return null;
+  if (decision.relationshipStoryMeaning === "unresolved_hurt" || decision.relationshipStoryMeaning === "repeated_harm") return null;
+
+  // A photo is an action, not decoration. Generic check-ins/reconnection/space
+  // never attach one merely because a matching asset exists.
+  const photoEligible = desire === "share_photo" ||
+    ((desire === "be_playful" || desire === "be_close") && urgeStrength >= 65);
+  if (!photoEligible) return null;
 
   const seed = hashText(
-    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${decision.tags.join(",")}|${reply}`
+    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${desire}|${urgeStrength}|${decision.tags.join(",")}|${reply}`
   );
-
-  if (seed % 10000 >= Math.floor(PHOTO_ATTACH_RATE * 10000)) return null;
 
   const timeBucket = getTimeBucket(currentTime);
   let candidates = PHOTOS.filter((photo) =>
+    (decision.relationshipStoryMeaning !== "repair_in_progress" || isRepairSafePhoto(photo)) &&
     decision.relationshipPoints >= photo.minRelationshipPoints &&
     (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
     photo.directions.includes(decision.direction) &&

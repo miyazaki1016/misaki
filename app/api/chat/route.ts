@@ -19,6 +19,40 @@ import {
   loadPersonaPrompt,
 } from "../../../lib/persona/persona-store";
 
+import {
+  createRelationshipSignalGuide,
+  sanitizeRelationshipSignalAssessment,
+  type RelationshipSignalAssessment,
+} from "../../../lib/relationship-signal";
+
+import {
+  loadRelationshipTimeContext,
+  createRelationshipTimeGuide,
+  recordRelationshipChatTurn,
+} from "../../../lib/relationship-time";
+
+import {
+  createRelationshipEmotionGuide,
+} from "../../../lib/relationship-emotion";
+
+import {
+  persistRelationshipEmotionFromSignals,
+} from "../../../lib/relationship-emotion-store";
+
+import {
+  previewRelationshipTurn,
+  createCurrentTurnActionGuide,
+} from "../../../lib/relationship-turn-expression";
+import { loadRelationshipHistory } from "../../../lib/relationship-patterns";
+import {
+  createLifeUnderstandingGuide,
+  extractExplicitLifeFacts,
+  selectRelevantLifeFacts,
+  encodeLifeFactMemory,
+  splitLifeFactMemory,
+  type LifeFact,
+} from "../../../lib/relationship-life-context";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -38,6 +72,8 @@ type MisakiTodayMemory = {
 type GeminiResult = {
   reply?: string;
   memory?: string[];
+  relationshipSignals?: unknown;
+  relationshipExpression?: { reply?: string };
   misakiTodayMemory?: {
     date?: string;
     items?: string[];
@@ -1754,6 +1790,22 @@ export async function POST(
       );
     }
 
+    const isAnonymous = userData.user.is_anonymous === true;
+
+    const relationshipTimeContext =
+      await measureStage(
+        "relationship-time-load",
+        () => loadRelationshipTimeContext(supabase, isAnonymous)
+      );
+
+    const relationshipHistory =
+      await measureStage(
+        "relationship-history-load",
+        () => loadRelationshipHistory(supabase as any, isAnonymous)
+      );
+    const relationshipPatterns = relationshipHistory.patterns;
+    const relationshipStory = relationshipHistory.story;
+
     const usageRequestId =
       crypto.randomUUID();
 
@@ -1965,6 +2017,25 @@ export async function POST(
         userProfile
       );
 
+    // Existing long-term memory is still the source. This adapter only exposes
+    // conservative, explicitly stated life facts; it does not infer schedules,
+    // locations, health, or mood from free text.
+    const splitMemory = splitLifeFactMemory(safeMemory);
+    const explicitLifeFacts = extractExplicitLifeFacts(message, safeCurrentTime);
+    const lifeFacts: LifeFact[] = [
+      ...splitMemory.ordinaryMemory.map((fact) => ({
+        kind: "profile" as const,
+        fact,
+        source: "memory" as const,
+        confidence: 1,
+      })),
+      ...splitMemory.facts,
+      ...explicitLifeFacts,
+    ];
+    const lifeUnderstandingGuide = createLifeUnderstandingGuide(
+      selectRelevantLifeFacts(lifeFacts, safeCurrentTime)
+    );
+
     const taxiContextGuide =
       createTaxiContextGuide(
         userProfile
@@ -2139,7 +2210,15 @@ ${personaPrompt}
 
 ${relationshipGuide}
 
+${createRelationshipTimeGuide(relationshipTimeContext)}
+
+${createRelationshipEmotionGuide(relationshipTimeContext)}
+
+${createRelationshipSignalGuide()}
+
 ${userProfileGuide}
+
+${lifeUnderstandingGuide}
 
 ${taxiContextGuide}
 
@@ -2256,6 +2335,10 @@ misakiTodayMemory は、
 {
   "reply": "美咲の返事",
   "memory": ["長期記憶"],
+  "relationshipSignals": {
+    "signals": [{"name":"warmth","strength":0.0,"confidence":0.0,"evidence":"根拠"}],
+    "relationshipFacts": {"mutualAffectionExplicit": false, "datingEstablishedExplicit": false}
+  },
   "misakiTodayMemory": {
     "date": "${currentDate}",
     "items": ["今日の美咲の出来事"]
@@ -2264,7 +2347,8 @@ misakiTodayMemory は、
 `.trim();
 
     async function generateReply(
-      retryProblems?: string[]
+      retryProblems?: string[],
+      supplementaryGuide = ""
     ) {
       const retryGuide =
         retryProblems &&
@@ -2362,7 +2446,8 @@ ${retryProblems
                       {
                         text:
                           baseSystemPrompt +
-                          retryGuide,
+                          retryGuide +
+                          supplementaryGuide,
                       },
                     ],
                   },
@@ -2596,23 +2681,132 @@ ${retryProblems
       );
     }
 
-    const updatedMemory =
-      Array.isArray(
-        parsed.memory
-      )
+    let relationshipSignalAssessment: RelationshipSignalAssessment =
+      sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+
+    // The first pass understands the user's turn. A second, expression-only
+    // pass lets the reply reflect the state caused by that same turn instead
+    // of waiting until the next message.
+    const currentTurnState =
+      previewRelationshipTurn(
+        relationshipTimeContext,
+        relationshipSignalAssessment,
+        relationshipPatterns
+      );
+
+    if (
+      relationshipSignalAssessment.signals.length > 0 ||
+      currentTurnState.action.direction !== "steady"
+    ) {
+      const expressionParsed =
+        await generateReply(
+          undefined,
+          "\n\n" +
+            createCurrentTurnActionGuide(
+              currentTurnState.action,
+              currentTurnState.emotion.afterglow,
+              currentTurnState.emotion.secondary,
+              relationshipStory
+            ) +
+            "\n\n【再生成の目的】\n最初の判定で得た関係シグナルと今回の行動意図を反映して、replyだけを自然に作り直してください。relationshipSignals の判定は同じユーザー発言について再度行い、根拠のないシグナルを追加しないでください。"
+        );
+
+      if (
+        expressionParsed &&
+        typeof expressionParsed.reply === "string" &&
+        expressionParsed.reply.trim()
+      ) {
+        // Keep the first pass as the canonical semantic assessment.
+        // The second pass is expression-only; it must not be able to rewrite
+        // the relationship evidence that caused the action decision.
+        const expressionReply = cleanFinalReply(
+          expressionParsed.reply.trim(),
+          message,
+          activityEvidence,
+          misakiDayType
+        );
+        const expressionProblems = getReplyProblems(
+          expressionReply,
+          message,
+          safeCurrentTime,
+          safeHistory,
+          activityEvidence,
+          misakiDayType
+        );
+
+        if (expressionProblems.length === 0) {
+          reply = expressionReply;
+        } else {
+          console.warn(
+            "MISAKI EXPRESSION REPLY REJECTED:",
+            expressionProblems,
+            expressionReply
+          );
+        }
+      }
+    }
+
+    console.log(
+      "RELATIONSHIP SIGNALS:",
+      {
+        traceId,
+        signals: relationshipSignalAssessment.signals.map((signal) => ({
+          name: signal.name,
+          strength: signal.strength,
+          confidence: signal.confidence,
+        })),
+        facts: relationshipSignalAssessment.relationshipFacts,
+      }
+    );
+
+    const relationshipEmotionWrite =
+      await measureStage(
+        "relationship-emotion-v2-write",
+        () => persistRelationshipEmotionFromSignals(
+          supabase,
+          isAnonymous,
+          relationshipTimeContext,
+          relationshipSignalAssessment,
+          relationshipPatterns
+        )
+      );
+
+    console.log("RELATIONSHIP EMOTION V2:", {
+      traceId,
+      applied: relationshipEmotionWrite.applied,
+      conflict: relationshipEmotionWrite.conflict,
+      emotion: relationshipEmotionWrite.emotion,
+      action: relationshipEmotionWrite.action,
+    });
+
+    const generatedMemory =
+      Array.isArray(parsed.memory)
         ? parsed.memory
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string"
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
+            .filter((item) => typeof item === "string")
+            .map((item) => item.trim())
             .filter(Boolean)
-            .slice(-MAX_MEMORY)
-        : safeMemory;
+        : splitMemory.ordinaryMemory;
+
+    const activeCarriedLifeFacts = selectRelevantLifeFacts(
+      splitMemory.facts,
+      safeCurrentTime,
+      MAX_MEMORY
+    );
+    const activeLifeFacts = selectRelevantLifeFacts(
+      [...activeCarriedLifeFacts, ...explicitLifeFacts],
+      safeCurrentTime,
+      MAX_MEMORY
+    );
+    const encodedLifeMemory = activeLifeFacts.map((fact) =>
+      encodeLifeFactMemory(fact)
+    );
+
+    // The model only owns ordinary long-term memory. Structured life facts are
+    // carried separately so it cannot silently rewrite dates or expiry.
+    const updatedMemory = [
+      ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
+      ...encodedLifeMemory,
+    ].slice(-MAX_MEMORY);
 
     const parsedTodayItems =
       Array.isArray(
@@ -2681,6 +2875,16 @@ ${retryProblems
           -MAX_TODAY_MEMORY
         ),
     };
+
+    await measureStage(
+      "relationship-turn-record",
+      () => recordRelationshipChatTurn(
+        supabase,
+        isAnonymous,
+        new Date(requestStartedAt),
+        new Date()
+      )
+    );
 
     chargedRequestId = null;
     chargedSupabase = null;
