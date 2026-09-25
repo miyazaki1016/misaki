@@ -53,7 +53,7 @@ export function deriveRelationshipStory(events: RelationshipEventLike[]): Relati
     const signals = signalsOf(event);
     const harm = signals.filter(s => String(s.name) === "hurtful").reduce((n,s)=>n+weight(s),0);
     const repair = signals.filter(s => String(s.name) === "repair").reduce((n,s)=>n+weight(s),0);
-    const care = signals.filter(s => ["care","trust","warmth"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
+    const demonstratedCare = signals.filter(s => ["care","trust"].includes(String(s.name))).reduce((n,s)=>n+weight(s),0);
 
     if (harm >= .45) {
       harmCount += 1;
@@ -71,13 +71,10 @@ export function deriveRelationshipStory(events: RelationshipEventLike[]): Relati
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
     }
 
-    if (care >= .55 && repairStage === "repair_attempted") {
-      repairStage = "rebuilding";
-      unresolvedHurt = Math.max(0, unresolvedHurt - care * .75);
+    if (demonstratedCare >= .55 && repairStage === "repair_attempted") {\n      repairStage = "rebuilding";\n      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .75);
       meaning = unresolvedHurt <= .2 ? "repair_demonstrated" : "repair_in_progress";
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
-    } else if (care >= .55 && repairStage === "rebuilding") {
-      unresolvedHurt = Math.max(0, unresolvedHurt - care * .5);
+    } else if (demonstratedCare >= .55 && repairStage === "rebuilding") {\n      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .5);
       if (unresolvedHurt <= .2) meaning = "repair_demonstrated";
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
     }
