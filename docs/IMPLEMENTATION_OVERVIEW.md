@@ -1916,3 +1916,29 @@ Body Clock で `misaki_relationship_events` を relationshipStory 用40件と mo
 - 258 tests / 258 PASS / 0 FAIL
 - Next.js Production Build: PASS
 - main / Production / 稼働中 Edge Function: 未変更
+
+
+### 2026-09-25 追記: relationshipStory の同一性・自発行動安全ゲート
+
+通常チャットと Body Clock が同じ関係履歴を別々の意味に解釈しないよう、canonical history の等価性テストを追加した。hurt / repair / demonstrated repair / repeated harm / boundary / generic warmth を同一入力として両判定器へ流し、最終 meaning が一致することを CI で固定している。
+
+Body Clock 側の履歴解釈も通常チャットへ合わせた。最大40件、created_at が揃う場合は時系列へ正規化し、旧形式 metadata.signal_summary も metadata.signals と同様に読む。created_at を持たないテスト用・互換入力では従来の newest-first 入力を reverse する。
+
+自発行動では、unresolved_hurt / repeated_harm の最中に stale な affectionate / happy / RECONNECT 状態だけを根拠として連絡を開始しない。urge の段階で give_space に止めるため、後段の motive・文章・写真だけを安全にして内部動機が矛盾する状態も避ける。
+
+ただし将来、台風・大雨・地震など現実に根拠がある外部安全情報が明示的に externalConcern として入力された場合だけは、関係の傷が未解決でも concerned な check_in を許せる狭い例外を用意した。これは仲直り扱いではなく安全確認である。現在の Body Clock 本体は externalConcern の実データ源をまだ接続していないため、美咲が外部事実を捏造してこの例外を発火することはない。EmergencyAlert 等の実入力ができるまで接続しない。
+
+写真は関係状態に段階差を持たせる。
+
+- unresolved_hurt / repeated_harm: 自発写真そのものを出さない。
+- repair_in_progress: 普通の写真は許可できるが romantic / affectionate / miss_you タグを含む写真は候補外。
+- repair_demonstrated / none: 他の emotion・action・desire・points 条件に従う。
+
+つまり「仲直り途中だから何も送れない」にはせず、一方で普通の写真から急に恋人温度へ飛ぶことも防ぐ。
+
+直近検証:
+- 4c2373e...: GitHub Actions run 426 SUCCESS、269 / 269 PASS、build PASS
+- 67827a6...: GitHub Actions run 430 SUCCESS、270 / 270 PASS、build PASS
+- main / Production / 稼働中 Edge Function: 未変更
+
+> **通常会話・Body Clock・写真は別々の人格ではない。同じ出来事の現在の意味を見て、その意味に合う行動だけを選ぶ。**
