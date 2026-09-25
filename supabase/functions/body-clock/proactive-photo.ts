@@ -120,6 +120,7 @@ function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {
 
 export function hasMisakiProactivePhotoOpportunity(input: { currentTime: string; decision: ProactiveDecisionContext }) {
   const { currentTime, decision } = input;
+  if (decision.relationshipStoryMeaning === "unresolved_hurt" || decision.relationshipStoryMeaning === "repeated_harm") return false;
   const timeBucket = getTimeBucket(currentTime);
   return PHOTOS.some((photo) =>
     decision.relationshipPoints >= photo.minRelationshipPoints &&
@@ -133,6 +134,7 @@ export function hasMisakiProactivePhotoOpportunity(input: { currentTime: string;
 export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): MisakiPhoto | null {
   const { currentTime, reply, decision, desire, urgeStrength, recentPhotoIds = [] } = input;
   if (!decision.shouldSend || !reply.trim()) return null;
+  if (decision.relationshipStoryMeaning === "unresolved_hurt" || decision.relationshipStoryMeaning === "repeated_harm") return null;
 
   // A photo is an action, not decoration. Generic check-ins/reconnection/space
   // never attach one merely because a matching asset exists.
