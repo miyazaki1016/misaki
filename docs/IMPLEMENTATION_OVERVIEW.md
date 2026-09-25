@@ -1896,3 +1896,23 @@ Body Clock でも以下を区別する。
 - 257 tests / 257 PASS / 0 FAIL
 - Next.js Production Build: PASS
 - main / Production / 稼働中 Edge Function: 未変更
+
+
+### 2026-09-25 追記: Body Clock の履歴読み込み統合と写真整合
+
+Body Clock で `misaki_relationship_events` を relationshipStory 用40件と motive 用3件に二重取得していた構造を整理した。現在は `processUser()` が最新40件を1回だけ取得し、同じイベント集合を relationshipStory の意味判定へ渡し、最新3件だけを motive の根拠として再利用する。
+
+これにより通常会話側と同様、「同じ関係履歴を一度読み、複数の判断が同じ事実を見る」構造になった。
+
+写真も文章と同じ関係状態に従う。`unresolved_hurt` または `repeated_harm` のときは、表面上の emotion / points / tags が写真条件を満たしていても Body Clock の自発写真を候補にしない。
+
+理由は写真も行動だから。文章だけ少し距離を保ちながら、写真だけ romantic / affectionate / miss_you に飛ぶのは「別人格化」であり禁止する。
+
+回帰テストでは、happy・高親密度・romanticタグという強い写真条件を意図的に与えた上で、story が unresolved_hurt / repeated_harm なら opportunity=false、selection=null になることを確認している。
+
+検証:
+- head `00eec3b9bb9cfd81319e3e4672d8747303ef75e9`
+- GitHub Actions run 390: SUCCESS
+- 258 tests / 258 PASS / 0 FAIL
+- Next.js Production Build: PASS
+- main / Production / 稼働中 Edge Function: 未変更
