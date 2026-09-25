@@ -83,6 +83,12 @@ export function extractExplicitLifeFacts(
     return date.toISOString();
   };
 
+  // Do not promote third-person reports, questions, or "talking about work"
+  // into the user's own schedule. This extractor is intentionally narrow.
+  if (/^(?:友達|友人|家族|母|父|兄|姉|弟|妹|彼|彼女|同僚|知人)/.test(text)) return [];
+  if (/[？?]$/.test(text) || /(?:かな|かも|らしい)(?:[。！!？?]|$)/.test(text)) return [];
+  if (/(?:仕事|勤務|乗務)の(?:話|相談|ことを話)/.test(text)) return [];
+
   const facts: LifeFact[] = [];
   const push = (kind: LifeFactKind, fact: string, validUntil?: string) => {
     facts.push({
