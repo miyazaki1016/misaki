@@ -48,6 +48,8 @@ import {
   createLifeUnderstandingGuide,
   extractExplicitLifeFacts,
   selectRelevantLifeFacts,
+  encodeLifeFactMemory,
+  splitLifeFactMemory,
   type LifeFact,
 } from "../../../lib/relationship-life-context";
 
@@ -2016,14 +2018,17 @@ export async function POST(
     // Existing long-term memory is still the source. This adapter only exposes
     // conservative, explicitly stated life facts; it does not infer schedules,
     // locations, health, or mood from free text.
+    const splitMemory = splitLifeFactMemory(safeMemory);
+    const explicitLifeFacts = extractExplicitLifeFacts(message, safeCurrentTime);
     const lifeFacts: LifeFact[] = [
-      ...safeMemory.map((fact) => ({
+      ...splitMemory.ordinaryMemory.map((fact) => ({
         kind: "profile" as const,
         fact,
         source: "memory" as const,
         confidence: 1,
       })),
-      ...extractExplicitLifeFacts(message, safeCurrentTime),
+      ...splitMemory.facts,
+      ...explicitLifeFacts,
     ];
     const lifeUnderstandingGuide = createLifeUnderstandingGuide(
       selectRelevantLifeFacts(lifeFacts, safeCurrentTime)
@@ -2771,23 +2776,34 @@ ${retryProblems
       action: relationshipEmotionWrite.action,
     });
 
-    const updatedMemory =
-      Array.isArray(
-        parsed.memory
-      )
+    const generatedMemory =
+      Array.isArray(parsed.memory)
         ? parsed.memory
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string"
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
+            .filter((item) => typeof item === "string")
+            .map((item) => item.trim())
             .filter(Boolean)
-            .slice(-MAX_MEMORY)
-        : safeMemory;
+        : splitMemory.ordinaryMemory;
+
+    const activeCarriedLifeFacts = selectRelevantLifeFacts(
+      splitMemory.facts,
+      safeCurrentTime,
+      MAX_MEMORY
+    );
+    const activeLifeFacts = selectRelevantLifeFacts(
+      [...activeCarriedLifeFacts, ...explicitLifeFacts],
+      safeCurrentTime,
+      MAX_MEMORY
+    );
+    const encodedLifeMemory = activeLifeFacts.map((fact) =>
+      encodeLifeFactMemory(fact)
+    );
+
+    // The model only owns ordinary long-term memory. Structured life facts are
+    // carried separately so it cannot silently rewrite dates or expiry.
+    const updatedMemory = [
+      ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
+      ...encodedLifeMemory,
+    ].slice(-MAX_MEMORY);
 
     const parsedTodayItems =
       Array.isArray(
