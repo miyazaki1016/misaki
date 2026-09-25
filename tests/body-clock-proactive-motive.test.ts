@@ -96,3 +96,20 @@ test("motive guide protects relationship intent from collapsing into generic che
  assert.match(motiveGuide(m),/二人の関係の続きを作る/);
  assert.match(motiveGuide(m),/単なる近況確認/);
 });
+
+
+test("unresolved hurt cannot reuse a relationship event as proactive closeness motive",()=>{
+ const now=new Date().toISOString();
+ const m=deriveProactiveMotive({desire:"be_close",focus:"relationship",history:[],memory:[],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"warm_chat",createdAt:now,storyMeaning:"unresolved_hurt"}]});
+ assert.equal(m.kind,"internal_state");
+ assert.equal(m.topicIntent,"none");
+ assert.equal(m.evidence,"none");
+});
+
+test("repeated harm cannot reuse a relationship event as reconnect motive",()=>{
+ const now=new Date().toISOString();
+ const m=deriveProactiveMotive({desire:"reconnect",focus:"relationship",history:[],memory:[],lifeEvidence:[],relationshipEvents:[{eventType:"emotion_action_v2_after_chat",reason:"repair_after_hurt",createdAt:now,storyMeaning:"repeated_harm"}]});
+ assert.equal(m.kind,"internal_state");
+ assert.equal(m.topicIntent,"none");
+ assert.equal(m.evidence,"none");
+});
