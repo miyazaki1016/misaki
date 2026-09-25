@@ -57,7 +57,7 @@ export function storyMeaningFromEvents(events: Array<{ metadata?: unknown }>): R
     const signals = Array.isArray(metadata.signals) ? metadata.signals : [];
     const harm = signals.filter((s:any)=>String(s?.name)==="hurtful").reduce((n:number,s:any)=>n+weight(s),0);
     const repair = signals.filter((s:any)=>["apology","repair"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
-    const care = signals.filter((s:any)=>["care","trust","warmth"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
+    const care = signals.filter((s:any)=>["care","trust"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
     if (harm >= .45) { harmCount += 1; unresolvedHurt = Math.min(3, unresolvedHurt + harm); repairStage="hurt"; meaning=harmCount>=2?"repeated_harm":"unresolved_hurt"; continue; }
     if (repair >= .5 && unresolvedHurt > 0) { repairStage="repair_attempted"; meaning="repair_in_progress"; unresolvedHurt=Math.max(.15,unresolvedHurt-repair*.35); }
     if (care >= .55 && repairStage==="repair_attempted") { repairStage="rebuilding"; unresolvedHurt=Math.max(0,unresolvedHurt-care*.75); meaning=unresolvedHurt<=.2?"repair_demonstrated":"repair_in_progress"; }
