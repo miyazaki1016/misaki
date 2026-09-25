@@ -266,7 +266,9 @@ export async function buildProactiveDecisionContext(
 
   if (error) throw error;
 
-  const relationshipStoryMeaning = storyMeaningFromEvents(relationshipEvents);\n\n  const row = (data || {}) as RelationshipRow;
+  const relationshipStoryMeaning = storyMeaningFromEvents(relationshipEvents);
+
+  const row = (data || {}) as RelationshipRow;
   const currentAction = action(row.action_state);
   const currentEmotion = emotion(row.emotion_state?.primary);
   const currentTimeBand = timeBand(row.last_interaction_at);
@@ -301,5 +303,24 @@ export async function buildProactiveDecisionContext(
 
 export function createProactiveDecisionGuide(context: ProactiveDecisionContext) {
   const storyGuide: Record<RelationshipStoryMeaning,string> = { none:"", unresolved_hurt:"未解決の引っかかりが残る。自発メッセージだけ急に甘く戻さない。", repair_in_progress:"修復途中。扉は閉じないが、完全に元通りの甘さを演じない。", repair_demonstrated:"その後の行動まで含めて修復できた履歴。古い傷を蒸し返さず、安心としてにじませる。", repeated_harm:"似た傷が繰り返された履歴。言葉だけで警戒を即解除せず、罰や無視にも飛ばない。" };
-  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n二人の出来事の現在の意味: ${context.relationshipStoryMeaning}\n${storyGuide[context.relationshipStoryMeaning]}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない\n・hurt / guarded / PULL / SULK のときも、罰・無視・罪悪感を与える表現にはしない\n・長く会っていないという時間だけを理由に miss_you / romantic を作らない`;
+  return `【今回の自発行動コンテキスト】
+方向: ${context.direction}
+感情: ${context.emotion}（強さ ${context.emotionIntensity}）
+行動傾向: ${context.action}
+親密度: ${context.intimacyLevel}
+関係時間帯: ${context.timeBand}
+生活根拠の確度: ${context.lifeConfidence}
+表現タグ: ${context.tags.join(", ")}
+二人の出来事の現在の意味: ${context.relationshipStoryMeaning}
+${storyGuide[context.relationshipStoryMeaning]}
+
+このコンテキストは文章と写真の共通の原因です。
+・方向、感情、行動、表現タグを返事の温度へ自然ににじませる
+・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない
+・タグ名や内部状態を本文に書かない
+・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない
+・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい
+・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない
+・hurt / guarded / PULL / SULK のときも、罰・無視・罪悪感を与える表現にはしない
+・長く会っていないという時間だけを理由に miss_you / romantic を作らない`;
 }
