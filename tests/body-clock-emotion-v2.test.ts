@@ -78,3 +78,19 @@ test("unresolved or repeated hurt cannot produce a contradictory proactive photo
  assert.equal(hasMisakiProactivePhotoOpportunity({currentTime:"2026/09/25 19:00",decision:repeated}),false);
  assert.equal(selectMisakiProactivePhoto({currentTime:"2026/09/25 19:00",reply:"ちょっと話したくなった",decision:repeated,desire:"share_photo",urgeStrength:90}),null);
 });
+
+
+test("Body Clock does not treat apology alone as demonstrated repair evidence",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"apology",strength:1,confidence:1}]),
+  event([{name:"hurtful",strength:.9,confidence:.9}])
+ ]),"unresolved_hurt");
+});
+
+test("Body Clock generic warmth after repair stays repair in progress",()=>{
+ assert.equal(storyMeaningFromEvents([
+  event([{name:"warmth",strength:1,confidence:1}]),
+  event([{name:"repair",strength:.9,confidence:.9},{name:"apology",strength:.9,confidence:.9}]),
+  event([{name:"hurtful",strength:1,confidence:1}])
+ ]),"repair_in_progress");
+});
