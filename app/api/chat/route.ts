@@ -1816,7 +1816,7 @@ export async function POST(
           () => loadRelationshipTimeContext(supabase, false)
         );
     const relationshipHistory = isAnonymous
-      ? { patterns: {}, story: { unresolvedHurt: false, repairStage: "none", meaning: "none", lastMeaningfulAt: null } }
+      ? await loadRelationshipHistory(supabase as any, true)
       : await measureStage(
           "relationship-history-load",
           () => loadRelationshipHistory(supabase as any, false)
