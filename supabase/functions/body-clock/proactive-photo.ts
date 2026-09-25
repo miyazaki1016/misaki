@@ -99,6 +99,10 @@ export function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, "an
   return "night";
 }
 
+function isRepairSafePhoto(photo: MisakiPhoto) {
+  return !photo.tags.some((tag) => ["romantic", "affectionate", "miss_you"].includes(tag));
+}
+
 function scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {
   return tags.reduce(
     (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),
@@ -123,6 +127,7 @@ export function hasMisakiProactivePhotoOpportunity(input: { currentTime: string;
   if (decision.relationshipStoryMeaning === "unresolved_hurt" || decision.relationshipStoryMeaning === "repeated_harm") return false;
   const timeBucket = getTimeBucket(currentTime);
   return PHOTOS.some((photo) =>
+    (decision.relationshipStoryMeaning !== "repair_in_progress" || isRepairSafePhoto(photo)) &&
     decision.relationshipPoints >= photo.minRelationshipPoints &&
     (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
     photo.directions.includes(decision.direction) &&
@@ -148,6 +153,7 @@ export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): Misak
 
   const timeBucket = getTimeBucket(currentTime);
   let candidates = PHOTOS.filter((photo) =>
+    (decision.relationshipStoryMeaning !== "repair_in_progress" || isRepairSafePhoto(photo)) &&
     decision.relationshipPoints >= photo.minRelationshipPoints &&
     (photo.times.includes(timeBucket) || photo.times.includes("any")) &&
     photo.directions.includes(decision.direction) &&
