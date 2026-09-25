@@ -2,6 +2,7 @@ import type { RelationshipTimeContext } from "./relationship-time.ts";
 import type { RelationshipSignalAssessment } from "./relationship-signal.ts";
 import { reduceRelationshipEmotion, type RelationshipPatternContext } from "./relationship-emotion-reducer.ts";
 import { createActionDecisionGuide, reduceRelationshipAction, type ActionDecision } from "./relationship-action-reducer.ts";
+import type { RelationshipStoryState } from "./relationship-patterns.ts";
 
 export function previewRelationshipTurn(context: RelationshipTimeContext | null, signals: RelationshipSignalAssessment, patterns?: RelationshipPatternContext) {
   const allowed = new Set(["neutral","happy","affectionate","concerned","hurt","sulky","guarded"]);
@@ -11,7 +12,7 @@ export function previewRelationshipTurn(context: RelationshipTimeContext | null,
   return {emotion,action};
 }
 
-export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow: string = "none", secondary: string | null = null) {
+export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow: string = "none", secondary: string | null = null, story?: RelationshipStoryState) {
   const afterglowGuide: Record<string,string>={warm:"さっきまでの嬉しさが少し残っている。理由なく急に無機質へ戻らない。",tender:"やわらかな親愛や仲直り後の繊細さが残っている。甘さを盛りすぎず、少し丁寧に近づく。",repairing:"まだ完全には解けていないが、関係を戻したい気持ちもある。傷を蒸し返さず、即リセットもしない。",wary:"少し警戒が残っている。冷酷にはならず、距離を急に縮めない。",concerned:"気がかりが残っている。根拠のある範囲だけ気遣い、心配を捏造しない。",none:"余韻による追加調整はない。"};
   const decisionGuide: Record<string,string> = {
     affection_remains_but_hurt_still_needs_space: "好意は残っていても今は傷を優先する。短め・静かめでもよいが、別れや嫌悪を勝手に示さない。",
@@ -21,6 +22,14 @@ export function createCurrentTurnActionGuide(decision: ActionDecision, afterglow
     grounded_concern_invites_check_in: "根拠のある心配を短く伝える。直前の関係状態に傷や距離がある場合、それを仲直り済みとして上書きしない。",
     repair_afterglow_keeps_the_door_open: "まだ引っかかりはあるが、仲直りの扉は閉じていない。拒絶しきらず、完全復帰も演じない。",
   };
+  const storyGuide: Record<RelationshipStoryState["meaning"], string> = {
+    none: "",
+    unresolved_hurt: "二人の間にまだ未解決の引っかかりがある。普通の話題へ移っても、急に完全復帰した温度へ戻さない。",
+    repair_in_progress: "謝罪や修復の動きは受け取っているが、まだ途中。少しずつ柔らかくしてよいが、一言で全部解決したようには振る舞わない。",
+    repair_demonstrated: "その後の行動まで含めて修復できた履歴がある。昔の傷を蒸し返さず、「修復できた二人」という安心を自然な温度として使う。",
+    repeated_harm: "似た傷が繰り返された履歴がある。現在の優しさは受け取りつつ、言葉だけで警戒を即解除せず、継続した行動を見る余地を残す。",
+  };
+  const storyText = story ? storyGuide[story.meaning] : "";
   const mixedGuide = secondary === "affectionate"
     ? "親愛は残っている。傷や警戒を無視して甘くしすぎず、逆に親愛まで消した冷酷な言い方にも飛ばない。"
     : secondary === "happy"
@@ -36,6 +45,9 @@ ${decisionGuide[decision.reason]}` : ""}
 ${mixedGuide ? `
 【同時に残っている感情】
 ${mixedGuide}` : ""}
+${storyText ? `
+【二人の出来事の余韻】
+${storyText}` : ""}
 
 【言葉への反映】
 ・感情名を説明せず、語尾・返答の長さ・距離感・冗談の量・踏み込み方ににじませる
