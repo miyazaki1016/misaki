@@ -174,3 +174,25 @@ export async function loadRelationshipPatterns(
 
   return deriveRelationshipPatterns(Array.isArray(data) ? data : []);
 }
+
+
+export async function loadRelationshipStory(
+  supabase: { from: (table: string) => any },
+  isAnonymous: boolean
+): Promise<RelationshipStoryState> {
+  if (isAnonymous) return deriveRelationshipStory([]);
+
+  const { data, error } = await supabase
+    .from("misaki_relationship_events")
+    .select("event_type,metadata,created_at")
+    .eq("event_type", "emotion_action_v2_after_chat")
+    .order("created_at", { ascending: false })
+    .limit(40);
+
+  if (error) {
+    console.error("RELATIONSHIP STORY LOAD ERROR:", error);
+    return deriveRelationshipStory([]);
+  }
+
+  return deriveRelationshipStory(Array.isArray(data) ? data : []);
+}
