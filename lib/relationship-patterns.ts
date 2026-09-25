@@ -71,10 +71,13 @@ export function deriveRelationshipStory(events: RelationshipEventLike[]): Relati
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
     }
 
-    if (demonstratedCare >= .55 && repairStage === "repair_attempted") {\n      repairStage = "rebuilding";\n      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .75);
+    if (demonstratedCare >= .55 && repairStage === "repair_attempted") {
+      repairStage = "rebuilding";
+      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .75);
       meaning = unresolvedHurt <= .2 ? "repair_demonstrated" : "repair_in_progress";
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
-    } else if (demonstratedCare >= .55 && repairStage === "rebuilding") {\n      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .5);
+    } else if (demonstratedCare >= .55 && repairStage === "rebuilding") {
+      unresolvedHurt = Math.max(0, unresolvedHurt - demonstratedCare * .5);
       if (unresolvedHurt <= .2) meaning = "repair_demonstrated";
       lastMeaningfulAt = event.created_at ?? lastMeaningfulAt;
     }
