@@ -17,6 +17,8 @@ export type ProactiveExpressionTag =
   | "encouraging"
   | "check_in";
 
+export type RelationshipStoryMeaning = "none" | "unresolved_hurt" | "repair_in_progress" | "repair_demonstrated" | "repeated_harm";
+
 export type ProactiveDecisionContext = {
   shouldSend: true;
   reason: "claimed_after_relationship_action_gate";
@@ -32,6 +34,7 @@ export type ProactiveDecisionContext = {
   lifeEvidence: string[];
   lifeConfidence: "none" | "explicit";
   tags: ProactiveExpressionTag[];
+  relationshipStoryMeaning: RelationshipStoryMeaning;
 };
 
 type RelationshipRow = {
@@ -40,6 +43,28 @@ type RelationshipRow = {
   action_state?: string | null;
   last_interaction_at?: string | null;
 };
+
+
+function storyMeaningFromEvents(events: Array<{ metadata?: unknown }>): RelationshipStoryMeaning {
+  let unresolvedHurt = 0;
+  let repairStage: "none" | "hurt" | "repair_attempted" | "rebuilding" = "none";
+  let meaning: RelationshipStoryMeaning = "none";
+  let harmCount = 0;
+  const ordered = [...events].reverse();
+  const weight = (s: any) => Math.max(0, Number(s?.strength)||0) * Math.max(0, Number(s?.confidence)||0);
+  for (const event of ordered) {
+    const metadata = event?.metadata && typeof event.metadata === "object" ? event.metadata as any : {};
+    const signals = Array.isArray(metadata.signals) ? metadata.signals : [];
+    const harm = signals.filter((s:any)=>String(s?.name)==="hurtful").reduce((n:number,s:any)=>n+weight(s),0);
+    const repair = signals.filter((s:any)=>["apology","repair"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
+    const care = signals.filter((s:any)=>["care","trust","warmth"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
+    if (harm >= .45) { harmCount += 1; unresolvedHurt = Math.min(3, unresolvedHurt + harm); repairStage="hurt"; meaning=harmCount>=2?"repeated_harm":"unresolved_hurt"; continue; }
+    if (repair >= .5 && unresolvedHurt > 0) { repairStage="repair_attempted"; meaning="repair_in_progress"; unresolvedHurt=Math.max(.15,unresolvedHurt-repair*.35); }
+    if (care >= .55 && repairStage==="repair_attempted") { repairStage="rebuilding"; unresolvedHurt=Math.max(0,unresolvedHurt-care*.75); meaning=unresolvedHurt<=.2?"repair_demonstrated":"repair_in_progress"; }
+    else if (care >= .55 && repairStage==="rebuilding") { unresolvedHurt=Math.max(0,unresolvedHurt-care*.5); if(unresolvedHurt<=.2) meaning="repair_demonstrated"; }
+  }
+  return meaning;
+}
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
@@ -240,6 +265,16 @@ export async function buildProactiveDecisionContext(
 
   if (error) throw error;
 
+  const { data: storyEvents, error: storyError } = await supabase
+    .from("misaki_relationship_events")
+    .select("metadata,created_at")
+    .eq("user_id", userId)
+    .eq("event_type", "emotion_action_v2_after_chat")
+    .order("created_at", { ascending: false })
+    .limit(40);
+  if (storyError) throw storyError;
+  const relationshipStoryMeaning = storyMeaningFromEvents(Array.isArray(storyEvents) ? storyEvents : []);
+
   const row = (data || {}) as RelationshipRow;
   const currentAction = action(row.action_state);
   const currentEmotion = emotion(row.emotion_state?.primary);
@@ -269,9 +304,11 @@ export async function buildProactiveDecisionContext(
     lifeEvidence: life.evidence,
     lifeConfidence: life.confidence,
     tags,
+    relationshipStoryMeaning,
   };
 }
 
 export function createProactiveDecisionGuide(context: ProactiveDecisionContext) {
-  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない\n・hurt / guarded / PULL / SULK のときも、罰・無視・罪悪感を与える表現にはしない\n・長く会っていないという時間だけを理由に miss_you / romantic を作らない`;
+  const storyGuide: Record<RelationshipStoryMeaning,string> = { none:"", unresolved_hurt:"未解決の引っかかりが残る。自発メッセージだけ急に甘く戻さない。", repair_in_progress:"修復途中。扉は閉じないが、完全に元通りの甘さを演じない。", repair_demonstrated:"その後の行動まで含めて修復できた履歴。古い傷を蒸し返さず、安心としてにじませる。", repeated_harm:"似た傷が繰り返された履歴。言葉だけで警戒を即解除せず、罰や無視にも飛ばない。" };
+  return `【今回の自発行動コンテキスト】\n方向: ${context.direction}\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\n行動傾向: ${context.action}\n親密度: ${context.intimacyLevel}\n関係時間帯: ${context.timeBand}\n生活根拠の確度: ${context.lifeConfidence}\n表現タグ: ${context.tags.join(", ")}\n二人の出来事の現在の意味: ${context.relationshipStoryMeaning}\n${storyGuide[context.relationshipStoryMeaning]}\n\nこのコンテキストは文章と写真の共通の原因です。\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\n・sleepy は深夜の身体状態として弱くにじませ、毎回「眠い」と説明しない\n・タグ名や内部状態を本文に書かない\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない\n・hurt / guarded / PULL / SULK のときも、罰・無視・罪悪感を与える表現にはしない\n・長く会っていないという時間だけを理由に miss_you / romantic を作らない`;
 }
