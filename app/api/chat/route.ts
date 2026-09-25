@@ -33,7 +33,7 @@ import {
   createRelationshipTimeGuide,
   recordRelationshipChatTurn,
 } from "../../../lib/relationship-time";
-import { createRelationshipEmotionGuide } from "../../../lib/relationship-emotion";
+
 import { persistRelationshipEmotionFromSignals } from "../../../lib/relationship-emotion-store";
 import {
   previewRelationshipTurn,
