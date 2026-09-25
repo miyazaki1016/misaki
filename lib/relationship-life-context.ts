@@ -64,3 +64,59 @@ ${lines.join("\n")}
 ・ただし生活情報だけで恋愛感情、心配、怒り、関係進展を新規生成しない
 ・過去の情報と現在の発言が矛盾する場合は、現在の明示発言を優先する`;
 }
+
+
+export function extractExplicitLifeFacts(
+  userMessage: string,
+  observedAt: string
+): LifeFact[] {
+  const text = userMessage.replace(/\s+/g, " ").trim();
+  if (!text) return [];
+
+  const observedMs = time(observedAt);
+  if (observedMs === null) return [];
+
+  const endOfLocalDay = (daysAhead = 0) => {
+    const date = new Date(observedMs);
+    date.setDate(date.getDate() + daysAhead);
+    date.setHours(23, 59, 59, 999);
+    return date.toISOString();
+  };
+
+  const facts: LifeFact[] = [];
+  const push = (kind: LifeFactKind, fact: string, validUntil?: string) => {
+    facts.push({
+      kind,
+      fact,
+      observedAt,
+      validUntil: validUntil ?? null,
+      confidence: 1,
+      source: "user",
+    });
+  };
+
+  // Only explicit first-person statements are extracted here. Ambiguous
+  // mentions remain in conversation history instead of becoming canonical life facts.
+  if (/(?:今日は|きょうは).{0,12}(?:休み|休暇|休日)(?:だ|です|なんだ|だよ|なの)?/.test(text)) {
+    push("schedule", "今日は休み", endOfLocalDay());
+  }
+  if (/(?:今日は|きょうは).{0,16}(?:仕事|勤務|乗務)(?:だ|です|なんだ|だよ|なの|する|します)?/.test(text)) {
+    push("schedule", "今日は仕事", endOfLocalDay());
+  }
+  if (/(?:明日は|あしたは).{0,12}(?:休み|休暇|休日)(?:だ|です|なんだ|だよ|なの)?/.test(text)) {
+    push("schedule", "明日は休み", endOfLocalDay(1));
+  }
+  if (/(?:明日は|あしたは).{0,16}(?:仕事|勤務|乗務)(?:だ|です|なんだ|だよ|なの|する|します)?/.test(text)) {
+    push("schedule", "明日は仕事", endOfLocalDay(1));
+  }
+
+  const late = text.match(/(?:今日は|きょうは)?.{0,8}(\d{1,2})時(?:ごろ|頃)?(?:まで|くらいまで)?.{0,8}(?:仕事|勤務|乗務)/);
+  if (late) {
+    const hour = Number(late[1]);
+    if (hour >= 0 && hour <= 23) {
+      push("schedule", `今日は${hour}時ごろまで仕事`, endOfLocalDay());
+    }
+  }
+
+  return facts;
+}
