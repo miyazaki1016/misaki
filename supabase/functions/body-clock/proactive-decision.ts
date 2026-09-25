@@ -45,16 +45,17 @@ type RelationshipRow = {
 };
 
 
-export function storyMeaningFromEvents(events: Array<{ metadata?: unknown }>): RelationshipStoryMeaning {
+export function storyMeaningFromEvents(events: Array<{ metadata?: unknown; created_at?: string }>): RelationshipStoryMeaning {
   let unresolvedHurt = 0;
   let repairStage: "none" | "hurt" | "repair_attempted" | "rebuilding" = "none";
   let meaning: RelationshipStoryMeaning = "none";
   let harmCount = 0;
-  const ordered = [...events].reverse();
-  const weight = (s: any) => Math.max(0, Number(s?.strength)||0) * Math.max(0, Number(s?.confidence)||0);
+  const ordered = [...events].slice(0,40).sort((a,b)=>new Date(String(a?.created_at||0)).getTime()-new Date(String(b?.created_at||0)).getTime());
+  const weight = (s: any) => { const strength=Number.isFinite(s?.strength)?Number(s.strength):0, confidence=Number.isFinite(s?.confidence)?Number(s.confidence):0; return strength*confidence; };
   for (const event of ordered) {
     const metadata = event?.metadata && typeof event.metadata === "object" ? event.metadata as any : {};
-    const signals = Array.isArray(metadata.signals) ? metadata.signals : [];
+    const rawSignals = metadata.signal_summary ?? metadata.signals;
+    const signals = Array.isArray(rawSignals) ? rawSignals : [];
     const harm = signals.filter((s:any)=>String(s?.name)==="hurtful").reduce((n:number,s:any)=>n+weight(s),0);
     const repair = signals.filter((s:any)=>String(s?.name)==="repair").reduce((n:number,s:any)=>n+weight(s),0);
     const care = signals.filter((s:any)=>["care","trust"].includes(String(s?.name))).reduce((n:number,s:any)=>n+weight(s),0);
