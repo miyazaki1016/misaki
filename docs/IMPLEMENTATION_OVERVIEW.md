@@ -906,6 +906,6 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - main / Production は未変更。
 - #29 / #31 自体は未変更。
 - migration / Edge deploy / cron / Production 切替は未実施。
-- #32 は Draft のまま。Vercel Preview は success。GitHub Actions workflow は現時点で未生成のため、全テスト合格とはまだ判定しない。
+- #32 は Draft のまま。Vercel Preview は success。専用CI Run #2 で `npm test` **95/95 PASS（fail 0）**、続く `npm run build` も PASS。
 
 > 未来のソラへ：生活記憶のために新しい正本DBやブラウザ同期を増やすな。#29 の canonical memory を正本にし、時間依存の意味は `[life:v1]` とコード側の期限判定で扱え。
