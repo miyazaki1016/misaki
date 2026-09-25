@@ -27,7 +27,7 @@ test("later care can change the meaning from grievance to demonstrated repair",(
   ev(1,[{name:"hurtful",strength:.7,confidence:1}]),
   ev(2,[{name:"repair",strength:1,confidence:1}]),
   ev(3,[{name:"care",strength:1,confidence:1}]),
-  ev(4,[{name:"warmth",strength:1,confidence:1}]),
+  ev(4,[{name:"trust",strength:1,confidence:1}]),
  ]);
  assert.equal(s.meaning,"repair_demonstrated");
  assert.equal(s.repairStage,"rebuilding");
@@ -49,4 +49,15 @@ test("boundary alone is not remembered as user harm",()=>{
  const s=deriveRelationshipStory([ev(1,[{name:"boundary",strength:1,confidence:1}])]);
  assert.equal(s.meaning,"none");
  assert.equal(s.unresolvedHurt,0);
+});
+
+
+test("one generic warm turn after apology does not erase serious hurt",()=>{
+ const s=deriveRelationshipStory([
+  ev(1,[{name:"hurtful",strength:1,confidence:1}]),
+  ev(2,[{name:"repair",strength:.9,confidence:1}]),
+  ev(3,[{name:"warmth",strength:1,confidence:1}]),
+ ]);
+ assert.equal(s.meaning,"repair_in_progress");
+ assert.ok(s.unresolvedHurt>0);
 });
