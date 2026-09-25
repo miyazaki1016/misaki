@@ -255,7 +255,8 @@ export async function buildProactiveDecisionContext(
   userId: string,
   points: number,
   life: ProactiveLifeContext,
-  currentTime: string
+  currentTime: string,
+  relationshipEvents: Array<{ metadata?: unknown }> = []
 ): Promise<ProactiveDecisionContext> {
   const { data, error } = await supabase
     .from("misaki_relationship_state")
@@ -265,17 +266,7 @@ export async function buildProactiveDecisionContext(
 
   if (error) throw error;
 
-  const { data: storyEvents, error: storyError } = await supabase
-    .from("misaki_relationship_events")
-    .select("metadata,created_at")
-    .eq("user_id", userId)
-    .eq("event_type", "emotion_action_v2_after_chat")
-    .order("created_at", { ascending: false })
-    .limit(40);
-  if (storyError) throw storyError;
-  const relationshipStoryMeaning = storyMeaningFromEvents(Array.isArray(storyEvents) ? storyEvents : []);
-
-  const row = (data || {}) as RelationshipRow;
+  const relationshipStoryMeaning = storyMeaningFromEvents(relationshipEvents);\n\n  const row = (data || {}) as RelationshipRow;
   const currentAction = action(row.action_state);
   const currentEmotion = emotion(row.emotion_state?.primary);
   const currentTimeBand = timeBand(row.last_interaction_at);
