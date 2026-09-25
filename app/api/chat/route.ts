@@ -43,7 +43,7 @@ import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
-import { loadRelationshipPatterns } from "../../../lib/relationship-patterns";
+import { loadRelationshipPatterns, loadRelationshipStory } from "../../../lib/relationship-patterns";
 import {
   createLifeUnderstandingGuide,
   extractExplicitLifeFacts,
@@ -1804,6 +1804,12 @@ export async function POST(
         () => loadRelationshipPatterns(supabase as any, isAnonymous)
       );
 
+    const relationshipStory =
+      await measureStage(
+        "relationship-story-load",
+        () => loadRelationshipStory(supabase as any, isAnonymous)
+      );
+
     const usageRequestId =
       crypto.randomUUID();
 
@@ -2703,7 +2709,8 @@ ${retryProblems
             createCurrentTurnActionGuide(
               currentTurnState.action,
               currentTurnState.emotion.afterglow,
-              currentTurnState.emotion.secondary
+              currentTurnState.emotion.secondary,
+              relationshipStory
             ) +
             "\n\n【再生成の目的】\n最初の判定で得た関係シグナルと今回の行動意図を反映して、replyだけを自然に作り直してください。relationshipSignals の判定は同じユーザー発言について再度行い、根拠のないシグナルを追加しないでください。"
         );
