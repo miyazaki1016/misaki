@@ -39,7 +39,7 @@ import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
-import { loadRelationshipHistory } from "../../../lib/relationship-patterns";
+import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 
 type TokyoWeather = {
@@ -1836,8 +1836,15 @@ export async function POST(
           "relationship-time-load",
           () => loadRelationshipTimeContext(supabase, false)
         );
+    const anonymousRelationshipEvents =
+      isAnonymous && Array.isArray(rootState.temporaryRelationship?.events)
+        ? rootState.temporaryRelationship.events.slice(-40)
+        : [];
     const relationshipHistory = isAnonymous
-      ? await loadRelationshipHistory(supabase as any, true)
+      ? {
+          patterns: deriveRelationshipPatterns(anonymousRelationshipEvents),
+          story: deriveRelationshipStory(anonymousRelationshipEvents),
+        }
       : await measureStage(
           "relationship-history-load",
           () => loadRelationshipHistory(supabase as any, false)
@@ -2880,6 +2887,15 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
           actionState: relationshipPreview.action.action,
           lastInteractionAt: new Date().toISOString(),
           signals: relationshipAssessment.signals.map(({ name, strength, confidence }) => ({ name, strength, confidence })),
+          events: [...anonymousRelationshipEvents, {
+            event_type: "emotion_action_v2_after_chat" as const,
+            created_at: new Date().toISOString(),
+            metadata: {
+              signal_summary: relationshipAssessment.signals.map(({ name, strength, confidence }) => ({
+                name, strength, confidence,
+              })),
+            },
+          }].slice(-40),
         },
         history: [...(Array.isArray(history) ? history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
