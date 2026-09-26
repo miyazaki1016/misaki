@@ -966,3 +966,19 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - `npm test`: **103/103 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - The suite count increased by more than the single new subtest because the repository test runner executes the canonical test module through multiple integration suites; the authoritative result is 103 total / 103 pass.
+
+
+### 2026-09-26 — semantic relationship points green checkpoint
+
+- Relationship points are no longer conceptually tied to message count on the integration branch.
+- `deriveRelationshipPointDelta()` converts grounded relationship signals into a bounded per-turn consequence:
+  - ordinary chat with no relationship meaning: 0
+  - grounded warmth/care/trust/openness/shared history/romantic meaning: +1 to +2
+  - hurt/rejection/boundary harm: -1 to -2
+  - repair: +1 to +2 when grounded, without making apology a farming mechanic
+- The canonical successful-turn SQL migration replaces fixed `+1` with the semantic delta inside the same atomic commit and clamps it server-side to `[-2, 2]`; points never fall below zero.
+- Existing anonymous/email-save/Body Clock continuity tests were updated only where they encoded the obsolete assumption that every neutral chat adds one point. Their history/identity/continuity assertions remain.
+- GitHub Actions Run #96: **SUCCESS**
+  - tests: **107/107 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The SQL change exists only as a migration file on PR #32's integration branch. It has **not** been applied to Production.
