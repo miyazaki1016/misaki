@@ -2210,6 +2210,10 @@ ${userProfileGuide}
 
 ${lifeUnderstandingGuide}
 
+${createRelationshipTimeGuide(relationshipTimeContext)}
+
+${createRelationshipSignalGuide()}
+
 ${taxiContextGuide}
 
 【ユーザーの今日の仕事・休みについて】
@@ -2325,6 +2329,13 @@ misakiTodayMemory は、
 {
   "reply": "美咲の返事",
   "memory": ["長期記憶"],
+  "relationshipSignals": {
+    "signals": [],
+    "relationshipFacts": {
+      "mutualAffectionExplicit": false,
+      "datingEstablishedExplicit": false
+    }
+  },
   "misakiTodayMemory": {
     "date": "${currentDate}",
     "items": ["今日の美咲の出来事"]
@@ -2333,7 +2344,8 @@ misakiTodayMemory は、
 `.trim();
 
     async function generateReply(
-      retryProblems?: string[]
+      retryProblems?: string[],
+      supplementaryGuide = ""
     ) {
       const retryGuide =
         retryProblems &&
@@ -2431,7 +2443,8 @@ ${retryProblems
                       {
                         text:
                           baseSystemPrompt +
-                          retryGuide,
+                          retryGuide +
+                          supplementaryGuide,
                       },
                     ],
                   },
@@ -2644,6 +2657,53 @@ ${retryProblems
         activityEvidence,
         misakiDayType
       );
+
+    const relationshipAssessment: RelationshipSignalAssessment =
+      sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+    const relationshipPreview = previewRelationshipTurn({
+      timeContext: relationshipTimeContext,
+      assessment: relationshipAssessment,
+      patterns: relationshipPatterns,
+      story: relationshipStory,
+    });
+    const relationshipActionGuide =
+      createCurrentTurnActionGuide(relationshipPreview);
+
+    if (relationshipAssessment.signals.length > 0 && relationshipActionGuide) {
+      const expressionParsed = await generateReply(
+        [],
+        `
+
+【今回の関係状態に合わせた表現調整】
+
+${relationshipActionGuide}
+
+意味・事実・記憶候補は変えず、返答の温度と距離感だけをこの状態に合わせてください。
+relationshipSignals は最初の判定をやり直さず、同じ意味を保ってください。
+`
+      );
+      if (expressionParsed?.reply?.trim()) {
+        reply = cleanFinalReply(
+          expressionParsed.reply.trim(),
+          message,
+          activityEvidence,
+          misakiDayType
+        );
+      }
+    }
+
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-emotion-persist",
+        () => persistRelationshipEmotionFromSignals(
+          supabase,
+          false,
+          relationshipTimeContext,
+          relationshipAssessment,
+          relationshipPatterns
+        )
+      );
+    }
 
     const finalProblems =
       getReplyProblems(
