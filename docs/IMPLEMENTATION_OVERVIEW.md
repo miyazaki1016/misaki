@@ -880,3 +880,146 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - UI / 通信
 
 のどこで生じたか切り分けて修正する。
+
+
+## 2026-09-25 — #29 × #31 統合検証（Draft PR #32）
+
+### 位置づけ
+- **#29 = 体**：会話・記憶・親密度をサーバー正本として保持する。
+- **#31 = 心**：出来事の意味、感情、行動、言葉の温度を扱う。
+- **#32 = 接続検証**：#29 の正本 memory に #31 の期限付き生活記憶と Body Clock の時間理解を接続する。
+- **#30 = 手術時の安全手順**：Production 切替直前まで保留。
+
+### 今回つないだ生活記憶
+`[life:v1]` は別DBを作らず、#29 の canonical `misaki_user_conversation_state.memory` の中に構造化文字列として保持する。普通の長期記憶はモデルが更新してよいが、`[life:v1]` の日時・期限はコード側が管理し、モデルに勝手に書き換えさせない。
+
+流れ：
+`canonical memoryを読む → 普通の記憶 / [life:v1] を分離 → 期限判定 → 今回の本人発言から明示的生活事実を追加 → 通常会話の理解へ使う → 再結合してcanonical memoryへ保存`
+
+具体例：
+- 9/25「今日は仕事」→ 9/25中は現在の生活文脈として利用可。
+- 9/26になったら「今日は仕事」を現在事実として扱わない。
+- 「友達は今日は仕事」「明日は休みかな？」は本人の確定予定として保存しない。
+- Body Clockも古い「明日」「今日」を現在の予定へ変換しない。fresh/recent な本人発言を現在状況の根拠にする。
+
+### 安全境界
+- main / Production は未変更。
+- #29 / #31 自体は未変更。
+- migration / Edge deploy / cron / Production 切替は未実施。
+- #32 は Draft のまま。Vercel Preview は success。専用CI Run #2 で `npm test` **95/95 PASS（fail 0）**、続く `npm run build` も PASS。
+
+> 未来のソラへ：生活記憶のために新しい正本DBやブラウザ同期を増やすな。#29 の canonical memory を正本にし、時間依存の意味は `[life:v1]` とコード側の期限判定で扱え。
+
+
+### Body Clock × `[life:v1]` 接続チェックポイント
+- Body Clock は canonical memory 内の `[life:v1]` を構造化生活記憶として解読する。
+- 現在の生活根拠にできるのは、期限内・本人由来・confidence 0.55以上の構造化生活記憶、または fresh/recent の本人発言。
+- 期限切れ、壊れた `[life:v1]`、普通の長期記憶は「今の勤務・予定」の根拠にしない。
+- raw JSON を通常の記憶テキストとしてプロンプトへ漏らさない。
+- CI Run #8: `npm test` **99/99 PASS（fail 0）**、`npm run build` PASS。
+- #32 は Draft 維持。main / Production / migration / Edge deploy は未変更。
+
+
+## 2026-09-26 — canonical × relationship v2 green checkpoint
+
+- Integration branch: `sora/canonical-relationship-integration` / PR #32 (Draft)
+- Relationship v2 core is wired into the canonical chat route while keeping main/Production untouched.
+- Fixed accidental literal `\\n` source corruption in `lib/relationship-time.ts`; relationship-time loading remains read-only.
+- Normal chat relationship integration now passes the canonical regression suite.
+- GitHub Actions `Canonical relationship integration tests` Run #62: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- No merge, Production deploy, migration apply, or Edge Function deploy has been performed.
+- This checkpoint proves current branch compile/test compatibility; anonymous multi-turn relationship continuity, content-based point delta, required RPC/migration reconciliation, and relative-day life-fact semantics still require dedicated integration work before production review.
+
+
+### 2026-09-26 — relationship v2 normal-chat activation
+
+- Canonical chat now actively requests and sanitizes `relationshipSignals`.
+- The first semantic assessment is kept as the meaning source; a second generation is used only when relationship signals require expression adjustment.
+- `previewRelationshipTurn` reduces the current signals with the loaded relationship time/pattern context, then `createCurrentTurnActionGuide` maps the resulting action/emotion/story to wording temperature.
+- Permanent accounts persist the reduced emotion/action through `persistRelationshipEmotionFromSignals`; anonymous accounts still do not write permanent relationship rows.
+- GitHub Actions Run #68: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- This does not yet solve anonymous multi-turn relationship semantic continuity; that must live in the temporary root (or be safely derived) rather than permanent relationship-event storage.
+
+
+### 2026-09-26 — anonymous relationship continuity checkpoint
+
+- Anonymous chat now carries the current relationship emotion/action context inside the encrypted temporary canonical root instead of writing permanent relationship rows.
+- Temporary relationship state includes emotion primary/intensity, action state, last interaction time, and sanitized signal summary.
+- On the next anonymous turn, that temporary state is reconstructed as relationship time/emotion context so hurt, caution, warmth, and repair do not reset merely because the next message starts.
+- Time remains evidence only; it may soften an existing emotion through the reducer but does not invent a new relationship event.
+- Permanent relationship persistence remains isolated from anonymous users.
+- GitHub Actions Run #74: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Still pending: dedicated multi-turn anonymous relationship regression tests, anonymous story/pattern trajectory beyond current emotion/action, content-based relationship point delta, RPC/migration reconciliation, and relative-day life-fact semantics.
+
+
+### 2026-09-26 — anonymous relationship regression guard
+
+- Added a dedicated anonymous multi-turn regression test: the first temporary turn seals relationship emotion/action state and the next turn consumes a temporary root that still contains relationship context.
+- The same test explicitly guards the persistence boundary: anonymous chat must not call `apply_relationship_emotion_action_v2` or `record_relationship_chat_turn`.
+- GitHub Actions Run #78: **SUCCESS**
+  - `npm test`: **103/103 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The suite count increased by more than the single new subtest because the repository test runner executes the canonical test module through multiple integration suites; the authoritative result is 103 total / 103 pass.
+
+
+### 2026-09-26 — semantic relationship points green checkpoint
+
+- Relationship points are no longer conceptually tied to message count on the integration branch.
+- `deriveRelationshipPointDelta()` converts grounded relationship signals into a bounded per-turn consequence:
+  - ordinary chat with no relationship meaning: 0
+  - grounded warmth/care/trust/openness/shared history/romantic meaning: +1 to +2
+  - hurt/rejection/boundary harm: -1 to -2
+  - repair: +1 to +2 when grounded, without making apology a farming mechanic
+- The canonical successful-turn SQL migration replaces fixed `+1` with the semantic delta inside the same atomic commit and clamps it server-side to `[-2, 2]`; points never fall below zero.
+- Existing anonymous/email-save/Body Clock continuity tests were updated only where they encoded the obsolete assumption that every neutral chat adds one point. Their history/identity/continuity assertions remain.
+- GitHub Actions Run #96: **SUCCESS**
+  - tests: **107/107 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The SQL change exists only as a migration file on PR #32's integration branch. It has **not** been applied to Production.
+
+
+### 2026-09-26 — anonymous multi-turn relationship trajectory green checkpoint
+
+- Anonymous sessions now keep a compact relationship-event trajectory inside the existing encrypted temporary root (maximum 40 events).
+- It stores signal summaries and timestamps, not verbatim grievance text, and never writes anonymous relationship events into the permanent relationship tables.
+- Anonymous chat now derives `RelationshipStoryState` and relationship patterns from that temporary trajectory using the same pure reducers as permanent chat.
+- This closes the previous gap where anonymous chat could carry current emotion/action but lost the multi-turn meaning of hurt → repair attempt → demonstrated care.
+- Dedicated regressions prove:
+  - unresolved hurt stays unresolved;
+  - repair language alone does not falsely complete reconciliation;
+  - repair followed by demonstrated care can become repaired history;
+  - repeated harm remains visible as a pattern.
+- GitHub Actions Run #104: **SUCCESS**
+  - tests: **111/111 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- PR #32 remains Draft. Main, Production, Production DB migrations, and Edge deployment remain untouched.
+
+
+### 2026-09-26 — permanent relationship v2 persistence connected
+
+- Added the missing permanent-account persistence RPC `apply_relationship_emotion_action_v2`.
+- The application-side semantic reducers remain responsible for interpreting the conversation; the RPC validates and atomically persists the resulting emotion/action state.
+- Every successful permanent v2 application writes `emotion_action_v2_after_chat` with the compact `signal_summary` consumed by `relationship-patterns.ts`, closing the permanent history/story loop.
+- Anonymous callers are rejected. Optimistic concurrency via `p_expected_state_updated_at` prevents stale relationship state from silently overwriting a newer turn.
+- Dedicated migration-contract regressions verify the event type/signal summary, anonymous/stale-state guards, and emotion/action bounds.
+- GitHub Actions Run #110: **SUCCESS**
+  - tests: **114/114 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Migration exists only in PR #32. It has not been applied to Production.
+
+
+### 2026-09-26 — healthy boundaries are not relationship damage
+
+- `boundary` is no longer counted as negative relationship-point evidence by itself.
+- A user saying that something is uncomfortable or setting a healthy limit must not mechanically damage the relationship.
+- Actual negative movement remains grounded in explicit `hurtful` / `rejection` meaning.
+- Added a regression fixing `boundary` alone at a semantic point delta of 0.
+- GitHub Actions Run #118: **SUCCESS**
+  - tests: **115/115 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)

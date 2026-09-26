@@ -1,6 +1,7 @@
 import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
 import { loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
+import { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from "../../../lib/relationship-life-context";
 import {
   createClient,
   type SupabaseClient,
@@ -22,6 +23,25 @@ import {
   loadPersonaPrompt,
 } from "../../../lib/persona/persona-store";
 
+import {
+  createRelationshipSignalGuide,
+  sanitizeRelationshipSignalAssessment,
+  type RelationshipSignalAssessment,
+} from "../../../lib/relationship-signal";
+import {
+  loadRelationshipTimeContext,
+  createRelationshipTimeGuide,
+  recordRelationshipChatTurn,
+} from "../../../lib/relationship-time";
+
+import { persistRelationshipEmotionFromSignals } from "../../../lib/relationship-emotion-store";
+import {
+  previewRelationshipTurn,
+  createCurrentTurnActionGuide,
+} from "../../../lib/relationship-turn-expression";
+import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
+import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
+
 type TokyoWeather = {
   temperature: number | null;
   apparentTemperature: number | null;
@@ -41,6 +61,8 @@ type MisakiTodayMemory = {
 type GeminiResult = {
   reply?: string;
   memory?: string[];
+  relationshipSignals?: unknown;
+  relationshipExpression?: { reply?: string };
   misakiTodayMemory?: {
     date?: string;
     items?: string[];
@@ -1571,6 +1593,11 @@ function parseGeminiText(
    POST
 ========================================================= */
 
+function publicChatResult(result: Record<string, unknown>) {
+  const { relationshipPointDelta: _internalRelationshipPointDelta, ...publicResult } = result;
+  return publicResult;
+}
+
 export async function POST(
   request: Request
 ) {
@@ -1771,14 +1798,14 @@ export async function POST(
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
       if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
-      return Response.json({ ...replay, temporaryState });
+      return Response.json(publicChatResult({ ...replay, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
-      if (completed) return Response.json(completed);
+      if (completed) return Response.json(publicChatResult(completed));
     } else {
       const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
-      if (completed) return Response.json(completed);
+      if (completed) return Response.json(publicChatResult(completed));
     }
     const rootState = isAnonymous
       ? await loadTemporaryRoot(userData.user.id, temporaryState)
@@ -1789,6 +1816,46 @@ export async function POST(
     const canonicalRelationshipPoints = rootState.relationshipPoints;
     const recallMode = isMemoryRecallQuestion(message);
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
+
+    const relationshipTimeContext = isAnonymous
+      ? rootState.temporaryRelationship
+        ? {
+            exists: true,
+            elapsedSeconds: rootState.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 1000) : 0,
+            elapsedHours: rootState.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 3600000) : 0,
+            timeBand: "temporary",
+            intimacyLevel: canonicalRelationshipPoints >= 160 ? "very_intimate"
+              : canonicalRelationshipPoints >= 80 ? "intimate"
+              : canonicalRelationshipPoints >= 30 ? "growing" : "initial",
+            intimacyPoints: canonicalRelationshipPoints,
+            emotionPrimary: rootState.temporaryRelationship.emotionPrimary,
+            emotionIntensity: rootState.temporaryRelationship.emotionIntensity,
+            actionState: rootState.temporaryRelationship.actionState,
+            lastInteractionAt: rootState.temporaryRelationship.lastInteractionAt,
+            stateUpdatedAt: null,
+          }
+        : null
+      : await measureStage(
+          "relationship-time-load",
+          () => loadRelationshipTimeContext(supabase, false)
+        );
+    const anonymousRelationshipEvents =
+      isAnonymous && Array.isArray(rootState.temporaryRelationship?.events)
+        ? rootState.temporaryRelationship.events.slice(-40)
+        : [];
+    const relationshipHistory = isAnonymous
+      ? {
+          patterns: deriveRelationshipPatterns(anonymousRelationshipEvents),
+          story: deriveRelationshipStory(anonymousRelationshipEvents),
+        }
+      : await measureStage(
+          "relationship-history-load",
+          () => loadRelationshipHistory(supabase as any, false)
+        );
+    const relationshipPatterns = relationshipHistory.patterns;
+    const relationshipStory = relationshipHistory.story;
 
 
     const {
@@ -1912,6 +1979,15 @@ export async function POST(
       "string"
         ? currentTime
         : "不明";
+
+    const splitMemory = splitLifeFactMemory(safeMemory);
+    const explicitLifeFacts = extractExplicitLifeFacts(message, safeCurrentTime);
+    const lifeFacts: LifeFact[] = [
+      ...splitMemory.ordinaryMemory.map((fact) => ({ kind: "profile" as const, fact, source: "memory" as const, confidence: 1 })),
+      ...splitMemory.facts,
+      ...explicitLifeFacts,
+    ];
+    const lifeUnderstandingGuide = createLifeUnderstandingGuide(selectRelevantLifeFacts(lifeFacts, safeCurrentTime));
 
     const currentDate =
       getDateKey(
@@ -2163,6 +2239,12 @@ ${relationshipGuide}
 
 ${userProfileGuide}
 
+${lifeUnderstandingGuide}
+
+${createRelationshipTimeGuide(relationshipTimeContext)}
+
+${createRelationshipSignalGuide()}
+
 ${taxiContextGuide}
 
 【ユーザーの今日の仕事・休みについて】
@@ -2278,6 +2360,13 @@ misakiTodayMemory は、
 {
   "reply": "美咲の返事",
   "memory": ["長期記憶"],
+  "relationshipSignals": {
+    "signals": [],
+    "relationshipFacts": {
+      "mutualAffectionExplicit": false,
+      "datingEstablishedExplicit": false
+    }
+  },
   "misakiTodayMemory": {
     "date": "${currentDate}",
     "items": ["今日の美咲の出来事"]
@@ -2286,7 +2375,8 @@ misakiTodayMemory は、
 `.trim();
 
     async function generateReply(
-      retryProblems?: string[]
+      retryProblems?: string[],
+      supplementaryGuide = ""
     ) {
       const retryGuide =
         retryProblems &&
@@ -2384,7 +2474,8 @@ ${retryProblems
                       {
                         text:
                           baseSystemPrompt +
-                          retryGuide,
+                          retryGuide +
+                          supplementaryGuide,
                       },
                     ],
                   },
@@ -2598,6 +2689,58 @@ ${retryProblems
         misakiDayType
       );
 
+    const relationshipAssessment: RelationshipSignalAssessment =
+      sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+    const relationshipPointDelta = deriveRelationshipPointDelta(relationshipAssessment);
+    const relationshipPreview = previewRelationshipTurn(
+      relationshipTimeContext,
+      relationshipAssessment,
+      relationshipPatterns
+    );
+    const relationshipActionGuide =
+      createCurrentTurnActionGuide(
+        relationshipPreview.action,
+        relationshipPreview.emotion.afterglow,
+        relationshipPreview.emotion.secondary,
+        relationshipStory
+      );
+
+    if (relationshipAssessment.signals.length > 0 && relationshipActionGuide) {
+      const expressionParsed = await generateReply(
+        [],
+        `
+
+【今回の関係状態に合わせた表現調整】
+
+${relationshipActionGuide}
+
+意味・事実・記憶候補は変えず、返答の温度と距離感だけをこの状態に合わせてください。
+relationshipSignals は最初の判定をやり直さず、同じ意味を保ってください。
+`
+      );
+      if (expressionParsed?.reply?.trim()) {
+        reply = cleanFinalReply(
+          expressionParsed.reply.trim(),
+          message,
+          activityEvidence,
+          misakiDayType
+        );
+      }
+    }
+
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-emotion-persist",
+        () => persistRelationshipEmotionFromSignals(
+          supabase,
+          false,
+          relationshipTimeContext,
+          relationshipAssessment,
+          relationshipPatterns
+        )
+      );
+    }
+
     const finalProblems =
       getReplyProblems(
         reply,
@@ -2618,23 +2761,17 @@ ${retryProblems
       );
     }
 
-    const updatedMemory =
-      recallMode ? safeMemory : Array.isArray(
-        parsed.memory
-      )
-        ? parsed.memory
-            .filter(
-              (item) =>
-                typeof item ===
-                  "string"
-            )
-            .map(
-              (item) =>
-                item.trim()
-            )
-            .filter(Boolean)
-            .slice(-MAX_MEMORY)
-        : safeMemory;
+    const generatedMemory =
+      recallMode ? splitMemory.ordinaryMemory : Array.isArray(parsed.memory)
+        ? parsed.memory.filter((item) => typeof item === "string").map((item) => item.trim()).filter(Boolean)
+        : splitMemory.ordinaryMemory;
+    const activeCarriedLifeFacts = selectRelevantLifeFacts(splitMemory.facts, safeCurrentTime, MAX_MEMORY);
+    const activeLifeFacts = selectRelevantLifeFacts([...activeCarriedLifeFacts, ...explicitLifeFacts], safeCurrentTime, MAX_MEMORY);
+    const encodedLifeMemory = activeLifeFacts.map((fact) => encodeLifeFactMemory(fact));
+    const updatedMemory = [
+      ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
+      ...encodedLifeMemory,
+    ].slice(-MAX_MEMORY);
 
     const parsedTodayItems =
       Array.isArray(
@@ -2704,6 +2841,18 @@ ${retryProblems
         ),
     };
 
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-turn-record",
+        () => recordRelationshipChatTurn(
+          supabase,
+          false,
+          new Date(requestStartedAt),
+          new Date()
+        )
+      );
+    }
+
     const generatedResult = {
       requestId: usageRequestId,
       rootUpdatedAt: rootState.updatedAt ?? null,
@@ -2714,6 +2863,7 @@ ${retryProblems
         updatedTodayMemory,
       relationshipPoints:
         safeRelationshipPoints,
+      relationshipPointDelta,
       usage: {
         messageCount:
           typeof usage.message_count ===
@@ -2732,10 +2882,26 @@ ${retryProblems
     };
     let completedResult: Record<string, unknown>;
     if (isAnonymous) {
-      completedResult = { ...generatedResult, relationshipPoints: canonicalRelationshipPoints + 1,
+      completedResult = { ...generatedResult, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
       const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
-        relationshipPoints: canonicalRelationshipPoints + 1,
+        relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
+        temporaryRelationship: {
+          emotionPrimary: relationshipPreview.emotion.primary,
+          emotionIntensity: relationshipPreview.emotion.intensity,
+          actionState: relationshipPreview.action.action,
+          lastInteractionAt: new Date().toISOString(),
+          signals: relationshipAssessment.signals.map(({ name, strength, confidence }) => ({ name, strength, confidence })),
+          events: [...anonymousRelationshipEvents, {
+            event_type: "emotion_action_v2_after_chat" as const,
+            created_at: new Date().toISOString(),
+            metadata: {
+              signal_summary: relationshipAssessment.signals.map(({ name, strength, confidence }) => ({
+                name, strength, confidence,
+              })),
+            },
+          }].slice(-40),
+        },
         history: [...(Array.isArray(history) ? history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
@@ -2759,7 +2925,7 @@ ${retryProblems
       }
     );
 
-    return Response.json(completedResult);
+    return Response.json(publicChatResult(completedResult));
   } catch (error) {
     console.error(
       "CHAT ROUTE ERROR:",
