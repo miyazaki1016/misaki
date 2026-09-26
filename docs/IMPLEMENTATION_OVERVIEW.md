@@ -1012,3 +1012,14 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - tests: **114/114 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - Migration exists only in PR #32. It has not been applied to Production.
+
+
+### 2026-09-26 — healthy boundaries are not relationship damage
+
+- `boundary` is no longer counted as negative relationship-point evidence by itself.
+- A user saying that something is uncomfortable or setting a healthy limit must not mechanically damage the relationship.
+- Actual negative movement remains grounded in explicit `hurtful` / `rejection` meaning.
+- Added a regression fixing `boundary` alone at a semantic point delta of 0.
+- GitHub Actions Run #118: **SUCCESS**
+  - tests: **115/115 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
