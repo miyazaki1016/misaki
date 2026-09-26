@@ -1593,6 +1593,11 @@ function parseGeminiText(
    POST
 ========================================================= */
 
+function publicChatResult(result: Record<string, unknown>) {
+  const { relationshipPointDelta: _internalRelationshipPointDelta, ...publicResult } = result;
+  return publicResult;
+}
+
 export async function POST(
   request: Request
 ) {
@@ -1793,14 +1798,14 @@ export async function POST(
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
       if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
-      return Response.json({ ...replay, temporaryState });
+      return Response.json(publicChatResult({ ...replay, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
-      if (completed) return Response.json(completed);
+      if (completed) return Response.json(publicChatResult(completed));
     } else {
       const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
-      if (completed) return Response.json(completed);
+      if (completed) return Response.json(publicChatResult(completed));
     }
     const rootState = isAnonymous
       ? await loadTemporaryRoot(userData.user.id, temporaryState)
@@ -2920,7 +2925,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       }
     );
 
-    return Response.json(completedResult);
+    return Response.json(publicChatResult(completedResult));
   } catch (error) {
     console.error(
       "CHAT ROUTE ERROR:",
