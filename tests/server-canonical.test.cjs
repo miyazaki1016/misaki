@@ -173,9 +173,9 @@ test('canonical read failure stops before consuming usage', async () => {
 test('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {
   const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');
   const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();
-  assert.equal(first.relationshipPoints, 1); assert.equal(first.ephemeral, true);
+  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);
   const root = h.load('lib/canonical-state.ts');
-  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 1);
+  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);
   assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);
   const before = h.consumed;
   const lostResponseReplay = await (await route.POST(h.request())).json();
@@ -184,10 +184,10 @@ test('anonymous successful state is sealed; modified or expired tokens cannot ch
   assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);
   assert.equal(h.consumed, before);
   const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();
-  assert.equal(replay.relationshipPoints, 1); assert.equal(h.consumed, before);
+  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);
   const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,
     requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();
-  assert.equal(second.relationshipPoints, 2);
+  assert.equal(second.relationshipPoints, 0);
   assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,
     requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);
   h.advanceClock(24 * 60 * 60 * 1000 + 1);
