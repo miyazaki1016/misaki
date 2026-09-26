@@ -931,3 +931,15 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - No merge, Production deploy, migration apply, or Edge Function deploy has been performed.
 - This checkpoint proves current branch compile/test compatibility; anonymous multi-turn relationship continuity, content-based point delta, required RPC/migration reconciliation, and relative-day life-fact semantics still require dedicated integration work before production review.
+
+
+### 2026-09-26 — relationship v2 normal-chat activation
+
+- Canonical chat now actively requests and sanitizes `relationshipSignals`.
+- The first semantic assessment is kept as the meaning source; a second generation is used only when relationship signals require expression adjustment.
+- `previewRelationshipTurn` reduces the current signals with the loaded relationship time/pattern context, then `createCurrentTurnActionGuide` maps the resulting action/emotion/story to wording temperature.
+- Permanent accounts persist the reduced emotion/action through `persistRelationshipEmotionFromSignals`; anonymous accounts still do not write permanent relationship rows.
+- GitHub Actions Run #68: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- This does not yet solve anonymous multi-turn relationship semantic continuity; that must live in the temporary root (or be safely derived) rather than permanent relationship-event storage.
