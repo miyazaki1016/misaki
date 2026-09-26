@@ -65,7 +65,7 @@ test("permanent history reads both native v2 and migrated anonymous relationship
     select() { return this; },
     in(_column: string, values: string[]) { selectedTypes = values; return this; },
     order() { return this; },
-    then(resolve: any) { resolve({ data: rows, error: null }); },
+    limit() { return Promise.resolve({ data: rows, error: null }); },
   };
   const result = await loadRelationshipHistory({ from: () => query } as any, false);
   assert.deepEqual(selectedTypes, ["emotion_action_v2_after_chat", "temporary_relationship_checkpoint"]);
