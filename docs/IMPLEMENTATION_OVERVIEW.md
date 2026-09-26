@@ -918,3 +918,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - raw JSON を通常の記憶テキストとしてプロンプトへ漏らさない。
 - CI Run #8: `npm test` **99/99 PASS（fail 0）**、`npm run build` PASS。
 - #32 は Draft 維持。main / Production / migration / Edge deploy は未変更。
+
+
+## 2026-09-26 — canonical × relationship v2 green checkpoint
+
+- Integration branch: `sora/canonical-relationship-integration` / PR #32 (Draft)
+- Relationship v2 core is wired into the canonical chat route while keeping main/Production untouched.
+- Fixed accidental literal `\\n` source corruption in `lib/relationship-time.ts`; relationship-time loading remains read-only.
+- Normal chat relationship integration now passes the canonical regression suite.
+- GitHub Actions `Canonical relationship integration tests` Run #62: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- No merge, Production deploy, migration apply, or Edge Function deploy has been performed.
+- This checkpoint proves current branch compile/test compatibility; anonymous multi-turn relationship continuity, content-based point delta, required RPC/migration reconciliation, and relative-day life-fact semantics still require dedicated integration work before production review.
