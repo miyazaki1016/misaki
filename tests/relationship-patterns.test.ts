@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveRelationshipPatterns, deriveRelationshipStory } from "../lib/relationship-patterns.ts";
+import { deriveRelationshipPatterns, deriveRelationshipStory, loadRelationshipHistory } from "../lib/relationship-patterns.ts";
 
 const event = (created_at: string, signals: Array<{name:string;strength:number;confidence:number}>) => ({
   event_type: "emotion_action_v2_after_chat",
@@ -52,4 +52,22 @@ test("repeated harm remains visible as a pattern instead of being erased by time
   const patterns = deriveRelationshipPatterns(events);
   assert.equal(story.meaning, "repeated_harm");
   assert.ok(patterns.repeatedHarm > 1);
+});
+
+
+test("permanent history reads both native v2 and migrated anonymous relationship events", async () => {
+  let selectedTypes: string[] = [];
+  const rows = [
+    event("2026-09-25T00:00:00Z", [s("hurtful", .8)]),
+    { ...event("2026-09-25T01:00:00Z", [s("repair", .8)]), event_type: "temporary_relationship_checkpoint" },
+  ];
+  const query: any = {
+    select() { return this; },
+    in(_column: string, values: string[]) { selectedTypes = values; return this; },
+    order() { return this; },
+    then(resolve: any) { resolve({ data: rows, error: null }); },
+  };
+  const result = await loadRelationshipHistory({ from: () => query } as any, false);
+  assert.deepEqual(selectedTypes, ["emotion_action_v2_after_chat", "temporary_relationship_checkpoint"]);
+  assert.equal(result.story.repairStage, "repair_attempted");
 });
