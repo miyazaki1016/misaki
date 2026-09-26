@@ -163,7 +163,7 @@ export async function loadRelationshipHistory(
   const { data, error } = await supabase
     .from("misaki_relationship_events")
     .select("event_type,metadata,created_at")
-    .eq("event_type", "emotion_action_v2_after_chat")
+    .in("event_type", ["emotion_action_v2_after_chat", "temporary_relationship_checkpoint"])
     .order("created_at", { ascending: false })
     .limit(40);
 
