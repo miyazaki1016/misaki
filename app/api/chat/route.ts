@@ -40,6 +40,7 @@ import {
   createCurrentTurnActionGuide,
 } from "../../../lib/relationship-turn-expression";
 import { loadRelationshipHistory } from "../../../lib/relationship-patterns";
+import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 
 type TokyoWeather = {
   temperature: number | null;
@@ -2678,6 +2679,7 @@ ${retryProblems
 
     const relationshipAssessment: RelationshipSignalAssessment =
       sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
+    const relationshipPointDelta = deriveRelationshipPointDelta(relationshipAssessment);
     const relationshipPreview = previewRelationshipTurn(
       relationshipTimeContext,
       relationshipAssessment,
@@ -2849,6 +2851,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
         updatedTodayMemory,
       relationshipPoints:
         safeRelationshipPoints,
+      relationshipPointDelta,
       usage: {
         messageCount:
           typeof usage.message_count ===
@@ -2867,10 +2870,10 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     };
     let completedResult: Record<string, unknown>;
     if (isAnonymous) {
-      completedResult = { ...generatedResult, relationshipPoints: canonicalRelationshipPoints + 1,
+      completedResult = { ...generatedResult, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
       const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
-        relationshipPoints: canonicalRelationshipPoints + 1,
+        relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         temporaryRelationship: {
           emotionPrimary: relationshipPreview.emotion.primary,
           emotionIntensity: relationshipPreview.emotion.intensity,
