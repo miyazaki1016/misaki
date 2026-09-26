@@ -999,3 +999,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - tests: **111/111 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - PR #32 remains Draft. Main, Production, Production DB migrations, and Edge deployment remain untouched.
+
+
+### 2026-09-26 — permanent relationship v2 persistence connected
+
+- Added the missing permanent-account persistence RPC `apply_relationship_emotion_action_v2`.
+- The application-side semantic reducers remain responsible for interpreting the conversation; the RPC validates and atomically persists the resulting emotion/action state.
+- Every successful permanent v2 application writes `emotion_action_v2_after_chat` with the compact `signal_summary` consumed by `relationship-patterns.ts`, closing the permanent history/story loop.
+- Anonymous callers are rejected. Optimistic concurrency via `p_expected_state_updated_at` prevents stale relationship state from silently overwriting a newer turn.
+- Dedicated migration-contract regressions verify the event type/signal summary, anonymous/stale-state guards, and emotion/action bounds.
+- GitHub Actions Run #110: **SUCCESS**
+  - tests: **114/114 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Migration exists only in PR #32. It has not been applied to Production.
