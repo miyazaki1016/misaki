@@ -24,7 +24,8 @@ export async function loadRelationshipTimeContext(
 ): Promise<RelationshipTimeContext | null> {
   if (isAnonymous) return null;
 
-  // v2: loading context is read-only. Time is evidence for the reducer, not a mutation trigger.\n  const { data, error } = await (supabase.rpc as any)(
+  // v2: loading context is read-only. Time is evidence for the reducer, not a mutation trigger.
+  const { data, error } = await (supabase.rpc as any)(
     "get_relationship_time_context"
   );
 
@@ -51,7 +52,11 @@ export async function loadRelationshipTimeContext(
     emotionIntensity: numberOr(emotion.intensity),
     actionState:
       typeof data.action_state === "string" ? data.action_state : "NORMAL",
-    lastInteractionAt:\n      typeof data.last_interaction_at === "string" ? data.last_interaction_at : null,\n    stateUpdatedAt:\n      typeof data.state_updated_at === "string" ? data.state_updated_at : null,\n  };
+    lastInteractionAt:
+      typeof data.last_interaction_at === "string" ? data.last_interaction_at : null,
+    stateUpdatedAt:
+      typeof data.state_updated_at === "string" ? data.state_updated_at : null,
+  };
 }
 
 export function createRelationshipTimeGuide(
