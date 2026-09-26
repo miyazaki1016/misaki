@@ -195,6 +195,27 @@ test('anonymous successful state is sealed; modified or expired tokens cannot ch
   assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);
   assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);
 });
+test('anonymous relationship emotion survives into the next temporary-root turn', async () => {
+  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');
+  const first = await (await route.POST(h.request())).json();
+  const root = h.load('lib/canonical-state.ts');
+  const firstState = root.openTemporaryState(first.temporaryState).state;
+  assert.ok(firstState.temporaryRelationship);
+  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');
+  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');
+
+  const second = await (await route.POST(h.request({
+    temporaryState: first.temporaryState,
+    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',
+    message: '次の会話'
+  }))).json();
+  const secondState = root.openTemporaryState(second.temporaryState).state;
+  assert.ok(secondState.temporaryRelationship);
+  assert.ok(secondState.temporaryRelationship.lastInteractionAt);
+  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);
+  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);
+});
+
 test('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {
   const h = harness({ anonymous: true });
   const crypto = h.load('lib/canonical-state.ts');
