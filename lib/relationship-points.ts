@@ -14,7 +14,9 @@ function weight(assessment: RelationshipSignalAssessment, names: string[]) {
 export function deriveRelationshipPointDelta(assessment: RelationshipSignalAssessment) {
   const positive = weight(assessment, ["warmth", "care", "trust", "openness", "shared_history"]);
   const romantic = weight(assessment, ["romantic"]);
-  const harm = weight(assessment, ["hurtful", "rejection", "boundary"]);
+  // A boundary is not harm by itself. Saying "that is not okay for me" must not
+  // punish the relationship; actual hurt/rejection is represented separately.
+  const harm = weight(assessment, ["hurtful", "rejection"]);
   const repair = weight(assessment, ["apology", "repair"]);
 
   if (harm >= 1.2) return -2;
