@@ -943,3 +943,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - `npm test`: **99/99 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - This does not yet solve anonymous multi-turn relationship semantic continuity; that must live in the temporary root (or be safely derived) rather than permanent relationship-event storage.
+
+
+### 2026-09-26 — anonymous relationship continuity checkpoint
+
+- Anonymous chat now carries the current relationship emotion/action context inside the encrypted temporary canonical root instead of writing permanent relationship rows.
+- Temporary relationship state includes emotion primary/intensity, action state, last interaction time, and sanitized signal summary.
+- On the next anonymous turn, that temporary state is reconstructed as relationship time/emotion context so hurt, caution, warmth, and repair do not reset merely because the next message starts.
+- Time remains evidence only; it may soften an existing emotion through the reducer but does not invent a new relationship event.
+- Permanent relationship persistence remains isolated from anonymous users.
+- GitHub Actions Run #74: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Still pending: dedicated multi-turn anonymous relationship regression tests, anonymous story/pattern trajectory beyond current emotion/action, content-based relationship point delta, RPC/migration reconciliation, and relative-day life-fact semantics.
