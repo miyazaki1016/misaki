@@ -8,6 +8,13 @@ export type RootState = {
   relationshipPoints: number;
   updatedAt?: string | null;
   temporaryRevision?: string | null;
+  temporaryRelationship?: {
+    emotionPrimary: string;
+    emotionIntensity: number;
+    actionState: string;
+    lastInteractionAt: string | null;
+    signals: Array<{ name: string; strength: number; confidence: number }>;
+  } | null;
 };
 
 export function createServerSupabase() {
