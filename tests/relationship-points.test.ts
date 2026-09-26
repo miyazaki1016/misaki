@@ -22,10 +22,15 @@ test("grounded warmth can move the relationship a little", () => {
 
 test("harm can reduce relationship points", () => {
   assert.equal(deriveRelationshipPointDelta(assessment([signal("hurtful", .7)]) as any), -1);
-  assert.equal(deriveRelationshipPointDelta(assessment([signal("hurtful", .7), signal("boundary", .7)]) as any), -2);
+  assert.equal(deriveRelationshipPointDelta(assessment([signal("hurtful", .8), signal("rejection", .7)]) as any), -2);
 });
 
 test("repair is meaningful but bounded", () => {
   assert.equal(deriveRelationshipPointDelta(assessment([signal("repair", .6)]) as any), 1);
   assert.equal(deriveRelationshipPointDelta(assessment([signal("repair", .95), signal("care", .5)]) as any), 2);
+});
+
+
+test("a healthy boundary alone does not reduce relationship points", () => {
+  assert.equal(deriveRelationshipPointDelta(assessment([signal("boundary", .9)]) as any), 0);
 });
