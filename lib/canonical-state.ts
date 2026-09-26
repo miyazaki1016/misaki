@@ -14,6 +14,11 @@ export type RootState = {
     actionState: string;
     lastInteractionAt: string | null;
     signals: Array<{ name: string; strength: number; confidence: number }>;
+    events?: Array<{
+      event_type: "emotion_action_v2_after_chat";
+      created_at: string;
+      metadata: { signal_summary: Array<{ name: string; strength: number; confidence: number }> };
+    }>;
   } | null;
 };
 
