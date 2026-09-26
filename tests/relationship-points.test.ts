@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { deriveRelationshipPointDelta } from "../lib/relationship-points";
+import { deriveRelationshipPointDelta } from "../lib/relationship-points.ts";
 
 const assessment = (signals: any[]) => ({
   signals,
