@@ -17,7 +17,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     auth: { getUser: async () => ({ data: { user }, error: null }) },
     from(table) {
       const filters = {};
-      const query = { select() { return query; }, not() { return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
+      const query = { select() { return query; }, not() { return query; }, in(k, v) { filters[k] = v; return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
         async maybeSingle() {
           if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };
           if (stateFailure) return { error: { message: 'unavailable' }, data: null };
