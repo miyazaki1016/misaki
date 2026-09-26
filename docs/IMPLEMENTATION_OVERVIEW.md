@@ -982,3 +982,20 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - tests: **107/107 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - The SQL change exists only as a migration file on PR #32's integration branch. It has **not** been applied to Production.
+
+
+### 2026-09-26 — anonymous multi-turn relationship trajectory green checkpoint
+
+- Anonymous sessions now keep a compact relationship-event trajectory inside the existing encrypted temporary root (maximum 40 events).
+- It stores signal summaries and timestamps, not verbatim grievance text, and never writes anonymous relationship events into the permanent relationship tables.
+- Anonymous chat now derives `RelationshipStoryState` and relationship patterns from that temporary trajectory using the same pure reducers as permanent chat.
+- This closes the previous gap where anonymous chat could carry current emotion/action but lost the multi-turn meaning of hurt → repair attempt → demonstrated care.
+- Dedicated regressions prove:
+  - unresolved hurt stays unresolved;
+  - repair language alone does not falsely complete reconciliation;
+  - repair followed by demonstrated care can become repaired history;
+  - repeated harm remains visible as a pattern.
+- GitHub Actions Run #104: **SUCCESS**
+  - tests: **111/111 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- PR #32 remains Draft. Main, Production, Production DB migrations, and Edge deployment remain untouched.
