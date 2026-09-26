@@ -121,7 +121,8 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       throw Error(name);
     };
     try {
-      vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);
+      const wrapped = "(function(require,module,exports){" + code + String.fromCharCode(10) + "})";
+      vm.runInContext(wrapped, context)(req, module, module.exports);
     } catch (error) {
       if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);
       throw error;
