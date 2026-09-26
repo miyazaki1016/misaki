@@ -2660,14 +2660,18 @@ ${retryProblems
 
     const relationshipAssessment: RelationshipSignalAssessment =
       sanitizeRelationshipSignalAssessment(parsed.relationshipSignals);
-    const relationshipPreview = previewRelationshipTurn({
-      timeContext: relationshipTimeContext,
-      assessment: relationshipAssessment,
-      patterns: relationshipPatterns,
-      story: relationshipStory,
-    });
+    const relationshipPreview = previewRelationshipTurn(
+      relationshipTimeContext,
+      relationshipAssessment,
+      relationshipPatterns
+    );
     const relationshipActionGuide =
-      createCurrentTurnActionGuide(relationshipPreview);
+      createCurrentTurnActionGuide(
+        relationshipPreview.action,
+        relationshipPreview.emotion.afterglow,
+        relationshipPreview.emotion.secondary,
+        relationshipStory
+      );
 
     if (relationshipAssessment.signals.length > 0 && relationshipActionGuide) {
       const expressionParsed = await generateReply(
