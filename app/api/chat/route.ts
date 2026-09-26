@@ -1812,7 +1812,25 @@ export async function POST(
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
 
     const relationshipTimeContext = isAnonymous
-      ? null
+      ? rootState.temporaryRelationship
+        ? {
+            exists: true,
+            elapsedSeconds: rootState.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 1000) : 0,
+            elapsedHours: rootState.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 3600000) : 0,
+            timeBand: "temporary",
+            intimacyLevel: canonicalRelationshipPoints >= 160 ? "very_intimate"
+              : canonicalRelationshipPoints >= 80 ? "intimate"
+              : canonicalRelationshipPoints >= 30 ? "growing" : "initial",
+            intimacyPoints: canonicalRelationshipPoints,
+            emotionPrimary: rootState.temporaryRelationship.emotionPrimary,
+            emotionIntensity: rootState.temporaryRelationship.emotionIntensity,
+            actionState: rootState.temporaryRelationship.actionState,
+            lastInteractionAt: rootState.temporaryRelationship.lastInteractionAt,
+            stateUpdatedAt: null,
+          }
+        : null
       : await measureStage(
           "relationship-time-load",
           () => loadRelationshipTimeContext(supabase, false)
@@ -2853,6 +2871,13 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
       const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
         relationshipPoints: canonicalRelationshipPoints + 1,
+        temporaryRelationship: {
+          emotionPrimary: relationshipPreview.emotion.primary,
+          emotionIntensity: relationshipPreview.emotion.intensity,
+          actionState: relationshipPreview.action.action,
+          lastInteractionAt: new Date().toISOString(),
+          signals: relationshipAssessment.signals.map(({ name, strength, confidence }) => ({ name, strength, confidence })),
+        },
         history: [...(Array.isArray(history) ? history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
