@@ -120,7 +120,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');
       throw Error(name);
     };
-    vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
+    try {\n      vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);\n    } catch (error) {\n      if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);\n      throw error;\n    }
     cache.set(file, module.exports); return module.exports;
   }
   return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
