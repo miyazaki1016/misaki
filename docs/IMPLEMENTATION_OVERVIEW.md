@@ -956,3 +956,13 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - `npm test`: **99/99 PASS, 0 fail**
   - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
 - Still pending: dedicated multi-turn anonymous relationship regression tests, anonymous story/pattern trajectory beyond current emotion/action, content-based relationship point delta, RPC/migration reconciliation, and relative-day life-fact semantics.
+
+
+### 2026-09-26 — anonymous relationship regression guard
+
+- Added a dedicated anonymous multi-turn regression test: the first temporary turn seals relationship emotion/action state and the next turn consumes a temporary root that still contains relationship context.
+- The same test explicitly guards the persistence boundary: anonymous chat must not call `apply_relationship_emotion_action_v2` or `record_relationship_chat_turn`.
+- GitHub Actions Run #78: **SUCCESS**
+  - `npm test`: **103/103 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The suite count increased by more than the single new subtest because the repository test runner executes the canonical test module through multiple integration suites; the authoritative result is 103 total / 103 pass.
