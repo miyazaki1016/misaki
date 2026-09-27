@@ -245,7 +245,7 @@ module.exports = { harness };
 test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {
   const h = harness({ initialPoints: 1 });
   const route = await h.load('app/api/chat/route.ts');
-  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }] });
+  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });
   const requestId = crypto.randomUUID();
   const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();
   const afterFirst = h.points;
