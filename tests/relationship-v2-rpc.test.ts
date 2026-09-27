@@ -49,3 +49,16 @@ test("email checkpoint migration retires the old signature and retry writer carr
   assert.match(migration, /perform public\.save_misaki_temporary_state\([\s\S]*p_state->'temporaryRelationship',[\s\S]*v_new/);
   assert.match(migration, /delete from public\.misaki_relationship_events[\s\S]*event_type='temporary_relationship_checkpoint'/);
 });
+
+
+test("missing temporary relationship checkpoint preserves existing emotion action and trajectory", () => {
+  const migration = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260926004000_preserve_temporary_relationship_on_email_save.sql"), "utf8");
+  assert.match(migration, /if p_relationship is null or jsonb_typeof\(p_relationship\) <> 'object' then[\s\S]*v_primary:=null/);
+  assert.match(migration, /if v_primary is null then[\s\S]*insert into public\.misaki_relationship_state\(user_id,intimacy_points,intimacy_level,intimacy_migrated_at\)/);
+  const nullBranch = migration.match(/if v_primary is null then([\s\S]*?)else/)?.[1] ?? "";
+  assert.doesNotMatch(nullBranch, /emotion_state=excluded\.emotion_state/);
+  assert.doesNotMatch(nullBranch, /action_state=excluded\.action_state/);
+  assert.doesNotMatch(nullBranch, /last_interaction_at=excluded\.last_interaction_at/);
+  assert.match(migration, /if v_primary is not null then[\s\S]*delete from public\.misaki_relationship_events[\s\S]*event_type='temporary_relationship_checkpoint'/);
+});
