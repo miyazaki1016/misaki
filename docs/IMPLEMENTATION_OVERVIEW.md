@@ -1161,3 +1161,16 @@ Run these checks **after DB migrations and application deployment**, in this ord
 10. **Observe before widening** — confirm no unexpected canonical conflicts/RPC errors before treating cutover as complete.
 
 If any application-level smoke check fails: stop widening traffic/validation, preserve evidence, and roll back the application first. Do not improvise a Production DB rollback.
+
+
+### 2026-09-27 — standalone silence RPC aligned with relationship philosophy
+
+- Removed the remaining legacy transition in `advance_relationship_silence_state()` that converted `happy/affectionate` into `lonely` solely because 3+ days elapsed.
+- Time alone may settle/evolve an already-existing emotion; it must not invent loneliness, repair, romance, conflict, or another relational fact.
+- Existing `lonely` and `sulky` states may still evolve their intensity/action over silence because those emotions already existed.
+- Dedicated regression prevents reintroducing `v_next_primary := 'lonely'` in the standalone silence RPC.
+- GitHub Actions Run #190: **SUCCESS**
+  - tests: **128/128 PASS, 0 fail**
+  - standalone silence no-invented-loneliness regression: **PASS**
+  - Next.js production build: **PASS**, static pages **14/14**
+- Production remains untouched.
