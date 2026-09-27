@@ -62,3 +62,11 @@ test("missing temporary relationship checkpoint preserves existing emotion actio
   assert.doesNotMatch(nullBranch, /last_interaction_at=excluded\.last_interaction_at/);
   assert.match(migration, /if v_primary is not null then[\s\S]*delete from public\.misaki_relationship_events[\s\S]*event_type='temporary_relationship_checkpoint'/);
 });
+
+
+test("semantic point RPC treats malformed deltas as zero and clamps valid deltas", () => {
+  const migration = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260926000000_semantic_relationship_point_delta.sql"), "utf8");
+  assert.match(migration, /greatest\(-2,least\(2,coalesce\(\(p_result->>'relationshipPointDelta'\)::integer,0\)\)\)/);
+  assert.match(migration, /exception when invalid_text_representation or numeric_value_out_of_range then[\s\S]*v_point_delta:=0/);
+});
