@@ -39,3 +39,13 @@ test("legacy post-chat emotion and derived-action triggers are retired under v2"
   assert.match(retirement, /drop trigger if exists trg_relationship_action_from_emotion/);
   assert.doesNotMatch(retirement, /lazy_silence/i);
 });
+
+
+test("email checkpoint migration retires the old signature and retry writer carries relationship state", () => {
+  const migration = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260926004000_preserve_temporary_relationship_on_email_save.sql"), "utf8");
+  assert.match(migration, /drop function if exists public\.save_misaki_temporary_state\(uuid,jsonb,jsonb,jsonb,integer,uuid\)/);
+  assert.match(migration, /p_state->'temporaryRelationship'/);
+  assert.match(migration, /perform public\.save_misaki_temporary_state\([\s\S]*p_state->'temporaryRelationship',[\s\S]*v_new/);
+  assert.match(migration, /delete from public\.misaki_relationship_events[\s\S]*event_type='temporary_relationship_checkpoint'/);
+});
