@@ -1103,3 +1103,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - null relationship checkpoint preservation: **PASS**
   - Next.js production build: **PASS** (static pages 14/14)
 - Production migrations remain unapplied.
+
+
+### 2026-09-27 — semantic point SQL fail-safe hardened
+
+- The canonical completion RPC no longer lets a malformed `relationshipPointDelta` abort the whole successful chat commit.
+- Valid deltas remain clamped to **-2..+2**; missing/malformed/out-of-range integer input falls back to **0**.
+- This keeps relationship scoring subordinate to the canonical conversation/memory commit instead of allowing scoring corruption to destroy an otherwise valid turn.
+- Dedicated regression added.
+- GitHub Actions Run #180: **SUCCESS**
+  - tests: **127/127 PASS, 0 fail**
+  - malformed semantic delta fallback/clamp: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
