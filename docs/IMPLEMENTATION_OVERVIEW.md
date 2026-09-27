@@ -1143,3 +1143,21 @@ PR #32 remains Draft and Production is untouched. The safe cutover is intentiona
 - Latest integration CI must be green.
 - PR #32 must remain unmerged until explicit production authorization.
 - No migration or Production deployment is performed by this planning step.
+
+
+### 2026-09-27 — production cutover smoke checklist
+
+Run these checks **after DB migrations and application deployment**, in this order, using disposable/test identities where possible:
+
+1. **Permanent normal chat** — one ordinary turn succeeds; history and memory persist; no automatic +1 occurs without semantic evidence.
+2. **Semantic movement** — verified positive evidence can increase and harmful evidence can decrease within the -2..+2 bound; client response does not expose `relationshipPointDelta`.
+3. **Replay idempotency** — replay the same request ID/message; no duplicate history, usage, event, or point movement.
+4. **Permanent emotion/action v2** — `emotion_action_v2_after_chat` is recorded and the reducer-selected state survives the canonical commit; legacy triggers do not overwrite it.
+5. **Anonymous continuity** — two anonymous turns carry encrypted `temporaryRelationship`; no permanent relationship RPC/write occurs.
+6. **Anonymous → email save** — checkpoint imports points, current emotion/action and compact semantic trajectory.
+7. **Email failure/retry** — chat after a failed email send and retry keeps the newest temporary relationship trajectory; a missing relationship payload does not reset an already-saved state.
+8. **Body Clock** — proactive/silence behavior still runs with retired legacy triggers; elapsed time alone does not create loneliness from neutral.
+9. **Failure-path sanity** — failed chat still follows existing usage refund behavior and does not create a successful relationship turn.
+10. **Observe before widening** — confirm no unexpected canonical conflicts/RPC errors before treating cutover as complete.
+
+If any application-level smoke check fails: stop widening traffic/validation, preserve evidence, and roll back the application first. Do not improvise a Production DB rollback.
