@@ -51,7 +51,9 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         assert.equal(args.p_user_id, user.id);
         const found = completed.get(args.p_request_id);
         if (found) return { data: found.result, error: null };
-        const result = { ...args.p_result, relationshipPoints: ++points, memorySynced: true, relationshipTimeSynced: true };
+        const delta = Math.max(-2, Math.min(2, Number(args.p_result.relationshipPointDelta) || 0));
+        points = Math.max(0, points + delta);
+        const result = { ...args.p_result, relationshipPoints: points, relationshipPointDelta: delta, memorySynced: true, relationshipTimeSynced: true };
         completed.set(args.p_request_id, { message: args.p_message, result });
         rootState.memory = result.memory;
         rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });
@@ -236,3 +238,18 @@ test('both permanent devices restore same server points and memory without brows
 });
 
 module.exports = { harness };
+
+
+test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {
+  const h = harness({ initialPoints: 1 });
+  const route = await h.load('app/api/chat/route.ts');
+  h.openaiReply = { reply: '...', relationshipSignals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }] };
+  const requestId = crypto.randomUUID();
+  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();
+  const afterFirst = h.points;
+  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();
+  assert.equal(afterFirst, 0);
+  assert.equal(h.points, 0);
+  assert.equal(first.relationshipPointDelta, undefined);
+  assert.equal(replay.relationshipPointDelta, undefined);
+});
