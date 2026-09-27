@@ -1036,3 +1036,15 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - GitHub Actions Run #132: **SUCCESS**
   - tests: **116/116 PASS, 0 fail**
   - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — permanent relationship v2 write ownership
+
+- Canonical chat uses a service-role Supabase client, so relationship v2 persistence now passes the already-authenticated permanent user id explicitly to the RPC.
+- The RPC is service-role-only and re-checks `auth.users.is_anonymous`; anonymous accounts cannot enter the permanent relationship state path.
+- Relationship v2 owns the post-chat emotion/action result. Legacy keyword emotion and derived-action triggers are retired to prevent them from overwriting the reducer result after canonical history is committed.
+- Lazy-silence/proactive behavior is intentionally not removed by the trigger-retirement migration.
+- Production migrations remain unapplied.
+- GitHub Actions Run #144: **SUCCESS**
+  - tests: **118/118 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
