@@ -1090,3 +1090,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - Body Clock silence contract: **PASS**
   - Next.js production build: **PASS** (static pages 14/14)
 - Production migrations remain unapplied.
+
+
+### 2026-09-27 — null email checkpoint cannot erase relationship state
+
+- Reviewed the anonymous → email-save bridge for retries/legacy roots where `temporaryRelationship` is absent.
+- A missing/non-object relationship payload is now relationship-state **no-op**, not an implicit `neutral / NORMAL / null lastInteraction` reset.
+- Points/checkpoint data can still refresh, while existing emotion, action, last interaction, and imported temporary relationship trajectory remain intact.
+- Dedicated regression locks this behavior.
+- GitHub Actions Run #174: **SUCCESS**
+  - tests: **126/126 PASS, 0 fail**
+  - null relationship checkpoint preservation: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
