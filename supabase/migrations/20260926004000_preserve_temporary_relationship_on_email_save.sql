@@ -84,3 +84,49 @@ end $$;
 
 revoke all on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid) from public,anon,authenticated;
 grant execute on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid) to service_role;
+
+
+-- The canonical root writer previously called the retired six-argument
+-- checkpoint. Replace it so retry-after-email-failure keeps carrying the
+-- latest relationship trajectory from the verified encrypted root.
+create or replace function public.write_misaki_temporary_root(
+  p_user_id uuid,p_token text,p_state jsonb,p_expected_revision uuid,
+  p_refresh_expiry boolean default true
+)
+returns uuid language plpgsql security invoker set search_path = '' as $$
+declare v_revision uuid; v_new uuid:=gen_random_uuid();
+begin
+  perform 1 from auth.users where id=p_user_id and is_anonymous for update;
+  if not found then raise exception 'anonymous account required'; end if;
+  perform 1 from public.background_push_state where user_id=p_user_id for update;
+  select revision into v_revision from public.misaki_temporary_roots where user_id=p_user_id for update;
+  if v_revision is distinct from p_expected_revision then raise exception 'temporary state changed'; end if;
+  if exists(select 1 from public.misaki_temporary_roots where user_id=p_user_id and expires_at<=clock_timestamp()) then
+    raise exception 'temporary state expired'; end if;
+  if p_token is null or jsonb_typeof(p_state->'history') is distinct from 'array'
+    or jsonb_typeof(p_state->'memory') is distinct from 'array' then raise exception 'verified state required'; end if;
+
+  insert into public.misaki_temporary_roots(user_id,token,revision,expires_at)
+    values(p_user_id,p_token,v_new,clock_timestamp()+interval '24 hours')
+    on conflict(user_id) do update set token=excluded.token,revision=excluded.revision,
+      expires_at=case when p_refresh_expiry then excluded.expires_at else misaki_temporary_roots.expires_at end;
+
+  if exists(select 1 from public.misaki_relationship_events
+      where user_id=p_user_id and event_type='email_save_checkpoint') then
+    perform public.save_misaki_temporary_state(
+      p_user_id,
+      p_state->'history',
+      p_state->'memory',
+      p_state->'todayMemory',
+      (p_state->>'relationshipPoints')::integer,
+      p_state->'temporaryRelationship',
+      v_new
+    );
+  end if;
+  return v_new;
+end $$;
+
+revoke all on function public.write_misaki_temporary_root(uuid,text,jsonb,uuid,boolean)
+  from public,anon,authenticated;
+grant execute on function public.write_misaki_temporary_root(uuid,text,jsonb,uuid,boolean)
+  to service_role;
