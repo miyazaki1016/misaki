@@ -1116,3 +1116,30 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - malformed semantic delta fallback/clamp: **PASS**
   - Next.js production build: **PASS** (static pages 14/14)
 - Production migrations remain unapplied.
+
+
+### 2026-09-27 — production cutover order (reviewed, not executed)
+
+PR #32 remains Draft and Production is untouched. The safe cutover is intentionally staged so schema/RPC support exists before application code can call it, while rollback never removes DB compatibility prematurely.
+
+**Forward order**
+1. Keep the application on the current production build.
+2. Apply the relationship-v2 DB migrations in filename order:
+   - `20260926000000_semantic_relationship_point_delta.sql`
+   - `20260926003000_relationship_emotion_action_v2_rpc.sql`
+   - `20260926004000_preserve_temporary_relationship_on_email_save.sql`
+   - `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql`
+3. Verify RPC signatures/grants and that the two legacy triggers are absent.
+4. Deploy the integration application only after the DB layer is ready.
+5. Smoke-test permanent chat, anonymous multi-turn continuity, anonymous→email save/retry, semantic point movement, replay idempotency, and Body Clock continuity.
+
+**Rollback rule**
+- If the application deployment is unhealthy, roll back the application first to the prior production build.
+- Do **not** immediately roll back the additive/replacement DB support: the old app remains compatible with the canonical five-argument completion RPC and temporary-root writer. Keeping the DB support avoids a second destructive change during incident recovery.
+- Trigger retirement is deliberately last among DB migrations. Re-enabling legacy triggers is not the default rollback because they can overwrite v2 emotion/action and recreate the conflict this cutover removes.
+- Any DB rollback, if ever required after diagnosis, must be a new reviewed forward migration rather than ad-hoc Production SQL.
+
+**Gate before execution**
+- Latest integration CI must be green.
+- PR #32 must remain unmerged until explicit production authorization.
+- No migration or Production deployment is performed by this planning step.
