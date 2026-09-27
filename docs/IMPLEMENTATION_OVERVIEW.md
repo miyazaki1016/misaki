@@ -1200,3 +1200,18 @@ PR #32 was re-audited after the persistence and silence hardening work.
 - No merge, Production deployment, Production migration application, Edge deployment, or cron change was performed during this audit.
 
 At this point, further changes should be driven by a concrete defect or an explicit production-cutover authorization rather than speculative redesign. The six-stage/5-heart product model remains a separate product-design task and is intentionally not mixed into this persistence/relationship-v2 cutover.
+
+
+### 2026-09-27 — reply quality feedback for real-conversation validation
+
+- Added small 👍 / 👎 controls beneath each Misaki reply that has a canonical request id.
+- 👍 is one tap. 👎 may optionally classify the issue as: unnatural, too cold, wrong distance, forgot context, repetitive, or other.
+- Feedback is stored server-side per `user_id + request_id` and may be changed by upsert.
+- Feedback is **quality telemetry only**. It does not alter relationship points, emotion, action, memory, or generation behavior directly.
+- Both permanent and anonymous authenticated users can submit feedback; storage is server/service-role mediated rather than direct client table access.
+- Dedicated regression contracts cover storage isolation, bounded values, and Misaki-only UI placement.
+- Run #208 test job: **SUCCESS**
+  - tests: **132/132 PASS, 0 fail**
+  - all 3 reply-feedback regressions: **PASS**
+  - Next.js production build: **PASS**, static pages **15/15**
+- The new feedback-table migration remains unapplied to Production.
