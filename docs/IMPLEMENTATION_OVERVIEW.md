@@ -1061,3 +1061,18 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - tests: **119/119 PASS, 0 fail**
   - retry regression: **PASS**
   - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — semantic relationship points covered by canonical regression
+
+- Canonical permanent-chat test harness no longer models the retired “one successful turn = +1 point” rule.
+- It applies the internal semantic `relationshipPointDelta` (-2..+2), clamps the stored total at zero, and reuses the committed result for the same request id.
+- Dedicated regression proves a harmful/rejection assessment can reduce a 1-point relationship to 0, never below 0, and replay does not apply the delta twice.
+- Public chat responses continue to strip `relationshipPointDelta`; the delta remains internal to canonical commit.
+- Free and Premium canonical tests no longer assume automatic relationship growth merely because a message succeeded.
+- GitHub Actions Run #162: **SUCCESS**
+  - tests: **123/123 PASS, 0 fail**
+  - email-send failure → additional chat → retry: **PASS**
+  - semantic permanent commit/replay/clamp regression: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migration remains unapplied.
