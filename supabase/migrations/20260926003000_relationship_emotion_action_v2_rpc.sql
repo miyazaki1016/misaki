@@ -11,20 +11,27 @@ create or replace function public.apply_relationship_emotion_action_v2(
   p_action_reason text,
   p_evidence jsonb,
   p_signal_summary jsonb,
-  p_expected_state_updated_at timestamptz default null
+  p_expected_state_updated_at timestamptz default null,
+  p_user_id uuid default null
 )
 returns jsonb
 language plpgsql
-security invoker
+security definer
 set search_path = ''
 as $$
 declare
-  v_user_id uuid := auth.uid();
+  v_user_id uuid := coalesce(auth.uid(), p_user_id);
+  v_claim_role text := coalesce(auth.role(),'');
   v_state public.misaki_relationship_state%rowtype;
   v_before jsonb;
   v_now timestamptz := clock_timestamp();
 begin
-  if v_user_id is null or coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then
+  -- Normal authenticated callers are bound to auth.uid(). The canonical chat
+  -- route uses the service role, so it must name the already-authenticated user.
+  if v_claim_role <> 'service_role' and p_user_id is not null and p_user_id is distinct from auth.uid() then
+    raise exception 'user mismatch';
+  end if;
+  if v_user_id is null or coalesce((select is_anonymous from auth.users where id=v_user_id), true) then
     raise exception 'permanent account required';
   end if;
   if p_primary not in ('neutral','happy','affectionate','concerned','hurt','sulky','guarded') then
@@ -72,7 +79,7 @@ begin
 end;
 $$;
 
-revoke all on function public.apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz)
+revoke all on function public.apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz,uuid)
   from public,anon,authenticated;
-grant execute on function public.apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz)
-  to authenticated,service_role;
+grant execute on function public.apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz,uuid)
+  to service_role;
