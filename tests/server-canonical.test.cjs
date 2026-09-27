@@ -6,10 +6,10 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const root = path.join(__dirname, '..');
 
-function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false } = {}) {
+function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {
   const user = { id: 'account-a', is_anonymous: anonymous };
   const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };
-  let points = 79, consumed = 0, refunded = 0, generated = 0;
+  let points = initialPoints, consumed = 0, refunded = 0, generated = 0;
   const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
   let checkpoint = false, revision = 0;
   let maintenance = false;
@@ -138,13 +138,13 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   };
 }
 
-test('Free chat ignores forged points/memory/history/today memory and commits one success', async () => {
+test('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {
   const h = harness();
   const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,
     memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));
   assert.equal(response.status, 200);
   const result = await response.json();
-  assert.equal(result.relationshipPoints, 80); assert.equal(h.points, 80); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
+  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 80); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
   const prompt = JSON.stringify(h.prompts);
   assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));
 });
@@ -157,10 +157,10 @@ test('same request replay returns saved response without generation/usage/additi
   assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);
   assert.equal(h.generated, generations); assert.equal(h.points, 80); assert.equal(h.refunded, 0);
 });
-test('Premium chat still adds exactly one point and does not refund', async () => {
+test('Premium chat does not get an automatic point and does not refund', async () => {
   const h = harness({ premium: true });
   const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();
-  assert.equal(result.relationshipPoints, 80); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);
+  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);
 });
 for (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {
   const h = harness({ [failure]: true });
