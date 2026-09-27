@@ -41,7 +41,13 @@ begin
 
   -- Server clamps the application assessment so forged/out-of-range deltas cannot
   -- move the relationship by more than the intentionally small per-turn bound.
-  v_point_delta:=greatest(-2,least(2,coalesce((p_result->>'relationshipPointDelta')::integer,0)));
+  -- Treat a missing or malformed application assessment as no point movement.
+  -- The DB still clamps valid values to the intentionally small per-turn bound.
+  begin
+    v_point_delta:=greatest(-2,least(2,coalesce((p_result->>'relationshipPointDelta')::integer,0)));
+  exception when invalid_text_representation or numeric_value_out_of_range then
+    v_point_delta:=0;
+  end;
 
   perform 1 from public.background_push_state where user_id=p_user_id for update;
   select updated_at into v_revision from public.misaki_user_conversation_state where user_id=p_user_id for update;
