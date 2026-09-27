@@ -22,3 +22,20 @@ test("permanent v2 RPC validates bounded emotion and action state", () => {
   assert.match(sql, /invalid emotion/);
   assert.match(sql, /invalid action/);
 });
+
+
+test("permanent v2 RPC binds service writes to an explicit permanent user", () => {
+  assert.match(sql, /p_user_id uuid default null/);
+  assert.match(sql, /coalesce\(auth\.uid\(\), p_user_id\)/);
+  assert.match(sql, /from auth\.users where id=v_user_id/);
+  assert.match(sql, /to service_role;/);
+  assert.doesNotMatch(sql, /to authenticated,service_role;/);
+});
+
+test("legacy post-chat emotion and derived-action triggers are retired under v2", () => {
+  const retirement = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql"), "utf8");
+  assert.match(retirement, /drop trigger if exists trg_relationship_emotion_from_conversation_state/);
+  assert.match(retirement, /drop trigger if exists trg_relationship_action_from_emotion/);
+  assert.doesNotMatch(retirement, /lazy_silence/i);
+});
