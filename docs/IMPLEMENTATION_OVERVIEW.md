@@ -1023,3 +1023,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - GitHub Actions Run #118: **SUCCESS**
   - tests: **115/115 PASS, 0 fail**
   - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — anonymous → permanent relationship story bridge
+
+- Email checkpoint now receives the server-verified `temporaryRelationship` from the encrypted temporary root.
+- Checkpoint persistence carries current emotion/action and compact semantic trajectory events; it does not copy verbatim grievance text.
+- Permanent relationship history reads both native `emotion_action_v2_after_chat` events and migrated `temporary_relationship_checkpoint` events.
+- Checkpoint retries replace the imported temporary trajectory instead of blindly duplicating it.
+- This preserves states such as unresolved hurt / repair in progress across anonymous → email/permanent conversion.
+- Production migration remains unapplied.
+- GitHub Actions Run #132: **SUCCESS**
+  - tests: **116/116 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
