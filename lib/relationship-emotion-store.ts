@@ -29,7 +29,8 @@ export async function persistRelationshipEmotionFromSignals(
   isAnonymous: boolean,
   context: RelationshipTimeContext | null,
   assessment: RelationshipSignalAssessment,
-  patterns?: RelationshipPatternContext
+  patterns?: RelationshipPatternContext,
+  userId?: string
 ): Promise<{ applied: boolean; conflict: boolean; emotion: EmotionReducerResult; action: ActionDecision }> {
   const learnedPatterns = patterns ?? await loadRelationshipPatterns(supabase as any, isAnonymous);
   const emotion = reduceRelationshipEmotion({
@@ -68,6 +69,7 @@ export async function persistRelationshipEmotionFromSignals(
       p_evidence: emotion.evidence,
       p_signal_summary: signalSummary,
       p_expected_state_updated_at: context?.stateUpdatedAt ?? null,
+      p_user_id: userId ?? null,
     }
   );
 
