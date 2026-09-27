@@ -2736,7 +2736,8 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
           false,
           relationshipTimeContext,
           relationshipAssessment,
-          relationshipPatterns
+          relationshipPatterns,
+          userData.user.id
         )
       );
     }
