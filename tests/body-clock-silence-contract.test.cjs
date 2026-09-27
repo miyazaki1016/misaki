@@ -16,3 +16,12 @@ test('Body Clock may still react to an already-lonely or sulky state', () => {
   assert.match(sql, /primary','neutral'\) = 'lonely'.*interval '7 days'.*'PULL'/s);
   assert.match(sql, /primary','neutral'\) = 'sulky'.*interval '7 days'.*'PULL'/s);
 });
+
+
+test("standalone silence evolution never invents loneliness from warm state", () => {
+  const sql = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260917030000_phase4_lazy_silence_evolution_rpc.sql"), "utf8");
+  assert.doesNotMatch(sql, /v_next_primary\s*:=\s*'lonely'/);
+  assert.doesNotMatch(sql, /warmth_turns_into_missing_after_gap/);
+  assert.match(sql, /v_primary\s*=\s*'lonely'[\s\S]*v_next_action/);
+});
