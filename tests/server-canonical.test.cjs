@@ -12,6 +12,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   let points = initialPoints, consumed = 0, refunded = 0, generated = 0;
   const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
   let checkpoint = false, revision = 0;
+  let openaiPayload = null;
   let maintenance = false;
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
@@ -103,7 +104,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (String(url).includes('generativelanguage')) {
         generated++; prompts.push(JSON.parse(options.body));
         if (generationFailure) return new Response('', { status: 500 });
-        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });
+        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(openaiPayload ?? { reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });
       }
       return Response.json({ current: {} });
     },
@@ -133,6 +134,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   }
   return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
+    setOpenaiPayload(value) { openaiPayload = value; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
       body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },
   };
@@ -144,7 +146,7 @@ test('Free chat ignores forged points/memory/history/today memory and commits se
     memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));
   assert.equal(response.status, 200);
   const result = await response.json();
-  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 80); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
+  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
   const prompt = JSON.stringify(h.prompts);
   assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));
 });
@@ -152,10 +154,10 @@ test('same request replay returns saved response without generation/usage/additi
   const h = harness(), route = h.load('app/api/chat/route.ts');
   const first = await (await route.POST(h.request())).json();
   const second = await (await route.POST(h.request())).json();
-  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 80);
+  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);
   const generations = h.generated;
   assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);
-  assert.equal(h.generated, generations); assert.equal(h.points, 80); assert.equal(h.refunded, 0);
+  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);
 });
 test('Premium chat does not get an automatic point and does not refund', async () => {
   const h = harness({ premium: true });
@@ -243,7 +245,7 @@ module.exports = { harness };
 test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {
   const h = harness({ initialPoints: 1 });
   const route = await h.load('app/api/chat/route.ts');
-  h.openaiReply = { reply: '...', relationshipSignals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }] };
+  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }] });
   const requestId = crypto.randomUUID();
   const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();
   const afterFirst = h.points;
