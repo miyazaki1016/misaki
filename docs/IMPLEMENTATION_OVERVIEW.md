@@ -1174,3 +1174,15 @@ If any application-level smoke check fails: stop widening traffic/validation, pr
   - standalone silence no-invented-loneliness regression: **PASS**
   - Next.js production build: **PASS**, static pages **14/14**
 - Production remains untouched.
+
+
+### 2026-09-27 — email bridge malformed event timestamp fail-safe
+
+- Anonymous → email relationship import now treats a malformed compact event `created_at` as recoverable metadata damage rather than failing the whole checkpoint.
+- Valid timestamps are preserved; empty/invalid/overflowing timestamps fall back to `now()`.
+- Conversation, memory, points, current emotion/action, and the rest of the relationship trajectory are therefore not lost because one legacy event timestamp is malformed.
+- GitHub Actions Run #196: **SUCCESS**
+  - tests: **129/129 PASS, 0 fail**
+  - malformed compact event timestamp regression: **PASS**
+  - Next.js production build: **PASS**, static pages **14/14**
+- Production remains untouched.
