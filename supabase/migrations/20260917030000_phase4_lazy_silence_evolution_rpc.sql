@@ -37,17 +37,12 @@ begin
   v_next_intensity := v_intensity;
   v_next_action := v_state.action_state;
 
-  -- Silence alone never proves loneliness. It only evolves an existing
-  -- relational emotion, with intimacy and elapsed time as context.
+  -- Silence alone never creates a new relational fact (loneliness, repair,
+  -- romance, conflict, etc.). It may only settle or evolve an emotion that
+  -- already exists, with intimacy and elapsed time as context.
   if v_primary = 'concerned' and v_elapsed >= 86400 then
     v_next_intensity := greatest(v_intensity - 15, 12);
     v_reason := 'concern_softens_with_silence';
-  elsif v_primary in ('happy', 'affectionate') and v_elapsed >= 259200
-        and v_state.intimacy_level in ('familiar', 'intimate', 'very_intimate') then
-    v_next_primary := 'lonely';
-    v_next_intensity := case when v_elapsed >= 604800 then 34 else 22 end;
-    v_next_action := case when v_elapsed >= 604800 then 'WAIT' else v_state.action_state end;
-    v_reason := 'warmth_turns_into_missing_after_gap';
   elsif v_primary in ('happy', 'affectionate') and v_elapsed >= 86400 then
     v_next_intensity := greatest(v_intensity - 10, 8);
     v_reason := 'warmth_settles_during_silence';
