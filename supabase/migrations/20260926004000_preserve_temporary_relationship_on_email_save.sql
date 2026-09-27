@@ -1,6 +1,9 @@
 -- Preserve the verified anonymous relationship trajectory at the email checkpoint.
 -- The encrypted temporary root remains authoritative input; callers cannot submit
 -- arbitrary plaintext relationship history.
+-- Replace the old six-argument checkpoint signature so stale callers cannot
+-- bypass relationship preservation.
+drop function if exists public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,uuid);
 
 create or replace function public.save_misaki_temporary_state(
   p_user_id uuid,p_history jsonb,p_memory jsonb,p_today_memory jsonb,p_points integer,
@@ -13,6 +16,7 @@ declare
   v_primary text;
   v_intensity integer;
   v_action text;
+  v_last_interaction timestamptz;
 begin
   perform 1 from auth.users where id=p_user_id and is_anonymous for update;
   if not found then raise exception 'anonymous account required'; end if;
@@ -23,8 +27,17 @@ begin
     raise exception 'temporary state expired'; end if;
 
   v_primary:=coalesce(p_relationship->>'emotionPrimary','neutral');
-  v_intensity:=greatest(0,least(100,coalesce((p_relationship->>'emotionIntensity')::integer,0)));
+  begin
+    v_intensity:=greatest(0,least(100,coalesce((p_relationship->>'emotionIntensity')::integer,0)));
+  exception when invalid_text_representation then
+    v_intensity:=0;
+  end;
   v_action:=coalesce(p_relationship->>'actionState','NORMAL');
+  begin
+    v_last_interaction:=nullif(p_relationship->>'lastInteractionAt','')::timestamptz;
+  exception when invalid_datetime_format then
+    v_last_interaction:=null;
+  end;
   if v_primary not in ('neutral','happy','affectionate','concerned','hurt','sulky','guarded') then v_primary:='neutral'; end if;
   if v_action not in ('NORMAL','WAIT','TEASE','SULK','CHASE','PULL','RECONNECT') then v_action:='NORMAL'; end if;
 
@@ -32,7 +45,7 @@ begin
     values(p_user_id,greatest(0,p_points),case when p_points>=160 then 'very_intimate' when p_points>=80 then 'intimate'
       when p_points>=30 then 'familiar' else 'initial' end,now(),
       jsonb_build_object('primary',v_primary,'intensity',v_intensity,'source','temporary_checkpoint'),
-      v_action,case when p_relationship->>'lastInteractionAt' is not null then (p_relationship->>'lastInteractionAt')::timestamptz else null end)
+      v_action,v_last_interaction)
     on conflict(user_id) do update set intimacy_points=excluded.intimacy_points,
       intimacy_level=excluded.intimacy_level,intimacy_migrated_at=excluded.intimacy_migrated_at,
       emotion_state=excluded.emotion_state,action_state=excluded.action_state,
@@ -47,6 +60,7 @@ begin
   perform set_config('request.jwt.claims',coalesce(v_claims,''),true);
 
   -- Rebuild only the compact semantic events from the authenticated temporary root.
+  -- A retry therefore replaces, rather than duplicates, the imported trajectory.
   delete from public.misaki_relationship_events
     where user_id=p_user_id and event_type='temporary_relationship_checkpoint';
   for v_event in select value from jsonb_array_elements(coalesce(p_relationship->'events','[]'::jsonb))
@@ -54,7 +68,10 @@ begin
     insert into public.misaki_relationship_events(user_id,event_type,reason,metadata,created_at)
     values(p_user_id,'temporary_relationship_checkpoint','verified anonymous relationship trajectory',
       jsonb_build_object('signal_summary',coalesce(v_event->'metadata'->'signal_summary','[]'::jsonb)),
-      coalesce((v_event->>'created_at')::timestamptz,now()));
+      case
+        when nullif(v_event->>'created_at','') is null then now()
+        else (v_event->>'created_at')::timestamptz
+      end);
   end loop;
 
   insert into public.misaki_relationship_events(user_id,event_type,reason,metadata)
