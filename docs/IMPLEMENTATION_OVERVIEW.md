@@ -1048,3 +1048,16 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - GitHub Actions Run #144: **SUCCESS**
   - tests: **118/118 PASS, 0 fail**
   - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — email checkpoint retry preserves relationship trajectory
+
+- The relationship-aware email checkpoint migration explicitly retires the old six-argument `save_misaki_temporary_state` signature.
+- `write_misaki_temporary_root` now forwards `temporaryRelationship` when an existing email-save checkpoint is refreshed after additional anonymous conversation.
+- Retry imports replace prior `temporary_relationship_checkpoint` events before rebuilding them, avoiding duplicate trajectory accumulation.
+- Existing retry semantics remain covered: email send failure → additional anonymous chat → retry checkpoints the latest verified server state even when the browser presents the old token.
+- Production migration remains unapplied.
+- GitHub Actions Run #152: **SUCCESS**
+  - tests: **119/119 PASS, 0 fail**
+  - retry regression: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
