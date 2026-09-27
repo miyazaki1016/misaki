@@ -5,9 +5,9 @@ security definer
 set search_path = ''
 as $$
 begin
-  -- Relationship time continues while the app is closed. Silence can soften warmth
-  -- or deepen an already plausible longing, but elapsed time alone never invents
-  -- user-side facts or forces one fixed emotion.
+  -- Relationship time continues while the app is closed, but elapsed time alone
+  -- never invents loneliness, repair, romance, conflict, or other new relational
+  -- facts. Silence may only settle an emotion that already exists.
   with due_ids as (
     select b.user_id
     from public.background_push_state b
@@ -21,14 +21,11 @@ begin
           when coalesce(r.emotion_state->>'primary','neutral') in ('happy','affectionate')
                and now() - r.last_interaction_at >= interval '24 hours'
             then jsonb_build_object('primary',coalesce(r.emotion_state->>'primary','neutral'),'intensity',greatest(12,coalesce((r.emotion_state->>'intensity')::int,0)-case when now()-r.last_interaction_at >= interval '3 days' then 18 else 10 end),'source','relationship_silence')
-          when r.intimacy_level in ('familiar','intimate','very_intimate')
-               and now()-r.last_interaction_at >= interval '3 days'
-               and coalesce(r.emotion_state->>'primary','neutral') in ('neutral','lonely')
-            then jsonb_build_object('primary','lonely','intensity',least(72,greatest(coalesce((r.emotion_state->>'intensity')::int,0),case when now()-r.last_interaction_at >= interval '7 days' then 48 when now()-r.last_interaction_at >= interval '5 days' then 38 else 28 end)),'source','relationship_silence')
           else r.emotion_state end,
         action_state = case
-          when r.intimacy_level in ('familiar','intimate','very_intimate') and now()-r.last_interaction_at >= interval '7 days' and coalesce(r.emotion_state->>'primary','neutral') in ('neutral','lonely','sulky') then 'PULL'
-          when r.intimacy_level in ('familiar','intimate','very_intimate') and now()-r.last_interaction_at >= interval '3 days' and coalesce(r.emotion_state->>'primary','neutral') in ('neutral','lonely') then 'WAIT'
+          when coalesce(r.emotion_state->>'primary','neutral') = 'lonely' and now()-r.last_interaction_at >= interval '7 days' then 'PULL'
+          when coalesce(r.emotion_state->>'primary','neutral') = 'lonely' and now()-r.last_interaction_at >= interval '3 days' then 'WAIT'
+          when coalesce(r.emotion_state->>'primary','neutral') = 'sulky' and now()-r.last_interaction_at >= interval '7 days' then 'PULL'
           else r.action_state end,
         state_updated_at=now()
     from due_ids d
