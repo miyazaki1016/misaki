@@ -70,3 +70,12 @@ test("semantic point RPC treats malformed deltas as zero and clamps valid deltas
   assert.match(migration, /greatest\(-2,least\(2,coalesce\(\(p_result->>'relationshipPointDelta'\)::integer,0\)\)\)/);
   assert.match(migration, /exception when invalid_text_representation or numeric_value_out_of_range then[\s\S]*v_point_delta:=0/);
 });
+
+
+test("email relationship bridge tolerates malformed compact event timestamps", () => {
+  const migration = fs.readFileSync(path.join(process.cwd(),
+    "supabase/migrations/20260926004000_preserve_temporary_relationship_on_email_save.sql"), "utf8");
+  assert.match(migration, /v_event_created_at timestamptz/);
+  assert.match(migration, /exception when invalid_datetime_format or datetime_field_overflow then[\s\S]*v_event_created_at:=now\(\)/);
+  assert.match(migration, /temporary_relationship_checkpoint[\s\S]*v_event_created_at/);
+});
