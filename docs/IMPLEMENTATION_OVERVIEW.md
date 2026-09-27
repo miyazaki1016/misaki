@@ -1076,3 +1076,17 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
   - semantic permanent commit/replay/clamp regression: **PASS**
   - Next.js production build: **PASS** (static pages 14/14)
 - Production migration remains unapplied.
+
+
+### 2026-09-27 — silence cannot invent loneliness
+
+- Reviewed legacy silence/action trigger and Body Clock proactive SQL before production cutover.
+- Retiring `trg_relationship_action_from_emotion` does **not** kill silence behavior: both `advance_relationship_silence_state()` and the Body Clock proactive claim path write their relevant `action_state` directly.
+- Removed the legacy proactive rule that could create `lonely` from a neutral state solely because 3+ days elapsed at sufficient intimacy.
+- Time may still settle an already-existing emotion and may change behavior from an already-existing `lonely`/`sulky` state; it must not invent loneliness, romance, repair, conflict, or a new incident.
+- Added a regression contract preventing neutral → lonely creation from silence alone.
+- GitHub Actions Run #168: **SUCCESS**
+  - tests: **125/125 PASS, 0 fail**
+  - Body Clock silence contract: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
