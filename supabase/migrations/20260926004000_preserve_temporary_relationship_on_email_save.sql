@@ -17,6 +17,7 @@ declare
   v_intensity integer;
   v_action text;
   v_last_interaction timestamptz;
+  v_event_created_at timestamptz;
 begin
   perform 1 from auth.users where id=p_user_id and is_anonymous for update;
   if not found then raise exception 'anonymous account required'; end if;
@@ -81,13 +82,17 @@ begin
       where user_id=p_user_id and event_type='temporary_relationship_checkpoint';
   for v_event in select value from jsonb_array_elements(coalesce(p_relationship->'events','[]'::jsonb))
   loop
+    -- The encrypted root is server-produced, but a malformed legacy timestamp
+    -- must not make email-save fail or destroy the rest of the checkpoint.
+    begin
+      v_event_created_at:=coalesce(nullif(v_event->>'created_at','')::timestamptz,now());
+    exception when invalid_datetime_format or datetime_field_overflow then
+      v_event_created_at:=now();
+    end;
     insert into public.misaki_relationship_events(user_id,event_type,reason,metadata,created_at)
     values(p_user_id,'temporary_relationship_checkpoint','verified anonymous relationship trajectory',
       jsonb_build_object('signal_summary',coalesce(v_event->'metadata'->'signal_summary','[]'::jsonb)),
-      case
-        when nullif(v_event->>'created_at','') is null then now()
-        else (v_event->>'created_at')::timestamptz
-      end);
+      v_event_created_at);
   end loop;
   end if;
 
