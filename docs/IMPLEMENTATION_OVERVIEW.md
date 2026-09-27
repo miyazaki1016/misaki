@@ -1186,3 +1186,17 @@ If any application-level smoke check fails: stop widening traffic/validation, pr
   - malformed compact event timestamp regression: **PASS**
   - Next.js production build: **PASS**, static pages **14/14**
 - Production remains untouched.
+
+
+### 2026-09-27 — final integration readiness checkpoint before production authorization
+
+PR #32 was re-audited after the persistence and silence hardening work.
+
+- PR remains **Draft**, open, and GitHub reports it **mergeable**.
+- Current scope: 33 changed files / 109 commits on the integration branch.
+- Latest head before this documentation checkpoint: `b2ac57d0dc21046e31f21f7d759f734a0ea322b9`.
+- GitHub Actions Run #198: **SUCCESS**.
+- The diff contains the expected four 2026-09-26 forward migrations plus the two deliberately amended legacy silence/proactive migrations and their regression contracts.
+- No merge, Production deployment, Production migration application, Edge deployment, or cron change was performed during this audit.
+
+At this point, further changes should be driven by a concrete defect or an explicit production-cutover authorization rather than speculative redesign. The six-stage/5-heart product model remains a separate product-design task and is intentionally not mixed into this persistence/relationship-v2 cutover.
