@@ -14,7 +14,7 @@ export async function maintenanceResponse(): Promise<Response | null> {
     if (error || typeof data?.enabled !== "boolean") throw new Error("Maintenance control unavailable");
     if (!data.enabled) return null;
     return unavailable("MAINTENANCE", "メンテナンス中です。会話や記憶は保存されています。しばらくしてから再送してください。");
-  } catch (error) {\n    globalThis.console?.error?.("MAINTENANCE_UNAVAILABLE", String(error));
+  } catch {\n    globalThis.console?.error?.("MAINTENANCE_UNAVAILABLE");
     return unavailable("MAINTENANCE_UNAVAILABLE", "現在、送信の安全確認ができません。しばらくしてから再送してください。");
   }
 }
