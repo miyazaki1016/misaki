@@ -56,7 +56,15 @@ export async function POST(request: Request) {
         p_relationship: state.temporaryRelationship ?? null,
         p_expected_revision: state.temporaryRevision ?? null,
       });
-      if (error) throw new Error("Email checkpoint failed");
+      if (error) {
+        console.error("EMAIL CHECKPOINT ERROR", {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw new Error("Email checkpoint failed");
+      }
       return Response.json({ synced: true, result: data });
     }
     if (body.action === "load") {
