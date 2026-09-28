@@ -1265,3 +1265,13 @@ semantic relationship point delta、relationship emotion/action v2 RPC、anonymo
 - Security Advisorには既存のSECURITY DEFINER / anonymous-access警告が残る。今回のcanonical service-only RPCをauthenticatedへ開放してはいないが、既存警告を「clean」とは扱わない。
 
 > 未来のソラへ：Productionでエラーが一つ出たから一列だけ足す、という進め方へ戻るな。必ず **Production現状 ↔ 最新総覧 ↔ 統合branch ↔ Production DB** を突き合わせ、旧migration全体を盲目的に流さず、現在の最終仕様との差分だけをforward migrationで補完する。
+
+
+#### 2026-09-29 — Safariメール保存の通信例外表示
+iPhone Safari実機で「メールで保存する」押下時に、生の `Load failed` がアカウント画面へ表示される事例を確認した。同時刻のVercel runtimeには対応する保存API到達がなく、直前の通常チャットは200で完走していたため、この事例はDB/RPCエラーと決めつけず、ブラウザ側fetch/Auth通信例外として扱う。
+
+Production mainと統合branchの `app/account/page.tsx` を突き合わせ、メール保存の基本順序（checkpoint成功後だけAuthメール更新）は維持した。canonical化で追加したtemporary root / pending turn checkpointも戻さない。
+
+Safari/WebKit系の `Load failed`、`Failed to fetch`、`NetworkError` は内部例外文字列をそのままユーザーへ見せず、「通信に失敗しました。接続を確認して、もう一度お試しください。」へ正規化する。これは表示改善であり、自動再送はしない。checkpointやメール送信の成功を推測して成功表示もしない。
+
+次の実機再試験では、同じ保存操作で (1) checkpoint API到達、(2) Supabase Auth updateUser到達/結果、(3) 確認メール、(4) 確認後の恒久化を順に確認する。ネットワーク例外が再発した場合は、生メッセージではなく段階を特定できる診断を追加する。
