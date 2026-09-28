@@ -34,6 +34,9 @@ function authError(error: any) {
   if (text.includes("invalid otp") || text.includes("invalid token")) {
     return "ログインコードが正しくないか、すでに無効です。最新のメールを確認してください。";
   }
+  if (text.includes("load failed") || text.includes("failed to fetch") || text.includes("networkerror")) {
+    return "通信に失敗しました。接続を確認して、もう一度お試しください。";
+  }
   return typeof error?.message === "string"
     ? error.message
     : "処理できませんでした。少し時間をおいてもう一度お試しください。";
