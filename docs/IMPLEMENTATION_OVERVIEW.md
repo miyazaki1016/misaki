@@ -1215,3 +1215,53 @@ At this point, further changes should be driven by a concrete defect or an expli
   - all 3 reply-feedback regressions: **PASS**
   - Next.js production build: **PASS**, static pages **15/15**
 - The new feedback-table migration remains unapplied to Production.
+
+
+### 2026-09-29 — Production差分 × 最新総覧の再照合 / canonical基盤補完
+
+Production、統合branch、Production DB、そして本総覧の4点を再照合した。以後の切替判断はコード差分だけではなく、この4点が同じ完成形を指していることを必須条件とする。
+
+#### 実機で通過した範囲
+- Previewの匿名通常会話が `POST /api/chat 200` まで完走。
+- 匿名multi-turnで「名前：せいちゃん」を次ターンでも保持し、MEMORY表示にも反映。
+- reply feedback の 👍 / 👎 が表示され、`POST /api/feedback/reply 200` を確認。
+- Free利用回数も成功ターンごとに20→19→18→17と進み、失敗ターンを成功扱いしていない。
+- これにより匿名の temporary canonical root → 次ターン復元 → memory → feedback まで実機で接続確認済み。
+
+#### Production DBで発見した歯抜け
+canonical root migrationを丸ごと適用せず後続v2 migrationを先行したため、Production DBに以下の不足が残っていた。
+- `misaki_relationship_state.intimacy_migrated_at`
+- `misaki_user_conversation_state.today_memory`
+- `misaki_email_checkpoint_user_idx`
+- `edit_misaki_conversation_state(...)`
+- `refresh_misaki_background_snapshot()` と trigger
+- canonical版11引数 `finish_misaki_body_clock_delivery(...)`
+
+これらはProduction現状と最新統合コードを突き合わせ、不足分だけをforward migrationとして補完した。元のcanonical migration全体は適用していない。理由は、旧fixed +1 relationship処理や一度きりbackfillなど、現在のrelationship v2で既に置換された処理を復活させないため。
+
+#### 匿名RPCの権限補修
+temporary root / email checkpoint の SECURITY INVOKER RPC が `auth.users` を直接参照し、service-role経由でも `42501 permission denied` になることをPreview診断ログで確認した。
+`auth.users` 自体への広いGRANTは行わず、`misaki_operations.assert_anonymous_user(uuid)` という限定SECURITY DEFINER helperへ匿名確認だけを隔離。helperはservice_roleのみ実行可とし、schema USAGEもservice_roleのみに付与した。
+`write_misaki_temporary_root`、`complete_misaki_temporary_turn`、`save_misaki_temporary_state` はこのhelperを使用する。
+
+#### Production DBへ既に反映したrelationship v2 /安全設備
+semantic relationship point delta、relationship emotion/action v2 RPC、anonymous→email relationship bridge、legacy emotion/action trigger retirement、silence/proactiveの「時間だけで寂しさを捏造しない」修正、reply feedback、maintenance gateはProduction DBへ適用済み。
+ただし **Productionアプリはまだ統合branchへ切替えていない**。PR #32はDraftのままとし、アプリProduction merge/deployは別の明示承認境界として扱う。
+
+#### 総覧の古い記述の読み替え
+本総覧前半には基礎工事当時の「1成功ターン=+1を維持」「legacy emotion/action triggerを残す」「Production migration未適用」等の歴史記録が残る。これらは当時の工程記録であり、現在仕様ではない。
+現在仕様は後段のrelationship v2記録を優先し、
+- relationship pointは会話内容から導くsemantic delta（-2..+2、通常会話0もあり）
+- legacy keyword emotion/action triggerは退役
+- relationship v2関連DB migrationはProduction DBへ適用済み
+とする。履歴として旧記述は削除せず、未来の実装者が工程と理由を追えるよう残す。
+
+#### まだ完了扱いにしない項目
+- 匿名→メール保存は、DB不足補完後の実機再試験が必要。
+- メール送信成功後、会話・memory・relationship emotion/action・trajectoryが恒久アカウントへ引き継がれることを確認する。
+- 恒久通常会話、replay idempotency、Body Clock、failure/refundを実機/ランタイムで確認する。
+- Previewで見えたProduction UIとの差はcanonical動作確認後に再比較し、`app/chat/page.tsx` を丸ごとProduction版へ戻さない。
+- `GET /api/persona/history 400` と匿名時の `permanent account required` は会話を止めない診断ノイズとして残っており、切替前に整理対象。
+- Security Advisorには既存のSECURITY DEFINER / anonymous-access警告が残る。今回のcanonical service-only RPCをauthenticatedへ開放してはいないが、既存警告を「clean」とは扱わない。
+
+> 未来のソラへ：Productionでエラーが一つ出たから一列だけ足す、という進め方へ戻るな。必ず **Production現状 ↔ 最新総覧 ↔ 統合branch ↔ Production DB** を突き合わせ、旧migration全体を盲目的に流さず、現在の最終仕様との差分だけをforward migrationで補完する。
