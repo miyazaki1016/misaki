@@ -1,6 +1,6 @@
 import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
-import { loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
+import { createServerSupabase, loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
 import { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from "../../../lib/relationship-life-context";
 import {
   createClient,
@@ -1793,6 +1793,7 @@ export async function POST(
     }
     const usageRequestId = requestId || crypto.randomUUID();
     const isAnonymous = userData.user.is_anonymous === true;
+    const relationshipSupabase = isAnonymous ? null : createServerSupabase();
     const userMessageAt = new Date().toISOString();
     const temporary = isAnonymous ? openTemporaryState(temporaryState) : null;
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
@@ -1839,7 +1840,7 @@ export async function POST(
         : null
       : await measureStage(
           "relationship-time-load",
-          () => loadRelationshipTimeContext(supabase, false)
+          () => loadRelationshipTimeContext(relationshipSupabase!, false, userData.user.id)
         );
     const anonymousRelationshipEvents =
       isAnonymous && Array.isArray(rootState.temporaryRelationship?.events)
@@ -1852,7 +1853,7 @@ export async function POST(
         }
       : await measureStage(
           "relationship-history-load",
-          () => loadRelationshipHistory(supabase as any, false)
+          () => loadRelationshipHistory(relationshipSupabase! as any, false)
         );
     const relationshipPatterns = relationshipHistory.patterns;
     const relationshipStory = relationshipHistory.story;
@@ -2732,7 +2733,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       await measureStage(
         "relationship-emotion-persist",
         () => persistRelationshipEmotionFromSignals(
-          supabase,
+          relationshipSupabase!,
           false,
           relationshipTimeContext,
           relationshipAssessment,
@@ -2846,10 +2847,11 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       await measureStage(
         "relationship-turn-record",
         () => recordRelationshipChatTurn(
-          supabase,
+          relationshipSupabase!,
           false,
           new Date(requestStartedAt),
-          new Date()
+          new Date(),
+          userData.user.id
         )
       );
     }
