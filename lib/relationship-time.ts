@@ -20,13 +20,15 @@ function numberOr(value: unknown, fallback = 0) {
 
 export async function loadRelationshipTimeContext(
   supabase: SupabaseClient,
-  isAnonymous: boolean
+  isAnonymous: boolean,
+  userId?: string
 ): Promise<RelationshipTimeContext | null> {
   if (isAnonymous) return null;
 
   // v2: loading context is read-only. Time is evidence for the reducer, not a mutation trigger.
   const { data, error } = await (supabase.rpc as any)(
-    "get_relationship_time_context"
+    "get_relationship_time_context",
+    { p_user_id: userId ?? null }
   );
 
   if (error || !data || typeof data !== "object") {
@@ -101,7 +103,8 @@ export async function recordRelationshipChatTurn(
   supabase: SupabaseClient,
   isAnonymous: boolean,
   userMessageAt: Date,
-  misakiMessageAt: Date
+  misakiMessageAt: Date,
+  userId?: string
 ): Promise<boolean> {
   if (isAnonymous) return false;
 
@@ -110,6 +113,7 @@ export async function recordRelationshipChatTurn(
     {
       p_user_message_at: userMessageAt.toISOString(),
       p_misaki_message_at: misakiMessageAt.toISOString(),
+      p_user_id: userId ?? null,
     }
   );
 
