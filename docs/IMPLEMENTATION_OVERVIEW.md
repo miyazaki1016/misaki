@@ -1275,3 +1275,30 @@ Production mainと統合branchの `app/account/page.tsx` を突き合わせ、�
 Safari/WebKit系の `Load failed`、`Failed to fetch`、`NetworkError` は内部例外文字列をそのままユーザーへ見せず、「通信に失敗しました。接続を確認して、もう一度お試しください。」へ正規化する。これは表示改善であり、自動再送はしない。checkpointやメール送信の成功を推測して成功表示もしない。
 
 次の実機再試験では、同じ保存操作で (1) checkpoint API到達、(2) Supabase Auth updateUser到達/結果、(3) 確認メール、(4) 確認後の恒久化を順に確認する。ネットワーク例外が再発した場合は、生メッセージではなく段階を特定できる診断を追加する。
+
+
+### 2026-09-30 — メール恒久化後の通常チャット 500 / relationship server境界修正
+
+iPhone実機で、匿名 → メール保存 → 確認メール → Previewへ復帰 → 恒久ログイン → 匿名時会話復元までは成功した。その直後の恒久通常会話「せいちゃんって呼んでね」で `POST /api/chat 500` を確認した。
+
+Vercel runtimeではGemini生成自体は成功し、その後 `apply_relationship_emotion_action_v2` と `record_relationship_chat_turn` が `42501 permission denied`、最終的に canonical turn commit failure となっていた。
+
+Production DBを確認すると、relationship v2の更新RPCは service_role にEXECUTEを限定しており、authenticatedへ広げるべきではない。したがって authenticatedへGRANTする回避策は採用しない。
+
+原因は、恒久通常会話routeがrelationship time/history/emotion/actionの処理へユーザーJWTのSupabase clientを渡していたこと。canonical commit自体は既にservice-role clientを使う一方、relationship補助処理だけ認証境界がずれていた。
+
+修正:
+- 恒久relationship処理は `createServerSupabase()` のserver-only clientへ統一。
+- `get_relationship_time_context(uuid)` と `record_relationship_chat_turn(..., uuid)` をservice-role専用RPCとしてforward追加し、serverから対象user idを明示する。
+- authenticated/anonにはEXECUTEを付与しない。
+- RPC内部でも、JWTが存在する場合のuser mismatchを拒否し、対象が恒久Auth userであることを確認する。
+- anonymous経路は従来どおりtemporary canonical rootを使い、このserver permanent経路へ混ぜない。
+
+検証:
+- GitHub Actions Run #238: SUCCESS。
+- Production DBで新RPCは service_role EXECUTE=true / authenticated EXECUTE=false を確認。
+- Security Advisorは再実行済み。既存のservice-only RLS-no-policyおよび既存SECURITY DEFINER警告は残るため「clean」とは扱わない。
+- PR #32はDraft、main / Productionアプリは未変更。
+- Vercelはコミット `269426c4...` のPreviewまではREADYだが、修正本体 `0c658683...` のPreview Deploymentがまだ生成されていない。CI成功とVercel Preview生成は別問題として追う。
+
+次の確認は、最新headを含むPreviewが生成された後、恒久通常会話 → relationship persist → canonical commit → usage確定まで200で完走すること。失敗ターンがFree利用回数を消費しないことも同時に再確認する。
