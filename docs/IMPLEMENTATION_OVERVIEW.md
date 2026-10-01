@@ -1387,3 +1387,47 @@ iPhone Chrome実機で、修正前の複数reloadから**1回の読み込みで�
 5. 6段階relationship→5 hearts等の未決仕様は、現在のcanonical統合smokeを壊さないよう別工程で扱う。
 
 > 未来のソラへ：2026-10-01時点で「保存できるはず」ではなく、Chrome/iPhone実機でlogout→再loginまで含めてhistory・memory・usage復元を確認済み。ここを再工事する前に、この実機green checkpointを回帰条件にせよ。
+
+
+### 2026-10-02 — relationship-time duplicate RPC 403 解消 / history同期の現在仕様確定
+
+#### relationship-time診断ノイズの原因確定
+恒久通常チャットは成功していた一方、Supabaseログに `get_relationship_time_context` の200直後、同RPCのauthenticated 403（`permission denied for function get_relationship_time_context`）が残っていた。
+
+原因はRPC signatureやDB migrationの欠落ではなく、同一chat request内の二重呼出しだった。
+- chat route本体はserver service-role clientで `get_relationship_time_context(p_user_id)` を呼び200。
+- 続く `loadPersonaPrompt(...)` がauthenticated clientを受け取り、persona-store内部から同RPCを再度呼んで403。
+- relationship-time loaderはRPC error時にnull fallbackしていたため、会話自体は成功し診断ノイズだけが残った。
+
+修正:
+- persona-store内部からrelationship-time RPC再取得を除去。
+- chat routeが既にservice-role境界で取得した `relationshipTimeContext` を `loadPersonaPrompt` へ明示的に渡して再利用。
+- authenticated / anonへservice-only RPCのEXECUTE権限は追加していない。
+
+検証:
+- 修正head: `50f575b820bea8f85934d202a11677b874c86a9f`。
+- GitHub Actions Run #254: **SUCCESS**。
+- Vercel Preview: **SUCCESS**。
+- 2026-10-02 07:35 JSTのiPhone実機Preview通常会話で、Supabaseログを確認。
+  - `get_relationship_time_context`: service_role / 200 / **1回のみ**。
+  - 以前の2回目 authenticated 403: **発生なし**。
+  - `permission denied for function get_relationship_time_context`: **発生なし**。
+  - `record_relationship_chat_turn`: service_role / 200。
+
+よって、このduplicate relationship-time RPC 403は**コード修正 + CI + Preview build + 実機 + Supabase runtime log**まで含めて解消確認済みとする。
+
+#### canonical history同期 — 矛盾記述の確定
+2026-10-01の途中記録には「5秒pollをBody Clock等のため残す」とあるが、その後の修正で廃止済み。現行 `app/chat/conversation-history-sync.tsx` を正とし、現在仕様は以下。
+- 5秒定期polling: **なし**。
+- 同期契機: initial mount / window focus / visibility復帰 / Auth state change。
+- 通常chat: server commit後のlocal表示を使用。
+- Body Clock等のbackground追加: ユーザーが画面へ戻った際にcanonical historyから取得。
+- canonical差分反映に `window.location.reload()` は使わず、eventで同一ページへ反映する。
+
+前段の「5秒pollを残す」は当時の途中状態を示す履歴として残すが、**現在仕様として参照してはならない**。
+
+#### 現在の境界
+- PR #32は引き続きDraft。
+- Productionアプリmerge/deployは未実施。
+- 今回の確認・修正でDB権限変更は行っていない。
+- 次のsmoke対象は replay idempotency / anonymous multi-turn relationship continuity / メール保存失敗・retry / Body Clock no-invented-loneliness / failure-refund。
