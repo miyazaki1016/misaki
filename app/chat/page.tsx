@@ -708,7 +708,12 @@ export default function ChatPage() {
       if (state.misakiTodayMemory) applyTodayMemory(state.misakiTodayMemory);
     }
     const receive = (event: Event) => applyRoot((event as CustomEvent).detail);
+    const receiveHistory = (event: Event) => {
+      const history = (event as CustomEvent).detail;
+      if (active && Array.isArray(history)) setMessages(history.slice(-MAX_MESSAGES));
+    };
     window.addEventListener("misaki-root-state", receive);
+    window.addEventListener("misaki-history-state", receiveHistory);
     async function load() {
       try {
         // A full remount ends the previous page's in-flight UI send marker.
@@ -745,7 +750,11 @@ export default function ChatPage() {
       } finally { if (active) setLoaded(true); }
     }
     void load();
-    return () => { active = false; window.removeEventListener("misaki-root-state", receive); };
+    return () => {
+      active = false;
+      window.removeEventListener("misaki-root-state", receive);
+      window.removeEventListener("misaki-history-state", receiveHistory);
+    };
   }, []);
 
   useEffect(
