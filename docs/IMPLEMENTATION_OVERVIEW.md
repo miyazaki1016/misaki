@@ -1325,3 +1325,65 @@ reload loop修正後も5秒pollingが残っていたため、恒久historyの定
 - relationship-time周辺には旧/新RPC signatureの診断ノイズが残る可能性があるため、実際のcaller/signatureを確認して整理する。authenticatedへservice-only RPC権限を広げない。
 - replay idempotency、Body Clock、failure/refundは引き続きsmoke対象。
 - PR #32はDraftのまま。Productionアプリmerge/deployは未承認・未実施。
+
+
+## 2026-10-01 — Preview実機: canonical恒久化・再ログイン復元 green checkpoint
+
+### 現在地
+- Integration branch: `sora/canonical-relationship-integration`
+- Draft PR #32 head: `a0c87b37c29ecfd1bcbff4e1a2cb26f3587e43e8`
+- **Productionアプリは未変更。PR #32はDraft維持。merge/deploy禁止。**
+- Production DBには統合Previewを成立させるsupport migrationを適用済み。アプリ切替承認とは別物として扱う。
+
+### 今回実機で通った一本の流れ
+Chrome/iPhone実機で以下を確認した。
+
+1. 匿名会話「はじめまして」を保持。
+2. メール保存→確認→恒久アカウント化。
+3. Preview originへ正しく戻り、保存済み会話を復元。
+4. 恒久ログイン状態で「せいちゃんって呼んでね」を送信。
+5. 美咲が「わかった、せいちゃんね。いい名前。これからそう呼ぶね！」と正常応答。
+6. Free残数が20→19へ一度だけ減少。
+7. MEMORYに「ユーザーの愛称はせいちゃん」を保存。
+8. 明示ログアウトで端末側の会話・記憶・キャッシュが消え、一時利用状態へ戻る。
+9. 同じメールへ6桁ログインコードを送り再ログイン。
+10. サーバー正本から会話履歴、MEMORY「ユーザーの愛称はせいちゃん」、Free残数19を復元。
+11. 日付区切りも9/30→10/1として復元。
+
+これにより少なくとも今回の実機経路では、
+`匿名 → メール保存 → 恒久化 → 恒久通常会話 → memory更新 → logout端末clear → 再login → history/memory/usage復元`
+が一周成立した。
+
+### 恒久チャット500の原因と修正
+最初の恒久チャットでは生成自体は成功したがDB commitで500になった。段階的に原因を分離した。
+
+- `apply_relationship_emotion_action_v2` / `record_relationship_chat_turn` は authenticated にGRANTせず、サーバーservice-role clientから呼ぶよう修正。relationship更新をクライアント権限へ開放しない。
+- 続いて `complete_misaki_chat_turn` 内部の `auth.users` 直接参照が `permission denied for table users` で失敗していることをProduction DBログで確定。
+- `auth.users` 自体へのGRANTはしない。恒久ユーザー確認だけを行う限定 `misaki_operations.assert_permanent_user(uuid)` SECURITY DEFINER helperを追加し、service_role専用EXECUTEとした。
+- `complete_misaki_chat_turn` もservice_role専用境界を維持。
+- 修正後の実機POST `/api/chat` は200、relationship emotion persist / turn record / canonical commitまで完走。
+
+**壊してはいけない:** DBエラーを直すために authenticated / anon へrelationship更新RPCやauth.users権限を広げない。privileged更新はサーバーservice_role境界の内側に置く。
+
+### Chrome履歴復元リロードループ
+ログイン直後、Chromeで履歴復元まで何度もページ全体がreloadされる問題を実機/Vercelログで確認。
+
+原因:
+`app/chat/conversation-history-sync.tsx` がcanonical historyと表示cacheの差分を検出するたびに `window.location.reload()` していた。reloadでcomponentが再mount→再同期→再reloadとなり得た。
+
+修正:
+- hard reloadを廃止。
+- canonical history取得後は `misaki-history-state` eventで同一ページのchat stateへ反映。
+- `app/chat/page.tsx` がeventを受け、表示messagesを更新。
+- 5秒poll自体はBody Clock等の外部追加履歴を拾う用途で現時点では残す。
+
+iPhone Chrome実機で、修正前の複数reloadから**1回の読み込みで履歴復元**へ改善確認済み。
+
+### 次にやること
+1. CI / 最新Previewのgreen状態を再確認。
+2. Runtimeログに残る旧signature側 `get_relationship_time_context` のpermission診断ノイズを、現行呼出し・migration・RPC signatureと照合して除去する。**権限を広げるだけの修正は禁止。**
+3. 5秒history pollingの重複GET/POSTを調査し、Body Clock等の外部履歴反映を壊さず無駄打ちを減らす。
+4. smoke checklist残り: replay idempotency、anonymous multi-turn relationship continuity、メール保存失敗/retry、Body Clock no-invented-loneliness、failure/refund等を順に実機/ログで確認。
+5. 6段階relationship→5 hearts等の未決仕様は、現在のcanonical統合smokeを壊さないよう別工程で扱う。
+
+> 未来のソラへ：2026-10-01時点で「保存できるはず」ではなく、Chrome/iPhone実機でlogout→再loginまで含めてhistory・memory・usage復元を確認済み。ここを再工事する前に、この実機green checkpointを回帰条件にせよ。
