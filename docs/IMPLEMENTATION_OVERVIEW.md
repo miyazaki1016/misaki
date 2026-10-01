@@ -1431,3 +1431,50 @@ iPhone Chrome実機で、修正前の複数reloadから**1回の読み込みで�
 - Productionアプリmerge/deployは未実施。
 - 今回の確認・修正でDB権限変更は行っていない。
 - 次のsmoke対象は replay idempotency / anonymous multi-turn relationship continuity / メール保存失敗・retry / Body Clock no-invented-loneliness / failure-refund。
+
+
+### 2026-10-02 — canonical統合 smoke green checkpoint（自動回帰中心）
+
+relationship-time duplicate RPC 403の実機runtime解消確認後、PR #32の残smokeを現行コードと回帰テストで再点検した。ここでは**自動回帰で確認した項目を実機確認済みと混同しない**。
+
+#### replay idempotency — 自動回帰 green
+- 同一 `request_id` の再送は保存済みresponseを返す。
+- 再生成なし、Free再消費なし、relationship再加算なし。
+- 同じrequest idを別messageへ使い回す不整合を拒否する。
+- 最新総覧更新後のGitHub Actions Run #256もSUCCESS。
+
+#### anonymous multi-turn relationship continuity — コード + 自動回帰 green
+- 匿名relationshipのpoints / emotion / action / signals / events / last interactionはtemporary canonical rootへ保存し、次turnはserver rootを正として読む。
+- 古いbrowser tokenでも最新shared rootへ追随する設計。
+- Body Clockを挟んだ匿名通常会話の連続性、lost-response recovery、stale revision拒否を回帰テストで確認。
+
+#### メール保存失敗・retry — コード + 自動回帰 green
+PR #29時代のP1「最初の保存内容へ固定される」を再点検。
+- `saveByEmail()` はretryのたびにメール更新より先に最新server canonical stateをcheckpointする。
+- transport email failure → 追加会話 → old tokenでretryしても最新server stateをcheckpointする。
+- confirmation待ち中の追加会話→再保存で最新pairを保持。
+- chat → Body Clock → chat → Body Clock → email saveを一つの連続contextとして保持。
+- checkpoint後のchat / Body Clockもshared root側に残る。
+
+#### Body Clock no-invented-loneliness — コード + 自動回帰 green
+- 沈黙だけを根拠にneutral/warm等から `lonely` を新規生成しない。
+- silenceは既存emotionをsettle/evolveできるだけで、新しいloneliness / romance / conflict等の関係事実を作らない。
+- 既に `lonely` / `sulky` の根拠がある場合は時間経過でWAIT/PULLへ変化可能。
+- 古い生活予定やtimeless memoryを現在進行形の事実としてBody Clockが断定しない回帰も維持。
+
+#### failure / refund — コード + 自動回帰 green
+- Free生成失敗: consume 1 → refund 1、relationship point変化なし。
+- canonical commit失敗: consume 1 → refund 1、relationship point変化なし。
+- canonical read失敗: usage consume前に停止。
+- 成功commit後はrefund対象を解除し、成功済みturnをrefundしない。
+- request内のrefund guardは一度refund後にcharged requestをclearし、二重refundを防ぐ。
+
+#### このcheckpointの意味
+以上は、既存実装の再読 + 回帰テスト + 最新CI greenを根拠とする。relationship-time 403については別節のとおりiPhone実機 + Supabase runtime logまで確認済みだが、**この節の各smokeをすべて今回あらためて実機操作したわけではない**。
+
+したがってPR #32全体をProduction切替安全と断定しない。Production app merge/deployは未承認・未実施、PR #32はDraftを維持する。
+
+#### 次の残件
+- repo-wide `loadPersonaPrompt(...)` caller audit: relationship-time contextをpersona-store内部取得からcaller注入へ変えたため、chat以外（特にBody Clock/proactive等）がrelationship continuityを失っていないか確認する。
+- 必要ならcaller別にservice-roleで取得済みcontextを渡す。authenticated経由のservice-only RPCは再導入しない。
+- 上記caller auditと必要な回帰追加後に、PR #32のProduction切替可否を別途判断する。
