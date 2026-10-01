@@ -1302,3 +1302,26 @@ Production DBを確認すると、relationship v2の更新RPCは service_role �
 - Vercelはコミット `269426c4...` のPreviewまではREADYだが、修正本体 `0c658683...` のPreview Deploymentがまだ生成されていない。CI成功とVercel Preview生成は別問題として追う。
 
 次の確認は、最新headを含むPreviewが生成された後、恒久通常会話 → relationship persist → canonical commit → usage確定まで200で完走すること。失敗ターンがFree利用回数を消費しないことも同時に再確認する。
+
+
+### 2026-10-01 — Chrome再ログイン復元 / 恒久通常会話 実機通過
+
+iPhone Chrome + Previewで恒久アカウントの一周テストを実施し、以下を実機確認した。
+
+- Chromeでログイン直後に何度もページreloadしていた原因は `ConversationHistorySync` のcanonical差分検出後の `window.location.reload()`。hard reloadを廃止し、取得したcanonical historyをイベントでその場反映するよう修正。実機では1回の読み込みで履歴復元まで到達。
+- 恒久ログイン状態で「せいちゃんって呼んでね」を送信し、`POST /api/chat 200` / chat total successを確認。Free残数は20→19。
+- Misaki返答「わかった、せいちゃんね。いい名前。これからそう呼ぶね！」まで表示。
+- MEMORYへ「ユーザーの愛称はせいちゃん」が保存された。
+- その後ログアウトすると端末表示/cacheはクリアされ、未ログイン・一時利用へ戻った。
+- 同じ保存済みメールへ6桁ログインコードで再ログインし、会話履歴、MEMORY「ユーザーの愛称はせいちゃん」、Free残数19がサーバー正本から復元した。
+- 日付区切りも9/30と10/1に分かれて復元された。
+
+これにより、**匿名→メール保存→恒久化→恒久通常会話→memory保存→logout端末clear→再login→history/memory/usage復元**までPreview実機で一周通過した。
+
+#### canonical history同期の整理
+reload loop修正後も5秒pollingが残っていたため、恒久historyの定期5秒pollを廃止。初回mount、focus、visibility復帰、Auth state changeで同期する。通常chatはcommit後にlocal表示され、Body Clock等のbackground追加はユーザーが画面へ戻った時にcanonicalから拾う。サーバー正本という境界は変更しない。
+
+#### 残件
+- relationship-time周辺には旧/新RPC signatureの診断ノイズが残る可能性があるため、実際のcaller/signatureを確認して整理する。authenticatedへservice-only RPC権限を広げない。
+- replay idempotency、Body Clock、failure/refundは引き続きsmoke対象。
+- PR #32はDraftのまま。Productionアプリmerge/deployは未承認・未実施。
