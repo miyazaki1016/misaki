@@ -2076,7 +2076,8 @@ export async function POST(
           loadPersonaPrompt(
             supabase,
             userData.user.id,
-            "chat"
+            "chat",
+            relationshipTimeContext
           )
       );
 
