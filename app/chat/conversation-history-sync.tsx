@@ -50,12 +50,14 @@ export default function ConversationHistorySync() {
       finally { syncing = false; }
     };
     void sync();
-    const timer = window.setInterval(() => void sync(), 5_000);
+    // Canonical history is refreshed on mount, foreground/focus and auth changes.
+    // Do not poll every 5 seconds: normal chat updates locally after commit, while
+    // Body Clock/background additions are picked up when the user returns.
     const visible = () => { if (document.visibilityState === "visible") void sync(); };
     window.addEventListener("focus", sync);
     document.addEventListener("visibilitychange", visible);
     const { data: listener } = supabase.auth.onAuthStateChange(() => window.setTimeout(() => void sync(), 100));
-    return () => { stopped = true; window.clearInterval(timer); window.removeEventListener("focus", sync);
+    return () => { stopped = true; window.removeEventListener("focus", sync);
       document.removeEventListener("visibilitychange", visible); listener.subscription.unsubscribe(); };
   }, []);
   return null;
