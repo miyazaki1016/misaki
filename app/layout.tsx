@@ -11,10 +11,10 @@ import BackgroundPushSync
 export const metadata:
   Metadata = {
   title:
-    "美咲 - タクドラの彼女",
+    "美咲 - 会話AI",
 
   description:
-    "東京のタクシードライバー向けAI彼女",
+    "会話と記憶から関係が育つAIパートナー",
 
   applicationName:
     "美咲",
