@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   try {
     const user = await authenticate(request);
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
-    if (user.is_anonymous) return Response.json({ error: "Temporary state required." }, { status: 400 });
+    if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { "Cache-Control": "no-store" } });
     return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("CONVERSATION STATE READ FAILED", error);

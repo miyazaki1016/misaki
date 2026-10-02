@@ -232,6 +232,12 @@ test('email checkpoint ignores forged browser snapshot and uses verified tempora
   const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;
   assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');
 });
+test('anonymous history GET is a safe no-op during auth transition', async () => {
+  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');
+  const response = await api.GET(h.request());
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });
+});
 test('both permanent devices restore same server points and memory without browser caches', async () => {
   const h = harness(), api = h.load('app/api/persona/history/route.ts');
   const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();
