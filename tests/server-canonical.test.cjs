@@ -309,9 +309,9 @@ test('Gemini transient failures use bounded short retry without retrying ordinar
   assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));
 });
 
-test('slow chat response shows a friendly Misaki wait state', () => {
+test('ordinary chat wait does not falsely claim Misaki is busy', () => {
   const source = fs.readFileSync(path.join(root, 'app/chat/page.tsx'), 'utf8');
   assert.ok(source.includes('美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね'));
-  assert.ok(source.includes('setWaitingOnReply(true), 1_800'));
-  assert.ok(source.includes('window.clearTimeout(waitingTimer)'));
+  assert.ok(!source.includes('setWaitingOnReply(true), 1_800'));
+  assert.ok(!source.includes('window.clearTimeout(waitingTimer)'));
 });
