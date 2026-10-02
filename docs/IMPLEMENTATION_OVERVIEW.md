@@ -1478,3 +1478,19 @@ PR #29時代のP1「最初の保存内容へ固定される」を再点検。
 - repo-wide `loadPersonaPrompt(...)` caller audit: relationship-time contextをpersona-store内部取得からcaller注入へ変えたため、chat以外（特にBody Clock/proactive等）がrelationship continuityを失っていないか確認する。
 - 必要ならcaller別にservice-roleで取得済みcontextを渡す。authenticated経由のservice-only RPCは再導入しない。
 - 上記caller auditと必要な回帰追加後に、PR #32のProduction切替可否を別途判断する。
+
+
+### 2026-10-02 — loadPersonaPrompt caller audit / Body Clock silence-expression hardening
+
+- repo-wide caller auditを実施。通常chatは `lib/persona/persona-store.ts` の `loadPersonaPrompt(..., relationshipTimeContext)` を使い、すでにservice-roleで取得したrelationship-time contextを再利用する。
+- Body Clockは同じloaderを共有せず、Edge Function専用の `supabase/functions/body-clock/persona-store.ts` を使用しているため、通常chat側の第4引数追加によるrelationship context欠落は発生しない。
+- Body Clockの関係状態は `buildProactiveDecisionContext()` が `misaki_relationship_state` から emotion / action / intimacy / last interaction を取得し、自発生成のdecision guideへ渡す。authenticated向けrelationship RPC権限の再追加は不要。
+- audit中、`deriveProactiveTags()` に「seven_plus_daysだけで `miss_you` を追加する」経路を発見。DB emotionをlonelyへ変更する処理ではないが、「時間だけで新しい関係感情を作らない」という契約に合わせ、この時間単独の付与を削除した。
+- `miss_you` は既存のgroundedな `lonely` emotionや `CHASE` actionなど、関係状態に根拠がある経路では引き続き使用可能。
+- regression contractを追加し、seven-plus-days time bandだけでは `miss_you` を追加しないこと、およびlonely/CHASEのgrounded経路を残すことを固定。
+- 最初のテスト実装はDeno Edge moduleをNode/Nextテストから直接importしたため Actions #261/#262 の `npm test` 自体は全passした一方、`next build` が `npm:@supabase/supabase-js` の型解決で失敗した。ロジック障害ではなくテスト境界の問題。
+- Deno moduleの直接importを除去し、既存silence-contractと同じsource-contract検査へ変更。
+- final head: `66d5c13d07c27f11bf35efb2afb06de261316108`
+- GitHub Actions #265 / #266: SUCCESS（tests + Next build）。
+- verification level: code audit + automated regression + CI/build green。今回の `miss_you` 境界は実機Body Clock送信を強制して再現確認したものではない。
+- PR #32は引き続きDraft。Production app merge/deployなし、DB mutationなし。
