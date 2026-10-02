@@ -292,3 +292,10 @@ test('history sync self-disables when server confirms anonymous state', () => {
   assert.ok(source.includes('state?.ephemeral === true'));
   assert.ok(source.includes('permanentlyDisabled = true'));
 });
+
+
+test('chat timestamp display does not poll permanent history', () => {
+  const source = fs.readFileSync(path.join(root, 'app/chat/chat-timestamp-display.tsx'), 'utf8');
+  assert.ok(!source.includes('POLL_MS'));
+  assert.ok(!source.includes('setInterval'));
+});
