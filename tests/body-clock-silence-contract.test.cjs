@@ -25,3 +25,25 @@ test("standalone silence evolution never invents loneliness from warm state", ()
   assert.doesNotMatch(sql, /warmth_turns_into_missing_after_gap/);
   assert.match(sql, /v_primary\s*=\s*'lonely'[\s\S]*v_next_action/);
 });
+
+
+const proactiveDecision = fs.readFileSync(path.join(__dirname, '..',
+  'supabase/functions/body-clock/proactive-decision.ts'), 'utf8');
+
+test('Body Clock time gap alone never adds miss_you expression', () => {
+  assert.doesNotMatch(
+    proactiveDecision,
+    /timeBand\s*===\s*["']seven_plus_days["'][\s\S]{0,300}tags\.add\(["']miss_you["']\)/
+  );
+});
+
+test('Body Clock keeps grounded miss_you expression paths', () => {
+  assert.match(
+    proactiveDecision,
+    /case\s+["']lonely["'][\s\S]{0,160}tags\.add\(["']miss_you["']\)/
+  );
+  assert.match(
+    proactiveDecision,
+    /case\s+["']CHASE["'][\s\S]{0,240}tags\.add\(["']miss_you["']\)/
+  );
+});
