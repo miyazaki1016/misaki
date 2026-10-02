@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 const CANONICAL_HOST = "misaki38-ai.com";
 
 export function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname === "/api/persona/history" && request.method === "GET") {
+    console.log("HISTORY EDGE TRACE", {
+      source: request.nextUrl.searchParams.get("source") ?? "untagged",
+      userAgent: request.headers.get("user-agent")?.slice(0, 160) ?? "unknown",
+    });
+  }
+
   const host =
     request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
 
