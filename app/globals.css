@@ -465,6 +465,28 @@ button {
     ease-in-out;
 }
 
+.shell .typingBubble .waitingReplyText {
+  width: auto;
+  height: auto;
+  display: inline;
+  border-radius: 0;
+  background: transparent;
+  animation: none;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #8f737b;
+}
+
+.shell .typingBubble:has(.waitingReplyText) {
+  width: auto;
+  min-width: 0;
+  height: auto;
+  min-height: 40px;
+  max-width: min(78vw, 330px);
+  padding: 9px 13px;
+}
+
 .shell
   .typingBubble
   span:nth-child(1) {
