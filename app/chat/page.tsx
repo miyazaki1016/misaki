@@ -217,6 +217,8 @@ export default function ChatPage() {
       INITIAL_MESSAGES
     );
 
+  const [replyFeedback, setReplyFeedback] = useState<Record<string, { rating: "good" | "bad"; reason?: string }>>({});
+
   const [
     memory,
     setMemory,
@@ -706,7 +708,12 @@ export default function ChatPage() {
       if (state.misakiTodayMemory) applyTodayMemory(state.misakiTodayMemory);
     }
     const receive = (event: Event) => applyRoot((event as CustomEvent).detail);
+    const receiveHistory = (event: Event) => {
+      const history = (event as CustomEvent).detail;
+      if (active && Array.isArray(history)) setMessages(history.slice(-MAX_MESSAGES));
+    };
     window.addEventListener("misaki-root-state", receive);
+    window.addEventListener("misaki-history-state", receiveHistory);
     async function load() {
       try {
         // A full remount ends the previous page's in-flight UI send marker.
@@ -743,7 +750,11 @@ export default function ChatPage() {
       } finally { if (active) setLoaded(true); }
     }
     void load();
-    return () => { active = false; window.removeEventListener("misaki-root-state", receive); };
+    return () => {
+      active = false;
+      window.removeEventListener("misaki-root-state", receive);
+      window.removeEventListener("misaki-history-state", receiveHistory);
+    };
   }, []);
 
   useEffect(
@@ -1391,6 +1402,23 @@ export default function ChatPage() {
     }
   }
 
+  async function rateReply(requestId: string, rating: "good" | "bad", reason?: string) {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) return;
+    const previous = replyFeedback[requestId];
+    setReplyFeedback(prev => ({ ...prev, [requestId]: { rating, ...(reason ? { reason } : {}) } }));
+    try {
+      const response = await fetch("/api/feedback/reply", {
+        method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ requestId, rating, reason }),
+      });
+      if (!response.ok) throw new Error("feedback failed");
+    } catch {
+      setReplyFeedback(prev => { const next = { ...prev }; if (previous) next[requestId] = previous; else delete next[requestId]; return next; });
+    }
+  }
+
   return (
     <main
       className="shell"
@@ -1917,18 +1945,27 @@ export default function ChatPage() {
             item,
             index
           ) => (
-            <div
-              key={
-                index
-              }
-              className={`bubble ${
-                item.role ===
-                "user"
-                  ? "user"
-                  : ""
-              }`}
-            >
-              {item.text}
+            <div key={index} className="messageWithFeedback">
+              <div className={`bubble ${item.role === "user" ? "user" : ""}`}>
+                {item.text}
+              </div>
+              {item.role === "misaki" && item.requestId && (
+                <div className="replyFeedback" aria-label="この返事を評価">
+                  <button type="button" className={replyFeedback[item.requestId]?.rating === "good" ? "selected" : ""}
+                    onClick={() => rateReply(item.requestId!, "good")} aria-label="いい返事" title="いい返事">👍</button>
+                  <button type="button" className={replyFeedback[item.requestId]?.rating === "bad" ? "selected" : ""}
+                    onClick={() => rateReply(item.requestId!, "bad")} aria-label="よくない返事" title="よくない返事">👎</button>
+                  {replyFeedback[item.requestId]?.rating === "bad" && (
+                    <select aria-label="よくなかった理由" value={replyFeedback[item.requestId]?.reason ?? ""}
+                      onChange={event => rateReply(item.requestId!, "bad", event.target.value || undefined)}>
+                      <option value="">理由は任意</option><option value="unnatural">不自然</option>
+                      <option value="too_cold">冷たすぎる</option><option value="distance_wrong">距離感がおかしい</option>
+                      <option value="forgot_context">前の話を忘れてる</option><option value="repetitive">同じことを繰り返す</option>
+                      <option value="other">その他</option>
+                    </select>
+                  )}
+                </div>
+              )}
             </div>
           )
         )}
@@ -2028,6 +2065,13 @@ export default function ChatPage() {
       ========================== */}
 
       <style jsx>{`
+        .messageWithFeedback { display: flex; flex-direction: column; align-items: flex-start; }
+        .messageWithFeedback:has(.bubble.user) { align-items: flex-end; }
+        .replyFeedback { display: flex; align-items: center; gap: 4px; margin: 3px 0 8px 8px; min-height: 24px; }
+        .replyFeedback button { border: 0; background: transparent; opacity: .42; padding: 2px 4px; cursor: pointer; font-size: 14px; }
+        .replyFeedback button.selected { opacity: 1; }
+        .replyFeedback select { border: 0; background: transparent; font-size: 11px; opacity: .7; max-width: 145px; }
+
         .misakiChatHeader {
           position: sticky;
           top: 0;

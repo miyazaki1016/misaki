@@ -6,18 +6,19 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const root = path.join(__dirname, '..');
 
-function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false } = {}) {
+function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {
   const user = { id: 'account-a', is_anonymous: anonymous };
   const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };
-  let points = 79, consumed = 0, refunded = 0, generated = 0;
+  let points = initialPoints, consumed = 0, refunded = 0, generated = 0;
   const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
   let checkpoint = false, revision = 0;
+  let openaiPayload = null;
   let maintenance = false;
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
     from(table) {
       const filters = {};
-      const query = { select() { return query; }, not() { return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
+      const query = { select() { return query; }, not() { return query; }, in(k, v) { filters[k] = v; return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },
         async maybeSingle() {
           if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };
           if (stateFailure) return { error: { message: 'unavailable' }, data: null };
@@ -51,7 +52,9 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         assert.equal(args.p_user_id, user.id);
         const found = completed.get(args.p_request_id);
         if (found) return { data: found.result, error: null };
-        const result = { ...args.p_result, relationshipPoints: ++points, memorySynced: true, relationshipTimeSynced: true };
+        const delta = Math.max(-2, Math.min(2, Number(args.p_result.relationshipPointDelta) || 0));
+        points = Math.max(0, points + delta);
+        const result = { ...args.p_result, relationshipPoints: points, relationshipPointDelta: delta, memorySynced: true, relationshipTimeSynced: true };
         completed.set(args.p_request_id, { message: args.p_message, result });
         rootState.memory = result.memory;
         rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });
@@ -101,7 +104,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (String(url).includes('generativelanguage')) {
         generated++; prompts.push(JSON.parse(options.body));
         if (generationFailure) return new Response('', { status: 500 });
-        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });
+        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(openaiPayload ?? { reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });
       }
       return Response.json({ current: {} });
     },
@@ -120,23 +123,30 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');
       throw Error(name);
     };
-    vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
+    try {
+      const wrapped = "(function(require,module,exports){" + code + String.fromCharCode(10) + "})";
+      vm.runInContext(wrapped, context)(req, module, module.exports);
+    } catch (error) {
+      if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);
+      throw error;
+    }
     cache.set(file, module.exports); return module.exports;
   }
   return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
+    setOpenaiPayload(value) { openaiPayload = value; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
       body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },
   };
 }
 
-test('Free chat ignores forged points/memory/history/today memory and commits one success', async () => {
+test('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {
   const h = harness();
   const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,
     memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));
   assert.equal(response.status, 200);
   const result = await response.json();
-  assert.equal(result.relationshipPoints, 80); assert.equal(h.points, 80); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
+  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);
   const prompt = JSON.stringify(h.prompts);
   assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));
 });
@@ -144,15 +154,15 @@ test('same request replay returns saved response without generation/usage/additi
   const h = harness(), route = h.load('app/api/chat/route.ts');
   const first = await (await route.POST(h.request())).json();
   const second = await (await route.POST(h.request())).json();
-  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 80);
+  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);
   const generations = h.generated;
   assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);
-  assert.equal(h.generated, generations); assert.equal(h.points, 80); assert.equal(h.refunded, 0);
+  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);
 });
-test('Premium chat still adds exactly one point and does not refund', async () => {
+test('Premium chat does not get an automatic point and does not refund', async () => {
   const h = harness({ premium: true });
   const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();
-  assert.equal(result.relationshipPoints, 80); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);
+  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);
 });
 for (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {
   const h = harness({ [failure]: true });
@@ -167,9 +177,9 @@ test('canonical read failure stops before consuming usage', async () => {
 test('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {
   const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');
   const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();
-  assert.equal(first.relationshipPoints, 1); assert.equal(first.ephemeral, true);
+  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);
   const root = h.load('lib/canonical-state.ts');
-  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 1);
+  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);
   assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);
   const before = h.consumed;
   const lostResponseReplay = await (await route.POST(h.request())).json();
@@ -178,10 +188,10 @@ test('anonymous successful state is sealed; modified or expired tokens cannot ch
   assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);
   assert.equal(h.consumed, before);
   const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();
-  assert.equal(replay.relationshipPoints, 1); assert.equal(h.consumed, before);
+  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);
   const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,
     requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();
-  assert.equal(second.relationshipPoints, 2);
+  assert.equal(second.relationshipPoints, 0);
   assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,
     requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);
   h.advanceClock(24 * 60 * 60 * 1000 + 1);
@@ -189,6 +199,27 @@ test('anonymous successful state is sealed; modified or expired tokens cannot ch
   assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);
   assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);
 });
+test('anonymous relationship emotion survives into the next temporary-root turn', async () => {
+  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');
+  const first = await (await route.POST(h.request())).json();
+  const root = h.load('lib/canonical-state.ts');
+  const firstState = root.openTemporaryState(first.temporaryState).state;
+  assert.ok(firstState.temporaryRelationship);
+  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');
+  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');
+
+  const second = await (await route.POST(h.request({
+    temporaryState: first.temporaryState,
+    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',
+    message: '次の会話'
+  }))).json();
+  const secondState = root.openTemporaryState(second.temporaryState).state;
+  assert.ok(secondState.temporaryRelationship);
+  assert.ok(secondState.temporaryRelationship.lastInteractionAt);
+  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);
+  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);
+});
+
 test('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {
   const h = harness({ anonymous: true });
   const crypto = h.load('lib/canonical-state.ts');
@@ -209,3 +240,18 @@ test('both permanent devices restore same server points and memory without brows
 });
 
 module.exports = { harness };
+
+
+test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {
+  const h = harness({ initialPoints: 1 });
+  const route = await h.load('app/api/chat/route.ts');
+  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });
+  const requestId = crypto.randomUUID();
+  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();
+  const afterFirst = h.points;
+  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();
+  assert.equal(afterFirst, 0);
+  assert.equal(h.points, 0);
+  assert.equal(first.relationshipPointDelta, undefined);
+  assert.equal(replay.relationshipPointDelta, undefined);
+});

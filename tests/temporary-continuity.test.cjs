@@ -51,11 +51,11 @@ test('email send failure -> additional chat -> retry checkpoints latest server s
   await save(h, first.temporaryState);
   h.user.is_anonymous = false;
   const state = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);
-  assert.equal(state.relationshipPoints, 2);
+  assert.equal(state.relationshipPoints, 0);
   assert.ok(state.history.some(item => item.text === 'メール失敗後の追加会話'));
   assert.equal((await h.load('app/api/persona/history/route.ts').POST(h.request({ saveAnonymous: true,
     expectedUserId: h.user.id, temporaryState: first.temporaryState }))).status, 409);
-  assert.equal(h.points, 2);
+  assert.equal(h.points, 0);
 });
 
 test('pending confirmation -> conversation -> resave -> permanent account retains newest pair', async () => {
@@ -64,7 +64,7 @@ test('pending confirmation -> conversation -> resave -> permanent account retain
   const second = await chat(h, '確認待ち中の会話', first.temporaryState);
   await save(h, second.temporaryState);
   h.user.is_anonymous = false;
-  assert.equal(h.rootState.history.length, 4); assert.equal(h.points, 2);
+  assert.equal(h.rootState.history.length, 4); assert.equal(h.points, 0);
   assert.ok(h.rootState.history.some(item => item.text === '確認待ち中の会話'));
 });
 
@@ -82,7 +82,7 @@ test('chat -> Body Clock -> chat -> Body Clock -> email save -> permanent accoun
   h.user.is_anonymous = false;
   const a = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);
   const b = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);
-  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 2); assert.equal(a.history.length, 6);
+  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 0); assert.equal(a.history.length, 6);
   assert.equal(a.history.filter(item => item.text === '自発メッセージを送ったよ').length, 2);
   assert.equal(h.consumed, 2); assert.equal(h.refunded, 0);
 });
@@ -92,7 +92,7 @@ test('chat and Body Clock after checkpoint remain saved even without another sav
   await save(h, first.temporaryState);
   await chat(h, '保存後', first.temporaryState); await bodyClock(h).send();
   h.user.is_anonymous = false;
-  assert.equal(h.points, 2); assert.equal(h.rootState.history.length, 5);
+  assert.equal(h.points, 0); assert.equal(h.rootState.history.length, 5);
   assert.ok(h.rootState.history.some(item => item.text === '自発メッセージを送ったよ'));
 });
 
@@ -114,7 +114,7 @@ test('explicit anonymous edit advances shared root and is respected by subsequen
   assert.equal((await api.POST(h.request({ action: 'clearHistory', temporaryState: first.temporaryState }))).status, 200);
   await bodyClock(h).send(); await save(h, first.temporaryState);
   assert.equal(h.rootState.history.length, 1);
-  assert.equal(h.points, 1);
+  assert.equal(h.points, 0);
 });
 
 test('an expired shared root cannot fall back to an older browser snapshot or receipt', async () => {
@@ -154,7 +154,7 @@ test('explicit anonymous load renews live temporary state without adding usage o
   const response = await h.load('app/api/persona/history/route.ts').POST(h.request({ action: 'load', temporaryState: first.temporaryState }));
   assert.equal(response.status, 200);
   assert.ok(Date.parse(h.temporaryRoots.get(h.user.id).expires_at) > before);
-  assert.equal(h.consumed, 1); assert.equal((await response.json()).relationshipPoints, 1);
+  assert.equal(h.consumed, 1); assert.equal((await response.json()).relationshipPoints, 0);
 });
 
 test('Body Clock skips a missing shared root even when old replay receipts remain', async () => {

@@ -53,9 +53,18 @@ export async function POST(request: Request) {
       const { data, error } = await createServerSupabase().rpc("save_misaki_temporary_state", {
         p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,
         p_today_memory: state.todayMemory, p_points: state.relationshipPoints,
+        p_relationship: state.temporaryRelationship ?? null,
         p_expected_revision: state.temporaryRevision ?? null,
       });
-      if (error) throw new Error("Email checkpoint failed");
+      if (error) {
+        console.error("EMAIL CHECKPOINT ERROR", {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+        });
+        throw new Error("Email checkpoint failed");
+      }
       return Response.json({ synced: true, result: data });
     }
     if (body.action === "load") {

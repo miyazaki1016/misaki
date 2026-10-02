@@ -880,3 +880,665 @@ Safari実機で、匿名利用中に送信待ちの「・・・」が消え、�
 - UI / 通信
 
 のどこで生じたか切り分けて修正する。
+
+
+## 2026-09-25 — #29 × #31 統合検証（Draft PR #32）
+
+### 位置づけ
+- **#29 = 体**：会話・記憶・親密度をサーバー正本として保持する。
+- **#31 = 心**：出来事の意味、感情、行動、言葉の温度を扱う。
+- **#32 = 接続検証**：#29 の正本 memory に #31 の期限付き生活記憶と Body Clock の時間理解を接続する。
+- **#30 = 手術時の安全手順**：Production 切替直前まで保留。
+
+### 今回つないだ生活記憶
+`[life:v1]` は別DBを作らず、#29 の canonical `misaki_user_conversation_state.memory` の中に構造化文字列として保持する。普通の長期記憶はモデルが更新してよいが、`[life:v1]` の日時・期限はコード側が管理し、モデルに勝手に書き換えさせない。
+
+流れ：
+`canonical memoryを読む → 普通の記憶 / [life:v1] を分離 → 期限判定 → 今回の本人発言から明示的生活事実を追加 → 通常会話の理解へ使う → 再結合してcanonical memoryへ保存`
+
+具体例：
+- 9/25「今日は仕事」→ 9/25中は現在の生活文脈として利用可。
+- 9/26になったら「今日は仕事」を現在事実として扱わない。
+- 「友達は今日は仕事」「明日は休みかな？」は本人の確定予定として保存しない。
+- Body Clockも古い「明日」「今日」を現在の予定へ変換しない。fresh/recent な本人発言を現在状況の根拠にする。
+
+### 安全境界
+- main / Production は未変更。
+- #29 / #31 自体は未変更。
+- migration / Edge deploy / cron / Production 切替は未実施。
+- #32 は Draft のまま。Vercel Preview は success。専用CI Run #2 で `npm test` **95/95 PASS（fail 0）**、続く `npm run build` も PASS。
+
+> 未来のソラへ：生活記憶のために新しい正本DBやブラウザ同期を増やすな。#29 の canonical memory を正本にし、時間依存の意味は `[life:v1]` とコード側の期限判定で扱え。
+
+
+### Body Clock × `[life:v1]` 接続チェックポイント
+- Body Clock は canonical memory 内の `[life:v1]` を構造化生活記憶として解読する。
+- 現在の生活根拠にできるのは、期限内・本人由来・confidence 0.55以上の構造化生活記憶、または fresh/recent の本人発言。
+- 期限切れ、壊れた `[life:v1]`、普通の長期記憶は「今の勤務・予定」の根拠にしない。
+- raw JSON を通常の記憶テキストとしてプロンプトへ漏らさない。
+- CI Run #8: `npm test` **99/99 PASS（fail 0）**、`npm run build` PASS。
+- #32 は Draft 維持。main / Production / migration / Edge deploy は未変更。
+
+
+## 2026-09-26 — canonical × relationship v2 green checkpoint
+
+- Integration branch: `sora/canonical-relationship-integration` / PR #32 (Draft)
+- Relationship v2 core is wired into the canonical chat route while keeping main/Production untouched.
+- Fixed accidental literal `\\n` source corruption in `lib/relationship-time.ts`; relationship-time loading remains read-only.
+- Normal chat relationship integration now passes the canonical regression suite.
+- GitHub Actions `Canonical relationship integration tests` Run #62: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- No merge, Production deploy, migration apply, or Edge Function deploy has been performed.
+- This checkpoint proves current branch compile/test compatibility; anonymous multi-turn relationship continuity, content-based point delta, required RPC/migration reconciliation, and relative-day life-fact semantics still require dedicated integration work before production review.
+
+
+### 2026-09-26 — relationship v2 normal-chat activation
+
+- Canonical chat now actively requests and sanitizes `relationshipSignals`.
+- The first semantic assessment is kept as the meaning source; a second generation is used only when relationship signals require expression adjustment.
+- `previewRelationshipTurn` reduces the current signals with the loaded relationship time/pattern context, then `createCurrentTurnActionGuide` maps the resulting action/emotion/story to wording temperature.
+- Permanent accounts persist the reduced emotion/action through `persistRelationshipEmotionFromSignals`; anonymous accounts still do not write permanent relationship rows.
+- GitHub Actions Run #68: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- This does not yet solve anonymous multi-turn relationship semantic continuity; that must live in the temporary root (or be safely derived) rather than permanent relationship-event storage.
+
+
+### 2026-09-26 — anonymous relationship continuity checkpoint
+
+- Anonymous chat now carries the current relationship emotion/action context inside the encrypted temporary canonical root instead of writing permanent relationship rows.
+- Temporary relationship state includes emotion primary/intensity, action state, last interaction time, and sanitized signal summary.
+- On the next anonymous turn, that temporary state is reconstructed as relationship time/emotion context so hurt, caution, warmth, and repair do not reset merely because the next message starts.
+- Time remains evidence only; it may soften an existing emotion through the reducer but does not invent a new relationship event.
+- Permanent relationship persistence remains isolated from anonymous users.
+- GitHub Actions Run #74: **SUCCESS**
+  - `npm test`: **99/99 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Still pending: dedicated multi-turn anonymous relationship regression tests, anonymous story/pattern trajectory beyond current emotion/action, content-based relationship point delta, RPC/migration reconciliation, and relative-day life-fact semantics.
+
+
+### 2026-09-26 — anonymous relationship regression guard
+
+- Added a dedicated anonymous multi-turn regression test: the first temporary turn seals relationship emotion/action state and the next turn consumes a temporary root that still contains relationship context.
+- The same test explicitly guards the persistence boundary: anonymous chat must not call `apply_relationship_emotion_action_v2` or `record_relationship_chat_turn`.
+- GitHub Actions Run #78: **SUCCESS**
+  - `npm test`: **103/103 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The suite count increased by more than the single new subtest because the repository test runner executes the canonical test module through multiple integration suites; the authoritative result is 103 total / 103 pass.
+
+
+### 2026-09-26 — semantic relationship points green checkpoint
+
+- Relationship points are no longer conceptually tied to message count on the integration branch.
+- `deriveRelationshipPointDelta()` converts grounded relationship signals into a bounded per-turn consequence:
+  - ordinary chat with no relationship meaning: 0
+  - grounded warmth/care/trust/openness/shared history/romantic meaning: +1 to +2
+  - hurt/rejection/boundary harm: -1 to -2
+  - repair: +1 to +2 when grounded, without making apology a farming mechanic
+- The canonical successful-turn SQL migration replaces fixed `+1` with the semantic delta inside the same atomic commit and clamps it server-side to `[-2, 2]`; points never fall below zero.
+- Existing anonymous/email-save/Body Clock continuity tests were updated only where they encoded the obsolete assumption that every neutral chat adds one point. Their history/identity/continuity assertions remain.
+- GitHub Actions Run #96: **SUCCESS**
+  - tests: **107/107 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- The SQL change exists only as a migration file on PR #32's integration branch. It has **not** been applied to Production.
+
+
+### 2026-09-26 — anonymous multi-turn relationship trajectory green checkpoint
+
+- Anonymous sessions now keep a compact relationship-event trajectory inside the existing encrypted temporary root (maximum 40 events).
+- It stores signal summaries and timestamps, not verbatim grievance text, and never writes anonymous relationship events into the permanent relationship tables.
+- Anonymous chat now derives `RelationshipStoryState` and relationship patterns from that temporary trajectory using the same pure reducers as permanent chat.
+- This closes the previous gap where anonymous chat could carry current emotion/action but lost the multi-turn meaning of hurt → repair attempt → demonstrated care.
+- Dedicated regressions prove:
+  - unresolved hurt stays unresolved;
+  - repair language alone does not falsely complete reconciliation;
+  - repair followed by demonstrated care can become repaired history;
+  - repeated harm remains visible as a pattern.
+- GitHub Actions Run #104: **SUCCESS**
+  - tests: **111/111 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- PR #32 remains Draft. Main, Production, Production DB migrations, and Edge deployment remain untouched.
+
+
+### 2026-09-26 — permanent relationship v2 persistence connected
+
+- Added the missing permanent-account persistence RPC `apply_relationship_emotion_action_v2`.
+- The application-side semantic reducers remain responsible for interpreting the conversation; the RPC validates and atomically persists the resulting emotion/action state.
+- Every successful permanent v2 application writes `emotion_action_v2_after_chat` with the compact `signal_summary` consumed by `relationship-patterns.ts`, closing the permanent history/story loop.
+- Anonymous callers are rejected. Optimistic concurrency via `p_expected_state_updated_at` prevents stale relationship state from silently overwriting a newer turn.
+- Dedicated migration-contract regressions verify the event type/signal summary, anonymous/stale-state guards, and emotion/action bounds.
+- GitHub Actions Run #110: **SUCCESS**
+  - tests: **114/114 PASS, 0 fail**
+  - Next.js production build: **PASS** (compiled successfully; static pages 14/14)
+- Migration exists only in PR #32. It has not been applied to Production.
+
+
+### 2026-09-26 — healthy boundaries are not relationship damage
+
+- `boundary` is no longer counted as negative relationship-point evidence by itself.
+- A user saying that something is uncomfortable or setting a healthy limit must not mechanically damage the relationship.
+- Actual negative movement remains grounded in explicit `hurtful` / `rejection` meaning.
+- Added a regression fixing `boundary` alone at a semantic point delta of 0.
+- GitHub Actions Run #118: **SUCCESS**
+  - tests: **115/115 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — anonymous → permanent relationship story bridge
+
+- Email checkpoint now receives the server-verified `temporaryRelationship` from the encrypted temporary root.
+- Checkpoint persistence carries current emotion/action and compact semantic trajectory events; it does not copy verbatim grievance text.
+- Permanent relationship history reads both native `emotion_action_v2_after_chat` events and migrated `temporary_relationship_checkpoint` events.
+- Checkpoint retries replace the imported temporary trajectory instead of blindly duplicating it.
+- This preserves states such as unresolved hurt / repair in progress across anonymous → email/permanent conversion.
+- Production migration remains unapplied.
+- GitHub Actions Run #132: **SUCCESS**
+  - tests: **116/116 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — permanent relationship v2 write ownership
+
+- Canonical chat uses a service-role Supabase client, so relationship v2 persistence now passes the already-authenticated permanent user id explicitly to the RPC.
+- The RPC is service-role-only and re-checks `auth.users.is_anonymous`; anonymous accounts cannot enter the permanent relationship state path.
+- Relationship v2 owns the post-chat emotion/action result. Legacy keyword emotion and derived-action triggers are retired to prevent them from overwriting the reducer result after canonical history is committed.
+- Lazy-silence/proactive behavior is intentionally not removed by the trigger-retirement migration.
+- Production migrations remain unapplied.
+- GitHub Actions Run #144: **SUCCESS**
+  - tests: **118/118 PASS, 0 fail**
+  - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — email checkpoint retry preserves relationship trajectory
+
+- The relationship-aware email checkpoint migration explicitly retires the old six-argument `save_misaki_temporary_state` signature.
+- `write_misaki_temporary_root` now forwards `temporaryRelationship` when an existing email-save checkpoint is refreshed after additional anonymous conversation.
+- Retry imports replace prior `temporary_relationship_checkpoint` events before rebuilding them, avoiding duplicate trajectory accumulation.
+- Existing retry semantics remain covered: email send failure → additional anonymous chat → retry checkpoints the latest verified server state even when the browser presents the old token.
+- Production migration remains unapplied.
+- GitHub Actions Run #152: **SUCCESS**
+  - tests: **119/119 PASS, 0 fail**
+  - retry regression: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+
+
+### 2026-09-27 — semantic relationship points covered by canonical regression
+
+- Canonical permanent-chat test harness no longer models the retired “one successful turn = +1 point” rule.
+- It applies the internal semantic `relationshipPointDelta` (-2..+2), clamps the stored total at zero, and reuses the committed result for the same request id.
+- Dedicated regression proves a harmful/rejection assessment can reduce a 1-point relationship to 0, never below 0, and replay does not apply the delta twice.
+- Public chat responses continue to strip `relationshipPointDelta`; the delta remains internal to canonical commit.
+- Free and Premium canonical tests no longer assume automatic relationship growth merely because a message succeeded.
+- GitHub Actions Run #162: **SUCCESS**
+  - tests: **123/123 PASS, 0 fail**
+  - email-send failure → additional chat → retry: **PASS**
+  - semantic permanent commit/replay/clamp regression: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migration remains unapplied.
+
+
+### 2026-09-27 — silence cannot invent loneliness
+
+- Reviewed legacy silence/action trigger and Body Clock proactive SQL before production cutover.
+- Retiring `trg_relationship_action_from_emotion` does **not** kill silence behavior: both `advance_relationship_silence_state()` and the Body Clock proactive claim path write their relevant `action_state` directly.
+- Removed the legacy proactive rule that could create `lonely` from a neutral state solely because 3+ days elapsed at sufficient intimacy.
+- Time may still settle an already-existing emotion and may change behavior from an already-existing `lonely`/`sulky` state; it must not invent loneliness, romance, repair, conflict, or a new incident.
+- Added a regression contract preventing neutral → lonely creation from silence alone.
+- GitHub Actions Run #168: **SUCCESS**
+  - tests: **125/125 PASS, 0 fail**
+  - Body Clock silence contract: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
+
+
+### 2026-09-27 — null email checkpoint cannot erase relationship state
+
+- Reviewed the anonymous → email-save bridge for retries/legacy roots where `temporaryRelationship` is absent.
+- A missing/non-object relationship payload is now relationship-state **no-op**, not an implicit `neutral / NORMAL / null lastInteraction` reset.
+- Points/checkpoint data can still refresh, while existing emotion, action, last interaction, and imported temporary relationship trajectory remain intact.
+- Dedicated regression locks this behavior.
+- GitHub Actions Run #174: **SUCCESS**
+  - tests: **126/126 PASS, 0 fail**
+  - null relationship checkpoint preservation: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
+
+
+### 2026-09-27 — semantic point SQL fail-safe hardened
+
+- The canonical completion RPC no longer lets a malformed `relationshipPointDelta` abort the whole successful chat commit.
+- Valid deltas remain clamped to **-2..+2**; missing/malformed/out-of-range integer input falls back to **0**.
+- This keeps relationship scoring subordinate to the canonical conversation/memory commit instead of allowing scoring corruption to destroy an otherwise valid turn.
+- Dedicated regression added.
+- GitHub Actions Run #180: **SUCCESS**
+  - tests: **127/127 PASS, 0 fail**
+  - malformed semantic delta fallback/clamp: **PASS**
+  - Next.js production build: **PASS** (static pages 14/14)
+- Production migrations remain unapplied.
+
+
+### 2026-09-27 — production cutover order (reviewed, not executed)
+
+PR #32 remains Draft and Production is untouched. The safe cutover is intentionally staged so schema/RPC support exists before application code can call it, while rollback never removes DB compatibility prematurely.
+
+**Forward order**
+1. Keep the application on the current production build.
+2. Apply the relationship-v2 DB migrations in filename order:
+   - `20260926000000_semantic_relationship_point_delta.sql`
+   - `20260926003000_relationship_emotion_action_v2_rpc.sql`
+   - `20260926004000_preserve_temporary_relationship_on_email_save.sql`
+   - `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql`
+3. Verify RPC signatures/grants and that the two legacy triggers are absent.
+4. Deploy the integration application only after the DB layer is ready.
+5. Smoke-test permanent chat, anonymous multi-turn continuity, anonymous→email save/retry, semantic point movement, replay idempotency, and Body Clock continuity.
+
+**Rollback rule**
+- If the application deployment is unhealthy, roll back the application first to the prior production build.
+- Do **not** immediately roll back the additive/replacement DB support: the old app remains compatible with the canonical five-argument completion RPC and temporary-root writer. Keeping the DB support avoids a second destructive change during incident recovery.
+- Trigger retirement is deliberately last among DB migrations. Re-enabling legacy triggers is not the default rollback because they can overwrite v2 emotion/action and recreate the conflict this cutover removes.
+- Any DB rollback, if ever required after diagnosis, must be a new reviewed forward migration rather than ad-hoc Production SQL.
+
+**Gate before execution**
+- Latest integration CI must be green.
+- PR #32 must remain unmerged until explicit production authorization.
+- No migration or Production deployment is performed by this planning step.
+
+
+### 2026-09-27 — production cutover smoke checklist
+
+Run these checks **after DB migrations and application deployment**, in this order, using disposable/test identities where possible:
+
+1. **Permanent normal chat** — one ordinary turn succeeds; history and memory persist; no automatic +1 occurs without semantic evidence.
+2. **Semantic movement** — verified positive evidence can increase and harmful evidence can decrease within the -2..+2 bound; client response does not expose `relationshipPointDelta`.
+3. **Replay idempotency** — replay the same request ID/message; no duplicate history, usage, event, or point movement.
+4. **Permanent emotion/action v2** — `emotion_action_v2_after_chat` is recorded and the reducer-selected state survives the canonical commit; legacy triggers do not overwrite it.
+5. **Anonymous continuity** — two anonymous turns carry encrypted `temporaryRelationship`; no permanent relationship RPC/write occurs.
+6. **Anonymous → email save** — checkpoint imports points, current emotion/action and compact semantic trajectory.
+7. **Email failure/retry** — chat after a failed email send and retry keeps the newest temporary relationship trajectory; a missing relationship payload does not reset an already-saved state.
+8. **Body Clock** — proactive/silence behavior still runs with retired legacy triggers; elapsed time alone does not create loneliness from neutral.
+9. **Failure-path sanity** — failed chat still follows existing usage refund behavior and does not create a successful relationship turn.
+10. **Observe before widening** — confirm no unexpected canonical conflicts/RPC errors before treating cutover as complete.
+
+If any application-level smoke check fails: stop widening traffic/validation, preserve evidence, and roll back the application first. Do not improvise a Production DB rollback.
+
+
+### 2026-09-27 — standalone silence RPC aligned with relationship philosophy
+
+- Removed the remaining legacy transition in `advance_relationship_silence_state()` that converted `happy/affectionate` into `lonely` solely because 3+ days elapsed.
+- Time alone may settle/evolve an already-existing emotion; it must not invent loneliness, repair, romance, conflict, or another relational fact.
+- Existing `lonely` and `sulky` states may still evolve their intensity/action over silence because those emotions already existed.
+- Dedicated regression prevents reintroducing `v_next_primary := 'lonely'` in the standalone silence RPC.
+- GitHub Actions Run #190: **SUCCESS**
+  - tests: **128/128 PASS, 0 fail**
+  - standalone silence no-invented-loneliness regression: **PASS**
+  - Next.js production build: **PASS**, static pages **14/14**
+- Production remains untouched.
+
+
+### 2026-09-27 — email bridge malformed event timestamp fail-safe
+
+- Anonymous → email relationship import now treats a malformed compact event `created_at` as recoverable metadata damage rather than failing the whole checkpoint.
+- Valid timestamps are preserved; empty/invalid/overflowing timestamps fall back to `now()`.
+- Conversation, memory, points, current emotion/action, and the rest of the relationship trajectory are therefore not lost because one legacy event timestamp is malformed.
+- GitHub Actions Run #196: **SUCCESS**
+  - tests: **129/129 PASS, 0 fail**
+  - malformed compact event timestamp regression: **PASS**
+  - Next.js production build: **PASS**, static pages **14/14**
+- Production remains untouched.
+
+
+### 2026-09-27 — final integration readiness checkpoint before production authorization
+
+PR #32 was re-audited after the persistence and silence hardening work.
+
+- PR remains **Draft**, open, and GitHub reports it **mergeable**.
+- Current scope: 33 changed files / 109 commits on the integration branch.
+- Latest head before this documentation checkpoint: `b2ac57d0dc21046e31f21f7d759f734a0ea322b9`.
+- GitHub Actions Run #198: **SUCCESS**.
+- The diff contains the expected four 2026-09-26 forward migrations plus the two deliberately amended legacy silence/proactive migrations and their regression contracts.
+- No merge, Production deployment, Production migration application, Edge deployment, or cron change was performed during this audit.
+
+At this point, further changes should be driven by a concrete defect or an explicit production-cutover authorization rather than speculative redesign. The six-stage/5-heart product model remains a separate product-design task and is intentionally not mixed into this persistence/relationship-v2 cutover.
+
+
+### 2026-09-27 — reply quality feedback for real-conversation validation
+
+- Added small 👍 / 👎 controls beneath each Misaki reply that has a canonical request id.
+- 👍 is one tap. 👎 may optionally classify the issue as: unnatural, too cold, wrong distance, forgot context, repetitive, or other.
+- Feedback is stored server-side per `user_id + request_id` and may be changed by upsert.
+- Feedback is **quality telemetry only**. It does not alter relationship points, emotion, action, memory, or generation behavior directly.
+- Both permanent and anonymous authenticated users can submit feedback; storage is server/service-role mediated rather than direct client table access.
+- Dedicated regression contracts cover storage isolation, bounded values, and Misaki-only UI placement.
+- Run #208 test job: **SUCCESS**
+  - tests: **132/132 PASS, 0 fail**
+  - all 3 reply-feedback regressions: **PASS**
+  - Next.js production build: **PASS**, static pages **15/15**
+- The new feedback-table migration remains unapplied to Production.
+
+
+### 2026-09-29 — Production差分 × 最新総覧の再照合 / canonical基盤補完
+
+Production、統合branch、Production DB、そして本総覧の4点を再照合した。以後の切替判断はコード差分だけではなく、この4点が同じ完成形を指していることを必須条件とする。
+
+#### 実機で通過した範囲
+- Previewの匿名通常会話が `POST /api/chat 200` まで完走。
+- 匿名multi-turnで「名前：せいちゃん」を次ターンでも保持し、MEMORY表示にも反映。
+- reply feedback の 👍 / 👎 が表示され、`POST /api/feedback/reply 200` を確認。
+- Free利用回数も成功ターンごとに20→19→18→17と進み、失敗ターンを成功扱いしていない。
+- これにより匿名の temporary canonical root → 次ターン復元 → memory → feedback まで実機で接続確認済み。
+
+#### Production DBで発見した歯抜け
+canonical root migrationを丸ごと適用せず後続v2 migrationを先行したため、Production DBに以下の不足が残っていた。
+- `misaki_relationship_state.intimacy_migrated_at`
+- `misaki_user_conversation_state.today_memory`
+- `misaki_email_checkpoint_user_idx`
+- `edit_misaki_conversation_state(...)`
+- `refresh_misaki_background_snapshot()` と trigger
+- canonical版11引数 `finish_misaki_body_clock_delivery(...)`
+
+これらはProduction現状と最新統合コードを突き合わせ、不足分だけをforward migrationとして補完した。元のcanonical migration全体は適用していない。理由は、旧fixed +1 relationship処理や一度きりbackfillなど、現在のrelationship v2で既に置換された処理を復活させないため。
+
+#### 匿名RPCの権限補修
+temporary root / email checkpoint の SECURITY INVOKER RPC が `auth.users` を直接参照し、service-role経由でも `42501 permission denied` になることをPreview診断ログで確認した。
+`auth.users` 自体への広いGRANTは行わず、`misaki_operations.assert_anonymous_user(uuid)` という限定SECURITY DEFINER helperへ匿名確認だけを隔離。helperはservice_roleのみ実行可とし、schema USAGEもservice_roleのみに付与した。
+`write_misaki_temporary_root`、`complete_misaki_temporary_turn`、`save_misaki_temporary_state` はこのhelperを使用する。
+
+#### Production DBへ既に反映したrelationship v2 /安全設備
+semantic relationship point delta、relationship emotion/action v2 RPC、anonymous→email relationship bridge、legacy emotion/action trigger retirement、silence/proactiveの「時間だけで寂しさを捏造しない」修正、reply feedback、maintenance gateはProduction DBへ適用済み。
+ただし **Productionアプリはまだ統合branchへ切替えていない**。PR #32はDraftのままとし、アプリProduction merge/deployは別の明示承認境界として扱う。
+
+#### 総覧の古い記述の読み替え
+本総覧前半には基礎工事当時の「1成功ターン=+1を維持」「legacy emotion/action triggerを残す」「Production migration未適用」等の歴史記録が残る。これらは当時の工程記録であり、現在仕様ではない。
+現在仕様は後段のrelationship v2記録を優先し、
+- relationship pointは会話内容から導くsemantic delta（-2..+2、通常会話0もあり）
+- legacy keyword emotion/action triggerは退役
+- relationship v2関連DB migrationはProduction DBへ適用済み
+とする。履歴として旧記述は削除せず、未来の実装者が工程と理由を追えるよう残す。
+
+#### まだ完了扱いにしない項目
+- 匿名→メール保存は、DB不足補完後の実機再試験が必要。
+- メール送信成功後、会話・memory・relationship emotion/action・trajectoryが恒久アカウントへ引き継がれることを確認する。
+- 恒久通常会話、replay idempotency、Body Clock、failure/refundを実機/ランタイムで確認する。
+- Previewで見えたProduction UIとの差はcanonical動作確認後に再比較し、`app/chat/page.tsx` を丸ごとProduction版へ戻さない。
+- `GET /api/persona/history 400` と匿名時の `permanent account required` は会話を止めない診断ノイズとして残っており、切替前に整理対象。
+- Security Advisorには既存のSECURITY DEFINER / anonymous-access警告が残る。今回のcanonical service-only RPCをauthenticatedへ開放してはいないが、既存警告を「clean」とは扱わない。
+
+> 未来のソラへ：Productionでエラーが一つ出たから一列だけ足す、という進め方へ戻るな。必ず **Production現状 ↔ 最新総覧 ↔ 統合branch ↔ Production DB** を突き合わせ、旧migration全体を盲目的に流さず、現在の最終仕様との差分だけをforward migrationで補完する。
+
+
+#### 2026-09-29 — Safariメール保存の通信例外表示
+iPhone Safari実機で「メールで保存する」押下時に、生の `Load failed` がアカウント画面へ表示される事例を確認した。同時刻のVercel runtimeには対応する保存API到達がなく、直前の通常チャットは200で完走していたため、この事例はDB/RPCエラーと決めつけず、ブラウザ側fetch/Auth通信例外として扱う。
+
+Production mainと統合branchの `app/account/page.tsx` を突き合わせ、メール保存の基本順序（checkpoint成功後だけAuthメール更新）は維持した。canonical化で追加したtemporary root / pending turn checkpointも戻さない。
+
+Safari/WebKit系の `Load failed`、`Failed to fetch`、`NetworkError` は内部例外文字列をそのままユーザーへ見せず、「通信に失敗しました。接続を確認して、もう一度お試しください。」へ正規化する。これは表示改善であり、自動再送はしない。checkpointやメール送信の成功を推測して成功表示もしない。
+
+次の実機再試験では、同じ保存操作で (1) checkpoint API到達、(2) Supabase Auth updateUser到達/結果、(3) 確認メール、(4) 確認後の恒久化を順に確認する。ネットワーク例外が再発した場合は、生メッセージではなく段階を特定できる診断を追加する。
+
+
+### 2026-09-30 — メール恒久化後の通常チャット 500 / relationship server境界修正
+
+iPhone実機で、匿名 → メール保存 → 確認メール → Previewへ復帰 → 恒久ログイン → 匿名時会話復元までは成功した。その直後の恒久通常会話「せいちゃんって呼んでね」で `POST /api/chat 500` を確認した。
+
+Vercel runtimeではGemini生成自体は成功し、その後 `apply_relationship_emotion_action_v2` と `record_relationship_chat_turn` が `42501 permission denied`、最終的に canonical turn commit failure となっていた。
+
+Production DBを確認すると、relationship v2の更新RPCは service_role にEXECUTEを限定しており、authenticatedへ広げるべきではない。したがって authenticatedへGRANTする回避策は採用しない。
+
+原因は、恒久通常会話routeがrelationship time/history/emotion/actionの処理へユーザーJWTのSupabase clientを渡していたこと。canonical commit自体は既にservice-role clientを使う一方、relationship補助処理だけ認証境界がずれていた。
+
+修正:
+- 恒久relationship処理は `createServerSupabase()` のserver-only clientへ統一。
+- `get_relationship_time_context(uuid)` と `record_relationship_chat_turn(..., uuid)` をservice-role専用RPCとしてforward追加し、serverから対象user idを明示する。
+- authenticated/anonにはEXECUTEを付与しない。
+- RPC内部でも、JWTが存在する場合のuser mismatchを拒否し、対象が恒久Auth userであることを確認する。
+- anonymous経路は従来どおりtemporary canonical rootを使い、このserver permanent経路へ混ぜない。
+
+検証:
+- GitHub Actions Run #238: SUCCESS。
+- Production DBで新RPCは service_role EXECUTE=true / authenticated EXECUTE=false を確認。
+- Security Advisorは再実行済み。既存のservice-only RLS-no-policyおよび既存SECURITY DEFINER警告は残るため「clean」とは扱わない。
+- PR #32はDraft、main / Productionアプリは未変更。
+- Vercelはコミット `269426c4...` のPreviewまではREADYだが、修正本体 `0c658683...` のPreview Deploymentがまだ生成されていない。CI成功とVercel Preview生成は別問題として追う。
+
+次の確認は、最新headを含むPreviewが生成された後、恒久通常会話 → relationship persist → canonical commit → usage確定まで200で完走すること。失敗ターンがFree利用回数を消費しないことも同時に再確認する。
+
+
+### 2026-10-01 — Chrome再ログイン復元 / 恒久通常会話 実機通過
+
+iPhone Chrome + Previewで恒久アカウントの一周テストを実施し、以下を実機確認した。
+
+- Chromeでログイン直後に何度もページreloadしていた原因は `ConversationHistorySync` のcanonical差分検出後の `window.location.reload()`。hard reloadを廃止し、取得したcanonical historyをイベントでその場反映するよう修正。実機では1回の読み込みで履歴復元まで到達。
+- 恒久ログイン状態で「せいちゃんって呼んでね」を送信し、`POST /api/chat 200` / chat total successを確認。Free残数は20→19。
+- Misaki返答「わかった、せいちゃんね。いい名前。これからそう呼ぶね！」まで表示。
+- MEMORYへ「ユーザーの愛称はせいちゃん」が保存された。
+- その後ログアウトすると端末表示/cacheはクリアされ、未ログイン・一時利用へ戻った。
+- 同じ保存済みメールへ6桁ログインコードで再ログインし、会話履歴、MEMORY「ユーザーの愛称はせいちゃん」、Free残数19がサーバー正本から復元した。
+- 日付区切りも9/30と10/1に分かれて復元された。
+
+これにより、**匿名→メール保存→恒久化→恒久通常会話→memory保存→logout端末clear→再login→history/memory/usage復元**までPreview実機で一周通過した。
+
+#### canonical history同期の整理
+reload loop修正後も5秒pollingが残っていたため、恒久historyの定期5秒pollを廃止。初回mount、focus、visibility復帰、Auth state changeで同期する。通常chatはcommit後にlocal表示され、Body Clock等のbackground追加はユーザーが画面へ戻った時にcanonicalから拾う。サーバー正本という境界は変更しない。
+
+#### 残件
+- relationship-time周辺には旧/新RPC signatureの診断ノイズが残る可能性があるため、実際のcaller/signatureを確認して整理する。authenticatedへservice-only RPC権限を広げない。
+- replay idempotency、Body Clock、failure/refundは引き続きsmoke対象。
+- PR #32はDraftのまま。Productionアプリmerge/deployは未承認・未実施。
+
+
+## 2026-10-01 — Preview実機: canonical恒久化・再ログイン復元 green checkpoint
+
+### 現在地
+- Integration branch: `sora/canonical-relationship-integration`
+- Draft PR #32 head: `a0c87b37c29ecfd1bcbff4e1a2cb26f3587e43e8`
+- **Productionアプリは未変更。PR #32はDraft維持。merge/deploy禁止。**
+- Production DBには統合Previewを成立させるsupport migrationを適用済み。アプリ切替承認とは別物として扱う。
+
+### 今回実機で通った一本の流れ
+Chrome/iPhone実機で以下を確認した。
+
+1. 匿名会話「はじめまして」を保持。
+2. メール保存→確認→恒久アカウント化。
+3. Preview originへ正しく戻り、保存済み会話を復元。
+4. 恒久ログイン状態で「せいちゃんって呼んでね」を送信。
+5. 美咲が「わかった、せいちゃんね。いい名前。これからそう呼ぶね！」と正常応答。
+6. Free残数が20→19へ一度だけ減少。
+7. MEMORYに「ユーザーの愛称はせいちゃん」を保存。
+8. 明示ログアウトで端末側の会話・記憶・キャッシュが消え、一時利用状態へ戻る。
+9. 同じメールへ6桁ログインコードを送り再ログイン。
+10. サーバー正本から会話履歴、MEMORY「ユーザーの愛称はせいちゃん」、Free残数19を復元。
+11. 日付区切りも9/30→10/1として復元。
+
+これにより少なくとも今回の実機経路では、
+`匿名 → メール保存 → 恒久化 → 恒久通常会話 → memory更新 → logout端末clear → 再login → history/memory/usage復元`
+が一周成立した。
+
+### 恒久チャット500の原因と修正
+最初の恒久チャットでは生成自体は成功したがDB commitで500になった。段階的に原因を分離した。
+
+- `apply_relationship_emotion_action_v2` / `record_relationship_chat_turn` は authenticated にGRANTせず、サーバーservice-role clientから呼ぶよう修正。relationship更新をクライアント権限へ開放しない。
+- 続いて `complete_misaki_chat_turn` 内部の `auth.users` 直接参照が `permission denied for table users` で失敗していることをProduction DBログで確定。
+- `auth.users` 自体へのGRANTはしない。恒久ユーザー確認だけを行う限定 `misaki_operations.assert_permanent_user(uuid)` SECURITY DEFINER helperを追加し、service_role専用EXECUTEとした。
+- `complete_misaki_chat_turn` もservice_role専用境界を維持。
+- 修正後の実機POST `/api/chat` は200、relationship emotion persist / turn record / canonical commitまで完走。
+
+**壊してはいけない:** DBエラーを直すために authenticated / anon へrelationship更新RPCやauth.users権限を広げない。privileged更新はサーバーservice_role境界の内側に置く。
+
+### Chrome履歴復元リロードループ
+ログイン直後、Chromeで履歴復元まで何度もページ全体がreloadされる問題を実機/Vercelログで確認。
+
+原因:
+`app/chat/conversation-history-sync.tsx` がcanonical historyと表示cacheの差分を検出するたびに `window.location.reload()` していた。reloadでcomponentが再mount→再同期→再reloadとなり得た。
+
+修正:
+- hard reloadを廃止。
+- canonical history取得後は `misaki-history-state` eventで同一ページのchat stateへ反映。
+- `app/chat/page.tsx` がeventを受け、表示messagesを更新。
+- 5秒poll自体はBody Clock等の外部追加履歴を拾う用途で現時点では残す。
+
+iPhone Chrome実機で、修正前の複数reloadから**1回の読み込みで履歴復元**へ改善確認済み。
+
+### 次にやること
+1. CI / 最新Previewのgreen状態を再確認。
+2. Runtimeログに残る旧signature側 `get_relationship_time_context` のpermission診断ノイズを、現行呼出し・migration・RPC signatureと照合して除去する。**権限を広げるだけの修正は禁止。**
+3. 5秒history pollingの重複GET/POSTを調査し、Body Clock等の外部履歴反映を壊さず無駄打ちを減らす。
+4. smoke checklist残り: replay idempotency、anonymous multi-turn relationship continuity、メール保存失敗/retry、Body Clock no-invented-loneliness、failure/refund等を順に実機/ログで確認。
+5. 6段階relationship→5 hearts等の未決仕様は、現在のcanonical統合smokeを壊さないよう別工程で扱う。
+
+> 未来のソラへ：2026-10-01時点で「保存できるはず」ではなく、Chrome/iPhone実機でlogout→再loginまで含めてhistory・memory・usage復元を確認済み。ここを再工事する前に、この実機green checkpointを回帰条件にせよ。
+
+
+### 2026-10-02 — relationship-time duplicate RPC 403 解消 / history同期の現在仕様確定
+
+#### relationship-time診断ノイズの原因確定
+恒久通常チャットは成功していた一方、Supabaseログに `get_relationship_time_context` の200直後、同RPCのauthenticated 403（`permission denied for function get_relationship_time_context`）が残っていた。
+
+原因はRPC signatureやDB migrationの欠落ではなく、同一chat request内の二重呼出しだった。
+- chat route本体はserver service-role clientで `get_relationship_time_context(p_user_id)` を呼び200。
+- 続く `loadPersonaPrompt(...)` がauthenticated clientを受け取り、persona-store内部から同RPCを再度呼んで403。
+- relationship-time loaderはRPC error時にnull fallbackしていたため、会話自体は成功し診断ノイズだけが残った。
+
+修正:
+- persona-store内部からrelationship-time RPC再取得を除去。
+- chat routeが既にservice-role境界で取得した `relationshipTimeContext` を `loadPersonaPrompt` へ明示的に渡して再利用。
+- authenticated / anonへservice-only RPCのEXECUTE権限は追加していない。
+
+検証:
+- 修正head: `50f575b820bea8f85934d202a11677b874c86a9f`。
+- GitHub Actions Run #254: **SUCCESS**。
+- Vercel Preview: **SUCCESS**。
+- 2026-10-02 07:35 JSTのiPhone実機Preview通常会話で、Supabaseログを確認。
+  - `get_relationship_time_context`: service_role / 200 / **1回のみ**。
+  - 以前の2回目 authenticated 403: **発生なし**。
+  - `permission denied for function get_relationship_time_context`: **発生なし**。
+  - `record_relationship_chat_turn`: service_role / 200。
+
+よって、このduplicate relationship-time RPC 403は**コード修正 + CI + Preview build + 実機 + Supabase runtime log**まで含めて解消確認済みとする。
+
+#### canonical history同期 — 矛盾記述の確定
+2026-10-01の途中記録には「5秒pollをBody Clock等のため残す」とあるが、その後の修正で廃止済み。現行 `app/chat/conversation-history-sync.tsx` を正とし、現在仕様は以下。
+- 5秒定期polling: **なし**。
+- 同期契機: initial mount / window focus / visibility復帰 / Auth state change。
+- 通常chat: server commit後のlocal表示を使用。
+- Body Clock等のbackground追加: ユーザーが画面へ戻った際にcanonical historyから取得。
+- canonical差分反映に `window.location.reload()` は使わず、eventで同一ページへ反映する。
+
+前段の「5秒pollを残す」は当時の途中状態を示す履歴として残すが、**現在仕様として参照してはならない**。
+
+#### 現在の境界
+- PR #32は引き続きDraft。
+- Productionアプリmerge/deployは未実施。
+- 今回の確認・修正でDB権限変更は行っていない。
+- 次のsmoke対象は replay idempotency / anonymous multi-turn relationship continuity / メール保存失敗・retry / Body Clock no-invented-loneliness / failure-refund。
+
+
+### 2026-10-02 — canonical統合 smoke green checkpoint（自動回帰中心）
+
+relationship-time duplicate RPC 403の実機runtime解消確認後、PR #32の残smokeを現行コードと回帰テストで再点検した。ここでは**自動回帰で確認した項目を実機確認済みと混同しない**。
+
+#### replay idempotency — 自動回帰 green
+- 同一 `request_id` の再送は保存済みresponseを返す。
+- 再生成なし、Free再消費なし、relationship再加算なし。
+- 同じrequest idを別messageへ使い回す不整合を拒否する。
+- 最新総覧更新後のGitHub Actions Run #256もSUCCESS。
+
+#### anonymous multi-turn relationship continuity — コード + 自動回帰 green
+- 匿名relationshipのpoints / emotion / action / signals / events / last interactionはtemporary canonical rootへ保存し、次turnはserver rootを正として読む。
+- 古いbrowser tokenでも最新shared rootへ追随する設計。
+- Body Clockを挟んだ匿名通常会話の連続性、lost-response recovery、stale revision拒否を回帰テストで確認。
+
+#### メール保存失敗・retry — コード + 自動回帰 green
+PR #29時代のP1「最初の保存内容へ固定される」を再点検。
+- `saveByEmail()` はretryのたびにメール更新より先に最新server canonical stateをcheckpointする。
+- transport email failure → 追加会話 → old tokenでretryしても最新server stateをcheckpointする。
+- confirmation待ち中の追加会話→再保存で最新pairを保持。
+- chat → Body Clock → chat → Body Clock → email saveを一つの連続contextとして保持。
+- checkpoint後のchat / Body Clockもshared root側に残る。
+
+#### Body Clock no-invented-loneliness — コード + 自動回帰 green
+- 沈黙だけを根拠にneutral/warm等から `lonely` を新規生成しない。
+- silenceは既存emotionをsettle/evolveできるだけで、新しいloneliness / romance / conflict等の関係事実を作らない。
+- 既に `lonely` / `sulky` の根拠がある場合は時間経過でWAIT/PULLへ変化可能。
+- 古い生活予定やtimeless memoryを現在進行形の事実としてBody Clockが断定しない回帰も維持。
+
+#### failure / refund — コード + 自動回帰 green
+- Free生成失敗: consume 1 → refund 1、relationship point変化なし。
+- canonical commit失敗: consume 1 → refund 1、relationship point変化なし。
+- canonical read失敗: usage consume前に停止。
+- 成功commit後はrefund対象を解除し、成功済みturnをrefundしない。
+- request内のrefund guardは一度refund後にcharged requestをclearし、二重refundを防ぐ。
+
+#### このcheckpointの意味
+以上は、既存実装の再読 + 回帰テスト + 最新CI greenを根拠とする。relationship-time 403については別節のとおりiPhone実機 + Supabase runtime logまで確認済みだが、**この節の各smokeをすべて今回あらためて実機操作したわけではない**。
+
+したがってPR #32全体をProduction切替安全と断定しない。Production app merge/deployは未承認・未実施、PR #32はDraftを維持する。
+
+#### 次の残件
+- repo-wide `loadPersonaPrompt(...)` caller audit: relationship-time contextをpersona-store内部取得からcaller注入へ変えたため、chat以外（特にBody Clock/proactive等）がrelationship continuityを失っていないか確認する。
+- 必要ならcaller別にservice-roleで取得済みcontextを渡す。authenticated経由のservice-only RPCは再導入しない。
+- 上記caller auditと必要な回帰追加後に、PR #32のProduction切替可否を別途判断する。
+
+
+### 2026-10-02 — loadPersonaPrompt caller audit / Body Clock silence-expression hardening
+
+- repo-wide caller auditを実施。通常chatは `lib/persona/persona-store.ts` の `loadPersonaPrompt(..., relationshipTimeContext)` を使い、すでにservice-roleで取得したrelationship-time contextを再利用する。
+- Body Clockは同じloaderを共有せず、Edge Function専用の `supabase/functions/body-clock/persona-store.ts` を使用しているため、通常chat側の第4引数追加によるrelationship context欠落は発生しない。
+- Body Clockの関係状態は `buildProactiveDecisionContext()` が `misaki_relationship_state` から emotion / action / intimacy / last interaction を取得し、自発生成のdecision guideへ渡す。authenticated向けrelationship RPC権限の再追加は不要。
+- audit中、`deriveProactiveTags()` に「seven_plus_daysだけで `miss_you` を追加する」経路を発見。DB emotionをlonelyへ変更する処理ではないが、「時間だけで新しい関係感情を作らない」という契約に合わせ、この時間単独の付与を削除した。
+- `miss_you` は既存のgroundedな `lonely` emotionや `CHASE` actionなど、関係状態に根拠がある経路では引き続き使用可能。
+- regression contractを追加し、seven-plus-days time bandだけでは `miss_you` を追加しないこと、およびlonely/CHASEのgrounded経路を残すことを固定。
+- 最初のテスト実装はDeno Edge moduleをNode/Nextテストから直接importしたため Actions #261/#262 の `npm test` 自体は全passした一方、`next build` が `npm:@supabase/supabase-js` の型解決で失敗した。ロジック障害ではなくテスト境界の問題。
+- Deno moduleの直接importを除去し、既存silence-contractと同じsource-contract検査へ変更。
+- final head: `66d5c13d07c27f11bf35efb2afb06de261316108`
+- GitHub Actions #265 / #266: SUCCESS（tests + Next build）。
+- verification level: code audit + automated regression + CI/build green。今回の `miss_you` 境界は実機Body Clock送信を強制して再現確認したものではない。
+- PR #32は引き続きDraft。Production app merge/deployなし、DB mutationなし。
+
+
+### 2026-10-02 — Production DB / Body Clock実物監査・切替/rollback手順確定
+
+#### 実物監査
+PR #32最終棚卸しとして、GitHub上の統合branchだけでなくProduction Supabaseのmigration履歴、RPC権限、稼働中Body Clock Edge Functionを読み取り監査した。
+
+- Production DBにはcanonical補完、relationship v2、reply feedback、maintenance、恒久auth guard等、統合Previewを支えるsupport migrationsがすでに適用済み。したがってPR #32作成時の「migrationsはProduction未適用」という記述は現在事実ではない。
+- relationship更新・relationship-time p_user_id overload・canonical privileged RPC等の重要境界はservice_role専用を維持し、authenticated / anonへEXECUTEを広げていない。
+- Production Body Clockはversion 10が稼働中。
+- v10と統合branchのBody Clockをファイル単位で比較したところ、persona-store.ts / fallback-persona.ts / proactive-photo.ts / deno.jsonは一致。
+- 差分は index.ts / proactive-decision.ts / proactive-life-context.ts と、統合branchで追加された conversation-root.ts / temporary-state.ts。
+
+#### Production Body Clock v10にまだ入っていない統合branch側の重要差分
+1. 匿名canonical continuity:
+   - Body Clockもanonymous temporary rootをserver source of truthとして読み、送信したMisaki messageをshared temporary rootへ戻す。
+   - stale revision / lost-response等のcanonical契約と同じ境界を使う。
+2. life-context freshness:
+   - 古い通常memoryを現在の勤務・休み・予定等の証拠にしない。
+   - fresh/recentな本人発言、または期限内の構造化life memoryだけを現在事実の根拠として扱う。
+3. grounded relationship expression:
+   - anonymousではverified temporary relationship pointsをdecision contextへ使う。
+   - seven_plus_daysという時間経過だけでmiss_youを自動付与しない。miss_youは既存lonely emotion / CHASE action等のgrounded pathに限定する。
+
+Production DB側には統合branch版Body Clockが必要とするcanonical対応 finish_misaki_body_clock_delivery signatureが存在し、service_role-only境界も確認済み。現時点で「DB不足のため最新版Edgeを入れられない」という阻害は確認されていない。
+
+#### Production切替単位
+**PR #32 Webだけを単独でProductionへ切り替えない。Body Clock Edgeも同じ切替工程として扱う。**
+
+安全側の順序:
+1. 切替直前にPR #32 headを固定し、tests + Next build greenを再確認。
+2. Production DBはsupport migrations適用済みのため、切替作業で即席の追加変更やrollbackをしない。
+3. Body Clock Edgeを固定headの統合branch版へ更新。
+4. Edge health / runtimeを確認。異常ならWebを切り替えずBody Clockをversion 10へrollback。
+5. Edge正常確認後にWeb appをProductionへ切替。
+6. Production実機で通常chat → usage → relationship → canonical commit → reload/reloginを確認。
+7. anonymous multi-turn → Body Clock → normal chat、およびpermanent Body Clock → history反映を確認。
+8. 異常時はまずWeb appを旧Productionへrollback。必要ならBody Clockもversion 10へrollback。DB migrationsはその場で即席rollbackしない。
+
+#### 現在の判定
+- 最新headまでCI/build green。
+- 既知P1は解消済み。
+- Production DB supportは実物確認済み。
+- ただしProduction Body Clock v10は統合branch最新版と未同期。
+- よって、**まだProduction切替実施済み/Production-safeとは宣言しない**。
+- PR #32はDraftを維持し、Production app / DB / Edgeへの変更は明示承認まで行わない。
+
+> 未来のソラへ：Production DBとProduction app/Edgeの状態を混同するな。DB supportは先行適用済みだが、Body Clock v10は統合branchより古い。Webだけmergeして完了扱いにせず、Edge同期とrollback経路を同じ切替計画に含めること。

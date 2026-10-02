@@ -42,17 +42,22 @@ export default function ConversationHistorySync() {
         // committed by the server. A display cache is never uploaded as root state.
         if (before.length > state.history.length && sameHistory(before.slice(0, state.history.length), state.history)) return;
         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(state.history));
-        window.location.reload();
+        // Canonical history refresh must never hard-reload the chat page.
+        // A reload remounts this sync component and can create a reload/fetch loop
+        // while auth and the display cache are converging (especially on Chrome).
+        window.dispatchEvent(new CustomEvent("misaki-history-state", { detail: state.history }));
       } catch (error) { console.error("CONVERSATION HISTORY SYNC ERROR", error); }
       finally { syncing = false; }
     };
     void sync();
-    const timer = window.setInterval(() => void sync(), 5_000);
+    // Canonical history is refreshed on mount, foreground/focus and auth changes.
+    // Do not poll every 5 seconds: normal chat updates locally after commit, while
+    // Body Clock/background additions are picked up when the user returns.
     const visible = () => { if (document.visibilityState === "visible") void sync(); };
     window.addEventListener("focus", sync);
     document.addEventListener("visibilitychange", visible);
     const { data: listener } = supabase.auth.onAuthStateChange(() => window.setTimeout(() => void sync(), 100));
-    return () => { stopped = true; window.clearInterval(timer); window.removeEventListener("focus", sync);
+    return () => { stopped = true; window.removeEventListener("focus", sync);
       document.removeEventListener("visibilitychange", visible); listener.subscription.unsubscribe(); };
   }, []);
   return null;

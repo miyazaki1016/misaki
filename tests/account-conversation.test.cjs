@@ -121,7 +121,7 @@ for (const failedEmail of [true, false]) test(`${failedEmail ? 'failed email sen
   await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();
   assert.equal(emails, 2); server.user.is_anonymous = false;
   const state = await server.load('lib/canonical-state.ts').loadCanonicalState(server.user.id);
-  assert.equal(state.relationshipPoints, 2);
+  assert.equal(state.relationshipPoints, 0);
   assert.ok(state.history.some(item => item.text === '保存再試行前の追加会話'));
 });
 test('failed checkpoint never sends confirmation email', async () => {

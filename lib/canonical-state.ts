@@ -8,6 +8,18 @@ export type RootState = {
   relationshipPoints: number;
   updatedAt?: string | null;
   temporaryRevision?: string | null;
+  temporaryRelationship?: {
+    emotionPrimary: string;
+    emotionIntensity: number;
+    actionState: string;
+    lastInteractionAt: string | null;
+    signals: Array<{ name: string; strength: number; confidence: number }>;
+    events?: Array<{
+      event_type: "emotion_action_v2_after_chat";
+      created_at: string;
+      metadata: { signal_summary: Array<{ name: string; strength: number; confidence: number }> };
+    }>;
+  } | null;
 };
 
 export function createServerSupabase() {
@@ -138,7 +150,17 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
     p_parent_hash: digest(typeof parent === "string" ? parent : ""), p_token: token,
     p_expected_revision: revision, p_state: verified.state,
   });
-  if (error || typeof data !== "string") throw new Error("Temporary receipt commit failed");
+  if (error || typeof data !== "string") {
+    if (error) {
+      console.error("TEMPORARY RECEIPT COMMIT ERROR", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+    }
+    throw new Error("Temporary receipt commit failed");
+  }
   return temporaryResponse(data, message);
 }
 
