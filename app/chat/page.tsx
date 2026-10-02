@@ -308,6 +308,14 @@ export default function ChatPage() {
     );
 
   const [
+    waitingOnReply,
+    setWaitingOnReply,
+  ] =
+    useState(
+      false
+    );
+
+  const [
     sendError,
     setSendError,
   ] =
@@ -1172,6 +1180,9 @@ export default function ChatPage() {
       ""
     );
 
+    setWaitingOnReply(false);
+    const waitingTimer = window.setTimeout(() => setWaitingOnReply(true), 1_800);
+
     let receivedResponse = false;
     let activeRequestId: string | null = null;
     try {
@@ -1396,6 +1407,8 @@ export default function ChatPage() {
     } finally {
       if (receivedResponse && JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null")?.requestId === activeRequestId) sessionStorage.removeItem("misaki-pending-chat-turn");
       if (sessionStorage.getItem("misaki-chat-sending") === activeRequestId) sessionStorage.removeItem("misaki-chat-sending");
+      window.clearTimeout(waitingTimer);
+      setWaitingOnReply(false);
       setLoading(
         false
       );
@@ -1971,12 +1984,12 @@ export default function ChatPage() {
         )}
 
         {loading && (
-          <div
-            className="bubble typingBubble"
-          >
-            <span />
-            <span />
-            <span />
+          <div className="bubble typingBubble">
+            {waitingOnReply ? (
+              <span className="waitingReplyText">美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね</span>
+            ) : (
+              <><span /><span /><span /></>
+            )}
           </div>
         )}
 
