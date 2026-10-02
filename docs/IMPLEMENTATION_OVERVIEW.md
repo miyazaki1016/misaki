@@ -1494,3 +1494,51 @@ PR #29時代のP1「最初の保存内容へ固定される」を再点検。
 - GitHub Actions #265 / #266: SUCCESS（tests + Next build）。
 - verification level: code audit + automated regression + CI/build green。今回の `miss_you` 境界は実機Body Clock送信を強制して再現確認したものではない。
 - PR #32は引き続きDraft。Production app merge/deployなし、DB mutationなし。
+
+
+### 2026-10-02 — Production DB / Body Clock実物監査・切替/rollback手順確定
+
+#### 実物監査
+PR #32最終棚卸しとして、GitHub上の統合branchだけでなくProduction Supabaseのmigration履歴、RPC権限、稼働中Body Clock Edge Functionを読み取り監査した。
+
+- Production DBにはcanonical補完、relationship v2、reply feedback、maintenance、恒久auth guard等、統合Previewを支えるsupport migrationsがすでに適用済み。したがってPR #32作成時の「migrationsはProduction未適用」という記述は現在事実ではない。
+- relationship更新・relationship-time p_user_id overload・canonical privileged RPC等の重要境界はservice_role専用を維持し、authenticated / anonへEXECUTEを広げていない。
+- Production Body Clockはversion 10が稼働中。
+- v10と統合branchのBody Clockをファイル単位で比較したところ、persona-store.ts / fallback-persona.ts / proactive-photo.ts / deno.jsonは一致。
+- 差分は index.ts / proactive-decision.ts / proactive-life-context.ts と、統合branchで追加された conversation-root.ts / temporary-state.ts。
+
+#### Production Body Clock v10にまだ入っていない統合branch側の重要差分
+1. 匿名canonical continuity:
+   - Body Clockもanonymous temporary rootをserver source of truthとして読み、送信したMisaki messageをshared temporary rootへ戻す。
+   - stale revision / lost-response等のcanonical契約と同じ境界を使う。
+2. life-context freshness:
+   - 古い通常memoryを現在の勤務・休み・予定等の証拠にしない。
+   - fresh/recentな本人発言、または期限内の構造化life memoryだけを現在事実の根拠として扱う。
+3. grounded relationship expression:
+   - anonymousではverified temporary relationship pointsをdecision contextへ使う。
+   - seven_plus_daysという時間経過だけでmiss_youを自動付与しない。miss_youは既存lonely emotion / CHASE action等のgrounded pathに限定する。
+
+Production DB側には統合branch版Body Clockが必要とするcanonical対応 finish_misaki_body_clock_delivery signatureが存在し、service_role-only境界も確認済み。現時点で「DB不足のため最新版Edgeを入れられない」という阻害は確認されていない。
+
+#### Production切替単位
+**PR #32 Webだけを単独でProductionへ切り替えない。Body Clock Edgeも同じ切替工程として扱う。**
+
+安全側の順序:
+1. 切替直前にPR #32 headを固定し、tests + Next build greenを再確認。
+2. Production DBはsupport migrations適用済みのため、切替作業で即席の追加変更やrollbackをしない。
+3. Body Clock Edgeを固定headの統合branch版へ更新。
+4. Edge health / runtimeを確認。異常ならWebを切り替えずBody Clockをversion 10へrollback。
+5. Edge正常確認後にWeb appをProductionへ切替。
+6. Production実機で通常chat → usage → relationship → canonical commit → reload/reloginを確認。
+7. anonymous multi-turn → Body Clock → normal chat、およびpermanent Body Clock → history反映を確認。
+8. 異常時はまずWeb appを旧Productionへrollback。必要ならBody Clockもversion 10へrollback。DB migrationsはその場で即席rollbackしない。
+
+#### 現在の判定
+- 最新headまでCI/build green。
+- 既知P1は解消済み。
+- Production DB supportは実物確認済み。
+- ただしProduction Body Clock v10は統合branch最新版と未同期。
+- よって、**まだProduction切替実施済み/Production-safeとは宣言しない**。
+- PR #32はDraftを維持し、Production app / DB / Edgeへの変更は明示承認まで行わない。
+
+> 未来のソラへ：Production DBとProduction app/Edgeの状態を混同するな。DB supportは先行適用済みだが、Body Clock v10は統合branchより古い。Webだけmergeして完了扱いにせず、Edge同期とrollback経路を同じ切替計画に含めること。
