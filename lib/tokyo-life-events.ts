@@ -1,3 +1,5 @@
+import type { UserProfile } from "./user-profile";
+
 export type TokyoLifeEvent = {
   type:
     | "earthquake"
@@ -1610,7 +1612,8 @@ export async function getTokyoLifeEvents():
 
 export function createTokyoLifeEventsGuide(
   events:
-    TokyoLifeEvent[]
+    TokyoLifeEvent[],
+  userProfile?: UserProfile
 ) {
   if (
     events.length ===
@@ -1673,6 +1676,16 @@ export function createTokyoLifeEventsGuide(
         "weather_forecast"
     );
 
+  const taxiWeatherHint =
+    userProfile?.isTokyoTaxiDriver
+      ? `\nユーザーが現在乗務中だと会話から確認できている場合だけ、\n「このあと雨強くなるなら、少し動き出るかもね」\nくらいなら自然です。\n\nただしタクシー需要を断定しないでください。\n`
+      : "";
+
+  const taxiContextGuide =
+    userProfile?.isTokyoTaxiDriver
+      ? `\n【ユーザーの仕事との接続】\n\nユーザーが東京のタクシードライバーであることは、\n会話または長期記憶から確認されています。\n\n鉄道の大規模な運転見合わせ、羽田の運航乱れ、\n大雨、雷雨、地震などは仕事にも関係する可能性があります。\n\nただし、現在乗務中・羽田にいる・今日は仕事などを\n根拠なく事実化せず、タクシー需要も断定しないでください。\n`
+      : "";
+
   const weatherGuide =
     hasWeatherForecast
       ? `
@@ -1704,22 +1717,7 @@ export function createTokyoLifeEventsGuide(
 「今はそんなでもないけど、
 あとで降りそうだよ」
 
-ユーザーが乗務中なら、
-
-「このあと雨強くなるなら、
-少し動き出るかもね」
-
-くらいなら自然です。
-
-ただし、
-
-「絶対忙しくなる」
-
-「確実に需要が増える」
-
-「羽田でロングが出る」
-
-などと断定しないでください。
+${taxiWeatherHint}
 `.trim()
       : "";
 
@@ -1829,49 +1827,7 @@ ${weatherGuide}
 
 程度で十分です。
 
-【タクシードライバーの彼氏との関係】
-
-ユーザーは
-東京のタクシードライバーです。
-
-そのため、
-
-・鉄道の大規模な運転見合わせ
-・羽田の運航乱れ
-・大雨
-・雷雨
-・地震
-
-などは、
-
-ユーザーの仕事にも
-関係する可能性があります。
-
-ただし、
-
-「今日は絶対タクシー需要が増える」
-
-「羽田で確実にロングが出る」
-
-など、
-
-タクシー需要を
-断定してはいけません。
-
-自然な表現なら、
-
-「電車止まってるなら、
-今日はバタバタしそうだね」
-
-「羽田ちょっと乱れてるみたい。
-あっちバタバタしてそう」
-
-「このあと雨強くなるなら、
-少し動き出るかもね」
-
-程度にしてください。
-
-【絶対ルール】
+${taxiContextGuide}\n\n【絶対ルール】
 
 ・毎回ニュースの話をしない
 
@@ -1910,7 +1866,7 @@ ${weatherGuide}
 ユーザーから聞かれない限り
 毎回読み上げない
 
-普通の38歳の彼女として、
+普通の38歳の女性として、
 必要なときだけ
 自然に使ってください。
 `.trim();
