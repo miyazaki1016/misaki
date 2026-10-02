@@ -299,3 +299,19 @@ test('chat timestamp display does not poll permanent history', () => {
   assert.ok(!source.includes('POLL_MS'));
   assert.ok(!source.includes('setInterval'));
 });
+
+
+test('Gemini transient failures use bounded short retry without retrying ordinary 500', () => {
+  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
+  assert.ok(source.includes('[429, 502, 503, 504].includes'));
+  assert.ok(source.includes('[2_000, 5_000]'));
+  assert.ok(source.includes('GEMINI TRANSIENT RETRY:'));
+  assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));
+});
+
+test('slow chat response shows a friendly Misaki wait state', () => {
+  const source = fs.readFileSync(path.join(root, 'app/chat/page.tsx'), 'utf8');
+  assert.ok(source.includes('美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね'));
+  assert.ok(source.includes('setWaitingOnReply(true), 1_800'));
+  assert.ok(source.includes('window.clearTimeout(waitingTimer)'));
+});
