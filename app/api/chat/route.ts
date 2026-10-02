@@ -2425,16 +2425,8 @@ ${retryProblems
 `
           : "";
 
-      const controller =
-        new AbortController();
       const startedAt =
         Date.now();
-      const timeout =
-        setTimeout(
-          () =>
-            controller.abort(),
-          GEMINI_TIMEOUT_MS
-        );
 
       const attempt =
         retryProblems &&
@@ -2491,35 +2483,87 @@ ${retryProblems
           });
         const transientDelaysMs =
           [2_000, 5_000];
+        const timeoutRetryDelaysMs =
+          [2_000];
         let response:
           Response | null = null;
+        let transientAttempt = 0;
+        let timeoutAttempt = 0;
 
-        for (
-          let transientAttempt = 0;
-          transientAttempt <= transientDelaysMs.length;
-          transientAttempt += 1
-        ) {
-          response =
-            await fetch(
-              geminiUrl,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type":
-                    "application/json",
-                },
-                signal:
-                  controller.signal,
-                body:
-                  geminiBody,
-              }
+        while (true) {
+          const controller =
+            new AbortController();
+          const timeout =
+            setTimeout(
+              () =>
+                controller.abort(),
+              GEMINI_TIMEOUT_MS
             );
+
+          try {
+            response =
+              await fetch(
+                geminiUrl,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type":
+                      "application/json",
+                  },
+                  signal:
+                    controller.signal,
+                  body:
+                    geminiBody,
+                }
+              );
+          } catch (error) {
+            if (
+              error instanceof
+                Error &&
+              error.name ===
+                "AbortError" &&
+              timeoutAttempt <
+                timeoutRetryDelaysMs.length
+            ) {
+              const delayMs =
+                timeoutRetryDelaysMs[
+                  timeoutAttempt
+                ];
+              timeoutAttempt += 1;
+
+              console.warn(
+                "GEMINI TIMEOUT RETRY:",
+                {
+                  traceId,
+                  attempt,
+                  timeoutAttempt,
+                  delayMs,
+                }
+              );
+
+              await new Promise(
+                (resolve) =>
+                  setTimeout(
+                    resolve,
+                    delayMs
+                  )
+              );
+              continue;
+            }
+
+            throw error;
+          } finally {
+            clearTimeout(
+              timeout
+            );
+          }
 
           if (
             ![429, 502, 503, 504].includes(
               response.status
             ) ||
-            transientAttempt === transientDelaysMs.length
+            transientAttempt >=
+              transientDelaysMs.length
           ) {
             break;
           }
@@ -2528,14 +2572,14 @@ ${retryProblems
             transientDelaysMs[
               transientAttempt
             ];
+          transientAttempt += 1;
 
           console.warn(
             "GEMINI TRANSIENT RETRY:",
             {
               traceId,
               attempt,
-              transientAttempt:
-                transientAttempt + 1,
+              transientAttempt,
               status:
                 response.status,
               delayMs,
@@ -2550,7 +2594,6 @@ ${retryProblems
               )
           );
         }
-
         if (!response) {
           throw new Error(
             "GEMINI_NO_RESPONSE"
@@ -2635,10 +2678,6 @@ ${retryProblems
         );
 
         throw error;
-      } finally {
-        clearTimeout(
-          timeout
-        );
       }
     }
 
