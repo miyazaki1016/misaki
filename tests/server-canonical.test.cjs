@@ -309,6 +309,16 @@ test('Gemini transient failures use bounded short retry without retrying ordinar
   assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));
 });
 
+test('Gemini timeout gets one bounded retry before the normal failure/refund path', () => {
+  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
+  assert.ok(source.includes('const timeoutRetryDelaysMs ='));
+  assert.ok(source.includes('[2_000];'));
+  assert.ok(source.includes('GEMINI TIMEOUT RETRY:'));
+  assert.ok(source.includes('timeoutAttempt <'));
+  assert.ok(source.includes('timeoutRetryDelaysMs.length'));
+  assert.ok(source.includes('throw new Error(\n            "GEMINI_TIMEOUT"\n          );'));
+});
+
 test('ordinary chat wait does not falsely claim Misaki is busy', () => {
   const source = fs.readFileSync(path.join(root, 'app/chat/page.tsx'), 'utf8');
   assert.ok(source.includes('美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね'));
