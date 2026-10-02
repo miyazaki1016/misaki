@@ -1542,3 +1542,65 @@ Production DB側には統合branch版Body Clockが必要とするcanonical対応
 - PR #32はDraftを維持し、Production app / DB / Edgeへの変更は明示承認まで行わない。
 
 > 未来のソラへ：Production DBとProduction app/Edgeの状態を混同するな。DB supportは先行適用済みだが、Body Clock v10は統合branchより古い。Webだけmergeして完了扱いにせず、Edge同期とrollback経路を同じ切替計画に含めること。
+
+
+---
+
+### 2026-10-03 — 実機 multi-browser checkpoint / PR #44 / 作業場引継ぎ
+
+2026-10-02夜〜2026-10-03未明のiPhone実機（Chrome + Safari、同一恒久アカウント）検証と、その結果から開始したPR #44までを、新しい作業チャットへ移る前のcheckpointとして記録する。
+
+#### 実機で確認したこと
+- 同一アカウントのChrome / Safari間で会話履歴は収束した。片方で送った成功会話は、もう片方へ戻った際にもcanonical historyから反映された。
+- 現行history同期は5秒pollingではない。恒久ユーザーでは mount / window focus / visibility復帰 / auth state change が同期契機。ブラウザ切替時の「自動更新」に見えた挙動は、主にfocus / visibility復帰で説明できる。
+- 一方、Free残回数表示と入力欄のenabled/disabled状態はhistory同期に追随していなかった。
+- 実例: Safari側が無料20回を使い切って入力不可になった後も、Chrome側は「今日あと1回」と入力可能状態を一時的に表示した。
+- そのChromeから送信を試すと、ユーザーメッセージのoptimistic bubbleが一瞬表示された後に消え、最終的に「今日は無料分を使い切りました」へ切り替わった。
+- この実機シナリオではserver-side daily quotaが追加送信を拒否し、Chrome/Safari併用による20回制限の迂回は成立しなかった。
+- ただし、完全同時送信によるrace conditionを意図的に再現した試験ではないため、「あらゆる同時実行で原子的に安全」とまではこの実機結果だけから断定しない。
+
+#### history保持と表示60件の整理
+現行コードの読取り経路を再確認した。
+- `app/chat/page.tsx`: `MAX_MESSAGES = 60`。画面表示は直近60件へslice。
+- `app/chat/conversation-history-sync.tsx`: canonical historyを取得し、focus / visibility等で反映。
+- `app/api/persona/history/route.ts`: canonical stateの `history` を返す。ここでは60件へのsliceを行っていない。
+- `lib/canonical-state.ts`: `misaki_user_conversation_state.history` を読み、load時に60件へtrimしていない。
+
+したがって現在確認できている構造は **DB canonical history field → history APIは取得したhistoryを返す → UI/cache側で直近60件を表示**。ただし特定ユーザーの古い1〜6件がDB実データとして残っていることや、書込みRPC内部に別のtrimが絶対にないことまで、この読取り経路確認だけで断定しない。end-to-endの保持保証を確定する場合は書込みRPCも含めて監査する。
+
+#### PR #44 — Free quota UIをcanonical history refreshへ同乗させる
+- PR: #44 `Sync free quota state with canonical history refresh`
+- branch: `sora/sync-free-usage-with-history`
+- head: `80916c5919af4cd4f42c0902634e058cb0787c5c`
+- base: Production切替後main `37cf2140485869d8dda1b1b94b96a7954374f480`
+- 変更対象: `app/chat/page.tsx` / `app/chat/conversation-history-sync.tsx`
+- 目的: permanent userのcanonical history refresh時に `get_daily_message_usage` も再取得し、`misaki-usage-state` eventでchat pageへ渡す。既存の `applyApiUsage()` から残回数とfree-limit入力状態を更新する。
+- **5秒pollingは復活させない。** ユーザーがブラウザへ戻る既存のmount / focus / visibility / auth同期にFree quota UIも同乗させる。
+- server側20回/日の制限、history retention、60件表示上限そのものは変更しない。
+- 2026-10-03作業場締め時点: PR #44はOPEN / mergeable。Vercel GitHub PreviewはReady表示。**Productionへmerge/deploy済みではなく、Production実機で修正後挙動を確認済みでもない。**
+
+#### PR #44で次に必ず確認すること
+1. diffを監督レビューする。
+2. `get_daily_message_usage` の失敗がcanonical history同期全体を止めないか確認する。現headではusage RPC errorをthrowしており、usage更新の一時失敗がhistory local cache/event反映まで阻害する可能性があるため、必要ならusage refreshをbest-effortへ分離する。
+3. GitHub Actionsをhead SHAで確認する。
+4. Vercel Previewの実物を確認し、必要ならsmokeする。
+5. greenでも即Production-safeと呼ばない。
+6. merge/deploy後の実機受入では、Safari等で最終Free回数を消費 → Chrome等へ戻る → focus時点で残回数0・入力不可へ先に収束し、追加送信を試す前にUIが正しく閉じることを確認する。history同期も壊れていないことを同時確認する。
+
+#### 開発体制の追加原則 — Workへ「裏」を欠損させない
+2026-10-03未明の整理で、既存の「せいちゃん=オーナー / ソラ=監督+現場職人 / Work=下請け職人」をさらに明確化した。
+
+**Workは、このチャットで積み上がった暗黙の背景・判断過程・違和感・設計理由を自動的にすべて共有している前提にしない。Workの品質は、監督ソラが必要な文脈を施工指示へ落とせるかに大きく依存する。**
+
+Workへ大規模作業を渡す際は、最低でも以下を施工指示に含める。
+1. 目的 — 何を実現する工事か。
+2. 理由 — なぜその仕様になったか。何を避けるためか。
+3. 守る思想 / 原則 — Misakiらしさ、安全境界、source of truth等。
+4. 今回やること。
+5. 今回やらないこと。
+6. 壊してはいけない既存仕様 / 他機能との関連。
+7. 合格条件 — 自動テスト、Preview、実機、Production確認を混同せず記載。
+
+**結論だけをWorkへ渡して、深掘りして得た設計理由を施工段階で薄めない。** コード上は正しくても体験・思想としてMisakiではない実装になることを防ぐ。監督ソラの重要な責務は、コードを書くことだけでなく、オーナーとの会話で得た「なぜ」を欠損させずWorkへ渡し、成果物を実物で検査して総覧へ戻すこと。
+
+> 未来のソラへ：新しい作業場では、まずこのcheckpointと最新main / PR #44実物を読むこと。記憶だけで「PR #44は直った」「Production確認済み」と進めるな。最初の仕事はPR #44レビューとCI/Preview確認。Workへ渡す場合は変更内容だけでなく、この実機で何が起き、なぜこの挙動を直すのかまで指示書へ含めること。
