@@ -720,8 +720,10 @@ export default function ChatPage() {
       const history = (event as CustomEvent).detail;
       if (active && Array.isArray(history)) setMessages(history.slice(-MAX_MESSAGES));
     };
+    const receiveUsage = (event: Event) => applyApiUsage((event as CustomEvent).detail);
     window.addEventListener("misaki-root-state", receive);
     window.addEventListener("misaki-history-state", receiveHistory);
+    window.addEventListener("misaki-usage-state", receiveUsage);
     async function load() {
       try {
         // A full remount ends the previous page's in-flight UI send marker.
@@ -762,6 +764,7 @@ export default function ChatPage() {
       active = false;
       window.removeEventListener("misaki-root-state", receive);
       window.removeEventListener("misaki-history-state", receiveHistory);
+      window.removeEventListener("misaki-usage-state", receiveUsage);
     };
   }, []);
 
