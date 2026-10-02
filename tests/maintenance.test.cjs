@@ -57,7 +57,8 @@ for (const reuse of [false, true]) test(`client maintenance keeps history and dr
     sessionStorage: { getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key) },
     crypto: { randomUUID: () => id }, JSON, Error, console, messages, maintenanceMessage: classifier.maintenanceMessage,
     setMessages: next => { messages = typeof next === 'function' ? next(messages) : next; }, setMessage: next => { draft = next; },
-    setSendError: next => { error = next; }, setLoading() {}, setShowPremium() {}, applyApiUsage: () => { usage++; },
+    setSendError: next => { error = next; }, setLoading() {}, setWaitingOnReply() {}, setShowPremium() {}, applyApiUsage: () => { usage++; },
+    window: { setTimeout, clearTimeout }, setTimeout, clearTimeout,
     fetch: async () => Response.json({ code: 'MAINTENANCE', maintenance: true, error: 'メンテナンス中です。' }, { status: 503 }),
   });
   const source = fs.readFileSync(require('node:path').join(__dirname, '../app/chat/page.tsx'), 'utf8');
