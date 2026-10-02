@@ -261,3 +261,26 @@ test('canonical permanent commit applies semantic point delta once and clamps at
   assert.equal(first.relationshipPointDelta, undefined);
   assert.equal(replay.relationshipPointDelta, undefined);
 });
+
+
+test('anonymous browser never enters permanent history GET sync', () => {
+  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');
+  assert.ok(source.includes('localStorage.getItem(AUTH_KIND_KEY) === "anonymous"'));
+  assert.ok(source.includes('session.user.is_anonymous'));
+  assert.ok(source.includes('if (!session?.user || session.user.is_anonymous) return;'));
+});
+
+test('Vercel runtime does not call the JR East endpoint that returns 403', () => {
+  const source = fs.readFileSync(path.join(root, 'lib/tokyo-life-events.ts'), 'utf8');
+  const guard = source.indexOf('if (process.env.VERCEL)');
+  const fetchCall = source.indexOf('await fetchText(\n      JR_EAST_KANTO_URL', guard);
+  assert.ok(guard >= 0);
+  assert.ok(fetchCall > guard);
+  assert.ok(source.slice(guard, fetchCall).includes('return [];'));
+});
+
+test('global metadata does not hardcode taxi-driver or lover targeting', () => {
+  const source = fs.readFileSync(path.join(root, 'app/layout.tsx'), 'utf8');
+  assert.ok(!source.includes('タクドラの彼女'));
+  assert.ok(!source.includes('東京のタクシードライバー向けAI彼女'));
+});
