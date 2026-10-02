@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabase";
 import { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from "../../lib/device-conversation";
 
 const CHAT_HISTORY_KEY = "misaki-chat-history";
+const AUTH_KIND_KEY = "misaki-auth-kind";
 function readHistory(): any[] {
   try { const value = JSON.parse(localStorage.getItem(CHAT_HISTORY_KEY) || "[]"); return Array.isArray(value) ? value : []; }
   catch { return []; }
@@ -16,6 +17,9 @@ export default function ConversationHistorySync() {
     let stopped = false, syncing = false;
     const sync = async () => {
       if (stopped || syncing || sessionStorage.getItem("misaki-chat-sending")) return;
+      // Anonymous history is carried by the temporary canonical root. Never start
+      // the permanent history GET path for a browser known to be anonymous.
+      if (localStorage.getItem(AUTH_KIND_KEY) === "anonymous") return;
       syncing = true;
       try {
         const { data, error } = await supabase.auth.getSession();
@@ -56,7 +60,10 @@ export default function ConversationHistorySync() {
     const visible = () => { if (document.visibilityState === "visible") void sync(); };
     window.addEventListener("focus", sync);
     document.addEventListener("visibilitychange", visible);
-    const { data: listener } = supabase.auth.onAuthStateChange(() => window.setTimeout(() => void sync(), 100));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!session?.user || session.user.is_anonymous) return;
+      window.setTimeout(() => void sync(), 100);
+    });
     return () => { stopped = true; window.removeEventListener("focus", sync);
       document.removeEventListener("visibilitychange", visible); listener.subscription.unsubscribe(); };
   }, []);

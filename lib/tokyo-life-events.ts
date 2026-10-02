@@ -1379,6 +1379,14 @@ async function getTrainEvents():
   Promise<
     TokyoLifeEvent[]
   > {
+  // JR East currently returns HTTP 403 to Vercel server-side fetches even
+  // though the public official page remains available in a browser. Do not
+  // hammer the blocked endpoint or turn an optional context source into a
+  // runtime error. Re-enable only with an official server-consumable source.
+  if (process.env.VERCEL) {
+    return [];
+  }
+
   const html =
     await fetchText(
       JR_EAST_KANTO_URL,
