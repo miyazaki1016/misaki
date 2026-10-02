@@ -2161,7 +2161,8 @@ export async function POST(
 
     const tokyoLifeEventsGuide =
       createTokyoLifeEventsGuide(
-        tokyoLifeEvents
+        tokyoLifeEvents,
+        userProfile
       );
 
     const recentMisakiMessages =
