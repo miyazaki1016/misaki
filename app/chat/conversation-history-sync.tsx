@@ -14,9 +14,9 @@ function sameHistory(a: any[], b: any[]) {
 }
 export default function ConversationHistorySync() {
   useEffect(() => {
-    let stopped = false, syncing = false;
+    let stopped = false, syncing = false, permanentlyDisabled = false;
     const sync = async () => {
-      if (stopped || syncing || sessionStorage.getItem("misaki-chat-sending")) return;
+      if (stopped || syncing || permanentlyDisabled || sessionStorage.getItem("misaki-chat-sending")) return;
       // Anonymous history is carried by the temporary canonical root. Never start
       // the permanent history GET path for a browser known to be anonymous.
       if (localStorage.getItem(AUTH_KIND_KEY) === "anonymous") return;
@@ -29,11 +29,16 @@ export default function ConversationHistorySync() {
         const userId = session.user.id;
         if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;
         const before = readHistory();
-        const response = await fetch("/api/persona/history", {
+        const response = await fetch("/api/persona/history?source=conversation-history-sync", {
           headers: { Authorization: `Bearer ${session.access_token}` }, cache: "no-store",
         });
         if (!response.ok) throw new Error("Conversation state load failed");
         const state = await response.json();
+        if (state?.ephemeral === true) {
+          permanentlyDisabled = true;
+          localStorage.setItem(AUTH_KIND_KEY, "anonymous");
+          return;
+        }
         if (!state || state.exists !== true || !Array.isArray(state.history) || !Array.isArray(state.memory)) return;
         const { data: latest } = await supabase.auth.getSession();
         if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||
