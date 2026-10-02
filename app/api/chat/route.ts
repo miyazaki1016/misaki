@@ -2459,47 +2459,103 @@ ${retryProblems
       );
 
       try {
-        const response =
-          await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type":
-                  "application/json",
+        const geminiUrl =
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
+        const geminiBody =
+          JSON.stringify({
+            systemInstruction: {
+              parts: [
+                {
+                  text:
+                    baseSystemPrompt +
+                    retryGuide +
+                    supplementaryGuide,
+                },
+              ],
+            },
+            contents: [
+              ...contents,
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: modelMessage,
+                  },
+                ],
               },
-              signal:
-                controller.signal,
-              body:
-                JSON.stringify({
-                  systemInstruction: {
-                    parts: [
-                      {
-                        text:
-                          baseSystemPrompt +
-                          retryGuide +
-                          supplementaryGuide,
-                      },
-                    ],
-                  },
-                  contents: [
-                    ...contents,
-                    {
-                      role: "user",
-                      parts: [
-                        {
-                          text: modelMessage,
-                        },
-                      ],
-                    },
-                  ],
-                  generationConfig: {
-                    responseMimeType:
-                      "application/json",
-                  },
-                }),
+            ],
+            generationConfig: {
+              responseMimeType:
+                "application/json",
+            },
+          });
+        const transientDelaysMs =
+          [2_000, 5_000];
+        let response:
+          Response | null = null;
+
+        for (
+          let transientAttempt = 0;
+          transientAttempt <= transientDelaysMs.length;
+          transientAttempt += 1
+        ) {
+          response =
+            await fetch(
+              geminiUrl,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type":
+                    "application/json",
+                },
+                signal:
+                  controller.signal,
+                body:
+                  geminiBody,
+              }
+            );
+
+          if (
+            ![429, 502, 503, 504].includes(
+              response.status
+            ) ||
+            transientAttempt === transientDelaysMs.length
+          ) {
+            break;
+          }
+
+          const delayMs =
+            transientDelaysMs[
+              transientAttempt
+            ];
+
+          console.warn(
+            "GEMINI TRANSIENT RETRY:",
+            {
+              traceId,
+              attempt,
+              transientAttempt:
+                transientAttempt + 1,
+              status:
+                response.status,
+              delayMs,
             }
           );
+
+          await new Promise(
+            (resolve) =>
+              setTimeout(
+                resolve,
+                delayMs
+              )
+          );
+        }
+
+        if (!response) {
+          throw new Error(
+            "GEMINI_NO_RESPONSE"
+          );
+        }
 
         const elapsedMs =
           Date.now() -
