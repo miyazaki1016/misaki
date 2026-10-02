@@ -1181,7 +1181,6 @@ export default function ChatPage() {
     );
 
     setWaitingOnReply(false);
-    const waitingTimer = window.setTimeout(() => setWaitingOnReply(true), 1_800);
 
     let receivedResponse = false;
     let activeRequestId: string | null = null;
@@ -1407,7 +1406,7 @@ export default function ChatPage() {
     } finally {
       if (receivedResponse && JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null")?.requestId === activeRequestId) sessionStorage.removeItem("misaki-pending-chat-turn");
       if (sessionStorage.getItem("misaki-chat-sending") === activeRequestId) sessionStorage.removeItem("misaki-chat-sending");
-      window.clearTimeout(waitingTimer);
+      
       setWaitingOnReply(false);
       setLoading(
         false
