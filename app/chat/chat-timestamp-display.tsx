@@ -9,7 +9,6 @@ type ServerMessage = {
   sentAt?: string | null;
 };
 
-const POLL_MS = 5_000;
 const TOKYO_TZ = "Asia/Tokyo";
 
 function sanitizeHistory(value: unknown): ServerMessage[] {
@@ -243,10 +242,6 @@ export default function ChatTimestampDisplay() {
       });
     }
 
-    const interval = window.setInterval(() => {
-      void refresh();
-    }, POLL_MS);
-
     const onFocus = () => void refresh();
     const onVisibility = () => {
       if (document.visibilityState === "visible") void refresh();
@@ -258,7 +253,6 @@ export default function ChatTimestampDisplay() {
     return () => {
       active = false;
       observer.disconnect();
-      window.clearInterval(interval);
       window.clearTimeout(renderTimer);
       window.removeEventListener("focus", onFocus);
       document.removeEventListener("visibilitychange", onVisibility);
