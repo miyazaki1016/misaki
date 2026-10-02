@@ -45,6 +45,22 @@ export default function ConversationHistorySync() {
           localStorage.getItem(DEVICE_USER_KEY) !== userId || sessionStorage.getItem("misaki-chat-sending") ||
           !sameHistory(before, readHistory())) return;
         window.dispatchEvent(new CustomEvent("misaki-root-state", { detail: state }));
+        // Usage convergence is best-effort. A transient quota RPC failure must
+        // never block the canonical history/cache refresh below.
+        try {
+          const { data: usageData, error: usageError } = await supabase.rpc("get_daily_message_usage");
+          if (usageError) throw usageError;
+          const usage = Array.isArray(usageData) ? usageData[0] : usageData;
+          if (usage && typeof usage === "object") {
+            window.dispatchEvent(new CustomEvent("misaki-usage-state", { detail: {
+              messageCount: typeof usage.message_count === "number" ? usage.message_count : undefined,
+              remaining: typeof usage.remaining === "number" ? usage.remaining : undefined,
+              isPremium: usage.is_premium === true,
+            } }));
+          }
+        } catch (usageError) {
+          console.error("USAGE STATE REFRESH ERROR", usageError);
+        }
         localStorage.removeItem(EMAIL_SAVE_USER_KEY);
         if (sameHistory(before, state.history)) return;
         // Keep a pending/failed local user bubble. Successful turns are already
