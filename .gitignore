@@ -5,3 +5,11 @@ node_modules/
 !.env.example
 *.tsbuildinfo
 supabase/.temp/
+*.dump
+manifest.txt
+user-kinds.csv
+migration-values.csv
+restore-routines.sql
+restore-data.sql
+restore-sequences.sql
+checksums.csv

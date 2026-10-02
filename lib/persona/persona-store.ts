@@ -9,7 +9,7 @@ import {
 
 import {
   createRelationshipTimeGuide,
-  loadRelationshipTimeContext,
+  type RelationshipTimeContext,
 } from "../relationship-time";
 import { createRelationshipEmotionGuide } from "../relationship-emotion";
 import { createRelationshipActionGuide } from "../relationship-action";
@@ -207,16 +207,10 @@ ${data
 `.trim();
 }
 
-async function loadRelationshipContinuityGuideSafely(
-  supabase: SupabaseClient
+function createRelationshipContinuityGuide(
+  context: RelationshipTimeContext | null
 ) {
   try {
-    const context =
-      await loadRelationshipTimeContext(
-        supabase,
-        false
-      );
-
     return [
       createRelationshipTimeGuide(context),
       createRelationshipEmotionGuide(context),
@@ -237,7 +231,8 @@ async function loadRelationshipContinuityGuideSafely(
 export async function loadPersonaPrompt(
   supabase: SupabaseClient,
   userId: string,
-  channel: PersonaChannel
+  channel: PersonaChannel,
+  relationshipTimeContext: RelationshipTimeContext | null = null
 ): Promise<LoadedPersonaPrompt> {
   try {
     const [
@@ -253,8 +248,10 @@ export async function loadPersonaPrompt(
           supabase,
           userId
         ),
-        loadRelationshipContinuityGuideSafely(
-          supabase
+        Promise.resolve(
+          createRelationshipContinuityGuide(
+            relationshipTimeContext
+          )
         ),
       ]);
 

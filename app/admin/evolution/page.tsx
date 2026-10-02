@@ -49,7 +49,6 @@ type ServerHistoryState = {
 };
 
 const CHAT_HISTORY_KEY = "misaki-chat-history";
-const LONG_MEMORY_KEY = "misaki-long-term-memory";
 
 const TRAIT_LABELS: Record<string, string> = {
   affection_level: "甘さ・愛情表現",
@@ -122,7 +121,7 @@ export default function EvolutionAdminPage() {
 
   const refreshStorageCounts = useCallback(() => {
     const history = readJsonStorage(CHAT_HISTORY_KEY) as ChatMessage[];
-    const memory = readJsonStorage(LONG_MEMORY_KEY);
+    const memory: unknown[] = [];
     setHistoryCount(history.length);
     setUserMessageCount(
       history.filter(
@@ -256,7 +255,7 @@ export default function EvolutionAdminPage() {
     if (analyzing) return;
 
     const history = readJsonStorage(CHAT_HISTORY_KEY) as ChatMessage[];
-    const memory = readJsonStorage(LONG_MEMORY_KEY);
+    const memory: unknown[] = [];
     const userCount = history.filter(
       (item) =>
         item?.role === "user" &&

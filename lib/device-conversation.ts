@@ -1,3 +1,4 @@
+export const TEMPORARY_STATE_KEY = "misaki-temporary-state-v1";
 export const DEVICE_USER_KEY = "misaki-device-user-id";
 export const EMAIL_SAVE_USER_KEY = "misaki-email-save-user-id";
 

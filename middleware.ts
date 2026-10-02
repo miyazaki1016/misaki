@@ -6,7 +6,7 @@ export function middleware(request: NextRequest) {
   const host =
     request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
 
-  if (host.endsWith(".vercel.app")) {
+  if (host === "misaki.vercel.app") {
     const url = request.nextUrl.clone();
     url.protocol = "https:";
     url.host = CANONICAL_HOST;

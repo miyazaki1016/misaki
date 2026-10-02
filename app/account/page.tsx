@@ -3,7 +3,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "../../lib/supabase";
-import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, readDeviceArray } from "../../lib/device-conversation";
+import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, TEMPORARY_STATE_KEY } from "../../lib/device-conversation";
 
 type Mode = "save" | "login";
 
@@ -33,6 +33,9 @@ function authError(error: any) {
   if (text.includes("expired")) return "コードの有効期限が切れています。新しいメールを送り直してください。";
   if (text.includes("invalid otp") || text.includes("invalid token")) {
     return "ログインコードが正しくないか、すでに無効です。最新のメールを確認してください。";
+  }
+  if (text.includes("load failed") || text.includes("failed to fetch") || text.includes("networkerror")) {
+    return "通信に失敗しました。接続を確認して、もう一度お試しください。";
   }
   return typeof error?.message === "string"
     ? error.message
@@ -110,18 +113,22 @@ export default function AccountPage() {
           localStorage.getItem(DEVICE_USER_KEY) !== session.user.id) {
         throw new Error("アカウント状態が変わりました。画面を開き直してください。");
       }
-      // Save before sending the link: confirmation may open in another tab/device.
+      // Refresh on every retry, including while confirmation is pending.
+      // The checkpoint follows server commits until this user becomes permanent.
       const saved = await fetch("/api/persona/history", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({
           saveAnonymous: true,
           expectedUserId: session.user.id,
-          history: readDeviceArray("misaki-chat-history"),
-          memory: readDeviceArray("misaki-long-term-memory"),
+          temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
+          pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null"),
         }),
       });
-      if (!saved.ok) throw new Error("会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");
+      if (!saved.ok) {
+        const result = await saved.json().catch(() => null);
+        throw new Error(result?.maintenance === true ? result.error : "会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。");
+      }
       const { data: latest } = await supabase.auth.getSession();
       if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {
         throw new Error("アカウント状態が変わりました。画面を開き直してください。");
@@ -133,7 +140,7 @@ export default function AccountPage() {
       );
       if (error) throw error;
       setMessage(
-        "確認メールを送りました。確認が完了すると、ここまでの会話・記憶をこのメールアドレスの美咲として保存します。"
+        "確認メールを送りました。確認前に続けた会話・記憶も保存し、確認が完了するとこのメールアドレスで引き継げます。"
       );
     } catch (error: any) {
       if (isExistingAccountError(error)) {
