@@ -284,3 +284,11 @@ test('global metadata does not hardcode taxi-driver or lover targeting', () => {
   assert.ok(!source.includes('タクドラの彼女'));
   assert.ok(!source.includes('東京のタクシードライバー向けAI彼女'));
 });
+
+
+test('history sync self-disables when server confirms anonymous state', () => {
+  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');
+  assert.ok(source.includes('/api/persona/history?source=conversation-history-sync'));
+  assert.ok(source.includes('state?.ephemeral === true'));
+  assert.ok(source.includes('permanentlyDisabled = true'));
+});
