@@ -1584,3 +1584,62 @@ runtime trace `519b64d7` では `weather` / `life-events` stage がともに成�
 - 目標は「なんでそんなこと覚えてるの😳」という嬉しい驚きであり、「なんでそれを知っているの😨」という監視感を生まないこと。
 
 この境界は、今後shared-world / user life-areaの取得ソースや自発会話を拡張する際の必須設計条件とする。
+
+
+### 2026-10-02 — Production canonical cutover 完了 checkpoint（PR #29〜#43）
+
+この節は、上の途中記録に残る「Production未切替」「PR #32 Draft」「Body Clock v10」等より新しい。**現在状態はこの節を優先する。** テスト成功とProduction安全を混同せず、以下は実際に確認した範囲だけを記録する。
+
+#### Production現在値
+- Web main: `37cf2140485869d8dda1b1b94b96a7954374f480`（PR #43 merge）。
+- Vercel Production: `dpl_9z8Qr8Mx3X84UgwmeJKsgH8wfyXE`、`READY`、alias `misaki38-ai.com`。
+- Production Body Clock Edge: version 11。custom `x-cron-secret` 境界を使い、canonical continuity対応版として稼働。
+- Production DBはcanonical/relationship v2/temporary continuity等のsupport migrations適用済み。privileged relationship/canonical更新はservice_role境界を維持し、authenticated/anonへ権限を広げていない。
+
+#### Web切替で通過した主要PR
+- PR #29: canonical server-state foundation。
+- PR #33: anonymous history GETの安全なephemeral応答。
+- PR #34: profile-aware life-events。
+- PR #35: cutover cleanup、JR East server-side取得の隔離、ユーザー固有のtaxi metadataをglobal promptから除去。
+- PR #36〜#39: history同期診断を段階的に行い、真因を `app/chat/chat-timestamp-display.tsx` の5秒 `setInterval` と確定。PR #39で定期pollを除去し、initial/focus/visibility等の必要同期だけを残した。診断コードも除去。
+- PR #40: Gemini 429/502/503/504を2秒→5秒のbounded retryで吸収。通常500はretryしない。
+- PR #41: 待機表示のレイアウト修正。
+- PR #42: 通常応答が1.8秒を超えただけで「美咲ちゃん、ちょっと忙しそう」と表示していたfalse busy timerを除去。通常待機はtyping dotsのまま。
+- PR #43: Production実機で発見した30秒 `GEMINI_TIMEOUT` に対し、2秒待って**1回だけ**再試行するbounded timeout retryを追加。2回目もtimeoutなら既存failure/refund pathへ落とす。通常500はretryしない。
+
+#### Production runtimeで確認した重要事実
+1. 5秒history GET問題:
+   PR #39後、30秒以上の実機観測で旧5秒cadenceは消失。reload/focus等に伴うGETまで「全て消えた」とは扱わない。
+2. Gemini 503:
+   旧Productionで実際の503を確認しPR #40を導入。PR #43後の最終smokeでも trace `717baf9e` が初回503 → `GEMINI TRANSIENT RETRY`（2秒）→ Gemini 200 → chat 200 / `ok:true`、total 10.151秒となり、**既存503 retryがProductionで実際に回復させた**ことを確認。
+3. false busy:
+   PR #42後の実機で、通常待機中にfalse busy文言が出ないことを確認。
+4. timeout:
+   2026-10-02 21:37 JST、旧PR #42 Production trace `c514b8d0` でGemini initialが約30秒後 `GEMINI_TIMEOUT`、chat 500を実測。これがPR #43の直接原因。
+   PR #43はcode review + regression + GitHub Actions #286 SUCCESS + Preview READY + Production READYまで確認。最終smokeではtimeout自体が再発していないため、**timeout retryのProduction実発火を確認済みとは書かない**。
+5. failure/refund:
+   chat outer catchは `refundIfCharged()` を通り、Free consume済み失敗をrefundする既存経路を再確認。自動回帰も維持。ただし上記21:37の特定timeout requestについてDBでrefund行そのものを直接突合した、とはこのcheckpointでは主張しない。
+6. 最終通常会話smoke:
+   新Productionで少なくとも3件の `POST /api/chat` が200 / `ok:true`。うち2件はGemini初回200、1件は上記503→retry→200。確認時点の新Production 5xxは0件。
+
+#### JR East / life-events
+JR Eastの公式ページはVercel server-sideで403になるため、現行コードは `process.env.VERCEL` でJR取得を返さず、Productionの診断ノイズを止めている。公式にserver-consumableな取得方法が確立するまで再有効化しない。weather/life-eventsは別系統で継続する。
+
+#### rollback基準
+現在の直前Production rollback候補はPR #42世代:
+- `dpl_LSJJYCHST4t8ewbCtdd3hXPRdWRT`
+- main `b6bd03cde1e44c77545978c2c144ac82e7c4b1b1`
+さらに必要ならPR #41 `dpl_HtHfEsJzqYgfaECKuuyW8odpjaZ5`、PR #40 `dpl_9nxMH17Ko2HHTqZSqWYTV17cHRpm`、PR #39 `dpl_FWb7LWJWLHh6ti7pZAm6RJhALnGg` が履歴上の復帰点。ただしDB support migrationsをその場で即席rollbackする運用はしない。
+
+#### canonical cutover判定
+2026-10-02時点で、canonical server-stateへのProduction切替工程は**完了checkpoint**とする。これは「今後バグが存在しない」という意味ではない。Production切替を止めていた既知P1、Body Clock同期、relationship権限境界、5秒history polling、Gemini一時503吸収、false busy、今回発見したtimeout retryまでを現在Productionへ反映し、CI/Preview/Production smokeの各段階を通過した、という意味である。
+
+次工程はcanonical移行の延長修理ではなく、shared-world / 6段階relationship・5 hearts等の製品機能を別工程として進める。
+
+#### shared-world追加メモ — 美咲の「家」と「現在地」を分ける
+Production会話で、美咲の固定生活圏（江東区・塩浜周辺）の天気を根拠にしつつ「こっちは少し雲が怪しくなってきたから、急いで帰らなきゃ！」という返答が出た。固定生活圏は「美咲が普段生活する地域」の根拠であり、その瞬間に美咲が家の外にいる証拠ではない。
+
+今後のshared-worldでは最低限、
+- home / life area（普段の生活圏）
+- current place / activity（その時どこで何をしている設定か）
+を別状態として扱う。current placeの根拠がない時に、天気情報だけから「今外にいて帰宅途中」等の行動を創作しない。これも「知れることを全部知ろうとしない」と同じく、世界の整合性を守る必須境界とする。
