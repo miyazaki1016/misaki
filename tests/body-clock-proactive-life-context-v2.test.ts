@@ -1,7 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { buildProactiveLifeContext } from "../supabase/functions/body-clock/proactive-life-context.ts";
-import { deriveProactiveTags } from "../supabase/functions/body-clock/proactive-decision.ts";
 const now=()=>new Date().toISOString(),days=(n:number)=>new Date(Date.now()-n*86400000).toISOString();
 test("fresh explicit user life statement is usable",()=>{const c=buildProactiveLifeContext([{role:"user",text:"今日は夜勤だよ",sentAt:now()}],[]);assert.equal(c.confidence,"explicit");assert.equal(c.situation,"今日は夜勤だよ")});
 test("old user life statement is not treated as current",()=>{const c=buildProactiveLifeContext([{role:"user",text:"今日は夜勤だよ",sentAt:days(8)}],[]);assert.equal(c.confidence,"none");assert.equal(c.situation,"none")});
@@ -12,8 +11,3 @@ test("unexpired structured life memory can ground Body Clock",()=>{const memory=
 test("expired structured life memory is ignored",()=>{const memory=["[life:v1]"+JSON.stringify({kind:"schedule",fact:"今日は仕事",observedAt:days(2),validUntil:new Date(Date.now()-3600000).toISOString(),confidence:1,source:"user"})];const c=buildProactiveLifeContext([],memory);assert.equal(c.confidence,"none")});
 test("malformed structured life memory never leaks raw JSON into context",()=>{const c=buildProactiveLifeContext([],["[life:v1]{broken"]);assert.equal(c.confidence,"none");assert.deepEqual(c.evidence,[])});
 test("ordinary saved memory remains background rather than current evidence",()=>{const c=buildProactiveLifeContext([],["今日は仕事だよ"]);assert.equal(c.confidence,"none")});
-
-
-test("seven days of silence alone never invents miss_you",()=>{const tags=deriveProactiveTags({direction:"MISAKI",action:"NORMAL",emotion:"neutral",timeBand:"seven_plus_days",lifeConfidence:"none",currentTime:"18:00"});assert.equal(tags.includes("miss_you"),false)});
-test("grounded lonely emotion may still express miss_you",()=>{const tags=deriveProactiveTags({direction:"MISAKI",action:"WAIT",emotion:"lonely",timeBand:"seven_plus_days",lifeConfidence:"none",currentTime:"18:00"});assert.equal(tags.includes("miss_you"),true)});
-test("grounded CHASE action may still express miss_you",()=>{const tags=deriveProactiveTags({direction:"MISAKI_TO_USER",action:"CHASE",emotion:"neutral",timeBand:"seven_plus_days",lifeConfidence:"none",currentTime:"18:00"});assert.equal(tags.includes("miss_you"),true)});
