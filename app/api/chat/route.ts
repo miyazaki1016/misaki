@@ -41,6 +41,7 @@ import {
 } from "../../../lib/relationship-turn-expression";
 import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
+import { generateGeminiJson } from "../../../lib/gemini-json-generator";
 
 type TokyoWeather = {
   temperature: number | null;
@@ -2424,259 +2425,58 @@ ${retryProblems
 必ずJSONだけを返してください。
 `
           : "";
-
-      const startedAt =
-        Date.now();
-
+      const startedAt = Date.now();
       const attempt =
-        retryProblems &&
-        retryProblems.length > 0
+        retryProblems && retryProblems.length > 0
           ? "retry"
           : "initial";
-      const hasSupplementaryUnicode =
-        /[\uD800-\uDBFF][\uDC00-\uDFFF]/
-          .test(
-            message
-          );
 
-      console.log(
-        "GEMINI FETCH START:",
-        {
-          traceId,
-          attempt,
-          messageLength:
-            message.length,
-          hasSupplementaryUnicode,
-        }
-      );
+      console.log("GEMINI FETCH START:", {
+        traceId,
+        attempt,
+        messageLength: message.length,
+      });
 
       try {
-        const geminiUrl =
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;
-        const geminiBody =
-          JSON.stringify({
-            systemInstruction: {
-              parts: [
-                {
-                  text:
-                    baseSystemPrompt +
-                    retryGuide +
-                    supplementaryGuide,
-                },
-              ],
-            },
-            contents: [
-              ...contents,
-              {
-                role: "user",
-                parts: [
-                  {
-                    text: modelMessage,
-                  },
-                ],
-              },
-            ],
-            generationConfig: {
-              responseMimeType:
-                "application/json",
-            },
-          });
-        const transientDelaysMs =
-          [2_000, 5_000];
-        const timeoutRetryDelaysMs =
-          [2_000];
-        let response:
-          Response | null = null;
-        let transientAttempt = 0;
-        let timeoutAttempt = 0;
+        const result = await generateGeminiJson({
+          apiKey,
+          systemInstruction:
+            baseSystemPrompt +
+            retryGuide +
+            supplementaryGuide,
+          contents,
+          userText: modelMessage,
+          timeoutMs: GEMINI_TIMEOUT_MS,
+        });
 
-        while (true) {
-          const controller =
-            new AbortController();
-          const timeout =
-            setTimeout(
-              () =>
-                controller.abort(),
-              GEMINI_TIMEOUT_MS
-            );
+        const elapsedMs = Date.now() - startedAt;
+        console.log("GEMINI FETCH END:", {
+          traceId,
+          attempt,
+          status: result.status,
+          elapsedMs,
+        });
 
-          try {
-            response =
-              await fetch(
-                geminiUrl,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type":
-                      "application/json",
-                  },
-                  signal:
-                    controller.signal,
-                  body:
-                    geminiBody,
-                }
-              );
-          } catch (error) {
-            if (
-              error instanceof
-                Error &&
-              error.name ===
-                "AbortError" &&
-              timeoutAttempt <
-                timeoutRetryDelaysMs.length
-            ) {
-              const delayMs =
-                timeoutRetryDelaysMs[
-                  timeoutAttempt
-                ];
-              timeoutAttempt += 1;
-
-              console.warn(
-                "GEMINI TIMEOUT RETRY:",
-                {
-                  traceId,
-                  attempt,
-                  timeoutAttempt,
-                  delayMs,
-                }
-              );
-
-              await new Promise(
-                (resolve) =>
-                  setTimeout(
-                    resolve,
-                    delayMs
-                  )
-              );
-              continue;
-            }
-
-            throw error;
-          } finally {
-            clearTimeout(
-              timeout
-            );
-          }
-
-          if (
-            ![429, 502, 503, 504].includes(
-              response.status
-            ) ||
-            transientAttempt >=
-              transientDelaysMs.length
-          ) {
-            break;
-          }
-
-          const delayMs =
-            transientDelaysMs[
-              transientAttempt
-            ];
-          transientAttempt += 1;
-
-          console.warn(
-            "GEMINI TRANSIENT RETRY:",
-            {
-              traceId,
-              attempt,
-              transientAttempt,
-              status:
-                response.status,
-              delayMs,
-            }
-          );
-
-          await new Promise(
-            (resolve) =>
-              setTimeout(
-                resolve,
-                delayMs
-              )
-          );
-        }
-        if (!response) {
-          throw new Error(
-            "GEMINI_NO_RESPONSE"
-          );
-        }
-
-        const elapsedMs =
-          Date.now() -
-          startedAt;
-
-        console.log(
-          "GEMINI FETCH END:",
-          {
+        if (!result.ok) {
+          console.error("GEMINI API ERROR:", {
             traceId,
             attempt,
-            status:
-              response.status,
+            status: result.status,
             elapsedMs,
-          }
-        );
-
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          console.error(
-            "GEMINI API ERROR:",
-            {
-              traceId,
-              attempt,
-              status:
-                response.status,
-              elapsedMs,
-              data,
-            }
-          );
-
+            data: result.data,
+          });
           return null;
         }
 
-        return parseGeminiText(
-          data?.candidates?.[0]
-            ?.content?.parts?.[0]
-            ?.text
-        );
+        return parseGeminiText(result.text);
       } catch (error) {
-        const elapsedMs =
-          Date.now() -
-          startedAt;
-
-        if (
-          error instanceof
-            Error &&
-          error.name ===
-            "AbortError"
-        ) {
-          console.error(
-            "GEMINI FETCH TIMEOUT:",
-            {
-              traceId,
-              attempt,
-              elapsedMs,
-              messageLength:
-                message.length,
-              hasSupplementaryUnicode,
-            }
-          );
-
-          throw new Error(
-            "GEMINI_TIMEOUT"
-          );
-        }
-
-        console.error(
-          "GEMINI FETCH FAILED:",
-          {
-            traceId,
-            attempt,
-            elapsedMs,
-            error,
-          }
-        );
-
+        const elapsedMs = Date.now() - startedAt;
+        console.error("GEMINI FETCH FAILED:", {
+          traceId,
+          attempt,
+          elapsedMs,
+          error,
+        });
         throw error;
       }
     }
