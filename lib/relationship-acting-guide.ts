@@ -93,6 +93,33 @@ ${notes.map((note) => `・${note}`).join("\n")}
 `.trim();
 }
 
+
+/**
+ * Temporary production adapter while the five relationship axes do not yet
+ * have canonical persisted values. It maps only legacy intimacy points and
+ * deliberately keeps direction axes neutral instead of inventing them.
+ */
+export function createLegacyRelationshipActingState(
+  points: number
+): RelationshipActingState {
+  const safePoints = Math.max(0, Number.isFinite(points) ? points : 0);
+  const intimacyStage: RelationshipActingState["intimacyStage"] =
+    safePoints >= 160 ? 5 :
+    safePoints >= 80 ? 4 :
+    safePoints >= 30 ? 2 :
+    0;
+
+  return {
+    intimacyStage,
+    friendship: 0,
+    trust: 0,
+    playfulness: 0,
+    affection: 0,
+    romance: 0,
+    relationshipStatus: "none",
+  };
+}
+
 export const ACTING_LAB_PROFILES: Record<string, RelationshipActingState> = {
   A: { intimacyStage: 0, friendship: 10, trust: 10, playfulness: 5, affection: 10, romance: 0 },
   B: { intimacyStage: 2, friendship: 75, trust: 55, playfulness: 75, affection: 40, romance: 5 },
