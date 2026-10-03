@@ -42,6 +42,10 @@ import {
 import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 import { generateGeminiJson } from "../../../lib/gemini-json-generator";
+import {
+  createLegacyRelationshipActingState,
+  createRelationshipActingGuide,
+} from "../../../lib/relationship-acting-guide";
 
 type TokyoWeather = {
   temperature: number | null;
@@ -2048,6 +2052,13 @@ export async function POST(
         safeRelationshipPoints
       );
 
+    const relationshipActingGuide =
+      createRelationshipActingGuide(
+        createLegacyRelationshipActingState(
+          safeRelationshipPoints
+        )
+      );
+
     const userProfile =
       buildUserProfile(
         [
@@ -2243,6 +2254,8 @@ export async function POST(
 ${personaPrompt}
 
 ${relationshipGuide}
+
+${relationshipActingGuide}
 
 ${userProfileGuide}
 
