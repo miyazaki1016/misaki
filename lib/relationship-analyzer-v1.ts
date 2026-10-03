@@ -1,4 +1,4 @@
-import { generateGeminiJson, type GeminiJsonResponse } from "./gemini-json-generator.ts";
+import { generateGeminiJson } from "./gemini-json-generator.ts";
 import { CRITICAL_TYPES, EVIDENCE_TYPES, parseEvidence, type CriticalType, type Turn } from "./relationship-engine-v1.ts";
 
 const EVIDENCE_RESPONSE_SCHEMA = {
@@ -35,28 +35,6 @@ const CRITICAL_RESPONSE_SCHEMA = {
   required: ["confirmed", "supportingTurn"],
 } as const;
 
-// Temporary provider diagnosis; log only allowlisted fields, never payloads.
-function logGeminiFailure(label: string, response: GeminiJsonResponse, turn: Turn) {
-  const error = (response.data as { error?: { code?: unknown; message?: unknown } } | null)?.error;
-  let message = typeof error?.message === "string" ? error.message : null;
-  // Provider messages may echo inputs. Keep keys and conversation text out of logs.
-  if (message !== null) {
-    for (const value of [process.env.GEMINI_API_KEY, turn.message, turn.reply]) {
-      if (value) {
-        message = message.replaceAll(value, "[REDACTED]");
-        message = message.replaceAll(JSON.stringify(value).slice(1, -1), "[REDACTED]");
-      }
-    }
-  }
-  console.error(label, {
-    status: response.status,
-    error: {
-      code: typeof error?.code === "number" && Number.isFinite(error.code) ? error.code : null,
-      message,
-    },
-  });
-}
-
 export async function analyzeRelationshipEvidence(turn: Turn) {
   const response = await generateGeminiJson({
     apiKey: process.env.GEMINI_API_KEY ?? "", contents: [], timeoutMs: 10_000,
@@ -72,10 +50,7 @@ Output exactly {"evidence":[{"type":"care","axis":"affection","polarity":1,"stre
 At most 5 observations; supportingTurn at most 96 characters and must be copied exactly from the user's message. No additional fields.`,
     userText: JSON.stringify(turn),
   });
-  if (!response.ok || !response.text) {
-    logGeminiFailure("RELATIONSHIP ANALYZER GEMINI FAILURE", response, turn);
-    throw new Error("relationship_analyzer_unavailable");
-  }
+  if (!response.ok || !response.text) throw new Error("relationship_analyzer_unavailable");
   return parseEvidence(JSON.parse(response.text), turn);
 }
 
@@ -107,10 +82,7 @@ Use prior canonical events only as context; never fabricate them. When uncertain
 supportingTurn must be copied exactly from the user's message. No additional fields.`,
     userText: JSON.stringify({ turn, candidate, priorEvents }),
   });
-  if (!response.ok || !response.text) {
-    logGeminiFailure("RELATIONSHIP VALIDATOR GEMINI FAILURE", response, turn);
-    throw new Error("relationship_validator_unavailable");
-  }
+  if (!response.ok || !response.text) throw new Error("relationship_validator_unavailable");
   const value = JSON.parse(response.text);
   if (!value || Object.keys(value).some(k => !["confirmed", "supportingTurn"].includes(k)) || typeof value.confirmed !== "boolean" ||
     typeof value.supportingTurn !== "string" || (value.confirmed && (!value.supportingTurn.trim() || !turn.message.includes(value.supportingTurn)))) throw new Error("invalid_critical_validation");
