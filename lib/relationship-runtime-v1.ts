@@ -75,7 +75,12 @@ export async function resumeRelationshipProcessing(userId: string, anonymous: bo
   const key = `${userId}:${anonymous}`;
   if (running.has(key)) return running.get(key);
   const task = (anonymous ? runAnonymous(userId) : runPermanent(userId))
-    .catch(() => { console.error("RELATIONSHIP V1 PROCESSING RETRY REQUIRED", { userId }); })
+    .catch((error: unknown) => {
+      console.error("RELATIONSHIP V1 PROCESSING RETRY REQUIRED", {
+        name: error instanceof Error ? error.name : "UnknownError",
+        message: error instanceof Error ? error.message : typeof error === "string" ? error : "Non-Error rejection",
+      });
+    })
     .finally(() => running.delete(key));
   running.set(key, task);
   return task;
