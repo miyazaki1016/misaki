@@ -1,5 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
+import { createLegacyRelationshipActingState, type RelationshipActingState } from "./relationship-acting-guide";
+import { criticalCandidates } from "./relationship-analyzer-v1";
 
 export type RootState = {
   history?: unknown[];
@@ -8,6 +11,10 @@ export type RootState = {
   relationshipPoints: number;
   updatedAt?: string | null;
   temporaryRevision?: string | null;
+  relationshipEngine?: Snapshot;
+  relationshipActingState?: RelationshipActingState;
+  relationshipCriticalPending?: boolean;
+  relationshipImportPending?: boolean;
   temporaryRelationship?: {
     emotionPrimary: string;
     emotionIntensity: number;
@@ -64,17 +71,37 @@ export function openTemporaryState(token: unknown): { state: RootState; requestI
 
 export async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {
   const db = createServerSupabase();
+  let relationshipImportPending = false;
+  if (engineEnabled()) {
+    try { await (await import("./relationship-runtime-v1")).importPermanentRelationship(userId); }
+    catch { relationshipImportPending = true; console.error("RELATIONSHIP V1 IMPORT RETRY REQUIRED", { userId }); }
+  }
   const [relationship, conversation] = await Promise.all([
-    db.from("misaki_relationship_state").select("intimacy_points").eq("user_id", userId).maybeSingle(),
+    db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
+  let relationshipCriticalPending = relationshipImportPending;
+  if (engineEnabled()) {
+    const { data, error } = await db.from("misaki_relationship_critical_pending").select("request_id").eq("user_id", userId).in("status", ["pending", "processing", "failed"]);
+    relationshipCriticalPending ||= !!error || !!data?.length;
+    // Bridge the interval after chat commit but before the after() worker creates pending rows.
+    const { data: recent, error: recentError } = await db.from("misaki_relationship_events").select("request_id,metadata")
+      .eq("user_id", userId).eq("event_type", "chat_turn_completed").order("id", { ascending: false }).limit(3);
+    const { data: processed, error: processedError } = await db.from("misaki_relationship_processing").select("request_id")
+      .eq("user_id", userId).eq("processing_version", "relationship-v1.1").eq("status", "applied");
+    relationshipCriticalPending ||= !!recentError || !!processedError || !!recent?.some(t =>
+      typeof t.metadata?.message === "string" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));
+  }
   return {
     relationshipPoints: relationship.data?.intimacy_points ?? 0,
     history: conversation.data?.history ?? [],
     memory: conversation.data?.memory ?? [],
     todayMemory: conversation.data?.today_memory ?? { date: "", items: [] },
     updatedAt: conversation.data?.updated_at ?? null,
+    relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,
+      createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
+    relationshipCriticalPending, relationshipImportPending,
   };
 }
 

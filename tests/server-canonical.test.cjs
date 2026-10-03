@@ -118,9 +118,11 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     const req = name => {
       if (name === '@supabase/supabase-js') return { createClient: () => client };
       if (name === 'node:crypto') return require(name);
+      if (name === 'next/server') return { after: task => task() };
+      if (name.endsWith('/relationship-runtime-v1')) return { enqueueTemporaryTurn: () => undefined, resumeRelationshipProcessing: async () => {}, pendingRelationshipGuide: () => '' };
       if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };
       if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };
-      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');
+      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name.replace(/\.ts$/, ''))) + '.ts');
       throw Error(name);
     };
     try {
