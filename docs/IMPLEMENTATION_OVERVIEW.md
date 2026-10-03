@@ -1821,3 +1821,23 @@ PR #45後に行った総点検①〜⑩を完了し、Relationship Engine v1の�
 **次の一手:** schemaを先に作らない。Productionの既存 `misaki_relationship_state` / `misaki_relationship_events`、canonical turn/request境界、conversation save後の処理境界、emotion/action triggers、Body Clock経路を実物監査し、v1を最小変更で載せるDB・処理境界設計を作る。
 
 > 未来のソラへ：詳細は必ず `docs/RELATIONSHIP_ENGINE_V1.md` を読むこと。このv1を「5軸score機能」へ縮めない。
+
+
+### 2026-10-03 — Relationship Engine v1 Production実物監査・DB処理境界設計
+
+Relationship Engine v1思想設計後、Production/sourceの既存canonical実装を監査し、実装前DB・処理境界案を `docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md` に固定した。
+
+- 設計commit: `50585d71760b7ded6a75012f3f39e19bda1032c7`
+- 既存 `misaki_relationship_state` は現在Stateとして拡張候補。
+- 既存 `misaki_relationship_events` は237件の既存監査/状態変更/checkpoint履歴を温存し、高頻度Evidence storeには転用しない。
+- v1 Evidence / Semantic Episode / Pattern は専用構造を第一候補とする。
+- 通常chatの `complete_misaki_chat_turn` と `request_id` は既存の強いcanonical success/idempotency境界として再利用候補。
+- 重大Eventは可能な場合canonical turn commitと同じ原子的単位でEvent + Statusを確定する。
+- Event Validator failureはchat成功を壊さずpending扱い。次turn Resolverは未処理critical turnも一時constraintとして見る。
+- 通常Evidence分析はcanonical save後のeventual/retryable処理。
+- anonymousは恒久plaintext Evidence tableへ逐次保存せず、既存encrypted temporary root内のcompact relationship trajectoryを継承・拡張する。
+- 既存legacy SQL keyword emotion/action triggersは停止済み。現v2 reducerは概念を残しつつcanonical-save後へ移す候補。
+- Body Clockはcanonical history/stateを共有するがgeneration pathはまだ独立。v1ではshared Resolver / Interpreter / Misaki Reply Coreへ統合対象。
+- schema/migration/code変更はまだ実施していない。
+
+**次の一手:** 上記設計を元に、実際のtable columns / indexes / unique constraints / RLS / RPC signatures / pending critical bridge / rollbackを含むschema・RPC提案を作る。まだmigration適用はしない。
