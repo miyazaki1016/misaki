@@ -35,6 +35,34 @@ const CRITICAL_RESPONSE_SCHEMA = {
   required: ["confirmed", "supportingTurn"],
 } as const;
 
+function evidenceValidationFailureReason(value: unknown, turn: Turn): string | null {
+  if (!value || typeof value !== "object") return "root_not_object";
+  if (Object.keys(value as Record<string, unknown>).some(k => k !== "evidence")) return "root_extra_key";
+  const items = (value as { evidence?: unknown }).evidence;
+  if (!Array.isArray(items)) return "evidence_not_array";
+  if (items.length > 5) return "evidence_too_many";
+  const seen = new Set<string>();
+  for (const item of items as any[]) {
+    if (!item || typeof item !== "object") return "candidate_not_object";
+    if (Object.keys(item).some(k => !["type", "axis", "polarity", "strength", "confidence", "interpretation", "subject", "supportingTurn"].includes(k))) return "candidate_extra_key";
+    if (!EVIDENCE_TYPES.includes(item.type)) return "invalid_type";
+    if (!["friendship", "trust", "playfulness", "affection", "romance"].includes(item.axis)) return "invalid_axis";
+    if (![-1, 1].includes(item.polarity)) return "invalid_polarity";
+    if (!Number.isInteger(item.strength) || item.strength < 1 || item.strength > 100) return "invalid_strength";
+    if (typeof item.confidence !== "number" || !Number.isFinite(item.confidence) || item.confidence < 0 || item.confidence > 1) return "invalid_confidence";
+    if (!["direct", "ambiguous", "hypothetical", "quoted", "third_party", "negated"].includes(item.interpretation)) return "invalid_interpretation";
+    if (!["user_to_misaki", "misaki_to_user", "third_party"].includes(item.subject)) return "invalid_subject";
+    if (typeof item.supportingTurn !== "string") return "supporting_not_string";
+    if (!item.supportingTurn.trim()) return "supporting_empty";
+    if (item.supportingTurn.length > 96) return "supporting_too_long";
+    if (!turn.message.includes(item.supportingTurn)) return "supporting_not_user_substring";
+    const key = `${item.type}:${item.axis}:${item.polarity}`;
+    if (seen.has(key)) return "duplicate_candidate";
+    seen.add(key);
+  }
+  return null;
+}
+
 export async function analyzeRelationshipEvidence(turn: Turn) {
   const response = await generateGeminiJson({
     apiKey: process.env.GEMINI_API_KEY ?? "", contents: [], timeoutMs: 10_000,
@@ -77,6 +105,7 @@ At most 5 observations; supportingTurn at most 96 characters and must be copied 
   } catch (error: unknown) {
     console.error("RELATIONSHIP ANALYZER STAGE FAILURE", {
       stage: "parse_evidence",
+      reason: evidenceValidationFailureReason(value, turn),
       name: error instanceof Error ? error.name : "UnknownError",
       message: error instanceof Error ? error.message : "Non-Error rejection",
     });
