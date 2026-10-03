@@ -1841,3 +1841,51 @@ Relationship Engine v1思想設計後、Production/sourceの既存canonical実�
 - schema/migration/code変更はまだ実施していない。
 
 **次の一手:** 上記設計を元に、実際のtable columns / indexes / unique constraints / RLS / RPC signatures / pending critical bridge / rollbackを含むschema・RPC提案を作る。まだmigration適用はしない。
+
+
+### 2026-10-03 — Relationship Engine v1 DB基盤 Production施工完了
+
+ソラ施工範囲としてRelationship Engine v1のDB基盤をProduction Supabaseへ適用し、同一migrationをGitHub `supabase/migrations/` に正本化した。
+
+Production migration:
+- `20261003081605_relationship_engine_v1_foundation`
+- `20261003081717_relationship_engine_v1_canonical_state_and_critical_event`
+- `20261003081813_relationship_engine_v1_bounded_state_application`
+- `20261003081902_relationship_engine_v1_analysis_write_surface`
+- `20261003082001_relationship_engine_v1_temporary_import_boundary`
+
+実装済みDB境界:
+- Evidence / Semantic Episode / Episode-Evidence / Pattern / Critical Pending
+- 既存 `misaki_relationship_state` に5軸（friendship/trust/playfulness/affection/romance 0..100）、relationship_status、state version
+- critical Event + Status用atomic RPC。romantic_acceptanceのみpartner成立、relationship_endのみ解除。reconciliationは自動復縁しない。axis scoreはStatusを変更しない。
+- bounded State apply RPC: 各軸1回±3、Pattern必須、canonical chat必須、request_id + processing_versionで二重適用防止
+- Evidence / Episode / Pattern書込RPC。ユーザー所有関係をDBで検証
+- processing ledgerでeventual/retryable分析状態を追跡可能
+- anonymous中はplaintext Evidence tableへ逐次保存しない。encrypted temporary root payloadを拡張する前提
+- email_save_checkpoint後だけone-time v1 canonical import可能。source revisionを監査保存
+- 新規内部tableはRLS有効、anon/authenticated direct accessなし、service_role限定
+
+DB総合テスト:
+- Production実ユーザーは不使用
+- 専用テストユーザーをtransaction内作成し、全テスト後ROLLBACK
+- Evidence→Episode→Pattern→State 正常系: PASS
+- State replay / critical Event replay 二重反映防止: PASS
+- romance scoreとStatus分離: PASS
+- romantic_acceptance / relationship_end semantics: PASS
+- delta範囲超過拒否: PASS
+- canonical未保存turn拒否: PASS
+- 他ユーザーEvidence混入拒否: PASS
+- Patternなし非ゼロ加点拒否: PASS
+- email checkpointなしtemporary import拒否: PASS
+- checkpoint後temporary v1 import: PASS
+- temporary import replayで正本非上書き: PASS
+- テストデータ残存なし（ROLLBACK）
+
+Security Advisor:
+- 今回追加RPC由来の新規 SECURITY DEFINER warningなし
+- internal service-role-only tablesの RLS enabled/no policy INFO は意図した構成
+- 既存DB由来の SECURITY DEFINER warningsは別課題として残る
+
+**次の一手:** DB基盤を勝手に再設計せず、この契約を使うWork向けアプリ実装指示書を作成する。Work実装対象は Resolver / Interpreter / Evidence Analyzer / Episode / Pattern / critical pending bridge / post-save ordering / anonymous encrypted payload / Body Clock shared Reply Core。ソラはWork成果をレビューし、DB契約・v1思想とのズレを修正する。
+
+**未来のソラへ:** DB基盤は施工済み。監査やschema設計からやり直さない。次はWorkへ渡すアプリ実装契約から再開。
