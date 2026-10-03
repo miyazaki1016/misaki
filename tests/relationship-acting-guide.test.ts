@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { ACTING_LAB_PROFILES, createRelationshipActingGuide } from "../lib/relationship-acting-guide";
+import { ACTING_LAB_PROFILES, createRelationshipActingGuide } from "../lib/relationship-acting-guide.ts";
 
 test("acting profiles never establish dating implicitly", () => {
   const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.E);
