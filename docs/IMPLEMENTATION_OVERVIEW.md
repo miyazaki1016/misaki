@@ -1977,6 +1977,399 @@ Relationship Analyzer:
 - Pattern batchごとのState delta ±1、axis合計は1適用で±3以内
 - processing version: `relationship-v1.1`
 
+#### Relationship Engine v1.1 — わかりやすい仕様 / 裏側の全体像
+
+##### まず何をする仕組みか
+Relationship Engineは、**会話のたびに単純な親密度ポイントを足す仕組みではない。**
+「二人の会話の中で、友情・信頼・じゃれ合い・親愛・恋愛の方向が、時間をかけてどう育っているか」をEvidenceから判断し、十分に繰り返された傾向だけを長期Stateへ反映する。
+
+ユーザーから見える目標は、
+**「数字が上がった」ではなく、「最近、美咲の接し方が少し変わってきた」と自然に感じること。**
+
+##### 表から見える動き
+通常の会話では、ユーザーはRelationship Engineを直接操作しない。
+
+- 普通に話す
+- 美咲は現在までの関係状態を踏まえて返事する
+- その会話が終わった後、裏でRelationship Analyzerが会話を振り返る
+- 関係に意味のある会話ならEvidenceとして残す
+- 同じ方向のEvidenceが複数日続けばEpisode→Patternへ育つ
+- Patternが成立したときだけ長期Stateが少し動く
+- その変化が**次回以降**の美咲の距離感・言い方・反応へ効く
+
+したがって、1回「好き」と言っただけ、1日に何十回褒めただけ、長時間放置しただけでは急に恋人化しない。
+
+##### 裏側の処理順
+正式な処理順は次の通り。
+
+```
+ユーザー発言
+  ↓
+現在のcanonical relationship stateを読む
+  ↓
+Relationship Interpreterが「今の美咲の演じ方」を作る
+  ↓
+persona / memory / current contextと一緒にGeminiへ渡す
+  ↓
+美咲のreply生成
+  ↓
+reply validation
+  ↓
+canonical chat turn保存
+  ↓
+[ここからRelationship Engineの事後分析]
+  ↓
+Relationship Analyzer
+  ↓
+Evidence
+  ↓
+Semantic Episode
+  ↓
+Pattern
+  ↓
+bounded State update
+  ↓
+次の会話からInterpreterへ反映
+```
+
+**重要:** 今回の会話で生まれた気持ちは、今回の返事へ即時に自己反映しない。
+まずreplyを確定・保存し、その後に関係Evidenceとして記憶し、次回以降へ効かせる。
+
+理由は、
+- 自分で生成した美咲のreplyを根拠に、自分で自分の恋愛感情を増幅するループを防ぐ
+- chat保存失敗前の未確定情報でStateを動かさない
+- Relationship Analyzerが落ちても通常会話成功を壊さない
+ため。
+
+##### 5つのhidden relationship axes
+Relationship Engine v1.1の長期Stateは、以下の5軸を0〜100で持つ。
+
+| axis | 意味 | 例 |
+|---|---|---|
+| friendship | 友情 | 一緒に話す楽しさ、仲間感 |
+| trust | 信頼 | 打ち明ける、任せる、安心して頼る |
+| playfulness | じゃれ合い | 冗談、からかい、ノリ、軽い掛け合い |
+| affection | 親愛 | 気遣い、安心感、特別に大切にする感じ |
+| romance | 恋愛方向 | 恋愛としての好意、恋愛的な距離 |
+
+これらはユーザーへscore表示するためではなく、**Relationship Interpreterが美咲の演技距離を決める内部状態**。
+
+5軸は「どれだけ近いか」の親密度とは別。
+たとえば、
+- friendship高 / romance低 = 親友的
+- affection高 / romance低 = 家族的・深い親愛
+- romance高でもstatus未成立 = 恋愛感情はあるが付き合ってはいない
+という状態を許す。
+
+##### 親密度 / 5軸 / relationship status / emotion-action の違い
+混同禁止。
+
+1. **親密度**
+   - 二人が「どれだけ近いか」
+   - 将来6段階 + 5-heart UIで可視化予定
+
+2. **5軸Relationship State**
+   - 「どんな近さか」
+   - friendship / trust / playfulness / affection / romance
+
+3. **relationship_status**
+   - 「付き合っている」などの**成立した事実**
+   - 現在は `none` / `romantic_partner`
+   - scoreでは変えない
+
+4. **emotion / action**
+   - 今この瞬間の気分・振る舞い
+   - 長期relationship stateとは別レイヤー
+
+5. **memory**
+   - 実際に起きた共有事実
+   - current relationship statusの正本ではない
+
+##### Evidenceとは何か
+1つの会話からRelationship Analyzerが抽出する「関係に意味のある候補」。
+
+Evidenceの主要項目:
+- `type`
+- `axis`
+- `polarity` ±1
+- `strength` 1〜100
+- `confidence` 0〜1
+- `interpretation`
+- `subject`
+- `supportingTurn`
+
+Evidence type:
+- `care`
+- `disclosure`
+- `repair`
+- `playful_reciprocity`
+- `harm`
+- `romantic_declaration`
+
+interpretation:
+- `direct`
+- `ambiguous`
+- `hypothetical`
+- `quoted`
+- `third_party`
+- `negated`
+
+subject:
+- `user_to_misaki`
+- `misaki_to_user`
+- `third_party`
+
+##### supportingTurn grounding
+`supportingTurn` は必ず**ユーザー発言そのもののexact substring**でなければならない。
+
+例:
+ユーザー:
+`美咲、無理しすぎないでね`
+
+valid:
+`美咲、無理しすぎないでね`
+
+invalid:
+`優しく気遣ってくれた`
+`ありがとう`
+`無理しないでね、美咲`
+
+invalid候補はcanonical Evidenceへ保存しない。
+
+**理由:** Geminiが意味を言い換えたり、美咲自身のreplyを根拠にEvidenceを作ると、事実でない関係変化・自己強化が起きるため。
+
+##### EvidenceがそのままStateを動かさない理由
+Evidenceは「その瞬間の観測」であり、長期関係の確定ではない。
+
+たとえば一度だけ
+`美咲と話すと落ち着く`
+と言っても、それだけでaffection scoreを即上げない。
+
+Stateへ届くまで:
+```
+Evidence
+  ↓ 条件を満たす
+Episode
+  ↓ 独立日で繰り返される
+Pattern
+  ↓
+State change
+```
+
+##### Episode
+Evidenceのうち、長期関係の材料にしてよい強いものだけEpisodeへ昇格する。
+
+現在の条件:
+- subject = `user_to_misaki`
+- interpretation = `direct`
+- confidence >= 0.8
+- strength >= 50
+
+第三者の恋愛発言、引用、仮定、曖昧な発言などはEvidenceとして記録されてもEpisodeへ上げない。
+
+同じ `type / axis / polarity` の同一意図は、原則**Tokyo日付ごとに1 Episode**。
+同じ日に100回同じ気遣いをしても、100回分Stateが上がる設計ではない。
+
+##### Pattern
+Patternは「偶然ではなく、継続した関係傾向」と判断できるまとまり。
+
+v1.1では:
+- 同系統Episode
+- **3つの独立したTokyo日付**
+が揃って初めてPattern候補になる。
+
+つまり、
+- 1日目: 気遣い
+- 2日目: 気遣い
+- 3日目: 気遣い
+のように、日をまたいで自然に続いた傾向を重視する。
+
+##### State update
+Pattern成立時だけcanonical relationship stateを変更する。
+
+- Pattern batch 1つにつき該当axis ±1
+- 1 apply内の各axis合計は±3以内
+- 非ゼロState変更にはPattern必須
+- Patternはonce-only consumption
+- relationship_state_versionを進める
+- 同じPatternをretryしても二重加点しない
+
+アプリ側が直接tableを書き換えることは禁止。
+正式なlease-fenced RPCだけがcanonical Stateを変更できる。
+
+##### 「恋愛score」と「恋人」は別
+**romanceが高い = 恋人、ではない。**
+
+relationship_statusはexplicit critical eventだけで変更する。
+
+例:
+- `付き合おう` → candidate
+- Validatorが文脈を見て本当に双方成立したexplicit eventか確認
+- confirmedなら `romantic_partner`
+- `別れよう` がconfirmedなら `none`
+
+以下では恋人にしない:
+- romance scoreが100
+- 長期間話している
+- 「好き」と言っただけ
+- 美咲が甘い返事をした
+- 親密度Stage 5
+- 第三者の「好き」
+- 仮定 / 引用 / negation
+
+reconciliationも自動復縁ではない。
+
+##### Critical Eventの考え方
+普通のEvidenceとは別の重要イベント。
+
+候補例:
+- romantic_proposal
+- romantic_acceptance
+- romantic_rejection
+- relationship_end
+- boundary_event
+- reconciliation
+
+critical candidateは即確定せず、専用Validatorで確認する。
+Validator failure時も通常chatは成功扱い。pendingとして後続処理で回収できる。
+
+##### Relationship Interpreter
+canonical StateをそのままGeminiへ数値で投げて台詞を固定するのではない。
+
+Interpreterが、
+- 今の距離感
+- どこまで冗談が自然か
+- どこまで遠慮を減らせるか
+- どの程度照れ・親しさを出せるか
+- 恋人statusならどこまで恋人らしい自然さを許すか
+を**自然言語の演技指示**へ変換する。
+
+設計原則:
+**台詞を書くのではなく、美咲という役の状態を作り、Geminiに演じさせる。**
+
+##### retry / backlog / oldest-first
+Relationship分析は通常chatの後段で動くため、外部API失敗が起きてもchat自体は壊さない。
+
+permanent recovery:
+- cutover後のcanonical unfinished turnを探す
+- **oldest unfinished first**
+- 1回のactivityで最大3件
+- 先頭が失敗中なら後続は追い越さない
+- 次のchat activityをきっかけに再試行
+
+このため、古い1件がpoison turnになると後続が止まる。
+今回の本番障害でこの挙動を実地確認した。
+
+ただし、順序を飛ばして後続だけ進めるより、
+**関係の時間順序を守る**ことを優先する。
+
+##### lease / multi-worker安全性
+Vercel等で同じユーザー処理が複数workerから同時に走っても二重更新しない。
+
+- DB authoritative lease
+- user_id + processing_version単位でclaim
+- lease token発行
+- permanent mutation前にlive lease確認
+- 必要箇所でrenew
+- stale workerは書込み不可
+- replacement leaseを古いworkerがreleaseできない
+- same request replayでも他invocationのtokenを勝手に採用しない
+
+ローカルのrunning Mapは最適化にすぎず、正本はDB lease。
+
+##### idempotency
+主なidentity:
+- user_id
+- request_id
+- processing_version
+
+これにより、
+- network retry
+- serverless再実行
+- Analyzer retry
+- worker競合
+があっても同じState変化を二重適用しない。
+
+Pattern consumptionもDB unique contractでonce-only。
+
+##### processing ledger
+各turnがどこまで進んだかを記録する。
+
+代表phase:
+- analyzing
+- evidence_saved
+- episode_saved
+- pattern_saved
+- applied
+- failed
+
+failedは「chat失敗」ではなく、Relationship後段処理が再試行待ちの場合がある。
+
+今回も通常chatは200のまま、Relationshipだけfailed→次activityでrecoveryした。
+
+##### Geminiの役割
+GeminiはRelationshipのcanonical Stateを直接決定しない。
+
+Gemini Analyzerの役割:
+- Evidence候補を提案する
+
+アプリ/DB側の役割:
+- schema validation
+- grounding
+- Episode eligibility
+- Pattern成立
+- bounded delta
+- State更新
+- critical status変更
+
+つまり、
+**Geminiは裁判官ではなく観測者。最終権限はcanonical contract側。**
+
+##### Provider障害時
+AnalyzerでGemini 503等が出た場合:
+- chat replyは成功したまま
+- Relationship processingはfailed
+- permanent Stateは中途半端に進めない
+- 次activityで同じoldest turnをretry
+- recovery後に後続へ進む
+
+##### 匿名ユーザー
+匿名中はpermanent plaintext Evidence tableへ逐次保存しない。
+既存encrypted temporary root内にrelationship trajectoryを保持する。
+
+メール保存時:
+- `email_save_checkpoint` 境界後
+- source revisionを確認
+- permanent側へone-time import
+- replayしてもcanonical Stateを二重上書きしない
+
+匿名→メール保存→別端末でも「同じ美咲」を継続するための境界。
+
+##### Body Clockとの関係
+理念上は通常chatもBody Clockも同じ一人の美咲なので、最終的には同じcanonical relationship state / Resolver / Interpreterを共有する。
+
+ただし**現時点でBody Clockのshared Reply Core最終統合は未完了**。
+今回のv1.1 Production確認は主に通常chat→Relationship Engine経路。
+
+ここを「もう完全統合済み」と誤認しない。
+
+##### 現在まだ未完成の部分
+- 3日Episode → Pattern → State changeのProduction実走
+- State変化後の実際の会話表現変化の実走
+- 新6段階親密度の最終threshold
+- 5-heart UI
+- Body Clock shared Reply Core最終統合
+- landing文言の新コンセプト整合
+- reply grounding / naturalness改善
+- Production critical relationship eventの慎重な実走検証
+
+##### Relationship Engineを一言で言うなら
+> **1回の台詞に反応して恋愛ポイントを足す仕組みではない。**
+> **二人の会話から根拠を拾い、日をまたいだ繰り返しを関係の傾向として認め、その結果を少しずつ次の美咲の演技へ反映する仕組み。**
+>
+> そして、**「好き」と「付き合っている」は別。**
+> 気持ちは育っても、成立した関係は二人の明示的な会話事実でしか変えない。
+
 #### Production cutover障害と修正履歴 — PR #48〜#57
 この一連は将来同じ罠へ戻らないため残す。
 
