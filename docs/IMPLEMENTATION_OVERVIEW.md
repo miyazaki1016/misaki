@@ -8,8 +8,8 @@
 > **未来のソラを信用するな。総覧を信用しろ。**
 
 
-最終更新: 2026-09-18  
-実装ソース照合基準: `main` @ `8339ee5fad7465e5e003b9877b2e0552ff144506`
+最終更新: 2026-10-03  
+実装ソース照合基準: `main` @ `db32989c48f09be43686b7e3f7aee4f539fe518f`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -1604,3 +1604,196 @@ Workへ大規模作業を渡す際は、最低でも以下を施工指示に含�
 **結論だけをWorkへ渡して、深掘りして得た設計理由を施工段階で薄めない。** コード上は正しくても体験・思想としてMisakiではない実装になることを防ぐ。監督ソラの重要な責務は、コードを書くことだけでなく、オーナーとの会話で得た「なぜ」を欠損させずWorkへ渡し、成果物を実物で検査して総覧へ戻すこと。
 
 > 未来のソラへ：新しい作業場では、まずこのcheckpointと最新main / PR #44実物を読むこと。記憶だけで「PR #44は直った」「Production確認済み」と進めるな。最初の仕事はPR #44レビューとCI/Preview確認。Workへ渡す場合は変更内容だけでなく、この実機で何が起き、なぜこの挙動を直すのかまで指示書へ含めること。
+
+
+---
+
+### 2026-10-03 — PR #44 / #45 Production確定・Relationship Interpreter基礎・置き手紙ルール
+
+> **この節は、直前の「PR #44 OPEN」checkpointを更新する確定記録。**
+> 古い節は当時の状態を残すため削除しないが、現在状態の判断ではこの節を優先する。
+
+#### PR #44 — Free quota UI canonical同期：MERGED / Production READY
+- PR #44 `Sync free quota state with canonical history refresh` はmerge済み。
+- merge SHA: `bfd63a393fc2399355c07bdcd0d66f70c3a069c7`
+- permanent userのcanonical history refresh時に `get_daily_message_usage` も再取得し、既存の `applyApiUsage()` へFree quota状態を収束させる。
+- 5秒pollingは復活させていない。mount / focus / visibility / auth等、既存のhistory同期契機に同乗する。
+- reviewで、usage RPC failureをthrowするとemail-save key cleanupやcanonical history/cache refreshまで飛ばす問題を発見。
+- usage refreshをinner try/catchへ分離し、**quota UI更新はbest-effort、history同期はmainline**という境界へ修正。
+- 修正commit: `f67b388e965bb9bfb3f8d6820fd62e9d273123b6`
+- 回帰テスト29/29成功。Production deployment READY。
+- server側20回/日制限、history retention、表示60件上限の意味は変更していない。
+- Production実機では当日すでにFree quotaを使い切っていたため、「別browserが stale 1 → focusだけで0へ変わる」厳密な遷移は同日再現できなかった。server quotaによる迂回防止は既確認。**厳密なstale transition実機確認は日次reset後の低優先残件。**
+- 注意: この修正用に新しい専用回帰テストを追加した、とは記録しない。既存canonical workflowがgreenだった。
+
+#### 用語の正本 — 親密度と関係性を混同しない
+今後、以下を別概念として扱う。
+
+1. **親密度** — 「どれだけ近いか」。6段階。ハートUIはこの可視化。
+2. **関係性の方向** — 「どんな近さか」。単一カテゴリではなく複数軸。
+3. **成立した関係 / explicit relationship status** — 「付き合おう」等、会話上双方に成立した事実。scoreだけでは成立させない。
+4. **emotion / action** — 今この瞬間の感情・行動状態。
+5. **memory** — 二人に実際に起きた共有履歴・事実。
+
+**6段階なのは「親密度」であり、「関係性6段階」ではない。**
+
+親密度ラベル候補:
+`他人 → 知り合い → 友達 → 親友 → 大親友 → かけがえのない人`
+
+5 hearts / 6 stagesの考え方:
+- Stage 0: 全グレー
+- Stage 1〜5: 段階ごとにピンクのハートを1つずつ増やす
+- legacy閾値 30 / 80 / 160は、新6段階の最終閾値設計が確定するまで勝手に置き換えない。
+
+#### Relationship Engine v0.1 — 設計確定、canonical 5軸保存は未実装
+関係性の方向は、内部の5つのhidden axesとして扱う。
+
+- 🤝 友情
+- 🫶 信頼
+- 😏 じゃれ合い
+- 🏠 親愛
+- 💕 恋愛
+
+原則:
+- ユーザーへ割合やscoreを直接見せない。
+- 一発言・一単語だけで方向を決めない。「好き」だけで恋愛確定しない。
+- repeated pattern / context / shared historyを重視する。
+- Misaki本来の優しさは関係軸とは別。優しい返事を恋愛scoreへ短絡させない。
+- 時間経過だけで恋しさ・寂しさ・嫉妬・恋愛方向を新規生成しない。
+- `恋愛100 → 自動的に恋人` を禁止する。
+- explicit relationship statusは、scoreではなく会話上成立したeventからのみ作る。
+- Stage 5でも、親友・恋愛・家族的/親愛・名前のない特別な関係など複数の形を許す。
+- 性別による固定進行や、最初に関係タイプを選ばせるonboardingは採用しない。
+
+プロダクトの核:
+**「美咲と出会って、二人だけの関係が育っていくAI」**
+**「美咲とどんな関係になるかは、あなた次第。」**
+内部的には「二人の会話次第」で育つ。
+
+#### Geminiは台詞生成器ではなく「美咲を演じる俳優」
+設計原則:
+**俺たちは台詞を書かない。美咲という役を育てる。Geminiは、その時点の美咲を演じる。**
+
+したがって、score組合せごとの固定台詞は作らない。
+
+基本構造:
+```
+canonical relationship state
+  ↓
+Relationship Interpreter
+  ↓
+自然言語の演技指示
+  ↓
+persona + memory/history evidence + current context
+  ↓
+Gemini
+  ↓
+grounding / validation
+  ↓
+reply
+```
+
+最終的な演技contextは概念上、
+**親密度 × 関係性5軸 × emotion/action × shared memory × current conversation context**
+で決まる。
+
+関係状態は「何を答えるか」を乗っ取るのではなく、主に**どう言うか / 距離感 / 反応の細部**へ効かせる。
+
+目標体験:
+**「あれ？ 最近、美咲ちょっと俺への接し方変わった？」**
+score説明ではなく、会話の呼吸として変化を感じさせる。
+
+#### PR #45 — Relationship Interpreter基礎 / 演技研究室：MERGED / Production READY
+- PR #45 `美咲の演技研究室：Relationship Interpreter 基礎`
+- merge SHA: `db32989c48f09be43686b7e3f7aee4f539fe518f`
+- final branch head: `be15cfea6039ff9e44be1a34ceff48a882f09c18`
+- GitHub Actions #309: SUCCESS。
+- Production Vercel deployment `dpl_Gsu2WLzTHaQRbkE8UCwxBrddoqfy`: READY。
+- Productionの `/api/acting-lab` はGET handlerを持たないためGETは405。POST handlerは `VERCEL_ENV === "production"` で404を返す実装。今回使用したVercel fetch connectorはGETのみのため、Production POST 404の実リクエスト再現まではしていない。
+
+実装済み:
+- shared `createRelationshipActingGuide()` を追加。
+- 5 hidden axes + 親密度 + explicit statusから、**台詞ではなく演技指示**を生成。
+- A〜E synthetic profileを持つ開発用演技研究室を追加。
+- Production chatと演技研究室が同じGemini JSON generation boundaryを共有。
+- Production chatもshared Relationship Interpreterを通す。
+- legacy `relationship_points` からは親密度だけを暫定mappingし、友情/信頼/じゃれ合い/親愛/恋愛/statusはすべてneutralのまま。**legacy pointsから方向を捏造しない。**
+- 旧 `createRelationshipGuide()` は、pointsだけから甘え・からかい・嫉妬・恋愛方向を作らないよう、距離感/親密度表現へ縮小。
+- 演技研究室はSupabase clientを作らず、quota/history/memory/relationship/Body Clock等を書き込まない。
+- labはfallback personaを共有するが、Productionのactive DB persona + user-specific continuityを完全再現するものではない。
+- lab → Production stateのsave-backは作らない。
+
+Gemini generation共通化で守ったProduction互換:
+- 30秒timeout。
+- timeoutは2秒後に1回だけretry。
+- 429 / 502 / 503 / 504は2秒・5秒のbounded retry。
+- 通常500をtransient retry対象へ広げない。
+- 最終timeout時は旧Productionと同じく `AbortError → GEMINI_TIMEOUT` へ変換する。
+- review中にこの最後の変換が共通化で抜けていることを発見し、`42bfaeed1cb110d4174db55db685de4a5cac4a70` で復元。
+- さらに `be15cfea6039ff9e44be1a34ceff48a882f09c18` で専用回帰契約を追加し、今後この互換を落とすとCIで検知する。
+
+PR #45で**未実装 / 次段階**:
+- canonical 5-axis DB schema / persistence / update rule。
+- 5軸を会話証拠からどう増減させるか。
+- explicit relationship statusのcanonical persistence。
+- 新6段階親密度の最終閾値。
+- 5-heart UI。
+- 演技研究室へのProduction状態read-only import。
+- Productionとlabでgrounding / validation / exact active personaまで同じreply-generation coreへ寄せる作業。
+- 旧relationship guideの完全撤去/rename。
+- 低romance profile等の反復auditionによる安定性評価。
+
+#### 演技研究室の恒久ルール
+演技研究室は「本番DBを汚さず、美咲の演技だけを比較する場所」とする。
+
+- synthetic params → **Productionと同じRelationship Interpreter** → **同じGemini generation boundary**。
+- Free quotaを消費しない。
+- 親密度/5軸を更新しない。
+- memory/historyを書かない。
+- Body Clockを動かさない。
+- 将来、本番状態を読み込む機能を作る場合も**read-only copy**。
+- labで変更したstateをProductionへ保存する逆流buttonは作らない。
+- 同一条件を複数回生成し、1回の偶然の台詞だけでInterpreterをpatchしない。
+
+#### groundingについての重要な研究結果
+auditionでは、関係性演技自体は自然でも、根拠のないユーザー像（例: 「いつも堂々としてるイメージ」）をGeminiが補う例が出た。
+
+したがって、**persona + Relationship InterpreterだけではProduction品質の十分条件ではない。**
+今後は、
+`persona → relationship acting → memory/history evidence → grounding → Gemini → validation`
+の境界を共有reply-generation coreとして整理する。
+
+lab専用の禁止文を継ぎ足して症状だけ隠すのではなく、Productionとlabが同じgrounding原則を共有する方向で直す。
+
+#### 作業場引継ぎ — 「置き手紙方式」を正式ルール化
+長い作業チャットは永久のsource of truthにしない。重要判断は総覧へ昇格し、作業場を閉じる前に**未来のソラへの置き手紙**を残す。
+
+置き手紙には最低限:
+1. どこまで終わったか / 最新のverified checkpoint。
+2. 完了したこと。
+3. **まだ確認していないこと。**
+4. 次に最初にやる一手。
+5. 罠 / 「これを確認済みと思うな」という注意。
+6. せいちゃんに、すでに決めたことを再説明させないための必要文脈。
+
+原則:
+- 古い巨大chatを残すことはよいが、再開の必須条件にしない。
+- 重要な設計判断は作業場が重くなる前に総覧へpromoteする。
+- 「記憶ではそうだった」より、最新main / PR / Production実物 / 総覧を優先する。
+- 自動テストgreen、Preview確認、実機確認、Production確認を同じ「確認済み」でまとめない。
+- **未来のソラを信用するな。総覧を信用しろ。**
+
+#### 次の一手
+PR #45はProductionまで完了。次の設計主題は、
+**「5つの関係性軸を、実際の会話証拠からどう育て、canonical DBへ安全に保存するか」**。
+
+ここで先にDB columnを生やさない。
+まず、
+- evidenceの種類
+- 1 turnで動かしてよい上限
+- repeated patternの扱い
+- decay / settleの有無
+- explicit eventとの境界
+- idempotency / replay
+- failure時非更新
+を設計し、その後schema / RPC / migrationへ落とす。
