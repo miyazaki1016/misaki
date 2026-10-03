@@ -63,6 +63,22 @@ test("Relationship Analyzer uses string polarity enum at Gemini boundary and nor
   }
 });
 
+test("Relationship Analyzer ignores evidence whose supportingTurn is not grounded in the user message", async () => {
+  const oldFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+    evidence: [{
+      type: "care", axis: "affection", polarity: "1", strength: 70, confidence: 0.95,
+      interpretation: "direct", subject: "user_to_misaki", supportingTurn: "ありがとう"
+    }]
+  }) }] } }] });
+  try {
+    const result = await analyzeRelationshipEvidence(turn);
+    assert.deepEqual(result, []);
+  } finally {
+    globalThis.fetch = oldFetch;
+  }
+});
+
 test("Relationship Analyzer still fails closed on out-of-contract polarity after transport normalization", async () => {
   const oldFetch = globalThis.fetch;
   globalThis.fetch = async () => Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({

@@ -99,6 +99,14 @@ At most 5 observations; supportingTurn at most 96 characters and must be copied 
         item.polarity = Number(item.polarity);
       }
     }
+    (value as { evidence: any[] }).evidence = (value as { evidence: any[] }).evidence.filter((item: any) =>
+      item &&
+      typeof item === "object" &&
+      typeof item.supportingTurn === "string" &&
+      item.supportingTurn.trim() &&
+      item.supportingTurn.length <= 96 &&
+      turn.message.includes(item.supportingTurn)
+    );
   }
   try {
     return parseEvidence(value, turn);
