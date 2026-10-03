@@ -317,6 +317,8 @@ test('Gemini timeout gets one bounded retry before the normal failure/refund pat
   assert.ok(source.includes('error.name === "AbortError"'));
   const chatSource = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
   assert.ok(chatSource.includes('generateGeminiJson({'));
+  assert.ok(chatSource.includes('error.name === "AbortError"'));
+  assert.ok(chatSource.includes('throw new Error("GEMINI_TIMEOUT")'));
   assert.ok(chatSource.includes('throw error'));
 });
 
