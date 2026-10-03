@@ -2442,11 +2442,14 @@ ${retryProblems
         retryProblems && retryProblems.length > 0
           ? "retry"
           : "initial";
+      const hasSupplementaryUnicode =
+        /[\uD800-\uDBFF][\uDC00-\uDFFF]/.test(message);
 
       console.log("GEMINI FETCH START:", {
         traceId,
         attempt,
         messageLength: message.length,
+        hasSupplementaryUnicode,
       });
 
       try {
@@ -2483,6 +2486,22 @@ ${retryProblems
         return parseGeminiText(result.text);
       } catch (error) {
         const elapsedMs = Date.now() - startedAt;
+
+        if (
+          error instanceof Error &&
+          error.name === "AbortError"
+        ) {
+          console.error("GEMINI FETCH TIMEOUT:", {
+            traceId,
+            attempt,
+            elapsedMs,
+            messageLength: message.length,
+            hasSupplementaryUnicode,
+          });
+
+          throw new Error("GEMINI_TIMEOUT");
+        }
+
         console.error("GEMINI FETCH FAILED:", {
           traceId,
           attempt,
