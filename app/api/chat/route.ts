@@ -1,3 +1,6 @@
+import { after } from "next/server";
+import { engineEnabled } from "../../../lib/relationship-engine-v1";
+import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
 import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
 import { createServerSupabase, loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from "../../../lib/canonical-state";
@@ -1800,14 +1803,21 @@ export async function POST(
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
       if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
+      after(() => resumeRelationshipProcessing(userData.user.id, true));
       return Response.json(publicChatResult({ ...replay, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
-      if (completed) return Response.json(publicChatResult(completed));
+      if (completed) {
+        after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
+        return Response.json(publicChatResult(completed));
+      }
     } else {
       const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
-      if (completed) return Response.json(publicChatResult(completed));
+      if (completed) {
+        after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
+        return Response.json(publicChatResult(completed));
+      }
     }
     const rootState = isAnonymous
       ? await loadTemporaryRoot(userData.user.id, temporaryState)
@@ -2043,14 +2053,14 @@ export async function POST(
 
     const safeRelationshipPoints = canonicalRelationshipPoints;
 
-    const relationshipGuide =
+    const relationshipGuide = engineEnabled() ? "" :
       createRelationshipGuide(
         safeRelationshipPoints
       );
 
     const relationshipActingGuide =
       createRelationshipActingGuide(
-        createLegacyRelationshipActingState(
+        rootState.relationshipActingState ?? (rootState.relationshipEngine ? { ...rootState.relationshipEngine.state, intimacyStage: createLegacyRelationshipActingState(safeRelationshipPoints).intimacyStage } : undefined) ?? createLegacyRelationshipActingState(
           safeRelationshipPoints
         )
       );
@@ -2252,6 +2262,7 @@ ${personaPrompt}
 ${relationshipGuide}
 
 ${relationshipActingGuide}
+${pendingRelationshipGuide(rootState)}
 
 ${userProfileGuide}
 
@@ -2657,20 +2668,6 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       }
     }
 
-    if (!isAnonymous) {
-      await measureStage(
-        "relationship-emotion-persist",
-        () => persistRelationshipEmotionFromSignals(
-          relationshipSupabase!,
-          false,
-          relationshipTimeContext,
-          relationshipAssessment,
-          relationshipPatterns,
-          userData.user.id
-        )
-      );
-    }
-
     const finalProblems =
       getReplyProblems(
         reply,
@@ -2771,19 +2768,6 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
         ),
     };
 
-    if (!isAnonymous) {
-      await measureStage(
-        "relationship-turn-record",
-        () => recordRelationshipChatTurn(
-          relationshipSupabase!,
-          false,
-          new Date(requestStartedAt),
-          new Date(),
-          userData.user.id
-        )
-      );
-    }
-
     const generatedResult = {
       requestId: usageRequestId,
       rootUpdatedAt: rootState.updatedAt ?? null,
@@ -2816,6 +2800,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       completedResult = { ...generatedResult, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
       const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
+        relationshipEngine: enqueueTemporaryTurn(rootState, { requestId: usageRequestId, message: message.slice(0, 2000), reply: reply.slice(0, 2000), savedAt: new Date().toISOString() }),
         relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         temporaryRelationship: {
           emotionPrimary: relationshipPreview.emotion.primary,
@@ -2845,6 +2830,38 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     }
     chargedRequestId = null;
     chargedSupabase = null;
+    after(async () => {
+      try {
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-emotion-persist",
+        () => persistRelationshipEmotionFromSignals(
+          relationshipSupabase!,
+          false,
+          relationshipTimeContext,
+          relationshipAssessment,
+          relationshipPatterns,
+          userData.user.id
+        )
+      );
+    }
+
+    if (!isAnonymous) {
+      await measureStage(
+        "relationship-turn-record",
+        () => recordRelationshipChatTurn(
+          relationshipSupabase!,
+          false,
+          new Date(requestStartedAt),
+          new Date(),
+          userData.user.id
+        )
+      );
+    }
+
+      } catch { console.error("POST SAVE LEGACY RELATIONSHIP RETRY REQUIRED", { traceId }); }
+      await resumeRelationshipProcessing(userData.user.id, isAnonymous);
+    });
     console.log(
       "CHAT TOTAL:",
       {

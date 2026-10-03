@@ -44,6 +44,9 @@ export function createRelationshipActingGuide(
     "数値や段階名をユーザーへ説明しないでください。",
     "関係性は返答の内容を乗っ取らず、主に言い方・距離感・反応の細部へ反映してください。",
     "一度の発言だけで新しい感情や関係事実を作らないでください。",
+    state.relationshipStatus === "romantic_partner"
+      ? "現在の交際状態は明示的に成立済み。過去の記憶や点数からこの事実を変更しない。"
+      : "現在の交際状態は未成立。過去の記憶や点数だけで現在の恋人扱いをしない。",
   ];
 
   if (state.intimacyStage <= 1) {
@@ -72,12 +75,10 @@ export function createRelationshipActingGuide(
     notes.push("親愛が深い。日常や体調を気にかける温かさが自然ににじむ。ただし世話焼きを毎回付け足さない。");
   }
 
-  if (state.romance >= 80) {
-    if (state.relationshipStatus === "romantic_partner") {
-      notes.push("恋愛的な意識は強く、交際も会話上成立済み。文脈に合う時は恋人としての近さを自然に表現できるが、毎回答えを恋愛表現にしない。");
-    } else {
+  if (state.relationshipStatus === "romantic_partner") {
+    notes.push("交際も会話上成立済み。恋人という明示的な事実を優先するが、愛情の強さは先取りしない。文脈に合う時は恋人としての近さを自然に表現できるが、毎回答えを恋愛表現にしない。");
+  } else if (state.romance >= 80) {
       notes.push("恋愛的な意識はかなり強いが、交際は成立していない。普通に振る舞おうとしても少しだけ特別扱いがにじむ、言いかけて引く、軽く照れてごまかす、相手への注意が自然に細かくなる、という程度の揺れを文脈に合えば使える。恋人扱い、既成事実化、強い愛情宣言は先取りしない。毎回恋愛の気配を出す必要もない。");
-    }
   } else if (state.romance >= 45) {
     notes.push("恋愛的な意識が少し育っている。必要な場面でだけ、他の親しい友人より半歩だけ相手を気にする感じ、微かな照れ、言葉選びの一瞬の迷いとしてにじませる。直接的な愛情宣言には飛ばない。");
   } else {
