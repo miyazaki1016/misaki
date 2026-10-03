@@ -7,6 +7,8 @@ export type GeminiJsonRequest = {
   }>;
   userText: string;
   timeoutMs?: number;
+  transientRetryDelaysMs?: number[];
+  timeoutRetryDelaysMs?: number[];
 };
 
 export type GeminiJsonResponse = {
@@ -21,36 +23,70 @@ const MODEL = "gemini-3.1-flash-lite";
 export async function generateGeminiJson(
   request: GeminiJsonRequest
 ): Promise<GeminiJsonResponse> {
-  const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
-    request.timeoutMs ?? 30_000
-  );
-
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${request.apiKey}`,
+  const body = JSON.stringify({
+    systemInstruction: {
+      parts: [{ text: request.systemInstruction }],
+    },
+    contents: [
+      ...request.contents,
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: controller.signal,
-        body: JSON.stringify({
-          systemInstruction: {
-            parts: [{ text: request.systemInstruction }],
-          },
-          contents: [
-            ...request.contents,
-            {
-              role: "user",
-              parts: [{ text: request.userText }],
-            },
-          ],
-          generationConfig: {
-            responseMimeType: "application/json",
-          },
-        }),
-      }
+        role: "user",
+        parts: [{ text: request.userText }],
+      },
+    ],
+    generationConfig: {
+      responseMimeType: "application/json",
+    },
+  });
+
+  const transientRetryDelaysMs =
+    request.transientRetryDelaysMs ?? [2_000, 5_000];
+  const timeoutRetryDelaysMs =
+    request.timeoutRetryDelaysMs ?? [2_000];
+  let transientAttempt = 0;
+  let timeoutAttempt = 0;
+
+  while (true) {
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      request.timeoutMs ?? 30_000
     );
+
+    let response: Response;
+    try {
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${request.apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          signal: controller.signal,
+          body,
+        }
+      );
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.name === "AbortError" &&
+        timeoutAttempt < timeoutRetryDelaysMs.length
+      ) {
+        const delayMs = timeoutRetryDelaysMs[timeoutAttempt++];
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        continue;
+      }
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+
+    if (
+      [429, 502, 503, 504].includes(response.status) &&
+      transientAttempt < transientRetryDelaysMs.length
+    ) {
+      const delayMs = transientRetryDelaysMs[transientAttempt++];
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+      continue;
+    }
 
     const data = await response.json();
     const text =
@@ -64,8 +100,6 @@ export async function generateGeminiJson(
       text,
       data,
     };
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
