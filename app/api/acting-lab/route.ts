@@ -99,18 +99,3 @@ ${actingGuide}
     results,
   });
 }
-
-
-// Preview convenience: GET can run a scenario via ?message= without any writes.
-export async function GET(request: NextRequest) {
-  const message = request.nextUrl.searchParams.get("message")?.trim();
-  if (!message) return POST(request);
-
-  const body = JSON.stringify({ message });
-  const forwarded = new NextRequest(request.url, {
-    method: "POST",
-    headers: request.headers,
-    body,
-  });
-  return POST(forwarded);
-}
