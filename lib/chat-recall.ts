@@ -30,11 +30,11 @@ function isDiagnosticHistoryItem(item: any) {
 }
 
 export function createRecallAwareMessage(
-  message: unknown,
+  message: string,
   history: unknown,
   recallMode: boolean
-) {
-  if (!recallMode || typeof message !== "string") return message;
+): string {
+  if (!recallMode) return message;
 
   const recentConversation = Array.isArray(history)
     ? history
