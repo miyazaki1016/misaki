@@ -12,7 +12,7 @@ const EVIDENCE_RESPONSE_SCHEMA = {
         properties: {
           type: { type: "STRING", enum: [...EVIDENCE_TYPES] },
           axis: { type: "STRING", enum: ["friendship", "trust", "playfulness", "affection", "romance"] },
-          polarity: { type: "INTEGER", enum: [-1, 1] },
+          polarity: { type: "INTEGER" },
           strength: { type: "INTEGER", minimum: 1, maximum: 100 },
           confidence: { type: "NUMBER", minimum: 0, maximum: 1 },
           interpretation: { type: "STRING", enum: ["direct", "ambiguous", "hypothetical", "quoted", "third_party", "negated"] },

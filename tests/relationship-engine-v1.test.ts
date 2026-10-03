@@ -90,6 +90,14 @@ test("model cannot emit State/status/delta or fabricated supporting text", () =>
   assert.throws(() => parseEvidence({ evidence: [{ ...evidence, delta: 50 }] }, turn));
   assert.throws(() => parseEvidence({ evidence: [{ ...evidence, supportingTurn: "存在しない" }] }, turn));
 });
+test("parseEvidence retains polarity -1/1 validation without provider enum", () => {
+  for (const polarity of [-1, 1]) {
+    assert.equal(parseEvidence({ evidence: [{ ...evidence, polarity }] }, turn)[0].polarity, polarity);
+  }
+  for (const polarity of [0, -2, 2, 0.5, "-1", "1", null, undefined]) {
+    assert.throws(() => parseEvidence({ evidence: [{ ...evidence, polarity }] }, turn), /invalid_evidence_candidate/);
+  }
+});
 for (const interpretation of ["ambiguous", "hypothetical", "quoted", "third_party", "negated"] as const) {
   test(`${interpretation} observation cannot produce an Episode`, () => assert.equal(episodeFor({ ...evidence, interpretation }, turn), null));
 }

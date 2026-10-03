@@ -31,7 +31,7 @@ test('Analyzer HTTP failure logs only status and Google error fields, retaining 
   const logged = JSON.stringify(h.logs);
   for (const value of [apiKey, turn.message, turn.reply, turn.requestId, 'private-response', 'details']) assert.ok(!logged.includes(value));
   assert.equal(h.calls.length, 1);
-  assert.deepEqual(Array.from(h.calls[0].responseSchema.properties.evidence.items.properties.polarity.enum), [-1, 1]);
+  assert.deepEqual(JSON.parse(JSON.stringify(h.calls[0].responseSchema.properties.evidence.items.properties.polarity)), { type: 'INTEGER' });
   assert.equal(h.calls[0].timeoutMs, 10000);
   assert.equal(h.calls[0].transientRetryDelaysMs.length, 0);
   assert.equal(h.calls[0].timeoutRetryDelaysMs.length, 0);
