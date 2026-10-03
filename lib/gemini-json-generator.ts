@@ -9,6 +9,7 @@ export type GeminiJsonRequest = {
   timeoutMs?: number;
   transientRetryDelaysMs?: number[];
   timeoutRetryDelaysMs?: number[];
+  responseSchema?: Record<string, unknown>;
 };
 
 export type GeminiJsonResponse = {
@@ -23,6 +24,11 @@ const MODEL = "gemini-3.1-flash-lite";
 export async function generateGeminiJson(
   request: GeminiJsonRequest
 ): Promise<GeminiJsonResponse> {
+  const generationConfig: Record<string, unknown> = {
+    responseMimeType: "application/json",
+  };
+  if (request.responseSchema) generationConfig.responseSchema = request.responseSchema;
+
   const body = JSON.stringify({
     systemInstruction: {
       parts: [{ text: request.systemInstruction }],
@@ -34,9 +40,7 @@ export async function generateGeminiJson(
         parts: [{ text: request.userText }],
       },
     ],
-    generationConfig: {
-      responseMimeType: "application/json",
-    },
+    generationConfig,
   });
 
   const transientRetryDelaysMs =
