@@ -6,6 +6,48 @@
 -- canonical State lock or state mutation occurs before the wait.
 begin;
 set local role service_role;
+-- ACL checks plus real invocation prove old paths cannot bypass lease fencing.
+-- Typed NULL arguments prevent creating any fixture even if a check fails.
+do $$
+declare
+  fn record; arguments text; legacy_count integer:=0; fenced_count integer:=0;
+  mutations text[]:=array[
+    'advance_misaki_relationship_processing','record_misaki_relationship_evidence',
+    'upsert_misaki_relationship_episode','upsert_misaki_relationship_pattern',
+    'upsert_misaki_relationship_critical_pending','advance_misaki_relationship_critical_pending',
+    'import_misaki_temporary_relationship','apply_misaki_relationship_state',
+    'apply_misaki_relationship_critical_event'
+  ];
+begin
+  assert current_user='service_role';
+  for fn in select p.oid,p.proname,p.proargtypes from pg_proc p
+    join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname='public' and p.proname=any(
+      select name||'_v1' from unnest(mutations) name
+    ) loop
+    legacy_count:=legacy_count+1;
+    assert not has_function_privilege('service_role',fn.oid,'EXECUTE'),
+      'legacy permanent mutation still executable: '||fn.proname;
+    select string_agg('NULL::'||format_type(arg,NULL),',' order by ordinal)
+      into arguments from unnest(fn.proargtypes::oid[]) with ordinality as args(arg,ordinal);
+    begin
+      execute format('select public.%I(%s)',fn.proname,arguments);
+      raise exception 'legacy mutation bypass accepted: %',fn.proname;
+    exception when insufficient_privilege then null;
+    end;
+  end loop;
+  assert legacy_count=9,'expected exactly nine legacy permanent mutation RPCs';
+  for fn in select p.oid,p.proname from pg_proc p
+    join pg_namespace n on n.oid=p.pronamespace
+    where n.nspname='public' and p.proname=any(
+      select name||'_v2' from unnest(mutations) name
+    ) loop
+    fenced_count:=fenced_count+1;
+    assert has_function_privilege('service_role',fn.oid,'EXECUTE'),
+      'fenced mutation is not executable: '||fn.proname;
+  end loop;
+  assert fenced_count=9,'expected exactly nine fenced permanent mutation RPCs';
+end $$;
 do $$
 declare
   u uuid; requests uuid[]; first_request uuid; later_request uuid;
