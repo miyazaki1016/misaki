@@ -6,9 +6,9 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const rootPath = path.resolve(__dirname, '..');
 
-function harness({ failure = false, outside = false } = {}) {
+function harness({ failure = false, outside = false, permanent } = {}) {
   const turn = { requestId: 'turn-3', message: '美咲、体調は大丈夫？', reply: 'ありがとう', savedAt: '2026-10-03T00:00:00Z' };
-  let root; let models = 0; let writes = 0; let imports = 0; let failed = failure;
+  let root; let models = 0; let writes = 0; let imports = 0; let failed = failure; let attempts = 0;
   const evidence = { type: 'care', axis: 'affection', polarity: 1, strength: 70, confidence: .95, interpretation: 'direct', subject: 'user_to_misaki', supportingTurn: '体調は大丈夫' };
   const cache = new Map();
   const canonical = {
@@ -22,7 +22,7 @@ function harness({ failure = false, outside = false } = {}) {
       async rpc(name, args) { assert.equal(name, 'import_misaki_temporary_relationship_v1'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },
     }),
   };
-  const context = vm.createContext({ process: { env: { MISAKI_RELATIONSHIP_ENGINE_VERSION: 'relationship-v1.1' } }, console: { error() {} }, Date, JSON, Map, Set, Object, Number, Promise });
+  const context = vm.createContext({ process: { env: { MISAKI_RELATIONSHIP_ENGINE_VERSION: 'relationship-v1.1', MISAKI_RELATIONSHIP_ENGINE_START_AT: '2026-10-03T00:00:00Z' } }, console: { error() {} }, Date, JSON, Map, Set, Object, Number, Promise });
   function load(file) {
     if (cache.has(file)) return cache.get(file);
     const code = ts.transpileModule(fs.readFileSync(path.join(rootPath, file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
@@ -30,6 +30,10 @@ function harness({ failure = false, outside = false } = {}) {
     const req = name => {
       if (name === 'node:crypto') return require(name);
       if (name === './canonical-state') return canonical;
+      if (permanent && name === './relationship-processing-v1') return {
+        CanonicalRelationshipStore: class { async rows(table) { return table === 'misaki_relationship_processing' ? [] : [turn, { ...turn, requestId: 'later' }].map(t => ({ request_id: t.requestId, created_at: t.savedAt })); } },
+        async processRelationshipTurn() { attempts++; if (permanent === 'failure') throw Error('DB failure'); return { status: 'deferred', reason: permanent }; },
+      };
       if (name.startsWith('./relationship-analyzer-v1')) return {
         criticalCandidates: () => [], validateCriticalEvent: async () => false,
         analyzeRelationshipEvidence: async () => { models++; if (failed) throw Error('timeout'); return [evidence]; },
@@ -46,7 +50,7 @@ function harness({ failure = false, outside = false } = {}) {
     episodes: [1, 2].map(day => engine.episodeFor(evidence, { ...turn, requestId: String(day), savedAt: `2026-10-0${day}T00:00:00Z` })),
     appliedPatterns: [], processed: [], pending: [turn],
   } };
-  return { runtime: load('lib/relationship-runtime-v1.ts'), clearFailure() { failed = false; }, get root() { return root; }, get models() { return models; }, get writes() { return writes; }, get imports() { return imports; } };
+  return { runtime: load('lib/relationship-runtime-v1.ts'), clearFailure() { failed = false; }, get root() { return root; }, get models() { return models; }, get writes() { return writes; }, get imports() { return imports; }, get attempts() { return attempts; } };
 }
 
 test('anonymous saved root analysis uses encrypted CAS writer and replay cannot grow twice', async () => {
@@ -68,10 +72,23 @@ test('another anonymous owner cannot consume this root', async () => {
   const h = harness(); await h.runtime.resumeRelationshipProcessing('another-user', true); assert.equal(h.models, 0); assert.equal(h.writes, 0);
 });
 test('permanence imports newest verified frozen root once, including pending analysis, without anonymous writer', async () => {
-  const h = harness(); await h.runtime.importPermanentRelationship('owner'); assert.equal(h.imports, 1); assert.equal(h.writes, 0);
-  await h.runtime.importPermanentRelationship('owner'); assert.equal(h.imports, 1); assert.equal(h.models, 1);
+  const h = harness(); await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);
+  await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);
 });
 test('permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root', async () => {
-  const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner'));
-  assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner'); assert.equal(h.imports, 1);
+  const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', async () => {}));
+  assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1);
+});
+
+for (const reason of ['lease_busy', 'out_of_order', 'lease_lost', 'failure']) {
+  test(`permanent after-save runner stops on ${reason} and preserves successful chat`, async () => {
+    const h = harness({ permanent: reason });
+    await h.runtime.resumeRelationshipProcessing('owner', false);
+    assert.equal(h.attempts, 1); assert.equal(h.models, 0); assert.equal(h.imports, 0);
+  });
+}
+test('permanence import rechecks ownership before model and atomic materialization', async () => {
+  const h = harness(); let checks = 0;
+  await assert.rejects(h.runtime.importPermanentRelationship('owner', async () => { if (++checks === 3) throw Error('lease_lost'); }));
+  assert.equal(h.models, 1); assert.equal(h.imports, 0); assert.equal(h.writes, 0);
 });

@@ -4,7 +4,7 @@ import { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type S
 import { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from "./relationship-analyzer-v1";
 import { CanonicalRelationshipStore, processRelationshipTurn } from "./relationship-processing-v1";
 
-// Within one runtime, concurrent retries share a task. DB request/version uniqueness is the final replay guard.
+// Local deduplication is an optimization; DB leases serialize distributed workers.
 const running = new Map<string, Promise<void>>();
 export function enqueueTemporaryTurn(root: RootState, turn: Turn): Snapshot | undefined {
   if (!engineEnabled()) return root.relationshipEngine;
@@ -13,7 +13,7 @@ export function enqueueTemporaryTurn(root: RootState, turn: Turn): Snapshot | un
     ? snapshot : { ...snapshot, pending: [...snapshot.pending, turn] };
 }
 
-async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>) {
+async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>, check?: () => Promise<void>) {
   let snapshot = root.relationshipEngine!;
   for (const turn of snapshot.pending) {
     const history = root.history as any[];
@@ -23,13 +23,19 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     for (const type of criticalCandidates(turn.message)) {
       const events = snapshot.criticalEvents ?? [];
       if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;
-      if (await validateCriticalEvent(turn, type, events)) {
+      await check?.();
+      const confirmed = await validateCriticalEvent(turn, type, events);
+      await check?.();
+      if (confirmed) {
         snapshot = { ...snapshot, state: { ...snapshot.state,
           relationshipStatus: type === "romantic_acceptance" ? "romantic_partner" : type === "relationship_end" ? "none" : snapshot.state.relationshipStatus },
           version: snapshot.version + 1, criticalEvents: [...events, { request_id: turn.requestId, event_type: type }] };
       }
     }
-    snapshot = applyTemporaryEvidence(snapshot, turn, await analyzeRelationshipEvidence(turn));
+    await check?.();
+    const evidence = await analyzeRelationshipEvidence(turn);
+    await check?.();
+    snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
     if (save) await save(snapshot);
   }
   return snapshot;
@@ -45,8 +51,7 @@ async function runAnonymous(userId: string) {
 }
 
 async function runPermanent(userId: string) {
-  // No permanent application may race ahead of the one-time encrypted import.
-  await importPermanentRelationship(userId);
+  // Import and ordinary processing share the claimed per-user lease.
   const store = new CanonicalRelationshipStore(createServerSupabase());
   // Scan saved canonical turns chronologically; one failed predecessor stops later application.
   const turns = await store.rows("misaki_relationship_events", userId, q => q.eq("event_type", "chat_turn_completed").order("id", { ascending: true }));
@@ -59,7 +64,8 @@ async function runPermanent(userId: string) {
     if (Date.parse(turn.created_at) < Date.parse(boundary)) continue;
     if (ledgers.some(l => l.request_id === turn.request_id && l.status === "applied")) continue;
     if (++count > 3) break;
-    await processRelationshipTurn(store, userId, turn.request_id);
+    const result = await processRelationshipTurn(store, userId, turn.request_id, undefined, undefined, check => importPermanentRelationship(userId, check));
+    if (result.status === "deferred") break;
   }
 }
 
@@ -75,8 +81,9 @@ export async function resumeRelationshipProcessing(userId: string, anonymous: bo
   return task;
 }
 
-export async function importPermanentRelationship(userId: string) {
+export async function importPermanentRelationship(userId: string, check: () => Promise<void>) {
   if (!engineEnabled()) return;
+  await check();
   const db = createServerSupabase();
   const { data: imported, error: importError } = await db.from("misaki_relationship_temporary_v1_imports").select("user_id").eq("user_id", userId).maybeSingle();
   if (importError) throw new Error("relationship_import_read_failed");
@@ -90,7 +97,8 @@ export async function importPermanentRelationship(userId: string) {
   if (!snapshot) return;
   // Once auth is permanent the temporary writer rejects writes. Finish the frozen
   // verified trajectory in memory and materialize atomically through the import RPC.
-  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state);
+  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check);
+  await check();
   const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v1", { p_user_id: userId, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
     p_engine_version: PROCESSING_VERSION, p_payload: snapshot });

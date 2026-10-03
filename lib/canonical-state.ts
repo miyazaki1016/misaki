@@ -73,8 +73,13 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
   const db = createServerSupabase();
   let relationshipImportPending = false;
   if (engineEnabled()) {
-    try { await (await import("./relationship-runtime-v1")).importPermanentRelationship(userId); }
-    catch { relationshipImportPending = true; console.error("RELATIONSHIP V1 IMPORT RETRY REQUIRED", { userId }); }
+    // Read path never starts permanent Relationship work without ownership.
+    // The post-save worker imports the frozen anonymous trajectory under its lease.
+    const [imported, temporary] = await Promise.all([
+      db.from("misaki_relationship_temporary_v1_imports").select("user_id").eq("user_id", userId).maybeSingle(),
+      db.from("misaki_temporary_roots").select("token").eq("user_id", userId).maybeSingle(),
+    ]);
+    relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);
   }
   const [relationship, conversation] = await Promise.all([
     db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
