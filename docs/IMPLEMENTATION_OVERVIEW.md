@@ -8,8 +8,8 @@
 > **未来のソラを信用するな。総覧を信用しろ。**
 
 
-最終更新: 2026-10-03  
-実装ソース照合基準: `main` @ `db32989c48f09be43686b7e3f7aee4f539fe518f`
+最終更新: 2026-10-04  
+実装ソース照合基準: `main` @ `b3811b4c91c37b567767b7c0294b524877c9ece9`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -1914,3 +1914,234 @@ Workはこの指示書、`RELATIONSHIP_ENGINE_V1.md`、`RELATIONSHIP_ENGINE_V1_D
 5. WorkがDB契約変更を要求した場合、勝手に許可せずソラが理由をレビューする。
 6. Production behavior cutoverはWork完了だけでは行わない。ソラレビュー→回帰→せいちゃん実機テスト後。
 7. 「未来のソラを信用するな。総覧を信用しろ。」
+
+
+---
+
+### 2026-10-04 — Relationship Engine v1.1 Production本番稼働・Evidence実走確認 checkpoint
+
+> **この節は、直前の「Work引継ぎ完了 / この作業場の終了checkpoint」を更新する現時点の最優先記録。**
+> Relationship Engine v1.1 は設計・DB基盤・Work実装・本番cutover・障害修正・Evidence実走確認まで進んだ。
+> 以後、Relationship Engineの現在状態を判断するときはこの節を優先する。
+
+#### 現在のProduction基準
+- Production main verified commit: `b3811b4c91c37b567767b7c0294b524877c9ece9`
+- Vercel Production deployment: `dpl_CE1daiaS9aQJAxE18ACTo6DXKEqK` — **READY**
+- Production aliasesに `misaki38-ai.com` を確認済み。
+- Relationship Engine feature gate:
+  - `MISAKI_RELATIONSHIP_ENGINE_VERSION=relationship-v1.1`
+  - `MISAKI_RELATIONSHIP_ENGINE_START_AT=2026-10-03T19:40:00+09:00`
+- **START_ATは過去turn回収境界として使用中。意図なく動かさない。**
+
+#### PR #46 — Relationship Engine DB契約：MERGED / Production施工済み
+merge commit: `57b33901cd6ebe297481c3220a165ffae230dd06`
+
+Production DBで以下を正式契約化した。
+- `misaki_relationship_worker_leases`
+- `misaki_relationship_pattern_consumptions`
+- claim / renew / release lease RPC
+- permanent mutationは全てlease-fenced v2 RPC
+- legacy permanent mutation v1はservice_roleからEXECUTE revoke
+- State非ゼロ変更にはPattern必須
+- Pattern消費とState適用は同一transactionでonce-only
+- explicit critical eventだけがrelationship_statusを変更可能
+- canonical turn / request / processing_versionを冪等性境界として使用
+
+**壊してはいけない:** appからcanonical tableを直接INSERT/UPDATEしない。恒久関係状態変更は正式RPC契約を通す。
+
+#### PR #47 — canonical Relationship Engine v1アプリ接続：MERGED / Production
+merge commit: `13a038f2b05189285c17bb09c397d7a2de257668`
+
+実装済み:
+- 通常chatでcanonical relationship stateをread
+- shared Relationship Interpreter → Gemini reply generation
+- reply成功・canonical turn保存後にNext `after()` でRelationship処理
+- **今回のturnで得たEvidenceは、そのturn自身のreply生成には使わず、次回以降へ効かせる**
+- permanent recoveryはcutover後canonical turnsを古い順に回収
+- 1 activityあたり最大3 unfinished turnを処理
+- Analyzer failureはchat成功を壊さない
+- anonymousはencrypted temporary rootを継承
+- Body Clock経路はこの工程では変更していない
+
+Relationship Analyzer:
+- type: care / disclosure / repair / playful_reciprocity / harm / romantic_declaration
+- axes: friendship / trust / playfulness / affection / romance
+- polarity: ±1
+- strength / confidence
+- interpretation: direct / ambiguous / hypothetical / quoted / third_party / negated
+- subject: user_to_misaki / misaki_to_user / third_party
+- supportingTurn: user messageのexact substring
+- qualifying Episode: direct user→Misaki / confidence >= 0.8 / strength >= 50
+- 同一intention/type/axis/polarityは同日1 Episode
+- Pattern成立は**3つの独立したTokyo日付**
+- Pattern batchごとのState delta ±1、axis合計は1適用で±3以内
+- processing version: `relationship-v1.1`
+
+#### Production cutover障害と修正履歴 — PR #48〜#57
+この一連は将来同じ罠へ戻らないため残す。
+
+1. **PR #48 — structured output導入**
+   - Analyzer / Critical ValidatorにresponseSchemaを導入。
+   - ただしAnalyzer 400は解消せず。
+
+2. **PR #49 / #50 — 一時診断**
+   - failure-only diagnosticsで原因を切り分け。
+   - ordinary chatは常に200で継続し、Relationshipだけafter()で失敗していた。
+
+3. **PR #51 — numeric enum 400修正**
+   - Google Gemini legacy responseSchemaで `polarity.enum=[-1,1]` がTYPE_STRINGとして拒否されていた。
+   - numeric enumを一旦削除し、`type: INTEGER` + internal `parseEvidence()` ±1検証を維持。
+   - ProductionでAnalyzer 400消失・既存failed turnの自動回収を確認。
+
+4. **PR #52 — 初回診断ログ撤去**
+   - temporary provider/runtime diagnostic detailを撤去。
+
+5. **PR #53 — polarity transport固定**
+   - Gemini boundaryでは `polarity: STRING enum ["-1","1"]`
+   - 受信直後にnumeric ±1へ正規化
+   - internal Evidence / DB契約はnumeric ±1のまま
+   - out-of-contract `"0"` はfail-close
+
+6. **PR #54 / #55 — stage / field診断**
+   - 古いfailed turnが後続を止める原因を最小診断。
+   - 根本原因は `supporting_not_user_substring`。
+   - GeminiがEvidence候補のsupportingTurnにuser message以外の文言を返し、strict `parseEvidence()` が拒否していた。
+
+7. **PR #56 — ungrounded Evidenceのdrop**
+   - user messageの非空・<=96文字・exact substringでないEvidence候補は**保存せず捨てる**。
+   - grounded candidateだけを既存strict `parseEvidence()` へ渡す。
+   - これによりMisaki自身の生成replyを根拠にRelationshipを自己増幅する経路を防止。
+   - 古い毒針turnは再処理で `applied` へ回復。
+
+8. **PR #57 — 診断ログ撤去**
+   - temporary stage / validation reason diagnosticsを撤去。
+   - 本番に残っているのは必要な機能修正だけ。
+   - merge commit: `b3811b4c91c37b567767b7c0294b524877c9ece9`
+   - CI #328 SUCCESS / Production READY
+
+#### recovery実走で確認した重要挙動
+Production smoke userで、過去failed requestが先頭に残ると、**canonical順序保証により後続turnは先へ進まない**ことを実地確認した。
+
+- old failed requestは新しいchat activityをきっかけに再試行
+- fixed後、attemptsが増えながら最終的に `applied`
+- その後、後続unfinished turnを古い順に最大3件ずつ回収
+- worker lease残存なしを確認
+- 503等のprovider一時失敗はfailedとして残り、次activityで再試行して回復
+
+**設計上の意味:** oldest-first / fail-closed / no out-of-orderは正しく動いた。一方で1件のpoison turnは後続を止めるため、Analyzer入力契約は「厳格に拒否する」だけでなく、**安全に無視できる不正候補は候補単位でdropする**必要がある。
+
+#### Evidence Production実走結果
+以下のturnをProductionで実際にAnalyzerへ通し、canonical Evidence保存を確認した。
+
+1. `今日はちょっと眠いな`
+   - processing: `applied`
+   - Evidence: **0件**
+   - ordinary neutral turnとして想定どおり
+
+2. `美咲、無理しすぎないでね`
+   - `care / affection / +1`
+   - subject: `user_to_misaki`
+   - interpretation: `direct`
+   - strength: 70
+   - confidence: 0.9
+   - supportingTurnはuser message exact substring
+   - Evidence保存成功
+
+3. `友達が「美咲のこと好き」って言ってたよ`
+   - `romantic_declaration / romance / +1`
+   - subject: `third_party`
+   - interpretation: `third_party`
+   - strength: 50
+   - confidence: 0.7
+   - **記録はするがuser→Misakiの恋愛Episodeには昇格しない**
+
+4. `美咲と話してると落ち着くし、もっと話したいな`
+   - `care / affection / +1`
+   - subject: `user_to_misaki`
+   - interpretation: `direct`
+   - strength: 60
+   - confidence: 0.9
+   - qualifying Evidence→EpisodeまでProductionで確認
+
+3本とも最終processingは `applied`。一時的なGemini 503が1回発生したが、次activityで正常再試行・回復した。
+
+#### 現在のcanonical relationship state
+Production smoke userでは、Evidence / Episodeは保存されたが、5軸Stateはまだ:
+- friendship: 0
+- trust: 0
+- playfulness: 0
+- affection: 0
+- romance: 0
+- relationship_status: `none`
+- relationship_engine_version: `relationship-v1.1`
+
+これは**正常**。v1.1は「1日の好意発言回数」でStateを上げない。Patternは3つの独立したTokyo日付が必要。
+
+#### 会話生成とRelationship記憶の時間関係
+今の正式仕様:
+```
+現在のcanonical state
+  ↓
+今回のreply生成
+  ↓
+canonical chat save
+  ↓
+Relationship Analyzer
+  ↓
+Evidence → Episode → Pattern → State
+  ↓
+次回以降のreplyへ反映
+```
+
+つまり、**今回の発言のあとに、その会話を関係Evidenceとして噛みしめ、次の会話から美咲の接し方へ効かせる**。
+
+理由:
+- 自分で生成したreplyを根拠に同一turnで自己強化するループを避ける
+- canonical save成功前の未確定情報でStateを動かさない
+- failure時も普通のchat成功を守る
+
+#### 今回の実機会話で見えた別件
+Relationship Engineとは別に、通常replyで文脈を少し先読みしすぎる例を確認。
+例: 文脈上「今日は仕事」が明示されていない状態で `明日も仕事？` の「も」が付く。
+
+これはRelationship EngineのEvidence不具合ではなく、**reply grounding / naturalness側の別課題**。必要ならshared Reply Core / grounding改善の検討対象とする。
+
+#### まだ確認していないこと
+以下を「確認済み」と扱わない。
+
+- **3日分の独立Episode → Pattern成立 → canonical axis State +1**
+- State version incrementとPattern consumptionのProduction実走
+- State変化後、Relationship Interpreterが次turnのreplyへ自然に効くこと
+- affinity変化をユーザーが「最近ちょっと接し方変わった？」と感じられる品質
+- explicit romantic_acceptance / relationship_endのProduction実走
+- Body Clockが新canonical 5-axis State / Interpreterを共有する最終統合
+- 新6段階親密度 / 5-heart UI
+- legacy intimacy_points / 30・80・160から新6段階への最終移行
+- Production landingの「38歳の彼女 / 恋愛対象 あなたの彼女」等、**初期状態から恋人ではない新方針と矛盾する表現の修正**
+
+#### 次の一手
+最優先は、**自然なProduction利用を続けながら3つの独立Tokyo日付で同系統Episodeを形成し、Pattern→State→次回replyまでの完全経路を実走確認すること。**
+
+検証時の注意:
+- Productionで日付をbackdateしない
+- 1日内で大量に同じ好意発言を送ってPattern成立を捏造しない
+- critical relationship eventは不用意にProductionで試さない
+- Stateが変わったらscoreそのものより、Interpreterが会話の距離感へどう反映したかを見る
+- 失敗時はchat成功とRelationship eventual処理を混同しない
+
+その後:
+1. Pattern→State実走確認
+2. Relationship Interpreter表現品質確認
+3. Body Clock / shared Reply Core統合
+4. 新6段階親密度の閾値決定
+5. 5-heart UI
+6. landing文言を「最初から彼女」前提から新コンセプトへ整合
+
+> **未来のソラへ**
+> Relationship Engine v1.1は「設計中」ではない。**Production稼働・Evidence実走まで完了済み。**
+> DB schema監査やAnalyzer 400原因調査からやり直すな。
+> 次は3日Pattern→State→Interpreterの実走確認から始める。
+> `supportingTurn` はuser message exact substringでgroundし、ungrounded candidateはdropする。
+> polarity transportはGemini境界だけSTRING `"-1"/"1"`、内部はnumeric ±1。
+> START_ATは既存backlog回収境界として勝手に動かすな。
+> **未来のソラを信用するな。総覧を信用しろ。**
