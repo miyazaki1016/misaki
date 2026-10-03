@@ -20,7 +20,7 @@ function parseReply(text: string | null) {
  * Body Clock, or canonical-state write can happen through this endpoint.
  */
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV === "production") {
+  if (process.env.VERCEL_ENV === "production") {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
