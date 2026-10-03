@@ -302,21 +302,24 @@ test('chat timestamp display does not poll permanent history', () => {
 
 
 test('Gemini transient failures use bounded short retry without retrying ordinary 500', () => {
-  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
+  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');
   assert.ok(source.includes('[429, 502, 503, 504].includes'));
   assert.ok(source.includes('[2_000, 5_000]'));
-  assert.ok(source.includes('GEMINI TRANSIENT RETRY:'));
+  assert.ok(source.includes('transientAttempt < transientRetryDelaysMs.length'));
   assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));
 });
 
 test('Gemini timeout gets one bounded retry before the normal failure/refund path', () => {
-  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
+  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');
   assert.ok(source.includes('const timeoutRetryDelaysMs ='));
-  assert.ok(source.includes('[2_000];'));
-  assert.ok(source.includes('GEMINI TIMEOUT RETRY:'));
-  assert.ok(source.includes('timeoutAttempt <'));
-  assert.ok(source.includes('timeoutRetryDelaysMs.length'));
-  assert.ok(source.includes('throw new Error(\n            "GEMINI_TIMEOUT"\n          );'));
+  assert.ok(source.includes('[2_000]'));
+  assert.ok(source.includes('timeoutAttempt < timeoutRetryDelaysMs.length'));
+  assert.ok(source.includes('error.name === "AbortError"'));
+  const chatSource = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');
+  assert.ok(chatSource.includes('generateGeminiJson({'));
+  assert.ok(chatSource.includes('error.name === "AbortError"'));
+  assert.ok(chatSource.includes('throw new Error("GEMINI_TIMEOUT")'));
+  assert.ok(chatSource.includes('throw error'));
 });
 
 test('ordinary chat wait does not falsely claim Misaki is busy', () => {
