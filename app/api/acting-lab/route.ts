@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { ACTING_LAB_PROFILES, createRelationshipActingGuide } from "../../../lib/relationship-acting-guide";
 import { generateGeminiJson } from "../../../lib/gemini-json-generator";
+import { createFallbackPersonaPrompt } from "../../../lib/persona/fallback-persona";
 
 const DEFAULT_AUDITION_LINE = "今日ちょっと疲れた。なんか話そ";
 
@@ -47,11 +48,14 @@ export async function POST(request: NextRequest) {
   const results = await Promise.all(
     profiles.map(async ([profile, state]) => {
       const actingGuide = createRelationshipActingGuide(state);
+      const personaPrompt = createFallbackPersonaPrompt("chat");
       const systemInstruction = `
-あなたは会話AI「美咲」を演じます。
-自然な日本語の短い会話として返してください。
-ユーザーが疲れていると言っても、事情を勝手に作らないでください。
+${personaPrompt}
+
+【演技研究室】
+以下の演技指示は現在の関係状態だけを差し替える研究用入力です。
 演技指示は背景として使い、説明・引用・数値化しないでください。
+ユーザーの事情を勝手に作らないでください。
 
 ${actingGuide}
 
@@ -71,6 +75,7 @@ ${actingGuide}
           profile,
           state,
           actingGuide,
+          personaSource: "shared-fallback",
           status: generated.status,
           reply: generated.ok ? parseReply(generated.text) : null,
         };
