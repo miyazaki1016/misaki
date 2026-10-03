@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import { AXES, PROCESSING_VERSION, parseEvidence, episodeFor, patternsFor, boundedDelta, applyTemporaryEvidence, canonicalActingState, type Evidence, type Turn, type Snapshot } from "../lib/relationship-engine-v1.ts";
 import { processRelationshipTurn, CanonicalRelationshipStore } from "../lib/relationship-processing-v1.ts";
-import { criticalCandidates } from "../lib/relationship-analyzer-v1.ts";
+import { analyzeRelationshipEvidence, criticalCandidates } from "../lib/relationship-analyzer-v1.ts";
 import { createLegacyRelationshipActingState, createRelationshipActingGuide } from "../lib/relationship-acting-guide.ts";
 import { generateGeminiJson } from "../lib/gemini-json-generator.ts";
 
@@ -38,6 +38,45 @@ class Store {
   async advancePending(_u: string, _t: Turn, type: string, status: string) { this.pendingRows.get(type).status = status; }
   async applyCritical(_u: string, t: Turn, type: string) { this.eventRows.push({ request_id: t.requestId, event_type: type }); if (type === "romantic_acceptance") this.state.relationshipStatus = "romantic_partner"; if (type === "relationship_end") this.state.relationshipStatus = "none"; this.pendingRows.delete(type); }
 }
+
+test("Relationship Analyzer uses string polarity enum at Gemini boundary and normalizes to numeric ±1", async () => {
+  const oldFetch = globalThis.fetch;
+  let body: any;
+  globalThis.fetch = async (_url, options) => {
+    body = JSON.parse(options!.body as string);
+    return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+      evidence: [{
+        type: "care", axis: "affection", polarity: "1", strength: 70, confidence: 0.95,
+        interpretation: "direct", subject: "user_to_misaki", supportingTurn: "体調は大丈夫"
+      }]
+    }) }] } }] });
+  };
+  try {
+    const result = await analyzeRelationshipEvidence(turn);
+    assert.equal(result[0].polarity, 1);
+    assert.deepEqual(
+      body.generationConfig.responseSchema.properties.evidence.items.properties.polarity,
+      { type: "STRING", enum: ["-1", "1"] }
+    );
+  } finally {
+    globalThis.fetch = oldFetch;
+  }
+});
+
+test("Relationship Analyzer still fails closed on out-of-contract polarity after transport normalization", async () => {
+  const oldFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({
+    evidence: [{
+      type: "care", axis: "affection", polarity: "0", strength: 70, confidence: 0.95,
+      interpretation: "direct", subject: "user_to_misaki", supportingTurn: "体調は大丈夫"
+    }]
+  }) }] } }] });
+  try {
+    await assert.rejects(() => analyzeRelationshipEvidence(turn), /invalid_evidence_candidate/);
+  } finally {
+    globalThis.fetch = oldFetch;
+  }
+});
 
 test("saved conversation → evidence → episode → pattern → bounded state → Interpreter → shared Gemini", async () => {
   const store = new Store();
