@@ -50,8 +50,21 @@ Output exactly {"evidence":[{"type":"care","axis":"affection","polarity":"1","st
 At most 5 observations; supportingTurn at most 96 characters and must be copied exactly from the user's message. No additional fields.`,
     userText: JSON.stringify(turn),
   });
-  if (!response.ok || !response.text) throw new Error("relationship_analyzer_unavailable");
-  const value = JSON.parse(response.text);
+  if (!response.ok || !response.text) {
+    console.error("RELATIONSHIP ANALYZER STAGE FAILURE", { stage: "gemini_http", status: response.status });
+    throw new Error("relationship_analyzer_unavailable");
+  }
+  let value: unknown;
+  try {
+    value = JSON.parse(response.text);
+  } catch (error: unknown) {
+    console.error("RELATIONSHIP ANALYZER STAGE FAILURE", {
+      stage: "json_parse",
+      name: error instanceof Error ? error.name : "UnknownError",
+      message: error instanceof Error ? error.message : "Non-Error rejection",
+    });
+    throw error;
+  }
   if (value && typeof value === "object" && Array.isArray((value as { evidence?: unknown }).evidence)) {
     for (const item of (value as { evidence: any[] }).evidence) {
       if (item && typeof item === "object" && (item.polarity === "-1" || item.polarity === "1")) {
@@ -59,7 +72,16 @@ At most 5 observations; supportingTurn at most 96 characters and must be copied 
       }
     }
   }
-  return parseEvidence(value, turn);
+  try {
+    return parseEvidence(value, turn);
+  } catch (error: unknown) {
+    console.error("RELATIONSHIP ANALYZER STAGE FAILURE", {
+      stage: "parse_evidence",
+      name: error instanceof Error ? error.name : "UnknownError",
+      message: error instanceof Error ? error.message : "Non-Error rejection",
+    });
+    throw error;
+  }
 }
 
 /** Candidate detection is separate from ordinary Evidence. Validation establishes no fact until the RPC succeeds. */
