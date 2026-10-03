@@ -1797,3 +1797,27 @@ PR #45はProductionまで完了。次の設計主題は、
 - idempotency / replay
 - failure時非更新
 を設計し、その後schema / RPC / migrationへ落とす。
+
+
+---
+
+### 2026-10-03 — Relationship Engine v1 思想設計フリーズ
+
+PR #45後に行った総点検①〜⑩を完了し、Relationship Engine v1の思想設計を専用正本文書 `docs/RELATIONSHIP_ENGINE_V1.md` に固定した。
+
+- 正本文書追加commit: `1937c316e9d3d4edcc11f1e447ee582ffc45357a`
+- 現段階で確定したのは思想・責任分界。DB schema / RPC / migration / retry job / 数値係数は未確定。
+- 核は **Evidence → Semantic Episode → Pattern → State + Event/Status → Relationship Context Resolver → Relationship Interpreter → shared Misaki Reply Core → Gemini**。
+- 親密度と恋愛を直結しない。Stage 5の非恋愛親友を正規に許す。
+- romance scoreから交際statusを自動生成しない。関係成立は二人の明示会話Event。
+- long-term State / recent Momentum / current Emotion-Actionを分離する。
+- Misaki生成文単独をpositive Relationship Evidenceにせず、自己強化を防ぐ。
+- 通常chat / Body Clock / proactive / photo / Push / future Voiceは同じ一人の美咲としてshared Reply Coreへ合流させる。
+- canonical conversation save成功後にRelationship分析を開始し、Analyzer failureは会話成功を壊さない。turn_idを冪等性の根にする。
+- Analyzer/model更新で過去のcanonical relationship historyを勝手に書き換えない。
+- Event historical factとactive influenceを分離し、「忘れないが引きずり続けない」を守る。
+- Memoryはcurrent relationship statusの正本にならない。
+
+**次の一手:** schemaを先に作らない。Productionの既存 `misaki_relationship_state` / `misaki_relationship_events`、canonical turn/request境界、conversation save後の処理境界、emotion/action triggers、Body Clock経路を実物監査し、v1を最小変更で載せるDB・処理境界設計を作る。
+
+> 未来のソラへ：詳細は必ず `docs/RELATIONSHIP_ENGINE_V1.md` を読むこと。このv1を「5軸score機能」へ縮めない。
