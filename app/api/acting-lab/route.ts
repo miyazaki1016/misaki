@@ -94,3 +94,9 @@ ${actingGuide}
     results,
   });
 }
+
+
+// Preview convenience: run the fixed default audition without a request body.
+export async function GET(request: NextRequest) {
+  return POST(request);
+}
