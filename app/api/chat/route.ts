@@ -2221,7 +2221,10 @@ export async function POST(
 勝手に作らないでください。
 `.trim();
 
-    const contents =
+    const contents: Array<{
+      role: "user" | "model";
+      parts: Array<{ text: string }>;
+    }> =
       safeHistory.map(
         (item) => ({
           role:
