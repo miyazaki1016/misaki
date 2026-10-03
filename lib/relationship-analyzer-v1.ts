@@ -12,7 +12,7 @@ const EVIDENCE_RESPONSE_SCHEMA = {
         properties: {
           type: { type: "STRING", enum: [...EVIDENCE_TYPES] },
           axis: { type: "STRING", enum: ["friendship", "trust", "playfulness", "affection", "romance"] },
-          polarity: { type: "INTEGER" },
+          polarity: { type: "STRING", enum: ["-1", "1"] },
           strength: { type: "INTEGER", minimum: 1, maximum: 100 },
           confidence: { type: "NUMBER", minimum: 0, maximum: 1 },
           interpretation: { type: "STRING", enum: ["direct", "ambiguous", "hypothetical", "quoted", "third_party", "negated"] },
@@ -46,12 +46,20 @@ Types: ${EVIDENCE_TYPES.join(", ")}. Axes: friendship, trust, playfulness, affec
 Distinguish direct, ambiguous, hypothetical, quoted, third_party, negated; preserve subject/direction.
 Misaki's generated words alone are never independent positive evidence. Loving a third party is not romance toward Misaki.
 "好き。でも恋愛じゃない" is not positive romance. Repeated confessions are the same semantic intention.
-Output exactly {"evidence":[{"type":"care","axis":"affection","polarity":1,"strength":50,"confidence":0.8,"interpretation":"direct","subject":"user_to_misaki","supportingTurn":"exact user substring"}]}.
+Output exactly {"evidence":[{"type":"care","axis":"affection","polarity":"1","strength":50,"confidence":0.8,"interpretation":"direct","subject":"user_to_misaki","supportingTurn":"exact user substring"}]}.
 At most 5 observations; supportingTurn at most 96 characters and must be copied exactly from the user's message. No additional fields.`,
     userText: JSON.stringify(turn),
   });
   if (!response.ok || !response.text) throw new Error("relationship_analyzer_unavailable");
-  return parseEvidence(JSON.parse(response.text), turn);
+  const value = JSON.parse(response.text);
+  if (value && typeof value === "object" && Array.isArray((value as { evidence?: unknown }).evidence)) {
+    for (const item of (value as { evidence: any[] }).evidence) {
+      if (item && typeof item === "object" && (item.polarity === "-1" || item.polarity === "1")) {
+        item.polarity = Number(item.polarity);
+      }
+    }
+  }
+  return parseEvidence(value, turn);
 }
 
 /** Candidate detection is separate from ordinary Evidence. Validation establishes no fact until the RPC succeeds. */
