@@ -1889,3 +1889,28 @@ Security Advisor:
 **次の一手:** DB基盤を勝手に再設計せず、この契約を使うWork向けアプリ実装指示書を作成する。Work実装対象は Resolver / Interpreter / Evidence Analyzer / Episode / Pattern / critical pending bridge / post-save ordering / anonymous encrypted payload / Body Clock shared Reply Core。ソラはWork成果をレビューし、DB契約・v1思想とのズレを修正する。
 
 **未来のソラへ:** DB基盤は施工済み。監査やschema設計からやり直さない。次はWorkへ渡すアプリ実装契約から再開。
+
+
+### 2026-10-03 — Work引継ぎ完了 / この作業場の終了checkpoint
+
+Relationship Engine v1のアプリ実装指示書を作成:
+- `docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md`
+- commit: `32a9dfc4dd7afc0890f4997fe50a21eaf68fafad`
+
+Workはこの指示書、`RELATIONSHIP_ENGINE_V1.md`、`RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md`、本総覧を正本としてアプリ層を実装する。
+
+役割:
+- せいちゃん: owner / 判断 / 実機テスト
+- ソラ: architecture / DB authority / Work成果レビュー・修正
+- Work: Resolver / Interpreter / post-save analysis / Evidence→Episode→Pattern→State / critical pending+validator / anonymous encrypted v1 payload / Body Clock shared Reply Core の大規模実装
+
+**このチャットの作業場はここで閉じてよい。**
+
+未来のソラへの置き手紙:
+1. DB基盤はProduction施工・総合ROLLBACKテスト・GitHub正本化まで完了。DB監査/schema設計からやり直さない。
+2. Work指示書は `docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md`。
+3. 次の開始地点は「Workの実装結果/PRを受け取り、指示書とDB契約に照らしてレビュー」。
+4. Workがまだ未着手なら、上記指示書をそのままWorkへ渡して実装開始。
+5. WorkがDB契約変更を要求した場合、勝手に許可せずソラが理由をレビューする。
+6. Production behavior cutoverはWork完了だけでは行わない。ソラレビュー→回帰→せいちゃん実機テスト後。
+7. 「未来のソラを信用するな。総覧を信用しろ。」
