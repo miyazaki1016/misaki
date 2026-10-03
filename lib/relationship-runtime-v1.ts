@@ -64,7 +64,7 @@ async function runPermanent(userId: string) {
     if (Date.parse(turn.created_at) < Date.parse(boundary)) continue;
     if (ledgers.some(l => l.request_id === turn.request_id && l.status === "applied")) continue;
     if (++count > 3) break;
-    const result = await processRelationshipTurn(store, userId, turn.request_id, undefined, undefined, check => importPermanentRelationship(userId, check));
+    const result = await processRelationshipTurn(store, userId, turn.request_id, undefined, undefined, (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));
     if (result.status === "deferred") break;
   }
 }
@@ -81,7 +81,7 @@ export async function resumeRelationshipProcessing(userId: string, anonymous: bo
   return task;
 }
 
-export async function importPermanentRelationship(userId: string, check: () => Promise<void>) {
+export async function importPermanentRelationship(userId: string, requestId: string, token: string, check: () => Promise<void>) {
   if (!engineEnabled()) return;
   await check();
   const db = createServerSupabase();
@@ -99,10 +99,10 @@ export async function importPermanentRelationship(userId: string, check: () => P
   // verified trajectory in memory and materialize atomically through the import RPC.
   if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check);
   await check();
-  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v1", { p_user_id: userId, p_source_revision: root.revision,
+  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
     p_engine_version: PROCESSING_VERSION, p_payload: snapshot });
-  if (rpcError) throw new Error("relationship_import_failed");
+  if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? ""}:${rpcError.message ?? ""}`);
 }
 
 export function pendingRelationshipGuide(root: RootState) {

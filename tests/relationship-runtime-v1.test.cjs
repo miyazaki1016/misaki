@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const rootPath = path.resolve(__dirname, '..');
 
-function harness({ failure = false, outside = false, permanent } = {}) {
+function harness({ failure = false, outside = false, importRace = false, permanent } = {}) {
   const turn = { requestId: 'turn-3', message: '美咲、体調は大丈夫？', reply: 'ありがとう', savedAt: '2026-10-03T00:00:00Z' };
   let root; let models = 0; let writes = 0; let imports = 0; let failed = failure; let attempts = 0;
   const evidence = { type: 'care', axis: 'affection', polarity: 1, strength: 70, confidence: .95, interpretation: 'direct', subject: 'user_to_misaki', supportingTurn: '体調は大丈夫' };
@@ -19,7 +19,7 @@ function harness({ failure = false, outside = false, permanent } = {}) {
       from(table) { const q = { select() { return q; }, eq() { return q; }, async maybeSingle() {
         return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: '2026-10-05T00:00:00Z' }, error: null };
       } }; return q; },
-      async rpc(name, args) { assert.equal(name, 'import_misaki_temporary_relationship_v1'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },
+      async rpc(name, args) { if (importRace) { assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_lease_token, 'live'); return { error: { code: 'P0001', message: 'relationship_processing_lease_required' } }; } assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_request_id, 'turn-3'); assert.equal(args.p_processing_version, 'relationship-v1.1'); assert.equal(args.p_lease_token, 'live'); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },
     }),
   };
   const context = vm.createContext({ process: { env: { MISAKI_RELATIONSHIP_ENGINE_VERSION: 'relationship-v1.1', MISAKI_RELATIONSHIP_ENGINE_START_AT: '2026-10-03T00:00:00Z' } }, console: { error() {} }, Date, JSON, Map, Set, Object, Number, Promise });
@@ -72,12 +72,12 @@ test('another anonymous owner cannot consume this root', async () => {
   const h = harness(); await h.runtime.resumeRelationshipProcessing('another-user', true); assert.equal(h.models, 0); assert.equal(h.writes, 0);
 });
 test('permanence imports newest verified frozen root once, including pending analysis, without anonymous writer', async () => {
-  const h = harness(); await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);
-  await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);
+  const h = harness(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);
+  await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);
 });
 test('permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root', async () => {
-  const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', async () => {}));
-  assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner', async () => {}); assert.equal(h.imports, 1);
+  const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}));
+  assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1);
 });
 
 for (const reason of ['lease_busy', 'out_of_order', 'lease_lost', 'failure']) {
@@ -89,6 +89,12 @@ for (const reason of ['lease_busy', 'out_of_order', 'lease_lost', 'failure']) {
 }
 test('permanence import rechecks ownership before model and atomic materialization', async () => {
   const h = harness(); let checks = 0;
-  await assert.rejects(h.runtime.importPermanentRelationship('owner', async () => { if (++checks === 3) throw Error('lease_lost'); }));
+  await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { if (++checks === 3) throw Error('lease_lost'); }));
   assert.equal(h.models, 1); assert.equal(h.imports, 0); assert.equal(h.writes, 0);
+});
+
+test('TOCTOU: permanent import is rejected by DB after application guard succeeds', async () => {
+  const h = harness({ importRace: true }); let checks = 0;
+  await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { checks++; }), /relationship_processing_lease_required/);
+  assert.ok(checks >= 4); assert.equal(h.imports, 0); assert.equal(h.writes, 0);
 });

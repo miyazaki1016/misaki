@@ -24,14 +24,14 @@ class Store {
   async release() {}
   async turn(userId: string, requestId: string) { this.hit("turn"); if (userId !== "owner" || requestId !== turn.requestId) throw Error("canonical_chat_turn_required"); return turn; }
   async ledger() { return this.status ? { status: this.status, last_error: this.last_error } : null; }
-  async advance(_u: string, _r: string, phase: string, error?: string) { this.hit(phase); this.status = phase; this.last_error = error; }
+  async advance(_u: string, _r: string, phase: string, _token: string, error?: string) { this.hit(phase); this.status = phase; this.last_error = error; }
   async evidence() { return this.evidenceRows; }
   async saveEvidence(_u: string, _t: Turn, key: string, e: Evidence) { this.hit("saveEvidence"); if (!this.evidenceRows.some(x => x.evidence_key === key)) { this.evidenceRows.push({ id: "evidence-3", evidence_key: key, payload: { candidate: e } }); this.writes.push("evidence"); } }
   async episodes() { return this.episodeRows; }
-  async saveEpisode(_u: string, e: any) { this.hit("saveEpisode"); if (!this.episodeRows.some(x => x.episode_key === e.key)) { this.episodeRows.push({ id: "episode-3", episode_key: e.key, summary: { episode: e } }); this.writes.push("episode"); } }
+  async saveEpisode(_u: string, _r: string, e: any) { this.hit("saveEpisode"); if (!this.episodeRows.some(x => x.episode_key === e.key)) { this.episodeRows.push({ id: "episode-3", episode_key: e.key, summary: { episode: e } }); this.writes.push("episode"); } }
   async patterns() { return this.patternRows; }
   async appliedPatterns() { return this.used; }
-  async savePattern(_u: string, key: string) { this.hit("savePattern"); this.patternRows.push({ id: key, pattern_key: key }); this.writes.push("pattern"); }
+  async savePattern(_u: string, _r: string, key: string) { this.hit("savePattern"); this.patternRows.push({ id: key, pattern_key: key }); this.writes.push("pattern"); }
   async apply(_u: string, r: string, ids: string[], delta: any) { this.hit("apply"); if (!this.applies.has(r)) { this.applies.add(r); this.used.push(...ids); for (const axis of AXES) this.state[axis] += delta[axis]; this.writes.push("state"); } }
   async events() { return this.eventRows; }
   async pending(_u: string, _t: Turn, type: string) { const p = this.pendingRows.get(type) ?? { status: "pending" }; this.pendingRows.set(type, p); return p; }
@@ -160,9 +160,9 @@ test("Lab keeps synthetic supply, shared Interpreter/generator, and writes:false
 });
 test("all new permanent writes use named canonical RPCs", async () => {
   const calls: any[] = []; const store = new CanonicalRelationshipStore({ rpc: async (name: string, args: any) => { calls.push({ name, args }); return { data: {}, error: null }; } });
-  await store.advance("owner", "turn", "analyzing");
-  await store.saveEvidence("owner", turn, "key", evidence);
-  assert.equal(calls[0].name, "advance_misaki_relationship_processing_v1"); assert.equal(calls[0].args.p_processing_version, PROCESSING_VERSION); assert.equal(calls[1].name, "record_misaki_relationship_evidence_v1");
+  await store.advance("owner", "turn", "analyzing", "live");
+  await store.saveEvidence("owner", turn, "key", evidence, "live");
+  assert.equal(calls[0].name, "advance_misaki_relationship_processing_v2"); assert.equal(calls[0].args.p_processing_version, PROCESSING_VERSION); assert.equal(calls[1].name, "record_misaki_relationship_evidence_v2");
 });
 
 // Separate store instances share only the simulated DB, never a local task map.
@@ -191,14 +191,14 @@ class DistributedDB {
       async release(_u: string, r: string, token: string) { db.releases++; if (db.lease?.request === r && db.lease.token === token) db.lease = undefined; },
       async turn(_u: string, r: string) { return db.turns.find(t => t.requestId === r)!; },
       async ledger(_u: string, r: string) { return db.store(r).ledger(); },
-      async advance(u: string, r: string, phase: string, error?: string) { return db.store(r).advance(u, r, phase, error); },
+      async advance(u: string, r: string, phase: string, token: string, error?: string) { db.assertLease(r, token); return db.store(r).advance(u, r, phase, token, error); },
       async evidence(_u: string, r: string) { return db.store(r).evidence(); },
-      async saveEvidence(u: string, t: Turn, key: string, e: Evidence) { return db.store(t.requestId).saveEvidence(u, t, key, e); },
+      async saveEvidence(u: string, t: Turn, key: string, e: Evidence, token: string) { db.assertLease(t.requestId, token); return db.store(t.requestId).saveEvidence(u, t, key, e); },
       async episodes() { return db.store(turn.requestId).episodes(); },
-      async saveEpisode(u: string, e: any) { return db.store(turn.requestId).saveEpisode(u, e); },
+      async saveEpisode(u: string, r: string, e: any, ids: string[], token: string) { db.assertLease(r, token); return db.store(turn.requestId).saveEpisode(u, r, e); },
       async patterns() { return db.store(turn.requestId).patterns(); },
       async appliedPatterns() { return db.store(turn.requestId).appliedPatterns(); },
-      async savePattern(u: string, key: string) { return db.store(turn.requestId).savePattern(u, key); },
+      async savePattern(u: string, r: string, key: string, _episodes: any[], token: string) { db.assertLease(r, token); return db.store(turn.requestId).savePattern(u, r, key); },
       async apply(u: string, r: string, ids: string[], delta: any, token: string) {
         db.assertLease(r, token);
         const state = db.store(turn.requestId);
@@ -207,8 +207,8 @@ class DistributedDB {
         return state.apply(u, r, ids, delta);
       },
       async events() { return db.store(turn.requestId).events(); },
-      async pending(u: string, t: Turn, type: string) { return db.store(t.requestId).pending(u, t, type); },
-      async advancePending(u: string, t: Turn, type: string, status: string) { return db.store(t.requestId).advancePending(u, t, type, status); },
+      async pending(u: string, t: Turn, type: string, token: string) { db.assertLease(t.requestId, token); return db.store(t.requestId).pending(u, t, type); },
+      async advancePending(u: string, t: Turn, type: string, status: string, token: string) { db.assertLease(t.requestId, token); return db.store(t.requestId).advancePending(u, t, type, status); },
       async applyCritical(u: string, t: Turn, type: string, token: string) { db.assertLease(t.requestId, token); return db.store(turn.requestId).applyCritical(u, t, type); },
     };
   }
@@ -311,4 +311,56 @@ test("competing explicit acceptance and breakup preserve canonical request order
   await processRelationshipTurn(db.worker() as any, "owner", breakup.requestId, async () => [], async () => true);
   assert.deepEqual(db.store(turn.requestId).eventRows.map(e => e.event_type), ["romantic_acceptance", "relationship_end"]);
   assert.equal(db.store(turn.requestId).state.relationshipStatus, "none");
+});
+
+const intermediateMutations = [
+  { name: "ledger", rpc: "advance_misaki_relationship_processing_v2", run: (s: CanonicalRelationshipStore, token: string) => s.advance("owner", turn.requestId, "analyzing", token) },
+  { name: "Evidence", rpc: "record_misaki_relationship_evidence_v2", run: (s: CanonicalRelationshipStore, token: string) => s.saveEvidence("owner", turn, "candidate", evidence, token) },
+  { name: "Episode", rpc: "upsert_misaki_relationship_episode_v2", run: (s: CanonicalRelationshipStore, token: string) => s.saveEpisode("owner", turn.requestId, episodeFor(evidence, turn)!, ["evidence"], token) },
+  { name: "Pattern", rpc: "upsert_misaki_relationship_pattern_v2", run: (s: CanonicalRelationshipStore, token: string) => s.savePattern("owner", turn.requestId, "pattern", [{ id: "episode", episode: episodeFor(evidence, turn)! }], token) },
+  { name: "critical pending creation", rpc: "upsert_misaki_relationship_critical_pending_v2", run: (s: CanonicalRelationshipStore, token: string) => s.pending("owner", turn, "romantic_acceptance", token) },
+  { name: "critical pending update", rpc: "advance_misaki_relationship_critical_pending_v2", run: (s: CanonicalRelationshipStore, token: string) => s.advancePending("owner", turn, "romantic_acceptance", "processing", token) },
+];
+function emptyQuery() {
+  const q: any = { select() { return q; }, eq() { return q; }, order() { return q; }, async range() { return { data: [], error: null }; } }; return q;
+}
+for (const mutation of intermediateMutations) {
+  test(`TOCTOU: stale worker cannot write ${mutation.name} after read guard succeeds then lease expires/reclaims`, async () => {
+    const db = new DistributedDB(), control = db.worker(), pause = barrier(); let writes = 0;
+    const claim = await control.claim("owner", turn.requestId), token = claim.leaseToken!;
+    const store = new CanonicalRelationshipStore({ from: emptyQuery, async rpc(name: string, args: any) {
+      assert.equal(name, mutation.rpc); assert.equal(args.p_processing_version, PROCESSING_VERSION);
+      assert.equal(args.p_request_id, turn.requestId); assert.equal(args.p_lease_token, token);
+      await pause.wait();
+      try { db.assertLease(args.p_request_id, args.p_lease_token); }
+      catch { return { error: { code: "P0001", message: "relationship_processing_lease_required" } }; }
+      writes++; return { data: {}, error: null };
+    } });
+    store.setLeaseGuard(() => control.renew("owner", turn.requestId, token));
+    const task = mutation.run(store, token); await pause.entered;
+    db.now = 121; const fresh = await db.worker().claim("owner", turn.requestId);
+    pause.finish(); await assert.rejects(task, /relationship_processing_lease_required/);
+    assert.equal(writes, 0); assert.equal(db.lease!.token, fresh.leaseToken);
+    await control.release("owner", turn.requestId, token); assert.equal(db.lease!.token, fresh.leaseToken);
+  });
+  test(`live ${mutation.name} passes current processing identity to v2 mutation`, async () => {
+    const calls: any[] = []; const store = new CanonicalRelationshipStore({ from: emptyQuery, async rpc(name: string, args: any) { calls.push({ name, args }); return { data: {}, error: null }; } });
+    await mutation.run(store, "live"); assert.equal(calls.length, 1); const call = calls[0];
+    assert.equal(call.name, mutation.rpc); assert.equal(call.args.p_processing_version, PROCESSING_VERSION); assert.equal(call.args.p_lease_token, "live"); assert.equal(call.args.p_request_id, turn.requestId);
+  });
+}
+test("intermediate DB lease rejection defers without trying to write a failed ledger", async () => {
+  const store = new Store(); store.saveEvidence = async () => { throw Error("record_misaki_relationship_evidence_v2_failed:P0001:relationship_processing_lease_required"); };
+  assert.deepEqual(await processRelationshipTurn(store as any, "owner", turn.requestId, async () => [evidence]), { status: "deferred", reason: "lease_lost" });
+  assert.equal(store.status, "analyzing"); assert.ok(!store.calls.includes("failed"));
+});
+test("failed journal lease rejection is also a nonfatal deferral", async () => {
+  const store = new Store(); const advance = store.advance.bind(store);
+  store.advance = async (u, r, phase, token, error) => { if (phase === "failed") throw Error("relationship_processing_lease_required"); await advance(u, r, phase, token, error); };
+  assert.deepEqual(await processRelationshipTurn(store as any, "owner", turn.requestId, async () => { throw Error("timeout"); }), { status: "deferred", reason: "lease_lost" });
+  assert.equal(store.status, "analyzing");
+});
+test("runtime never calls any legacy permanent Relationship mutation RPC", () => {
+  const source = ["relationship-processing-v1.ts", "relationship-runtime-v1.ts"].map(p => fs.readFileSync(new URL(`../lib/${p}`, import.meta.url), "utf8")).join("\n");
+  assert.doesNotMatch(source, /["'](?:advance_misaki_relationship_processing|record_misaki_relationship_evidence|upsert_misaki_relationship_episode|upsert_misaki_relationship_pattern|upsert_misaki_relationship_critical_pending|advance_misaki_relationship_critical_pending|import_misaki_temporary_relationship|apply_misaki_relationship_state|apply_misaki_relationship_critical_event)_v1["']/);
 });

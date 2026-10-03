@@ -1,6 +1,6 @@
 # Relationship Engine v1 application integration
 
-Status: review draft, not a production cutover. Uses updated Draft PR #46 at `1df32aeb05be7fa368648e4492c2c17e18b5d889` as the formal distributed-worker DB contract. No migration or DB definition changes are included.
+Status: review draft, not a production cutover. Uses updated Draft PR #46 at `5d25f30d2fdaa4d3c38f16561c295a125f2b5a8a` as the formal distributed-worker DB contract. No migration or DB definition changes are included.
 
 ## Runtime boundary
 
@@ -49,20 +49,20 @@ The conservative initial Episode/Pattern policy is an application policy for rev
 - claim_misaki_relationship_processing_v1
 - renew_misaki_relationship_processing_lease_v1
 - release_misaki_relationship_processing_lease_v1
-- advance_misaki_relationship_processing_v1
-- record_misaki_relationship_evidence_v1
-- upsert_misaki_relationship_episode_v1
-- upsert_misaki_relationship_pattern_v1
+- advance_misaki_relationship_processing_v2
+- record_misaki_relationship_evidence_v2
+- upsert_misaki_relationship_episode_v2
+- upsert_misaki_relationship_pattern_v2
 - apply_misaki_relationship_state_v2
-- upsert_misaki_relationship_critical_pending_v1
-- advance_misaki_relationship_critical_pending_v1
+- upsert_misaki_relationship_critical_pending_v2
+- advance_misaki_relationship_critical_pending_v2
 - apply_misaki_relationship_critical_event_v2
 
-`lib/relationship-runtime-v1.ts` additionally uses `import_misaki_temporary_relationship_v1` at permanence and the existing encrypted-root writer for anonymous post-save processing. Chat's existing completion RPCs remain unchanged.
+`lib/relationship-runtime-v1.ts` additionally uses `import_misaki_temporary_relationship_v2` at permanence and the existing encrypted-root writer for anonymous post-save processing. Chat's existing completion RPCs remain unchanged.
 
 Before processing or importing permanent Relationship data, the worker claims the oldest unfinished post-cutover request under the DB's per-user/version lease. `lease_busy`, `out_of_order`, `nothing_to_process`, and a replayed same-request claim are deferrals. A replayed claim returns an existing token; this invocation does **not** adopt or release that token. This prevents two same-request workers from sharing ownership. A lost claim response waits for expiry/reclaim.
 
-A newly acquired token is renewed before each store operation, each internal paginated DB read/write, and before/after each external analyzer or validator call. Lease duration is 120 seconds; analyzer calls retain the separate 10-second/no-retry analysis budget. Renewal errors conservatively stop processing. No stale model result, pending status, or failed ledger journal is written after observed lease loss. State and critical mutations use only v2 RPCs with the live token, independently checked by DB. Consumed Patterns are read from `misaki_relationship_pattern_consumptions`; DB enforces consumption once across request IDs. Both successful and aborted owners release in `finally`; token-specific stale release cannot delete a replacement lease. Release errors remain isolated from saved chat.
+A newly acquired token is renewed before each store operation, each internal paginated DB read/write, and before/after each external analyzer or validator call. Lease duration is 120 seconds; analyzer calls retain the separate 10-second/no-retry analysis budget. Renewal errors conservatively stop processing. No stale model result, pending status, or failed ledger journal is written after observed lease loss. All nine permanent data mutation paths use v2 RPCs with explicit `p_processing_version`, `p_lease_token`, and the current owned `p_request_id`, independently checked inside the DB write transaction. Episode/Pattern ownership uses the current processing request, even when the supporting Episode comes from an earlier request. Import receives the same owned request/token as ordinary processing. The new intermediate wrappers lock the lease row and check its current expiry through the formal assert helper; an application renewal is never treated as sufficient write authorization. Claim/renew/release keep their formally specified v1 names. Reads retain application-side guards. Any intermediate/import/failure-journal DB lease rejection is a nonfatal deferral; no subsequent failed-ledger write is attempted. Consumed Patterns are read from `misaki_relationship_pattern_consumptions`; DB enforces consumption once across request IDs. Both successful and aborted owners release in `finally`; token-specific stale release cannot delete a replacement lease. Release errors remain isolated from saved chat.
 
 The ledger is keyed by user/request/processing version. Completed phases are skipped. Failure records a compact sanitized journal containing the last completed phase and candidate observations; the journal fits the control RPC's 2,000-character field. Recovery performs the explicit failed→analyzing control transition, restores completed phase labels without rerunning their operations, and continues. Partial writes are found by stable keys and links. State success followed by ledger failure is recovered through the application audit/consumed Pattern set and request/version replay guard.
 
@@ -81,17 +81,17 @@ Email save is not made into an early one-time import. After auth becomes permane
 ## Verification
 
 - Existing tests: 176/176 pass.
-- New tests: 57/57 pass (233 total), including 17 added for this review.
+- New Relationship tests: 73/73 pass (249 total), including 16 added in this full-fencing revision.
 - TypeScript noEmit and Next production build: pass.
-- Multi-worker application tests use independent store instances over one shared DB-contract model, explicit barriers, and a controlled clock: same-user/request races, oldest unfinished ordering, lease expiry/reclaim, stale State/critical rejection, cross-request Pattern consumption, competing acceptance/breakup transitions, renewal loss, release failure, guarded import, and saved-chat failure isolation pass. These are deterministic orchestration tests, not live multi-process Vercel tests.
-- `tests/relationship-distributed.rollback.sql` ran successfully against the installed DB contract in one BEGIN/ROLLBACK transaction using service_role. It reads existing canonical turn IDs without reading message contents; all fixture writes use RPCs. Checks: out-of-order/busy/replayed claims, renewal, token-specific release/reclaim, stale renewal/final rejection, invalid State/critical tokens, ±3 bound, Pattern requirement, same-request State replay, cross-request Pattern consumption. All seven fixture categories were verified zero after rollback. No persistent DB/schema change.
-- The live DB clock-expiry wait is covered by the deterministic worker model; the rollback test reclaims through release rather than holding production locks during an expiry wait. Sora's DB rollback checks are also recorded in the PR #47 review comment.
+- Multi-worker application tests use independent store instances over one shared DB-contract model, explicit barriers, and a controlled clock: same-user/request races, oldest unfinished ordering, lease expiry/reclaim, stale State/critical rejection, cross-request Pattern consumption, competing acceptance/breakup transitions, renewal loss, release failure, guarded import, and saved-chat failure isolation pass. Additional tests pause each intermediate RPC after the application guard has succeeded, expire/reclaim ownership, and verify rejection at the DB-contract boundary with zero writes. Live-token schema checks cover all six intermediate adapters; import carries the same identity and preserves the DB lease-rejection reason. These are deterministic orchestration tests, not live multi-process Vercel tests.
+- `tests/relationship-distributed.rollback.sql` ran successfully against the installed DB contract in one BEGIN/ROLLBACK transaction using service_role. It reads existing canonical turn IDs without reading message contents; all fixture writes use RPCs. Checks: out-of-order/busy/replayed claims, renewal, real expiry/reclaim, token-specific stale release, rejection of stale ledger/Evidence/Episode/Pattern/critical pending creation+update/import/State/Critical, invalid State/critical tokens, ±3 bound, Pattern requirement, same-request State replay, cross-request Pattern consumption. Import receipt is asserted unchanged; stale artifacts and pending status remain unchanged. Fresh-token intermediate wrappers also succeed. All nine tracked fixture categories were verified zero after rollback. No persistent DB/schema change.
+- The DB check uses a 30-second lease and waits 31 seconds before reclaiming. During this wait it holds only unique test-version lease/artifact locks; no canonical State row lock or State mutation precedes the wait. No direct table INSERT/UPDATE or DDL is used.
 - Lab writes:false, shared generator boundary and existing quota/history/memory/Body Clock/email-save/device regressions pass.
 - Actual Gemini classification quality and signed-in cross-device Preview journeys still require Sora/owner evaluation; mocked generator tests do not establish live model quality.
 
 ## Distributed blocker resolution and remaining review
 
-The original missing worker ownership/order/Pattern-consumption contract is resolved by the updated PR #46 contract, token-fenced application integration, and the passing multi-worker/DB rollback tests above. Legacy final apply v1 RPCs are no longer runtime dependencies; installed DB privileges show service_role cannot execute them.
+The original missing worker ownership/order/Pattern-consumption contract is resolved by the updated PR #46 contract, token-fenced application integration, and the passing multi-worker/DB rollback tests above. The intermediate check/write TOCTOU identified in the second review is addressed by the seven new token-fenced wrappers in the pinned contract, and the passing tests above. No legacy permanent data mutation v1 RPC is called from application runtime; v1 names are retained only for the formal claim/renew/release control APIs. Internal DB delegation is part of Sora’s contract and is unchanged.
 
 The PR remains Draft and production enablement remains off. Sora still reviews the policy and safety boundaries. Live Gemini classification quality, signed-in cross-device Preview journeys, and actual Vercel multi-instance traffic have not been exercised with the engine enabled. Recovery remains opportunistic on successful/replayed chat activity; there is no newly introduced queue or autonomous retry scheduler.
 
