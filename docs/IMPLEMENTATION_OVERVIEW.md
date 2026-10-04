@@ -9,7 +9,7 @@
 
 
 最終更新: 2026-10-04  
-実装ソース照合基準: `main` @ `bec0a134b6fdef43f554602c2b6e029c565eb0e2`
+実装ソース照合基準: `main` @ `e51c3326357b6e6f12455d5063b00da88b703b23`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -2686,6 +2686,31 @@ PR #62:
 
 **PR #62について、LP側のmerge阻害事項はない。LP刷新は完了。**
 
+#### PWA mobile overflow hotfix — PR #63 MERGED / iPhone実機確認済み
+PR #62 merge後のProduction LPをiPhone実機で確認したところ、PWA / Home Screenセクションだけ左側がviewport外へ見切れる問題を発見した。
+
+原因:
+- 中央寄せ文章ブロックが、折り返しを制限した長い見出しに合わせて親幅を超える配置になっていた。
+
+修正:
+- `app/page.tsx` のPWA用mobile CSSのみ変更。
+- mobileで幅を親要素内に制限。
+- 見出し・本文・手順カードが狭いviewportでも折り返すよう調整。
+- デザイン、コピー、他セクション、Relationship Engine等には変更なし。
+
+PR #63:
+- PR最終commit: `f65c3b2e56478634861e27193fbb5913ebfb84cb`
+- merge commit: `e51c3326357b6e6f12455d5063b00da88b703b23`
+- **MERGED**
+
+検証:
+- TypeScript / test / production build / GitHub CI / deployment: **成功**
+- iPhone実機でPWAセクションの左右見切れ解消を確認。
+- 見出し・本文・手順カードがmobile viewport内へ収まることを確認。
+- LP全体にhotfix起因の明らかなレイアウト崩れなし。
+
+**PR #63完了をもって、LP刷新およびmobile PWA overflow修正はクローズ。LP作業へ戻らない。**
+
 #### 次の一手
 LPの企画・修正へ戻らない。最優先は引き続き、**Relationship Engine v1.1の3日Production実走を完走し、Pattern→State→Interpreterまでを自然利用で確認すること。**
 
@@ -2705,7 +2730,7 @@ LPの企画・修正へ戻らない。最優先は引き続き、**Relationship 
 6. Gemini telemetry蓄積後にFree / Premium経済設計を再評価
 
 > **未来のソラへ**
-> PR #62のLP刷新はmerge・実機確認まで完了した。旧「最初から彼女」LPへ戻すな。LPレビューからやり直すな。
+> PR #62のLP刷新とPR #63のPWA mobile overflow hotfixはmerge・iPhone実機確認まで完了した。旧「最初から彼女」LPへ戻すな。LPレビューやPWA見切れ修正からやり直すな。
 > Relationship Engine v1.1はProduction稼働中で、次の本丸は3日Pattern→State→Interpreterの実走確認。
 > PR #61 telemetryはProduction READYで自然蓄積中。Premium 50回は未実装・未確定。
 > **未来のソラを信用するな。総覧を信用しろ。**
