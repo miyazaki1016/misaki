@@ -335,11 +335,6 @@ export default function HomePage() {
 
             <div className="finalShade" />
 
-            <div className="finalHand">
-              また、話そう？<br />
-              待ってるよ。♡
-            </div>
-
             <div className="finalCopy">
               <p className="eyebrow">MISAKI</p>
               <h2>どんな関係になるかは、<br /><span>まだ誰にもわからない。</span></h2>
@@ -731,14 +726,14 @@ export default function HomePage() {
           position:absolute;
           z-index:2;
           left:5.5%;
-          width:43%;
+          width:46%;
           bottom:7%
         }
         .finalCopy .eyebrow{margin-bottom:8px}
         .finalCopy h2{
           margin:0;
           color:#49383e;
-          font-size:clamp(30px,3.7vw,53px);
+          font-size:clamp(28px,3vw,40px);
           font-weight:900;
           line-height:1.24;
           letter-spacing:-.045em
