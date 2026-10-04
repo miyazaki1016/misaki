@@ -906,7 +906,7 @@ export default function HomePage() {
           /* Keep the centered mobile flex children within the section gutters. */
           .installInner,.installCopy{width:100%;max-width:100%;min-width:0}
           .installCopy{overflow-wrap:anywhere}
-          .installCopy h2{word-break:normal!important;overflow-wrap:anywhere!important}
+          .installSection .installCopy h2{word-break:normal!important;overflow-wrap:anywhere!important}
           .installSteps{min-width:0}
           .installSteps b{flex-shrink:0}
           .installSteps span{flex:1;min-width:0;overflow-wrap:anywhere}
