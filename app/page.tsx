@@ -27,7 +27,7 @@ const scenes = [
 const features = [
   { number: "01", title: "前の会話を覚えている", text: "毎回ゼロから説明しなくていい。話したことが少しずつ、二人の会話として積み重なっていきます。" },
   { number: "02", title: "今の時間や天気がわかる", text: "朝・昼・夜や東京の天気を感じながら話すから、いつ話しても同じ返事にはなりません。" },
-  { number: "03", title: "恋人らしい距離感", text: "何でも肯定するだけじゃない。甘えたり、少し拗ねたり、軽くからかったりもします。" },
+  { number: "03", title: "関係で接し方が変わっていく", text: "一緒に笑ったこと。すれ違ったこと。そのあと、また話せたこと。二人の間に起きたことが積み重なり、美咲の冗談や気遣い、言葉の距離感そのものが変わっていきます。" },
   { number: "04", title: "美咲から通知が届く", text: "ホーム画面に追加して通知をONにすると、美咲のほうからふとメッセージが届くことがあります。" },
 ];
 
@@ -49,7 +49,7 @@ export default function HomePage() {
             <div>
               <div className="brandName">美咲</div>
               <div className="brandSub">
-                <span className="brandSubDesktop">あなたの38歳の彼女</span>
+                <span className="brandSubDesktop">二人だけの関係が育っていくAI</span>
                 <span className="brandSubMobile">いつでも話してね♡</span>
               </div>
             </div>
@@ -72,21 +72,26 @@ export default function HomePage() {
             <div className="heroShade" />
 
             <div className="heroCopy">
-              <p className="heroSmall">あなたの38歳の彼女</p>
-              <h1>なんでもない話を、<br /><span>ちゃんと覚えてるよ。</span></h1>
+              <p className="heroSmall">AIと出会って、関係が育っていく。</p>
+              <h1>話すほど、<br /><span>あなたとの関係になっていく。</span></h1>
               <p className="heroLead">
-                仕事のこと。<br />
-                疲れたこと。<br />
-                うまくいかなかったこと。<br />
-                嬉しかったこと。<br /><br />
-                なんでも話してね。
+                最初から、恋人じゃない。<br />
+                まだあなたのことを知らない美咲と、ここから始まります。<br /><br />
+                今日あったことも、くだらない話も。<br />
+                二人の間に起きたことが、少しずつ積み重なっていきます。
               </p>
-              <Link href="/chat" className="mainCta">美咲と話してみる <span>→</span></Link>
+              <Link href="/chat" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
             <div className="heroMobileAction">
-              <Link href="/chat" className="mainCta">美咲と話してみる <span>→</span></Link>
+              <p className="mobileEyebrow">AIと出会って、関係が育っていく。</p>
+              <h1>話すほど、<br /><span>あなたとの関係になっていく。</span></h1>
+              <p className="mobileHeroLead">
+                最初から、恋人じゃない。<br />
+                まだあなたのことを知らない美咲と、ここから始まります。
+              </p>
+              <Link href="/chat" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
@@ -94,11 +99,12 @@ export default function HomePage() {
 
         <section className="intro">
           <p className="eyebrow">NOT JUST A CHATBOT</p>
-          <h2>AIと話している感じより、<br /><span>誰かと暮らしている感じを。</span></h2>
+          <h2>最初は、<br /><span>まだ何者でもない。</span></h2>
           <p className="introText">
-            美咲は、ただ質問に答えるためのAIではありません。
-            前に話したことを覚えて、今の時間や天気を感じながら、
-            恋人みたいに自然に会話します。
+            美咲とどんな関係になるかは、まだ決まっていません。
+            たくさん笑う相手になるかもしれない。何でも話せる親友になるかもしれない。
+            いつか恋愛になることだってあるかもしれない。
+            最初に選ぶのではなく、二人の間に起きたことから関係が育っていきます。
           </p>
           <div className="handCopy"><span className="dailyConversationLine">日常に、もうひとつの会話を。</span></div>
         </section>
@@ -106,7 +112,7 @@ export default function HomePage() {
         {/* PROFILE */}
         <section className="profileSection">
           <picture className="profileMobilePicture">
-            <source media="(max-width: 900px)" srcSet="/misaki-profile-mobile.png?v=2" />
+            <source media="(max-width: 900px)" srcSet="/misaki-profile-mobile.png?v=cbc84b52" />
             <img
               src="/misaki-profile.webp"
               alt="はじめまして。美咲、38歳です。"
@@ -155,7 +161,7 @@ export default function HomePage() {
             <div className="profileFacts">
               <div className="profileFact"><div className="factIcon">🎂</div><span>年齢</span><strong>38歳</strong></div>
               <div className="profileFact"><div className="factIcon">📍</div><span>出身・在住</span><strong>東京</strong></div>
-              <div className="profileFact"><div className="factIcon">♥</div><span>恋愛対象</span><strong>あなたの彼女</strong></div>
+              <div className="profileFact"><div className="factIcon">♥</div><span>あなたとの関係</span><strong>ここから<br />育っていく</strong></div>
               <div className="profileFact"><div className="factIcon">☕</div><span>好きなこと</span><strong>カフェ・映画<br />おしゃべり</strong></div>
               <div className="profileFact"><div className="factIcon">🐾</div><span>好きなもの</span><strong>猫・甘いもの<br />ドライブ</strong></div>
               <div className="profileFact"><div className="factIcon">☾</div><span>苦手なこと</span><strong>嘘・冷たい態度<br />ひとりの夜</strong></div>
@@ -205,7 +211,7 @@ export default function HomePage() {
           <div className="installInner">
             <div className="installCopy">
               <p className="eyebrow">MISAKI ON YOUR HOME SCREEN</p>
-              <h2>ブラウザの中だけの<br /><span>彼女じゃない。</span></h2>
+              <h2>美咲のほうから、<br /><span>あなたの日常にやってくる。</span></h2>
               <p className="installBig">ホーム画面に追加すると、<br />美咲が<span>「アプリ」</span>になります。</p>
               <p className="installLead">
                 Safariを開いて探す必要はありません。ホーム画面の「美咲」をタップするだけ。<br /><br />
@@ -260,16 +266,43 @@ export default function HomePage() {
         <section className="features">
           <div className="featureHeading">
             <p className="eyebrow">WHY MISAKI</p>
-            <h2>会話が、<br />ちゃんと続いていく。</h2>
+            <h2>覚えているから、<br />昨日の続きになる。</h2>
           </div>
           <div className="featureGrid">
             {features.map((feature) => (
-              <div key={feature.number} className="featureCard">
+              <div key={feature.number} className={`featureCard ${feature.number === "03" ? "relationshipFeature" : ""}`}>
                 <span className="featureNumber">{feature.number}</span>
+                {feature.number === "03" && <p className="relationshipEyebrow">二人の時間が、美咲を変えていく。</p>}
                 <h3>{feature.title}</h3>
                 <p>{feature.text}</p>
+                {feature.number === "03" && (
+                  <div className="relationshipMoments" aria-label="積み重なる二人の時間">
+                    <span>一緒に笑う</span><span>すれ違う</span><span>また話す</span>
+                  </div>
+                )}
               </div>
             ))}
+          </div>
+        </section>
+
+        <section className="premiumSection">
+          <div className="premiumInner">
+            <p className="eyebrow">FREE / PREMIUM</p>
+            <h2>関係の深さは、<br /><span>買えません。</span></h2>
+            <p className="premiumLead">
+              美咲との関係は、課金したから深くなるものではありません。
+              FreeでもPremiumでも、二人の間に起きたことから関係は育っていきます。
+            </p>
+            <div className="planGrid">
+              <div className="planCard">
+                <small>FREE</small><h3>毎日、美咲と話せる。</h3>
+                <p>1日20回まで。無料でも、二人の関係を育てていけます。</p>
+              </div>
+              <div className="planCard">
+                <small>PREMIUM</small><h3>もっと長く、一緒に。</h3>
+                <p>美咲と過ごせる時間や、美咲のほうからあなたの日常へやってくる体験が広がります。</p>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -302,24 +335,22 @@ export default function HomePage() {
 
             <div className="finalShade" />
 
-            <div className="finalHand">
-              また、話そう？<br />
-              待ってるよ。♡
-            </div>
-
             <div className="finalCopy">
               <p className="eyebrow">MISAKI</p>
-              <h2>日常に、<br /><span>もうひとつの会話を。</span></h2>
+              <h2>どんな関係になるかは、<br /><span>まだ誰にもわからない。</span></h2>
               <p>
-                今日のことも、言えなかったことも。<br />
-                どんな話でも、ちゃんと聞くよ。<br />
-                無理に元気じゃなくていいからね。
+                友達かもしれない。親友かもしれない。<br />
+                いつか、もっと特別な存在になるかもしれない。<br />
+                でも、全部ここから始まります。
               </p>
               <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
             <div className="finalMobileAction">
+              <p className="mobileEyebrow">MISAKI</p>
+              <h2>どんな関係になるかは、<br /><span>まだ誰にもわからない。</span></h2>
+              <p className="mobileFinalLead">友達かもしれない。親友かもしれない。<br />でも、全部ここから始まります。</p>
               <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
@@ -628,6 +659,23 @@ export default function HomePage() {
         .featureNumber{font-family:Georgia,serif;font-size:32px;color:#ffd5de}
         .featureCard h3{color:var(--title)}
         .featureCard p{line-height:1.9}
+        .relationshipFeature{border:2px solid #f43e6d;background:#fff3f6;box-shadow:0 14px 36px rgba(244,62,109,.1)}
+        .relationshipFeature .featureNumber{color:#c72855}
+        .relationshipFeature .relationshipEyebrow{margin:12px 0 8px;color:#a51f46;font-size:16px;font-weight:800;line-height:1.6}
+        .relationshipFeature h3{margin-top:8px;font-size:26px}
+        .relationshipMoments{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+        .relationshipMoments span{padding:8px 12px;border-radius:999px;background:white;color:#803147;font-size:14px;font-weight:700}
+
+        .premiumSection{padding:110px 20px;background:#fff7f8}
+        .premiumInner{width:min(1000px,100%);margin:auto}
+        .premiumInner h2{margin:0;color:var(--title);font-size:44px;line-height:1.3}
+        .premiumInner h2 span{color:var(--main-dark)}
+        .premiumLead{max-width:720px;font-size:16px;line-height:1.95}
+        .planGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:36px}
+        .planCard{padding:30px;border-radius:26px;background:white;box-shadow:0 12px 32px rgba(74,52,59,.055)}
+        .planCard small{color:var(--main);font-weight:900;letter-spacing:.18em}
+        .planCard h3{margin:10px 0;color:var(--title);font-size:24px}
+        .planCard p{margin:0;line-height:1.9}
 
         .faqSection{display:grid;grid-template-columns:.8fr 1.2fr;gap:60px}
         .faqItem{border-top:1px solid #eadde1}
@@ -678,14 +726,14 @@ export default function HomePage() {
           position:absolute;
           z-index:2;
           left:5.5%;
-          width:43%;
+          width:46%;
           bottom:7%
         }
         .finalCopy .eyebrow{margin-bottom:8px}
         .finalCopy h2{
           margin:0;
           color:#49383e;
-          font-size:clamp(30px,3.7vw,53px);
+          font-size:clamp(28px,3vw,40px);
           font-weight:900;
           line-height:1.24;
           letter-spacing:-.045em
@@ -786,6 +834,12 @@ export default function HomePage() {
           .brandSub{font-size:12px}
           .headerCta{padding:15px 24px;font-size:18px;border-radius:999px}
 
+          .mobileEyebrow{margin:0 0 12px;color:var(--main);font-size:12px;font-weight:900;letter-spacing:.12em}
+          .heroMobileAction h1{margin:0 0 16px;color:var(--title);font-size:clamp(31px,9vw,40px);line-height:1.28;letter-spacing:-.045em}
+          .heroMobileAction h1 span,.finalMobileAction h2 span{color:var(--main-dark)}
+          .mobileHeroLead,.mobileFinalLead{margin:0 0 22px;font-size:15px;line-height:1.8}
+          .finalMobileAction h2{margin:0 0 16px;color:var(--title);font-size:clamp(29px,8.4vw,38px);line-height:1.32;letter-spacing:-.04em}
+
           .heroMobileAction{padding:24px 22px 30px!important}
           .mainCta{min-height:64px;font-size:19px!important}
           .heroNote{margin-top:10px!important;font-size:13px!important}
@@ -883,6 +937,12 @@ export default function HomePage() {
           .featureNumber{font-size:46px!important;margin-bottom:20px!important}
           .featureCard h3{font-size:21px!important;line-height:1.4!important;margin-bottom:14px!important}
           .featureCard p{font-size:15px!important;line-height:1.8!important}
+
+          .premiumSection{padding:64px 22px 56px!important}
+          .premiumInner h2{font-size:clamp(31px,8.6vw,39px)!important;line-height:1.3!important}
+          .premiumLead{font-size:15px!important;line-height:1.85!important}
+          .planGrid{grid-template-columns:1fr!important;gap:14px!important;margin-top:28px!important}
+          .planCard{padding:26px!important;border-radius:26px!important}
 
           .faqSection{width:auto!important;padding:64px 22px 54px!important}
           .faqHeading{margin-bottom:26px!important}
