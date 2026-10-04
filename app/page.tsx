@@ -27,7 +27,7 @@ const scenes = [
 const features = [
   { number: "01", title: "前の会話を覚えている", text: "毎回ゼロから説明しなくていい。話したことが少しずつ、二人の会話として積み重なっていきます。" },
   { number: "02", title: "今の時間や天気がわかる", text: "朝・昼・夜や東京の天気を感じながら話すから、いつ話しても同じ返事にはなりません。" },
-  { number: "03", title: "関係で接し方が変わっていく", text: "最初から距離が近いわけじゃない。二人の間に起きたことが積み重なるほど、冗談や気遣い、言葉の距離感も少しずつ変わっていきます。" },
+  { number: "03", title: "関係で接し方が変わっていく", text: "一緒に笑ったこと。すれ違ったこと。そのあと、また話せたこと。二人の間に起きたことが積み重なり、美咲の冗談や気遣い、言葉の距離感そのものが変わっていきます。" },
   { number: "04", title: "美咲から通知が届く", text: "ホーム画面に追加して通知をONにすると、美咲のほうからふとメッセージが届くことがあります。" },
 ];
 
@@ -270,10 +270,16 @@ export default function HomePage() {
           </div>
           <div className="featureGrid">
             {features.map((feature) => (
-              <div key={feature.number} className="featureCard">
+              <div key={feature.number} className={`featureCard ${feature.number === "03" ? "relationshipFeature" : ""}`}>
                 <span className="featureNumber">{feature.number}</span>
+                {feature.number === "03" && <p className="relationshipEyebrow">二人の時間が、美咲を変えていく。</p>}
                 <h3>{feature.title}</h3>
                 <p>{feature.text}</p>
+                {feature.number === "03" && (
+                  <div className="relationshipMoments" aria-label="積み重なる二人の時間">
+                    <span>一緒に笑う</span><span>すれ違う</span><span>また話す</span>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -658,6 +664,12 @@ export default function HomePage() {
         .featureNumber{font-family:Georgia,serif;font-size:32px;color:#ffd5de}
         .featureCard h3{color:var(--title)}
         .featureCard p{line-height:1.9}
+        .relationshipFeature{border:2px solid #f43e6d;background:#fff3f6;box-shadow:0 14px 36px rgba(244,62,109,.1)}
+        .relationshipFeature .featureNumber{color:#c72855}
+        .relationshipFeature .relationshipEyebrow{margin:12px 0 8px;color:#a51f46;font-size:16px;font-weight:800;line-height:1.6}
+        .relationshipFeature h3{margin-top:8px;font-size:26px}
+        .relationshipMoments{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+        .relationshipMoments span{padding:8px 12px;border-radius:999px;background:white;color:#803147;font-size:14px;font-weight:700}
 
         .premiumSection{padding:110px 20px;background:#fff7f8}
         .premiumInner{width:min(1000px,100%);margin:auto}
