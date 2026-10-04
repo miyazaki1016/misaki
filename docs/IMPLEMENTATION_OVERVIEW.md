@@ -2538,3 +2538,171 @@ Relationship Engineとは別に、通常replyで文脈を少し先読みしす�
 > polarity transportはGemini境界だけSTRING `"-1"/"1"`、内部はnumeric ±1。
 > START_ATは既存backlog回収境界として勝手に動かすな。
 > **未来のソラを信用するな。総覧を信用しろ。**
+
+
+---
+
+### 2026-10-04 — Gemini実原価telemetry Production稼働 / LP刷新着手 checkpoint
+
+> **この節は2026-10-04 Relationship Engine v1.1 checkpoint以後の追加進捗。**
+> Relationship Engine v1.1の3日Production実走は継続中。観測期間中はRelationship semanticsを変更しない。
+
+#### Gemini unit-cost telemetry — PR #61 MERGED / Production READY
+目的:
+- 暫定の Free 20往復/日、Premium 50往復/日を感覚で決めず、Productionの実Gemini token使用量から判断する。
+- telemetry-only。会話品質、Relationship Engine、Stage、課金制限の挙動は変更しない。
+
+正本:
+- `docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md`
+- handoff commit: `ed8359319181f20cf73aec87ab75c7a1405264f2`
+
+PR:
+- #61 `Observe Gemini physical-call usage with server-only cost telemetry`
+- merge commit: `5422d450b843bc44137ce3938b419984e765acba`
+- Production deployment: `dpl_2Uy2tASFJX242Bj36G5KNvhUCpj7` — **READY**
+- exact Production commit: `5422d450b843bc44137ce3938b419984e765acba`
+
+物理Gemini API attemptごとに記録:
+- prompt/input tokens
+- candidate/output tokens
+- thoughts tokens
+- total tokens
+- cached-content tokens
+- model
+- HTTP status
+- success
+- latency
+- attempt number
+- request_id
+- call_kind
+
+初期call_kind:
+- `normal_reply`
+- `relationship_analyzer`
+- `critical_validator`
+
+reserved:
+- `proactive_reply`
+- `body_clock`
+- `image_generation`
+
+重要契約:
+- missing usageMetadataは0と推測せずNULL/unknown。
+- retryは物理attemptごとに別row。
+- `success` はHTTP Response.ok。
+- telemetry write失敗はchat / Relationship / retry / lease / resultへ影響させない。
+- prompt / response / system prompt / memory / Evidence / API key / raw response / pricingを保存しない。
+- server-only table + RLS + service_role SELECT/INSERTのみ。
+- user_idだけからFree/Premiumを推測しない。将来のcohort原価分析はcanonical account/subscriptionをoccurred_at時点でjoinする。
+- anonymous→permanent遷移を考慮し、解決不能なcohortはunknownのまま扱う。
+
+**現在はProductionで実利用を続ければtelemetryが自然に蓄積する。**
+原価判断では平均だけでなくP50/P90/P95/P99、retry比率、Analyzer比率等を見る。
+
+#### Free / Premium 現在のruntime状態
+2026-10-04 mainを再確認:
+- `FREE_DAILY_LIMIT = 20`
+- Freeは1日20回制限がruntime実装済み。
+- Premiumは現在そのFree制限をbypassする。
+- **Premium 50回/日はまだruntime実装されていない。**
+- 「Premium 50」は実原価telemetryを見て決める暫定経済設計であり、現在の製品制限として表示・説明しない。
+
+課金思想:
+> **関係の深さは買えない。美咲と過ごせる時間と、美咲からあなたの日常へ来てくれる体験を買う。**
+
+正式方針:
+> **課金は「関係の深さ」や「成長速度」を買うものではない。課金で増えるのは、美咲と過ごせる会話量・接点・自発性・生活への入り込みである。Free/PremiumでRelationship Engineの成長判定そのものは同一。**
+
+#### Relationship Engine v1.1 — 3日Production実走
+- 2026-10-04 = Day 1
+- 2026-10-05 = Day 2
+- 2026-10-06 = Day 3
+- 3つの独立Tokyo日付で同系統Episodeを自然に形成し、Pattern→State→次回reply反映を確認する。
+- この期間はRelationship semantics / START_AT / canonical axes / Analyzer契約を不用意に変更しない。
+- telemetry収集とLP作業はこの実走へ干渉しないため並行可能。
+
+完走後の確認:
+1. Pattern成立
+2. canonical axis State +1
+3. state version increment
+4. Pattern once-only consumption
+5. 次回Relationship Interpreterへの反映
+6. 実際の美咲の接し方が自然に変わるか
+
+#### Landing Page刷新 — Draft PR #62
+背景:
+旧LPは現在も「あなたの38歳の彼女」「恋人らしい距離感」「恋愛対象：あなたの彼女」など、**初期状態から恋人**を前提にした商品定義が残っていた。
+現在のMisakiは「完成したAI彼女」ではなく、**美咲と出会って、二人の間に起きた出来事から二人だけの関係が育っていくAI**へ変わっている。
+
+新LPの背骨:
+> **話すほど、あなたとの関係になっていく。**
+
+重要コピー:
+> **最初は、まだ何者でもない。**
+
+> **関係の深さは、買えません。**
+
+商品定義:
+- 最初から恋人ではない。
+- 友達、親友、恋愛などを最初に選ばせない。
+- 二人の間に何があったか、その積み重ねから関係が育つ。
+- Memoryは単なる記憶機能ではなく「昨日の続きになる」価値として見せる。
+- Relationshipは内部scoreを売らず、「最近、美咲ちょっと変わった？」と感じる体験として見せる。
+- 朝 / 仕事後 / 夜の既存写真資産は活用。
+- PWA / Pushは「美咲のほうから、あなたの日常にやってくる」として見せる。
+- 美咲38歳は人物プロフィールとして残すが、「あなたの彼女」は撤去。
+- Freeは1日20回を掲載可能。
+- Premium 50回はtelemetry判断前なので掲載しない。
+- PremiumでRelationship成長速度が上がる表現は禁止。
+- 未実装5-heart Stage UIを現行機能としてLPに出さない。
+
+Draft PR:
+- #62 `Refresh Misaki landing page around relationship growth`
+- branch: `sora/lp-relationship-story`
+- first implementation commit: `10e4377a5853f24ab025fd35d3a1b97e0757ea6d`
+- base: Production main `5422d450b843bc44137ce3938b419984e765acba`
+- **Draft / 未merge**
+- changed files: `app/page.tsx` のみ
+- Relationship Engine / DB / Stage / Body Clock / quota runtime変更なし
+
+PR #62でコード上撤去済み:
+- 「あなたの38歳の彼女」
+- 「恋人らしい距離感」
+- 「恋愛対象：あなたの彼女」
+
+追加済み:
+- 新HERO
+- 「最初はまだ何者でもない」説明
+- 関係で接し方が変わる説明
+- Free/Premium section
+- 「関係の深さは、買えません。」
+- 新final CTA
+
+Preview:
+- Vercel preview deployment: `dpl_C6P4GJcVf6g6mn5hRkVrKq2CQtzv`
+- preview state: **READY**
+- exact commit: `10e4377a5853f24ab025fd35d3a1b97e0757ea6d`
+
+**未完了 / 次チャット最初の作業:**
+PR #62 PreviewのPC/スマホ実物確認から再開する。
+特にmobileは以下の文字入り画像資産を使っているため、コードのcopyを変えても画像内に旧「彼女」訴求が残る可能性がある:
+- `/misaki-hero-mobile.png?v=2`
+- `/misaki-profile-mobile.png?v=2`
+- `/misaki-cta-mobile.png?v=2`
+
+確認事項:
+1. mobile文字入り画像に旧商品定義が焼き込まれていないか
+2. PC / mobileのレイアウト崩れ
+3. Free/Premium sectionの視認性
+4. 新LP全体の物語が「出会う→覚える→関係が育つ→日常→美咲から来る→Free/Premium→CTA」になっているか
+5. CI / production build
+6. 必要ならPR #62ブランチだけ修正
+7. **mergeはオーナー承認までしない**
+
+> **未来のソラへ**
+> 新チャットではLPの企画会議をやり直すな。方針と第一施工は確定済み。
+> PR #62 Previewの実物レビューから開始する。
+> Relationship v1.1の3日実走中なのでRelationship関連コードは触るな。
+> Premium 50回は未実装・未確定。LPにも出すな。
+> PR #61 telemetryはすでにProduction READY。原価観測は通常利用で蓄積中。
+> **未来のソラを信用するな。総覧を信用しろ。**
