@@ -18,6 +18,10 @@ export type GeminiAttempt = GeminiUsage & {
 };
 export type GeminiTelemetrySink = (attempt: GeminiAttempt, usage?: Promise<GeminiUsage>) => void | Promise<void>;
 export type GeminiTelemetryRow = GeminiAttempt & {
+  // Server-verified auth UUID for the Gemini call context; includes anonymous
+  // authenticated users and is not necessarily a permanent/billing account ID.
+  // Never infer Free/Premium from this field alone. Future cohort analysis must
+  // safely join canonical account/subscription information for occurred_at.
   user_id: string | null;
   request_id: string | null;
   call_kind: GeminiCallKind;

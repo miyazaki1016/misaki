@@ -28,6 +28,21 @@ zero, or infer charges from network failure. Pricing and FX are separate future
 versioned calculation inputs. Usage does not establish a provider invoice by
 itself, and NULL rows must remain visible as coverage gaps in later cost reports.
 
+## Identity semantics and future cohort analysis
+
+`user_id` is the auth user UUID verified by the server for the context in which
+the Gemini call occurs. It is not necessarily a permanent account or billing
+account ID: anonymous authenticated user UUIDs are included. NULL means no
+verified identity was supplied; it does not identify a plan or cohort.
+
+Free / Premium cohort analysis must never infer a plan from `user_id` alone,
+including whether it is present. Future analysis must safely join the verified
+auth identity to canonical account and subscription information, accounting for
+anonymous-to-permanent identity transitions and the subscription state applicable
+at `occurred_at`. Unresolved identity or subscription mappings must remain unknown
+rather than being assigned a plan by assumption. This telemetry change implements
+no canonical-account mapping, subscription join, plan detection or billing logic.
+
 ## Integration and failure isolation
 
 - Authenticated chat generation: `normal_reply`, server-verified user UUID and

@@ -3,7 +3,13 @@ import { after } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { telemetryRow, telemetryFailure, type GeminiCallKind, type GeminiTelemetrySink } from "./gemini-usage-telemetry";
 
-/** Call only with server-verified identity. No browser/API write endpoint exists. */
+/**
+ * userId is the server-verified auth UUID for this Gemini call context, including
+ * anonymous authenticated users; it need not identify a permanent/billing account.
+ * It alone cannot determine Free/Premium. Future analysis must safely join
+ * canonical account/subscription information for the call time.
+ * No browser/API write endpoint exists.
+ */
 export function createGeminiTelemetrySink(callKind: GeminiCallKind, userId: string | null, requestId: string | null): GeminiTelemetrySink {
   return (attempt, usage) => {
     const row = telemetryRow(attempt, { callKind, userId, requestId });
