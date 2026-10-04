@@ -903,6 +903,14 @@ export default function HomePage() {
 
           .installSection{padding:62px 22px 56px!important}
           .installInner{gap:34px!important}
+          /* Keep the centered mobile flex children within the section gutters. */
+          .installInner,.installCopy{width:100%;max-width:100%;min-width:0}
+          .installCopy{overflow-wrap:anywhere}
+          .installCopy h2{word-break:normal!important;overflow-wrap:anywhere!important}
+          .installSteps{min-width:0}
+          .installSteps b{flex-shrink:0}
+          .installSteps span{flex:1;min-width:0;overflow-wrap:anywhere}
+          .installSection .phone{max-width:100%}
           .installCopy h2{
             font-size:clamp(31px,8.6vw,39px)!important;
             line-height:1.3!important;
