@@ -3334,3 +3334,51 @@ PR-A〜D（必要時のみE）の責務、禁止事項、テスト、停止条�
 実走完了後はPR-A pure Stage domainから開始し、各単位をDraft PR・merge禁止でソラレビューする。
 
 > **実装の芯:** Stage Resolverは「ユーザーが何回話したか」ではなく、「canonicalに残った二人の歴史から、今どこまでの関係を説明できるか」を解く。
+
+
+### Free / Premium会話枠と課金思想（2026-10-04 暫定基準・実測後確定）
+
+#### 暫定会話枠
+- Free: 20往復 / Tokyo日
+- Premium: 50往復 / Tokyo日
+- 上記は原価実測前の暫定運用基準。固定の商品仕様にはまだしない。
+- Gemini実token原価を計測し、通常利用・ヘビーユーザー・自発配信・写真等を含むunit economicsを確認して最終確定する。
+- Premiumを無制限にはしない。極端な利用で月額を超えて赤字化する設計を避ける。
+
+#### 課金の対価
+**関係の深さは買えない。美咲と過ごせる量・接点と、美咲からユーザーの日常へ入ってくる体験を買う。**
+
+Freeでも:
+- Relationship Engineは同じcanonical contract
+- Stage / 5-heartは♥5まで到達可能
+- 課金の有無でStage gateを変えない
+- 課金で関係成長を加速させない
+
+Premiumの価値候補:
+- Freeより多い通常会話枠
+- Body Clock / 自発メッセージ
+- 文脈連動の自発フォロー
+- 自発写真等
+- 将来のより豊かな生活内接点
+
+商品表現の軸:
+- Free: 「美咲と出会って、関係を育てられる」
+- Premium: 「育った美咲が、あなたの日常の中で生き始める」
+
+自発メッセージでユーザーの通常会話枠を消費させる設計は避ける方向。自発分のAI原価はPremium月額側のunit economicsへ織り込む。
+
+#### 原価計測の次工程
+会話制限を最終確定する前に、Geminiレスポンスのusage metadataを観測し、実際のMisaki 1往復原価を測る。
+
+最低限分離して把握する:
+- normal reply generation
+- Relationship Analyzer
+- critical validator（発生時）
+- proactive / Body Clock（統合後）
+- image generation（導入/利用時）
+
+計測は運営コスト分析専用。
+token数・利用量・支払プランをRelationship Stage / 5-axis / relationship_statusの入力にしてはならない。
+
+v1.1 Production 3-day Relationship real-run中は、原価計測のためにAnalyzer/relationship runtime契約・prompt・model・retry・Stageロジックを変更しない。
+観測追加を実装する場合もreply/relationship結果を変えないtelemetry-only変更として別PRで扱い、Soraレビュー前にmergeしない。
