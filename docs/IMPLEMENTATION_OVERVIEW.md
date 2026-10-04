@@ -9,7 +9,7 @@
 
 
 最終更新: 2026-10-04  
-実装ソース照合基準: `main` @ `b3811b4c91c37b567767b7c0294b524877c9ece9`
+実装ソース照合基準: `main` @ `bec0a134b6fdef43f554602c2b6e029c565eb0e2`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -2542,7 +2542,8 @@ Relationship Engineとは別に、通常replyで文脈を少し先読みしす�
 
 ---
 
-### 2026-10-04 — Gemini実原価telemetry Production稼働 / LP刷新着手 checkpoint
+
+### 2026-10-04 — Gemini実原価telemetry Production稼働 / LP刷新完了 checkpoint
 
 > **この節は2026-10-04 Relationship Engine v1.1 checkpoint以後の追加進捗。**
 > Relationship Engine v1.1の3日Production実走は継続中。観測期間中はRelationship semanticsを変更しない。
@@ -2593,7 +2594,8 @@ reserved:
 - telemetry write失敗はchat / Relationship / retry / lease / resultへ影響させない。
 - prompt / response / system prompt / memory / Evidence / API key / raw response / pricingを保存しない。
 - server-only table + RLS + service_role SELECT/INSERTのみ。
-- user_idだけからFree/Premiumを推測しない。将来のcohort原価分析はcanonical account/subscriptionをoccurred_at時点でjoinする。
+- `user_id` はGemini call発生時にserverが検証したauth user UUIDであり、恒久課金アカウントIDとは限らない。anonymous authenticated user UUIDも含む。
+- Free / Premium cohortを `user_id` 単独で判定しない。将来のcohort原価分析はcanonical account/subscriptionをoccurred_at時点で安全にjoinする。
 - anonymous→permanent遷移を考慮し、解決不能なcohortはunknownのまま扱う。
 
 **現在はProductionで実利用を続ければtelemetryが自然に蓄積する。**
@@ -2629,10 +2631,10 @@ reserved:
 5. 次回Relationship Interpreterへの反映
 6. 実際の美咲の接し方が自然に変わるか
 
-#### Landing Page刷新 — Draft PR #62
+#### Landing Page刷新 — PR #62 MERGED / 実機最終確認済み
 背景:
-旧LPは現在も「あなたの38歳の彼女」「恋人らしい距離感」「恋愛対象：あなたの彼女」など、**初期状態から恋人**を前提にした商品定義が残っていた。
-現在のMisakiは「完成したAI彼女」ではなく、**美咲と出会って、二人の間に起きた出来事から二人だけの関係が育っていくAI**へ変わっている。
+旧LPには「あなたの38歳の彼女」「恋人らしい距離感」「恋愛対象：あなたの彼女」など、**初期状態から恋人**を前提にした商品定義が残っていた。
+現在のMisakiは「完成したAI彼女」ではなく、**美咲と出会って、二人の間に起きた出来事から二人だけの関係が育っていくAI**であるため、LPをこの正式方針へ刷新した。
 
 新LPの背骨:
 > **話すほど、あなたとの関係になっていく。**
@@ -2648,61 +2650,62 @@ reserved:
 - 二人の間に何があったか、その積み重ねから関係が育つ。
 - Memoryは単なる記憶機能ではなく「昨日の続きになる」価値として見せる。
 - Relationshipは内部scoreを売らず、「最近、美咲ちょっと変わった？」と感じる体験として見せる。
-- 朝 / 仕事後 / 夜の既存写真資産は活用。
 - PWA / Pushは「美咲のほうから、あなたの日常にやってくる」として見せる。
 - 美咲38歳は人物プロフィールとして残すが、「あなたの彼女」は撤去。
-- Freeは1日20回を掲載可能。
+- Freeは1日20回を掲載。
 - Premium 50回はtelemetry判断前なので掲載しない。
 - PremiumでRelationship成長速度が上がる表現は禁止。
 - 未実装5-heart Stage UIを現行機能としてLPに出さない。
 
-Draft PR:
-- #62 `Refresh Misaki landing page around relationship growth`
+PR #62:
+- title: `Refresh Misaki landing page around relationship growth`
 - branch: `sora/lp-relationship-story`
-- first implementation commit: `10e4377a5853f24ab025fd35d3a1b97e0757ea6d`
-- base: Production main `5422d450b843bc44137ce3938b419984e765acba`
-- **Draft / 未merge**
-- changed files: `app/page.tsx` のみ
-- Relationship Engine / DB / Stage / Body Clock / quota runtime変更なし
+- PR最終commit: `9bfa0760f56b3d1c3bf6d07af056410afde975ec`
+- merge commit: `bec0a134b6fdef43f554602c2b6e029c565eb0e2`
+- **MERGED**
+- LPの実機mobile最終確認済み。
 
-PR #62でコード上撤去済み:
-- 「あなたの38歳の彼女」
-- 「恋人らしい距離感」
-- 「恋愛対象：あなたの彼女」
+最終仕上げ:
+- Feature 03を視覚的に強調し、**「二人の時間が、美咲を変えていく。」** を追加。
+- 「一緒に笑う／すれ違う／また話す」の積み重ねが接し方を変えることを前面化。
+- PC Final CTAの手書き補助コピー重なりを解消。
+- mobileプロフィール画像の旧コピー **「恋愛対象／あなたの彼女」** を撤去し、**「あなたとの関係／ここから、少しずつ。」** へ変更。
+- mobileプロフィール画像はブラウザ/CDNキャッシュ対策として参照URLを `?v=cbc84b52` へ更新。
+- mobile HERO「いつでも、どんな話でも。待ってるよ。」とFinal「また、話そう？／いつでも、ここで待ってるよ。」は実機確認のうえ、恋人関係を断定しないため維持。
+- morning / work / night等の既存画像も恋人関係を断定しないため維持。
 
-追加済み:
-- 新HERO
-- 「最初はまだ何者でもない」説明
-- 関係で接し方が変わる説明
-- Free/Premium section
-- 「関係の深さは、買えません。」
-- 新final CTA
+最終検証:
+- mobileフルページ実機確認: **合格**
+- desktop Preview: **合格**
+- TypeScript: **成功**
+- production build: **成功**
+- 既存テスト: **262/262成功**
+- GitHub CI: **成功**
+- Vercel build/deploy: **成功**
+- Relationship Engine / DB / migration / RPC / quota runtime / Body Clock / chat behaviorへの変更なし。
 
-Preview:
-- Vercel preview deployment: `dpl_C6P4GJcVf6g6mn5hRkVrKq2CQtzv`
-- preview state: **READY**
-- exact commit: `10e4377a5853f24ab025fd35d3a1b97e0757ea6d`
+**PR #62について、LP側のmerge阻害事項はない。LP刷新は完了。**
 
-**未完了 / 次チャット最初の作業:**
-PR #62 PreviewのPC/スマホ実物確認から再開する。
-特にmobileは以下の文字入り画像資産を使っているため、コードのcopyを変えても画像内に旧「彼女」訴求が残る可能性がある:
-- `/misaki-hero-mobile.png?v=2`
-- `/misaki-profile-mobile.png?v=2`
-- `/misaki-cta-mobile.png?v=2`
+#### 次の一手
+LPの企画・修正へ戻らない。最優先は引き続き、**Relationship Engine v1.1の3日Production実走を完走し、Pattern→State→Interpreterまでを自然利用で確認すること。**
 
-確認事項:
-1. mobile文字入り画像に旧商品定義が焼き込まれていないか
-2. PC / mobileのレイアウト崩れ
-3. Free/Premium sectionの視認性
-4. 新LP全体の物語が「出会う→覚える→関係が育つ→日常→美咲から来る→Free/Premium→CTA」になっているか
-5. CI / production build
-6. 必要ならPR #62ブランチだけ修正
-7. **mergeはオーナー承認までしない**
+検証時の注意:
+- Productionで日付をbackdateしない
+- 1日内で大量に同じ好意発言を送ってPattern成立を捏造しない
+- critical relationship eventは不用意にProductionで試さない
+- Stateが変わったらscoreそのものより、Interpreterが会話の距離感へどう反映したかを見る
+- 失敗時はchat成功とRelationship eventual処理を混同しない
+
+完走後:
+1. Pattern→State実走確認
+2. Relationship Interpreter表現品質確認
+3. Body Clock / shared Reply Core統合
+4. 新6段階親密度の閾値決定
+5. 5-heart UI
+6. Gemini telemetry蓄積後にFree / Premium経済設計を再評価
 
 > **未来のソラへ**
-> 新チャットではLPの企画会議をやり直すな。方針と第一施工は確定済み。
-> PR #62 Previewの実物レビューから開始する。
-> Relationship v1.1の3日実走中なのでRelationship関連コードは触るな。
-> Premium 50回は未実装・未確定。LPにも出すな。
-> PR #61 telemetryはすでにProduction READY。原価観測は通常利用で蓄積中。
+> PR #62のLP刷新はmerge・実機確認まで完了した。旧「最初から彼女」LPへ戻すな。LPレビューからやり直すな。
+> Relationship Engine v1.1はProduction稼働中で、次の本丸は3日Pattern→State→Interpreterの実走確認。
+> PR #61 telemetryはProduction READYで自然蓄積中。Premium 50回は未実装・未確定。
 > **未来のソラを信用するな。総覧を信用しろ。**
