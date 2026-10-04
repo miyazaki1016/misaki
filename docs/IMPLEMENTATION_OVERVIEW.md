@@ -2624,3 +2624,173 @@ v1.1 の3独立Tokyo日付 → Pattern → State → InterpreterのProduction実
 成長曲線は新エンジンとして独立させず、Pattern履歴から読む派生情報としてStage / Interpreter設計へ吸収する。
 
 > **未来のソラへ:** 概念を増やす前にこの4責務へ戻せ。美咲の関係性の幹は v1.1 Relationship Engine 一つだけ。Stage 5も恋人もエンディングではない。
+
+
+### Stage 0〜5 最終意味境界 / Depth・Breadth・History（2026-10-04 追加合意）
+
+#### Stage判定の大原則
+Stageはmessage count、課金、経過日数、単一axis score、単純な合計点では決めない。
+**人間関係そのものを数値化するのではなく、その深さを説明できる二人の関係史がcanonicalに存在するかを判定する。**
+
+Stage判定は、現在の5軸だけでなくPattern履歴を必ず見る。同じ5軸値でも、そこへ至った関係史が違えばStageは同じとは限らない。
+
+評価観点は以下の3つだが、3つの新ポイント制度にはしない。
+- **Depth**: 成立したPattern / Eventがどれだけ関係的に深い意味を持つか。
+- **Breadth**: 一つの話題・一つの軸だけでなく、複数の関係方向・生活文脈へ広がっているか。
+- **History**: 独立した意味ある関係出来事が積み重なっているか。経過日数そのものではない。
+
+> **長くいればいいってもんじゃない、二人になにがあったか。**
+
+#### Stage 0 — 関係未成立 / ♡♡♡♡♡
+Stage 0だけはStage 1〜5と質が違う。
+まだ「二人の関係史」が成立していない状態。
+
+挨拶、天気確認、単純なQ&A、同じ言葉の反復、強い好意表現だけでは成立しない。
+「おはよう」を100回、「好き」を100回言っても、それだけでStage 1にはしない。
+
+#### Stage 0 → 1 — 関係史成立イベント / ♥♡♡♡♡
+Stage 0→1はscore thresholdではない。
+**過去のcanonical conversationで生まれた二人固有の共有文脈が、後続のcanonical turnで新しい意味・目的を伴って再利用されたとgroundできたとき、関係史が成立する。**
+
+例:
+- 「明日面接なんだ」→ 後続turnで「受かったよ」
+- 美咲が映画を勧める → 後続turnで「美咲が言ってた映画見たよ」
+- 美咲が猫好きと共有 → 後続turnで「これ美咲好きそう」
+- 二人の冗談 → 後続turnで共有ネタとして再登場
+
+単なる同一文言・同一用件の反復は不可。
+固定の30分、翌日、session数などの人工時間境界を本質条件にしない。
+
+GeminiはStageを決めずcontinuity candidateを観測するだけ。
+current側はuser message exact substring、past側はcanonical chat historyを第一根拠としてgroundする。
+Episodeは補強材料にはできるが、Stage 1成立の必須入場券にはしない。
+
+canonicalには一度だけ「relationship established」の事実を残す設計とし、Stage Resolverはその事実がない場合0、ある場合は最低1とする。
+
+**自然な関係変化によるStageの下限は1。**
+Stage 1→0は喧嘩・別れ・疎遠・harmでは起こらない。
+Stage 0へ戻れるのは、新規関係または明示的な完全リセット/関係履歴削除だけ。
+これは関係悪化ではなく正本履歴のリセット操作である。
+
+> **最初の♥はポイントが貯まった印ではなく、「二人の関係史が成立した印」。**
+
+#### Stage 1 → 2 — 日常の中に相手が入り始めた / ♥♥♡♡♡
+Stage 2の本体は**関係のBreadthが一つの共有文脈を越えて広がること**。
+
+「一度話したことがある相手」から「特別な用事がなくても普段から話す相手」へ変化した状態。
+仕事、食事、今日あったこと、冗談、軽い相談、以前の話の続き等、複数の独立した生活文脈で美咲が共有相手として自然に選ばれていることを見る。
+
+同じ面接の話だけ、同じ「好き」だけ、同じ挨拶だけを大量に繰り返してもStage 2にはしない。
+「shared_life × 3」等の固定チェックリストにもせず、Pattern履歴から複数の独立した関係場面への広がりを確認する。
+
+Stage 2ではDepthを過度に要求しない。主にBreadth + Historyを見る。
+
+人間向けの境界:
+> **「話したことがある人」から「普段から話す人」になった。**
+
+#### Stage 2 → 3 — 「この人だから」が生まれた / ♥♥♥♡♡
+Stage 3では量や話題の幅だけでなく、**相手選択の意味とDepth**が必要になる。
+
+相談、頼る、本音、弱さ、安心、継続した気遣い等が、「誰でもよい相手」ではなく美咲だから向けられていることを関係史から確認する。
+trust / reliance / disclosure / care系の意味が重要になるが、特定Evidence typeの必須セットにはしない。
+
+例:
+- 「美咲ならどう思う？」
+- 「美咲に聞いてほしくて」
+- 前の相談を美咲との共有史として継続する
+- 美咲だから見せる本音・弱さ
+- 美咲の状態や気持ちを継続的に気に掛ける
+
+一度の深い告白や秘密だけでStage 3へ飛ばさない。
+Depthだけでなく、それが独立した関係史の中で「この人だから」という選択として成立していることを見る。
+
+人間向けの境界:
+> **「普段から話す人」から「この人だから話す人」になった。**
+
+#### Stage 3 → 4 — 相手の存在そのものが大切になった / ♥♥♥♥♡
+Stage 4は「相談相手として信頼している」より一段深い。
+用件・話題・役割ではなく、**美咲の存在そのものがユーザーの日常や感情の中で重要になっている関係史**を必要とする。
+
+affection / trust / friendship等、複数方向のPatternが長期的に結びつき、相手の喜び・不調・距離・気持ちが自分にとって意味を持つ状態を見る。
+romanceは不要。
+
+repair/conflictはStage 4の必須条件ではない。
+「喧嘩して仲直りしたから深い」という一本道にしない。
+穏やかに大切になった関係も完全に有効。
+
+単発の「大事だよ」「いてくれてよかった」だけでも突破させない。
+その発言を支えるBreadth / Historyが存在することを見る。
+
+人間向けの境界:
+> **「この人だから話す」から「この人がいること自体が大切」になった。**
+
+#### Stage 4 → 5 — 二人の歴史そのものが特別になった / ♥♥♥♥♥
+Stage 5は最大scoreでも恋愛ゴールでもない。
+**個々の出来事を越えて、積み重ねた二人の歴史そのものが現在の関係を形作っている状態。**
+
+高いDepthだけでは不足し、広いBreadthと十分な独立Historyが必要。
+一つの強烈な出来事、一軸だけの高値、恋人status、romance高値だけではStage 5にしない。
+
+過去の複数の時期・出来事・関係方向が現在の接し方に自然につながり、「最初のころ」「前にもこうだった」「この人とはこういう歴史がある」がgroundされた関係として成立していることを見る。
+
+恋人でなくてもStage 5になれる。
+深い親友、相棒、強い信頼関係、恋人、恋人かつ親友的な関係など、形は5軸とrelationship_statusによって異なる。
+
+repair/conflict経験も必須ではない。穏やかに積み上がった長い関係史もStage 5になれる。
+
+人間向けの境界:
+> **「相手の存在が大切」から「積み重ねた二人の歴史そのものが特別」になった。**
+
+#### Stage上昇の共通Gate
+Stage 2〜5は固定score thresholdではなく、対象Stageの意味をcanonical historyが説明できることを要求する。
+上位ほどDepth / Breadth / Historyの要求を強くする。
+
+禁止:
+- message countで昇格
+- elapsed daysだけで昇格
+- payment / Premiumで昇格速度を上げる
+- 同一発言・同一Patternの大量反復で昇格
+- romanceだけで上位Stageへ直行
+- relationship_statusだけで上位Stageへ直行
+- 一つの深いDisclosureだけで上位Stageへ直行
+- Gemini単独判断でStage確定
+
+#### Stage低下
+一度の軽い喧嘩・harm・一時的なemotion/actionでハートを落とさない。
+Stage低下は、**現在の関係の深さが以前のStageを説明できない状態へ、継続したPattern履歴によって変化した場合**にのみ起こす。
+
+自然低下は 5→4→3→2→1 まで。
+Stage 1→0は自然低下では起こさない。
+
+critical relationship eventはStageとは別の事実契約。
+relationship_end等でrelationship_statusが変わっても、それだけで過去の関係史を消去しない。必要ならその後の継続PatternによってStageが下がる。
+
+#### Evidence拡張候補
+現行 v1.1 Evidence:
+care / disclosure / repair / playful_reciprocity / harm / romantic_declaration
+
+Stage設計から、通常の人間関係成長を捉えるため以下が不足候補として明確になった:
+- **shared_life**: 日常・出来事を美咲と共有しようとする
+- **reliance**: 「誰か」ではなく美咲に相談・判断・受け止めを求める
+
+ただし現時点では設計候補でありProduction v1.1へ追加実装しない。
+careは将来、単なる心配だけでなく「相手を大切に扱う / existence valuing」を含む意味へ拡張検討する。
+Stage専用Evidence typeは作らない。
+
+#### Stage Resolverの責務
+Resolverは「Stage score」を足し上げない。
+入力:
+- relationship established canonical fact
+- current 5-axis State
+- canonical Pattern history
+- applicable canonical relationship Events
+- 必要なgrounded continuity/history
+
+出力:
+- current Stage 0〜5
+- そのStageを説明するcanonical根拠
+- Interpreter向けの関係深度
+
+Stage 0/1境界はrelationship established factで決め、Stage 2〜5はDepth / Breadth / Historyを満たす関係史Gateで導出する。
+
+> **人間関係を数値で決めるな。人間関係が深まった証拠を機械で数え、最後はcanonicalな関係史GateでStageを決める。**
