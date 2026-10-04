@@ -45,6 +45,7 @@ import {
 import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 import { generateGeminiJson } from "../../../lib/gemini-json-generator";
+import { createGeminiTelemetrySink } from "../../../lib/gemini-usage-telemetry-server";
 import {
   createLegacyRelationshipActingState,
   createRelationshipActingGuide,
@@ -2465,6 +2466,7 @@ ${retryProblems
 
       try {
         const result = await generateGeminiJson({
+          telemetrySink: createGeminiTelemetrySink("normal_reply", userData.user.id, usageRequestId),
           apiKey,
           systemInstruction:
             baseSystemPrompt +

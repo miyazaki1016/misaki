@@ -1,4 +1,5 @@
 import { generateGeminiJson } from "./gemini-json-generator.ts";
+import type { GeminiTelemetrySink } from "./gemini-usage-telemetry.ts";
 import { CRITICAL_TYPES, EVIDENCE_TYPES, parseEvidence, type CriticalType, type Turn } from "./relationship-engine-v1.ts";
 
 const EVIDENCE_RESPONSE_SCHEMA = {
@@ -35,8 +36,9 @@ const CRITICAL_RESPONSE_SCHEMA = {
   required: ["confirmed", "supportingTurn"],
 } as const;
 
-export async function analyzeRelationshipEvidence(turn: Turn) {
+export async function analyzeRelationshipEvidence(turn: Turn, telemetrySink?: GeminiTelemetrySink) {
   const response = await generateGeminiJson({
+    telemetrySink,
     apiKey: process.env.GEMINI_API_KEY ?? "", contents: [], timeoutMs: 10_000,
     transientRetryDelaysMs: [], timeoutRetryDelaysMs: [],
     responseSchema: EVIDENCE_RESPONSE_SCHEMA as unknown as Record<string, unknown>,
@@ -83,9 +85,10 @@ export function criticalCandidates(message: string): CriticalType[] {
   return candidates;
 }
 
-export async function validateCriticalEvent(turn: Turn, candidate: CriticalType, priorEvents: unknown[]) {
+export async function validateCriticalEvent(turn: Turn, candidate: CriticalType, priorEvents: unknown[], telemetrySink?: GeminiTelemetrySink) {
   if (!CRITICAL_TYPES.includes(candidate)) throw new Error("invalid_critical_type");
   const response = await generateGeminiJson({
+    telemetrySink,
     apiKey: process.env.GEMINI_API_KEY ?? "", contents: [], timeoutMs: 10_000,
     transientRetryDelaysMs: [], timeoutRetryDelaysMs: [],
     responseSchema: CRITICAL_RESPONSE_SCHEMA as unknown as Record<string, unknown>,

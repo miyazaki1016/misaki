@@ -3,6 +3,7 @@ import { createLegacyRelationshipActingState } from "./relationship-acting-guide
 import { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
 import { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from "./relationship-analyzer-v1";
 import { CanonicalRelationshipStore, processRelationshipTurn } from "./relationship-processing-v1";
+import { createGeminiTelemetrySink } from "./gemini-usage-telemetry-server";
 
 // Local deduplication is an optimization; DB leases serialize distributed workers.
 const running = new Map<string, Promise<void>>();
@@ -13,7 +14,7 @@ export function enqueueTemporaryTurn(root: RootState, turn: Turn): Snapshot | un
     ? snapshot : { ...snapshot, pending: [...snapshot.pending, turn] };
 }
 
-async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>, check?: () => Promise<void>) {
+async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>, check?: () => Promise<void>, telemetryUserId: string | null = null) {
   let snapshot = root.relationshipEngine!;
   for (const turn of snapshot.pending) {
     const history = root.history as any[];
@@ -24,7 +25,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
       const events = snapshot.criticalEvents ?? [];
       if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;
       await check?.();
-      const confirmed = await validateCriticalEvent(turn, type, events);
+      const confirmed = await validateCriticalEvent(turn, type, events, createGeminiTelemetrySink("critical_validator", telemetryUserId, turn.requestId));
       await check?.();
       if (confirmed) {
         snapshot = { ...snapshot, state: { ...snapshot.state,
@@ -33,7 +34,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
       }
     }
     await check?.();
-    const evidence = await analyzeRelationshipEvidence(turn);
+    const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink("relationship_analyzer", telemetryUserId, turn.requestId));
     await check?.();
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
     if (save) await save(snapshot);
@@ -47,7 +48,7 @@ async function runAnonymous(userId: string) {
   await analyzeTemporarySnapshot(root, async snapshot => {
     await editTemporaryRoot(userId, { ...root, relationshipEngine: snapshot }, "relationship-analysis");
     root = await loadTemporaryRoot(userId, null);
-  });
+  }, undefined, userId);
 }
 
 async function runPermanent(userId: string) {
@@ -64,7 +65,10 @@ async function runPermanent(userId: string) {
     if (Date.parse(turn.created_at) < Date.parse(boundary)) continue;
     if (ledgers.some(l => l.request_id === turn.request_id && l.status === "applied")) continue;
     if (++count > 3) break;
-    const result = await processRelationshipTurn(store, userId, turn.request_id, undefined, undefined, (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));
+    const result = await processRelationshipTurn(store, userId, turn.request_id,
+      t => analyzeRelationshipEvidence(t, createGeminiTelemetrySink("relationship_analyzer", userId, t.requestId)),
+      (t, type, events) => validateCriticalEvent(t, type, events, createGeminiTelemetrySink("critical_validator", userId, t.requestId)),
+      (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));
     if (result.status === "deferred") break;
   }
 }
@@ -97,7 +101,7 @@ export async function importPermanentRelationship(userId: string, requestId: str
   if (!snapshot) return;
   // Once auth is permanent the temporary writer rejects writes. Finish the frozen
   // verified trajectory in memory and materialize atomically through the import RPC.
-  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check);
+  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);
   await check();
   const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
