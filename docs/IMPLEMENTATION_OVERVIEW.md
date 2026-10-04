@@ -2834,3 +2834,212 @@ Resolverは「Stage score」を足し上げない。
 Stage 0/1境界はrelationship established factで決め、Stage 2〜5はDepth / Breadth / Historyを満たす関係史Gateで導出する。
 
 > **人間関係を数値で決めるな。人間関係が深まった証拠を機械で数え、最後はcanonicalな関係史GateでStageを決める。**
+
+
+### Stage Resolver v1.2 実装契約（設計確定・未実装）
+
+#### 位置づけ
+Stage Resolverは新しいRelationship Engineではない。
+v1.1のcanonical relationship facts/historyを読み、0〜5のStageを**派生値として解決するread model**とする。
+
+```
+canonical relationship facts
+  ├─ relationship established fact
+  ├─ 5-axis State
+  ├─ Pattern history
+  └─ critical relationship Events
+          ↓
+      Stage Resolver
+          ↓
+       Stage 0..5
+          ↓
+existing relationship acting guide / Interpreter
+          ↓
+        reply
+```
+
+既存 `lib/relationship-acting-guide.ts` は既に `intimacyStage: 0|1|2|3|4|5` を受け取れるため、Stage専用の別acting engineを作らない。
+v1.2ではlegacy points由来Stage adapterをcanonical Resolverへ置き換える方向とする。
+
+#### canonical / derivedの境界
+canonicalとして保存するもの:
+- relationship establishedという不可逆の関係史成立事実
+- v1.1 5-axis State
+- Pattern / Episode / Evidenceの既存canonical履歴
+- explicit critical relationship Events / relationship_status
+
+原則derived:
+- current Stage 0〜5
+- Depth / Breadth / Historyの評価結果
+- growth tendency
+- Interpreter用Stage表現
+
+Stageを新しい加点正本として保存しない。
+性能上cacheが必要になった場合も、再計算可能なderived cacheとして扱い、canonical relationship factsより権威を持たせない。
+
+#### relationship established fact
+permanent側は、Stage 0/1境界を安定して解決できる最小canonical factを追加する。
+推奨:
+- `misaki_relationship_state.relationship_established_at timestamptz null`
+- `misaki_relationship_events.event_type='relationship_established'` の監査イベント
+- event metadataに `prior_request_id`, `current_request_id`, `continuity_type`, `processing_version` を保持
+
+成立処理はidempotent / once-only。
+current request_idはcanonical `chat_turn_completed` であることを要求し、prior request_idも同一userの過去canonical turnであることをDB/app境界で検証する。
+同一request、未来turn、他user turn、memory summaryだけを根拠に成立させない。
+
+`relationship_established_at` は通常のRelationship processing、harm、relationship_endではNULLへ戻さない。
+明示的な完全reset/data deletion契約だけが消去可能。
+
+匿名側も同じ意味論をencrypted temporary root内で保持し、email save時に既存one-time import境界でpermanent factへ移す。
+匿名とpermanentで♥1の意味を変えない。
+
+#### continuity observer
+Stage 0→1のためにAnalyzerへ「Stageを決める能力」は与えない。
+別のcontinuity observationとして、現在turnが過去共有文脈を再利用している候補だけを提案させる。
+
+candidateは最小限:
+- current supporting substring
+- prior context description / retrieval hint
+- continuity type
+- confidence
+
+初期continuity type:
+- `shared_event`
+- `personal_context`
+- `misaki_specific`
+- `shared_reference`
+
+候補はcanonical factではない。
+app側がcurrent exact substring grounding + prior canonical turn retrieval + semantic linkを確認できた場合だけrelationship established eventへ昇格する。
+past側をGeminiの自由記述だけでgroundしない。
+
+#### Stage 2〜5 Gate evaluator
+Stage 2〜5は、単一のnumeric total scoreを作らない。
+Resolver内部では機械判定可能な**事実predicate**へ分解する。
+
+代表predicate:
+- independent relationship contextsが複数存在する
+- relationship-bearing Patternsが複数方向へ広がっている
+- userがMisakiを特定相手として選ぶgrounded historyがある
+- trust/reliance/disclosure/care等の深い関係意味が独立機会で継続している
+- existence-valuingを支える複数方向のhistoryがある
+- 複数時期/複数出来事のhistoryが現在関係へ再利用されている
+- sustained negative Patternによって以前の深度が現在も説明可能か
+
+数値を使う場合は「独立Pattern数」「distinct context数」「distinct axis数」等の客観的証拠数に限定する。
+`friendship + trust + ... >= N` のような関係点数合算は作らない。
+
+各Stage gateは前段Stage成立を前提とする。
+一回の処理で0→3等へ飛ばさず、relationship historyの意味境界を順に満たしていることを確認する。
+
+#### 上昇・下降のヒステリシス
+Stage上昇と下降を同じ瞬間thresholdにしない。
+一時的な揺れで♥が点滅するのを防ぐ。
+
+- 上昇: 対象Stageのpositive relationship history gateが十分にgroundされる。
+- 維持: 一時的なnegative turn / emotion / actionでは維持する。
+- 下降: sustained negative Pattern/historyにより、現在関係がそのStageの意味を継続的に説明できなくなったことを要求する。
+- critical event: status変更は即時でもStage低下とは別。過去historyは消さない。
+- floor: established後の自然下降はStage 1。
+
+下降判定にも「30日話さなかったから」等の無交流時間だけを使わない。
+
+#### Interpreter接続
+既存 `createRelationshipActingGuide()` を維持し、Resolverが解決したStageを `intimacyStage` へ渡す。
+5軸はcanonical値、relationshipStatusはcritical event契約のcanonical値をそのまま渡す。
+
+Stageは「距離の深さ」を担当し、5軸は「方向」、statusは「成立事実」を担当する。
+Stage 4/5だから甘い、Stage 5だから恋人、という固定演技は禁止。
+
+acting guideは将来Stage別に以下の距離差を表現できるよう調整する:
+- 0: 初対面寄り。共有史を前提にしない。
+- 1: 顔なじみ。groundedな過去文脈だけ自然に拾う。
+- 2: 日常的な親しさ。軽い省略・冗談・気軽さ。
+- 3: 「この人だから」の信頼。遠慮の減少、本音への自然な受け止め。
+- 4: 存在の重要性が会話の呼吸に出る。深い気遣い・自然な甘え等は5軸/文脈が許す時だけ。
+- 5: 長い二人の歴史を説明せず自然に前提化できる。ただしgroundingなしの思い出捏造は禁止。
+
+固定台詞集は作らない。
+
+#### 5-heart UI
+UIはResolverのStageだけを表示する。
+- Stage 0: ♡♡♡♡♡
+- Stage 1: ♥♡♡♡♡
+- Stage 2: ♥♥♡♡♡
+- Stage 3: ♥♥♥♡♡
+- Stage 4: ♥♥♥♥♡
+- Stage 5: ♥♥♥♥♥
+
+UIからStage/5軸/statusを変更できない。
+ハートはromance meterではない。
+relationship_statusは必要なら別のUXとして扱い、ハート数と混ぜない。
+
+#### legacy intimacy_pointsとの互換性
+現行 `createLegacyRelationshipActingState(points)` は30/80/160をStageへ仮変換しているが、これはcanonical v1.2 Stage契約ではない。
+v1.2 cutover後にlegacy pointsを毎replyのStage正本として使い続けない。
+
+既存ユーザー移行では、legacy pointsだけから「二人に起きていない関係史」を捏造しない。
+移行時は既存canonical history / relationship events / v1.1 historyを優先してResolver可能な範囲を再構成し、情報不足時の保守的fallbackを別途migration設計で定める。
+**0戻し防止と既存ユーザーの関係連続性を最優先**し、migration前にfixtureで検証する。
+
+#### Evidence拡張の順序
+`shared_life` / `reliance` はStage設計上有力だが、Stage Resolver実装と同時にv1.1 Analyzer契約を変更しない。
+順序:
+1. v1.1 Production 3日Pattern→State→Interpreter実走完了
+2. Stage Resolverのhistory predicateを既存Evidence/Patternでfixture検証
+3. 既存観測だけでは♥2/♥3の実例を十分捕捉できないことを確認
+4. その場合だけAnalyzer v1.2としてshared_life / relianceを追加
+5. transport/schema/parser/Episode/Pattern/匿名importを同時にversioned更新
+
+「Stageを上げたいからEvidenceを増やす」は禁止。現実の関係変化を観測できない穴を埋めるためだけに追加する。
+
+#### 実装安全境界
+現在のv1.1 Production 3日実走中はruntime/DB Analyzer契約を変更しない。
+まずdocs/fixture/test設計を完成させ、v1.1実走完了後にv1.2実装branchへ進む。
+
+v1.2実装時も:
+- normal chat成功をStage Resolver失敗で壊さない
+- Stage導出失敗時は最後に安全に解決できた関係状態を先取りしない
+- Gemini failureでStageを推測しない
+- canonical relationship factsをclient/localStorageから書かせない
+- request replayでrelationship establishedを二重作成しない
+- anonymous→email saveで♥/Stageが逆行しない
+- multi-deviceで同一canonical factsから同一Stageを解決する
+
+#### 必須テストマトリクス
+最低限、以下をfixture化する。
+- 挨拶100回 → Stage 0
+- 「好き」100回 → それだけではStage上昇しない
+- 初回の深い秘密だけ → Stage 0
+- past「明日面接」→ later「受かった」grounded → Stage 1
+- memory summaryだけに過去文脈 → Stage 0のまま
+- 一つの面接storyだけ継続 → Stage 1
+- 複数の日常文脈へ広がる → Stage 2 candidate
+- 一度の深い相談だけ → Stage 2→3を自動突破しない
+- 独立historyで「美咲だから相談」継続 → Stage 3 candidate
+- romance高値だけ → Stage 4/5にならない
+- romantic_partnerだけ → Stage 4/5にならない
+- conflict/repairなしでも十分なhistory → Stage 4/5可能
+- 軽いharm 1回 → Stage維持
+- sustained negative history → 5→4等の下降candidate
+- relationship_end → status none、history保持、Stage即0禁止
+- full reset → Stage 0可能
+- same request replay → relationship established/event二重作成なし
+- anonymous→email save→別端末 → established fact / Stage連続
+- Free→Premium → Stage加速なし・同じ関係正本
+- message volume差（20 vs 500/day）だけではStage速度差を作らない
+
+#### 実装順序（v1.2）
+1. Stage Resolver pure domain contract + fixtures
+2. relationship established continuity observer / grounding contract
+3. permanent + anonymous canonical established fact
+4. Resolverを既存acting guideへ接続
+5. legacy Stage adapterからcanonical Resolverへの安全な切替
+6. 5-heart read-only UI
+7. real-runでStage/acting自然さ確認
+8. 必要性が実証された場合のみshared_life / reliance Analyzer拡張
+
+この順序では、UIを先に作って中身をlegacy pointsで誤魔化さない。
+
+> **未来のソラへ:** Stageは新しいポイントエンジンではない。canonicalな「二人に何があったか」を読むResolverである。既存acting guideを再利用し、legacy intimacy pointsをv1.2の正本へ昇格させるな。
