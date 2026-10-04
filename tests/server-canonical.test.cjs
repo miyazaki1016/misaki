@@ -98,7 +98,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   let clock = Date.now();
   class TestDate extends Date { static now() { return clock; } }
   const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,
-    AbortController, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },
+    AbortController, performance, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },
     console: { log() {}, warn() {}, error() {} },
     fetch: async (url, options) => {
       if (String(url).includes('generativelanguage')) {
@@ -119,6 +119,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (name === '@supabase/supabase-js') return { createClient: () => client };
       if (name === 'node:crypto') return require(name);
       if (name === 'next/server') return { after: task => task() };
+      if (name.endsWith('/gemini-usage-telemetry-server')) return { createGeminiTelemetrySink: () => () => {} };
       if (name.endsWith('/relationship-runtime-v1')) return { enqueueTemporaryTurn: () => undefined, resumeRelationshipProcessing: async () => {}, pendingRelationshipGuide: () => '' };
       if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };
       if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };

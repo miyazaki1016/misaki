@@ -30,6 +30,7 @@ function harness({ failure = false, outside = false, importRace = false, permane
     const req = name => {
       if (name === 'node:crypto') return require(name);
       if (name === './canonical-state') return canonical;
+      if (name === './gemini-usage-telemetry-server') return { createGeminiTelemetrySink: () => () => {} };
       if (permanent && name === './relationship-processing-v1') return {
         CanonicalRelationshipStore: class { async rows(table) { return table === 'misaki_relationship_processing' ? [] : [turn, { ...turn, requestId: 'later' }].map(t => ({ request_id: t.requestId, created_at: t.savedAt })); } },
         async processRelationshipTurn() { attempts++; if (permanent === 'failure') throw Error('DB failure'); return { status: 'deferred', reason: permanent }; },

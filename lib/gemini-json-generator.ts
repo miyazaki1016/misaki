@@ -1,3 +1,5 @@
+import { normalizeGeminiUsage, observeGeminiAttempt, type GeminiTelemetrySink } from "./gemini-usage-telemetry.ts";
+
 export type GeminiJsonRequest = {
   apiKey: string;
   systemInstruction: string;
@@ -10,6 +12,7 @@ export type GeminiJsonRequest = {
   transientRetryDelaysMs?: number[];
   timeoutRetryDelaysMs?: number[];
   responseSchema?: Record<string, unknown>;
+  telemetrySink?: GeminiTelemetrySink;
 };
 
 export type GeminiJsonResponse = {
@@ -20,6 +23,39 @@ export type GeminiJsonResponse = {
 };
 
 const MODEL = "gemini-3.1-flash-lite";
+
+/** Retry bodies were previously discarded. Observe a bounded clone off the retry path. */
+function retryUsage(response: Response) {
+  const unknown = normalizeGeminiUsage(null);
+  try {
+    const clone = response.clone();
+    const reader = clone.body?.getReader();
+    if (!reader) return Promise.resolve(unknown);
+    return new Promise<ReturnType<typeof normalizeGeminiUsage>>(resolve => {
+      let finished = false;
+      const finish = (usage: ReturnType<typeof normalizeGeminiUsage>) => {
+        if (finished) return;
+        finished = true;
+        clearTimeout(timer);
+        resolve(usage);
+        void reader.cancel().catch(() => {});
+      };
+      const timer = setTimeout(() => finish(unknown), 2_000);
+      void (async () => {
+        const decoder = new TextDecoder();
+        let body = "";
+        try {
+          while (!finished) {
+            const { done, value } = await reader.read();
+            if (done) { body += decoder.decode(); finish(normalizeGeminiUsage(JSON.parse(body)?.usageMetadata)); return; }
+            body += decoder.decode(value, { stream: true });
+            if (body.length > 1_000_000) { finish(unknown); return; }
+          }
+        } catch { finish(unknown); }
+      })();
+    });
+  } catch { return Promise.resolve(unknown); }
+}
 
 export async function generateGeminiJson(
   request: GeminiJsonRequest
@@ -49,8 +85,19 @@ export async function generateGeminiJson(
     request.timeoutRetryDelaysMs ?? [2_000];
   let transientAttempt = 0;
   let timeoutAttempt = 0;
+  let physicalAttempt = 0;
 
   while (true) {
+    const attemptNo = ++physicalAttempt;
+    const occurredAt = new Date().toISOString();
+    const startedAt = performance.now();
+    let httpLatencyMs: number | null = null;
+    const observe = (status: number | null, success: boolean, metadata?: unknown, usage?: ReturnType<typeof retryUsage>) =>
+      observeGeminiAttempt(request.telemetrySink, {
+        ...normalizeGeminiUsage(metadata), model: MODEL, attempt_no: attemptNo,
+        http_status: status, success, latency_ms: httpLatencyMs ?? Math.max(0, Math.round(performance.now() - startedAt)),
+        occurred_at: occurredAt,
+      }, usage);
     const controller = new AbortController();
     const timeout = setTimeout(
       () => controller.abort(),
@@ -68,7 +115,9 @@ export async function generateGeminiJson(
           body,
         }
       );
+      httpLatencyMs = Math.max(0, Math.round(performance.now() - startedAt));
     } catch (error) {
+      observe(null, false);
       if (
         error instanceof Error &&
         error.name === "AbortError" &&
@@ -87,12 +136,16 @@ export async function generateGeminiJson(
       [429, 502, 503, 504].includes(response.status) &&
       transientAttempt < transientRetryDelaysMs.length
     ) {
+      if (request.telemetrySink) observe(response.status, response.ok, undefined, retryUsage(response));
       const delayMs = transientRetryDelaysMs[transientAttempt++];
       await new Promise((resolve) => setTimeout(resolve, delayMs));
       continue;
     }
 
-    const data = await response.json();
+    let data: any;
+    try { data = await response.json(); }
+    catch (error) { observe(response.status, response.ok); throw error; }
+    observe(response.status, response.ok, data?.usageMetadata);
     const text =
       typeof data?.candidates?.[0]?.content?.parts?.[0]?.text === "string"
         ? data.candidates[0].content.parts[0].text

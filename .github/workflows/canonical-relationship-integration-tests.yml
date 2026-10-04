@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main, codex/server-canonical-foundation]
   push:
-    branches: [sora/canonical-relationship-integration]
+    branches: [sora/canonical-relationship-integration, work/gemini-unit-cost-telemetry]
 permissions:
   contents: read
 jobs:
@@ -18,4 +18,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: npx tsc --noEmit
       - run: npm run build
