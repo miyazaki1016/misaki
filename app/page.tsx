@@ -112,7 +112,7 @@ export default function HomePage() {
         {/* PROFILE */}
         <section className="profileSection">
           <picture className="profileMobilePicture">
-            <source media="(max-width: 900px)" srcSet="/misaki-profile-mobile.png?v=2" />
+            <source media="(max-width: 900px)" srcSet="/misaki-profile-mobile.png?v=cbc84b52" />
             <img
               src="/misaki-profile.webp"
               alt="はじめまして。美咲、38歳です。"
