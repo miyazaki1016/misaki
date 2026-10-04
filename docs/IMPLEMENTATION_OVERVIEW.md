@@ -3326,4 +3326,11 @@ v1.1 Production実走完了後、Workへは巨大な一括変更ではなく以�
 - Free/Premiumで同じcanonical growth contract
 - Body Clock統合前は「統合済み」と表示/記録しない
 
+#### Work引継ぎ状態（2026-10-04）
+v1.2実装指示書を `docs/RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md` に作成済み。
+PR-A〜D（必要時のみE）の責務、禁止事項、テスト、停止条件を固定した。
+
+**開始条件:** v1.1の3独立Tokyo日付 Pattern→State→acting Production実走をソラが完了確認するまで、Workはv1.2 runtime/DB実装を開始しない。
+実走完了後はPR-A pure Stage domainから開始し、各単位をDraft PR・merge禁止でソラレビューする。
+
 > **実装の芯:** Stage Resolverは「ユーザーが何回話したか」ではなく、「canonicalに残った二人の歴史から、今どこまでの関係を説明できるか」を解く。
