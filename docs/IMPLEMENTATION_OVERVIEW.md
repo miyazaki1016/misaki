@@ -3382,3 +3382,135 @@ token数・利用量・支払プランをRelationship Stage / 5-axis / relations
 
 v1.1 Production 3-day Relationship real-run中は、原価計測のためにAnalyzer/relationship runtime契約・prompt・model・retry・Stageロジックを変更しない。
 観測追加を実装する場合もreply/relationship結果を変えないtelemetry-only変更として別PRで扱い、Soraレビュー前にmergeしない。
+
+
+### Gemini unit-cost telemetry — 設計契約（2026-10-04 / telemetry-only・未実装）
+
+#### 目的
+Free 20 / Premium 50往復/日の暫定枠を、推測ではなくProduction実測原価で判断できるようにする。
+Relationship Engineや会話品質を変更する機能ではなく、AI変動費を観測するためだけのtelemetry。
+
+#### 1. 計測単位
+Gemini APIの**物理call単位**を最小レコードとし、同じrequest_id / source turnへ紐づけて後から1往復原価を合算する。
+
+call_kind初期値:
+- normal_reply
+- relationship_analyzer
+- critical_validator
+- proactive_reply
+- body_clock
+- image_generation（画像系導入時。text tokenと画像単価を混同しない）
+
+同一requestのretryは別のbillable attemptになり得るため、attempt_noを持つ。
+「ユーザー1往復原価」は成功したreplyだけでなく、そのreplyに伴って実際に発生したAnalyzer/retry等のAPI消費を合算して求める。
+
+#### 2. Geminiから保存するusage
+API responseのusageMetadataから、存在する項目だけを保存する。
+最低限:
+- prompt/input token count
+- candidates/output token count
+- thoughts token count（返却される場合）
+- total token count
+- cached content token count（返却される場合）
+- model
+- call_kind
+- attempt_no
+- HTTP status / success
+- latency_ms
+- occurred_at
+
+Google側field追加に備え、raw usageMetadata全体をJSONで恒久保存するのではなく、必要fieldを明示的に正規化する。未知fieldを会話処理失敗理由にしない。
+
+#### 3. 保存してはいけないもの
+unit-cost telemetryには以下を保存しない:
+- user message本文
+- Misaki reply本文
+- system prompt本文
+- memory本文
+- Evidence本文 / supportingTurn本文
+- API key
+- Gemini raw response本文
+
+request_id等の既存opaque identifierでcanonical turnと結び、原価集計に会話本文を複製しない。
+
+#### 4. 原価の扱い
+token telemetryは**利用量の事実**を保存し、円換算単価を各rowへ固定埋め込みしない。
+モデル料金・為替は変更されるため、集計時にversioned pricing table/configを適用する。
+
+これにより過去usageを:
+- 当時料金での実支出推定
+- 現在料金で同じusageを処理した場合の再試算
+の両方に使える。
+
+#### 5. 集計で必ず出す指標
+Tokyo日 / 月単位で:
+- active users
+- Free / Premium別turn数
+- call_kind別call数
+- input/output/thought tokens
+- 1 successful conversation turnあたりAI原価
+- userあたり日次/月次AI原価
+- P50 / P90 / P95 / P99 user cost
+- retry由来原価
+- Analyzer比率
+- proactive / Body Clock比率
+- image比率（導入後）
+- Free 20上限時の原価分布
+- Premium 50上限時の原価分布
+
+平均だけで上限を決めない。Premium赤字リスクはP95/P99と「毎日上限利用」stress caseも見る。
+
+#### 6. unit economics判定
+Premium月額については最低限:
+gross price
+- store/payment fee
+- tax handling where applicable
+- Gemini normal conversation
+- Relationship Engine
+- proactive / Body Clock
+- image generation
+- Supabase/Vercel等の配賦可能な変動費
+= contribution margin
+として判断する。
+
+Freeは「1人あたり平均原価」だけでなく、Free→Premium conversionを含む獲得コストとして別途評価する。
+
+#### 7. privacy / Relationship境界
+usage telemetryは課金・運営分析専用。
+以下への入力を禁止:
+- Stage Resolver
+- Relationship Facts
+- 5 axes
+- relationship_status
+- emotion/action
+- acting guide
+- Gemini persona prompt
+
+Free/Premiumやtoken量で関係の深さを変えない。
+
+#### 8. failure safety
+telemetry write failureでnormal chatを失敗させない。
+Relationship Engineのpost-reply処理もtelemetry failureで止めない。
+telemetryはbest-effort / non-authoritative。
+usageMetadata欠落時は0と推測せず「unknown」として扱う。
+
+#### 9. v1.1 3日実走中の実装境界
+現在のRelationship v1.1 Production実走を汚さないため:
+- model変更禁止
+- prompt変更禁止
+- generationConfig変更禁止
+- Analyzer schema/parser変更禁止
+- retry契約変更禁止
+- Relationship DB/RPC契約変更禁止
+- Stage実装禁止
+
+実装するなら独立したtelemetry-only Draft PRとし、Gemini responseからusageMetadataを読み取る観測追加 + 非権威保存だけに限定する。
+mergeはソラレビューとCI確認後に別判断する。
+
+#### 10. 最終判断に必要な観測期間
+まず100〜300 successful conversation turnsを初期サンプルとして確認し、normal reply / Analyzerの実token比率と1往復原価を把握する。
+その後、実ユーザー分布が取れる段階では最低7日、可能なら30日でP50/P90/P95/P99を再評価する。
+
+Free 20 / Premium 50の最終確定は、少なくとも初期実測を確認してから行う。
+
+> **原価計測の芯:** 「何文字話したか」ではなく、実際にproviderが課金対象として数えたusageをcall単位で観測し、1往復・1ユーザー・1か月へ積み上げる。計測結果をRelationshipの意味へ逆流させない。
