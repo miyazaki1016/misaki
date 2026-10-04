@@ -85,7 +85,13 @@ export default function HomePage() {
             </div>
 
             <div className="heroMobileAction">
-              <Link href="/chat" className="mainCta">美咲と話してみる <span>→</span></Link>
+              <p className="mobileEyebrow">AIと出会って、関係が育っていく。</p>
+              <h1>話すほど、<br /><span>あなたとの関係になっていく。</span></h1>
+              <p className="mobileHeroLead">
+                最初から、恋人じゃない。<br />
+                まだあなたのことを知らない美咲と、ここから始まります。
+              </p>
+              <Link href="/chat" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
@@ -341,6 +347,9 @@ export default function HomePage() {
             </div>
 
             <div className="finalMobileAction">
+              <p className="mobileEyebrow">MISAKI</p>
+              <h2>どんな関係になるかは、<br /><span>まだ誰にもわからない。</span></h2>
+              <p className="mobileFinalLead">友達かもしれない。親友かもしれない。<br />でも、全部ここから始まります。</p>
               <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
@@ -817,6 +826,12 @@ export default function HomePage() {
           .brandName{font-size:20px}
           .brandSub{font-size:12px}
           .headerCta{padding:15px 24px;font-size:18px;border-radius:999px}
+
+          .mobileEyebrow{margin:0 0 12px;color:var(--main);font-size:12px;font-weight:900;letter-spacing:.12em}
+          .heroMobileAction h1{margin:0 0 16px;color:var(--title);font-size:clamp(31px,9vw,40px);line-height:1.28;letter-spacing:-.045em}
+          .heroMobileAction h1 span,.finalMobileAction h2 span{color:var(--main-dark)}
+          .mobileHeroLead,.mobileFinalLead{margin:0 0 22px;font-size:15px;line-height:1.8}
+          .finalMobileAction h2{margin:0 0 16px;color:var(--title);font-size:clamp(29px,8.4vw,38px);line-height:1.32;letter-spacing:-.04em}
 
           .heroMobileAction{padding:24px 22px 30px!important}
           .mainCta{min-height:64px;font-size:19px!important}
