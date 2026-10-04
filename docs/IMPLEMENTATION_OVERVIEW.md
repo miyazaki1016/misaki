@@ -3043,3 +3043,287 @@ v1.2実装時も:
 この順序では、UIを先に作って中身をlegacy pointsで誤魔化さない。
 
 > **未来のソラへ:** Stageは新しいポイントエンジンではない。canonicalな「二人に何があったか」を読むResolverである。既存acting guideを再利用し、legacy intimacy pointsをv1.2の正本へ昇格させるな。
+
+
+### Stage Resolver v1.2 — predicate / migration / Work実装境界（2026-10-04 設計確定・未実装）
+
+#### 1. Resolverを二層に分ける
+Stage判定をLLMの一発判定にも巨大なif文にもせず、以下の二層に分離する。
+
+**Layer A: Relationship Facts**
+canonical historyから再現可能な事実predicateだけを作る。
+例:
+- `established`
+- `has_multiple_independent_contexts`
+- `has_cross_axis_history`
+- `has_misaki_specific_selection_history`
+- `has_repeated_deep_trust_history`
+- `has_existence_valuing_history`
+- `has_multi_period_shared_history`
+- `has_sustained_negative_history`
+
+各factは必ず根拠となるrequest_id / pattern_key / event_id等を返せること。
+booleanだけを保存して根拠を失わない。
+
+**Layer B: Stage Gate**
+Layer Aのfactsを使い、Stageの人間向け意味が説明できる最高段階を順番に解決する。
+Stage Gate自身は会話本文を再解釈しない。
+
+これにより「なぜ♥3なのか」を後から監査でき、Geminiモデル変更でStageが突然変わることを防ぐ。
+
+#### 2. Context identity
+♥2以降で必要な「独立した生活文脈」はtopic文字列の完全一致/不一致では判定しない。
+同じ面接storyを言い換えただけで別contextに水増しされないよう、contextはcanonical history上の共有出来事/生活領域/二人固有参照の継続単位として扱う。
+
+初期context familyの例:
+- work / school / task
+- daily_life
+- health / wellbeing
+- hobby / entertainment
+- food / outing
+- personal concern / consultation
+- shared joke / pair-specific reference
+- relationship / feelings
+
+これはStageポイント表ではなく、Breadthの重複排除用taxonomy。
+将来taxonomyが増えても過去Stageを壊さないようversionを持つ。
+
+同一storyが複数familyへ触れても、同じrequest chainを複数独立historyとして二重計上しない。
+
+#### 3. Stage Gateの具体契約
+以下は「点数threshold」ではなく、最低限必要な証拠形状を定義する。最終実装ではfixtureで境界を調整する。
+
+**Stage 0**
+- `established=false`
+
+**Stage 1**
+- `established=true`
+- 以降の自然低下floor
+
+**Stage 2 — 日常の中に入った**
+必須:
+- established
+- 複数の独立context familyにrelationship-bearing historyが存在
+- それらが単一request chain / 同一storyの言い換えではない
+- raw message countではなく、canonicalに独立性を説明できる
+
+補強:
+- cross-axis history
+- pair-specific referenceの再利用
+- voluntary everyday sharing
+
+Stage 2では「深い秘密」「恋愛宣言」等の強度は必須ではない。
+
+**Stage 3 — この人だから**
+必須:
+- Stage 2 gate
+- Misaki-specific selectionを示すgrounded history
+- その意味が単発ではなく、独立したrelationship historyで支持される
+
+selectionの例:
+- Misakiだから相談した
+- Misakiだから報告した
+- Misakiに聞いてほしい/判断を求めた
+- Misakiには本音を見せる
+- Misakiを継続的に気遣う
+
+単発の強いdisclosure / declarationだけでは不可。
+
+**Stage 4 — 存在そのものが大切**
+必須:
+- Stage 3 gate
+- 複数方向のrelationship history
+- existence-valuing / enduring careを説明できるhistory
+- 役割・一用件を越えて相手の存在/状態が意味を持つこと
+
+romance / romantic_partner / repairは必須ではない。
+
+**Stage 5 — 二人の歴史そのものが特別**
+必須:
+- Stage 4 gate
+- 複数の独立した時期/出来事/relationship directionにまたがるhistory
+- 過去の共有史が現在の接し方へgroundedに再利用されている
+- 一つの事件、一軸、一statusだけでは説明できないBreadth + Depth + History
+
+Stage 5はfreezeしない。5軸・emotion/action・status・Patternはその後も変化する。
+
+#### 4. 「独立」の定義
+Stageのための独立性はcalendar dayだけでは決めない。
+v1.1 Pattern生成では3 Tokyo日付がspam抑制として有効だが、Stage historyの意味上は以下を区別する。
+
+独立とみなせる:
+- 別の共有出来事
+- 別の生活context
+- 過去contextが新しい目的で再利用された
+- 別の関係方向を持つPattern
+
+独立とみなさない:
+- 同じstoryの細切れ
+- 同じ宣言の言い換え
+- 同じ日の連投だけ
+- request retry / replay
+- 同一contextをtopic labelだけ変えたもの
+
+日付は補助証拠にはできるが、日付だけでHistoryを作らない。
+
+#### 5. Stage遷移の速度制御
+人工的な「Stage 2になるまで14日」等は置かない。
+ただし一回のResolver評価で複数Stageを飛び越えてUIが急変するのも避ける。
+
+原則:
+- canonical history上、過去から各gateが既に成立しているmigration/rebuild時は正しいStageまで再構成可能。
+- 通常運用で新規にgateが成立した時は、Stage transition eventを一段ずつ記録/提示できる構造にする。
+- 表示演出の速度とcanonical Stage判定は分離する。UI animationのためにStage正本を遅らせない。
+- 一回の強いturnだけで複数gateが新規成立するpredicate設計を避ける。
+
+#### 6. Stage transition audit
+Stage自体はderivedだが、「ユーザーに見えた関係変化」を監査できるよう、Stageが前回解決値から変化した時だけaudit eventを残す案を採用する。
+
+推奨event:
+- `relationship_stage_changed`
+metadata:
+- from_stage
+- to_stage
+- resolver_version
+- evidence refs / fact refs
+- reason code
+
+このeventはStageの正本ではない。再計算結果と不一致ならcanonical facts + current resolver contractを優先する。
+UI通知や将来の「いつ♥が増えたか」説明にも使える。
+
+#### 7. 下降predicate
+negative scoreの単純合計で下げない。
+各上位Stageの意味が「現在も成立しているか」を、継続したnegative relationship Patternsを含めて再評価する。
+
+下降候補:
+- repeated boundary/harm history
+- sustained trust erosion
+- sustained withdrawal/rejection that changes pair relationship
+- explicit relationship_end後に継続して距離が変化したhistory
+
+非下降:
+- 一度の喧嘩
+- 一度の不機嫌
+- 一時emotion/action
+- 数日/数週間会話がないことだけ
+- relationship_end単独
+- romance score低下だけ
+
+下降は一度に原則1段階ずつ。established=trueなら1未満にしない。
+
+#### 8. Resolver versioning
+Stage意味の将来調整で過去ユーザーを壊さないよう `resolver_version` を持つ。
+例: `relationship-stage-v1`
+
+versionは:
+- audit event
+- derived cacheを導入する場合のcache key
+- fixture expected result
+に含める。
+
+Analyzer processing_versionとStage resolver_versionは別責務なので混同しない。
+
+#### 9. 既存ユーザーmigration
+migrationで最優先するのは「関係を消さない」「存在しない歴史を作らない」の両立。
+
+順序:
+1. canonical relationship events / chat history / v1.1 historyからrelationship establishedを再構成できるか確認
+2. Pattern / Episode / existing relationship historyからStage factsを再構成
+3. legacy intimacy pointsは補助的なcontinuity safeguardに限定
+4. history不足時は高Stageをpointsだけで捏造しない
+5. 一方、既存ユーザーを誤ってStage 0へ落とさない
+
+legacy points > 0だがcanonical history不足という旧データについては、migration専用の`legacy_relationship_known`相当の保守的established migration markerを検討する。
+これは♥1以上の「既に関係があった」ことを守るためだけに使い、♥2〜♥5の証拠には使わない。
+
+migration fixtureを先に作り、実データ分布を確認してから最終SQLを確定する。推測でpoints→Stage換算表を作らない。
+
+#### 10. UI契約
+header heart UIはread-only。
+サーバーが解決したStageを受け取り描画する。
+
+UI要件:
+- 初期5個グレー
+- Stage数だけpink
+- romance/statusとは視覚的にも意味的にも分離
+- client localStorageのStageを正本にしない
+- optimistic Stage increment禁止
+- API/SSR取得失敗時に勝手に0へ戻してちらつかせない
+- last known display cacheを使う場合もserver canonical/derived resultで上書き
+- accessibility labelは「関係の深さ 2/5」等、恋愛度と呼ばない
+
+Stage change演出は控えめにし、ゲームのlevel-up感を出しすぎない。
+
+#### 11. Interpreter契約
+Stageはacting guideへ距離感だけを与える。
+5軸/status/emotion/actionとの優先順位:
+1. explicit safety / user boundary
+2. canonical relationship_status / critical facts
+3. current emotion/action
+4. Stage depth
+5. 5-axis directional nuance
+6. growth/history nuance
+
+ただし上位が下位を完全上書きするという意味ではなく、矛盾時の事実優先順位。
+
+例:
+- Stage 5 + status none + romance low → 深い相棒/親友として自然。恋人演技しない。
+- Stage 3 + romantic_partner → 恋人という事実は認めるが、長年連れ添ったような演技をしない。
+- Stage 4 + current action withdrawal → 大切な相手だからこその距離の取り方は可能。
+- Stage 1 + romance high → 強い恋愛意識があっても共有史の多い旧知のように振る舞わない。
+
+#### 12. Workへ渡す実装単位
+v1.1 Production実走完了後、Workへは巨大な一括変更ではなく以下の順で渡す。
+
+**PR-A: pure Stage domain**
+- resolver types
+- fact predicates
+- fixtures
+- no DB/runtime/UI change
+
+**PR-B: relationship established**
+- continuity observer
+- canonical grounding
+- permanent DB fact/event
+- anonymous encrypted fact
+- one-time import
+- idempotency/lease/replay tests
+
+**PR-C: runtime integration**
+- canonical Stage Resolver read
+- existing acting guide integration
+- legacy adapter cutover
+- failure fallback
+- multi-device/anonymous continuity tests
+
+**PR-D: 5-heart UI**
+- read-only server-derived Stage
+- header hearts
+- accessibility
+- no relationship write path
+
+**PR-E: Evidence v1.2 only if proven necessary**
+- shared_life / reliance
+- analyzer/schema/parser versioning
+- Episode/Pattern handling
+- anonymous/import parity
+- regression tests
+
+各PRはCI成功・Draft・merge禁止でソラレビューを挟む。
+
+#### 13. v1.2 acceptance gates
+実装完了扱いにする条件:
+- v1.1 3-day Production Pattern→State→acting real-runが完了している
+- Stage fixture matrixが全pass
+- Stage 0→1 groundingがcanonical past/current turnで監査可能
+- same request replayで二重成立なし
+- anonymous→email→別端末でStage逆行なし
+- legacy userが不当にStage 0へ落ちない
+- pointsだけで高Stageを捏造しない
+- Stage changeがexisting acting guideへ次turnから反映
+- 5-heartがserver-derivedで、UIからwrite不能
+- relationship_statusとheartが独立
+- Free/Premiumで同じcanonical growth contract
+- Body Clock統合前は「統合済み」と表示/記録しない
+
+> **実装の芯:** Stage Resolverは「ユーザーが何回話したか」ではなく、「canonicalに残った二人の歴史から、今どこまでの関係を説明できるか」を解く。
