@@ -95,8 +95,11 @@ export async function importPermanentRelationship(userId: string, requestId: str
   const { data: root, error } = await db.from("misaki_temporary_roots").select("token,revision,expires_at").eq("user_id", userId).maybeSingle();
   if (error) throw new Error("relationship_import_root_read_failed");
   if (!root) return;
+  // An expired anonymous checkpoint is no longer importable and must not poison
+  // permanent Relationship processing. Invalid/unverifiable live roots still fail closed.
+  if (Date.parse(root.expires_at) <= Date.now()) return;
   const verified = openTemporaryState(root.token);
-  if (!verified || Date.parse(root.expires_at) <= Date.now()) throw new Error("relationship_import_root_expired");
+  if (!verified) throw new Error("relationship_import_root_invalid");
   let snapshot = verified.state.relationshipEngine;
   if (!snapshot) return;
   // Once auth is permanent the temporary writer rejects writes. Finish the frozen
