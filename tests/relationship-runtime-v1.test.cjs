@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const rootPath = path.resolve(__dirname, '..');
 
-function harness({ failure = false, outside = false, importRace = false, permanent } = {}) {
+function harness({ failure = false, outside = false, importRace = false, expiredRoot = false, permanent } = {}) {
   const turn = { requestId: 'turn-3', message: '美咲、体調は大丈夫？', reply: 'ありがとう', savedAt: '2026-10-03T00:00:00Z' };
   let root; let models = 0; let writes = 0; let imports = 0; let failed = failure; let attempts = 0;
   const evidence = { type: 'care', axis: 'affection', polarity: 1, strength: 70, confidence: .95, interpretation: 'direct', subject: 'user_to_misaki', supportingTurn: '体調は大丈夫' };
@@ -17,7 +17,7 @@ function harness({ failure = false, outside = false, importRace = false, permane
     openTemporaryState: () => ({ state: structuredClone(root) }),
     createServerSupabase: () => ({
       from(table) { const q = { select() { return q; }, eq() { return q; }, async maybeSingle() {
-        return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: '2026-10-05T00:00:00Z' }, error: null };
+        return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: expiredRoot ? '2020-01-01T00:00:00Z' : '2099-10-05T00:00:00Z' }, error: null };
       } }; return q; },
       async rpc(name, args) { if (importRace) { assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_lease_token, 'live'); return { error: { code: 'P0001', message: 'relationship_processing_lease_required' } }; } assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_request_id, 'turn-3'); assert.equal(args.p_processing_version, 'relationship-v1.1'); assert.equal(args.p_lease_token, 'live'); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },
     }),
@@ -75,6 +75,11 @@ test('another anonymous owner cannot consume this root', async () => {
 test('permanence imports newest verified frozen root once, including pending analysis, without anonymous writer', async () => {
   const h = harness(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);
   await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);
+});
+test('expired anonymous checkpoint is ignored and cannot poison permanent relationship processing', async () => {
+  const h = harness({ expiredRoot: true });
+  await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {});
+  assert.equal(h.imports, 0); assert.equal(h.models, 0); assert.equal(h.writes, 0);
 });
 test('permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root', async () => {
   const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}));
