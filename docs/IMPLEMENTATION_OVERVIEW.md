@@ -2874,3 +2874,124 @@ LPの企画・修正へ戻らない。最優先は引き続き、**Relationship 
 > Relationship Engine v1.1はProduction稼働中で、次の本丸は3日Pattern→State→Interpreterの実走確認。
 > PR #61 telemetryはProduction READYで自然蓄積中。Premium 50回は未実装・未確定。
 > **未来のソラを信用するな。総覧を信用しろ。**
+
+
+---
+
+### 2026-10-07 — Memory v1 再設計方針（オーナー合意 / 未実装）
+
+#### 背景
+現行の会話正本は `misaki_user_conversation_state` の `history / memory / today_memory`。通常チャット成功時は Body Clock 側の `recent_history / long_term_memory / today_memory` も同期される。通常reply runtimeでは `MAX_HISTORY=60 / MAX_MEMORY=30 / MAX_TODAY_MEMORY=12`。また `[life:v1]` の構造化Life Factが通常memoryと同じ30枠を共有している。
+
+現状は長期memoryをUIの×で削除しても、直近historyが残るためMemory RecallやUser Profile経由で同じ事実を再参照できる余地がある。したがって「記憶項目を消す」「会話で忘れてと言う」「履歴を消す」を同一操作として扱わない。
+
+#### 目標モデル
+Memoryを次の責務へ分離する。
+
+1. **User Memory — ユーザー自身についての長期情報**
+   - 名前・呼び方、仕事、家族、嗜好、習慣、価値観等。
+   - 現行 `memory` はまず互換性を保ったままこの役割として扱う。
+   - 将来は固定30件FIFOではなく、構造化・重要度・更新/訂正を持つ。
+   - 安定した重要プロフィールが件数上限だけで押し出されない設計を目指す。
+
+2. **Shared Memory — 二人が後で思い出せる出来事**
+   - 「二人に何があったか」を保持する共有エピソード。
+   - 初めての出来事、二人だけの冗談/呼び方、約束、感情が大きく動いた会話、関係上の節目、後日参照価値の高い出来事等を厳しく選ぶ。
+   - 日常の全turnを保存しない。
+   - User Memoryの30枠へ混ぜず、独立したcanonical領域を新設する。
+   - DBには十分保持できても、replyへ毎回全件注入しない。現在話題に関連する**原則0〜3件**だけを想起候補として渡す。
+   - 検索されたShared Memoryを必ず発話へ出すのではなく、自然に関係するときだけ参照する。
+   - v1では古いmemoryを自動削除/自動圧縮しない。実データ量・重複傾向を観測後に統合/圧縮を設計する。
+
+3. **Relationship Memory — 関係がどう育ったか**
+   - 既存Relationship Engine v1.1の Evidence → Episode → Pattern → State を正本として維持する。
+   - Relationship Episodeは関係性計算の内部証拠、Shared Memoryは美咲が「あのとき」と思い出すための記憶。意味が異なるため同一化しない。
+   - Shared MemoryからRelationship Stateを直接更新しない。Relationship EngineからShared Memoryを機械的にコピーしない。同じ会話を別目的で独立判定する。
+
+運用上の `history` は「今の会話文脈」、`today_memory` は「当日文脈」であり、上記の長期Memory層とは区別する。
+
+#### Forget Control v1
+「忘れる」と「削除」を分離する。
+
+- **Soft Forget（会話上の『忘れて』）**
+  - 対象をactive User Memoryから外し、美咲が自発的に持ち出さない。
+  - 古いhistory / recall / User Profile / Natural Memory更新 / Shared Memory検索 / Body Clock等から勝手に復活させないため、忘却制御をreply生成入口で共通適用する。
+  - 過去履歴を物理削除したことにはしない。
+  - 後日ユーザー自身が同じ事実を明示的に再提示した場合は再学習可能とする。「過去から勝手に復活」は禁止、「現在ユーザーが再度教える」は許可。
+
+- **Hard Delete（記憶UIからの明示削除）**
+  - canonical User Memory項目を削除するデータ管理操作。
+  - 古い履歴から自動再登録しないようForget Controlを適用する。
+  - **チャット履歴そのものの削除とは別操作。** 現行UIの×を「保存データ全域から完全消去」と説明してはならない。
+  - 将来、履歴や派生保存先を含む完全消去を提供する場合は別の明示操作・削除契約として設計する。
+
+Forget Controlの保存形式は実装前に確定する。単純な文字列ブラックリストではなく、対象・由来・状態・再学習条件を安全に判定できるcanonicalな制御情報を想定する。忘れた事実そのものをtombstoneへ保持する場合はプライバシー上の意味を別途評価する。
+
+#### Shared Memory v1 DB / runtime方針
+新規canonicalテーブル（仮称 `misaki_shared_memories`）を想定。少なくとも以下の概念を持つ。
+
+- id / user_id
+- summary
+- occurred_at
+- importance
+- topics
+- emotion
+- source_request_ids
+- last_recalled_at / recall_count
+- status
+- 将来統合用 merged_into
+
+生成は通常チャットのcanonical commit成功後。毎turnを候補判定しても、採用は厳しくする。Shared Memory生成失敗で通常チャット成功を巻き戻さない。重複・同一出来事は新規乱造せず既存memoryの更新/統合候補とする。
+
+reply時の基本形:
+```
+直近会話
++ 関連User Memory
++ 関連Shared Memory（原則0〜3件）
++ Relationship State / Interpreter
+↓
+Forget Control
+↓
+reply生成
+```
+
+#### 実装順
+1. Forget Controlのschema/semanticsと回帰テストを確定
+2. Forget Controlを通常reply / recall / profile / memory更新 / Body Clock等の参照入口へ適用
+3. Shared Memory canonical table + 保存/重複防止
+4. 関連Shared Memoryの取得（原則0〜3件）
+5. reply promptへ参考情報として統合
+6. Memory UI整理
+7. Production実データ観測後に統合・圧縮を設計
+
+#### 必須テスト
+- UI×でUser Memory正本が削除される
+- 会話上の「忘れて」でSoft Forgetが成立する
+- 直後のMemory Recallが古いhistoryから対象を復活させない
+- history 60件以内/外の双方で意図どおり
+- User Profile派生で対象を復活させない
+- Body Clock / proactiveで対象を自発参照しない
+- ユーザーが後日明示的に再提示した場合は再学習できる
+- 嗜好変更・訂正が古い値と重複しない
+- Shared MemoryがUser Memory / Relationship Stateを直接書き換えない
+- Shared Memory生成失敗が通常chat成功を壊さない
+- 関連Shared Memory 0件でも自然にreplyできる
+- Relationship Engine v1.1のEvidence/Episode/Pattern/State semantics、oldest-first、fail-closed、START_ATを変更しない
+- 匿名→メール保存、別端末復元、Free/Premium、Body Clock同期に回帰がない
+
+#### UI別件 — Memory表示とチャットスクロール（未実装）
+現行 `app/chat/page.tsx` には固定右上メニューから「美咲の記憶」を開く入口がすでにある。問題は入口ではなく、Memory panelが通常document flow内に描画されるため、閲覧時にチャット位置を乱し得る点。将来はmodal/overlay等で開き、閉じたら元のチャットscroll位置へ戻るUXを優先する。
+
+また、送信後の「・・・・」生成表示付近などでチャットが数行上へ勝手に動く実機症状を確認。reply挿入、生成indicator、画像load、history同期、input高さ変化等を含むscroll-control競合として横断調査する。**未修正なので修正済み扱いしない。**
+
+#### Work実装境界 / 壊してはいけない原則
+- 既存canonical root、匿名暗号化root、通常chat atomic commitを独断で置換しない。
+- 現行memoryを一括migrationして消失させない。段階移行する。
+- Relationship Engineの意味論をMemory都合で変更しない。
+- 「件数を30→100に増やすだけ」をMemory再設計の完成としない。
+- Shared Memoryを毎turn保存しない。
+- 検索された過去を毎回セリフに出さない。
+- UI×を「履歴を含む完全消去」と誤表示しない。
+- Forget ControlはNatural Memoryだけでなく、再想起し得る全主要経路で一貫して効かせる。
+
+**現在位置:** Memory v1は設計合意まで。コード/DB migrationは未実装。次はWork向け実装仕様をこの節に従って作成し、まずForget Controlから段階実装する。
