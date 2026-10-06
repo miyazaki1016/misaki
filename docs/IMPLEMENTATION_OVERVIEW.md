@@ -3181,3 +3181,6 @@ Soft Forgetは生成contextだけをmaskして終わらない。chat routeの `u
 PRはDraftを維持。merge/Production migration/Edge適用なし。実モデルPreview・Production実機の未完了条件は上記のとおり継続する。
 
 追補の追加テスト10件（DB正本3、chat call計測2、Body Clock call計測5）は成功。UTC/JSTの全回帰は各261/261成功、fail/skip 0。今回の差分はテスト・harness・総覧のみで、前回成功したTypeScript/production build対象のapplication/DDLは変更していない。
+
+#### Batch resolver比較検証（2026-10-07 JST / 検証専用）
+本番3-call化は未実施。`tests/forget-batch-evaluate.ts` に同一fixtureの現行/batch両arm比較と実usage/latency取得用live transportを追加。20シナリオのscripted比較と不正応答のfail-closed検証を実施した。barrier/provenanceは現行policyからサーバー側で取得し、reofferは独立callを維持。cache、Relationship Engine、DB schema、Forget semantics、再学習条件、atomic commitは変更なし。結果/全不一致分類は [batch検証報告](../tests/reports/forget-batch-evaluation.md) と `tests/reports/forget-batch-scripted.json` に保存。実Geminiキー未設定でtokens/latencyは未測定、意味判定同等性は未証明。Draft/merge禁止/Production未適用を継続する。
