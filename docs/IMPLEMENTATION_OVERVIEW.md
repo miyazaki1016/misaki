@@ -2995,3 +2995,128 @@ reply生成
 - Forget ControlはNatural Memoryだけでなく、再想起し得る全主要経路で一貫して効かせる。
 
 **現在位置:** Memory v1は設計合意まで。コード/DB migrationは未実装。次はWork向け実装仕様をこの節に従って作成し、まずForget Controlから段階実装する。
+
+
+---
+
+### Work handoff — Forget Control v1 第1工事（2026-10-07 / 実装前仕様）
+
+#### 工事目的
+Memory v1全体を一度に実装しない。第1工事は**Forget Controlだけ**を導入し、「User Memoryから消した情報がhistory等から勝手に復活する」経路を止める。Shared Memory、Memory検索高度化、Relationship Engine変更、30件上限撤廃はこのPRへ混ぜない。
+
+#### 実装契約
+1. canonicalなforget-control保存先を新設する。恒久ユーザーだけでなく匿名root→メール保存の連続性も壊さないこと。
+2. controlは少なくとも `soft_forget` と `hard_delete` の由来を区別できること。ただし両者とも「過去文脈からの自動復活禁止」を共通適用する。
+3. 忘却対象の判定を生の完全一致文字列だけに依存させない。対象概念を安全に識別できる構造を持たせる一方、忘れたセンシティブ事実を不要に複製保存しない。
+4. 現在turnでユーザー自身が対象情報を明示的に再提示した場合だけ、再学習/forget解除候補にできる。古いhistory、既存profile、モデル推測を解除根拠にしない。
+5. Forget適用後のcontextを、少なくとも通常reply、Memory Recall、User Profile生成、Natural/User Memory更新、Body Clock/proactiveが共有できる設計にする。各所に独自の場当たり文字列filterを複製しない。
+6. UIの既存×はUser Memory項目削除 + hard-delete control作成を同じcanonical操作として扱い、片方だけ成功する中間状態を作らない。可能なら同一RPC/transaction境界で行う。
+7. 会話上のSoft Forgetは、通常replyの成功保存と整合するcanonical更新として扱う。モデルが「忘れた」と返しただけでcontrolが保存されない状態を完成扱いしない。
+8. Forget Control自身の失敗時に、削除/忘却が成功したようなUI・replyを返さない。データ管理操作はfail closed。
+9. forget対象がない、既にforget済み、同じrequestの再送は冪等に扱う。
+10. 履歴そのものは第1工事では物理削除しない。既存 `clearHistory` の意味も変更しない。
+
+#### 推奨データモデル
+具体的なDDL名は既存命名規約へ合わせてよいが、概念上は次を満たす。
+
+```
+forget_control
+- id
+- canonical owner/root key
+- target_key          // 正規化した概念識別子。生の秘密情報そのものを主キー化しない
+- target_type         // person/name/preference/fact 等。v1で必要最小限
+- mode                // soft_forget | hard_delete
+- status              // active | released
+- source_request_id   // 冪等性・監査
+- created_at
+- released_at
+```
+
+target_key生成・照合は誤爆を最小化すること。「隆紀」をforgetしたから同じ文字列を含む無関係な文脈を全削除、のような実装は禁止。v1で安全な概念同定が困難なケースは無理に自動forgetせず、明示対象だけを扱う。
+
+#### 参照時の共通フィルタ
+Forget適用順は原則:
+```
+canonical root/history/memoryを取得
+→ active forget controls取得
+→ current user turnから明示的な再提示があるか判定
+→ 忘却対象をmemory/context/profile材料から除外
+→ recall/profile/reply/body-clockへ渡す
+```
+
+**重要:** current user turnそのものを隠してはいけない。ユーザーが「隆紀のことは忘れて」と言っているturnまで消すと意図判定できない。一方、過去historyにある「弟は隆紀」は生成根拠から除外する。
+
+#### UI×の契約
+現行 `/api/persona/history` の `deleteMemory` はcanonical memory削除を行う。この第1工事では、同じ操作にhard-delete controlを原子的に結び付ける。画面文言は「この記憶を美咲から削除しますか？」程度とし、**会話履歴も完全消去されるとは表示しない**。
+
+#### Soft Forget検出
+「忘れて」「その話は覚えないで」等の自然言語意図を扱う。単純キーワードだけで対象を決めない。対象が曖昧なら、別の人物/事実を誤ってforgetするより確認またはno-opを優先する。
+
+第1工事ではSoft Forgetを一般的な会話memory更新の副作用として曖昧に処理せず、**forget intent → target extraction → canonical write** の追跡可能な経路にする。
+
+#### 再学習 / release
+active controlを解除できるのは、現在turnでユーザー本人が対象事実を再度明示し、再学習の意図が十分明確な場合だけ。単に対象名が出ただけで自動解除しない。v1では保守的に運用し、曖昧ならactiveのままにする。
+
+Hard Deleteも「ユーザーが後で新しく教え直した情報」は新しいUser Memoryとして保持可能。ただし古いhistoryを根拠に復元してはならない。
+
+#### 匿名→メール保存
+匿名利用でもForget Controlを一時canonical rootと整合して保持し、メール保存時にUser Memory/historyと同じcheckpoint境界で恒久側へ一度だけ引き継ぐ。再試行でcontrolが重複しない。既存の匿名保存再試行・checkpoint semanticsを変更しない。
+
+#### Body Clock / proactive
+長期memoryだけをfilterして終わりにしない。Body Clockが持つ `long_term_memory` / `recent_history` 等のsnapshotからもforget対象が生成根拠へ入らないことを確認する。既存の配送間隔、claim、Push、写真selector、emotion/action/directionは変更しない。
+
+#### Relationship Engineとの境界
+Forget ControlはRelationship Evidence/Episode/Pattern/Stateを削除・巻き戻し・再計算しない。忘れた事実の細部と、その過去のやり取りで形成された関係状態は別物として扱う。Relationship Analyzer v1.1のsemantics、oldest-first、fail-closed、retry、START_ATに変更を入れない。
+
+#### 必須自動テスト
+最低限:
+1. User Memoryに人物事実を保存 → UI delete → memoryから消える + active hard-delete control
+2. 同じ事実が直近history内に残る → recall質問 → 古い事実を答えない
+3. User Profile生成 → forget対象を含めない
+4. 通常reply → forget対象を自発参照しない
+5. Body Clock/proactive context → forget対象を含めない
+6. Soft Forget → active control + User Memory除外
+7. forget後に古いhistoryだけ存在 → Natural Memory更新で再登録しない
+8. current turnで明示的に再教授 → 規定条件を満たせばrelease/再学習
+9. 無関係な同名/部分一致を誤削除しない
+10. 重複request / 二重delete / 二重forgetが冪等
+11. 匿名forget → メール保存 → 別端末復元後もforget維持
+12. forget-control write失敗時に成功扱いしない
+13. Free/Premium quota/refund、通常chat atomic saveに回帰なし
+14. Relationship Engine既存テスト全合格
+15. Body Clock既存テスト全合格
+
+#### 実機受入テスト
+代表シナリオ:
+```
+A: 「弟の名前は隆紀だよ」
+→ 美咲が覚える
+
+B: 「隆紀のことは忘れて」
+→ Soft Forget成立
+
+C: 直後「弟の名前覚えてる？」
+→ 「隆紀」と古いhistoryから復活させない
+
+D: 数十turn後に同じ質問
+→ 同様に復活させない
+
+E: 後日ユーザーが「弟の隆紀がさ…」と明示的に再提示
+→ 仕様条件に従い再学習可能
+```
+
+UI×についても同じC/Dを確認する。ただし「履歴から完全消去された」とは判定しない。
+
+#### PR完了条件
+- migration / rollback方針が明示されている
+- 既存データを破壊的に一括変換しない
+- TypeScript / production build / full test suite成功
+- 新規Forget Control tests成功
+- PreviewでUI deleteとSoft Forgetの代表シナリオ成功
+- Production migration/mergeは、レビューで既存canonical root・匿名保存・Body Clock・Relationship Engineへの影響を確認してから
+- Production実機で代表シナリオを確認するまで「Forget Control完成」と記録しない
+
+#### このPRでやらないこと
+Shared Memory table/生成/検索、Memory 30件上限変更、Life Fact全面migration、Memory modal化、scroll jump修正、Relationship Engine変更、新6段階/5-heart UI、人物設定/自己開示は別工程。
+
+**Workへ:** まず最新mainと本総覧を読み、実装前に現行 `app/api/chat/route.ts`、`app/api/persona/history/route.ts`、canonical root RPC/migration、匿名root保存、Body Clock memory参照経路を再照合すること。総覧と実装が食い違えば勝手に合わせず、差分を報告してから施工する。
