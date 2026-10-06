@@ -7,17 +7,18 @@ const ts = require('typescript');
 const nodeCrypto = require('node:crypto');
 const directory = path.join(__dirname, '../supabase/functions/body-clock');
 
-async function verifyBodyClock({ anonymous = false, expired = false, tampered = false, forget = false, forgetReadFailure = false } = {}) {
-  const calls = [], prompts = [];
+async function verifyBodyClock({ anonymous = false, expired = false, tampered = false, forget = false, forgetReadFailure = false, realPersonaStore = false, withTraits = false, withToday = false } = {}) {
+  const calls = [], prompts = [], geminiCalls = [];
   const shared = await import('../supabase/functions/_shared/forget-control.ts');
   const controls = forget ? await shared.addForgetControls([], [{subject:'user.brother',predicate:'name',value:'隆紀',scope:'person'}], 'soft_forget', 'forget', new Date().toISOString(), 'test') : [];
   const forgetPayload = forget ? await shared.sealForgetControls(controls, 'test', 'account') : null;
   const facts = forget ? [{role:'user',text:'弟の名前は隆紀だよ'}] : [];
   const memories = forget ? ['弟は隆紀'] : [];
+  const todayMemory={date:'',items:withToday?['猫が好き']:[]};
   const iv = nodeCrypto.randomBytes(12);
   const cipher = nodeCrypto.createCipheriv('aes-256-gcm', nodeCrypto.createHash('sha256').update('misaki-temporary-state-v1:test').digest(), iv);
   const encrypted = Buffer.concat([cipher.update(JSON.stringify({ expires: Date.now() + (expired ? -1000 : 60000),
-    result: { reply: 'ok' }, state: { forgetControls: controls, relationshipPoints: 80, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] } })), cipher.final()]);
+    result: { reply: 'ok' }, state: { todayMemory, forgetControls: controls, relationshipPoints: 80, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] } })), cipher.final()]);
   const bytes = Buffer.concat([iv, cipher.getAuthTag(), encrypted]);
   if (tampered) bytes[40] ^= 1;
   const token = bytes.toString('base64url');
@@ -28,8 +29,8 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
         single: async () => ({ data: { next_push_at: 'lease' }, error: null }),
         maybeSingle: async () => ({ data: table === 'misaki_forget_controls' ? (forget ? {payload:forgetPayload}:null) : table === 'misaki_temporary_roots' ? { token, revision: 'root-generation', expires_at: new Date(Date.now() + 60000).toISOString() } : table === 'daily_message_requests' ? { temporary_result: token } : table === 'misaki_relationship_state'
           ? { intimacy_points: anonymous ? 999 : 80, intimacy_level: anonymous ? 'very_intimate' : 'intimate', action_state: 'NORMAL', emotion_state: { primary: 'happy', intensity: 34 } }
-          : { history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] }, error: table==='misaki_forget_controls'&&forgetReadFailure?{message:'failed'}:null }),
-        limit() { return query; }, then(resolve) { resolve({ data: [], error: null }); },
+          : { today_memory:todayMemory, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] }, error: table==='misaki_forget_controls'&&forgetReadFailure?{message:'failed'}:null }),
+        limit() { return query; }, then(resolve) { resolve({ data: table==='misaki_persona_versions'?[{id:'v',version_code:'v'}]:table==='misaki_prompt_modules'?[{content:'美咲',metadata:{channels:['proactive']}}]:table==='misaki_user_relationship_traits'&&withTraits?[{content:'猫が好き'}]:[], error: null }); },
         insert: async item => { calls.push({ event: item }); return { error: null }; },
       };
       return query;
@@ -47,6 +48,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
       if (String(url).includes('generativelanguage')) {
         const payload=JSON.parse(options.body);
         let task;try{task=JSON.parse(payload.contents?.[0]?.parts?.[0]?.text)}catch{}
+        geminiCalls.push(task?.task??'reply');
         if(task?.task) return Response.json({candidates:[{content:{parts:[{text:JSON.stringify(await require('./forget-fixture.cjs').judge(task.task,task.input))}]}}]});
         prompts.push(payload);
         return Response.json({ candidates: [{ content: { parts: [{ text: '{"reply":"今日はいい感じ😊"}' }] } }] });
@@ -63,7 +65,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     const module = { exports: {} };
     const req = name => {
       if (name.startsWith('npm:')) return { createClient: () => client };
-      if (name === './persona-store.ts') return { loadPersonaPrompt: async () => ({ text: '美咲' }) };
+      if (name === './persona-store.ts' && !realPersonaStore) return { loadPersonaPrompt: async () => ({ text: '美咲' }) };
       return load(name.startsWith('../') ? name : name.slice(2));
     };
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
@@ -87,6 +89,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
   assert.ok(delivery.p_delay_minutes >= 55 && delivery.p_delay_minutes <= 210);
   assert.equal(calls.find(call => call.push).push.deliveryId, 'delivery');
   assert.ok(!calls.some(call => call.name === 'complete_misaki_chat_turn'));
+  return geminiCalls;
 }
 test('Body Clock uses canonical history/memory/points for decision, photo, delivery and push', () => verifyBodyClock());
 test('anonymous Body Clock decodes the shared server root and uses the same temporary points', () => verifyBodyClock({ anonymous: true }));
@@ -96,3 +99,10 @@ test('anonymous Body Clock rejects tampered temporary receipts', () => verifyBod
 test('Body Clock filters canonical old history and memory before life, decision and generation',()=>verifyBodyClock({forget:true}));
 test('anonymous Body Clock preserves controls in encrypted root while using a filtered generation view',()=>verifyBodyClock({anonymous:true,forget:true}));
 test('Body Clock control read failure prevents generation and delivery',()=>assert.rejects(verifyBodyClock({forget:true,forgetReadFailure:true}),/forget_read_failed/));
+for(const options of [{forget:false,withTraits:true},{forget:true},{forget:true,withTraits:true},{forget:true,withToday:true},{forget:true,withToday:true,withTraits:true}]) test(`Body Clock Gemini extra fetch count ${JSON.stringify(options)}`,async t=>{
+ const tasks=await verifyBodyClock({...options,realPersonaStore:true});
+ const extra=tasks.filter(task=>task!=='reply');
+ assert.equal(extra.length,options.forget?3+Number(!!options.withToday)+Number(!!options.withTraits):0);
+ assert.equal(tasks.filter(task=>task==='reply').length,1);
+ t.diagnostic(JSON.stringify({options,extra:extra.length,tasks}));
+});

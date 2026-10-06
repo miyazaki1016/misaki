@@ -3155,3 +3155,29 @@ Shared Memory table/生成/検索、Memory 30件上限変更、Life Fact全面mi
 意味判定はscripted test doubleを使うため、実Geminiの日本語同定精度を検証済とは扱わない。PGliteは実migration/RPCを最小隔離schemaで実行したもので、Production DB全体のcloneではない。既存Life Factの時刻依存テストはAmerica/Phoenixで失敗するがUTC/JSTでは成功する（今回のLife Fact変更はなし）。Shared Memoryの検証項目は対象外・未実装。
 
 未解決の受入: 実モデルPreviewでSoft Forget/UI×の代表シナリオ・数十turn・確認再記憶・匿名保存/別端末・Body Clockを実施すること。接続済Supabaseに隔離branchがなく、Productionへのmigration/試験書込みは行っていない。ローカル画面試験はブラウザ実行環境の準備失敗で未実施。追加semantic resolver呼出しの実latency/costと実モデル誤判定もPreviewで確認が必要。Production実機の復活防止確認はさらにレビュー・適用承認後の工程であり未完了。
+
+#### PR #66レビュー追補 — Soft Forget正本と追加call数（2026-10-07 JST）
+
+Soft Forgetは生成contextだけをmaskして終わらない。chat routeの `updatedMemory` を `completeCanonicalTurn` がRPCへ渡し、`complete_misaki_chat_turn` が同じtransactionでcontrolを保存して `misaki_user_conversation_state.memory = p_result.memory` とBody Clock snapshotを更新する。現行実装に対象memory残存は見つからず、productionコード/DDL修正は不要だった。
+
+`tests/forget-database.test.cjs` に実chat route→実migration RPC→PGlite DB列の直接読取を追加。入力memory `['弟の名前は隆紀']` に対して現在turn `隆紀のことは忘れて` を送ると、commit後のDB memoryは `[]`、controlは復号するとactive soft_forget、元のhistoryは残る。モデルが旧memoryを再出力するfixtureでも同じ結果になる。無関係な `猫が好き` を同時に保持するケース、およびcontrol保存失敗時にmemory/control/historyすべてが更新前のままで500になるケースも検証した。RPCへのmemoryとDB列の両方をassertしており、Response/context maskのassertだけではない。
+
+`tests/forget-call-count.test.cjs` とBody Clock追加ケースは実route・共通policy・実persona storeのfetch呼出しをカウントする。意味判定応答はscripted doubleで、実モデルの料金/所要時間の測定ではない。下表は単一control、非空history/memory/Today Memory/生成memory/生成Today Memory、retryなし、同じ値の確認再記憶という固定条件の1turnあたりForget追加call数。既存reply生成・retry・表現調整・Relationship workerのcallは追加数に含めない。
+
+| 経路 | traitなし | traitあり |
+|---|---:|---:|
+| Forget Controlなしの通常reply | 0 | 0 |
+| Soft Forget成立turn | 6 | 7 |
+| active Forget後の通常turn | 7 | 8 |
+| 再提示・確認質問turn | 6 | 7 |
+| 確認肯定・同じ値でreleaseするturn | 4 | 5 |
+| Body Clock（Today Memory空） | 3 | 4 |
+| Body Clock（Today Memoryあり） | 4 | 5 |
+
+内訳: 通常active turnはreoffer判定1 + history/memory/Today Memoryのmask各1 + persona trait mask（非空なら1）+生成memory/Today Memory/replyの検証各1。Forget成立はtarget抽出1がreoffer判定を置換し、固定ackなのでreply検証が不要。再提示も固定確認replyで検証不要。肯定は確認factのtarget抽出1、旧history/Today Memory/生成Today Memory mask各1（同値release後のmemory/outputには対象barrierがない）。Body Clockはhistory/memory/任意Today Memory/任意trait/reply maskで、reoffer判定は行わない。
+
+数は全ユーザー固定ではない。空の入力/出力はcallなし。肯定対象が複数ならtarget抽出は対象controlごと、訂正した旧値のbarrierは追加memory/output判定を必要とし、active/releasedが混在するとhistoryのbarrier groupごとにcallが増える。少数値の固定quotaとして扱ってはいけない。各callは25秒timeoutで、通常active turnにも7〜8回の追加が生じる現行設計のlatency/costは実モデルPreviewで未検証。今回は計測と証明だけを追加し、判定の統合・省略や意味論変更は行っていない。
+
+PRはDraftを維持。merge/Production migration/Edge適用なし。実モデルPreview・Production実機の未完了条件は上記のとおり継続する。
+
+追補の追加テスト10件（DB正本3、chat call計測2、Body Clock call計測5）は成功。UTC/JSTの全回帰は各261/261成功、fail/skip 0。今回の差分はテスト・harness・総覧のみで、前回成功したTypeScript/production build対象のapplication/DDLは変更していない。

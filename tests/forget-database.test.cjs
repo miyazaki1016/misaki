@@ -78,6 +78,51 @@ test('Soft Forget commit is atomic with chat receipt, quota proof and Body Clock
  assert.equal((await controls(id)).length,1);assert.equal((await state(id)).history.length,2);
  assert.equal((await db.query("select count(*)::int n from misaki_relationship_events where user_id=$1 and event_type='chat_turn_completed'",[id])).rows[0].n,1);
 }));
+// The real chat route produces the payload; the real migration RPC commits it.
+// Read DB columns directly, without passing through forgetContext/response masking.
+for (const {invalidPayload,keepUnrelated} of [{invalidPayload:false,keepUnrelated:false},{invalidPayload:false,keepUnrelated:true},{invalidPayload:true,keepUnrelated:true}]) test(`Soft Forget real route -> RPC: ${invalidPayload?'failed write preserves both originals':keepUnrelated?'target removed, unrelated fact survives':'singleton canonical memory becomes empty; history survives'}`,()=>isolated(async()=>{
+ const {harness}=require('./helpers/canonical-harness.cjs'),{judge}=require('./forget-fixture.cjs');
+ const id=await seed(),h=harness();h.user.id=id;h.setSemanticJudge(judge);
+ const remaining=keepUnrelated?['猫が好き']:[],original=['弟の名前は隆紀',...remaining];
+ await complete(id,randomUUID(),'弟の名前は隆紀',{memory:original});
+ Object.assign(h.rootState,await state(id));
+ // Supabase returns timestamptz as a string; JS Date would truncate PG microseconds.
+ h.rootState.updated_at=(await db.query('select updated_at::text value from misaki_user_conversation_state where user_id=$1',[id])).rows[0].value;
+ const before=await state(id),oldPayload=(await controls(id))[0].payload;
+ // The pre-existing SQL fixture ciphertext is replaced by a genuinely sealed empty vector.
+ const shared=h.load('supabase/functions/_shared/forget-control.ts');
+ const empty=await shared.sealForgetControls([],'server-only-test-key',id);
+ await db.query('update misaki_forget_controls set payload=$2 where user_id=$1',[id,empty]);h.forgetPayloads.set(id,empty);
+ h.setOpenaiPayload({reply:'うん、わかったよ。',memory:original,misakiTodayMemory:{items:[]}});
+ const mockRpc=h.client.rpc.bind(h.client);let rpcError;
+ h.client.rpc=async(name,args)=>{
+  if(name!=='complete_misaki_chat_turn') {
+   if(name==='consume_daily_message')await db.query("insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)",[args.p_request_id,id]);
+   return mockRpc(name,args);
+  }
+  assert.deepEqual(Array.from(args.p_result.memory),remaining);
+  await db.exec('savepoint route_commit');
+  try {
+   const result={...args.p_result,...(invalidPayload?{forgetControlPayload:null}:{})};
+   const data=(await db.query('select complete_misaki_chat_turn($1,$2,$3,$4,$5::jsonb)result',[id,args.p_request_id,args.p_message,args.p_user_message_at,JSON.stringify(result)])).rows[0].result;
+   return {data,error:null};
+  } catch(error) {rpcError=error.message;await db.exec('rollback to route_commit');return {data:null,error:{message:error.message}};}
+ };
+ const requestId=randomUUID(),response=await h.load('app/api/chat/route.ts').POST(h.request({message:'隆紀のことは忘れて',requestId}));
+ assert.equal(response.status,invalidPayload?500:200,rpcError??JSON.stringify(await response.json()));
+ const stored=await state(id),encrypted=(await controls(id))[0].payload;
+ if(invalidPayload){assert.match(rpcError,/forget payload/);assert.deepEqual(stored,before);assert.equal(encrypted,empty);}
+ else {
+  assert.deepEqual(stored.memory,remaining);assert.ok(!JSON.stringify(stored.memory).includes('隆紀'));
+  assert.deepEqual(stored.history.slice(0,before.history.length),before.history);
+  assert.ok(stored.history.some(row=>row.text==='弟の名前は隆紀'));
+  const vector=await shared.openForgetControls(encrypted,'server-only-test-key',id);
+  assert.equal(vector.length,1);assert.equal(vector[0].mode,'soft_forget');assert.equal(vector[0].status,'active');assert.equal(vector[0].sourceRequestId,requestId);
+  const snapshot=(await db.query('select long_term_memory from background_push_state where user_id=$1',[id])).rows[0];assert.deepEqual(snapshot.long_term_memory,remaining);
+  const receipt=(await db.query("select metadata from misaki_relationship_events where user_id=$1 and request_id=$2 and event_type='chat_turn_completed'",[id,requestId])).rows[0];
+  assert.ok(receipt);assert.notEqual(encrypted,oldPayload);
+ }
+}));
 test('failed control commit leaves no successful chat; Free refund works once; successful request cannot refund',()=>isolated(async()=>{
  const id=await seed(),r=randomUUID();await db.query('insert into daily_message_usage values($1,current_date,1,clock_timestamp())',[id]);
  await db.query("insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)",[r,id]);

@@ -4,11 +4,11 @@ const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
 const root = path.join(__dirname, '../..');
-function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {
+function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79, realPersonaStore = false, personaTraits = [] } = {}) {
   const user = { id: 'account-a', is_anonymous: anonymous };
   const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };
   let points = initialPoints, consumed = 0, refunded = 0, generated = 0;
-  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];
+  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [], geminiCalls = [];
   let checkpoint = false, revision = 0;
   let openaiPayload = null;
   let maintenance = false; const forgetPayloads = new Map(); let semanticJudge = null;
@@ -34,7 +34,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         } };
       query.single = async () => ({ data: { next_push_at: 'lease' }, error: null });
       query.insert = async () => ({ error: null });
-      query.then = resolve => resolve({ data: [], error: null });
+      query.then = resolve => resolve({ data: realPersonaStore && table === 'misaki_persona_versions' ? [{id:'fixture',version_code:'fixture'}] : realPersonaStore && table === 'misaki_prompt_modules' ? [{module_key:'base',content:'美咲',metadata:{channels:['chat']}}] : table === 'misaki_user_relationship_traits' ? personaTraits : [], error: null });
       return query;
     },
     async rpc(name, args) {
@@ -112,6 +112,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (String(url).includes('generativelanguage')) {
         const payload = JSON.parse(options.body);
         let task; try { task = JSON.parse(payload.contents?.[0]?.parts?.[0]?.text); } catch {}
+        geminiCalls.push({ task: task?.task ?? 'reply', rows: task?.input?.rows?.length ?? null });
         if (task?.task && !semanticJudge) {
           if (task.task === 'target') return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ ambiguous:false, targets:task.input.candidates.map((c,i)=>({subject:'user',predicate:'fixture',value:c.text,scope:'fact',evidenceIndex:i,evidence:c.text})) }) }] } }] });
           if (task.task === 'mask') return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ rows:task.input.rows.map((r,index)=>({index,uncertain:false,spans:task.input.targets.filter(t=>r.text===t.value).map(t=>t.value)})) }) }] } }] });
@@ -137,7 +138,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
       if (name === 'next/server') return { after: task => task() };
       if (name.endsWith('/gemini-usage-telemetry-server')) return { createGeminiTelemetrySink: () => () => {} };
       if (name.endsWith('/relationship-runtime-v1')) return { enqueueTemporaryTurn: () => undefined, resumeRelationshipProcessing: async () => {}, pendingRelationshipGuide: () => '' };
-      if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };
+      if (name.endsWith('/persona/persona-store') && !realPersonaStore) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };
       if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };
       if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name.replace(/\.ts$/, ''))) + '.ts');
       throw Error(name);
@@ -151,7 +152,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     }
     cache.set(file, module.exports); return module.exports;
   }
-  return { client, user, forgetPayloads, setSemanticJudge: value => { semanticJudge = value; }, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
+  return { client, user, forgetPayloads, geminiCalls, setSemanticJudge: value => { semanticJudge = value; }, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
     setOpenaiPayload(value) { openaiPayload = value; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
