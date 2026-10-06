@@ -8,8 +8,8 @@
 > **未来のソラを信用するな。総覧を信用しろ。**
 
 
-最終更新: 2026-10-04  
-実装ソース照合基準: `main` @ `e51c3326357b6e6f12455d5063b00da88b703b23`
+最終更新: 2026-10-07  
+実装ソース照合基準: `main` @ `49a663258e93af88566be586d758442ad92dfaf1`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -1782,6 +1782,54 @@ lab専用の禁止文を継ぎ足して症状だけ隠すのではなく、Produ
 - 「記憶ではそうだった」より、最新main / PR / Production実物 / 総覧を優先する。
 - 自動テストgreen、Preview確認、実機確認、Production確認を同じ「確認済み」でまとめない。
 - **未来のソラを信用するな。総覧を信用しろ。**
+
+#### 2026-10-07 最新main再照合 — PR #64 / #65反映
+
+2026-10-07、総覧正本と最新 `main` を再照合。前回の総覧照合基準 `e51c3326357b6e6f12455d5063b00da88b703b23`（PR #63）以後に、Relationship EngineのProduction実走で見つかった回復阻害2件が修正され、現在の照合基準は `49a663258e93af88566be586d758442ad92dfaf1`（PR #65 merge）となった。
+
+##### PR #64 — 期限切れ匿名rootが恒久Relationship処理を塞がないよう修正
+- title: `Do not let expired anonymous roots block relationship processing`
+- merge commit: `b44c185497d3cc719e67c07c9ae1cde5e0daf61f`
+- **MERGED**
+- Production調査で、恒久ユーザーの最古 `chat_turn_completed` がRelationship Analyzerへ到達する前に、期限切れ `misaki_temporary_roots` の存在によって繰り返し失敗していた。
+- oldest-first recoveryのため、この1件がpoison turnとなり後続の仕掛かり処理まで塞いでいた。
+- 修正後は、**期限切れ匿名checkpointは「import不能」として静かにskip**し、恒久Relationship処理を妨げない。
+- 一方で、まだ有効期限内のrootがinvalid / unverifiableな場合は従来どおりfail-closedを維持する。
+- 期限切れrootではimport / model call / relationship writeを行わない回帰テストを追加。
+- Relationship semantics、Evidence / Episode / Pattern、State、START_AT、oldest-first順序そのものは変更していない。
+
+重要原則:
+> **期限切れ匿名checkpointは過去の残骸として後続処理を止めない。ただし生きているrootの真正性検証は緩めない。**
+
+##### PR #65 — Relationship Analyzer / Critical Validatorの一時障害をbounded retry
+- title: `Retry transient Relationship Analyzer failures`
+- merge commit: `49a663258e93af88566be586d758442ad92dfaf1`
+- **MERGED**
+- PR #64後、Relationship backlog recovery自体は進む一方、Productionで `relationship_analyzer` のHTTP 503が繰り返し観測された。
+- それまでAnalyzer / Critical Validatorはgenerator側にretry機構が存在していても、呼出側でretry delayを空配列にしていたため、1 processing activityにつき物理Gemini callが1回で終了していた。
+- 現在は既存のbounded retry policyを有効化:
+  - transient error: **2秒 → 5秒** の再試行
+  - timeout: **2秒** 後に1回再試行
+  - 対象: Relationship Analyzer / Critical Validator
+- oldest-first、fail-closed、Evidence / Episode / Pattern規則、relationship scoring、START_AT、DB stateは変更していない。
+- retryは無制限にしない。物理Gemini attemptはPR #61のtelemetryでattempt単位に観測する。
+
+重要原則:
+> **会話成功とRelationship後処理成功は別。Relationship側の一時的なGemini障害はbounded retryで吸収し、それでも失敗したものは既存のeventual / oldest-first recoveryへ戻す。**
+
+##### 3日Production実走の現在地
+当初のDay 1=10/4、Day 2=10/5、Day 3=10/6という「3つの独立Tokyo日付で自然にEpisodeを積む」方針自体は維持する。ただし、期間中に期限切れ匿名rootによるpoison turnとAnalyzer 503が見つかったため、**カレンダー上で10/6を迎えたことだけをもってPattern→State→Interpreter完走とは判定しない。**
+
+完走条件は従来どおり実データで以下を確認すること:
+1. 対象Evidenceが処理済みである
+2. 独立日付Episodeが成立している
+3. Patternが成立している
+4. canonical axis Stateが期待どおり更新される
+5. state versionが更新される
+6. Patternがonce-onlyでconsumeされる
+7. 次回replyでRelationship InterpreterがStateを自然な接し方へ反映する
+
+**現時点の扱い:** Relationship Engine v1.1は「実装完了・Production稼働済み」だが、自然利用によるPattern→State→Interpreterの最終実走確認は、backlog回復後の実データを見て完了判定する。PR #64/#65はその回復性を直したもので、Relationshipの意味論を変更する修正ではない。
 
 #### 次の一手
 PR #45はProductionまで完了。次の設計主題は、
