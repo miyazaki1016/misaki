@@ -3,8 +3,10 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:
 import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
 import { createLegacyRelationshipActingState, type RelationshipActingState } from "./relationship-acting-guide";
 import { criticalCandidates } from "./relationship-analyzer-v1";
+import { openForgetControls, sealForgetControls, validateControls, type ForgetControl } from "../supabase/functions/_shared/forget-control";
 
 export type RootState = {
+  forgetControls?: ForgetControl[];
   history?: unknown[];
   memory: string[];
   todayMemory: { date: string; items: string[] };
@@ -86,6 +88,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
+  const forgetControls = await loadForgetControls(userId);
   let relationshipCriticalPending = relationshipImportPending;
   if (engineEnabled()) {
     const { data, error } = await db.from("misaki_relationship_critical_pending").select("request_id").eq("user_id", userId).in("status", ["pending", "processing", "failed"]);
@@ -99,6 +102,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
       typeof t.metadata?.message === "string" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));
   }
   return {
+    forgetControls,
     relationshipPoints: relationship.data?.intimacy_points ?? 0,
     history: conversation.data?.history ?? [],
     memory: conversation.data?.memory ?? [],
@@ -108,6 +112,16 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
     relationshipCriticalPending, relationshipImportPending,
   };
+}
+
+export async function loadForgetControls(userId: string): Promise<ForgetControl[]> {
+  const { data, error } = await createServerSupabase().from("misaki_forget_controls").select("payload").eq("user_id", userId).maybeSingle();
+  if (error) throw new Error("Forget control read failed");
+  return data ? openForgetControls(data.payload, process.env.SUPABASE_SERVICE_ROLE_KEY!, userId) : [];
+}
+
+export function forgetControlPayload(userId: string, controls: ForgetControl[] = []) {
+  return sealForgetControls(validateControls(controls), process.env.SUPABASE_SERVICE_ROLE_KEY!, userId);
 }
 
 export async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {
@@ -144,9 +158,10 @@ export async function loadCompletedTurn(userId: string, requestId: string, messa
 
 export async function completeCanonicalTurn(userId: string, requestId: string, message: string,
   userMessageAt: string, result: Record<string, unknown>) {
+  const { forgetControls, ...publicResult } = result;
   const { data, error } = await createServerSupabase().rpc("complete_misaki_chat_turn", {
     p_user_id: userId, p_request_id: requestId, p_message: message,
-    p_user_message_at: userMessageAt, p_result: result,
+    p_user_message_at: userMessageAt, p_result: { ...publicResult, forgetControlPayload: await forgetControlPayload(userId, (forgetControls ?? []) as ForgetControl[]) },
   });
   if (error || !data) throw new Error("Canonical turn commit failed");
   return data as Record<string, unknown>;
@@ -180,7 +195,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
   const { data, error } = await createServerSupabase().rpc("complete_misaki_temporary_turn", {
     p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),
     p_parent_hash: digest(typeof parent === "string" ? parent : ""), p_token: token,
-    p_expected_revision: revision, p_state: verified.state,
+    p_expected_revision: revision, p_state: { ...verified.state, forgetControlPayload: await forgetControlPayload(userId, verified.state.forgetControls ?? []) },
   });
   if (error || typeof data !== "string") {
     if (error) {
@@ -199,7 +214,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
 export async function editTemporaryRoot(userId: string, state: RootState, purpose = "edit") {
   const token = sealTemporaryState(state, purpose);
   const { error } = await createServerSupabase().rpc("write_misaki_temporary_root", {
-    p_user_id: userId, p_token: token, p_state: state, p_expected_revision: state.temporaryRevision ?? null,
+    p_user_id: userId, p_token: token, p_state: { ...state, forgetControlPayload: await forgetControlPayload(userId, state.forgetControls ?? []) }, p_expected_revision: state.temporaryRevision ?? null,
   });
   if (error) throw new Error("Temporary edit commit failed");
   return token;

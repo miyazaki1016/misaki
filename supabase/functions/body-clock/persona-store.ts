@@ -1,3 +1,4 @@
+import { createForgetJudge, maskForgetRows, type ForgetControl } from "../_shared/forget-control.ts";
 import type {
   SupabaseClient,
 } from "npm:@supabase/supabase-js@2.57.4";
@@ -41,7 +42,8 @@ let globalCache:
 
 function moduleSupportsChannel(
   module: PromptModuleRow,
-  channel: PersonaChannel
+  channel: PersonaChannel,
+  forgetControls: ForgetControl[] = []
 ) {
   const channels =
     module.metadata?.channels;
@@ -149,7 +151,8 @@ async function loadActiveGlobalModules(
 
 async function loadUserRelationshipTraits(
   supabase: SupabaseClient,
-  userId: string
+  userId: string,
+  controls: ForgetControl[] = []
 ) {
   const {
     data,
@@ -185,13 +188,14 @@ async function loadUserRelationshipTraits(
     return "";
   }
 
+  const filtered = await maskForgetRows(data.map(trait => ({ ...trait, text: trait.content })), controls, createForgetJudge(Deno.env.get("GEMINI_API_KEY")!), "derived");
   return `
 【このユーザーとの関係で育った特徴】
 
-${data
+${filtered
   .map(
     (trait) =>
-      `・${trait.content}`
+      `・${trait.text}`
   )
   .join("\n")}
 
@@ -203,7 +207,8 @@ ${data
 export async function loadPersonaPrompt(
   supabase: SupabaseClient,
   userId: string,
-  channel: PersonaChannel
+  channel: PersonaChannel,
+  forgetControls: ForgetControl[] = []
 ): Promise<LoadedPersonaPrompt> {
   try {
     const [
@@ -216,7 +221,8 @@ export async function loadPersonaPrompt(
         ),
         loadUserRelationshipTraits(
           supabase,
-          userId
+          userId,
+          forgetControls
         ),
       ]);
 

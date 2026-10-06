@@ -1,4 +1,5 @@
 import { after } from "next/server";
+import { createForgetJudge, prepareForgetTurn, forgetContext, maskForgetRows, forgetVersion } from "../../../supabase/functions/_shared/forget-control";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
 import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
 import { maintenanceResponse } from "../../../lib/maintenance";
@@ -1599,7 +1600,7 @@ function parseGeminiText(
 ========================================================= */
 
 function publicChatResult(result: Record<string, unknown>) {
-  const { relationshipPointDelta: _internalRelationshipPointDelta, ...publicResult } = result;
+  const { relationshipPointDelta: _internalRelationshipPointDelta, forgetControls: _controls, forgetControlPayload: _payload, forgetControlVersion: _version, ...publicResult } = result;
   return publicResult;
 }
 
@@ -1804,18 +1805,24 @@ export async function POST(
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
       if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
+      const latestRoot = await loadTemporaryRoot(userData.user.id, temporaryState);
+      if (forgetVersion(latestRoot.forgetControls) !== (replay.forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
       after(() => resumeRelationshipProcessing(userData.user.id, true));
       return Response.json(publicChatResult({ ...replay, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
       if (completed) {
+        const latestRoot = await loadCanonicalState(userData.user.id);
+        if (forgetVersion(latestRoot.forgetControls) !== ((completed as Record<string, unknown>).forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
         after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
         return Response.json(publicChatResult(completed));
       }
     } else {
       const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
       if (completed) {
+        const latestRoot = await loadTemporaryRoot(userData.user.id, completed.temporaryState);
+        if (forgetVersion(latestRoot.forgetControls) !== ((completed as Record<string, unknown>).forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
         after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
         return Response.json(publicChatResult(completed));
       }
@@ -1823,9 +1830,13 @@ export async function POST(
     const rootState = isAnonymous
       ? await loadTemporaryRoot(userData.user.id, temporaryState)
       : await loadCanonicalState(userData.user.id);
-    memory = rootState.memory;
-    misakiTodayMemory = rootState.todayMemory;
-    history = "history" in rootState ? rootState.history : [];
+    const forgetJudge = createForgetJudge(process.env.GEMINI_API_KEY!);
+    const forgetTurn = await prepareForgetTurn(rootState, message, usageRequestId, userMessageAt,
+      `${process.env.SUPABASE_SERVICE_ROLE_KEY}:${userData.user.id}`, forgetJudge);
+    const forgetView = await forgetContext({ ...rootState, forgetControls: forgetTurn.controls }, forgetJudge);
+    memory = [...forgetView.memory, ...forgetTurn.learned];
+    misakiTodayMemory = forgetView.todayMemory;
+    history = forgetView.history;
     const canonicalRelationshipPoints = rootState.relationshipPoints;
     const recallMode = isMemoryRecallQuestion(message);
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
@@ -2070,10 +2081,7 @@ export async function POST(
       buildUserProfile(
         [
           ...safeHistory,
-          {
-            role: "user",
-            text: message,
-          },
+          ...(forgetTurn.reply ? [] : [{ role: "user" as const, text: message }]),
         ],
         safeMemory
       );
@@ -2096,7 +2104,8 @@ export async function POST(
             supabase,
             userData.user.id,
             "chat",
-            relationshipTimeContext
+            relationshipTimeContext,
+            forgetTurn.controls
           )
       );
 
@@ -2259,6 +2268,7 @@ export async function POST(
 
     const baseSystemPrompt = `
 ${personaPrompt}
+${forgetTurn.controls.length ? "【忘却した情報の扱い】過去に忘れてほしいと言われた情報を、履歴や推測から作り直さないでください。再記憶は本人への確認と肯定が成立した今回の情報だけに基づきます。知らない名前や事実を補完せず、制御の内部情報を会話に出さないでください。" : ""}
 
 ${relationshipGuide}
 
@@ -2697,10 +2707,12 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     const activeCarriedLifeFacts = selectRelevantLifeFacts(splitMemory.facts, safeCurrentTime, MAX_MEMORY);
     const activeLifeFacts = selectRelevantLifeFacts([...activeCarriedLifeFacts, ...explicitLifeFacts], safeCurrentTime, MAX_MEMORY);
     const encodedLifeMemory = activeLifeFacts.map((fact) => encodeLifeFactMemory(fact));
-    const updatedMemory = [
+    const candidateMemory = [
       ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
       ...encodedLifeMemory,
+      ...forgetTurn.learned,
     ].slice(-MAX_MEMORY);
+    const updatedMemory = (await maskForgetRows(candidateMemory.map(text => ({ text })), forgetTurn.controls, forgetJudge, "output")).map(x => x.text);
 
     const parsedTodayItems =
       Array.isArray(
@@ -2769,8 +2781,16 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
           -MAX_TODAY_MEMORY
         ),
     };
+    updatedTodayMemory.items = (await maskForgetRows(updatedTodayMemory.items.map(text => ({ text })), forgetTurn.controls, forgetJudge, "derived")).map(x => x.text);
+    if (forgetTurn.reply) reply = forgetTurn.reply;
+    else {
+      const safeReply = await maskForgetRows([{ text: reply }], forgetTurn.controls, forgetJudge, "output");
+      if (!safeReply.length || safeReply[0].text !== reply) throw new Error("Forget reply validation failed");
+    }
 
     const generatedResult = {
+      forgetControls: forgetTurn.controls,
+      forgetControlVersion: forgetVersion(forgetTurn.controls),
       requestId: usageRequestId,
       rootUpdatedAt: rootState.updatedAt ?? null,
       reply,
@@ -2801,7 +2821,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     if (isAnonymous) {
       completedResult = { ...generatedResult, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
-      const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
+      const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory, forgetControls: forgetTurn.controls,
         relationshipEngine: enqueueTemporaryTurn(rootState, { requestId: usageRequestId, message: message.slice(0, 2000), reply: reply.slice(0, 2000), savedAt: new Date().toISOString() }),
         relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         temporaryRelationship: {
@@ -2820,7 +2840,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
             },
           }].slice(-40),
         },
-        history: [...(Array.isArray(history) ? history : []),
+        history: [...(Array.isArray(rootState.history) ? rootState.history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
           .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))
