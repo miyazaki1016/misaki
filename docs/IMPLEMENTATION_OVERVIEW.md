@@ -9,7 +9,7 @@
 
 
 最終更新: 2026-10-07  
-実装ソース照合基準: `main` @ `49a663258e93af88566be586d758442ad92dfaf1`
+実装ソース照合基準: `main` @ `eb9ca4bec1a8a24afc58d4728f3c2bac3164bbf2`
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
 
@@ -3194,3 +3194,34 @@ PRはDraftを維持。merge/Production migration/Edge適用なし。実モデル
 性能最適化はForget Control本体から分離する。**PR #66では現行resolverを維持し、batch化コードを本番経路へ接続しない。** 既存batchコードは検証専用のままとし、cacheも導入しない。将来、canonical非書込みのShadow環境と実Gemini認証を用意したうえで、別PRで実Gemini比較→全不一致の人間判定→採否判断を行う。Shadow結果はcanonical DB、Forget Control、reply、memory、Today Memory、persona、Relationship Engineへ反映しない。
 
 現在位置は総覧更新後の停止。PR #66はDraft・未merge、Production migration/Next/Edge適用なし。Forget Control全体のPreview/Production実機受入は引き続き未完了で、完成扱いしない。
+
+#### PR #66 Preview実機受入ゲート（2026-10-07 JST / 最終レビュー固定）
+
+コード・migration・自動回帰の横断レビューでは、通常chat、匿名temporary root、メール保存checkpoint、UI Memory削除、Body Clock、persona trait、quota/refund、古いreceipt拒否までForget Controlの主要保存/参照境界が接続されていることを再確認した。HEAD `a13fb439d1a78f76f5607b8bb6465287fa95b3a3` 時点でGitHub Actions `Canonical relationship integration tests` とVercel statusはsuccess。ただし、これは実モデル・実画面・Production受入の代替ではない。
+
+**Preview実機で合格が必要な項目:**
+1. Soft Forget: 「弟の名前は隆紀だよ」→記憶成立→「隆紀のことは忘れて」→直後のRecallで「隆紀」を復活させない。
+2. 長期復活防止: Forget後に数十turn会話してから再度Recallしても、古いhistoryを根拠に復活させない。
+3. 確認付き再学習: 「弟の隆紀がさ…」の再提示だけではactiveのまま、美咲の確認→直後30分以内の肯定で初めて新しい現在根拠として再学習する。旧historyは解除根拠にしない。
+4. 訂正再学習: 旧値を忘れた後に別の新値を教え直した場合、新値だけを学習し旧値を復活させない。
+5. UI× Hard Delete: Memory UIの×で対象memoryが消え、その後のRecall・通常replyでもhistoryから復活しない。会話履歴そのものが物理削除されたとは判定しない。
+6. 匿名連続性: 匿名でForget→メール保存/checkpoint→保存再試行→恒久化→別端末復元後もcontrolが1回だけ引き継がれ、対象memoryが復活しない。
+7. Body Clock/proactive: active Forget対象を自発メッセージ、life context、persona traitから持ち出さない。既存の配送間隔・Push・写真・Relationship挙動を変えない。
+8. 失敗系: Forget/control保存失敗を成功表示しない。Freeは既存refund契約を守り、成功済requestはrefundしない。古いpre-Forget receipt/replayは409で再配信しない。
+9. 無関係保持: 同名・部分一致・別事実を誤って消さず、対象外memory/contextを保持する。
+10. 実画面: iPhone/PCの実ブラウザでMemory削除確認文言、Forget応答、再学習確認、エラー表示に破綻がない。
+
+**実Geminiで測るが、3-call batch採否とは分離する項目:**
+- 現行resolverの日本語target/mask/reoffer判定が代表シナリオで意味的に正しいこと。
+- 実latency、input/output token、追加call数、概算費用を記録すること。
+- 誤判定・曖昧判定はfail closedになり、別人物/別事実を誤forgetしないこと。
+- これらはPR #66の現行resolver受入データであり、batch版とのShadow比較ではない。batch比較は別PRまで禁止。
+
+**合否境界:**
+- 上記Preview実機項目が通るまでPR #66をReady/Mergeにしない。
+- Preview合格後もProduction migration/Next/Body Clock Edgeは明示承認なしに適用しない。
+- Production適用時はDB・Next・Edgeを協調更新し、旧app/Edgeと新RPCを混在させない。
+- Production実機で代表Soft Forget / UI× / Recall / 再学習 / Body Clockを確認するまで「Forget Control完成」と記録しない。
+- 一度Forgetが成立した環境では、旧appへの単純rollbackやcontrol table削除を行わない。復活防止を維持したroll-forwardを基本とする。
+
+**現在の判定:** コードレビュー/自動検証ゲートは通過。次の阻害はPreview実機・実Gemini受入であり、PR #66は引き続きDraft・未merge・Production未適用。
