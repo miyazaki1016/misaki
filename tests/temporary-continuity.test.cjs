@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const ts = require('typescript');
-const { harness } = require('./server-canonical.test.cjs');
+const { harness } = require('./helpers/canonical-harness.cjs');
 
 function bodyClock(h) {
   const cache = new Map();
@@ -26,7 +26,7 @@ function bodyClock(h) {
     if (file === 'index.ts') code += '\nmodule.exports.processUser = processUser;';
     const module = { exports: {} };
     const req = name => name.startsWith('npm:') ? { createClient: () => h.client }
-      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.slice(2));
+      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.startsWith('../') ? name : name.slice(2));
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
   }

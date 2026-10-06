@@ -1,3 +1,4 @@
+import { createForgetJudge, maskForgetRows, type ForgetControl } from "../../supabase/functions/_shared/forget-control";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { analyzeUserEvolution, type ExistingRelationshipTrait } from "./evolution-analyzer";
 import type { ChatMessage } from "../user-profile";
@@ -119,7 +120,7 @@ export async function runUserEvolutionAnalysis(
   apiKey: string,
   history: ChatMessage[],
   memory: string[],
-  options?: { force?: boolean }
+  options?: { force?: boolean; forgetControls?: ForgetControl[] }
 ): Promise<EvolutionRunResult> {
   try {
     const force = options?.force === true;
@@ -148,7 +149,9 @@ export async function runUserEvolutionAnalysis(
       }
     }
 
-    const existingTraits = await loadExistingTraits(supabase, userId);
+    const judge = createForgetJudge(apiKey), controls = options?.forgetControls ?? [];
+    const existingTraits = (await maskForgetRows((await loadExistingTraits(supabase, userId)).map(t => ({ ...t, text: t.content })), controls, judge, "derived"))
+      .map(({ text, ...t }) => ({ ...t, content: text }));
     const candidates = await analyzeUserEvolution(
       apiKey,
       history,
@@ -158,7 +161,8 @@ export async function runUserEvolutionAnalysis(
     const saved = await saveCandidates(
       supabase,
       existingTraits,
-      candidates
+      (await maskForgetRows(candidates.map(c => ({ ...c, text: c.proposedContent })), controls, judge, "derived"))
+        .filter(c => c.text === c.proposedContent)
     );
 
     return {

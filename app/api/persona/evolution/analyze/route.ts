@@ -1,3 +1,5 @@
+import { loadCanonicalState, loadTemporaryRoot } from "../../../../../lib/canonical-state";
+import { createForgetJudge, forgetContext } from "../../../../../supabase/functions/_shared/forget-control";
 import { createClient } from "@supabase/supabase-js";
 import { runUserEvolutionAnalysis } from "../../../../../lib/persona/evolution-runner";
 import type { ChatMessage } from "../../../../../lib/user-profile";
@@ -78,37 +80,14 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    let safeHistory = sanitizeHistory(body?.history);
-    let safeMemory = sanitizeMemory(body?.memory);
-    let historySource: "browser" | "server" = "browser";
-
-    const browserUserMessageCount = safeHistory.filter(
-      (item) => item.role === "user"
-    ).length;
-
-    if (userData.user.is_anonymous !== true || browserUserMessageCount === 0) {
-      const { data: storedState, error: storedError } = await supabase
-        .from("misaki_user_conversation_state")
-        .select("history,memory")
-        .eq("user_id", userData.user.id)
-        .maybeSingle();
-
-      if (storedError) {
-        console.error("EVOLUTION STORED HISTORY LOAD ERROR:", storedError);
-        if (userData.user.is_anonymous !== true) return Response.json({ error: "Canonical context unavailable." }, { status: 500 });
-      } else if (!storedState && userData.user.is_anonymous !== true) {
-        safeHistory = []; safeMemory = []; historySource = "server";
-      } else if (storedState) {
-        const storedHistory = sanitizeHistory(storedState.history);
-        const storedMemory = sanitizeMemory(storedState.memory);
-
-        if (userData.user.is_anonymous !== true || storedHistory.some((item) => item.role === "user")) {
-          safeHistory = storedHistory;
-          safeMemory = storedMemory;
-          historySource = "server";
-        }
-      }
-    }
+    // Browser history/memory are display caches, including for anonymous users.
+    const canonical = userData.user.is_anonymous
+      ? await loadTemporaryRoot(userData.user.id, body?.temporaryState)
+      : await loadCanonicalState(userData.user.id);
+    const context = await forgetContext(canonical, createForgetJudge(apiKey));
+    const safeHistory = sanitizeHistory(context.history);
+    const safeMemory = sanitizeMemory(context.memory);
+    const historySource = "server";
 
     const userMessageCount = safeHistory.filter(
       (item) => item.role === "user"
@@ -134,7 +113,7 @@ export async function POST(request: Request) {
       apiKey,
       safeHistory,
       safeMemory,
-      { force: true }
+      { force: true, forgetControls: canonical.forgetControls ?? [] }
     );
 
     return Response.json({

@@ -3120,3 +3120,38 @@ UI×についても同じC/Dを確認する。ただし「履歴から完全消�
 Shared Memory table/生成/検索、Memory 30件上限変更、Life Fact全面migration、Memory modal化、scroll jump修正、Relationship Engine変更、新6段階/5-heart UI、人物設定/自己開示は別工程。
 
 **Workへ:** まず最新mainと本総覧を読み、実装前に現行 `app/api/chat/route.ts`、`app/api/persona/history/route.ts`、canonical root RPC/migration、匿名root保存、Body Clock memory参照経路を再照合すること。総覧と実装が食い違えば勝手に合わせず、差分を報告してから施工する。
+
+### Forget Control v1 第1工事 — レビュー用実装（2026-10-06 UTC）
+
+**状態: 実装・ローカル自動検証済、実モデルPreview/Production受入未完了。完成扱いしない。** 基準mainは `eb9ca4bec1a8a24afc58d4728f3c2bac3164bbf2`。上の2026-10-07仕様に加え、ユーザー承認によって再提示後の確認・肯定を必須化し、clearMemoryの全対象にもHard Deleteを残す。匿名persona evolutionのブラウザ由来history/memory入力を廃止し、検証済canonical rootだけを解析材料にする。Relationshipの処理順・意味論は変更しない。
+
+#### 実装と保存境界
+- Next/Deno共有の `supabase/functions/_shared/forget-control.ts` に概念同定、参照用context、再記憶確認、出力検証を集約。対象はsubject/predicate/value/scopeで保持し、同名・部分一致で一括除去しない。判定不能・不完全なモデル応答・保存失敗はfail closed。
+- 永久側は `misaki_forget_controls` にownerごとの暗号化control vectorを保存。HMAC target key、AES-GCM ciphertext、owner AADを使い、生の対象値や全historyを新しい平文DB列へ複製しない。暗号化鍵は既存service-role secretに依存するため、鍵変更時は読取互換または再暗号化が必要。Forget自体に24h期限は設けない。
+- Soft Forgetはchat commit、UI×/clearMemoryはcanonical edit、匿名はtemporary root/checkpointと同じtransactionに保存。古いhistoryはそのまま保持し、clearHistoryの意味を変更しない。古いtransport receiptは現在のcontrol versionと異なる場合409とし、古いreply/memoryを再配信しない。
+- 現在turnの明示的な再提示だけでpending確認を作り、その確認の直後・30分以内の肯定turnでreleaseする。古いhistoryは時刻とrelease時の行fingerprintで遮断したまま。訂正した値は新しく学習し、退役した旧値は復活させない。由来が確定できない旧persona traitはrelease後も遮断する。
+- Body Clockのlife/decision/generation、Recall/Profile/Natural Memory、persona trait参照に同じpolicyを適用。Relationship Stateの巻き戻し・Evidence等の削除は行わない。Shared Memoryその他の別工程は実装していない。
+
+#### Migration / 適用・rollback方針
+新規 `20261006200002_forget_control_v1.sql` はservice-only/RLSの暗号化保存表・保存helperを追加し、最新版chat commit、edit、checkpoint、temporary writerを必要なForget保存引数だけ拡張する。旧edit/checkpoint overloadを撤去し、revision/checkpoint/lock順/maintenance guardを維持する。既存memory/historyを一括変換しない。Productionへは未適用。
+
+適用はレビュー後に隔離DB/Previewで検証し、既存maintenance freeze下でDB・Next・Body Clock Edgeを協調更新する。旧app/Edgeと新RPCを混在させない。適用前に現行RPC/権限・root/controlデータと鍵の参照をバックアップする（秘密鍵をGitへ保存しない）。新しいForgetが成立した後に旧appへ戻すと復活禁止を破るため、control tableを削除して単純rollbackしてはいけない。保護を維持した修正をroll forwardし、必要ならmaintenance状態で整合したsnapshotを復元する。既存成功chatを無断で削除しない。
+
+#### 自動検証結果と限界
+`TZ=UTC npm test` と `TZ=Asia/Tokyo npm test`: 各251/251成功、skip 0。新規Forget検証48件（共通policy20、API統合19、実migration SQL6、Body Clock追加3）。従来test harnessのimportによる重複登録を解消し、既存固有ケースは維持した。`npx tsc --noEmit`、`npm run build`成功。
+
+| 必須項目 | 自動検証の根拠 |
+|---|---|
+| 1/2/6/7 UI×・Soft Forget・Recall・Natural Memory復活防止 | API統合: 記憶→forget→質問→40turn→質問（両モード）、共通policy: history60件内外 |
+| 3/4/5 Profile・reply・Body Clock/proactive | 実Profile/trait loader・共通context/出力guard・Body Clock canonical/匿名テスト |
+| 8 再学習 | 再提示のみはactive、確認の肯定でrelease、新根拠のみ、旧history/未来誤時刻を遮断 |
+| 9 同名・部分一致 | 無関係な同名/部分一致/別節保持、曖昧・重複spanはfail closed |
+| 10 冪等 | double delete/forget、receipt再試行、control version変更時の古いreceipt拒否 |
+| 11 匿名→保存→別端末 | API統合とSQLcheckpoint refresh/retry/恒久再import拒否 |
+| 12 保存失敗 | APIとSQLでmemory/control/chatの片側成功を禁止、revision競合rollback |
+| 13 quota/refund/atomic save | Free/Premium既存回帰、Forget失敗時、実SQLのcommit/refund/receipt検証 |
+| 14/15 Relationship/Body Clock | 全既存固有テストを含むfull suite成功、Relationship実装ファイル変更なし |
+
+意味判定はscripted test doubleを使うため、実Geminiの日本語同定精度を検証済とは扱わない。PGliteは実migration/RPCを最小隔離schemaで実行したもので、Production DB全体のcloneではない。既存Life Factの時刻依存テストはAmerica/Phoenixで失敗するがUTC/JSTでは成功する（今回のLife Fact変更はなし）。Shared Memoryの検証項目は対象外・未実装。
+
+未解決の受入: 実モデルPreviewでSoft Forget/UI×の代表シナリオ・数十turn・確認再記憶・匿名保存/別端末・Body Clockを実施すること。接続済Supabaseに隔離branchがなく、Productionへのmigration/試験書込みは行っていない。ローカル画面試験はブラウザ実行環境の準備失敗で未実施。追加semantic resolver呼出しの実latency/costと実モデル誤判定もPreviewで確認が必要。Production実機の復活防止確認はさらにレビュー・適用承認後の工程であり未完了。

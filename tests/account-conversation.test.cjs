@@ -56,11 +56,13 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name.endsWith('/supabase')) return { supabase: client };
       if (name.endsWith('/canonical-state')) return {
         createServerSupabase: () => client,
+        forgetControlPayload: async () => 'encrypted-forget-control-fixture',
         openTemporaryState: token => token === 'verified' ? { state: { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 } } : null,
         loadTemporaryRoot: async (_id, token) => token === 'verified' ? { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 }
           : { memory: [], history: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0 },
         sealTemporaryState: () => 'verified',
       };
+      if (name.endsWith('/_shared/forget-control')) return {};
       if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');
       throw Error(name);
     };
@@ -104,7 +106,7 @@ test('maintenance checkpoint response keeps email unsent and displays maintenanc
 });
 
 for (const failedEmail of [true, false]) test(`${failedEmail ? 'failed email send' : 'pending confirmation'}: saveByEmail retry preserves additional server conversation`, async () => {
-  const server = require('./server-canonical.test.cjs').harness({ anonymous: true });
+  const server = require('./helpers/canonical-harness.cjs').harness({ anonymous: true });
   const chat = server.load('app/api/chat/route.ts'), api = server.load('app/api/persona/history/route.ts');
   const first = await (await chat.POST(server.request())).json();
   const h = harness(server.user, { [ownerKey]: server.user.id }, { 'misaki-temporary-state-v1': first.temporaryState });

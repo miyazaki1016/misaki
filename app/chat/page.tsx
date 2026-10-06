@@ -1024,7 +1024,7 @@ export default function ChatPage() {
     const expectedOwner = owner.session?.user.id;
     const response = await fetch("/api/persona/history", {
       method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ action, value, temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY) }),
+      body: JSON.stringify({ action, value, requestId: crypto.randomUUID(), temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY) }),
     });
     if (!response.ok) {
       const result = await response.json().catch(() => null);
@@ -1044,7 +1044,7 @@ export default function ChatPage() {
     } catch (error) { setSendError((error as Error).message); }
   }
   async function deleteMemory(index: number) {
-    if (!window.confirm("この記憶を削除しますか？")) return;
+    if (!window.confirm("この記憶を美咲から削除しますか？")) return;
     try { await changeStoredState("deleteMemory", memory[index]); }
     catch (error) { setSendError((error as Error).message); }
   }

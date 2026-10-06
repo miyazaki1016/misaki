@@ -1,6 +1,7 @@
 import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
-import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from "../../../../lib/canonical-state";
+import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot, forgetControlPayload } from "../../../../lib/canonical-state";
+import { createForgetJudge, identifyForgetTargets, addForgetControls } from "../../../../supabase/functions/_shared/forget-control";
 
 async function authenticate(request: Request) {
   const token = request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
         p_today_memory: state.todayMemory, p_points: state.relationshipPoints,
         p_relationship: state.temporaryRelationship ?? null,
         p_expected_revision: state.temporaryRevision ?? null,
+        p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),
       });
       if (error) {
         console.error("EMAIL CHECKPOINT ERROR", {
@@ -87,14 +89,28 @@ export async function POST(request: Request) {
       (body.action === "deleteMemory" && typeof body.value !== "string")) {
       return Response.json({ error: "Explicit state operation required." }, { status: 400 });
     }
+    const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
+    const requestId = typeof body.requestId === "string" && /^[0-9a-f-]{36}$/i.test(body.requestId) ? body.requestId : crypto.randomUUID();
+    if (body.action !== "clearHistory") {
+      const items = body.action === "clearMemory" ? state.memory : state.memory.filter(item => item === body.value);
+      const judge = createForgetJudge(process.env.GEMINI_API_KEY!);
+      let controls = state.forgetControls ?? [];
+      for (const item of items) {
+        const targets = await identifyForgetTargets("UI explicitly deletes all facts in this item", [{ text: item }], judge);
+        if (!targets.length) throw new Error("Memory deletion target could not be safely identified");
+        controls = await addForgetControls(controls, targets.map(t => ({ ...t, scope: "fact" as const })), "hard_delete", requestId, new Date().toISOString(), `${process.env.SUPABASE_SERVICE_ROLE_KEY}:${user.id}`);
+      }
+      state.forgetControls = controls;
+    }
     if (user.is_anonymous) {
-      const state = await loadTemporaryRoot(user.id, body.temporaryState);
       if (body.action === "clearHistory") state.history = [];
       else state.memory = body.action === "clearMemory" ? [] : state.memory.filter(item => item !== body.value);
       return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });
     }
     const { error } = await createServerSupabase().rpc("edit_misaki_conversation_state", {
       p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,
+      p_expected_updated_at: state.updatedAt ?? null,
+      p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),
     });
     if (error) throw new Error("Conversation edit failed");
     return Response.json(responseState(await loadCanonicalState(user.id)));
