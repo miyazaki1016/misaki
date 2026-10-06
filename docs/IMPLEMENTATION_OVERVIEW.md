@@ -3184,3 +3184,13 @@ PRはDraftを維持。merge/Production migration/Edge適用なし。実モデル
 
 #### Batch resolver比較検証（2026-10-07 JST / 検証専用）
 本番3-call化は未実施。`tests/forget-batch-evaluate.ts` に同一fixtureの現行/batch両arm比較と実usage/latency取得用live transportを追加。20シナリオのscripted比較と不正応答のfail-closed検証を実施した。barrier/provenanceは現行policyからサーバー側で取得し、reofferは独立callを維持。cache、Relationship Engine、DB schema、Forget semantics、再学習条件、atomic commitは変更なし。結果/全不一致分類は [batch検証報告](../tests/reports/forget-batch-evaluation.md) と `tests/reports/forget-batch-scripted.json` に保存。実Geminiキー未設定でtokens/latencyは未測定、意味判定同等性は未証明。Draft/merge禁止/Production未適用を継続する。
+
+#### 実Gemini Shadow検証の停止・性能最適化の分離（2026-10-07 JST / オーナー承認）
+
+**test doubleによる構造検証は完了しているが、実Gemini Shadow比較は未実施。GEMINI_API_KEY/環境設定不足、およびcanonical非書込みShadow入口が存在しないため。実モデルの精度・token・latency・費用は未測定。したがって現行resolverから3-call batch版への置換は禁止。** 通常chat APIはcanonical commitを伴うため、Shadow検証の代用として実行しない。
+
+構造検証は20シナリオ、検証専用テスト23/23、UTC/JST各全回帰284/284成功。不一致3件と「両者一致だが両方誤り」の人工ケースを分類済。ただし部分一致・人物事実節でbatch側だけ期待結果に一致した結果はtest doubleの比較であり、実モデルの優劣・意味判定同等性・安全性の証明ではない。
+
+性能最適化はForget Control本体から分離する。**PR #66では現行resolverを維持し、batch化コードを本番経路へ接続しない。** 既存batchコードは検証専用のままとし、cacheも導入しない。将来、canonical非書込みのShadow環境と実Gemini認証を用意したうえで、別PRで実Gemini比較→全不一致の人間判定→採否判断を行う。Shadow結果はcanonical DB、Forget Control、reply、memory、Today Memory、persona、Relationship Engineへ反映しない。
+
+現在位置は総覧更新後の停止。PR #66はDraft・未merge、Production migration/Next/Edge適用なし。Forget Control全体のPreview/Production実機受入は引き続き未完了で、完成扱いしない。
