@@ -19,3 +19,16 @@ test("anonymous critical identity resolution is not conditional on a Pattern res
   const between=runtime.slice(applyIndex,identityIndex);
   assert.doesNotMatch(between,/appliedPatterns|Pattern|pattern/);
 });
+
+test("identity feature gate keeps permanent worker and anonymous resolver off",()=>{
+  assert.match(runtime,/if \(identityEnabled\(\)\) await processPermanentIdentity\(userId\);/);
+  assert.match(runtime,/if \(identityEnabled\(\) && snapshot\.version !== turnStartVersion\)/);
+});
+
+test("identity feature gate off preserves legacy v2 temporary import",()=>{
+  const gate=runtime.indexOf("if (!identityEnabled()) {");
+  const v2=runtime.indexOf('db.rpc("import_misaki_temporary_relationship_v2"',gate);
+  const returnIndex=runtime.indexOf("return;",v2);
+  const v3=runtime.indexOf('db.rpc("import_misaki_temporary_relationship_v3"',gate);
+  assert.ok(gate>=0&&v2>gate&&returnIndex>v2&&v3>returnIndex);
+});
