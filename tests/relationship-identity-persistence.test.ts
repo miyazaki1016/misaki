@@ -35,3 +35,10 @@ test("temporary identity import resets anonymous candidate versions and remaps a
  assert.match(sql,/null,0,null,[\s\n]*p_constraint_state,case when p_constraint_state='none' then null else v_source_version end/);
  assert.match(sql,/candidate_identity=null,[\s\n]*candidate_confirmations=0,candidate_source_version=null/);
 });
+
+test("temporary identity import records an immutable canonical transition",()=>{
+ const sql=readFileSync("supabase/migrations/20261007070000_relationship_identity_v1_atomic_temporary_import.sql","utf8");
+ assert.match(sql,/insert into public\.misaki_relationship_identity_transitions/);
+ assert.match(sql,/'canonical_override','temporary_checkpoint_import'/);
+ assert.match(sql,/coalesce\(v_identity_before,'\{\}'::jsonb\),v_identity_after/);
+});
