@@ -55,6 +55,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
         candidateConfirmations: resolved.candidateConfirmations,
         candidateSourceVersion: resolved.candidateSourceVersion,
         constraint: resolved.constraint,
+        constraintAnchorVersion: resolved.constraintAnchorVersion,
         preRomanticIdentity: resolved.preRomanticIdentity
       } };
     }
@@ -139,7 +140,7 @@ export async function importPermanentRelationship(userId: string, requestId: str
     p_engine_version: PROCESSING_VERSION, p_payload: snapshot,
     p_primary_identity: identity.primaryIdentity, p_candidate_identity: identity.candidateIdentity ?? null,
     p_candidate_confirmations: identity.candidateConfirmations ?? 0, p_candidate_source_version: identity.candidateSourceVersion ?? null,
-    p_constraint_state: identity.constraint ?? "none", p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
+    p_constraint_state: identity.constraint ?? "none", p_constraint_anchor_version: identity.constraintAnchorVersion ?? null, p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
     p_resolver_version: IDENTITY_RESOLVER_VERSION });
   if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? ""}:${rpcError.message ?? ""}`);
 }
@@ -178,6 +179,7 @@ async function processPermanentIdentity(userId: string) {
     candidateConfirmations:Number(saved.candidate_confirmations ?? 0),
     candidateSourceVersion:saved.candidate_source_version == null ? null : Number(saved.candidate_source_version),
     constraint:saved.constraint_state as RelationshipConstraint,
+    constraintAnchorVersion:saved.constraint_anchor_version == null ? null : Number(saved.constraint_anchor_version),
     preRomanticIdentity:saved.pre_romantic_identity as Exclude<RelationshipIdentity,"lover">|null
   } : undefined;
 
@@ -196,7 +198,7 @@ async function processPermanentIdentity(userId: string) {
     p_resolver_version:IDENTITY_RESOLVER_VERSION,p_primary_identity:resolved.primaryIdentity,
     p_candidate_identity:resolved.candidateIdentity,p_candidate_confirmations:resolved.candidateConfirmations,
     p_candidate_source_version:resolved.candidateSourceVersion,p_constraint_state:resolved.constraint,
-    p_pre_romantic_identity:resolved.preRomanticIdentity,p_transition_decision:resolved.transitionDecision,p_reason_code:resolved.reasonCode
+    p_constraint_anchor_version:resolved.constraintAnchorVersion,p_pre_romantic_identity:resolved.preRomanticIdentity,p_transition_decision:resolved.transitionDecision,p_reason_code:resolved.reasonCode
   });
   if (applyError) {
     if (/stale_relationship_state_version/.test(applyError.message ?? "")) return; // a newer canonical state won; retry from it later.
