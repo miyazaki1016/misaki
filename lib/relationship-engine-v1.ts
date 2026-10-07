@@ -25,6 +25,7 @@ export type Snapshot = {
   identity?: IdentityState;
 };
 export function engineEnabled() { return process.env.MISAKI_RELATIONSHIP_ENGINE_VERSION === PROCESSING_VERSION; }
+export function identityEnabled() { return engineEnabled() && process.env.MISAKI_RELATIONSHIP_IDENTITY_VERSION === "relationship-identity-v1"; }
 export function hash(text: string) { return createHash("sha256").update(text).digest("hex"); }
 
 /** Fail closed: the model supplies observations, never score/status/delta. */
