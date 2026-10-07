@@ -9,7 +9,7 @@ create or replace function public.import_misaki_temporary_relationship_v3(
  p_constraint_state text,p_constraint_anchor_version bigint,p_pre_romantic_identity text,p_resolver_version text
 ) returns jsonb language plpgsql security invoker set search_path='' as $$
 declare
- v_checkpoint_id bigint; v_existing jsonb; v_after jsonb; v_identity_after jsonb; v_now timestamptz:=clock_timestamp();
+ v_checkpoint_id bigint; v_existing jsonb; v_after jsonb; v_identity_before jsonb; v_identity_after jsonb; v_now timestamptz:=clock_timestamp();
  v_source_version bigint;
 begin
  if p_engine_version<>p_processing_version then raise exception 'relationship_processing_version_mismatch'; end if;
@@ -39,6 +39,8 @@ begin
  perform 1 from public.misaki_relationship_state where user_id=p_user_id for update;
  if exists(select 1 from public.misaki_relationship_state_applications where user_id=p_user_id) then raise exception 'v1_state_already_processed'; end if;
 
+ select to_jsonb(s) into v_identity_before from public.misaki_relationship_identity_state s where user_id=p_user_id for update;
+
  update public.misaki_relationship_state set
    friendship_score=p_friendship,trust_score=p_trust,playfulness_score=p_playfulness,affection_score=p_affection,romance_score=p_romance,
    relationship_status=p_relationship_status,relationship_state_version=relationship_state_version+1,
@@ -61,6 +63,15 @@ begin
    identity_version=misaki_relationship_identity_state.identity_version+1,resolver_version=excluded.resolver_version,
    source_relationship_state_version=excluded.source_relationship_state_version,updated_at=v_now
  returning to_jsonb(misaki_relationship_identity_state.*) into v_identity_after;
+
+ insert into public.misaki_relationship_identity_transitions(
+   user_id,source_relationship_state_version,resolver_version,from_identity,to_identity,
+   transition_decision,reason_code,before_state,after_state
+ ) values(
+   p_user_id,v_source_version,p_resolver_version,
+   coalesce(v_identity_before->>'primary_identity',p_primary_identity),p_primary_identity,
+   'canonical_override','temporary_checkpoint_import',coalesce(v_identity_before,'{}'::jsonb),v_identity_after
+ ) on conflict(user_id,source_relationship_state_version,resolver_version) do nothing;
 
  insert into public.misaki_relationship_temporary_v1_imports(user_id,checkpoint_event_id,source_revision,relationship_payload)
  values(p_user_id,v_checkpoint_id,p_source_revision,coalesce(p_payload,'{}'::jsonb)||jsonb_build_object(
