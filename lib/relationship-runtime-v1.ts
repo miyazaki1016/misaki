@@ -40,14 +40,18 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     await check?.();
     const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink("relationship_analyzer", telemetryUserId, turn.requestId));
     await check?.();
+    const preEvidenceVersion=snapshot.version;
+    const preEvidenceRomance=snapshot.state.romance;
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
+    const hasNewRomancePattern=snapshot.version>preEvidenceVersion && snapshot.state.romance>preEvidenceRomance;
     if (identityEnabled() && snapshot.version !== turnStartVersion) {
       const latestCritical = snapshot.criticalEvents?.filter(e => e.request_id === turn.requestId).at(-1)?.event_type ?? null;
       const resolved = resolveRelationshipIdentity({
         relationshipStateVersion: snapshot.version,
         state: snapshot.state,
         current: snapshot.identity,
-        criticalEvent: latestCritical==="romantic_proposal"?null:latestCritical
+        criticalEvent: latestCritical==="romantic_proposal"?null:latestCritical,
+        hasNewRomancePattern
       });
       snapshot = { ...snapshot, identity: {
         primaryIdentity: resolved.primaryIdentity,
@@ -56,6 +60,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
         candidateSourceVersion: resolved.candidateSourceVersion,
         constraint: resolved.constraint,
         constraintAnchorVersion: resolved.constraintAnchorVersion,
+        romanceReentryVersion: resolved.romanceReentryVersion,
         preRomanticIdentity: resolved.preRomanticIdentity
       } };
     }
