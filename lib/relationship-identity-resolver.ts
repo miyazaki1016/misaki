@@ -51,8 +51,6 @@ function adjacentTarget(current:RelationshipIdentity,target:RelationshipIdentity
  if(current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
  const local=neighbors[current].filter(id=>gates[id](s)).map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
  // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers a supported neighbor.
- const targetDistance=distance(s,centers[target]);
- if(targetDistance<=.015) return target;
  return local[0]?.[0]??target;
 }
 export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
