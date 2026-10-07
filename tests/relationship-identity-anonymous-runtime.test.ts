@@ -32,3 +32,25 @@ test("identity feature gate off preserves legacy v2 temporary import",()=>{
   const v3=runtime.indexOf('db.rpc("import_misaki_temporary_relationship_v3"',gate);
   assert.ok(gate>=0&&v2>gate&&returnIndex>v2&&v3>returnIndex);
 });
+
+
+test("permanent identity worker carries romance reentry provenance end to end",()=>{
+  const start=runtime.indexOf("async function processPermanentIdentity");
+  assert.ok(start>=0);
+  const worker=runtime.slice(start);
+  assert.match(worker,/romanceReentryVersion:saved\.romance_reentry_version == null \? null : Number\(saved\.romance_reentry_version\)/);
+  assert.match(worker,/hasNewRomancePattern=false/);
+  assert.match(worker,/romance_delta/);
+  assert.match(worker,/hasNewRomancePattern=true/);
+  assert.match(worker,/current,criticalEvent,hasNewRomancePattern/);
+  assert.match(worker,/p_romance_reentry_version:resolved\.romanceReentryVersion/);
+});
+
+test("anonymous identity snapshot persists romance reentry provenance",()=>{
+  const start=runtime.indexOf("async function analyzeTemporarySnapshot");
+  const end=runtime.indexOf("async function runAnonymous",start);
+  const anonymous=runtime.slice(start,end);
+  assert.match(anonymous,/const hasFreshRomanceProvenance=snapshot\.version>preEvidenceVersion && snapshot\.state\.romance>preEvidenceRomance/);
+  assert.match(anonymous,/hasNewRomancePattern:hasFreshRomanceProvenance/);
+  assert.match(anonymous,/romanceReentryVersion: resolved\.romanceReentryVersion/);
+});
