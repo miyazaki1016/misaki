@@ -41,7 +41,7 @@ test("permanent identity worker carries romance reentry provenance end to end",(
   assert.match(worker,/romanceReentryVersion:saved\.romance_reentry_version == null \? null : Number\(saved\.romance_reentry_version\)/);
   assert.match(worker,/hasNewRomancePattern=false/);
   assert.match(worker,/romance_delta/);
-  assert.match(worker,/hasNewRomancePattern=true/);
+  assert.match(worker,/hasNewRomancePattern=Number\(application\?\.after_state\?\.relationship_state_version\)[\s\S]*Number\(application\?\.romance_delta \?\? 0\)>0/);
   assert.match(worker,/current,criticalEvent,hasNewRomancePattern/);
   assert.match(worker,/p_romance_reentry_version:resolved\.romanceReentryVersion/);
 });
