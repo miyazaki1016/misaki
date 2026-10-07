@@ -3120,3 +3120,23 @@ UI×についても同じC/Dを確認する。ただし「履歴から完全消�
 Shared Memory table/生成/検索、Memory 30件上限変更、Life Fact全面migration、Memory modal化、scroll jump修正、Relationship Engine変更、新6段階/5-heart UI、人物設定/自己開示は別工程。
 
 **Workへ:** まず最新mainと本総覧を読み、実装前に現行 `app/api/chat/route.ts`、`app/api/persona/history/route.ts`、canonical root RPC/migration、匿名root保存、Body Clock memory参照経路を再照合すること。総覧と実装が食い違えば勝手に合わせず、差分を報告してから施工する。
+
+
+---
+
+### 将来構想メモ — Misaki World / 複数キャラクター（2026-10-07・アイデア段階 / 未実装）
+
+Relationship Engine / Relationship Identity を、美咲ひとりに閉じた仕組みにせず、将来は複数の女の子が同じ世界に存在できる余地を残す。
+
+構想例:
+- 関係状態は将来的に `user × character` 単位へ一般化できる設計を意識する。
+- ユーザーは美咲と仲良くなる・恋人になる・別れるだけでなく、別キャラクターと別の関係を育てられる可能性がある。
+- 過去の関係は消去せず歴史として残り、元恋人・親友・相棒など、そのキャラクターとの積み重ねを将来の会話へ自然に反映できる余地を持たせる。
+- 将来拡張する場合は、二者間の `Relationship`、世界で起きている事実の `World State`、各キャラクターが何を知っているかの `Character Memory` を混同しない。
+- 現行v1の実装対象はあくまで美咲一人。複数キャラクター、キャラクター間認知、嫉妬・交際競合等は今回実装しない。
+- ただしRelationship Identity等の新設計を「Misakiという固有キャラクターしか存在できない」形へ不要にベタ書きしない。
+
+#### 恋愛Statusの境界メモ
+恋人は5軸の数値だけでは成立・解消しない。交際成立・別れは会話から確定するCanonical Event / Statusとして扱う。現時点では婚姻のような現実世界の排他的な社会契約をStatusとして実装しない。プロポーズ等の会話そのものは将来の大きな共有出来事になり得るが、`spouse` 等のStatus追加は未決・未実装。
+
+> **位置づけ:** これはロードマップ確定事項ではなく「総覧の端に残す将来構想」。まず美咲一人でRelationship Engine → Identity → 明示的な交際成立 → 関係継続 / 別れまでを完成させる。将来横展開するときに、現在の設計が拡張を不必要に阻害しないための設計メモとして保持する。
