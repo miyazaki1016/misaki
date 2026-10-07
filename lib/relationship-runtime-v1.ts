@@ -196,6 +196,7 @@ async function processPermanentIdentity(userId: string) {
     candidateSourceVersion:saved.candidate_source_version == null ? null : Number(saved.candidate_source_version),
     constraint:saved.constraint_state as RelationshipConstraint,
     constraintAnchorVersion:saved.constraint_anchor_version == null ? null : Number(saved.constraint_anchor_version),
+    romanceReentryVersion:saved.romance_reentry_version == null ? null : Number(saved.romance_reentry_version),
     preRomanticIdentity:saved.pre_romantic_identity as Exclude<RelationshipIdentity,"lover">|null
   } : undefined;
 
@@ -206,7 +207,7 @@ async function processPermanentIdentity(userId: string) {
       playfulness:Number(relationship.playfulness_score),affection:Number(relationship.affection_score),
       romance:Number(relationship.romance_score),relationshipStatus:relationship.relationship_status
     },
-    current,criticalEvent
+    current,criticalEvent,hasNewRomancePattern
   });
 
   const { error: applyError } = await db.rpc("apply_misaki_relationship_identity_v1",{
@@ -214,7 +215,7 @@ async function processPermanentIdentity(userId: string) {
     p_resolver_version:IDENTITY_RESOLVER_VERSION,p_primary_identity:resolved.primaryIdentity,
     p_candidate_identity:resolved.candidateIdentity,p_candidate_confirmations:resolved.candidateConfirmations,
     p_candidate_source_version:resolved.candidateSourceVersion,p_constraint_state:resolved.constraint,
-    p_constraint_anchor_version:resolved.constraintAnchorVersion,p_pre_romantic_identity:resolved.preRomanticIdentity,p_transition_decision:resolved.transitionDecision,p_reason_code:resolved.reasonCode
+    p_constraint_anchor_version:resolved.constraintAnchorVersion,p_romance_reentry_version:resolved.romanceReentryVersion,p_pre_romantic_identity:resolved.preRomanticIdentity,p_transition_decision:resolved.transitionDecision,p_reason_code:resolved.reasonCode
   });
   if (applyError) {
     if (/stale_relationship_state_version/.test(applyError.message ?? "")) return; // a newer canonical state won; retry from it later.
