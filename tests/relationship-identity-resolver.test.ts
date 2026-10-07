@@ -108,3 +108,19 @@ test("boundary constraint blocks romance reentry even with a new romance pattern
  assert.notEqual(r.candidateIdentity,"special_person");
  assert.notEqual(r.candidateIdentity,"person_of_interest");
 });
+
+test("fresh romance provenance remains available across later non-romance canonical updates",()=>{
+ const state={friendship:78,trust:82,playfulness:50,affection:85,romance:75,relationshipStatus:"none" as const};
+ const first=resolveRelationshipIdentity({relationshipStateVersion:11,state,current:{primaryIdentity:"friend",constraint:"post_rejection",constraintAnchorVersion:10},hasNewRomancePattern:true});
+ assert.equal(first.romanceReentryVersion,11);
+ assert.ok(first.candidateIdentity==="special_person"||first.candidateIdentity==="person_of_interest");
+ const second=resolveRelationshipIdentity({relationshipStateVersion:12,state,current:first,hasNewRomancePattern:false});
+ assert.equal(second.romanceReentryVersion,11);
+ assert.ok(second.primaryIdentity==="special_person"||second.primaryIdentity==="person_of_interest");
+});
+test("new rejection resets prior romance reentry provenance",()=>{
+ const state={friendship:78,trust:82,playfulness:50,affection:85,romance:75,relationshipStatus:"none" as const};
+ const result=resolveRelationshipIdentity({relationshipStateVersion:20,state,current:{primaryIdentity:"friend",constraint:"post_rejection",constraintAnchorVersion:10,romanceReentryVersion:11},criticalEvent:"romantic_rejection"});
+ assert.equal(result.romanceReentryVersion,null);
+ assert.equal(result.candidateIdentity,null);
+});
