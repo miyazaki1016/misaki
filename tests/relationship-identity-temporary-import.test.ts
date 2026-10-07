@@ -1,5 +1,5 @@
 import test from "node:test"; import assert from "node:assert/strict"; import fs from "node:fs";
-const sql=fs.readFileSync(new URL("../supabase/migrations/20261007070000_relationship_identity_v1_atomic_temporary_import.sql",import.meta.url),"utf8");
+const sql=fs.readFileSync(new URL("../supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql",import.meta.url),"utf8");
 test("temporary import materializes relationship and identity in one RPC transaction",()=>{
  assert.match(sql,/update public\.misaki_relationship_state/);
  assert.match(sql,/insert into public\.misaki_relationship_identity_state/);

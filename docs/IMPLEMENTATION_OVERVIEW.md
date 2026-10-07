@@ -3493,7 +3493,7 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 
 ### Relationship Identity v1 — PR #67 migration順序・resolver総監査（2026-10-07）
 
-**状態:** `work/relationship-identity-v1` / [Draft PR #67](https://github.com/miyazaki1016/misaki/pull/67)。コード監査・修正・自動検証まで実施。mergeしていない。Production migration / deploy / env変更は行っていない。PR #66 Forget Controlは変更・混入していない。以下は上の「実装前・コード未実装」handoffに対する現在の施工記録であり、古い施工前ステータスを現在状態と読み違えないこと。
+**状態:** `work/relationship-identity-v1` / [Draft PR #67](https://github.com/miyazaki1016/misaki/pull/67)。**Production適用済み・Identity gate OFF**。Production migration履歴は `20261007114143 / 20261007114154 / 20261007114158 / 20261007114201`。PRはDraftのまま、merge禁止・gate ON禁止。今回の作業は適用済み履歴へのファイル名整合と総覧・テスト参照更新のみで、Production操作は行わない。PR #66 Forget Controlは変更・混入していない。以下は上の「実装前・コード未実装」handoffに対する現在の施工記録であり、古い施工前ステータスを現在状態と読み違えないこと。
 
 #### 再照合した正本・施工境界
 
@@ -3501,7 +3501,7 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - 施工開始branch HEAD: `2b97931217ab816018d70ddc63d0f764bb8bf276`。コード修正commit: `555d35bc19e7003dd9b051d02762b4bdfac1b192`。
 - 本総覧のRelationship Identity handoff / canonical persistence、現行resolver / permanent・anonymous runtime / canonical read / Acting Guide / chat接続、Relationship schema・Engine migrationsとcommit historyを照合した。
 - 070000の復元正本は `c769243c557f9a79eaef0a60821208b3a28fd0e1^` のファイル内容。復元後にbyte一致を確認した。
-- Production migration一覧をread-onlyで確認し、Identityの064000 / 070000 / 083000が未適用であることを確認した。この未適用branch内のmigration訂正であり、適用済みProduction履歴を修復・改変していない。
+- 前回監査時点ではIdentity migrationは未適用だった。その後owner指示によりProduction適用済み。今回ownerから提示されたProduction履歴に4本のファイル名を整合する。SQL本文は全4本とも監査済みcommit `636c3fd` とbyte一致し、Production履歴・DB・gateは変更しない。
 - 既存11 Primary Identities、classifier centers / gates / distance weights、distinct-version 2回confirmation、critical-event precedence、constraintの意味論を維持。仮classifier値を本工事で新しくfreezeしていない。
 - Relationship Engine v1.1のAnalyzer / Interpreter / Evidence → Episode → Pattern → State、3独立Tokyo日Pattern、5軸delta計算、relationship_status、oldest-first、START_AT、fail-closed、retry、lease・processing ledgerを変更していない。mainとの差分でEngine単体は既存PRのIdentity型・feature gate追加のみ、processing / analyzer / Supabase Functionsに今回の差分なし。
 
@@ -3520,10 +3520,10 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 
 | 順序 | migration | その時点の状態 |
 | --- | --- | --- |
-| 1 | `20261007064000_relationship_identity_v1_canonical.sql` | Identity current-state / transition ledger / 12引数apply。既存ファイルを変更せず保持 |
-| 2 | `20261007070000_relationship_identity_v1_atomic_temporary_import.sql` | provenance列不要の21引数temporary import v3。指定commit前の内容へ復元 |
-| 3 | `20261007083000_relationship_identity_v1_romance_reentry_provenance.sql` | provenance列と13引数apply。旧12引数はrevoke後DROP。旧temporary importはまだ呼出し可能 |
-| 4 | `20261007085726_relationship_identity_v1_temporary_import_romance_provenance.sql` | boolean fact対応の22引数import v3。旧21引数はrevoke後DROP |
+| 1 | `20261007114143_relationship_identity_v1_canonical.sql` | Identity current-state / transition ledger / 12引数apply。既存ファイルを変更せず保持 |
+| 2 | `20261007114154_relationship_identity_v1_atomic_temporary_import.sql` | provenance列不要の21引数temporary import v3。指定commit前の内容へ復元 |
+| 3 | `20261007114158_relationship_identity_v1_romance_reentry_provenance.sql` | provenance列と13引数apply。旧12引数はrevoke後DROP。旧temporary importはまだ呼出し可能 |
+| 4 | `20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql` | boolean fact対応の22引数import v3。旧21引数はrevoke後DROP |
 
 最終schemaに旧12引数apply / 旧21引数importを残さない。新RPCにdefault引数は付けず、旧signatureの暗黙選択を許可しない。
 
@@ -3561,18 +3561,24 @@ SQL統合テストは空のPGliteに最低限のAuth / legacy参照fixtureを作
 
 #### 残存リスク・未解決事項
 
-- PGliteはsingle-session。row lockingは実RPC定義のlock順とtransaction契約を確認したが、複数DBセッションのlock待機・競合試験は未実施。既存Engineのlease挙動を変更していないこととは別に、Production前に隔離Postgresで競合確認が必要。
+- PGliteはsingle-session。row lockingは実RPC定義のlock順とtransaction契約を確認したが、複数DBセッションのlock待機・競合試験は未実施。既存Engineのlease挙動を変更していないこととは別に、Identity gate有効化前に隔離Postgresで競合確認が必要。
 - リポジトリは初期Supabase schemaの完全なmigration履歴を収録しておらず、legacyに同一timestampのmigrationもある。今回の「最初から適用成功」は**明示した隔離baseline + tracked Relationship migrations + Identity全4本**である。アプリ全体の空Supabase `db reset` 成功を主張しない。過去の全migration履歴を本scopeで推測修復していない。
-- 既存 `tests/*.rollback.sql` を完全なSupabase実DBへ流す受入検証、および隔離Supabaseに接続したPreviewのanonymous → email → 別端末restore / retry実機受入は未実施。Production未適用のIdentityを、Productionへwriteして検証することは禁止。
-- classifier値は今回の正本HEADを維持しており、数値classifierの新freezeやconstraint解除ルールの追加はしていない。Production導入前に既存のownerレビューgateを確認する。
+- 既存 `tests/*.rollback.sql` を完全なSupabase実DBへ流す受入検証、および隔離Supabaseに接続したPreviewのanonymous → email → 別端末restore / retry実機受入は未実施。Identity migrationはProduction適用済みだがgate OFF。今回Productionへwriteして検証することは禁止。
+- classifier値は今回の正本HEADを維持しており、数値classifierの新freezeやconstraint解除ルールの追加はしていない。Identity gate有効化前に既存のownerレビューgateを確認する。
 - 全自動・CI/build成功と、Production適用可能との承認を混同しない。PR #67は引き続きDraft / merge禁止で止める。
 
-#### Production適用前に必要な手順（この工事では実行しない）
+#### Identity gate有効化前の残存受入手順（この工事では実行しない）
+
+DB migrationはProduction適用済み。以下の旧適用前チェックは残存受入事項として保持する。Productionへの4本再適用は不要・禁止。Identity gateはOFFを維持する。
 
 1. ownerがPR差分・総覧・classifier / constraintの既存承認範囲をレビューする。Draft解除 / merge / Production操作は別承認。
 2. 独立したSupabase / Postgres隔離環境に正しいlegacy baselineを用意し、既存履歴の重複・欠落を確認した上でIdentity4本を順番に適用。最終RPC signature / ACL / stale / replay / ledger / checkpoint原子性を再確認する。
 3. 別セッションでState更新とIdentity apply、同一sourceの二重apply、import競合・retryを試験し、lock待機後のstale拒否と二重ledger防止を確認する。
 4. Previewを隔離DBへ接続し、anonymous → email → 別端末restore、breakup / rejection / boundary、fresh positive Pattern → re-entry → non-romance更新 → 新critical reset、pending / 次turn反映を実機で受入。既存rollback SQL suiteも隔離環境で実施する。
-5. 初めてProduction適用を承認する際は、実DBのmigration履歴・backup / rollback方針・feature gateがoffであることを再確認し、既存Relationship Engine v1.1を変更せず4本を適用・検証してからIdentity gateの段階的有効化を別途判断する。旧overloadに依存する稼働版との整合を確認せずgateを先にonにしない。
+5. Production履歴は上記4本へ整合済み。既存Relationship Engine v1.1・backup / rollback方針・稼働版のRPC signature整合を確認し、残存受入完了後にIdentity gate有効化を別途判断する。本作業ではgate ONは禁止。
 
-**停止位置:** PR #67のコード・migration・自動検証と総覧記録まで。Production migration / deploy / env変更・mergeは未実施。Forget Control / PR #66は触らない。
+**停止位置:** Production適用済み・Identity gate OFF。PR #67はDraft・未merge。今回の変更はmigrationファイル名・テスト参照・総覧のみ。merge・gate ONは禁止。Forget Control / PR #66は触らない。
+
+#### Production履歴へのファイル名整合（2026-10-07）
+
+1本目はcommit `2eb4b90` で新名ファイルが追加されたが旧名も残っていたため、内容一致を確認して重複を解消し `git mv` で旧名を除去。残り3本も `git mv` し、4本すべて監査済みcommit `636c3fd` のSQL本文とbyte一致を確認。SQL内の旧timestampを含むコメントも変更しない。テストのファイル参照のみ新名称へ更新する。ローカルUTC full suite 320件・tsc・Next build成功。全CIの最終結果はPRの最新HEADに紐づくchecksを正本とする。
