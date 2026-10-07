@@ -11,6 +11,7 @@ create table if not exists public.misaki_relationship_identity_state (
   candidate_source_version bigint,
   constraint_state text not null default 'none'
     check (constraint_state in ('none','post_breakup','post_rejection','boundary')),
+  constraint_anchor_version bigint,
   pre_romantic_identity text
     check (pre_romantic_identity is null or pre_romantic_identity in ('acquaintance','conversation_partner','friend','compatible_friend','trusted_friend','partner_in_crime','best_friend','important_person','person_of_interest','special_person')),
   identity_since timestamptz not null default clock_timestamp(),
@@ -50,6 +51,7 @@ create or replace function public.apply_misaki_relationship_identity_v1(
  p_candidate_confirmations integer,
  p_candidate_source_version bigint,
  p_constraint_state text,
+ p_constraint_anchor_version bigint,
  p_pre_romantic_identity text,
  p_transition_decision text,
  p_reason_code text
@@ -85,11 +87,11 @@ begin
 
  insert into public.misaki_relationship_identity_state(
    user_id,primary_identity,candidate_identity,candidate_confirmations,candidate_source_version,
-   constraint_state,pre_romantic_identity,identity_since,identity_version,resolver_version,
+   constraint_state,constraint_anchor_version,pre_romantic_identity,identity_since,identity_version,resolver_version,
    source_relationship_state_version,updated_at
  ) values(
    p_user_id,p_primary_identity,p_candidate_identity,p_candidate_confirmations,p_candidate_source_version,
-   p_constraint_state,p_pre_romantic_identity,v_now,1,p_resolver_version,p_source_relationship_state_version,v_now
+   p_constraint_state,p_constraint_anchor_version,p_pre_romantic_identity,v_now,1,p_resolver_version,p_source_relationship_state_version,v_now
  )
  on conflict(user_id) do update set
    primary_identity=excluded.primary_identity,
@@ -97,6 +99,7 @@ begin
    candidate_confirmations=excluded.candidate_confirmations,
    candidate_source_version=excluded.candidate_source_version,
    constraint_state=excluded.constraint_state,
+   constraint_anchor_version=excluded.constraint_anchor_version,
    pre_romantic_identity=excluded.pre_romantic_identity,
    identity_since=case when misaki_relationship_identity_state.primary_identity<>excluded.primary_identity then v_now else misaki_relationship_identity_state.identity_since end,
    identity_version=misaki_relationship_identity_state.identity_version+1,
@@ -118,5 +121,5 @@ begin
  return jsonb_build_object('replayed',false,'state',v_after);
 end $$;
 
-revoke execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,text,text,text) from public,anon,authenticated;
-grant execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,text,text,text) to service_role;
+revoke execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,text,text,text) from public,anon,authenticated;
+grant execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,text,text,text) to service_role;
