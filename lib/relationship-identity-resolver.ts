@@ -72,7 +72,7 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
   return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
  const hasPostAnchorState=constraint==="none"||constraintAnchorVersion==null||input.relationshipStateVersion>constraintAnchorVersion;
  const rawNext=hasPostAnchorState?candidate(input.state,constraint):null;
- const next=rawNext?adjacentTarget(cur.primaryIdentity,rawNext,input.state):null;
+ // Adjacency shapes ordinary growth. Post-constraint rebuilding is already guarded by the anchor, romance block, and two distinct canonical confirmations, so do not distort its safe non-romantic candidate through the ordinary graph.\n const next=rawNext?(constraint==="none"?adjacentTarget(cur.primaryIdentity,rawNext,input.state):rawNext):null;
  if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
  const sameCandidate=cur.candidateIdentity===next;
  const sameSource=sameCandidate&&cur.candidateSourceVersion===input.relationshipStateVersion;
