@@ -49,9 +49,9 @@ const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<Re
 };
 function adjacentTarget(current:RelationshipIdentity,target:RelationshipIdentity,s:AxisState){
  if(current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
- const local=neighbors[current].filter(id=>gates[id](s));
- // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers a supported neighbor.
- return local[0]??target;
+ const local=neighbors[current].filter(id=>gates[id](s)).map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
+ // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers the supported neighbor closest to the canonical shape.
+ return local[0]?.[0]??target;
 }
 export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
  const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");
