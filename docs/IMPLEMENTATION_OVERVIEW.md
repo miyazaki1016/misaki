@@ -3354,3 +3354,136 @@ Acting Guideは従来どおり「演技方向」であり台詞ではない。Id
 Relationship IdentityはPR #66とは別PRにする。Workはまず最新main・本総覧・Relationship schema/migrations・`relationship-runtime-v1.ts`・`relationship-processing-v1.ts`・`relationship-acting-guide.ts`・chat接続点を再照合する。DDL/閾値を独断freezeしない。
 
 **現在位置:** Identityの意味論・precedence・履歴/hysteresis・breakup/rejection方針・Resolver I/Oまで実装前仕様化。次は現行DB schema/RPCとの突き合わせ → 最小canonical persistence案 → Work施工範囲確定。Productionは未変更。
+
+
+#### Relationship Identity v1 — canonical persistence / Work施工境界（2026-10-07）
+
+現行Relationship schema/RPC/runtimeとの再照合結果から、Identityは `misaki_relationship_state` へ列追加して混在させず、**既存Relationship Engineのcanonical出力を購読する独立した第二層canonical** とする。
+
+理由:
+- `misaki_relationship_state` は既に5-axis + `relationship_status` + `relationship_state_version` の正本であり、Pattern適用/critical event/import RPCがロックして更新する。
+- Identityはcurrent identity、hysteresis、constraint、transition historyという別のライフサイクルを持つ。
+- Identity失敗が5-axis State/critical eventのcanonical commitを巻き戻したり破損させてはならない。
+- 将来Identity Resolverだけをversion up/交換できる境界を保つ。
+
+##### 最小DBモデル（名称はWork実装前レビューで既存命名規約と照合）
+1. Identity current-state table（例: `misaki_relationship_identity_state`）
+   - `user_id` primary key
+   - `primary_identity`
+   - `identity_since`
+   - `identity_version`
+   - `resolver_version`
+   - `source_relationship_state_version`
+   - `constraint_state`（構造化可能な値。自由文をcanonical意味論にしない）
+   - `constraint_since` / 必要ならsource critical event id
+   - `updated_at`
+
+2. Identity transition ledger（例: `misaki_relationship_identity_transitions`）
+   - immutable/idempotent transition record
+   - `user_id`
+   - source request/event/state-version key
+   - `from_identity`
+   - `to_identity`
+   - `transition_decision`
+   - `reason_code`
+   - `resolver_version`
+   - `source_relationship_state_version`
+   - before/after identity state（監査に必要な最小構造）
+   - `created_at`
+   - 同一source/versionの再実行で二重transitionを作らないunique boundary
+
+**Traits/Awarenessはv1では原則永続化しない。** canonical 5-axis + current Identity + constraintから都度導出する。表示用説明文やGemini生成文もcanonical tableへ保存しない。
+
+##### Identity apply RPCの責務
+Identity専用RPCは次だけを行う:
+- user ownership / source canonical relationship state versionを検証
+- stale source versionを拒否または安全なreplayとして処理
+- current Identity rowをlock
+- resolverが返したtransition decisionを許可されたenum/domainとして検証
+- current state更新 + transition ledgerを同一transactionでcommit
+- idempotent replayで二重transitionを作らない
+
+Identity RPCは以下を**絶対に変更しない**:
+- friendship/trust/playfulness/affection/romance
+- `relationship_status`
+- Evidence / Episode / Pattern
+- Relationship Engine processing ledger
+- critical event validation結果
+
+また、DB RPC自身に複雑な分類ロジックを二重実装しない。Resolverの意味論はTypeScript側を主とし、DBはcanonical consistency / concurrency / idempotency boundaryを担当する。
+
+##### Resolver実行タイミング
+通常恒久ユーザー:
+1. chat成功 → canonical `chat_turn_completed`
+2. 既存Relationship Engine v1.1を従来どおり処理
+3. critical event / Pattern→Stateの処理がそのturnについて確定
+4. **確定済みcanonical relationship state/versionを読む**
+5. Relationship Identity Resolverを実行
+6. Identity専用RPCでapply
+7. 次turn以降、Reply Core/Acting GuideがそのIdentityを読む
+
+Identityをchat成功の同期クリティカルパスへ入れて、Identity失敗で成功済みchat/quotaを失敗扱いにしない。既存のafter()/retry思想に合わせ、失敗時はIdentity側を再試行可能にする。
+
+重要: Patternが無いturnでは既存State RPCはversion-only mutationをしない。Identityも毎turn無意味にversionを増やさない。canonical relationship state/event/constraintにIdentity判断上の新しい入力がない場合はno-op/replayとする。
+
+##### Critical Event
+`romantic_acceptance` / `relationship_end` 等はscore Stateより強い入力である。Identity workerは最新validated critical event/statusを入力に含める。
+
+- `romantic_acceptance` → canonical statusが `romantic_partner` ならIdentity=`恋人` をcanonical override。
+- `relationship_end` → `恋人` を即解除し、post-breakup constraintを開始。旧scoreだけで `特別な人` / `親友` へ即再分類しない。
+- `romantic_rejection` → romantic promotion suppression constraintを開始し、既存の安全な非恋愛Identity continuityを優先。
+- `boundary_event` → boundary constraintがcandidateより上位。
+- `reconciliation` はそれ自体を自動的な `romantic_partner` 復帰と同義にしない。現行critical-event semantics/status更新規則を尊重する。
+
+Constraintの解除を単純な時間経過やscore閾値だけで決めない。明示eventまたは十分な新しいcanonical関係形成を必要とする具体ルールはResolver fixtureでfreezeする。
+
+##### 匿名 / メール保存
+匿名temporary rootでもRelationship Identity continuityを保持する。Identityを恒久ユーザーだけの後付け機能にしない。
+
+- temporary Relationship SnapshotにIdentity current state/historyに必要な最小情報をversion付きで保持する。
+- 匿名中も同じpure Resolverを使う。
+- メール保存時、5-axis/statusとIdentityを同じcheckpoint由来として恒久canonicalへ一度だけmaterializeする。
+- import replayでIdentityを二重遷移させない。
+- 追加会話を含む保存再試行でもcheckpoint/source revision整合を壊さない。
+- 別端末復元後、Identityが初期値へ戻らない。
+- anonymous expiryは既存fail-closed/0戻し防止思想を維持する。
+
+既存 `import_misaki_temporary_relationship_v2` へIdentity責務を無造作に追加してRelationship Engine importを肥大化させるか、Identity専用import RPCを同じcheckpoint boundaryから呼ぶかは、migration実装前にatomicity/retry fixtureを比較して決定する。**「保存できた5軸と保存できなかったIdentity」が恒久状態として長時間残る設計は禁止。**
+
+##### Worker / ordering
+IdentityはRelationship Engineより後段。Identity処理が先行して未確定Stateを読むことを禁止する。
+
+恒久処理の概念順:
+```
+relationship turn claim/processing
+  → critical validation/apply
+  → evidence/episode/pattern/state apply
+  → relationship processing applied
+  → identity input snapshot
+  → identity resolve
+  → identity canonical apply
+```
+
+既存Relationship Engineのlease ownershipをIdentity RPCへ雑に流用しない。Identityを同一lease内でatomicに続行する案と、Relationship processing appliedを前提とするIdentity専用idempotent worker案を比較し、後者を第一候補とする。理由はIdentity障害をRelationship Engineの成功/再処理と切り離せるため。
+
+##### Read path / Acting Guide
+Reply生成時はcanonical relationship stateとcanonical Identityを読み、`source_relationship_state_version` の整合を確認する。Identityが一時的に追いついていない場合:
+- stale Identityを新Stateへ無理に再解釈しない。
+- status=`romantic_partner` 等のhard canonical factはActing Guideで常に優先。
+- pending critical guide/boundaryを優先。
+- safe fallbackを使い、バックグラウンドIdentity再処理へ委ねる。
+
+これによりeventual consistency中でも「別れたのに恋人扱い」等の危険な逆転を防ぐ。
+
+##### Workの最初の施工単位
+1. pure `relationship-identity-resolver.ts` + fixture tests（DBなし）
+2. Identity persistence migration/RPC + SQL tests
+3. permanent worker integration + retry/idempotency tests
+4. temporary snapshot/import integration tests
+5. Acting Guide read-path integration
+6. Preview/isolated acceptance
+7. Production適用はowner承認後のみ
+
+PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
+
+**施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
