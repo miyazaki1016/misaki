@@ -39,7 +39,7 @@ function candidate(s:AxisState,constraint:RelationshipConstraint){
  if(s.romance>=80&&Math.max(s.friendship,s.trust,s.affection)<45) return null;
  return ranked[0][0];
 }
-function traits(s:AxisState):RelationshipTrait[]{
+export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
  const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");
  if(s.trust>=70)out.push("deep_trust"); if(s.playfulness>=70&&s.friendship>=60)out.push("playful_sync");
  if(s.affection>=75)out.push("strong_affection"); if(s.romance>=45&&Math.max(s.friendship,s.trust,s.affection)>=45)out.push("romantic_awareness"); return out;
@@ -51,14 +51,14 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
  if(input.criticalEvent==="romantic_rejection") constraint="post_rejection";
  if(input.criticalEvent==="boundary_event") constraint="boundary";
  if(input.state.relationshipStatus==="romantic_partner"||input.criticalEvent==="romantic_acceptance")
-  return {primaryIdentity:"lover",traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint:"none",preRomanticIdentity:cur.primaryIdentity==="lover"?(cur.preRomanticIdentity??null):cur.primaryIdentity,transitionDecision:"canonical_override",reasonCode:"explicit_romantic_partnership"};
+  return {primaryIdentity:"lover",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint:"none",preRomanticIdentity:cur.primaryIdentity==="lover"?(cur.preRomanticIdentity??null):cur.primaryIdentity,transitionDecision:"canonical_override",reasonCode:"explicit_romantic_partnership"};
  if(input.criticalEvent==="relationship_end"&&cur.primaryIdentity==="lover")
-  return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
+  return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
  const next=candidate(input.state,constraint);
- if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
+ if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
  const sameCandidate=cur.candidateIdentity===next;
  const sameSource=sameCandidate&&cur.candidateSourceVersion===input.relationshipStateVersion;
  const confirmations=sameSource?(cur.candidateConfirmations??1):(sameCandidate?(cur.candidateConfirmations??0)+1:1);
- if(confirmations<2) return {primaryIdentity:cur.primaryIdentity,traits:traits(input.state),candidateIdentity:next,candidateConfirmations:confirmations,candidateSourceVersion:input.relationshipStateVersion,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"hold",reasonCode:sameSource?"duplicate_source_version_ignored":"candidate_requires_second_canonical_state"};
- return {primaryIdentity:next,traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"lateral",reasonCode:"candidate_confirmed_by_distinct_state_versions"};
+ if(confirmations<2) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:next,candidateConfirmations:confirmations,candidateSourceVersion:input.relationshipStateVersion,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"hold",reasonCode:sameSource?"duplicate_source_version_ignored":"candidate_requires_second_canonical_state"};
+ return {primaryIdentity:next,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"lateral",reasonCode:"candidate_confirmed_by_distinct_state_versions"};
 }
