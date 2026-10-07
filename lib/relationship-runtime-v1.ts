@@ -152,7 +152,8 @@ export async function importPermanentRelationship(userId: string, requestId: str
     p_engine_version: PROCESSING_VERSION, p_payload: snapshot,
     p_primary_identity: identity.primaryIdentity, p_candidate_identity: identity.candidateIdentity ?? null,
     p_candidate_confirmations: identity.candidateConfirmations ?? 0, p_candidate_source_version: identity.candidateSourceVersion ?? null,
-    p_constraint_state: identity.constraint ?? "none", p_constraint_anchor_version: identity.constraintAnchorVersion ?? null, p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
+    p_constraint_state: identity.constraint ?? "none", p_constraint_anchor_version: identity.constraintAnchorVersion ?? null,
+    p_romance_reentry_established: identity.romanceReentryVersion != null, p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
     p_resolver_version: IDENTITY_RESOLVER_VERSION });
   if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? ""}:${rpcError.message ?? ""}`);
 }
