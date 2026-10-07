@@ -49,11 +49,13 @@ begin
    user_id,primary_identity,candidate_identity,candidate_confirmations,candidate_source_version,constraint_state,constraint_anchor_version,pre_romantic_identity,
    identity_since,identity_version,resolver_version,source_relationship_state_version,updated_at
  ) values(
-   p_user_id,p_primary_identity,p_candidate_identity,p_candidate_confirmations,p_candidate_source_version,p_constraint_state,p_constraint_anchor_version,p_pre_romantic_identity,
+   p_user_id,p_primary_identity,
+   null,0,null,
+   p_constraint_state,case when p_constraint_state='none' then null else v_source_version end,p_pre_romantic_identity,
    v_now,1,p_resolver_version,v_source_version,v_now
  ) on conflict(user_id) do update set
-   primary_identity=excluded.primary_identity,candidate_identity=excluded.candidate_identity,
-   candidate_confirmations=excluded.candidate_confirmations,candidate_source_version=excluded.candidate_source_version,
+   primary_identity=excluded.primary_identity,candidate_identity=null,
+   candidate_confirmations=0,candidate_source_version=null,
    constraint_state=excluded.constraint_state,constraint_anchor_version=excluded.constraint_anchor_version,pre_romantic_identity=excluded.pre_romantic_identity,
    identity_since=case when misaki_relationship_identity_state.primary_identity<>excluded.primary_identity then v_now else misaki_relationship_identity_state.identity_since end,
    identity_version=misaki_relationship_identity_state.identity_version+1,resolver_version=excluded.resolver_version,
