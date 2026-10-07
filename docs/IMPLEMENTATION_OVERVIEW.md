@@ -3597,6 +3597,8 @@ DB migrationはProduction適用済み。以下の旧適用前チェックは残�
 
 **重要な解釈:** 以前の会話履歴で美咲が「恋人」と発言していても、それだけではcanonical Identityは `acquaintance` のままだった。今回初めて明示的な相互交際合意がcanonical Critical Eventとして成立し、正本のRelationship Status / Identityと会話上の関係が一致した。会話のノリや高いscoreだけでloverへ昇格していないことも同時に確認できた。
 
-**次の受入:** lover成立後の次turnで直接関係質問を行い、Acting Guideがcanonical `lover` を自然に自己認識して回答し、内部ラベル・score・ルールを露出しないことを確認する。その後も anonymous path / temporary import v3、breakup / rejection / boundary、fresh romance Patternによるre-entry、真のmulti-session lock contentionは未完了として残す。
+**Acting Guide実機受入 PASS（2026-10-08）:** canonical `lover` 成立後の次turnでownerが「ねえ美咲、俺たちって今どんな関係？😊」と質問。美咲は「私たち、恋人同士でしょ？」と自然に回答し、直前会話も参照した表現を返した。内部の `lover` / Identity / score /判定ルールは露出していない。同一turnの生成結果を遡及変更せず、canonical成立後の**次turn**でActing Guideが現在Identityを自己認識する設計どおり。よって `canonical romantic_acceptance → Identity lover → next-turn Acting Guide self-recognition` の実機E2EをPASSとする。
+
+**次の受入:** anonymous path / temporary import v3 の実アプリ経路を優先し、匿名会話のRelationship Identityが保存時に恒久アカウントへ原子的に引き継がれることを確認する。その後 breakup / rejection / boundary、fresh romance Patternによるre-entry、真のmulti-session lock contentionを未完了事項として残す。
 
 **停止位置:** Production Identity migrationは適用済みだがProduction frontend Identity gateはOFF。PR #67はDraft・未merge。Production gate ON / mergeはownerの別承認まで禁止。PR #66 Forget Controlは触らない。
