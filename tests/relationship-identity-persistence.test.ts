@@ -42,3 +42,20 @@ test("temporary identity import records an immutable canonical transition",()=>{
  assert.match(sql,/'canonical_override','temporary_checkpoint_import'/);
  assert.match(sql,/coalesce\(v_identity_before,'\{\}'::jsonb\),v_identity_after/);
 });
+
+
+test("temporary identity import maps romance reentry fact into permanent version namespace",()=>{
+ const importSql=fs.readFileSync(new URL("../supabase/migrations/20261007070000_relationship_identity_v1_atomic_temporary_import.sql",import.meta.url),"utf8");
+ const runtime=fs.readFileSync(new URL("../lib/relationship-runtime-v1.ts",import.meta.url),"utf8");
+ assert.match(runtime,/p_romance_reentry_established:\s*identity\.romanceReentryVersion\s*!=\s*null/);
+ assert.doesNotMatch(runtime,/p_romance_reentry_version:\s*identity\.romanceReentryVersion/);
+ assert.match(importSql,/p_romance_reentry_established boolean/);
+ assert.match(importSql,/p_constraint_state in \('post_breakup','post_rejection'\)[\s\S]*p_romance_reentry_established,false\)[\s\S]*then v_source_version else null end/);
+ assert.doesNotMatch(importSql,/romance_reentry_version[^\n]*p_constraint_anchor_version/);
+});
+
+test("temporary identity import never restores romance reentry under boundary",()=>{
+ const importSql=fs.readFileSync(new URL("../supabase/migrations/20261007070000_relationship_identity_v1_atomic_temporary_import.sql",import.meta.url),"utf8");
+ assert.match(importSql,/p_constraint_state in \('post_breakup','post_rejection'\)/);
+ assert.doesNotMatch(importSql,/p_constraint_state in \([^\n]*'boundary'[^\n]*\)[^\n]*p_romance_reentry_established/);
+});
