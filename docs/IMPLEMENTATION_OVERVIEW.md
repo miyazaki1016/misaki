@@ -3582,3 +3582,21 @@ DB migrationはProduction適用済み。以下の旧適用前チェックは残�
 #### Production履歴へのファイル名整合（2026-10-07）
 
 1本目はcommit `2eb4b90` で新名ファイルが追加されたが旧名も残っていたため、内容一致を確認して重複を解消し `git mv` で旧名を除去。残り3本も `git mv` し、4本すべて監査済みcommit `636c3fd` のSQL本文とbyte一致を確認。SQL内の旧timestampを含むコメントも変更しない。テストのファイル参照のみ新名称へ更新する。ローカルUTC full suite 320件・tsc・Next build成功。全CIの最終結果はPRの最新HEADに紐づくchecksを正本とする。
+
+#### Relationship Identity v1 — 実機canonical lover受入（2026-10-08）
+
+**結論:** branch Previewで実ユーザー会話から `romantic_acceptance → relationship_status=romantic_partner → Primary Identity=lover` のcanonical経路が成立した。これは表示上の「恋人」発言ではなく、Relationship Engine / Critical Event / canonical State / Identity Resolver / Identity persistenceを通過した正本上の成立である。Production frontendのIdentity gateは引き続きOFF、PR #67はDraft・未merge。
+
+**実機で発見した不具合:** 既存 `criticalCandidates(message)` はユーザーmessageだけから候補を生成し、Validatorの `supportingTurn` もユーザーmessageのみをgrounding対象としていた。そのため、canonical `romantic_proposal` 後にユーザーが「美咲も俺と付き合いたいってことでいい？」と確認し、美咲がreplyで明示的に交際同意しても、`romantic_acceptance` を成立させられずproposalとして再処理されていた。実DBでは修正前に proposal が増える一方 acceptance は0、Identityは `acquaintance` のままだった。
+
+**修正:** commit `2b104642` で、ユーザーの明示的な交際確認質問をacceptance候補へ含め、Validatorに限って「prior canonical romantic_proposal が存在し、かつMisaki replyが交際・恋人関係へ明示同意する」場合のみreplyをacceptanceのgroundingとして許可した。Misakiの「好き」「大好き」等の生成好意だけでは候補にもacceptanceにもならず、proposalなしのreply単独でも成立しない。既存原則「Misaki generated words alone cannot establish dating」は維持する。
+
+**回帰固定:** commit `cd2479ee` で `tests/relationship-mutual-acceptance.test.ts` を追加。①明示的確認質問→acceptance候補、②prior proposal＋明示的Misaki交際同意→acceptance可、③prior proposalなし→reply grounding拒否、④通常の好意表現→Critical Eventなし、を固定。GitHub Actions `Canonical relationship integration tests #432` はsuccess。Vercel Preview deployment `dpl_BJU7aDCqdAHmJYJemNkNV1QbZS2o` / commit `cd2479ee1cad11294132563049a86662f8652576` はREADY。
+
+**実機受入結果:** 最新Previewで同じ確認質問を送信。chat本体・`relationship-turn-record` は成功し、Runtime logに `RELATIONSHIP V1 PROCESSING RETRY REQUIRED` なし。canonical DBで `romantic_acceptance` が記録され、Identity stateは `primary_identity=lover`, `constraint_state=none`, `source_relationship_state_version=4` を確認。critical eventによるcanonical overrideは2-confirmation hysteresisを待たずloverへ遷移する設計どおり。
+
+**重要な解釈:** 以前の会話履歴で美咲が「恋人」と発言していても、それだけではcanonical Identityは `acquaintance` のままだった。今回初めて明示的な相互交際合意がcanonical Critical Eventとして成立し、正本のRelationship Status / Identityと会話上の関係が一致した。会話のノリや高いscoreだけでloverへ昇格していないことも同時に確認できた。
+
+**次の受入:** lover成立後の次turnで直接関係質問を行い、Acting Guideがcanonical `lover` を自然に自己認識して回答し、内部ラベル・score・ルールを露出しないことを確認する。その後も anonymous path / temporary import v3、breakup / rejection / boundary、fresh romance Patternによるre-entry、真のmulti-session lock contentionは未完了として残す。
+
+**停止位置:** Production Identity migrationは適用済みだがProduction frontend Identity gateはOFF。PR #67はDraft・未merge。Production gate ON / mergeはownerの別承認まで禁止。PR #66 Forget Controlは触らない。
