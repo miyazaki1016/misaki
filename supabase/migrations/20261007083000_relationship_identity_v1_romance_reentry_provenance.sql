@@ -30,17 +30,25 @@ begin
  if p_candidate_confirmations not between 0 and 1 then raise exception 'invalid_candidate_confirmations'; end if;
  if p_constraint_state not in ('none','post_breakup','post_rejection','boundary') then raise exception 'invalid_identity_constraint'; end if;
  if p_constraint_state in ('none','boundary') and p_romance_reentry_version is not null then raise exception 'invalid_romance_reentry_constraint'; end if;
- if p_romance_reentry_version is not null and (p_constraint_anchor_version is null or p_romance_reentry_version<=p_constraint_anchor_version or p_romance_reentry_version>p_source_relationship_state_version) then raise exception 'invalid_romance_reentry_version'; end if;
+ if p_romance_reentry_version is not null and (p_constraint_anchor_version is null or p_romance_reentry_version<p_constraint_anchor_version or p_romance_reentry_version>p_source_relationship_state_version) then raise exception 'invalid_romance_reentry_version'; end if;
  if p_pre_romantic_identity='lover' then raise exception 'invalid_pre_romantic_identity'; end if;
  if p_transition_decision not in ('maintain','promote','demote','lateral','canonical_override','hold') then raise exception 'invalid_identity_decision'; end if;
 
  select relationship_state_version into v_relationship_version
- from public.misaki_relationship_state where user_id=p_user_id;
+ from public.misaki_relationship_state where user_id=p_user_id for update;
  if v_relationship_version is null then raise exception 'canonical_relationship_state_required'; end if;
  if v_relationship_version<>p_source_relationship_state_version then raise exception 'stale_relationship_state_version'; end if;
 
  select * into v_current from public.misaki_relationship_identity_state where user_id=p_user_id for update;
- if found then
+ -- Imported checkpoint provenance maps both anchor and proof to the first permanent version.
+ -- Equal versions are valid only when preserving that already-canonical fact, never for fresh proof.
+ if p_romance_reentry_version is not null and p_romance_reentry_version=p_constraint_anchor_version
+    and not (v_current.romance_reentry_version is not distinct from p_romance_reentry_version
+      and v_current.constraint_anchor_version is not distinct from p_constraint_anchor_version
+      and v_current.constraint_state is not distinct from p_constraint_state) then
+   raise exception 'invalid_romance_reentry_version';
+ end if;
+ if v_current.user_id is not null then
    if v_current.source_relationship_state_version>p_source_relationship_state_version then raise exception 'identity_source_regression'; end if;
    if v_current.source_relationship_state_version=p_source_relationship_state_version and v_current.resolver_version=p_resolver_version then
      return jsonb_build_object('replayed',true,'state',to_jsonb(v_current));
@@ -87,6 +95,7 @@ begin
  return jsonb_build_object('replayed',false,'state',v_after);
 end $$;
 
-revoke execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,text,text,text) from service_role;
+revoke execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,text,text,text) from public,anon,authenticated,service_role;
+drop function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,text,text,text);
 revoke execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,bigint,text,text,text) from public,anon,authenticated;
 grant execute on function public.apply_misaki_relationship_identity_v1(uuid,bigint,text,text,text,integer,bigint,text,bigint,bigint,text,text,text) to service_role;

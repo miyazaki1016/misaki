@@ -54,3 +54,11 @@ test("anonymous identity snapshot persists romance reentry provenance",()=>{
   assert.match(anonymous,/hasNewRomancePattern:hasFreshRomanceProvenance/);
   assert.match(anonymous,/romanceReentryVersion: resolved\.romanceReentryVersion/);
 });
+
+
+test("romance provenance application is selected by canonical source version, not timestamp row order",()=>{
+ assert.match(runtime,/\.eq\("after_state->>relationship_state_version",String\(relationship\.relationship_state_version\)\)/);
+ const start=runtime.indexOf('select("romance_delta,after_state")');
+ const end=runtime.indexOf('if(applicationError)',start);
+ assert.doesNotMatch(runtime.slice(start,end),/order\("created_at"/);
+});

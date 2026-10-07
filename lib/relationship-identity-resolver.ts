@@ -28,6 +28,11 @@ function distance(s:AxisState,c:[number,number,number,number,number]){
  const a=[s.friendship,s.trust,s.playfulness,s.affection,s.romance],w=[1,1,1,1,.35];
  return a.reduce((n,v,i)=>n+w[i]*((v-c[i])/100)**2,0)/w.reduce((a,b)=>a+b,0);
 }
+// Equal canonical distances are ambiguous, not an implicit priority from declaration order.
+function uniqueClosest<T extends RelationshipIdentity>(ranked:readonly (readonly [T,number])[]):T|null{
+ if(!ranked.length || (ranked.length>1 && Math.abs(ranked[0][1]-ranked[1][1])<=1e-12)) return null;
+ return ranked[0][0];
+}
 function candidate(s:AxisState,constraint:RelationshipConstraint,allowRomanceUnderConstraint=false){
  if(s.relationshipStatus==="romantic_partner") return "lover" as const;
  const blockedRomance=constraint!=="none"&&!allowRomanceUnderConstraint;
@@ -37,7 +42,7 @@ function candidate(s:AxisState,constraint:RelationshipConstraint,allowRomanceUnd
  if(!ranked.length||ranked[0][1]>.30) return null;
  // Romance without relational foundation must never manufacture relationship growth.
  if(s.romance>=80&&Math.max(s.friendship,s.trust,s.affection)<45) return null;
- return ranked[0][0];
+ return uniqueClosest(ranked);
 }
 const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<RelationshipIdentity,"lover">[]>={
  acquaintance:["conversation_partner"], conversation_partner:["friend","acquaintance"],
@@ -48,10 +53,10 @@ const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<Re
  person_of_interest:["friend","important_person","special_person"], special_person:["person_of_interest","important_person","partner_in_crime","best_friend"]
 };
 function adjacentTarget(current:RelationshipIdentity,target:RelationshipIdentity,s:AxisState){
- if(current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
+ if(current===target||current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
  const local=neighbors[current].filter(id=>gates[id](s)).map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
  // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers the supported neighbor closest to the canonical shape.
- return local[0]?.[0]??target;
+ return local.length?uniqueClosest(local):target;
 }
 export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
  const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");

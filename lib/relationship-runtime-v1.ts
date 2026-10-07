@@ -189,7 +189,8 @@ async function processPermanentIdentity(userId: string) {
   let hasNewRomancePattern=false;
   if(saved?.constraint_state && saved.constraint_state!=="none" && saved.constraint_state!=="boundary"){
     const { data: application, error: applicationError } = await db.from("misaki_relationship_state_applications")
-      .select("romance_delta,after_state").eq("user_id",userId).order("created_at",{ascending:false}).limit(1).maybeSingle();
+      .select("romance_delta,after_state").eq("user_id",userId)
+      .eq("after_state->>relationship_state_version",String(relationship.relationship_state_version)).limit(1).maybeSingle();
     if(applicationError) throw new Error("relationship_identity_application_read_failed");
     hasNewRomancePattern=Number(application?.after_state?.relationship_state_version)===Number(relationship.relationship_state_version)
       && Number(application?.romance_delta ?? 0)>0;
