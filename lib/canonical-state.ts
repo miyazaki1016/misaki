@@ -116,6 +116,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
         candidateConfirmations: Number(identity.data.candidate_confirmations ?? 0),
         candidateSourceVersion: identity.data.candidate_source_version == null ? null : Number(identity.data.candidate_source_version),
         constraint: identity.data.constraint_state as RelationshipConstraint,
+        constraintAnchorVersion: identity.data.constraint_anchor_version == null ? null : Number(identity.data.constraint_anchor_version),
         preRomanticIdentity: identity.data.pre_romantic_identity as Exclude<RelationshipIdentity,"lover">|null
       } : undefined,
     relationshipCriticalPending, relationshipImportPending,
