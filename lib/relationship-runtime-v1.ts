@@ -130,9 +130,17 @@ export async function importPermanentRelationship(userId: string, requestId: str
   // verified trajectory in memory and materialize atomically through the import RPC.
   if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);
   await check();
-  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
+  const identity = snapshot.identity ?? resolveRelationshipIdentity({
+    relationshipStateVersion: snapshot.version,
+    state: snapshot.state
+  });
+  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v3", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
-    p_engine_version: PROCESSING_VERSION, p_payload: snapshot });
+    p_engine_version: PROCESSING_VERSION, p_payload: snapshot,
+    p_primary_identity: identity.primaryIdentity, p_candidate_identity: identity.candidateIdentity ?? null,
+    p_candidate_confirmations: identity.candidateConfirmations ?? 0, p_candidate_source_version: identity.candidateSourceVersion ?? null,
+    p_constraint_state: identity.constraint ?? "none", p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
+    p_resolver_version: IDENTITY_RESOLVER_VERSION });
   if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? ""}:${rpcError.message ?? ""}`);
 }
 
