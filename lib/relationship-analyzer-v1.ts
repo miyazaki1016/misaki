@@ -77,7 +77,7 @@ export function criticalCandidates(message: string): CriticalType[] {
   if (/[「」『』]|もし|たとえば|例えば|仮に|って言|と言|彼女|彼氏|第三者/.test(message)) return [];
   const candidates: CriticalType[] = [];
   if (/付き合って|恋人になって/.test(message)) candidates.push("romantic_proposal");
-  if (/付き合おう|恋人になろう|交際を承諾/.test(message)) candidates.push("romantic_acceptance");
+  if (/付き合おう|恋人になろう|交際を承諾|付き合いたいってことでいい|付き合うってことでいい|恋人(?:同士)?ってことでいい/.test(message)) candidates.push("romantic_acceptance");
   if (/別れよう|交際を終わ|恋人関係を終わ/.test(message)) candidates.push("relationship_end");
   if (/付き合えない|恋愛じゃない|恋人にはなれない/.test(message)) candidates.push("romantic_rejection");
   if (/やめて|しないで|嫌だから/.test(message)) candidates.push("boundary_event");
@@ -96,14 +96,18 @@ export async function validateCriticalEvent(turn: Turn, candidate: CriticalType,
 Return exactly {"confirmed":boolean,"supportingTurn":"exact user substring"}.
 Scores, elapsed time, generated Misaki affection and memory cannot establish dating.
 romantic_acceptance requires explicit mutual agreement to partnership, not merely mutual affection, a proposal or "好き".
+For a user's explicit confirmation question such as "付き合いたいってことでいい？", romantic_acceptance may be confirmed only when a prior canonical romantic_proposal exists AND Misaki's reply explicitly agrees to dating/being partners. Misaki affection alone never qualifies.
 Third-party, quoted, hypothetical, ambiguous or negated events are not confirmed. Reconciliation never means automatic reunion.
 Use prior canonical events only as context; never fabricate them. When uncertain return false.
-supportingTurn must be copied exactly from the user's message. No additional fields.`,
+supportingTurn must be copied exactly from the user's message, except for romantic_acceptance grounded by a prior canonical romantic_proposal plus Misaki's explicit partnership agreement, where it may be copied exactly from Misaki's reply. No additional fields.`,
     userText: JSON.stringify({ turn, candidate, priorEvents }),
   });
   if (!response.ok || !response.text) throw new Error("relationship_validator_unavailable");
   const value = JSON.parse(response.text);
+  const priorProposal = candidate === "romantic_acceptance" && priorEvents.some((event: any) => event?.event_type === "romantic_proposal");
+  const grounded = typeof value?.supportingTurn === "string" &&
+    (turn.message.includes(value.supportingTurn) || (priorProposal && turn.reply.includes(value.supportingTurn)));
   if (!value || Object.keys(value).some(k => !["confirmed", "supportingTurn"].includes(k)) || typeof value.confirmed !== "boolean" ||
-    typeof value.supportingTurn !== "string" || (value.confirmed && (!value.supportingTurn.trim() || !turn.message.includes(value.supportingTurn)))) throw new Error("invalid_critical_validation");
+    typeof value.supportingTurn !== "string" || (value.confirmed && (!value.supportingTurn.trim() || !grounded))) throw new Error("invalid_critical_validation");
   return value.confirmed as boolean;
 }
