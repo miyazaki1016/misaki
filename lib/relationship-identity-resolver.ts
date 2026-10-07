@@ -40,7 +40,7 @@ function candidate(s:AxisState,constraint:RelationshipConstraint){
  return ranked[0][0];
 }
 const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<RelationshipIdentity,"lover">[]>={
- acquaintance:["conversation_partner"], conversation_partner:["acquaintance","friend"],
+ acquaintance:["conversation_partner"], conversation_partner:["friend","acquaintance"],
  friend:["conversation_partner","compatible_friend","trusted_friend","person_of_interest","important_person"],
  compatible_friend:["friend","partner_in_crime","important_person"], trusted_friend:["friend","best_friend","important_person"],
  partner_in_crime:["compatible_friend","important_person","special_person"], best_friend:["trusted_friend","important_person","special_person"],
@@ -49,9 +49,9 @@ const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<Re
 };
 function adjacentTarget(current:RelationshipIdentity,target:RelationshipIdentity,s:AxisState){
  if(current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
- const local=neighbors[current].filter(id=>gates[id](s)).map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
+ const local=neighbors[current].filter(id=>gates[id](s));
  // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers a supported neighbor.
- return local[0]?.[0]??target;
+ return local[0]??target;
 }
 export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
  const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");
