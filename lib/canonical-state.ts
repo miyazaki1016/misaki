@@ -3,6 +3,7 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:
 import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
 import { createLegacyRelationshipActingState, type RelationshipActingState } from "./relationship-acting-guide";
 import { criticalCandidates } from "./relationship-analyzer-v1";
+import { resolveRelationshipIdentity, type IdentityState, type RelationshipIdentity, type RelationshipConstraint } from "./relationship-identity-resolver";
 
 export type RootState = {
   history?: unknown[];
@@ -13,6 +14,7 @@ export type RootState = {
   temporaryRevision?: string | null;
   relationshipEngine?: Snapshot;
   relationshipActingState?: RelationshipActingState;
+  relationshipIdentity?: IdentityState;
   relationshipCriticalPending?: boolean;
   relationshipImportPending?: boolean;
   temporaryRelationship?: {
@@ -81,8 +83,9 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     ]);
     relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);
   }
-  const [relationship, conversation] = await Promise.all([
+  const [relationship, identity, conversation] = await Promise.all([
     db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
+    db.from("misaki_relationship_identity_state").select("*").eq("user_id", userId).maybeSingle(),
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
@@ -106,6 +109,15 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     updatedAt: conversation.data?.updated_at ?? null,
     relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,
       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
+    relationshipIdentity: engineEnabled() && !identity.error && identity.data && relationship.data &&
+      Number(identity.data.source_relationship_state_version) === Number(relationship.data.relationship_state_version) ? {
+        primaryIdentity: identity.data.primary_identity as RelationshipIdentity,
+        candidateIdentity: identity.data.candidate_identity as RelationshipIdentity|null,
+        candidateConfirmations: Number(identity.data.candidate_confirmations ?? 0),
+        candidateSourceVersion: identity.data.candidate_source_version == null ? null : Number(identity.data.candidate_source_version),
+        constraint: identity.data.constraint_state as RelationshipConstraint,
+        preRomanticIdentity: identity.data.pre_romantic_identity as Exclude<RelationshipIdentity,"lover">|null
+      } : undefined,
     relationshipCriticalPending, relationshipImportPending,
   };
 }
