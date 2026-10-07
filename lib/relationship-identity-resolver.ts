@@ -69,7 +69,8 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
  if(input.criticalEvent==="relationship_end"&&cur.primaryIdentity==="lover")
   return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,romanceReentryVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
  const hasPostAnchorState=constraint==="none"||constraintAnchorVersion==null||input.relationshipStateVersion>constraintAnchorVersion;
- if(hasPostAnchorState&&constraint!=="none"&&constraint!=="boundary"&&input.hasNewRomancePattern===true) romanceReentryVersion=input.relationshipStateVersion;\n const allowRomanceReentry=hasPostAnchorState&&constraint!=="boundary"&&(romanceReentryVersion!=null||input.hasNewRomancePattern===true);
+ if(hasPostAnchorState&&constraint!=="none"&&constraint!=="boundary"&&input.hasNewRomancePattern===true) romanceReentryVersion=input.relationshipStateVersion;
+ const allowRomanceReentry=hasPostAnchorState&&constraint!=="boundary"&&(romanceReentryVersion!=null||input.hasNewRomancePattern===true);
  const rawNext=hasPostAnchorState?candidate(input.state,constraint,allowRomanceReentry):null;
  // Adjacency shapes ordinary growth. Post-constraint rebuilding is already guarded by the anchor, romance block, and two distinct canonical confirmations.
  const adjacentNext=rawNext?(constraint==="none"?adjacentTarget(cur.primaryIdentity,rawNext,input.state):rawNext):null;
