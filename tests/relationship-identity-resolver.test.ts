@@ -124,3 +124,10 @@ test("new rejection resets prior romance reentry provenance",()=>{
  assert.equal(result.romanceReentryVersion,null);
  assert.equal(result.candidateIdentity,null);
 });
+
+
+test("adjacency chooses the supported neighbor closest to canonical shape rather than array order",()=>{
+ const r=resolveRelationshipIdentity({state:state(75,78,48,80,72),relationshipStateVersion:1,current:{primaryIdentity:"important_person",constraint:"none"}});
+ assert.equal(r.candidateIdentity,"special_person");
+ assert.notEqual(r.candidateIdentity,"friend");
+});
