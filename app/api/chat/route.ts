@@ -2063,7 +2063,16 @@ export async function POST(
       createRelationshipActingGuide(
         rootState.relationshipActingState ?? (rootState.relationshipEngine ? { ...rootState.relationshipEngine.state, intimacyStage: createLegacyRelationshipActingState(safeRelationshipPoints).intimacyStage } : undefined) ?? createLegacyRelationshipActingState(
           safeRelationshipPoints
-        )
+        ),
+        rootState.relationshipIdentity ? {
+          primaryIdentity: rootState.relationshipIdentity.primaryIdentity,
+          traits: rootState.relationshipActingState ? undefined : undefined,
+          constraint: rootState.relationshipIdentity.constraint
+        } : rootState.relationshipEngine?.identity ? {
+          primaryIdentity: rootState.relationshipEngine.identity.primaryIdentity,
+          traits: undefined,
+          constraint: rootState.relationshipEngine.identity.constraint
+        } : undefined
       );
 
     const userProfile =
