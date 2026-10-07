@@ -3155,3 +3155,202 @@ Relationship Engine / Relationship Identity を、美咲ひとりに閉じた仕
 - 将来の概念分離は少なくとも `Relationship（特定の二者間）` / `World State（世界で成立している事実）` / `Character Knowledge（各キャラクターが知っている事実）` を維持する。あるキャラクターの記憶・発言を、別Relationshipのcanonical truthとして扱わない。
 
 > **封印メモ:** 最初の動機は「1対多では結婚を扱いにくいなら、多対多の世界ならどうか」という雑談から。発展すると社会シミュレーション規模になるため、ここでいったん閉じる。現在の優先事項は美咲一人のRelationship Engine / Identity / 会話品質を完成させること。将来必要になったときだけ、このメモを再び開く。
+
+
+---
+
+### Work handoff — Relationship Identity v1（2026-10-07 / 実装前仕様・コード未実装）
+
+#### 目的
+既存 Relationship Engine v1.1 の Evidence → Episode → Pattern → 5-axis State を変更せず、その後段に「現在の二人はどういう関係か」を表す Relationship Identity を追加する。Identity は単一のレベル階段ではなく、同じ親密度でも相棒・親友・大切な人等へ分岐できる関係の形である。
+
+基本パイプライン:
+```
+Canonical Event / Status
+→ active Relationship Constraint
+→ Identity History
+→ canonical 5-axis State
+→ Traits / Awareness
+→ Identity candidate
+→ adjacency / continuity
+→ hysteresis
+→ Primary Identity
+→ Relationship Acting Guide
+→ shared Reply Core / Gemini
+```
+
+**Patternを二重に数えない。** 5-axis Stateは既に3独立Tokyo日のPatternを通ったcanonical結果なので、Identity昇格のためにもう一度3-day Patternを要求しない。
+
+#### v1 Primary Identity（表示可能な関係名）
+1. 顔見知り
+2. 話し相手
+3. 友達
+4. 気の合う友達
+5. 信頼できる友達
+6. 相棒
+7. 親友
+8. 大切な人
+9. 気になる人
+10. 特別な人
+11. 恋人
+
+`相談相手` はPrimary Identityではなくtrait/roleとして扱う。`惹かれ合う二人` はMisaki側の相互性をcanonicalに判定できる仕組みがないためv1対象外。
+
+#### Identityと他状態の責務
+- Hearts / intimacy = 関係の深さ。Identityの一本道レベルではない。
+- 5 axes = friendship / trust / playfulness / affection / romance の蓄積品質。ユーザーへ数値表示しない。
+- Primary Identity = 現在の二人の関係の安定した名前。UIとMisakiの自己認識で共有する。
+- Traits / Awareness = Primary Identityを変えずに表現できるニュアンス。初期候補: `comfortable`, `deep_trust`, `playful_sync`, `strong_affection`, `romantic_awareness`。
+- relationship_status = 明示的に成立したcanonical事実。Identityから書き換えない。
+
+#### 絶対ルール
+1. `relationship_status=romantic_partner` のときPrimary Identityは `恋人`。
+2. 5軸がどれだけ高くても、scoreだけで `恋人` にしない。
+3. 5軸が低下しても、scoreだけで交際終了にしない。
+4. 交際成立・別れはvalidated Canonical Event / Statusのみで変更する。
+5. `romantic_rejection`, `relationship_end`, `boundary_event` 等の明示事実・制約はscore由来Identityより上位。
+6. current turnで発生したState/Identity変更は既存v1.1と同様、原則次turnから会話表現へ反映する。現在replyへ遡及させない。
+7. candidateが分類不能なら無理に関係名を作らず、現在Identityを安全に維持する。
+8. Identityを毎turn 11種類から再選挙しない。現在Identityの維持判定→近傍candidate→hysteresisの順。
+9. entry条件とmaintenance条件を分ける。成立済みIdentityは小さなscore変動で降格・横滑りさせない。
+10. Resolver/APIは可能な範囲で固有名 `Misaki` に依存させずRelationshipドメインとして書く。ただしv1 DB/runtimeを複数character対応へ拡張する工事はしない。
+
+#### 自然な隣接関係
+```
+顔見知り
+  ↓
+話し相手
+  ↓
+友達
+ ├─ 気の合う友達 ──→ 相棒 ─────┐
+ ├─ 信頼できる友達 ─→ 親友 ─────┼→ 大切な人
+ │                       │        │
+ └─ 気になる人 ─────────┼────────┘
+                         ↓
+                      特別な人
+                         ↓
+                 [明示的な交際成立]
+                         ↓
+                        恋人
+```
+これは必須通過ルートではない。canonical stateが十分変化した場合のskip余地は残すが、通常は近傍遷移を優先する。逆方向もあり得る。
+
+#### 意味境界
+- 相棒: friendship + trust + 強いplayfulness。一緒に動く/阿吽の呼吸。romance不要。
+- 親友: friendship + 深いtrust + affection。弱さを預けられる。軽いromance上昇だけで `気になる人` へ置換しない。
+- 大切な人: trust + 強いaffection。「大事にしたい」。romance不要。
+- 気になる人: 関係の土台がある上でromantic awarenessが芽生えた状態。romance単独上昇では成立させない。
+- 特別な人: trust + affection + 十分なromance。「普通の友達だけでは説明しにくい」が、交際成立を意味しない。
+- 恋人: explicit mutual dating成立のみ。score classifier対象外。
+
+#### Traits / Awareness
+Primary Identityと別に導出する。例:
+- `親友 + romantic_awareness`
+- `相棒 + strong_affection`
+- `友達 + deep_trust`
+
+これにより、親友のromanceが少し上がっただけでPrimary Identityを `気になる人` に壊さない。既存Acting Guideのromance 45/80、very-high trust/playfulness/affection等の演技方向はIdentity/traitsへ整理して接続し、二重promptを作らない。
+
+#### Hysteresis / continuity
+- entry threshold > maintenance threshold を原則とする。
+- candidate発生だけで即切替しない。現在Identityを維持できるなら維持する。
+- 別candidateが十分かつ継続的に優勢になった場合だけ遷移する。
+- 1日の甘い会話、喧嘩、romance spike等でpromotion/demotionさせない。
+- 数値閾値は本仕様時点では未freeze。仮classifier値をそのままProduction定数へコピーしない。
+- classifierは最低軸、相対shape、全体depth、current identity、canonical constraintsを扱い、巨大な単純if/else閾値表だけにしない。
+
+#### Breakup / rejectionの特別処理
+`relationship_end` はhysteresisより上位で、`恋人` Identityを即時解除する。ただし5-axis Stateは削除・リセットしない。
+
+重要: breakup直後に残存する高romance/trust/affectionだけを見て、自動的に `特別な人` や `親友` へ再分類してはならない。「昨日まで恋人だった二人」を通常の高score友人と同一視しない。
+
+そのためIdentity History / Relationship Constraintに、少なくとも「交際終了後で関係再形成中」であることを表現できる内部状態を持たせる。これはv1 Primary Identityを12個へ増やす意味ではない。表示Identityを一時維持/保留する具体UXは実装前レビューで確定する。
+
+`romantic_rejection` 後も同様に、古い高romanceからromantic Identityへ即promotionしない。拒絶前に成立していた安全な友情Identityがあれば、そのcontinuityを優先する。rejection/boundaryの解除条件をscore低下だけにしない。
+
+#### 仮classifierで確認済みの代表形（閾値freezeではない）
+- 相棒型 F90/T82/P92/A60/R5 → 相棒
+- 親友型 F90/T95/P50/A85/R5 → 親友
+- 大切な人型 F75/T90/P35/A95/R10 → 大切な人
+- 恋愛の芽 F60/T55/P40/A55/R55 → 気になる人
+- 特別な人型 F78/T82/P50/A85/R75 → 特別な人
+- 高romance孤立 F25/T15/P20/A20/R95 → romantic Identityへしない / 分類拒否可能
+- 親友+恋愛意識 F90/T95/P50/A90/R55 → 親友 + romantic_awareness
+
+親友型 F90/T95/P50/A85 でromanceを0→100へ振った仮試験では、R0–60が親友、R65以降が特別な人candidateになった。ただし65はProduction閾値ではなく、hysteresis前candidateの探索値に過ぎない。
+
+#### Resolver I/O（概念契約）
+入力:
+- canonical 5-axis state
+- relationship_status
+- validated recent critical event / active constraint
+- current Primary Identity
+- Identity history / last transition metadata
+- current relationship state version
+- 必要ならintimacy stage（補助。source of truthにはしない）
+
+出力:
+- `primaryIdentity`
+- `traits[]`
+- `candidateIdentity | null`
+- `constraintState`
+- `transitionDecision: maintain | promote | demote | lateral | canonical_override | hold`
+- `reasonCode`（監査/テスト用。ユーザーへ表示しない）
+- `identityVersion`
+
+Resolverは台詞を生成しない。score/status/eventを変更しない。Geminiへ生の閾値や内部reasonCodeを説明させない。
+
+#### 永続化方針
+hysteresisと履歴依存があるため、Primary Identityは完全な都度導出だけにしない。少なくともcurrent identity / identity_since / version / transition history相当をcanonicalに保持する方向。
+
+ただし**DDLは未確定**。Workはmigrationを書く前に現行Relationship schema/RPC/migrationsを再照合し、既存canonical root・匿名→メール保存・temporary relationship importと整合する具体案を提示すること。Traitsはv1では原則都度導出し、不要に永続化しない。
+
+#### Acting Guide接続
+既存 `createRelationshipActingGuide()` を置換するのではなく拡張する。概念上:
+```
+canonical relationship state
+→ resolveRelationshipIdentity(...)
+→ createRelationshipActingGuide({
+     ...fiveAxes,
+     relationshipStatus,
+     primaryIdentity,
+     traits
+   })
+→ Gemini
+```
+Acting Guideは従来どおり「演技方向」であり台詞ではない。Identity名を毎回答えに言わせない。「俺たちってどういう関係？」等の文脈では、Primary Identity + historyを根拠にMisaki自身の言葉で自然に答えさせる。
+
+#### 必須回帰 / stress tests
+1. ♥5相当でも `相棒` / `親友` / `大切な人` が別々に成立可能。
+2. 親友 + mild romance → `親友 + romantic_awareness`。即 `気になる人` にしない。
+3. romance=100でもexplicit datingなし → `恋人` にならない。
+4. romance単独spike + 他軸低 → romantic Identityへteleportしない。
+5. explicit `romantic_acceptance` → status `romantic_partner` → Identity `恋人`。
+6. 恋人中にscore低下 → scoreだけでは別れない。
+7. `relationship_end` → 恋人Identity即解除。高い旧romanceから即 `特別な人` へ戻らない。
+8. `romantic_rejection` → 高romanceが残ってもromantic Identity promotionを抑制。
+9. active `boundary_event` がscore由来candidateより優先。
+10. 小さなState変動でIdentityがflapしない。
+11. candidate分類不能 → current Identityを安全に維持。
+12. current-turn変更が同turn replyへ遡及しない。
+13. pending explicit relationship event中に交際成立/復縁を先取りしない。
+14. Identity Resolver追加でEvidence/Episode/Pattern/State semantics、oldest-first、fail-closed、retry、lease/idempotencyを変更しない。
+15. legacy relationshipPoints guideを再び二重にpromptへ入れない。
+16. 匿名→メール保存/別端末復元でもIdentity continuityを壊さない。
+17. 将来拡張を意識し、Resolver単体テストが固有名Misakiなしでも成立する。
+
+#### このPRでやらないこと
+- Relationship Engine v1.1の5-axis計算変更
+- 新6段階Hearts閾値freeze / 5-heart UI実装
+- Body Clock shared Reply Core最終統合
+- Forget Control / Shared Memory変更
+- 複数character DB化 / `character_id` migration
+- World State / Character Knowledge
+- 結婚 / 離婚 / 不倫 / user-user接点
+- `spouse` 等の新canonical status
+- PR #66への混入
+
+#### 実装開始前ゲート
+Relationship IdentityはPR #66とは別PRにする。Workはまず最新main・本総覧・Relationship schema/migrations・`relationship-runtime-v1.ts`・`relationship-processing-v1.ts`・`relationship-acting-guide.ts`・chat接続点を再照合する。DDL/閾値を独断freezeしない。
+
+**現在位置:** Identityの意味論・precedence・履歴/hysteresis・breakup/rejection方針・Resolver I/Oまで実装前仕様化。次は現行DB schema/RPCとの突き合わせ → 最小canonical persistence案 → Work施工範囲確定。Productionは未変更。
