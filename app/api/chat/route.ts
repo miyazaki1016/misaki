@@ -1,5 +1,6 @@
 import { after } from "next/server";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
+import { deriveRelationshipTraits } from "../../../lib/relationship-identity-resolver";
 import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
 import { maintenanceResponse } from "../../../lib/maintenance";
 import { createRecallAwareMessage, isMemoryRecallQuestion } from "../../../lib/chat-recall";
@@ -2066,11 +2067,11 @@ export async function POST(
         ),
         rootState.relationshipIdentity ? {
           primaryIdentity: rootState.relationshipIdentity.primaryIdentity,
-          traits: rootState.relationshipActingState ? undefined : undefined,
+          traits: rootState.relationshipActingState ? deriveRelationshipTraits(rootState.relationshipActingState) : undefined,
           constraint: rootState.relationshipIdentity.constraint
         } : rootState.relationshipEngine?.identity ? {
           primaryIdentity: rootState.relationshipEngine.identity.primaryIdentity,
-          traits: undefined,
+          traits: deriveRelationshipTraits(rootState.relationshipEngine.state),
           constraint: rootState.relationshipEngine.identity.constraint
         } : undefined
       );
