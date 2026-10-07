@@ -47,7 +47,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
         relationshipStateVersion: snapshot.version,
         state: snapshot.state,
         current: snapshot.identity,
-        criticalEvent: latestCritical
+        criticalEvent: latestCritical==="romantic_proposal"?null:latestCritical
       });
       snapshot = { ...snapshot, identity: {
         primaryIdentity: resolved.primaryIdentity,
