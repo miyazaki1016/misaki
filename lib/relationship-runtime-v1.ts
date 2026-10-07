@@ -24,6 +24,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     if (!history?.some(t => t.requestId === turn.requestId && t.role === "user" && t.text === turn.message) ||
       !history.some(t => t.requestId === turn.requestId && t.role === "misaki" && t.text === turn.reply)) throw new Error("temporary_canonical_turn_required");
     // Pending turn remains encrypted/durable if validation or analysis fails.
+    const turnStartVersion = snapshot.version;
     for (const type of criticalCandidates(turn.message)) {
       const events = snapshot.criticalEvents ?? [];
       if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;
@@ -39,9 +40,8 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     await check?.();
     const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink("relationship_analyzer", telemetryUserId, turn.requestId));
     await check?.();
-    const beforeIdentityVersion = snapshot.version;
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
-    if (snapshot.version !== beforeIdentityVersion) {
+    if (snapshot.version !== turnStartVersion) {
       const latestCritical = snapshot.criticalEvents?.filter(e => e.request_id === turn.requestId).at(-1)?.event_type ?? null;
       const resolved = resolveRelationshipIdentity({
         relationshipStateVersion: snapshot.version,
