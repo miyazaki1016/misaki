@@ -1,5 +1,5 @@
 import { after } from "next/server";
-import { engineEnabled } from "../../../lib/relationship-engine-v1";
+import { engineEnabled, identityEnabled } from "../../../lib/relationship-engine-v1";
 import { deriveRelationshipTraits } from "../../../lib/relationship-identity-resolver";
 import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
 import { maintenanceResponse } from "../../../lib/maintenance";
@@ -2069,7 +2069,7 @@ export async function POST(
           primaryIdentity: rootState.relationshipIdentity.primaryIdentity,
           traits: rootState.relationshipActingState ? deriveRelationshipTraits(rootState.relationshipActingState) : undefined,
           constraint: rootState.relationshipIdentity.constraint
-        } : rootState.relationshipEngine?.identity ? {
+        } : identityEnabled() && rootState.relationshipEngine?.identity ? {
           primaryIdentity: rootState.relationshipEngine.identity.primaryIdentity,
           traits: deriveRelationshipTraits(rootState.relationshipEngine.state),
           constraint: rootState.relationshipEngine.identity.constraint
