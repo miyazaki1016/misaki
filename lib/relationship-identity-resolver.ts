@@ -5,7 +5,7 @@ export type RelationshipTrait = "comfortable" | "deep_trust" | "playful_sync" | 
 export type IdentityDecision = "maintain" | "promote" | "demote" | "lateral" | "canonical_override" | "hold";
 export type AxisState = { friendship:number; trust:number; playfulness:number; affection:number; romance:number; relationshipStatus?:"none"|"romantic_partner" };
 export type IdentityState = { primaryIdentity:RelationshipIdentity; candidateIdentity?:RelationshipIdentity|null; candidateConfirmations?:number; candidateSourceVersion?:number|null; constraint?:RelationshipConstraint; constraintAnchorVersion?:number|null; preRomanticIdentity?:Exclude<RelationshipIdentity,"lover">|null };
-export type IdentityInput = { state:AxisState; relationshipStateVersion:number; current?:IdentityState; criticalEvent?:"romantic_acceptance"|"romantic_rejection"|"relationship_end"|"boundary_event"|"reconciliation"|null };
+export type IdentityInput = { state:AxisState; relationshipStateVersion:number; current?:IdentityState; criticalEvent?:"romantic_acceptance"|"romantic_rejection"|"relationship_end"|"boundary_event"|"reconciliation"|null; hasNewRomancePattern?:boolean };
 export type IdentityResult = { primaryIdentity:RelationshipIdentity; traits:RelationshipTrait[]; candidateIdentity:RelationshipIdentity|null; candidateConfirmations:number; candidateSourceVersion:number|null; constraint:RelationshipConstraint; constraintAnchorVersion:number|null; preRomanticIdentity:Exclude<RelationshipIdentity,"lover">|null; transitionDecision:IdentityDecision; reasonCode:string };
 
 const centers:Record<Exclude<RelationshipIdentity,"lover">,[number,number,number,number,number]>={
@@ -28,9 +28,9 @@ function distance(s:AxisState,c:[number,number,number,number,number]){
  const a=[s.friendship,s.trust,s.playfulness,s.affection,s.romance],w=[1,1,1,1,.35];
  return a.reduce((n,v,i)=>n+w[i]*((v-c[i])/100)**2,0)/w.reduce((a,b)=>a+b,0);
 }
-function candidate(s:AxisState,constraint:RelationshipConstraint){
+function candidate(s:AxisState,constraint:RelationshipConstraint,allowRomanceUnderConstraint=false){
  if(s.relationshipStatus==="romantic_partner") return "lover" as const;
- const blockedRomance=constraint!=="none";
+ const blockedRomance=constraint!=="none"&&!allowRomanceUnderConstraint;
  const ranked=(Object.keys(centers) as Exclude<RelationshipIdentity,"lover">[])
   .filter(id=>gates[id](s)&&(!blockedRomance||!["person_of_interest","special_person"].includes(id)))
   .map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
@@ -69,7 +69,7 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
  if(input.criticalEvent==="relationship_end"&&cur.primaryIdentity==="lover")
   return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
  const hasPostAnchorState=constraint==="none"||constraintAnchorVersion==null||input.relationshipStateVersion>constraintAnchorVersion;
- const rawNext=hasPostAnchorState?candidate(input.state,constraint):null;
+ const allowRomanceReentry=hasPostAnchorState&&constraint!=="boundary"&&input.hasNewRomancePattern===true;\n const rawNext=hasPostAnchorState?candidate(input.state,constraint,allowRomanceReentry):null;
  // Adjacency shapes ordinary growth. Post-constraint rebuilding is already guarded by the anchor, romance block, and two distinct canonical confirmations.
  const adjacentNext=rawNext?(constraint==="none"?adjacentTarget(cur.primaryIdentity,rawNext,input.state):rawNext):null;
  // Preserve a stable distant raw candidate across canonical versions. One observation still follows adjacency; a second distinct canonical confirmation may escape the graph.
