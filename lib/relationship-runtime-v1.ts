@@ -180,6 +180,15 @@ async function processPermanentIdentity(userId: string) {
   const eventVersion = Number(latestEvent?.after_state?.relationship_state_version);
   const criticalEvent = eventVersion === Number(relationship.relationship_state_version) ? latestEvent.event_type : null;
 
+  let hasNewRomancePattern=false;
+  if(saved?.constraint_state && saved.constraint_state!=="none" && saved.constraint_state!=="boundary"){
+    const { data: application, error: applicationError } = await db.from("misaki_relationship_state_applications")
+      .select("romance_delta,after_state").eq("user_id",userId).order("created_at",{ascending:false}).limit(1).maybeSingle();
+    if(applicationError) throw new Error("relationship_identity_application_read_failed");
+    hasNewRomancePattern=Number(application?.after_state?.relationship_state_version)===Number(relationship.relationship_state_version)
+      && Number(application?.romance_delta ?? 0)>0;
+  }
+
   const current:IdentityState|undefined = saved ? {
     primaryIdentity:saved.primary_identity as RelationshipIdentity,
     candidateIdentity:saved.candidate_identity as RelationshipIdentity|null,
