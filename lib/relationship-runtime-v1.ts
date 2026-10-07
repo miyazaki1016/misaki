@@ -43,7 +43,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     const preEvidenceVersion=snapshot.version;
     const preEvidenceRomance=snapshot.state.romance;
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
-    const hasNewRomancePattern=snapshot.version>preEvidenceVersion && snapshot.state.romance>preEvidenceRomance;
+    const hasFreshRomanceProvenance=snapshot.version>preEvidenceVersion && snapshot.state.romance>preEvidenceRomance;
     if (identityEnabled() && snapshot.version !== turnStartVersion) {
       const latestCritical = snapshot.criticalEvents?.filter(e => e.request_id === turn.requestId).at(-1)?.event_type ?? null;
       const resolved = resolveRelationshipIdentity({
@@ -51,7 +51,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
         state: snapshot.state,
         current: snapshot.identity,
         criticalEvent: latestCritical==="romantic_proposal"?null:latestCritical,
-        hasNewRomancePattern
+        hasNewRomancePattern:hasFreshRomanceProvenance
       });
       snapshot = { ...snapshot, identity: {
         primaryIdentity: resolved.primaryIdentity,
