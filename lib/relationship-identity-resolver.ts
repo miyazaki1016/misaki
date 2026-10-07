@@ -71,11 +71,15 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
  const hasPostAnchorState=constraint==="none"||constraintAnchorVersion==null||input.relationshipStateVersion>constraintAnchorVersion;
  const rawNext=hasPostAnchorState?candidate(input.state,constraint):null;
  // Adjacency shapes ordinary growth. Post-constraint rebuilding is already guarded by the anchor, romance block, and two distinct canonical confirmations.
- const next=rawNext?(constraint==="none"?adjacentTarget(cur.primaryIdentity,rawNext,input.state):rawNext):null;
+ const adjacentNext=rawNext?(constraint==="none"?adjacentTarget(cur.primaryIdentity,rawNext,input.state):rawNext):null;
+ // Preserve a stable distant raw candidate across canonical versions. One observation still follows adjacency; a second distinct canonical confirmation may escape the graph.
+ const priorDistantConfirmed=constraint==="none"&&rawNext&&adjacentNext!==rawNext&&cur.candidateIdentity===rawNext&&cur.candidateSourceVersion!==input.relationshipStateVersion;
+ const next=priorDistantConfirmed?rawNext:adjacentNext;
  if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
- const sameCandidate=cur.candidateIdentity===next;
+ const trackedCandidate=constraint==="none"&&rawNext&&adjacentNext!==rawNext?rawNext:next;
+ const sameCandidate=cur.candidateIdentity===trackedCandidate;
  const sameSource=sameCandidate&&cur.candidateSourceVersion===input.relationshipStateVersion;
  const confirmations=sameSource?(cur.candidateConfirmations??1):(sameCandidate?(cur.candidateConfirmations??0)+1:1);
- if(confirmations<2) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:next,candidateConfirmations:confirmations,candidateSourceVersion:input.relationshipStateVersion,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"hold",reasonCode:sameSource?"duplicate_source_version_ignored":"candidate_requires_second_canonical_state"};
+ if(confirmations<2) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:trackedCandidate,candidateConfirmations:confirmations,candidateSourceVersion:input.relationshipStateVersion,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"hold",reasonCode:sameSource?"duplicate_source_version_ignored":"candidate_requires_second_canonical_state"};
  return {primaryIdentity:next,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"lateral",reasonCode:"candidate_confirmed_by_distinct_state_versions"};
 }
