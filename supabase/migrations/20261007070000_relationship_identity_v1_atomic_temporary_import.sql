@@ -6,7 +6,7 @@ create or replace function public.import_misaki_temporary_relationship_v3(
  p_source_revision uuid,p_friendship integer,p_trust integer,p_playfulness integer,p_affection integer,p_romance integer,
  p_relationship_status text,p_engine_version text,p_payload jsonb,
  p_primary_identity text,p_candidate_identity text,p_candidate_confirmations integer,p_candidate_source_version bigint,
- p_constraint_state text,p_constraint_anchor_version bigint,p_pre_romantic_identity text,p_resolver_version text
+ p_constraint_state text,p_constraint_anchor_version bigint,p_romance_reentry_established boolean,p_pre_romantic_identity text,p_resolver_version text
 ) returns jsonb language plpgsql security invoker set search_path='' as $$
 declare
  v_checkpoint_id bigint; v_existing jsonb; v_after jsonb; v_identity_before jsonb; v_identity_after jsonb; v_now timestamptz:=clock_timestamp();
@@ -48,17 +48,18 @@ begin
  where user_id=p_user_id returning to_jsonb(misaki_relationship_state.*),relationship_state_version into v_after,v_source_version;
 
  insert into public.misaki_relationship_identity_state(
-   user_id,primary_identity,candidate_identity,candidate_confirmations,candidate_source_version,constraint_state,constraint_anchor_version,pre_romantic_identity,
+   user_id,primary_identity,candidate_identity,candidate_confirmations,candidate_source_version,constraint_state,constraint_anchor_version,romance_reentry_version,pre_romantic_identity,
    identity_since,identity_version,resolver_version,source_relationship_state_version,updated_at
  ) values(
    p_user_id,p_primary_identity,
    null,0,null,
-   p_constraint_state,case when p_constraint_state='none' then null else v_source_version end,p_pre_romantic_identity,
+   p_constraint_state,case when p_constraint_state='none' then null else v_source_version end,
+   case when p_constraint_state in ('post_breakup','post_rejection') and coalesce(p_romance_reentry_established,false) then v_source_version else null end,p_pre_romantic_identity,
    v_now,1,p_resolver_version,v_source_version,v_now
  ) on conflict(user_id) do update set
    primary_identity=excluded.primary_identity,candidate_identity=null,
    candidate_confirmations=0,candidate_source_version=null,
-   constraint_state=excluded.constraint_state,constraint_anchor_version=excluded.constraint_anchor_version,pre_romantic_identity=excluded.pre_romantic_identity,
+   constraint_state=excluded.constraint_state,constraint_anchor_version=excluded.constraint_anchor_version,romance_reentry_version=excluded.romance_reentry_version,pre_romantic_identity=excluded.pre_romantic_identity,
    identity_since=case when misaki_relationship_identity_state.primary_identity<>excluded.primary_identity then v_now else misaki_relationship_identity_state.identity_since end,
    identity_version=misaki_relationship_identity_state.identity_version+1,resolver_version=excluded.resolver_version,
    source_relationship_state_version=excluded.source_relationship_state_version,updated_at=v_now
@@ -85,5 +86,5 @@ begin
  return jsonb_build_object('replayed',false,'state',v_after,'identity',v_identity_after);
 end $$;
 
-revoke execute on function public.import_misaki_temporary_relationship_v3(uuid,uuid,text,uuid,uuid,integer,integer,integer,integer,integer,text,text,jsonb,text,text,integer,bigint,text,bigint,text,text) from public,anon,authenticated;
-grant execute on function public.import_misaki_temporary_relationship_v3(uuid,uuid,text,uuid,uuid,integer,integer,integer,integer,integer,text,text,jsonb,text,text,integer,bigint,text,bigint,text,text) to service_role;
+revoke execute on function public.import_misaki_temporary_relationship_v3(uuid,uuid,text,uuid,uuid,integer,integer,integer,integer,integer,text,text,jsonb,text,text,integer,bigint,text,bigint,boolean,text,text) from public,anon,authenticated;
+grant execute on function public.import_misaki_temporary_relationship_v3(uuid,uuid,text,uuid,uuid,integer,integer,integer,integer,integer,text,text,jsonb,text,text,integer,bigint,text,bigint,boolean,text,text) to service_role;
