@@ -1,6 +1,6 @@
 import { createServerSupabase, loadTemporaryRoot, editTemporaryRoot, openTemporaryState, type RootState } from "./canonical-state";
 import { createLegacyRelationshipActingState } from "./relationship-acting-guide";
-import { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
+import { engineEnabled, identityEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
 import { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from "./relationship-analyzer-v1";
 import { CanonicalRelationshipStore, processRelationshipTurn } from "./relationship-processing-v1";
 import { createGeminiTelemetrySink } from "./gemini-usage-telemetry-server";
@@ -41,7 +41,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink("relationship_analyzer", telemetryUserId, turn.requestId));
     await check?.();
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
-    if (snapshot.version !== turnStartVersion) {
+    if (identityEnabled() && snapshot.version !== turnStartVersion) {
       const latestCritical = snapshot.criticalEvents?.filter(e => e.request_id === turn.requestId).at(-1)?.event_type ?? null;
       const resolved = resolveRelationshipIdentity({
         relationshipStateVersion: snapshot.version,
@@ -92,10 +92,10 @@ async function runPermanent(userId: string) {
       (t, type, events) => validateCriticalEvent(t, type, events, createGeminiTelemetrySink("critical_validator", userId, t.requestId)),
       (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));
     if (result.status === "deferred") break;
-    await processPermanentIdentity(userId);
+    if (identityEnabled()) await processPermanentIdentity(userId);
   }
   // Applied Relationship turns may have been skipped above while Identity previously failed.
-  await processPermanentIdentity(userId);
+  if (identityEnabled()) await processPermanentIdentity(userId);
 }
 
 /** Called via Next after(): never changes an already-successful chat/quota receipt. */
@@ -131,6 +131,13 @@ export async function importPermanentRelationship(userId: string, requestId: str
   // verified trajectory in memory and materialize atomically through the import RPC.
   if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);
   await check();
+  if (!identityEnabled()) {
+    const { error: legacyImportError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
+      ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
+      p_engine_version: PROCESSING_VERSION, p_payload: snapshot });
+    if (legacyImportError) throw new Error(`relationship_import_failed:${legacyImportError.code ?? ""}:${legacyImportError.message ?? ""}`);
+    return;
+  }
   const identity = snapshot.identity ?? resolveRelationshipIdentity({
     relationshipStateVersion: snapshot.version,
     state: snapshot.state
