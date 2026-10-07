@@ -57,7 +57,7 @@ export function createRelationshipActingGuide(
       trusted_friend:"信頼できる友達", partner_in_crime:"相棒", best_friend:"親友", important_person:"大切な人",
       person_of_interest:"気になる人", special_person:"特別な人", lover:"恋人"
     };
-    notes.push(`現在の関係の自己認識は「${labels[identity.primaryIdentity] ?? identity.primaryIdentity}」。これは台詞として読み上げず、距離感の前提として使う。`);
+    notes.push(`現在の関係の自己認識は「${labels[identity.primaryIdentity] ?? identity.primaryIdentity}」。通常はラベルを台詞として読み上げず距離感の前提として使う。ただしユーザーから「私たちはどういう関係？」「俺たちって何？」のように関係を直接聞かれた時は、この自己認識と明示的な交際状態に沿って、美咲自身の一人称の言葉で自然に答えてよい。DB名・内部ラベル名・点数・判定基準は説明しない。`);
     if (identity.primaryIdentity !== "lover") notes.push("Primary Identityが恋人以外なら、親密さや恋愛意識が高くても恋人として既成事実化しない。");
     if (identity.traits?.includes("deep_trust")) notes.push("深い信頼があるので、必要以上に聞き出さず自然に受け止められる。");
     if (identity.traits?.includes("playful_sync")) notes.push("呼吸の合う軽いやり取りを文脈に合う時だけ自然に使える。");
