@@ -1,3 +1,4 @@
+import type { RelationshipIdentity, RelationshipTrait, RelationshipConstraint } from "./relationship-identity-resolver";
 export type RelationshipActingState = {
   intimacyStage: 0 | 1 | 2 | 3 | 4 | 5;
   friendship: number;
@@ -27,7 +28,8 @@ function level(value: number) {
  * Scores must not automatically establish a relationship status.
  */
 export function createRelationshipActingGuide(
-  input: RelationshipActingState
+  input: RelationshipActingState,
+  identity?: { primaryIdentity: RelationshipIdentity; traits?: RelationshipTrait[]; constraint?: RelationshipConstraint }
 ) {
   const state = {
     ...input,
