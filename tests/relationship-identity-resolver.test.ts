@@ -74,9 +74,12 @@ test("post-breakup constraint remains until relationship is rebuilt; it is not a
  assert.equal(second.constraint,"post_breakup");
 });
 
-test("normal distant growth prefers a supported adjacent identity",()=>{
+test("normal distant growth holds the current identity on first observation while tracking the raw candidate",()=>{
  const r=resolveRelationshipIdentity({state:state(58,62,35,58,8),relationshipStateVersion:1,current:{primaryIdentity:"conversation_partner",constraint:"none"}});
- assert.equal(r.candidateIdentity,"friend");
+ assert.equal(r.primaryIdentity,"conversation_partner");
+ assert.equal(r.candidateIdentity,"trusted_friend");
+ assert.equal(r.candidateConfirmations,1);
+ assert.equal(r.transitionDecision,"hold");
 });
 test("strong canonical shape may escape adjacency without becoming a mandatory ladder",()=>{
  const r=resolveRelationshipIdentity({state:state(88,90,55,78,8),relationshipStateVersion:1,current:{primaryIdentity:"friend",constraint:"none"}});
