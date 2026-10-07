@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { RelationshipActingState } from "./relationship-acting-guide.ts";
+import type { IdentityState } from "./relationship-identity-resolver.ts";
 
 export const PROCESSING_VERSION = "relationship-v1.1";
 export const AXES = ["friendship", "trust", "playfulness", "affection", "romance"] as const;
@@ -21,6 +22,7 @@ export type Snapshot = {
   state: RelationshipActingState; version: number; episodes: Episode[]; appliedPatterns: string[];
   processed: string[]; pending: Turn[];
   criticalEvents?: Array<{ request_id: string; event_type: CriticalType }>;
+  identity?: IdentityState;
 };
 export function engineEnabled() { return process.env.MISAKI_RELATIONSHIP_ENGINE_VERSION === PROCESSING_VERSION; }
 export function hash(text: string) { return createHash("sha256").update(text).digest("hex"); }
