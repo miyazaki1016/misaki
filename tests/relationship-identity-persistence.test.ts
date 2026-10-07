@@ -29,3 +29,9 @@ test("tables and RPC are not callable by browser roles",()=>{
   assert.match(sql,/revoke all on table public\.misaki_relationship_identity_state from public,anon,authenticated/);
   assert.match(sql,/revoke execute on function public\.apply_misaki_relationship_identity_v1[\s\S]*from public,anon,authenticated/);
 });
+
+test("temporary identity import resets anonymous candidate versions and remaps active constraint anchor",()=>{
+ const sql=readFileSync("supabase/migrations/20261007070000_relationship_identity_v1_atomic_temporary_import.sql","utf8");
+ assert.match(sql,/null,0,null,[\s\n]*p_constraint_state,case when p_constraint_state='none' then null else v_source_version end/);
+ assert.match(sql,/candidate_identity=null,[\s\n]*candidate_confirmations=0,candidate_source_version=null/);
+});
