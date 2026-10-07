@@ -65,3 +65,11 @@ test("post rejection blocks romantic promotion while allowing friendship-side re
  const friendship=resolveRelationshipIdentity({state:state(90,95,50,85,75),relationshipStateVersion:31,current:{primaryIdentity:"friend",constraint:"post_rejection",constraintAnchorVersion:30}});
  assert.equal(friendship.candidateIdentity,"best_friend"); assert.notEqual(friendship.candidateIdentity,"special_person");
 });
+
+test("post-breakup constraint remains until relationship is rebuilt; it is not a timer",()=>{
+ const first=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:21,current:{primaryIdentity:"friend",constraint:"post_breakup",constraintAnchorVersion:20}});
+ assert.equal(first.constraint,"post_breakup"); assert.equal(first.candidateConfirmations,1);
+ const second=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:22,current:{primaryIdentity:first.primaryIdentity,candidateIdentity:first.candidateIdentity,candidateConfirmations:first.candidateConfirmations,candidateSourceVersion:first.candidateSourceVersion,constraint:first.constraint,constraintAnchorVersion:first.constraintAnchorVersion}});
+ assert.equal(second.primaryIdentity,"best_friend");
+ assert.equal(second.constraint,"post_breakup");
+});
