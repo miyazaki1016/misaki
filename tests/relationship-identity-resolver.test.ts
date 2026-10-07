@@ -39,3 +39,29 @@ test("breakup restores safe pre-romantic identity instead of inventing acquainta
  const r=resolveRelationshipIdentity({state:state(90,90,50,95,95),relationshipStateVersion:20,current:{primaryIdentity:"lover",constraint:"none",preRomanticIdentity:"best_friend"},criticalEvent:"relationship_end"});
  assert.equal(r.primaryIdentity,"best_friend"); assert.equal(r.constraint,"post_breakup");
 });
+
+test("constraint anchor blocks stale same-version promotion after breakup",()=>{
+ const ended=resolveRelationshipIdentity({state:state(90,90,50,95,95),relationshipStateVersion:20,current:{primaryIdentity:"lover",constraint:"none",preRomanticIdentity:"best_friend"},criticalEvent:"relationship_end"});
+ assert.equal(ended.constraintAnchorVersion,20);
+ const same=resolveRelationshipIdentity({state:state(90,90,50,95,95),relationshipStateVersion:20,current:{primaryIdentity:ended.primaryIdentity,constraint:ended.constraint,constraintAnchorVersion:ended.constraintAnchorVersion,preRomanticIdentity:ended.preRomanticIdentity}});
+ assert.equal(same.primaryIdentity,"best_friend"); assert.equal(same.candidateIdentity,null);
+});
+test("only a post-anchor canonical state can start rebuilding identity",()=>{
+ const current:IdentityState={primaryIdentity:"friend",constraint:"post_breakup",constraintAnchorVersion:20,preRomanticIdentity:"friend"};
+ const same=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:20,current});
+ assert.equal(same.candidateIdentity,null);
+ const newer=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:21,current});
+ assert.equal(newer.candidateIdentity,"best_friend"); assert.equal(newer.candidateConfirmations,1); assert.equal(newer.candidateSourceVersion,21);
+});
+test("duplicate post-anchor version cannot complete rebuilding confirmation",()=>{
+ const current:IdentityState={primaryIdentity:"friend",constraint:"post_breakup",constraintAnchorVersion:20,preRomanticIdentity:"friend"};
+ const first=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:21,current});
+ const replay=resolveRelationshipIdentity({state:state(90,95,50,85,5),relationshipStateVersion:21,current:{primaryIdentity:first.primaryIdentity,candidateIdentity:first.candidateIdentity,candidateConfirmations:first.candidateConfirmations,candidateSourceVersion:first.candidateSourceVersion,constraint:first.constraint,constraintAnchorVersion:first.constraintAnchorVersion,preRomanticIdentity:first.preRomanticIdentity}});
+ assert.equal(replay.primaryIdentity,"friend"); assert.equal(replay.candidateConfirmations,1);
+});
+test("post rejection blocks romantic promotion while allowing friendship-side rebuilding",()=>{
+ const rejected=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:30,current:{primaryIdentity:"friend",constraint:"none"},criticalEvent:"romantic_rejection"});
+ assert.equal(rejected.constraint,"post_rejection"); assert.equal(rejected.constraintAnchorVersion,30); assert.equal(rejected.candidateIdentity,null);
+ const friendship=resolveRelationshipIdentity({state:state(90,95,50,85,75),relationshipStateVersion:31,current:{primaryIdentity:"friend",constraint:"post_rejection",constraintAnchorVersion:30}});
+ assert.equal(friendship.candidateIdentity,"best_friend"); assert.notEqual(friendship.candidateIdentity,"special_person");
+});
