@@ -39,6 +39,22 @@ function candidate(s:AxisState,constraint:RelationshipConstraint){
  if(s.romance>=80&&Math.max(s.friendship,s.trust,s.affection)<45) return null;
  return ranked[0][0];
 }
+const neighbors:Record<Exclude<RelationshipIdentity,"lover">,readonly Exclude<RelationshipIdentity,"lover">[]>={
+ acquaintance:["conversation_partner"], conversation_partner:["acquaintance","friend"],
+ friend:["conversation_partner","compatible_friend","trusted_friend","person_of_interest","important_person"],
+ compatible_friend:["friend","partner_in_crime","important_person"], trusted_friend:["friend","best_friend","important_person"],
+ partner_in_crime:["compatible_friend","important_person","special_person"], best_friend:["trusted_friend","important_person","special_person"],
+ important_person:["friend","compatible_friend","trusted_friend","partner_in_crime","best_friend","person_of_interest","special_person"],
+ person_of_interest:["friend","important_person","special_person"], special_person:["person_of_interest","important_person","partner_in_crime","best_friend"]
+};
+function adjacentTarget(current:RelationshipIdentity,target:RelationshipIdentity,s:AxisState){
+ if(current==="lover"||target==="lover"||neighbors[current].includes(target)) return target;
+ const local=neighbors[current].filter(id=>gates[id](s)).map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
+ // Escape only when canonical shape overwhelmingly supports a distant region; normal movement prefers a supported neighbor.
+ const targetDistance=target==="lover"?0:distance(s,centers[target]);
+ if(targetDistance<=.06) return target;
+ return local[0]?.[0]??target;
+}
 export function deriveRelationshipTraits(s:AxisState):RelationshipTrait[]{
  const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");
  if(s.trust>=70)out.push("deep_trust"); if(s.playfulness>=70&&s.friendship>=60)out.push("playful_sync");
@@ -55,7 +71,8 @@ export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
  if(input.criticalEvent==="relationship_end"&&cur.primaryIdentity==="lover")
   return {primaryIdentity:cur.preRomanticIdentity??"acquaintance",traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_restore_safe_identity"};
  const hasPostAnchorState=constraint==="none"||constraintAnchorVersion==null||input.relationshipStateVersion>constraintAnchorVersion;
- const next=hasPostAnchorState?candidate(input.state,constraint):null;
+ const rawNext=hasPostAnchorState?candidate(input.state,constraint):null;
+ const next=rawNext?adjacentTarget(cur.primaryIdentity,rawNext,input.state):null;
  if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:deriveRelationshipTraits(input.state),candidateIdentity:null,candidateConfirmations:0,candidateSourceVersion:null,constraint,constraintAnchorVersion,preRomanticIdentity:cur.preRomanticIdentity??null,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
  const sameCandidate=cur.candidateIdentity===next;
  const sameSource=sameCandidate&&cur.candidateSourceVersion===input.relationshipStateVersion;
