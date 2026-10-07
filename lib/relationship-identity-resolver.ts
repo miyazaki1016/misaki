@@ -1,0 +1,62 @@
+export const RELATIONSHIP_IDENTITIES = ["acquaintance","conversation_partner","friend","compatible_friend","trusted_friend","partner_in_crime","best_friend","important_person","person_of_interest","special_person","lover"] as const;
+export type RelationshipIdentity = typeof RELATIONSHIP_IDENTITIES[number];
+export type RelationshipConstraint = "none" | "post_breakup" | "post_rejection" | "boundary";
+export type RelationshipTrait = "comfortable" | "deep_trust" | "playful_sync" | "strong_affection" | "romantic_awareness";
+export type IdentityDecision = "maintain" | "promote" | "demote" | "lateral" | "canonical_override" | "hold";
+export type AxisState = { friendship:number; trust:number; playfulness:number; affection:number; romance:number; relationshipStatus?:"none"|"romantic_partner" };
+export type IdentityState = { primaryIdentity:RelationshipIdentity; candidateIdentity?:RelationshipIdentity|null; candidateConfirmations?:number; constraint?:RelationshipConstraint };
+export type IdentityInput = { state:AxisState; current?:IdentityState; criticalEvent?:"romantic_acceptance"|"romantic_rejection"|"relationship_end"|"boundary_event"|"reconciliation"|null };
+export type IdentityResult = { primaryIdentity:RelationshipIdentity; traits:RelationshipTrait[]; candidateIdentity:RelationshipIdentity|null; candidateConfirmations:number; constraint:RelationshipConstraint; transitionDecision:IdentityDecision; reasonCode:string };
+
+const centers:Record<Exclude<RelationshipIdentity,"lover">,[number,number,number,number,number]>={
+ acquaintance:[15,10,10,10,0], conversation_partner:[30,20,15,20,0], friend:[50,35,30,30,5],
+ compatible_friend:[65,45,70,40,5], trusted_friend:[65,70,35,50,5], partner_in_crime:[82,72,82,58,8],
+ best_friend:[88,90,55,78,8], important_person:[72,82,42,90,12], person_of_interest:[58,48,38,48,55],
+ special_person:[75,78,48,80,72]
+};
+const gates:Record<Exclude<RelationshipIdentity,"lover">,(s:AxisState)=>boolean>={
+ acquaintance:()=>true, conversation_partner:s=>s.friendship>=20||s.trust>=15||s.affection>=15,
+ friend:s=>s.friendship>=40&&Math.max(s.trust,s.playfulness,s.affection)>=25,
+ compatible_friend:s=>s.friendship>=55&&s.playfulness>=55, trusted_friend:s=>s.friendship>=55&&s.trust>=60,
+ partner_in_crime:s=>s.friendship>=70&&s.trust>=55&&s.playfulness>=70,
+ best_friend:s=>s.friendship>=75&&s.trust>=80&&s.affection>=65,
+ important_person:s=>s.trust>=70&&s.affection>=80&&s.friendship>=55,
+ person_of_interest:s=>s.romance>=45&&Math.max(s.friendship,s.trust,s.affection)>=45&&(s.trust+s.affection)>=90,
+ special_person:s=>s.romance>=65&&s.trust>=65&&s.affection>=70&&s.friendship>=60
+};
+function distance(s:AxisState,c:[number,number,number,number,number]){
+ const a=[s.friendship,s.trust,s.playfulness,s.affection,s.romance],w=[1,1,1,1,.35];
+ return a.reduce((n,v,i)=>n+w[i]*((v-c[i])/100)**2,0)/w.reduce((a,b)=>a+b,0);
+}
+function candidate(s:AxisState,constraint:RelationshipConstraint){
+ if(s.relationshipStatus==="romantic_partner") return "lover" as const;
+ const blockedRomance=constraint!=="none";
+ const ranked=(Object.keys(centers) as Exclude<RelationshipIdentity,"lover">[])
+  .filter(id=>gates[id](s)&&(!blockedRomance||!["person_of_interest","special_person"].includes(id)))
+  .map(id=>[id,distance(s,centers[id])] as const).sort((a,b)=>a[1]-b[1]);
+ if(!ranked.length||ranked[0][1]>.30) return null;
+ // Romance without relational foundation must never manufacture relationship growth.
+ if(s.romance>=80&&Math.max(s.friendship,s.trust,s.affection)<45) return null;
+ return ranked[0][0];
+}
+function traits(s:AxisState):RelationshipTrait[]{
+ const out:RelationshipTrait[]=[]; if(Math.max(s.friendship,s.trust,s.affection)>=50)out.push("comfortable");
+ if(s.trust>=70)out.push("deep_trust"); if(s.playfulness>=70&&s.friendship>=60)out.push("playful_sync");
+ if(s.affection>=75)out.push("strong_affection"); if(s.romance>=45&&Math.max(s.friendship,s.trust,s.affection)>=45)out.push("romantic_awareness"); return out;
+}
+export function resolveRelationshipIdentity(input:IdentityInput):IdentityResult{
+ const cur=input.current??{primaryIdentity:"acquaintance",candidateIdentity:null,candidateConfirmations:0,constraint:"none"};
+ let constraint=cur.constraint??"none";
+ if(input.criticalEvent==="relationship_end") constraint="post_breakup";
+ if(input.criticalEvent==="romantic_rejection") constraint="post_rejection";
+ if(input.criticalEvent==="boundary_event") constraint="boundary";
+ if(input.state.relationshipStatus==="romantic_partner"||input.criticalEvent==="romantic_acceptance")
+  return {primaryIdentity:"lover",traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,constraint:"none",transitionDecision:"canonical_override",reasonCode:"explicit_romantic_partnership"};
+ if(input.criticalEvent==="relationship_end"&&cur.primaryIdentity==="lover")
+  return {primaryIdentity:"acquaintance",traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,constraint,transitionDecision:"canonical_override",reasonCode:"explicit_relationship_end_hold"};
+ const next=candidate(input.state,constraint);
+ if(!next||next===cur.primaryIdentity) return {primaryIdentity:cur.primaryIdentity,traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,constraint,transitionDecision:"maintain",reasonCode:next?"current_identity_supported":"candidate_refused"};
+ const confirmations=cur.candidateIdentity===next?(cur.candidateConfirmations??0)+1:1;
+ if(confirmations<2) return {primaryIdentity:cur.primaryIdentity,traits:traits(input.state),candidateIdentity:next,candidateConfirmations:confirmations,constraint,transitionDecision:"hold",reasonCode:"candidate_requires_second_canonical_state"};
+ return {primaryIdentity:next,traits:traits(input.state),candidateIdentity:null,candidateConfirmations:0,constraint,transitionDecision:"lateral",reasonCode:"candidate_confirmed_twice"};
+}
