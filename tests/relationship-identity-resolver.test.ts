@@ -89,3 +89,22 @@ test("adjacency does not turn high romance into lover status",()=>{
  const r=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:1,current:{primaryIdentity:"friend",constraint:"none"}});
  assert.notEqual(r.candidateIdentity,"lover");
 });
+
+test("post-rejection romance reentry requires a new canonical romance pattern",()=>{
+ const current:IdentityState={primaryIdentity:"friend",constraint:"post_rejection",constraintAnchorVersion:10};
+ const stale=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:11,current,hasNewRomancePattern:false});
+ assert.notEqual(stale.candidateIdentity,"special_person");
+ assert.notEqual(stale.candidateIdentity,"person_of_interest");
+ const fresh=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:11,current,hasNewRomancePattern:true});
+ assert.ok(fresh.candidateIdentity==="special_person"||fresh.candidateIdentity==="person_of_interest");
+});
+test("post-breakup friendship-only state update cannot revive romance identity",()=>{
+ const r=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:21,current:{primaryIdentity:"best_friend",constraint:"post_breakup",constraintAnchorVersion:20},hasNewRomancePattern:false});
+ assert.notEqual(r.candidateIdentity,"special_person");
+ assert.notEqual(r.candidateIdentity,"person_of_interest");
+});
+test("boundary constraint blocks romance reentry even with a new romance pattern",()=>{
+ const r=resolveRelationshipIdentity({state:state(78,82,50,85,75),relationshipStateVersion:31,current:{primaryIdentity:"friend",constraint:"boundary",constraintAnchorVersion:30},hasNewRomancePattern:true});
+ assert.notEqual(r.candidateIdentity,"special_person");
+ assert.notEqual(r.candidateIdentity,"person_of_interest");
+});
