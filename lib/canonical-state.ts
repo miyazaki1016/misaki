@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
-import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
+import { engineEnabled, identityEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
 import { createLegacyRelationshipActingState, type RelationshipActingState } from "./relationship-acting-guide";
 import { criticalCandidates } from "./relationship-analyzer-v1";
 import { resolveRelationshipIdentity, type IdentityState, type RelationshipIdentity, type RelationshipConstraint } from "./relationship-identity-resolver";
@@ -85,10 +85,10 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
   }
   const [relationship, identity, conversation] = await Promise.all([
     db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
-    db.from("misaki_relationship_identity_state").select("*").eq("user_id", userId).maybeSingle(),
+    identityEnabled() ? db.from("misaki_relationship_identity_state").select("*").eq("user_id", userId).maybeSingle() : Promise.resolve({ data: null, error: null }),
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
-  if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
+  if (relationship.error || conversation.error || (identityEnabled() && identity.error)) throw new Error("Canonical state read failed");
   let relationshipCriticalPending = relationshipImportPending;
   if (engineEnabled()) {
     const { data, error } = await db.from("misaki_relationship_critical_pending").select("request_id").eq("user_id", userId).in("status", ["pending", "processing", "failed"]);
@@ -109,7 +109,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     updatedAt: conversation.data?.updated_at ?? null,
     relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,
       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
-    relationshipIdentity: engineEnabled() && !identity.error && identity.data && relationship.data &&
+    relationshipIdentity: identityEnabled() && identity.data && relationship.data &&
       Number(identity.data.source_relationship_state_version) === Number(relationship.data.relationship_state_version) ? {
         primaryIdentity: identity.data.primary_identity as RelationshipIdentity,
         candidateIdentity: identity.data.candidate_identity as RelationshipIdentity|null,
