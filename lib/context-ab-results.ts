@@ -7,6 +7,8 @@ export type ContextTrial = {
   success: boolean;
   jsonValid: boolean;
   timedOut: boolean;
+  httpStatus?: number | null;
+  emptyCandidate?: boolean;
 };
 export function summarizeContextTrials(trials: readonly ContextTrial[]) {
   const summarize = (variant: "A" | "B") => {
@@ -24,6 +26,9 @@ export function summarizeContextTrials(trials: readonly ContextTrial[]) {
       successes: successful.length,
       timeouts: rows.filter((row) => row.timedOut).length,
       invalidJson: rows.filter((row) => !row.jsonValid).length,
+      malformedJson: rows.filter((row) => row.httpStatus === 200 && !row.emptyCandidate && !row.jsonValid).length,
+      emptyCandidates: rows.filter((row) => row.emptyCandidate === true).length,
+      httpStatusCounts: Object.fromEntries([...new Set(rows.map((row) => String(row.httpStatus ?? "network_error")))].sort().map((status) => [status, rows.filter((row) => String(row.httpStatus ?? "network_error") === status).length])),
       latencyP50Ms: percentile(rows.map((row) => row.latencyMs), 0.5),
       latencyP95Ms: percentile(rows.map((row) => row.latencyMs), 0.95),
       meanPromptTokens: mean(rows.flatMap((row) => row.promptTokens === null ? [] : [row.promptTokens])),
