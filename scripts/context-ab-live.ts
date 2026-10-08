@@ -64,16 +64,24 @@ const shortSnapshot = {
 const fixture = process.env.MISAKI_AB_FIXTURE ?? "short";
 if (!["short", "long"].includes(fixture)) throw new Error("MISAKI_AB_FIXTURE must be short or long.");
 const snapshot = fixture === "long" ? makeSyntheticLongContext() : shortSnapshot;
+const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? "0");
+if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error("MISAKI_AB_DELAY_MS must be 0..120000.");
 const adapter = createIsolatedGeminiAdapter({
   apiKey,
   model,
   allowLiveRequests: true,
   timeoutMs: 30000,
 });
-const result = await runOfflineContextComparison(snapshot, adapter, runs);
+let requestCount = 0;
+const pacedAdapter: typeof adapter = async (request) => {
+  if (requestCount++ > 0 && delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
+  return adapter(request);
+};
+const result = await runOfflineContextComparison(snapshot, pacedAdapter, runs);
 console.log(JSON.stringify({
   mode: "synthetic-live-gemini",
   fixture,
+  delayMs,
   model,
   runsPerVariant: runs,
   promptChars: result.promptChars,
