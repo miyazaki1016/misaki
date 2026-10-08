@@ -49,7 +49,7 @@ jobs:
       - name: Checkout pinned experiment commit (not Production)
         uses: actions/checkout@v4
         with:
-          ref: f18b5ea58cc34f148d5bc08fc710f7a4606766a5
+          ref: c62cd88b72c81d4d85a40596f35d7dfe3db18091
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -65,6 +65,7 @@ jobs:
           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}
           MISAKI_AB_FIXTURE: ${{ inputs.fixture }}
           MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}
+          MISAKI_AB_EXPORT_REVIEW: ${{ inputs.experiment == 'quality' && 'YES' || 'NO' }}
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then
             echo 'Secret missing; refusing live calls.'
@@ -75,3 +76,19 @@ jobs:
           else
             node --experimental-strip-types scripts/context-ab-live.ts
           fi
+      - name: Upload blinded synthetic replies for human review
+        if: ${{ success() && inputs.experiment == 'quality' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-blind-review
+          path: ab-review-output/blind-review.json
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload separate answer key
+        if: ${{ success() && inputs.experiment == 'quality' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-review-key
+          path: ab-review-output/blind-key.json
+          if-no-files-found: error
+          retention-days: 1
