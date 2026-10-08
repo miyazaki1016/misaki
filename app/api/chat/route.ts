@@ -46,6 +46,7 @@ import {
 import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from "../../../lib/relationship-patterns";
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 import { generateGeminiJson } from "../../../lib/gemini-json-generator";
+import { contextSizeMeasurementEnabled, measureContextSize } from "../../../lib/context-size-measurement";
 import { createGeminiTelemetrySink } from "../../../lib/gemini-usage-telemetry-server";
 import {
   createLegacyRelationshipActingState,
@@ -2411,6 +2412,33 @@ misakiTodayMemory は、
   }
 }
 `.trim();
+
+    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS)) {
+      // Counts only: no prompt text, user content, IDs, or memory values.
+      console.log("MISAKI CONTEXT SIZE:", {
+        traceId,
+        ...measureContextSize({
+          systemInstruction: baseSystemPrompt,
+          history: contents,
+          userText: modelMessage,
+          persona: personaPrompt,
+          relationshipGuides: [
+            relationshipGuide, relationshipActingGuide,
+            pendingRelationshipGuide(rootState),
+            createRelationshipTimeGuide(relationshipTimeContext),
+            createRelationshipSignalGuide(),
+          ],
+          longTermMemory: memoryText,
+          todayMemory: todayMemoryGuide,
+          repeatedReplies: recentTopicText,
+          environmentGuides: [
+            misakiLife, timeGuide, weatherGuide,
+            weatherHistoryGuide, tokyoLifeEventsGuide,
+            activityGroundingGuide, taxiContextGuide,
+          ],
+        }),
+      });
+    }
 
     async function generateReply(
       retryProblems?: string[],
