@@ -10,8 +10,13 @@ export function createIsolatedGeminiAdapter(options: {
   model: string;
   timeoutMs?: number;
   fetchImpl?: typeof fetch;
+  /** Explicit authorization is required for real billable model requests. */
+  allowLiveRequests?: boolean;
 }): ReadOnlyModelAdapter {
   if (!options.apiKey || !options.model) throw new Error("Missing Gemini credentials or model");
+  if (!options.fetchImpl && options.allowLiveRequests !== true) {
+    throw new Error("Live Gemini calls disabled: set allowLiveRequests explicitly");
+  }
   const fetcher = options.fetchImpl ?? fetch;
   const timeoutMs = options.timeoutMs ?? 30000;
   return async ({ systemInstruction, history, userText }) => {
