@@ -14,6 +14,14 @@ on:
         options:
           - 'short'
           - 'long'
+      delay_ms:
+        description: 'Delay between Gemini requests in milliseconds (0 or 10000)'
+        required: true
+        type: choice
+        default: '10000'
+        options:
+          - '0'
+          - '10000'
       runs_per_variant:
         description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'
         required: true
@@ -33,7 +41,7 @@ jobs:
       - name: Checkout pinned experiment commit (not Production)
         uses: actions/checkout@v4
         with:
-          ref: c1a66ecc3d6e1c913311873e0f0096f23d1ecd02
+          ref: d159ac70fb95be23204e04c4d91b453f1f7894f3
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -48,6 +56,7 @@ jobs:
           MISAKI_AB_MODEL: gemini-3.1-flash-lite
           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}
           MISAKI_AB_FIXTURE: ${{ inputs.fixture }}
+          MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then
             echo 'Secret missing; refusing live calls.'
