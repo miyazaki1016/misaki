@@ -3487,3 +3487,118 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+---
+
+### Relationship Identity v1 — PR #67 migration順序・resolver総監査（2026-10-07）
+
+**状態:** `work/relationship-identity-v1` / [Draft PR #67](https://github.com/miyazaki1016/misaki/pull/67)。**Production適用済み・Identity gate OFF**。Production migration履歴は `20261007114143 / 20261007114154 / 20261007114158 / 20261007114201`。PRはDraftのまま、merge禁止・gate ON禁止。今回の作業は適用済み履歴へのファイル名整合と総覧・テスト参照更新のみで、Production操作は行わない。PR #66 Forget Controlは変更・混入していない。以下は上の「実装前・コード未実装」handoffに対する現在の施工記録であり、古い施工前ステータスを現在状態と読み違えないこと。
+
+#### 再照合した正本・施工境界
+
+- 最新main: `18e2c0bdfa007c980858f85341eb8c78e0e5301a`。
+- 施工開始branch HEAD: `2b97931217ab816018d70ddc63d0f764bb8bf276`。コード修正commit: `555d35bc19e7003dd9b051d02762b4bdfac1b192`。
+- 本総覧のRelationship Identity handoff / canonical persistence、現行resolver / permanent・anonymous runtime / canonical read / Acting Guide / chat接続、Relationship schema・Engine migrationsとcommit historyを照合した。
+- 070000の復元正本は `c769243c557f9a79eaef0a60821208b3a28fd0e1^` のファイル内容。復元後にbyte一致を確認した。
+- 前回監査時点ではIdentity migrationは未適用だった。その後owner指示によりProduction適用済み。今回ownerから提示されたProduction履歴に4本のファイル名を整合する。SQL本文は全4本とも監査済みcommit `636c3fd` とbyte一致し、Production履歴・DB・gateは変更しない。
+- 既存11 Primary Identities、classifier centers / gates / distance weights、distinct-version 2回confirmation、critical-event precedence、constraintの意味論を維持。仮classifier値を本工事で新しくfreezeしていない。
+- Relationship Engine v1.1のAnalyzer / Interpreter / Evidence → Episode → Pattern → State、3独立Tokyo日Pattern、5軸delta計算、relationship_status、oldest-first、START_AT、fail-closed、retry、lease・processing ledgerを変更していない。mainとの差分でEngine単体は既存PRのIdentity型・feature gate追加のみ、processing / analyzer / Supabase Functionsに今回の差分なし。
+
+#### 実装した修正
+
+1. 070000の先行provenance列参照とboolean引数追加を除去し、provenance導入前の自己完結するatomic temporary importへ復元。
+2. 083000で13引数Identity apply RPCを作成後、旧12引数signatureを `PUBLIC / anon / authenticated / service_role` から明示revokeし、DROP。13引数RPCはSECURITY INVOKERでservice_roleのみ実行可能。
+3. Supabase CLI **2.81.2** の `--help` / `migration new --help` 確認後、`supabase migration new relationship_identity_v1_temporary_import_romance_provenance` により083000より後の新migrationを作成。temporary import v3のboolean provenance対応を移設し、旧21引数import overloadもrevoke → DROP。最終importは22引数のみ。
+4. importではanonymousのcandidate source / constraint anchor / romance re-entryの数値versionを恒久canonicalへコピーしない。candidateをresetし、active `post_breakup / post_rejection` かつprovenance fact=trueの場合だけ、新permanent `v_source_version` へproofをmapする。`none / boundary / false / null` はproof=null。checkpoint import・Identity・transition ledgerを同一transactionに保つ。
+5. importでanchorとproofが同じpermanent versionへmapされた後、従来083000の `proof <= anchor` 検証が次回保存を拒否する不整合を修正。equal-anchor proofは、locked canonical Identity rowに既に同じconstraint / anchor / proofがある場合の保持に限定する。新しくequal-anchor proofを捏造するapplyは拒否し、通常のfresh proofは引き続きanchorより後のcanonical versionを必要とする。
+6. Identity applyがcanonical relationship rowをlockしてsource versionを検証し、その後Identity rowをlockする。初回Identity作成とState更新の競合中もsource検証をtransaction中に固定し、stale拒否 / replay / identity_since / immutable transition ledgerの保証を維持。
+7. resolverのadjacency距離最小選択を維持。現在Identity自身がcandidateのとき近傍へ動かそうとしていた経路を、現在Identity支持として維持するよう修正。距離同率はObject / 配列順で選ばず分類保留し、総覧の「分類不能なら現在Identityを維持」契約を適用。新しいIdentity優先順位やthresholdは追加していない。
+8. permanent workerのromance provenance applicationを `created_at` の先頭rowではなくcanonical `after_state.relationship_state_version` で取得。時刻同率やrow順でfresh proofの有無が変わらないようにした。Engine application自体は変更していない。
+
+#### migration最終構成（必ずこの順序）
+
+| 順序 | migration | その時点の状態 |
+| --- | --- | --- |
+| 1 | `20261007114143_relationship_identity_v1_canonical.sql` | Identity current-state / transition ledger / 12引数apply。既存ファイルを変更せず保持 |
+| 2 | `20261007114154_relationship_identity_v1_atomic_temporary_import.sql` | provenance列不要の21引数temporary import v3。指定commit前の内容へ復元 |
+| 3 | `20261007114158_relationship_identity_v1_romance_reentry_provenance.sql` | provenance列と13引数apply。旧12引数はrevoke後DROP。旧temporary importはまだ呼出し可能 |
+| 4 | `20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql` | boolean fact対応の22引数import v3。旧21引数はrevoke後DROP |
+
+最終schemaに旧12引数apply / 旧21引数importを残さない。新RPCにdefault引数は付けず、旧signatureの暗黙選択を許可しない。
+
+#### 自動検証結果
+
+- `npm ci`: 成功。SQL統合テスト用dev dependency `@electric-sql/pglite@0.5.8` をexact pinしlockfileへ記録。
+- `TZ=UTC npm test`: **320 / 320成功**。
+- `TZ=Asia/Tokyo npm test`: **320 / 320成功**。
+- `node --test --experimental-strip-types tests/relationship-identity-*.test.ts`: **57 / 57成功**（今回追加16件を含む）。
+- `npx tsc --noEmit`: 成功。
+- `npm run build`: 成功。Nextのlint / type validity stageも完了。独立した `npm run lint` script / ESLint configはリポジトリに存在しないため、それを実行したとは扱わない。
+- `git -c core.whitespace=cr-at-eol diff --check`: 成功。
+
+SQL統合テストは空のPGliteに最低限のAuth / legacy参照fixtureを作り、tracked Relationship foundation / Engine migrationsを適用した上で、Identity列を**最初から順番に適用**した。064000の12引数apply、070000の旧import、083000の13引数applyと旧import、最終新importをそれぞれ次migration前に実呼出しして、各時点が自己完結することを確認した。DDLが作成できたことだけで合格にしていない。
+
+確認した契約:
+- 最終RPCのoverload数・引数数・SECURITY INVOKER・role ACL。service_roleの実write成功、browser rolesの呼出し拒否。
+- stale canonical source拒否、same-version replay、identity_since保持/Identity変更時更新、ledger件数の冪等性。ledger保存失敗時のIdentity write rollback。
+- anonymous version=900等をpermanent version=41へコピーせず、constraint / proofを契約どおりmap。import replayでversion / ledgerを二重更新しない。
+- breakup / rejection / boundary、fresh positive romance Pattern proof、後続non-romance updateでの保持、新rejection / boundaryでreset。equal-anchor proofの新規捏造拒否。
+- 既存lease付きState RPCによるpositive romance Pattern applicationと、その後のnon-romance application。時刻同率でもcanonical source versionで正しいrowを参照。
+- importのbad lease / checkpoint欠落拒否、axes更新後にIdentity INSERTが失敗した場合のaxes / Identity / import marker / ledger atomic rollback。
+- hysteresisのdistinct canonical version 2回のみ。same-version replayで2回目confirmationを増やさない。
+- 全11 Identity × canonical shapes × constraints × provenance × critical eventsの**6,336ケース**を、centers Object順・neighbors配列順を反転したresolverと比較し一致。各中心の小変動維持、分類同率保留、非隣接targetの距離rankingも確認。
+- actual temporary Engineの3独立Tokyo日positive romance Patternからproofが成立することを確認。Pattern条件・State更新をテストのために差し替えていない。
+
+全suiteには既存quota / refund、canonical chat / anonymous checkpoint / restore、Body Clock、Relationship Engine / Pattern / Acting Guide等の回帰も含む。
+
+#### CI / Preview
+
+コードcommit `555d35bc19e7003dd9b051d02762b4bdfac1b192`:
+- [GitHub Actions — Canonical relationship integration tests #427](https://github.com/miyazaki1016/misaki/actions/runs/37598444755): **success**。Node 22で `npm ci / npm test / tsc / build` が成功。
+- [Vercel Preview](https://misaki-4l7l9mdsr-kishibojim.vercel.app): **READY**。deployment `dpl_6NzEcK8UZoHAuhegDtxhWJLBnodv`、target=Preview、同じコードSHAを確認。
+- Preview READYはbuild成功を意味し、Identity migrationを適用した隔離Supabaseでの実機受入成功を意味しない。今回PreviewからProduction DBへfixture / chat / RPC writeはしていない。
+
+#### 残存リスク・未解決事項
+
+- PGliteはsingle-session。row lockingは実RPC定義のlock順とtransaction契約を確認したが、複数DBセッションのlock待機・競合試験は未実施。既存Engineのlease挙動を変更していないこととは別に、Identity gate有効化前に隔離Postgresで競合確認が必要。
+- リポジトリは初期Supabase schemaの完全なmigration履歴を収録しておらず、legacyに同一timestampのmigrationもある。今回の「最初から適用成功」は**明示した隔離baseline + tracked Relationship migrations + Identity全4本**である。アプリ全体の空Supabase `db reset` 成功を主張しない。過去の全migration履歴を本scopeで推測修復していない。
+- 既存 `tests/*.rollback.sql` を完全なSupabase実DBへ流す受入検証、および隔離Supabaseに接続したPreviewのanonymous → email → 別端末restore / retry実機受入は未実施。Identity migrationはProduction適用済みだがgate OFF。今回Productionへwriteして検証することは禁止。
+- classifier値は今回の正本HEADを維持しており、数値classifierの新freezeやconstraint解除ルールの追加はしていない。Identity gate有効化前に既存のownerレビューgateを確認する。
+- 全自動・CI/build成功と、Production適用可能との承認を混同しない。PR #67は引き続きDraft / merge禁止で止める。
+
+#### Identity gate有効化前の残存受入手順（この工事では実行しない）
+
+DB migrationはProduction適用済み。以下の旧適用前チェックは残存受入事項として保持する。Productionへの4本再適用は不要・禁止。Identity gateはOFFを維持する。
+
+1. ownerがPR差分・総覧・classifier / constraintの既存承認範囲をレビューする。Draft解除 / merge / Production操作は別承認。
+2. 独立したSupabase / Postgres隔離環境に正しいlegacy baselineを用意し、既存履歴の重複・欠落を確認した上でIdentity4本を順番に適用。最終RPC signature / ACL / stale / replay / ledger / checkpoint原子性を再確認する。
+3. 別セッションでState更新とIdentity apply、同一sourceの二重apply、import競合・retryを試験し、lock待機後のstale拒否と二重ledger防止を確認する。
+4. Previewを隔離DBへ接続し、anonymous → email → 別端末restore、breakup / rejection / boundary、fresh positive Pattern → re-entry → non-romance更新 → 新critical reset、pending / 次turn反映を実機で受入。既存rollback SQL suiteも隔離環境で実施する。
+5. Production履歴は上記4本へ整合済み。既存Relationship Engine v1.1・backup / rollback方針・稼働版のRPC signature整合を確認し、残存受入完了後にIdentity gate有効化を別途判断する。本作業ではgate ONは禁止。
+
+**停止位置:** Production適用済み・Identity gate OFF。PR #67はDraft・未merge。今回の変更はmigrationファイル名・テスト参照・総覧のみ。merge・gate ONは禁止。Forget Control / PR #66は触らない。
+
+#### Production履歴へのファイル名整合（2026-10-07）
+
+1本目はcommit `2eb4b90` で新名ファイルが追加されたが旧名も残っていたため、内容一致を確認して重複を解消し `git mv` で旧名を除去。残り3本も `git mv` し、4本すべて監査済みcommit `636c3fd` のSQL本文とbyte一致を確認。SQL内の旧timestampを含むコメントも変更しない。テストのファイル参照のみ新名称へ更新する。ローカルUTC full suite 320件・tsc・Next build成功。全CIの最終結果はPRの最新HEADに紐づくchecksを正本とする。
+
+#### Relationship Identity v1 — 実機canonical lover受入（2026-10-08）
+
+**結論:** branch Previewで実ユーザー会話から `romantic_acceptance → relationship_status=romantic_partner → Primary Identity=lover` のcanonical経路が成立した。これは表示上の「恋人」発言ではなく、Relationship Engine / Critical Event / canonical State / Identity Resolver / Identity persistenceを通過した正本上の成立である。Production frontendのIdentity gateは引き続きOFF、PR #67はDraft・未merge。
+
+**実機で発見した不具合:** 既存 `criticalCandidates(message)` はユーザーmessageだけから候補を生成し、Validatorの `supportingTurn` もユーザーmessageのみをgrounding対象としていた。そのため、canonical `romantic_proposal` 後にユーザーが「美咲も俺と付き合いたいってことでいい？」と確認し、美咲がreplyで明示的に交際同意しても、`romantic_acceptance` を成立させられずproposalとして再処理されていた。実DBでは修正前に proposal が増える一方 acceptance は0、Identityは `acquaintance` のままだった。
+
+**修正:** commit `2b104642` で、ユーザーの明示的な交際確認質問をacceptance候補へ含め、Validatorに限って「prior canonical romantic_proposal が存在し、かつMisaki replyが交際・恋人関係へ明示同意する」場合のみreplyをacceptanceのgroundingとして許可した。Misakiの「好き」「大好き」等の生成好意だけでは候補にもacceptanceにもならず、proposalなしのreply単独でも成立しない。既存原則「Misaki generated words alone cannot establish dating」は維持する。
+
+**回帰固定:** commit `cd2479ee` で `tests/relationship-mutual-acceptance.test.ts` を追加。①明示的確認質問→acceptance候補、②prior proposal＋明示的Misaki交際同意→acceptance可、③prior proposalなし→reply grounding拒否、④通常の好意表現→Critical Eventなし、を固定。GitHub Actions `Canonical relationship integration tests #432` はsuccess。Vercel Preview deployment `dpl_BJU7aDCqdAHmJYJemNkNV1QbZS2o` / commit `cd2479ee1cad11294132563049a86662f8652576` はREADY。
+
+**実機受入結果:** 最新Previewで同じ確認質問を送信。chat本体・`relationship-turn-record` は成功し、Runtime logに `RELATIONSHIP V1 PROCESSING RETRY REQUIRED` なし。canonical DBで `romantic_acceptance` が記録され、Identity stateは `primary_identity=lover`, `constraint_state=none`, `source_relationship_state_version=4` を確認。critical eventによるcanonical overrideは2-confirmation hysteresisを待たずloverへ遷移する設計どおり。
+
+**重要な解釈:** 以前の会話履歴で美咲が「恋人」と発言していても、それだけではcanonical Identityは `acquaintance` のままだった。今回初めて明示的な相互交際合意がcanonical Critical Eventとして成立し、正本のRelationship Status / Identityと会話上の関係が一致した。会話のノリや高いscoreだけでloverへ昇格していないことも同時に確認できた。
+
+**Acting Guide実機受入 PASS（2026-10-08）:** canonical `lover` 成立後の次turnでownerが「ねえ美咲、俺たちって今どんな関係？😊」と質問。美咲は「私たち、恋人同士でしょ？」と自然に回答し、直前会話も参照した表現を返した。内部の `lover` / Identity / score /判定ルールは露出していない。同一turnの生成結果を遡及変更せず、canonical成立後の**次turn**でActing Guideが現在Identityを自己認識する設計どおり。よって `canonical romantic_acceptance → Identity lover → next-turn Acting Guide self-recognition` の実機E2EをPASSとする。
+
+**次の受入:** anonymous path / temporary import v3 の実アプリ経路を優先し、匿名会話のRelationship Identityが保存時に恒久アカウントへ原子的に引き継がれることを確認する。その後 breakup / rejection / boundary、fresh romance Patternによるre-entry、真のmulti-session lock contentionを未完了事項として残す。
+
+**停止位置:** Production Identity migrationは適用済みだがProduction frontend Identity gateはOFF。PR #67はDraft・未merge。Production gate ON / mergeはownerの別承認まで禁止。PR #66 Forget Controlは触らない。

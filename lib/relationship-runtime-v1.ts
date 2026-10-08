@@ -1,9 +1,12 @@
 import { createServerSupabase, loadTemporaryRoot, editTemporaryRoot, openTemporaryState, type RootState } from "./canonical-state";
 import { createLegacyRelationshipActingState } from "./relationship-acting-guide";
-import { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
+import { engineEnabled, identityEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
 import { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from "./relationship-analyzer-v1";
 import { CanonicalRelationshipStore, processRelationshipTurn } from "./relationship-processing-v1";
 import { createGeminiTelemetrySink } from "./gemini-usage-telemetry-server";
+import { resolveRelationshipIdentity, type IdentityState, type RelationshipIdentity, type RelationshipConstraint } from "./relationship-identity-resolver";
+
+const IDENTITY_RESOLVER_VERSION = "relationship-identity-v1";
 
 // Local deduplication is an optimization; DB leases serialize distributed workers.
 const running = new Map<string, Promise<void>>();
@@ -21,6 +24,7 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     if (!history?.some(t => t.requestId === turn.requestId && t.role === "user" && t.text === turn.message) ||
       !history.some(t => t.requestId === turn.requestId && t.role === "misaki" && t.text === turn.reply)) throw new Error("temporary_canonical_turn_required");
     // Pending turn remains encrypted/durable if validation or analysis fails.
+    const turnStartVersion = snapshot.version;
     for (const type of criticalCandidates(turn.message)) {
       const events = snapshot.criticalEvents ?? [];
       if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;
@@ -36,7 +40,30 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
     await check?.();
     const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink("relationship_analyzer", telemetryUserId, turn.requestId));
     await check?.();
+    const preEvidenceVersion=snapshot.version;
+    const preEvidenceRomance=snapshot.state.romance;
     snapshot = applyTemporaryEvidence(snapshot, turn, evidence);
+    const hasFreshRomanceProvenance=snapshot.version>preEvidenceVersion && snapshot.state.romance>preEvidenceRomance;
+    if (identityEnabled() && snapshot.version !== turnStartVersion) {
+      const latestCritical = snapshot.criticalEvents?.filter(e => e.request_id === turn.requestId).at(-1)?.event_type ?? null;
+      const resolved = resolveRelationshipIdentity({
+        relationshipStateVersion: snapshot.version,
+        state: snapshot.state,
+        current: snapshot.identity,
+        criticalEvent: latestCritical==="romantic_proposal"?null:latestCritical,
+        hasNewRomancePattern:hasFreshRomanceProvenance
+      });
+      snapshot = { ...snapshot, identity: {
+        primaryIdentity: resolved.primaryIdentity,
+        candidateIdentity: resolved.candidateIdentity,
+        candidateConfirmations: resolved.candidateConfirmations,
+        candidateSourceVersion: resolved.candidateSourceVersion,
+        constraint: resolved.constraint,
+        constraintAnchorVersion: resolved.constraintAnchorVersion,
+        romanceReentryVersion: resolved.romanceReentryVersion,
+        preRomanticIdentity: resolved.preRomanticIdentity
+      } };
+    }
     if (save) await save(snapshot);
   }
   return snapshot;
@@ -70,7 +97,10 @@ async function runPermanent(userId: string) {
       (t, type, events) => validateCriticalEvent(t, type, events, createGeminiTelemetrySink("critical_validator", userId, t.requestId)),
       (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));
     if (result.status === "deferred") break;
+    if (identityEnabled()) await processPermanentIdentity(userId);
   }
+  // Applied Relationship turns may have been skipped above while Identity previously failed.
+  if (identityEnabled()) await processPermanentIdentity(userId);
 }
 
 /** Called via Next after(): never changes an already-successful chat/quota receipt. */
@@ -106,13 +136,96 @@ export async function importPermanentRelationship(userId: string, requestId: str
   // verified trajectory in memory and materialize atomically through the import RPC.
   if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);
   await check();
-  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
+  if (!identityEnabled()) {
+    const { error: legacyImportError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
+      ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
+      p_engine_version: PROCESSING_VERSION, p_payload: snapshot });
+    if (legacyImportError) throw new Error(`relationship_import_failed:${legacyImportError.code ?? ""}:${legacyImportError.message ?? ""}`);
+    return;
+  }
+  const identity = snapshot.identity ?? resolveRelationshipIdentity({
+    relationshipStateVersion: snapshot.version,
+    state: snapshot.state
+  });
+  const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v3", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",
-    p_engine_version: PROCESSING_VERSION, p_payload: snapshot });
+    p_engine_version: PROCESSING_VERSION, p_payload: snapshot,
+    p_primary_identity: identity.primaryIdentity, p_candidate_identity: identity.candidateIdentity ?? null,
+    p_candidate_confirmations: identity.candidateConfirmations ?? 0, p_candidate_source_version: identity.candidateSourceVersion ?? null,
+    p_constraint_state: identity.constraint ?? "none", p_constraint_anchor_version: identity.constraintAnchorVersion ?? null,
+    p_romance_reentry_established: identity.romanceReentryVersion != null, p_pre_romantic_identity: identity.preRomanticIdentity ?? null,
+    p_resolver_version: IDENTITY_RESOLVER_VERSION });
   if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? ""}:${rpcError.message ?? ""}`);
 }
 
 export function pendingRelationshipGuide(root: RootState) {
   return root.relationshipCriticalPending || root.relationshipEngine?.pending.some(t => criticalCandidates(t.message).length)
     ? "【未解決の明示的関係イベント】直近の関係変更は検証待ち。成立・継続・復縁を断定せず、現在のユーザーの境界を優先してください。" : "";
+}
+
+
+async function processPermanentIdentity(userId: string) {
+  const db = createServerSupabase();
+  const { data: relationship, error: relationshipError } = await db.from("misaki_relationship_state")
+    .select("friendship_score,trust_score,playfulness_score,affection_score,romance_score,relationship_status,relationship_state_version")
+    .eq("user_id",userId).maybeSingle();
+  if (relationshipError) throw new Error("relationship_identity_source_read_failed");
+  if (!relationship) return;
+
+  const { data: saved, error: identityError } = await db.from("misaki_relationship_identity_state").select("*").eq("user_id",userId).maybeSingle();
+  // Migration is intentionally deployable separately from runtime. Until present, retry later.
+  if (identityError) throw new Error("relationship_identity_state_read_failed");
+  if (saved?.source_relationship_state_version === relationship.relationship_state_version && saved?.resolver_version === IDENTITY_RESOLVER_VERSION) return;
+
+  const { data: eventRows, error: eventError } = await db.from("misaki_relationship_events")
+    .select("event_type,after_state,id").eq("user_id",userId)
+    .in("event_type",["romantic_acceptance","romantic_rejection","relationship_end","boundary_event","reconciliation"])
+    .order("id",{ascending:false}).limit(1);
+  if (eventError) throw new Error("relationship_identity_event_read_failed");
+  const latestEvent = eventRows?.[0];
+  const eventVersion = Number(latestEvent?.after_state?.relationship_state_version);
+  const criticalEvent = eventVersion === Number(relationship.relationship_state_version) ? latestEvent.event_type : null;
+
+  let hasNewRomancePattern=false;
+  if(saved?.constraint_state && saved.constraint_state!=="none" && saved.constraint_state!=="boundary"){
+    const { data: application, error: applicationError } = await db.from("misaki_relationship_state_applications")
+      .select("romance_delta,after_state").eq("user_id",userId)
+      .eq("after_state->>relationship_state_version",String(relationship.relationship_state_version)).limit(1).maybeSingle();
+    if(applicationError) throw new Error("relationship_identity_application_read_failed");
+    hasNewRomancePattern=Number(application?.after_state?.relationship_state_version)===Number(relationship.relationship_state_version)
+      && Number(application?.romance_delta ?? 0)>0;
+  }
+
+  const current:IdentityState|undefined = saved ? {
+    primaryIdentity:saved.primary_identity as RelationshipIdentity,
+    candidateIdentity:saved.candidate_identity as RelationshipIdentity|null,
+    candidateConfirmations:Number(saved.candidate_confirmations ?? 0),
+    candidateSourceVersion:saved.candidate_source_version == null ? null : Number(saved.candidate_source_version),
+    constraint:saved.constraint_state as RelationshipConstraint,
+    constraintAnchorVersion:saved.constraint_anchor_version == null ? null : Number(saved.constraint_anchor_version),
+    romanceReentryVersion:saved.romance_reentry_version == null ? null : Number(saved.romance_reentry_version),
+    preRomanticIdentity:saved.pre_romantic_identity as Exclude<RelationshipIdentity,"lover">|null
+  } : undefined;
+
+  const resolved=resolveRelationshipIdentity({
+    relationshipStateVersion:Number(relationship.relationship_state_version),
+    state:{
+      friendship:Number(relationship.friendship_score),trust:Number(relationship.trust_score),
+      playfulness:Number(relationship.playfulness_score),affection:Number(relationship.affection_score),
+      romance:Number(relationship.romance_score),relationshipStatus:relationship.relationship_status
+    },
+    current,criticalEvent,hasNewRomancePattern
+  });
+
+  const { error: applyError } = await db.rpc("apply_misaki_relationship_identity_v1",{
+    p_user_id:userId,p_source_relationship_state_version:Number(relationship.relationship_state_version),
+    p_resolver_version:IDENTITY_RESOLVER_VERSION,p_primary_identity:resolved.primaryIdentity,
+    p_candidate_identity:resolved.candidateIdentity,p_candidate_confirmations:resolved.candidateConfirmations,
+    p_candidate_source_version:resolved.candidateSourceVersion,p_constraint_state:resolved.constraint,
+    p_constraint_anchor_version:resolved.constraintAnchorVersion,p_romance_reentry_version:resolved.romanceReentryVersion,p_pre_romantic_identity:resolved.preRomanticIdentity,p_transition_decision:resolved.transitionDecision,p_reason_code:resolved.reasonCode
+  });
+  if (applyError) {
+    if (/stale_relationship_state_version/.test(applyError.message ?? "")) return; // a newer canonical state won; retry from it later.
+    throw new Error(`relationship_identity_apply_failed:${applyError.code ?? ""}:${applyError.message ?? ""}`);
+  }
 }
