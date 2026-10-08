@@ -6,6 +6,14 @@ on:
         description: 'Type YES to authorize 2 or 40 billable Gemini requests with synthetic data'
         required: true
         type: string
+      fixture:
+        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'
+        required: true
+        type: choice
+        default: 'short'
+        options:
+          - 'short'
+          - 'long'
       runs_per_variant:
         description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'
         required: true
@@ -25,7 +33,7 @@ jobs:
       - name: Checkout pinned experiment commit (not Production)
         uses: actions/checkout@v4
         with:
-          ref: 9d7b14d42e279d249f48482209b6d130f36674d9
+          ref: 04781ea0b3cf2ed4a0d5a7ab356712e1cacf2dbb
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -39,6 +47,7 @@ jobs:
           MISAKI_AB_LIVE: 'YES'
           MISAKI_AB_MODEL: gemini-3.1-flash-lite
           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}
+          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}
         run: |
           if [ -z "$GEMINI_API_KEY" ]; then
             echo 'Secret missing; refusing live calls.'
