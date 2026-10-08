@@ -8,6 +8,7 @@ import { randomInt } from "node:crypto";
 import { qualityScenarios, assessQualityReply } from "../lib/context-ab-quality.ts";
 import { makePromptVariants } from "../lib/context-ab-prompt.ts";
 import { makeSyntheticLongContext } from "../lib/context-ab-long-fixture.ts";
+import { makeLongQualityHistory, recentModelReplies } from "../lib/context-ab-quality-long-history.ts";
 
 if (process.env.MISAKI_AB_LIVE !== "YES") throw new Error("Explicit live opt-in required");
 const apiKey = process.env.GEMINI_API_KEY;
@@ -17,6 +18,7 @@ if (!model) throw new Error("MISAKI_AB_MODEL is required");
 const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? "10000");
 if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error("Invalid delay");
 const fixture = makeSyntheticLongContext();
+const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === "long";
 const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };
 const scenarioCounts: Record<string,Record<string,boolean | number>> = {};
 const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === "YES";
@@ -24,7 +26,8 @@ const reviewItems: Array<{scenarioId:string; description:string; userText:string
 const reviewKeys: Array<{scenarioId:string; response1:"A"|"B"; response2:"A"|"B"}> = [];
 let count=0;
 for (const scenario of qualityScenarios) {
-  const replies=scenario.history.filter(h=>h.role==="model").map(h=>h.text);
+  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;
+  const replies=recentModelReplies(scenarioHistory);
   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);
   const metrics:Record<string,boolean | number>={};
   const captured: Partial<Record<"A"|"B",string>> = {};
@@ -38,7 +41,7 @@ for (const scenario of qualityScenarios) {
         signal:AbortSignal.timeout(30000),
         body:JSON.stringify({
           systemInstruction:{parts:[{text:variants[variant]+`\n\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {"reply":"こんにちは"}。他のキーは任意です。`}]},
-          contents:[...scenario.history.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:"user",parts:[{text:scenario.userText}]}],
+          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:"user",parts:[{text:scenario.userText}]}],
           generationConfig:{responseMimeType:"application/json",temperature:0},
         }),
       });
@@ -73,7 +76,7 @@ for (const scenario of qualityScenarios) {
     reviewKeys.push({scenarioId:scenario.id,response1:swap?"B":"A",response2:swap?"A":"B"});
   }
 }
-console.log(JSON.stringify({mode:"synthetic-quality-ab",model,delayMs,totals,scenarioCounts,notes:"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt."},null,2));
+console.log(JSON.stringify({mode:"synthetic-quality-ab",model,delayMs,historyMode:useLongHistory?"long":"short",totals,scenarioCounts,notes:"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt."},null,2));
 
 if (exportReview) {
   mkdirSync("ab-review-output",{recursive:true});
