@@ -1,5 +1,5 @@
-import { makePromptVariants } from "./context-ab-prompt";
-import { summarizeContextTrials, type ContextTrial } from "./context-ab-results";
+import { makePromptVariants } from "./context-ab-prompt.ts";
+import { summarizeContextTrials, type ContextTrial } from "./context-ab-results.ts";
 
 /**
  * Offline-only benchmark harness. Caller supplies a *frozen*, already
