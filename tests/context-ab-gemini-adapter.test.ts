@@ -39,3 +39,10 @@ test("isolated adapter handles upstream HTTP errors and never claims success", a
 test("isolated adapter refuses missing credentials", () => {
   assert.throws(() => createIsolatedGeminiAdapter({ apiKey: "", model: "gemini-test" }));
 });
+
+test("live Gemini calls require explicit opt-in", () => {
+  assert.throws(
+    () => createIsolatedGeminiAdapter({ apiKey: "test-only", model: "gemini-test" }),
+    /Live Gemini calls disabled/,
+  );
+});
