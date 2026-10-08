@@ -2413,7 +2413,7 @@ misakiTodayMemory は、
 }
 `.trim();
 
-    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS)) {
+    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS) || (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "work/conversation-context-compression-spike")) {
       // Counts only: no prompt text, user content, IDs, or memory values.
       console.log("MISAKI CONTEXT SIZE:", {
         traceId,
