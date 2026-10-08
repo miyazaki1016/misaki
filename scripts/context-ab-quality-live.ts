@@ -31,7 +31,7 @@ for (const scenario of qualityScenarios) {
         headers:{"Content-Type":"application/json","x-goog-api-key":apiKey},
         signal:AbortSignal.timeout(30000),
         body:JSON.stringify({
-          systemInstruction:{parts:[{text:variants[variant]}]},
+          systemInstruction:{parts:[{text:variants[variant]+"\n\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\\\"reply\\\":\\\"こんにちは\\\"}。他のキーは任意です。"}]},
           contents:[...scenario.history.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:"user",parts:[{text:scenario.userText}]}],
           generationConfig:{responseMimeType:"application/json",temperature:0},
         }),
