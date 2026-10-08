@@ -12,6 +12,7 @@
  */
 import { runOfflineContextComparison } from "../lib/context-ab-offline-harness.ts";
 import { createIsolatedGeminiAdapter } from "../lib/context-ab-gemini-adapter.ts";
+import { makeSyntheticLongContext } from "../lib/context-ab-long-fixture.ts";
 
 if (process.env.MISAKI_AB_LIVE !== "YES") {
   throw new Error("Live Gemini A/B is disabled; explicit MISAKI_AB_LIVE=YES required.");
@@ -24,7 +25,7 @@ const runs = Number(process.env.MISAKI_AB_RUNS ?? "1");
 if (!Number.isSafeInteger(runs) || runs < 1 || runs > 20) {
   throw new Error("MISAKI_AB_RUNS must be 1..20.");
 }
-const snapshot = {
+const shortSnapshot = {
   systemPromptTemplate: [
     "あなたは美咲という会話AIです。自然で短い日本語の返事をしてください。",
     "{{RECENT_REPLY_SECTION}}",
@@ -60,6 +61,9 @@ const snapshot = {
   ],
   userText: "さっき散歩から帰ってきたよ",
 };
+const fixture = process.env.MISAKI_AB_FIXTURE ?? "short";
+if (!["short", "long"].includes(fixture)) throw new Error("MISAKI_AB_FIXTURE must be short or long.");
+const snapshot = fixture === "long" ? makeSyntheticLongContext() : shortSnapshot;
 const adapter = createIsolatedGeminiAdapter({
   apiKey,
   model,
@@ -69,6 +73,7 @@ const adapter = createIsolatedGeminiAdapter({
 const result = await runOfflineContextComparison(snapshot, adapter, runs);
 console.log(JSON.stringify({
   mode: "synthetic-live-gemini",
+  fixture,
   model,
   runsPerVariant: runs,
   promptChars: result.promptChars,
