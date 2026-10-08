@@ -52,6 +52,6 @@ export default function BlindReviewPage(){
   <table style={{width:"100%",borderCollapse:"collapse"}}><thead><tr><th style={{textAlign:"left"}}>評価軸</th><th>X</th><th>Y</th></tr></thead>
   <tbody>{axes.map(([key,label])=><tr key={key}><td>{label}</td>{(["X","Y"] as const).map(side=><td key={side}><select aria-label={label+" "+side} value={(side==="X"?leftScores:rightScores)[key]} onChange={e=>score(side,key,Number(e.target.value) as 0|1|2)}><option value={0}>0</option><option value={1}>1</option><option value={2}>2</option></select></td>)}</tr>)}</tbody></table>
   <button disabled={!left.trim()||!right.trim()} onClick={()=>setShowResult(true)} style={{marginTop:20,padding:"10px 20px"}}>採点結果を表示</button>
-  {showResult&&<section role="status"><h2>採点結果</h2><p>X：{result.leftTotal}/10点　Y：{result.rightTotal}/10点　判定：{result.overall==="tie"?"引き分け":result.overall==="left"?"X優勢":"Y優勢"}</p><p>{answerKey?\`対応：X＝\${answerKey.X}版、Y＝\${answerKey.Y}版。\`:""}これは1組の人間評価であり、A/Bの優劣や本番採用を決定するものではありません。</p></section>}
+  {showResult&&<section role="status"><h2>採点結果</h2><p>X：{result.leftTotal}/10点　Y：{result.rightTotal}/10点　判定：{result.overall==="tie"?"引き分け":result.overall==="left"?"X優勢":"Y優勢"}</p><p>{answerKey?`対応：X＝${answerKey.X}版、Y＝${answerKey.Y}版。`:""}これは1組の人間評価であり、A/Bの優劣や本番採用を決定するものではありません。</p></section>}
  </main>;
 }
