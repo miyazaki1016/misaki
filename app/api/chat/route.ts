@@ -2412,10 +2412,11 @@ misakiTodayMemory は、
 }
 `.trim();
 
-    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS) || (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "work/conversation-context-compression-spike")) {
+    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS) || (process.env.VERCEL_ENV === "preview" && ["work/conversation-context-compression-spike", "work/context-no-duplicate-replies-ab"].includes(process.env.VERCEL_GIT_COMMIT_REF || ""))) {
       // Counts only: no prompt text, user content, IDs, or memory values.
       console.log("MISAKI CONTEXT SIZE:", {
         traceId,
+        experimentVariant: "no-duplicate-replies",
         overlap: {
           replies: countRepeatedRepliesInHistory(contents, recentMisakiMessages),
           sections: analyzePromptSectionOverlap(baseSystemPrompt, [
