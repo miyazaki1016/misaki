@@ -15,6 +15,7 @@ export async function POST(request:Request){
  if(request.headers.get("x-misaki-quality-consent")!=="YES")return Response.json({error:"Explicit consent required"},{status:400,headers:noStore});
  const key=process.env.MISAKI_AB_GEMINI_API_KEY||process.env.GEMINI_API_KEY;
  if(!key)return Response.json({error:"Gemini key unavailable"},{status:503,headers:noStore});
+ let stage="load-history";
  try{
   const state=await loadCanonicalState(user.id);
   if(!Array.isArray(state.history)||state.history.length<4)return Response.json({error:"Insufficient history"},{status:422,headers:noStore});
@@ -37,11 +38,13 @@ export async function POST(request:Request){
    return parsed.reply as string;
   };
   // X/Y labels are randomized independently of call order; do not expose the mapping until review.
+  stage="gemini-first";
   const firstA=Math.random()<0.5;
   const first=await generate(firstA?prompts.A:prompts.B);
+  stage="gemini-second";
   const second=await generate(firstA?prompts.B:prompts.A);
   const reviewId=crypto.randomUUID();
   // No database writes. Mapping is returned only to this authenticated owner and held in browser memory.
   return Response.json({mode:"preview-blind-quality",reviewId,X:first,Y:second,key:{X:firstA?"A":"B",Y:firstA?"B":"A"},model,historyTurns:history.length},{headers:noStore});
- }catch{return Response.json({error:"Quality comparison failed; production unchanged"},{status:500,headers:noStore});}
+ }catch{return Response.json({error:"Quality comparison failed; production unchanged",stage},{status:500,headers:noStore});}
 }
