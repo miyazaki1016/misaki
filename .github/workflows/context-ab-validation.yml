@@ -20,4 +20,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - run: node --experimental-strip-types scripts/context-ab-smoke.ts
       - run: npx tsc --noEmit
