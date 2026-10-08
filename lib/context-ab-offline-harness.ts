@@ -22,6 +22,8 @@ export type ModelTrialResult = {
   success: boolean;
   jsonValid: boolean;
   timedOut: boolean;
+  httpStatus?: number | null;
+  emptyCandidate?: boolean;
 };
 
 export type ReadOnlyModelAdapter = (request: Readonly<{
