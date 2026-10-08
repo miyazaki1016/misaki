@@ -3,6 +3,8 @@
  * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.
  * Only aggregate numeric pass/fail counts are logged; no model text.
  */
+import { writeFileSync, mkdirSync } from "node:fs";
+import { randomInt } from "node:crypto";
 import { qualityScenarios, assessQualityReply } from "../lib/context-ab-quality.ts";
 import { makePromptVariants } from "../lib/context-ab-prompt.ts";
 import { makeSyntheticLongContext } from "../lib/context-ab-long-fixture.ts";
@@ -17,11 +19,15 @@ if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new
 const fixture = makeSyntheticLongContext();
 const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };
 const scenarioCounts: Record<string,Record<string,boolean | number>> = {};
+const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === "YES";
+const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];
+const reviewKeys: Array<{scenarioId:string; response1:"A"|"B"; response2:"A"|"B"}> = [];
 let count=0;
 for (const scenario of qualityScenarios) {
   const replies=scenario.history.filter(h=>h.role==="model").map(h=>h.text);
   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);
   const metrics:Record<string,boolean | number>={};
+  const captured: Partial<Record<"A"|"B",string>> = {};
   for (const variant of ["A","B"] as const) {
     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));
     const stats=totals[variant]; stats.calls++;
@@ -45,6 +51,7 @@ for (const scenario of qualityScenarios) {
       const valid=parsed!==null && typeof parsed==="object";
       if(valid)stats.jsonValid++;
       const reply=valid && typeof (parsed as {reply?:unknown}).reply==="string" ? (parsed as {reply:string}).reply : "";
+      if (exportReview && response.ok) captured[variant]=reply;
       const result=assessQualityReply(scenario,reply);
       metrics[variant+"ReplyFieldPresent"]=valid && typeof (parsed as {reply?:unknown}).reply==="string";
       metrics[variant+"Nonempty"]=result.nonempty;
@@ -60,5 +67,17 @@ for (const scenario of qualityScenarios) {
     }
   }
   scenarioCounts[scenario.id]=metrics;
+  if (exportReview && captured.A && captured.B) {
+    const swap=randomInt(2)===1;
+    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});
+    reviewKeys.push({scenarioId:scenario.id,response1:swap?"B":"A",response2:swap?"A":"B"});
+  }
 }
 console.log(JSON.stringify({mode:"synthetic-quality-ab",model,delayMs,totals,scenarioCounts,notes:"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt."},null,2));
+
+if (exportReview) {
+  mkdirSync("ab-review-output",{recursive:true});
+  writeFileSync("ab-review-output/blind-review.json",JSON.stringify({notice:"Synthetic scenarios only. Human ratings are not automatic quality proof.",items:reviewItems},null,2),{mode:0o600});
+  writeFileSync("ab-review-output/blind-key.json",JSON.stringify(reviewKeys,null,2),{mode:0o600});
+  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));
+}
