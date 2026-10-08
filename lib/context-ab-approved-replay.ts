@@ -19,12 +19,12 @@ function mapRole(role: string): "user" | "model" {
 
 /**
  * Takes a redacted, locally supplied snapshot. The final user turn is the
- * next message to replay; all earlier turns form the shared A/B history.
+ * next message to replay unless supplied separately; all earlier turns form the shared A/B history.
  * Fails closed on unknown roles, malformed messages, or insufficient history.
  */
-export function prepareApprovedReplayFixture(input: unknown): ReplayFixture {
-  if (!Array.isArray(input) || input.length < 3 || input.length > 60) {
-    throw new Error("Expected 3..60 approved conversation turns");
+export function prepareApprovedReplayFixture(input: unknown, separateNextUserText?: unknown): ReplayFixture {
+  if (!Array.isArray(input) || input.length < 2 || input.length > 60) {
+    throw new Error("Expected 2..60 approved conversation turns");
   }
   const turns = input.map((entry): { role: "user" | "model"; text: string } => {
     if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
@@ -36,9 +36,12 @@ export function prepareApprovedReplayFixture(input: unknown): ReplayFixture {
     }
     return { role: mapRole(turn.role), text: turn.text };
   });
-  const next = turns[turns.length - 1];
+  if (separateNextUserText !== undefined && (typeof separateNextUserText !== "string" || !separateNextUserText.trim())) {
+    throw new Error("Invalid next user text");
+  }
+  const next = separateNextUserText === undefined ? turns[turns.length - 1] : { role: "user" as const, text: separateNextUserText as string };
   if (next.role !== "user") throw new Error("Last turn must be a user message");
-  const prior = turns.slice(0, -1);
+  const prior = separateNextUserText === undefined ? turns.slice(0, -1) : turns;
   return {
     history: prior.map((turn) => ({ role: turn.role, parts: [{ text: turn.text }] })),
     nextUserText: next.text,
