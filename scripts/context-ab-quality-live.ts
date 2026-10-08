@@ -46,12 +46,17 @@ for (const scenario of qualityScenarios) {
       if(valid)stats.jsonValid++;
       const reply=valid && typeof (parsed as {reply?:unknown}).reply==="string" ? (parsed as {reply:string}).reply : "";
       const result=assessQualityReply(scenario,reply);
+      metrics[variant+"ReplyFieldPresent"]=valid && typeof (parsed as {reply?:unknown}).reply==="string";
+      metrics[variant+"Nonempty"]=result.nonempty;
+      metrics[variant+"ExpectedFactsPresent"]=result.expectedFactsPresent;
+      metrics[variant+"UnsupportedClaimsAbsent"]=result.unsupportedClaimsAbsent;
       const passed=response.ok && valid && result.nonempty && result.expectedFactsPresent && result.unsupportedClaimsAbsent;
       metrics[variant+"Passed"]=passed;
       if(passed)stats.passed++;
     }catch{
       metrics[variant+"HttpStatus"]=0;
       metrics[variant+"Passed"]=false;
+      metrics[variant+"RequestError"]=true;
     }
   }
   scenarioCounts[scenario.id]=metrics;
