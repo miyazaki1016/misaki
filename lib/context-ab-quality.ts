@@ -59,3 +59,14 @@ export function assessQualityReply(scenario:QualityScenario, reply:string) {
     // Heuristic only: independent human review is still required.
   };
 }
+
+/** Human-only blind comparison: no raw reply text is returned or persisted. */
+export type BlindQualityScores={memory:0|1|2;relationship:0|1|2;continuity:0|1|2;repetition:0|1|2;naturalness:0|1|2};
+export type BlindQualityJudgment={left:BlindQualityScores;right:BlindQualityScores};
+export function summarizeBlindQuality(j:BlindQualityJudgment){
+ const axes=(["memory","relationship","continuity","repetition","naturalness"] as const);
+ const scores=axes.map(axis=>({axis,left:j.left[axis],right:j.right[axis],winner:j.left[axis]===j.right[axis]?"tie":j.left[axis]>j.right[axis]?"left":"right"}));
+ const leftTotal=scores.reduce((sum,s)=>sum+s.left,0);
+ const rightTotal=scores.reduce((sum,s)=>sum+s.right,0);
+ return {scores,leftTotal,rightTotal,overall:leftTotal===rightTotal?"tie":leftTotal>rightTotal?"left":"right"};
+}
