@@ -47,6 +47,7 @@ import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationship
 import { deriveRelationshipPointDelta } from "../../../lib/relationship-points";
 import { generateGeminiJson } from "../../../lib/gemini-json-generator";
 import { contextSizeMeasurementEnabled, measureContextSize } from "../../../lib/context-size-measurement";
+import { analyzePromptSectionOverlap, countRepeatedRepliesInHistory } from "../../../lib/context-overlap-analysis";
 import { createGeminiTelemetrySink } from "../../../lib/gemini-usage-telemetry-server";
 import {
   createLegacyRelationshipActingState,
@@ -2417,6 +2418,20 @@ misakiTodayMemory は、
       // Counts only: no prompt text, user content, IDs, or memory values.
       console.log("MISAKI CONTEXT SIZE:", {
         traceId,
+        overlap: {
+          replies: countRepeatedRepliesInHistory(contents, recentMisakiMessages),
+          sections: analyzePromptSectionOverlap(baseSystemPrompt, [
+            { name: "persona", text: personaPrompt },
+            { name: "relationshipGuide", text: relationshipGuide },
+            { name: "relationshipActing", text: relationshipActingGuide },
+            { name: "longTermMemory", text: memoryText },
+            { name: "todayMemory", text: todayMemoryGuide },
+            { name: "recentReplies", text: recentTopicText },
+            { name: "weather", text: weatherGuide },
+            { name: "weatherHistory", text: weatherHistoryGuide },
+            { name: "lifeEvents", text: tokyoLifeEventsGuide },
+          ]),
+        },
         ...measureContextSize({
           systemInstruction: baseSystemPrompt,
           history: contents,
