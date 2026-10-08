@@ -22,4 +22,4 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Run offline replay tests only
-        run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts
+        run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-ab-replay-boundary.test.ts
