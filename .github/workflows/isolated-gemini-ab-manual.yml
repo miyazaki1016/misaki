@@ -33,7 +33,7 @@ jobs:
       - name: Checkout pinned experiment commit (not Production)
         uses: actions/checkout@v4
         with:
-          ref: 04781ea0b3cf2ed4a0d5a7ab356712e1cacf2dbb
+          ref: c1a66ecc3d6e1c913311873e0f0096f23d1ecd02
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
