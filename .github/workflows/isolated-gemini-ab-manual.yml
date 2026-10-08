@@ -3,9 +3,17 @@ on:
   workflow_dispatch:
     inputs:
       confirm_billable_requests:
-        description: 'Type YES to authorize 2 or 40 billable Gemini requests with synthetic data'
+        description: 'Type YES to authorize billable synthetic Gemini requests (quality: 8 calls; latency: 2 or 40)'
         required: true
         type: string
+      experiment:
+        description: 'Latency/token or four-scenario quality A/B'
+        required: true
+        type: choice
+        default: 'latency'
+        options:
+          - 'latency'
+          - 'quality'
       fixture:
         description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'
         required: true
@@ -41,7 +49,7 @@ jobs:
       - name: Checkout pinned experiment commit (not Production)
         uses: actions/checkout@v4
         with:
-          ref: d159ac70fb95be23204e04c4d91b453f1f7894f3
+          ref: f71754a599ae94f91ca31b94cfcfb7d24029ce25
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -62,4 +70,8 @@ jobs:
             echo 'Secret missing; refusing live calls.'
             exit 1
           fi
-          node --experimental-strip-types scripts/context-ab-live.ts
+          if [ "${{ inputs.experiment }}" = "quality" ]; then
+            node --experimental-strip-types scripts/context-ab-quality-live.ts
+          else
+            node --experimental-strip-types scripts/context-ab-live.ts
+          fi
