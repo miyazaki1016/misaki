@@ -15,6 +15,7 @@ export default function ReplaySelfCheckPage(){
  const [expectedEmail,setExpectedEmail]=useState("");
  const [abStatus,setAbStatus]=useState("未実行");
  const [abResult,setAbResult]=useState<unknown>(null);
+ const [numericHistory,setNumericHistory]=useState<{aMs:number;bMs:number;aTokens:number;bTokens:number}[]>([]);
  const [approvedTurns,setApprovedTurns]=useState<{role:string;text:string}[]|null>(null);
  async function check(){
   setApprovedTurns(null);
@@ -54,6 +55,10 @@ export default function ReplaySelfCheckPage(){
    const result=await response.json();
    if(!response.ok)throw new Error(result.error||"比較失敗");
    setAbResult(result);setAbStatus("A/B比較完了（本文は表示しません）");
+   if(result?.A?.success===true&&result?.B?.success===true&&
+    [result.A.latencyMs,result.B.latencyMs,result.A.promptTokens,result.B.promptTokens].every((n:unknown)=>typeof n==="number"&&Number.isFinite(n))){
+    setNumericHistory(prev=>[...prev,{aMs:result.A.latencyMs,bMs:result.B.latencyMs,aTokens:result.A.promptTokens,bTokens:result.B.promptTokens}]);
+   }
   }catch(error){setAbStatus(error instanceof Error?error.message:"比較失敗");}
  }
  function saveLocalCopy(){
@@ -67,7 +72,7 @@ export default function ReplaySelfCheckPage(){
  }
  return <main style={{maxWidth:620,margin:"40px auto",padding:24,fontFamily:"sans-serif",lineHeight:1.7}}>
   <h1>美咲・実会話A/B事前確認</h1>
-  <p>この画面は実験用です。既存の読み取り専用APIを使い、本人の会話件数だけ表示します。会話本文・認証トークンは画面に表示せず、Geminiにも送信しません。</p>
+  <p>この画面は実験用です。履歴確認だけではGeminiに送信しません。下のA/B実行ボタンに同意した場合のみ、会話本文をGeminiへ送信します。会話本文・認証トークンは画面に表示しません。</p>
   <label htmlFor="email">ログインしているメールアドレス</label>
   <input id="email" type="email" value={expectedEmail} onChange={e=>setExpectedEmail(e.target.value)}
    autoComplete="email" style={{display:"block",width:"100%",padding:12,margin:"8px 0 16px"}}/>
@@ -78,6 +83,7 @@ export default function ReplaySelfCheckPage(){
   <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button>
   <hr/><p><strong>Gemini実会話A/B実測（各1回・実験）</strong>：同じ実会話履歴をA/Bにそれぞれ1回送信します。4回測定版はまだ未接続です。API費用が発生し、会話本文はGoogle Geminiに送信されます。実験用の簡略プロンプトであり、本番プロンプトそのものではありません。</p>
   <button onClick={runAB} style={{padding:"10px 20px"}}>同意してGemini A/Bを2回実行</button><p role="status">{abStatus}</p>
+  {numericHistory.length>0&&<p>この画面を開いてからの成功測定：{numericHistory.length}組／平均応答時間 A {Math.round(numericHistory.reduce((s,x)=>s+x.aMs,0)/numericHistory.length)}ms・B {Math.round(numericHistory.reduce((s,x)=>s+x.bMs,0)/numericHistory.length)}ms／平均入力トークン A {Math.round(numericHistory.reduce((s,x)=>s+x.aTokens,0)/numericHistory.length)}・B {Math.round(numericHistory.reduce((s,x)=>s+x.bTokens,0)/numericHistory.length)}。この集計は画面を閉じると消え、サーバーには保存されません。</p>}
   {abResult!==null&&<pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{JSON.stringify(abResult,null,2)}</pre>}</>}
  </main>;
 }
