@@ -13,6 +13,8 @@ type Status={kind:"idle"|"loading"|"ok"|"error";message:string;total?:number;use
 export default function ReplaySelfCheckPage(){
  const [status,setStatus]=useState<Status>({kind:"idle",message:"未確認"});
  const [expectedEmail,setExpectedEmail]=useState("");
+ const [abStatus,setAbStatus]=useState("未実行");
+ const [abResult,setAbResult]=useState<unknown>(null);
  const [approvedTurns,setApprovedTurns]=useState<{role:string;text:string}[]|null>(null);
  async function check(){
   setApprovedTurns(null);
@@ -42,6 +44,18 @@ export default function ReplaySelfCheckPage(){
    setStatus({kind:"error",message:error instanceof Error?error.message:"確認できませんでした"});
   }
  }
+ async function runAB(){
+  if(!approvedTurns||!window.confirm("実際の会話本文をGeminiへ送信し、A/B各1回（計2回）の有料API比較を実行します。会話本文は外部モデルに送信されます。本番の履歴・記憶は変更しません。実行しますか？"))return;
+  setAbStatus("GeminiでA/B比較中…");setAbResult(null);
+  try{
+   const {data:{session}}=await supabase.auth.getSession();
+   if(!session?.access_token)throw new Error("再ログインしてください");
+   const response=await fetch("/api/experiments/replay-ab",{method:"POST",headers:{Authorization:`Bearer ${session.access_token}`},cache:"no-store"});
+   const result=await response.json();
+   if(!response.ok)throw new Error(result.error||"比較失敗");
+   setAbResult(result);setAbStatus("A/B比較完了（本文は表示しません）");
+  }catch(error){setAbStatus(error instanceof Error?error.message:"比較失敗");}
+ }
  function saveLocalCopy(){
   if(!approvedTurns) return;
   const payload={format:"misaki-approved-replay-v1",exportedAt:new Date().toISOString(),history:approvedTurns};
@@ -61,6 +75,9 @@ export default function ReplaySelfCheckPage(){
   <p role="status">{status.message}</p>
   {status.kind==="ok"&&<><p>合計: {status.total}件／ユーザー: {status.users}件／美咲: {status.misaki}件</p>
   <p><strong>次のステップ（任意）</strong>：会話本文を含むJSONファイルを、この端末に保存できます。個人的な発言も含まれます。保存したファイルは自動送信されません。内容を確認し、共有してよい場合だけアップロードしてください。</p>
-  <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button></>}
+  <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button>
+  <hr/><p><strong>Gemini実会話A/B実測（実験）</strong>：同じ実会話履歴をA/Bにそれぞれ1回送信します。API費用が発生し、会話本文はGoogle Geminiに送信されます。実験用の簡略プロンプトであり、本番プロンプトそのものではありません。</p>
+  <button onClick={runAB} style={{padding:"10px 20px"}}>同意してGemini A/Bを2回実行</button><p role="status">{abStatus}</p>
+  {abResult!==null&&<pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{JSON.stringify(abResult,null,2)}</pre>}</>}
  </main>;
 }
