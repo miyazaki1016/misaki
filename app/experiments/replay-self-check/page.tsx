@@ -76,7 +76,7 @@ export default function ReplaySelfCheckPage(){
   {status.kind==="ok"&&<><p>合計: {status.total}件／ユーザー: {status.users}件／美咲: {status.misaki}件</p>
   <p><strong>次のステップ（任意）</strong>：会話本文を含むJSONファイルを、この端末に保存できます。個人的な発言も含まれます。保存したファイルは自動送信されません。内容を確認し、共有してよい場合だけアップロードしてください。</p>
   <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button>
-  <hr/><p><strong>Gemini実会話A/B実測（実験）</strong>：同じ実会話履歴をA/Bにそれぞれ1回送信します。API費用が発生し、会話本文はGoogle Geminiに送信されます。実験用の簡略プロンプトであり、本番プロンプトそのものではありません。</p>
+  <hr/><p><strong>Gemini実会話A/B実測（各1回・実験）</strong>：同じ実会話履歴をA/Bにそれぞれ1回送信します。4回測定版はまだ未接続です。API費用が発生し、会話本文はGoogle Geminiに送信されます。実験用の簡略プロンプトであり、本番プロンプトそのものではありません。</p>
   <button onClick={runAB} style={{padding:"10px 20px"}}>同意してGemini A/Bを2回実行</button><p role="status">{abStatus}</p>
   {abResult!==null&&<pre style={{whiteSpace:"pre-wrap",overflowWrap:"anywhere"}}>{JSON.stringify(abResult,null,2)}</pre>}</>}
  </main>;
