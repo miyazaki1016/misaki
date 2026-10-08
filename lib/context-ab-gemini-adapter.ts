@@ -55,6 +55,8 @@ export function createIsolatedGeminiAdapter(options: {
         success: response.ok && raw.length > 0,
         jsonValid,
         timedOut: false,
+        httpStatus: response.status,
+        emptyCandidate: raw.length === 0,
       };
     } catch (error) {
       const timedOut = error instanceof Error &&
@@ -66,6 +68,8 @@ export function createIsolatedGeminiAdapter(options: {
         success: false,
         jsonValid: false,
         timedOut,
+        httpStatus: null,
+        emptyCandidate: false,
       };
     }
   };
