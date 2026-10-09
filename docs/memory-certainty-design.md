@@ -1,105 +1,105 @@
-# Memory Certainty / Tentative Plan Design Note
+# 記憶の確度・未確定の予定の扱いに関する設計書
 
-Status: **design-only; not implemented; not Production-approved**  
-Working branch: work/context-no-duplicate-replies-ab  
-Related but separate draft: PR #66, work/forget-control-v1 (Forget Control). This note does not modify PR #66 or its branch.
+状態：**設計のみ。未実装。本番適用の承認なし。**  
+作業ブランチ：work/context-no-duplicate-replies-ab  
+関連する別作業：PR #66「Forget Control」（ブランチ work/forget-control-v1）。この設計書の変更はPR #66やそのブランチには加えない。
 
-## Goal
+## 目的
 
-Prevent a tentative statement, a question, a guess, or an outdated plan from becoming a confident current fact in Misaki's replies or proactive messages. Also preserve the difference between a plan and a completed event, and ensure an explicit correction supersedes the older version.
+仮の発言、質問、推測、古くなった予定が、美咲の返信や自発メッセージの中で、確定した現在の事実として扱われることを防ぐ。また、「予定」と「完了した出来事」を区別し、明示的な訂正があった場合は古い内容より新しい内容を優先する。
 
-Examples the system should distinguish:
+システムでは、少なくとも次の違いを区別する。
 
-- 「明日は休み」 — user-stated plan, valid for the stated day.
-- 「明日は休みかも」 — tentative; must not be asserted as confirmed.
-- 「明日は休みじゃなくなった。仕事になった」 — explicit correction; old plan is superseded.
-- 「今日は仕事だった」 — completed/past event, not evidence that the user is working now.
-- 「弟が明日休みらしい」 — third-party / hearsay, not the user's own schedule.
-- 「明日は休み？」 — question, not a fact.
-- 「明日は休みだよ」 after an earlier tentative plan — may confirm it, but only when the current statement clearly refers to the same subject and date.
+- 「明日は休み」— ユーザー本人が述べた予定。対象の日付に限って扱う。
+- 「明日は休みかも」— 未確定。確定事項として断定しない。
+- 「明日は休みじゃなくなった。仕事になった」— 明示的な訂正。以前の予定は置き換えられる。
+- 「今日は仕事だった」— 過去に起きたこと。今も仕事中だという根拠にはならない。
+- 「弟が明日休みらしい」— 第三者についての情報、または伝聞。ユーザー本人の予定として扱わない。
+- 「明日は休み？」— 質問であり、事実ではない。
+- 以前「明日は休みかも」と話していて、後から「明日は休みだよ」と述べた場合— 同じ人物・同じ日付についての発言だと明確な場合に限り、後の発言を確認情報として扱える。
 
-## What the source currently supports
+## 現在の実装について確認できたこと
 
-Checked against main implementation and the open Draft PR #66 branch on 2026-10-10:
+2026年10月10日時点で、mainブランチの実装と、オープン中のDraft PR #66のブランチを確認した。
 
-1. Canonical conversation state currently stores history, memory as string[], and today_memory in misaki_user_conversation_state; the application exposes them through lib/canonical-state.ts.
-2. Ordinary long-term memory is stored as strings. The reply route can combine generated memory with structured life facts and stores the result back in the same canonical memory list.
-3. [life:v1] adds structure for kind, fact, observedAt, validUntil, confidence, and source. Its current kinds include profile/schedule/routine/situation/preference/concern. selectRelevantLifeFacts checks confidence and expiry and marks schedule/situation/concern as current relevance.
-4. The current explicit-life-fact extractor is intentionally narrow and rejects some questions, uncertainty markers, and third-person openings. However, the LifeFact type has no explicit epistemic status such as tentative/confirmed/corrected/completed. validUntil handles time validity, not certainty or completion.
-5. Today Memory is a separate day-scoped context. It should not be treated as proof that an item is still true on another day.
-6. PR #66 adds Forget Control protections for forgotten/deleted information across memory/context paths. That is a different concern: a fact can be non-forgotten and still be tentative, stale, corrected, or completed. Do not duplicate or weaken its controls.
-7. The current design principle is to keep canonical state on the server and avoid creating a new truth source without first checking existing RPC/write paths. No database migration or new table is proposed by this note.
+1. 正規の会話状態は、`misaki_user_conversation_state` に会話履歴（history）、文字列配列の記憶（memory）、当日の記憶（today_memory）を保存している。アプリ側の処理は `lib/canonical-state.ts` から利用する。
+2. 通常の長期記憶は文字列として保存される。返信処理では、生成された記憶と構造化された生活情報を組み合わせ、正規の記憶リストに保存する場合がある。
+3. `[life:v1]` 形式では、情報の種類（kind）、内容（fact）、観測日時（observedAt）、有効期限（validUntil）、確信度（confidence）、情報源（source）を記録できる。種類には profile／schedule／routine／situation／preference／concern がある。 `selectRelevantLifeFacts` は確信度と期限を確認し、schedule／situation／concern を「現在に関係する情報」として分類する。
+4. 現在の明示的な生活情報の抽出処理は、対象を意図的に絞っており、一部の質問、不確かさを示す表現、第三者についての発言を除外する。ただし、LifeFact型には「未確定／確定／訂正済み／完了」といった明示的な状態がない。`validUntil` は有効期間を扱うもので、情報の確実性や完了状態を表すものではない。
+5. 今日の記憶（Today Memory）は、特定の日にひもづく別の情報領域である。昨日の項目が残っていることだけを根拠に、今日も正しい事実だと判断してはならない。
+6. PR #66は、忘却・削除した情報が記憶や文脈経路から復活するのを防ぐForget Controlを追加する。これは今回の課題とは別である。忘却されていない情報でも、未確定、期限切れ、訂正済み、完了済みである可能性がある。Forget Controlの仕組みを重複実装したり、弱めたりしない。
+7. 現在の設計方針では、正規の状態はサーバー側で管理し、既存のRPCや書き込み経路を調べずに新たな「正解の保存先」を作らない。この設計書では、DBマイグレーションや新しいテーブルを提案しない。
 
-These findings describe code inspected in the referenced sources; they do not establish that the live Gemini model will classify every Japanese phrasing correctly.
+ここに記載した内容は、参照したソースコードを確認した結果である。実際のGeminiモデルが、あらゆる日本語表現を正しく分類できることを証明するものではない。
 
-## Proposed fact lifecycle (candidate for review)
+## 提案する情報の状態（レビュー候補）
 
-Use an explicit status in the structured fact representation, rather than asking the model to infer certainty later from prose alone:
+後から文章だけを見てモデルに確実性を推測させるのではなく、構造化された情報に状態を明示する。
 
-- tentative: speaker explicitly signals uncertainty, possibility, or an unconfirmed plan.
-- confirmed: clearly asserted by the user about the identified subject/time.
-- corrected: a newer explicit statement supersedes an earlier value for the same subject/predicate/time scope. Prefer keeping the replacement as the active fact and retaining supersession/provenance needed for audit; do not let the old value compete as current.
-- completed: an event or plan is reported as completed. It may be used as past history, not as a current/future state.
-- unknown / no fact: ambiguous wording, a question, hearsay, or insufficient evidence should not be promoted into a usable structured fact.
+- **tentative（未確定）**：話し手が不確かさ、可能性、未確定の予定を明示している。
+- **confirmed（確定）**：対象となる人物と時期が特定でき、ユーザーが明確に事実として述べている。
+- **corrected（訂正済み）**：同じ人物・項目・対象期間について、新しい明示的な発言が以前の値を置き換えた状態。新しい内容を有効な情報として扱い、監査に必要な訂正元・訂正先の関係は保持する。古い内容を現在の事実候補として競合させない。
+- **completed（完了）**：出来事や予定が完了したと報告されている状態。過去の出来事としては利用できるが、現在や未来の状態の根拠にはしない。
+- **unknown（不明）／事実として採用しない**：表現が曖昧、質問、伝聞、または根拠不足の場合。利用可能な構造化事実として登録しない。
 
-Minimum useful metadata to evaluate before implementation:
+実装前に検討する最低限のメタデータ：
 
-- subject (who the fact is about; e.g. user vs family member)
-- predicate/value (what is true or planned)
-- temporal scope (date or interval, and timezone where relevant)
-- status (tentative / confirmed / corrected / completed)
-- source/provenance (explicit user statement vs extracted/generated memory)
-- observed time and optional validity end
-- confidence, without using confidence alone to turn a tentative fact into a confirmed one
-- supersedes/superseded relationship when a correction is explicit
+- **対象人物**：誰についての情報か（ユーザー本人か、家族かなど）。
+- **項目・値**：何が事実または予定なのか。
+- **対象期間**：日付や期間。必要に応じてタイムゾーンも記録する。
+- **状態**：未確定／確定／訂正済み／完了。
+- **情報源・根拠**：ユーザーの明示的な発言か、抽出・生成された記憶か。
+- **観測日時**と、必要に応じた**有効期限**。
+- **確信度**：ただし確信度の数値だけで、未確定情報を確定情報へ格上げしない。
+- **訂正関係**：明示的な訂正があった場合、どの情報がどの情報に置き換えられたか。
 
-Do not infer that every bare past-tense sentence is a completed plan, or that every future-tense sentence is confirmed. Ambiguity should result in no structured fact or a clarification, not a confident assertion.
+過去形で書かれた文がすべて「予定の完了」を意味するとは限らない。また、未来形の文がすべて確定した予定とは限らない。曖昧な場合は、確定した事実として登録せず、必要に応じて確認する。
 
-## Read/use policy
+## 記憶を読み出して利用する際のルール
 
-1. For claims about the user's current schedule or situation, allow only a clearly scoped, non-expired fact whose status is confirmed; require the relevant date/time to match.
-2. A tentative fact may be mentioned only with its uncertainty intact (e.g. “休みかもしれないって言ってたね”), never as a definite statement or as a proactive-send trigger requiring certainty.
-3. A completed fact is historical evidence only. It must not prove that the plan is still active or that the same state holds today.
-4. A corrected fact blocks the superseded value from current-context selection. Latest explicit correction wins within the same subject and temporal scope.
-5. If old memory and a fresh explicit user message conflict, the fresh explicit message takes precedence; update/supersede the structured fact only when the scope matches.
-6. Keep ordinary shared memories distinct from current life facts, relationship episodes, and Forget Control. Do not turn this into a blanket deletion or automatic compression project.
+1. ユーザーの現在の予定や状況を事実として述べる場合は、対象期間が明確で、期限切れではなく、状態が「確定」の情報だけを利用する。対象となる日時が一致していることも確認する。
+2. 未確定の情報に触れる場合は、不確かさを保った表現にする（例：「休みかもしれないって言ってたね」）。断定表現に変えたり、確実性を必要とする自発メッセージの送信条件に使ったりしない。
+3. 完了した情報は過去の出来事としてのみ使う。その予定が今も有効であることや、今日も同じ状態であることの根拠にしない。
+4. 訂正済みの情報は、現在の文脈から古い値を除外する。同じ人物・同じ項目・同じ対象期間であれば、最新の明示的な訂正を優先する。
+5. 古い記憶と、ユーザーの新しい明示的な発言が矛盾する場合は、新しい発言を優先する。ただし、対象人物や対象期間が一致するときに限って、既存情報の更新・置き換えを行う。
+6. 通常の共有記憶、現在の生活情報、関係性のエピソード、Forget Controlを混同しない。すべての記憶を一律に削除したり、自動圧縮したりする仕組みには広げない。
 
-## Safe implementation sequence
+## 安全に実装するための順序
 
-1. Read-only inventory first: enumerate every writer/reader of canonical memory, today_memory, [life:v1], and Body Clock snapshots on the exact base branch that will eventually receive the work. Compare main and PR #66; do not base a future implementation on the older A/B branch's snapshot alone.
-2. Define a backward-compatible structured-life-fact version and explicit status semantics. Do not silently reinterpret legacy plain strings as confirmed facts.
-3. Add deterministic parser/selector tests before changing prompt/runtime behavior.
-4. Add a write-path change only after the exact canonical RPC, anonymous temporary root/checkpoint, email-save, and Body Clock handoff paths are mapped. Keep status changes in the same canonical transaction as the corresponding memory update.
-5. Apply the same selector to normal reply and Body Clock before facts enter generation. If status is missing/invalid, fail closed for claims about current plans; preserve ordinary memory for conversational recall without presenting it as current fact.
-6. Keep Forget Control filtering in place and verify certainty handling does not reintroduce a forgotten target.
-7. Run scripted tests while Gemini billing is unavailable. Do not claim model-quality validation until a live, approved model test can be run after billing is restored.
-8. No schema migration, Edge deployment, merge, or Production change without separate explicit approval.
+1. **まず読み取り専用で全経路を調査する。** 実際に作業を反映することになるブランチを対象に、正規の memory、today_memory、`[life:v1]`、Body Clockのスナップショットについて、すべての書き込み元・読み出し元を洗い出す。mainとPR #66を比較する。古いA/B実験ブランチの状態だけを根拠に実装しない。
+2. 後方互換性のある構造化生活情報の新バージョンと、状態の意味を定義する。既存の通常文字列の記憶を、暗黙に「確定」とみなしてはならない。
+3. プロンプトや実行時処理を変える前に、決定論的なパーサーと選択処理のテストを追加する。
+4. 正規RPC、匿名利用の一時ルート／チェックポイント、メール保存、Body Clockへの受け渡し経路を特定してから、書き込み処理を変更する。状態の更新と対応する記憶の更新は、同じ正規トランザクション内で行う。
+5. 通常返信とBody Clockの両方で、情報を生成モデルに渡す前に同じ選択ルールを適用する。状態が欠落・不正な場合、現在の予定について断定する用途では安全側に倒して採用しない。通常の会話を思い出すための記憶として保持する場合も、現在の事実であるかのように表現しない。
+6. Forget Controlのフィルタリングを維持し、確実性を扱う仕組みの追加によって、忘却対象が復活しないことを検証する。
+7. Geminiの課金が利用できない間は、スクリプト化されたテストを実行する。課金復旧後に承認を得て実モデルを検証するまでは、モデルの品質が確認できたと主張しない。
+8. 別途明示的な承認を得るまで、DBマイグレーション、Edgeへのデプロイ、マージ、本番変更は行わない。
 
-## Required regression matrix
+## 必須の回帰テスト項目
 
-- Confirmed plan vs tentative plan.
-- Tentative plan later explicitly confirmed.
-- Confirmed plan later corrected to a different plan.
-- Plan explicitly cancelled.
-- Past/completed event vs current state.
-- User's own plan vs a family member's plan / hearsay.
-- Question about a plan vs assertion.
-- Old memory conflicts with fresh explicit statement.
-- Same wording but different dates/subjects.
-- Expired plan does not become current.
-- Legacy plain memory with no certainty metadata is not silently upgraded to confirmed.
-- Today Memory from yesterday is not treated as today's fact.
-- Body Clock does not send or phrase a proactive message as if an uncertain plan were confirmed.
-- Forget Control active target cannot return through history, generated memory, or certainty upgrade.
-- Anonymous temporary state, checkpoint/email-save, permanent account, logout/login, and cross-device read remain consistent.
-- No double write / stale generation can overwrite a newer correction.
+- 確定した予定と未確定の予定を区別できる。
+- 未確定の予定が、後の発言で明示的に確定した場合。
+- 確定した予定が、別の予定へ訂正された場合。
+- 予定が明示的に取り消された場合。
+- 過去に完了した出来事と、現在の状態を区別できる。
+- ユーザー本人の予定と、家族の予定・伝聞を区別できる。
+- 予定についての質問と、予定の断定を区別できる。
+- 古い記憶と新しい明示的な発言が矛盾する場合。
+- 文言が同じでも、対象日付や対象人物が異なる場合。
+- 期限切れの予定を現在の予定として扱わない。
+- 確実性の情報を持たない旧形式の記憶を、暗黙に「確定」へ格上げしない。
+- 昨日のToday Memoryを、今日の事実として扱わない。
+- Body Clockが、未確定の予定を確定済みのように表現したり、その前提で自発メッセージを送ったりしない。
+- Forget Controlの有効な対象が、履歴・生成された記憶・確実性の格上げを経由して復活しない。
+- 匿名利用の一時状態、チェックポイント／メール保存、通常アカウント、ログアウト・再ログイン、複数端末での読み出しに一貫性がある。
+- 二重書き込みや古い処理結果によって、新しい訂正内容が上書きされない。
 
-## Open decisions (not yet approved)
+## 未決定の事項（まだ承認されていない）
 
-- Whether status belongs only to [life:v2] facts or also to a separately typed shared-memory candidate record.
-- Exact Japanese grammar/LLM classification boundary for indirect, joking, conditional, and quoted speech.
-- Whether the UI should visibly show uncertainty/status or keep it internal.
-- Whether a corrected/completed fact remains as historical evidence, and for how long.
-- Whether low-confidence ambiguous statements should trigger clarification or simply remain in history.
+- 状態管理を `[life:v2]` の生活情報だけに適用するか、通常の共有記憶候補にも型付きの仕組みを導入するか。
+- 間接表現、冗談、条件表現、引用された発言などを日本語でどう分類するか。モデルに任せる範囲も含めて検討が必要。
+- 不確実性や状態を画面上でユーザーに表示するか、内部だけで扱うか。
+- 訂正済み・完了済みの情報を過去の記録として残すか、残す場合はどの程度の期間か。
+- 確信度が低く曖昧な発言について、追加確認をするか、単に会話履歴にとどめるか。
 
-**Recommendation:** start with structured life facts because they already have time scope and source metadata, but do not extend this to every ordinary memory until data flow and compatibility are mapped. Certainty must be a first-class property, not a prompt-only instruction.
+**推奨方針：** まずは、対象期間や情報源などのメタデータがすでにある構造化生活情報から着手する。ただし、データの流れと互換性を調査し終えるまでは、すべての通常記憶に適用範囲を広げない。確実性はプロンプト上の注意書きだけで済ませず、情報の状態として明示的に管理する。
