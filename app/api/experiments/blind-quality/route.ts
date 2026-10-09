@@ -2,6 +2,7 @@ import {createClient} from "@supabase/supabase-js";
 import {loadCanonicalState} from "../../../../lib/canonical-state";
 import {selectLastUserReplayBoundary} from "../../../../lib/context-ab-replay-boundary";
 import {makePromptVariants} from "../../../../lib/context-ab-prompt";
+import {BlindQualitySafeError,decodeBlindQualityReply} from "../../../../lib/context-ab-blind-quality";
 
 /** Preview-only, owner-authorized, read-only blind quality comparison. Never logs replies. */
 export async function POST(request:Request){
@@ -19,6 +20,7 @@ export async function POST(request:Request){
  try{
   const state=await loadCanonicalState(user.id);
   if(!Array.isArray(state.history)||state.history.length<4)return Response.json({error:"Insufficient history"},{status:422,headers:noStore});
+  stage="prepare-history";
   const fixture=selectLastUserReplayBoundary(state.history.slice(-60));
   const history=fixture.history.map(turn=>({role:turn.role,parts:[{text:turn.parts[0].text}]}));
   const replies=fixture.history.filter(turn=>turn.role==="model").slice(-8).map(turn=>turn.parts[0].text);
@@ -30,12 +32,10 @@ export async function POST(request:Request){
     method:"POST",headers:{"Content-Type":"application/json","x-goog-api-key":key},signal:AbortSignal.timeout(30000),
     body:JSON.stringify({systemInstruction:{parts:[{text:systemInstruction}]},contents:[...history,{role:"user",parts:[{text:fixture.nextUserText}]}],generationConfig:{responseMimeType:"application/json",temperature:0}}),
    });
-   if(!response.ok)throw new Error("Model request failed");
-   const payload=await response.json();
-   const raw=payload?.candidates?.[0]?.content?.parts?.map((p:{text?:string})=>p.text??"").join("")??"";
-   const parsed=JSON.parse(raw);
-   if(typeof parsed?.reply!=="string"||!parsed.reply.trim())throw new Error("Invalid reply");
-   return parsed.reply as string;
+   if(!response.ok)throw new BlindQualitySafeError("gemini-http-error",response.status);
+   let payload:unknown;
+   try{payload=await response.json();}catch{throw new BlindQualitySafeError("gemini-empty-response");}
+   return decodeBlindQualityReply(payload);
   };
   // X/Y labels are randomized independently of call order; do not expose the mapping until review.
   stage="gemini-first";
@@ -46,5 +46,10 @@ export async function POST(request:Request){
   const reviewId=crypto.randomUUID();
   // No database writes. Mapping is returned only to this authenticated owner and held in browser memory.
   return Response.json({mode:"preview-blind-quality",reviewId,X:first,Y:second,key:{X:firstA?"A":"B",Y:firstA?"B":"A"},model,historyTurns:history.length},{headers:noStore});
- }catch{return Response.json({error:"Quality comparison failed; production unchanged",stage},{status:500,headers:noStore});}
+ }catch(error){
+  const diagnostic=error instanceof BlindQualitySafeError
+   ? {reasonCode:error.code,...(error.upstreamStatus?{upstreamStatus:error.upstreamStatus}:{})}
+   : {reasonCode:stage==="load-history"?"history-load-failed":stage==="prepare-history"?"history-preparation-failed": "gemini-request-failed"};
+  return Response.json({error:"Quality comparison failed; production unchanged",stage,...diagnostic},{status:500,headers:noStore});
+ }
 }
