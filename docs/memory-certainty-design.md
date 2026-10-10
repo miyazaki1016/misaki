@@ -222,3 +222,16 @@ Geminiを使う品質評価は、決定論的テストとは別ゲートにす�
 5. Today Memoryは別の `{date, items}` 構造で扱われ、現在日付と合わない場合はチャット処理中に空へリセットされる。これを生活情報の確実性状態の代用にはしない。
 
 この確認範囲では、状態の意味を持たない旧形式の生活情報が、確信度や期限だけで選択・保存されること、訂正・取消しが同じ対象にひもづく状態遷移として扱われていないことが、v1設計で優先して解決すべき候補となる。匿名のチェックポイント／メール保存との完全な往復、およびRPC内部の原子的更新・競合制御の詳細は、まだ確認を完了していない。
+
+
+### 正規RPC契約の初回確認
+
+`supabase/migrations/20260918073918_canonical_misaki_root_state.sql` で確認できたこと：
+
+- `complete_misaki_chat_turn` は、成功したチャットターンの履歴・記憶・Today Memory・利用回数等を一つのトランザクションで更新する設計コメントを持つ。
+- このRPCは `misaki_user_conversation_state` の `updated_at` を期待値として比較し、競合する古い状態の書き込みを拒否する。さらに Body Clock のロック順序を明記している。
+- 通常アカウントの正規保存は、アプリ側からこのRPCを通して行う。状態の確実性を導入する際も、クライアントからの直接更新や別の独立書き込み経路を作らない。
+- 匿名利用の `complete_misaki_temporary_turn` は、匿名状態のトークンと期待revisionを使って `write_misaki_temporary_root` へつなぐ。別途、`save_misaki_temporary_state` はチェックポイントを保存し、revisionの不一致や期限切れを拒否する。
+- Forget Control向けの `edit_misaki_conversation_state` は、記憶・履歴の変更後にBody Clock側のスナップショットも更新する。
+
+これは該当マイグレーションのソース確認であり、Production DBに現在この定義が適用されているかをこの調査だけで断定するものではない。次の調査では、メール保存／匿名チェックポイントのアプリ側呼び出しと、Body Clockが読む正規状態・一時状態の分岐を最後まで追跡する。
