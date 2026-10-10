@@ -1,0 +1,38 @@
+name: Isolated Gemini A/B (manual only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_two_billable_requests:
+        description: 'Type YES to authorize 2 billable Gemini requests using synthetic data'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-gemini-ab:
+    if: ${{ github.event.inputs.confirm_two_billable_requests == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts
+      - name: Run exactly one synthetic A/B pair
+        env:
+          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}
+          MISAKI_AB_LIVE: 'YES'
+          MISAKI_AB_MODEL: gemini-3.1-flash-lite
+          MISAKI_AB_RUNS: '1'
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo 'MISAKI_AB_GEMINI_API_KEY is not configured; refusing live requests.'
+            exit 1
+          fi
+          node --experimental-strip-types scripts/context-ab-live.ts

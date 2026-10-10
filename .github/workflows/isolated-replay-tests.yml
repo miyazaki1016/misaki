@@ -1,0 +1,25 @@
+name: Isolated Replay Tests
+
+on:
+  pull_request:
+    paths:
+      - "lib/context-ab-*.ts"
+      - "tests/context-ab-*.test.ts"
+      - ".github/workflows/isolated-replay-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  replay-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Run offline replay tests only
+        run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-balanced.test.ts

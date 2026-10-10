@@ -2370,12 +2370,10 @@ ${tokyoLifeEventsGuide}
 
 ${todayMemoryGuide}
 
-【直近の美咲の発言】
+【直近の美咲の発言と表現の重複】
 
-${recentTopicText}
-
-同じ表現を
-そのまま繰り返さないでください。
+直近の美咲の発言は会話履歴に含まれています。
+会話履歴を参照し、同じ表現をそのまま繰り返さないでください。
 
 【長期記憶】
 
@@ -2414,10 +2412,11 @@ misakiTodayMemory は、
 }
 `.trim();
 
-    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS) || (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "work/conversation-context-compression-spike")) {
+    if (contextSizeMeasurementEnabled(process.env.MISAKI_CONTEXT_SIZE_METRICS) || (process.env.VERCEL_ENV === "preview" && ["work/conversation-context-compression-spike", "work/context-no-duplicate-replies-ab"].includes(process.env.VERCEL_GIT_COMMIT_REF || ""))) {
       // Counts only: no prompt text, user content, IDs, or memory values.
       console.log("MISAKI CONTEXT SIZE:", {
         traceId,
+        experimentVariant: "no-duplicate-replies",
         overlap: {
           replies: countRepeatedRepliesInHistory(contents, recentMisakiMessages),
           sections: analyzePromptSectionOverlap(baseSystemPrompt, [
