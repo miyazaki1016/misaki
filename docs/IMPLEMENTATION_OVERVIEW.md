@@ -3724,3 +3724,45 @@ Body Clockは保存済み記憶だけでなく、直近のユーザー発言も�
 
 今回の総覧追記は文書のみ。DBスキーマ／データ、RPC、Edge Function、Production、Geminiの有料呼び出し、デプロイ、PRマージは変更・実行しない。実装着手と本番反映は、既存の承認・安全ゲートを維持する。
 
+
+
+## 2026-10-12 記憶の確度：読み取り専用データフロー追跡（追加分）
+
+> **確認範囲：** GitHub上の `main`、`work/context-no-duplicate-replies-ab`、PR #66の `work/forget-control-v1`。ソース読み取りのみ。DB実照会、コード変更、Gemini呼び出し、デプロイ、マージは行っていない。以下はソース上の経路確認であり、Production DBに該当マイグレーションが適用済みであることの証明ではない。
+
+### 1. 匿名利用 → メール保存チェックポイントの呼び出し元
+
+- `app/account/page.tsx` の `saveByEmail()` が、メール送信・認証情報更新より前に `POST /api/persona/history` を呼ぶ。送信データには `saveAnonymous: true`、匿名ユーザーID、ブラウザの一時状態トークン、保留中ターンが含まれる。
+- `app/api/persona/history/route.ts` は匿名IDを検証し、`loadTemporaryRoot()` でサーバーの一時ルートを読み、必要なら保留中の完了ターンを回復した後、`save_misaki_temporary_state` RPCを呼ぶ。引数は history / memory / today_memory / points / temporaryRelationship / expected_revision。
+- `supabase/migrations/20260926004000_preserve_temporary_relationship_on_email_save.sql` では、チェックポイントRPCが一時ルートのrevision・期限を検証し、正規の `misaki_user_conversation_state` を更新して `email_save_checkpoint` イベントを記録する契約を定義している。書き込みは既存RPC経由であり、確度設計のための新しい保存先を追加する必要はない。
+- `lib/canonical-state.ts` の `loadTemporaryRoot()` は、匿名サーバールートがない場合、`email_save_checkpoint` の存在を確認してから正規状態の復元へ進む。通常の匿名利用では、単なるブラウザスナップショットを正規の永続会話状態として扱わない。
+- **PR #66との境界：** メール保存のルート（`app/api/persona/history/route.ts`）は main と確度設計ブランチでは同じ内容。PR #66側にはForget ControlペイロードをRPCへ渡す差分がある。確度設計を進める場合は、PR #66の保護処理を維持し、PR #66ブランチへこの設計書を追加しない。
+
+### 2. Body Clockの送信経路と確度判定の欠落箇所
+
+- `supabase/functions/body-clock/conversation-root.ts` は、匿名ユーザーなら期限付きの暗号化一時ルートを読み、通常アカウントなら `misaki_user_conversation_state` の history / memory / today_memory を読む。PR #66側にはForget Control関連の差分があるため、同ファイルを単純に上書きしない。
+- `supabase/functions/body-clock/proactive-life-context.ts` は main・確度設計ブランチ・PR #66で同一内容。通常記憶、期限内の構造化 `[life:v1]`、直近の本人発言を候補にし、キーワード・新しさで situation / plan を選ぶ。確定／未確定／訂正／取消し／完了の状態を判定するフィールドや決定論的分類器はない。特に、直近発言「明日は休みかも」などを現在の予定候補として拾わない保証は、現状の実装から確認できない。
+- `supabase/functions/body-clock/index.ts` は生活文脈を作り、`buildProactiveDecisionContext()` を経てGeminiでメッセージを生成し、`finish_misaki_body_clock_delivery` RPCで配信記録・会話履歴等を確定した後、通知が有効なら署名付きdelivery IDをPush relayへ渡す。確認した経路には、Gemini生成後・配信確定前に生活根拠の確実性を再判定する明示的な最終ゲートは見つからなかった。
+- `app/api/push/body-clock/route.ts` は署名、配信ID、配信済み状態、配信からの経過時間、通知設定、重複送信を確認してPushを送るが、生活根拠の確実性・予定状態を再検証しない。したがって、**確度設計の主要な実装候補は、生活根拠の選択と、Body Clockが生成した文面を配信として確定する前のサーバー側ゲート**。ただし実装方法は未承認であり、まだ変更しない。
+- `proactive-decision.ts` の `shouldSend: true` は行動コンテキストの生成結果で、生活予定の確定性を検証するゲートではない。プロンプト上の注意だけでは、決定論的な確度保証にならない。
+
+### 3. main / 作業ブランチ / PR #66の差分確認
+
+確認したファイルのBlob SHA比較結果：
+
+- `proactive-life-context.ts`、`proactive-decision.ts`、`20260926004000_preserve_temporary_relationship_on_email_save.sql`：3ブランチで同一。
+- `app/api/persona/history/route.ts)：mainと確度設計ブランチは同一。PR #66側はForget Control処理を含む差分あり。
+- `supabase/functions/body-clock/index.ts)、`conversation-root.ts)：mainと確度設計ブランチは同一。PR #66側には差分あり。
+- Push relayの `app/api/push/body-clock/route.ts)：3ブランチで同一。
+
+### 4. 現時点の判定と残作業
+
+**確認できた：** 匿名→メール保存のアプリ呼び出し元、チェックポイントRPC、正規状態復元の入口、およびBody Clockの根拠選択→生成→配信確定→Push relayのソース上の順序。
+
+**まだ確認できていない：**
+- Production DBにおける各RPC定義・権限・マイグレーションの実適用状態。
+- 通常ログイン後・複数端末での実動作、および匿名→メール保存の実データ往復。
+- Body Clockの送信直前ゲートをどの既存契約内で安全に差し込めるか、RPC内部の全ロック／lease／revision制約。
+- 確度分類器の日本語表現に対する品質。これは決定論的テストと、課金復旧・承認後の実Gemini品質評価を分けて検証する必要がある。
+
+**次の安全な作業：** まだ書き込みはせず、PR #66のBody Clock差分と配信RPCのロック・lease契約を読み取り専用で比較し、確度ルールを共有できる境界を提案する。結果をオーナーに報告し、対象ブランチと変更範囲の承認を得るまでは実装・DB・Edge・Production変更・PRマージを行わない。
