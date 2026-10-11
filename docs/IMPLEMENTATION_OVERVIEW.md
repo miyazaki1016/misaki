@@ -94,6 +94,16 @@ workflowは実験用コミット `9a40d98c4ecec2f17eef1489a687acc1e24f338e` をc
 - persona側の感情・行動継続ガイドとroute側のrelationship acting guideも近い主題を扱う。ただし役割・内容が完全に同じとは限らないため、単純削除せず、意味単位で差分を取る候補とする。
 - 東京イベントガイドは最大9件のイベントを入力にできる。天気・イベント・プロフィール・記憶・関係状態により実際のprompt長が変動する。
 
+### 追加精査：重複はpersonaの取得経路で変わる
+
+- DB personaが正常にロードされた場合、`loadPersonaPrompt()` は `createRelationshipContinuityGuide()` 経由で関係時間・感情継続・行動傾向の3ガイドをpersona本文に加え、route側の `baseSystemPrompt` が `createRelationshipTimeGuide()` を再度追加する。関係時間ガイドが二重追加になる経路を確認した。
+- personaがfallbackになった場合は、`persona-store.ts` がDB用の関係継続ガイドを含めずfallback personaを返すため、同じ二重追加とは限らない。整理する際はDB成功・fallbackの両経路を保護する必要がある。
+- `relationshipActingGuide` は親密度・友情・信頼・遊び心・親愛・恋愛意識や明示的な交際状態を扱う別ガイドであり、感情継続・行動傾向ガイドと似た主題があっても同一機能とは断定できない。
+- 最初の返答で関係シグナルが1件以上あると、routeは `createCurrentTurnActionGuide()` を生成し、同じbase system promptと履歴を含む生成をもう一度呼ぶ経路がある。これは品質目的の追加生成なので、単純削除せず、発動条件・品質効果・追加トークンを別に検証する。
+- 関係シグナル判定ガイドは返答JSONと後段の関係状態更新に関わるため、演技ガイドとまとめて削除しない。
+
+現時点で最も安全な候補は、DB persona成功時に重複し得る関係時間ガイドの一本化を検討すること。まだ変更・テストはしていない。有効なDB persona module本文自体はこの調査では取得していないため、module本文内の重複は未確認。
+
 ### 軽量化候補の優先順位（変更提案のみ、未実装）
 
 1. **優先候補：直近Misaki発言のsystem promptへの再掲を省く**。これは既存A/Bの対象。会話履歴は残し、短い指示に置き換える案を、反復・話題追跡・感情連続性の回帰ケースで評価する。
