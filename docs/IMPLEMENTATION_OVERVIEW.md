@@ -3766,3 +3766,22 @@ Body Clockは保存済み記憶だけでなく、直近のユーザー発言も�
 - 確度分類器の日本語表現に対する品質。これは決定論的テストと、課金復旧・承認後の実Gemini品質評価を分けて検証する必要がある。
 
 **次の安全な作業：** まだ書き込みはせず、PR #66のBody Clock差分と配信RPCのロック・lease契約を読み取り専用で比較し、確度ルールを共有できる境界を提案する。結果をオーナーに報告し、対象ブランチと変更範囲の承認を得るまでは実装・DB・Edge・Production変更・PRマージを行わない。
+
+
+### 2026-10-12 読み取り専用追補 — PR #66のBody Clockゲートと配信RPC契約
+
+前回の調査をPR #66の実差分およびcanonical migrationまで追って精査した。**Forget Controlの出力ゲートと、今回設計中の生活情報の確度ゲートは別物**として扱う。
+
+- PR #66の `supabase/functions/body-clock/index.ts` は、canonical history / memory / Today Memoryを `forgetContext()` に通し、生成したreplyを `maskForgetRows(..., "output")` で再検証する。削除・忘却対象がreplyに残っていれば `finish_misaki_body_clock_delivery` を呼ぶ前に失敗する。これはForget Control保護であり、`tentative / confirmed / corrected / completed` といった予定の確度を検証するものではない。
+- PR #66の `conversation-root.ts` は、永続アカウントでは暗号化されたForget Controlを読み、匿名アカウントでは期限付きtemporary root内のForget Controlを読む。Forget Control読取失敗はfail closed。確度設計を追加する場合も、この読取・保護経路を置き換えたり迂回したりしない。
+- `20260918073918_canonical_misaki_root_state.sql` の `finish_misaki_body_clock_delivery` は、まずaccount rowをロックし、その後 `background_push_state` をロックして、配信lease（`next_push_at = p_lease_until` と期限内）・日次上限・空でない本文を検証する。匿名側はtemporary rootのexpected revisionを `write_misaki_temporary_root(..., false)` で検証し、永続側はconversationの `updated_at` が `p_expected_updated_at` と一致することを確認する。成功時に配信記録、会話履歴（永続側）、次回lease、日次回数を同じRPC transactionで確定する。例外時はtransaction全体がrollbackされる契約。
+- このRPCはアプリ側で使われる `p_expected_revision` / `p_temporary_token` / `p_temporary_state` / `p_expected_updated_at` を受け取る。既存のrevision・lease・lock orderを守る必要があるため、確度ゲートを新たなDB writeや別経路として挿入するのではなく、まず生成前の候補選択と生成直後〜既存RPC呼出し前の決定論的検証を検討する。既存RPCの再設計は前提にしない。
+- Push relayの `app/api/push/body-clock/route.ts` は、署名・永続配信ID・source/status・配信からの経過時間・通知設定・重複attemptを検証して送信する。生活情報の確度を再判定する場所ではないため、配信RPCで本文が確定した後にrelayへ確度判定を追加する案は、原則として適切な第一候補ではない。
+
+**差分・状態の注意：** PR #66のBody ClockにはForget Controlの読取・文脈マスク・生成reply検証・temporary rootへの状態引継ぎが追加されている。PR #66は未マージのレビュー対象で、差分の存在はProduction適用済みの証拠ではない。Production DBのマイグレーション適用状態、実Edgeのrevision、実配信の動作は今回も未確認。
+
+**確度設計への結論（提案であり未承認）：**
+1. まず純粋関数で生活情報の状態分類と有効候補選択を実装・テストする。
+2. 通常チャットとBody Clockが同じ規則を使える境界を設計する。
+3. Body Clockでは既存Forget Controlの入力・出力ゲートを維持し、確度検証が通らない場合は安全側に倒して配信確定RPCを呼ばない。
+4. DB migration、新テーブル、RPC変更、Edge deploy、本番有効化は、呼出経路・ロック契約・テストを揃え、オーナーが変更範囲を明示承認するまで行わない。
