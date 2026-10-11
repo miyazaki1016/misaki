@@ -3634,3 +3634,6 @@ Identity resolver / persistence / Acting Guideには自動テストがあり、c
 
 
 **追加の実行タイミング注意（2026-10-11追査）:** ソース上、`/account` のメール保存処理は確認メール送信前に匿名checkpointを保存するが、Auth state listener / email confirmation後の画面遷移そのものからRelationship Identity importを直接呼ぶ処理は確認できなかった。Identity v3 importは `runPermanent → processRelationshipTurn` のpermanent Relationship processing経路から呼ばれる構造で、通常は正式化後の恒久アカウント側チャット処理が走った際に再開される。したがって「メール確認が完了した瞬間にimport済み」とはまだ主張しない。隔離Preview受入では、確認完了直後にチャットしないケースと、次turnを送ったケースの双方で、import ledger・canonical axes / Identity・checkpoint状態・別端末restoreを確認し、遅延が仕様どおりかを明示する。
+
+
+**Previewデプロイ状態の再確認（2026-10-11）:** 最新の総覧追記commit `9f61e12b02449e26ded0815ce9fbdc3c1aae960b` に紐づくVercel Previewは `READY`。これはデプロイ成功の確認であり、メール認証・匿名import・別端末restoreを実行した受入結果ではない。実アカウントを使う2パターンの受入は引き続き未完了。環境変数のsecret値は読み出さず、Production設定の変更も行っていない。
