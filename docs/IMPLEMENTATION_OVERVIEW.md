@@ -3631,3 +3631,6 @@ DB migrationはProduction適用済み。以下の旧適用前チェックは残�
 Identity resolver / persistence / Acting Guideには自動テストがあり、canonical loverから返答までのPreview E2Eも一度PASSしている。したがって「Identityから返答までの検証が一切ない」とは扱わない。一方、そのE2Eは匿名import・constraint・re-entryの全経路を網羅していないため、これらを完了済みとも扱わない。
 
 **停止位置:** Production migrationsは適用済み、Production Identity gate OFF、PR #67 Draft / 未merge。隔離Supabase受入・複数セッション競合・ownerレビューが終わるまでmerge / gate ONを行わない。PR #66 Forget Controlは対象外。
+
+
+**追加の実行タイミング注意（2026-10-11追査）:** ソース上、`/account` のメール保存処理は確認メール送信前に匿名checkpointを保存するが、Auth state listener / email confirmation後の画面遷移そのものからRelationship Identity importを直接呼ぶ処理は確認できなかった。Identity v3 importは `runPermanent → processRelationshipTurn` のpermanent Relationship processing経路から呼ばれる構造で、通常は正式化後の恒久アカウント側チャット処理が走った際に再開される。したがって「メール確認が完了した瞬間にimport済み」とはまだ主張しない。隔離Preview受入では、確認完了直後にチャットしないケースと、次turnを送ったケースの双方で、import ledger・canonical axes / Identity・checkpoint状態・別端末restoreを確認し、遅延が仕様どおりかを明示する。
