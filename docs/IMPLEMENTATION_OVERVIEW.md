@@ -3602,3 +3602,32 @@ DB migrationはProduction適用済み。以下の旧適用前チェックは残�
 **次の受入:** anonymous path / temporary import v3 の実アプリ経路を優先し、匿名会話のRelationship Identityが保存時に恒久アカウントへ原子的に引き継がれることを確認する。その後 breakup / rejection / boundary、fresh romance Patternによるre-entry、真のmulti-session lock contentionを未完了事項として残す。
 
 **停止位置:** Production Identity migrationは適用済みだがProduction frontend Identity gateはOFF。PR #67はDraft・未merge。Production gate ON / mergeはownerの別承認まで禁止。PR #66 Forget Controlは触らない。
+
+---
+
+### Relationship Identity v1 — 追加ソース監査の整理（2026-10-11）
+
+**監査対象:** PR #67 head `ece799c20d685f00c007cb2f897bdd6b2443a2d3`。この節は既存の2026-10-08実機受入記録を置き換えず、その後のソース・テスト照合で確認した範囲と未完了事項を追記する。コード / migration / 環境設定の変更なし。
+
+#### テストで確認できたこと
+
+- `tests/relationship-identity-anonymous-runtime.test.ts` は匿名Identityのcritical-only version変更、Identity gate、v2/v3 import分岐、romance provenanceの保存・恒久workerへの伝達、canonical source versionによるPattern application選択をソース契約として確認する。
+- `tests/relationship-runtime-v1.test.cjs` は匿名checkpointの暗号化CAS、分析失敗後の再試行、owner検証、期限切れrootの無視、恒久化時の最新verified root import、重複import防止、lease失敗 / TOCTOU拒否をruntime harnessで確認する。ただし、このharnessのimport RPCはv2を前提とするため、Identity v3の実DB連携を証明するものではない。
+- `tests/relationship-identity-audit.test.ts` は11 Identity、4 constraint、critical event、provenance、hysteresis、宣言順序不変性、3日Patternによるromance re-entryを確認する。
+- `tests/relationship-identity-sql.test.ts` はPGlite上でIdentity RPC / importのDDL・ACL・stale / replay・transaction rollback・provenance契約を統合確認する。ただしPGliteはsingle-sessionであり、実Postgresの複数セッション競合は未確認。
+- `tests/relationship-acting-guide.test.ts` は交際状態の先取り、内部scoreの露出、時間経過だけによる恋愛感情の捏造、legacy pointsの保守的変換などを確認する。
+- 2026-10-08のPreview実機では、canonical `romantic_acceptance → lover → 次turnのActing Guide自己認識` が成功済み。これは実機確認済みだが、匿名Identity v3 importの実機確認とは別である。
+
+#### 現在も未完了の受入
+
+1. **匿名 → email / 恒久アカウント:** 隔離Supabase接続Previewで、匿名会話・Identity・checkpointが原子的に引き継がれ、別端末restore / retry後も継続することを確認する。正式化直後にチャットを再開しない場合の実行タイミングも確認対象。既存harnessはv3実DB連携の代替にならない。
+2. **別れ / 拒絶 / boundary:** resolver / SQLの自動テストはあるが、Previewで実会話からconstraintが設定され、境界がActing Guideに反映されることを未確認。
+3. **romance re-entry:** fresh positive Pattern、後続non-romance updateによるproof保持、新critical eventによるresetを隔離環境の実アプリ経路で確認する。
+4. **複数DBセッション競合:** State updateとIdentity apply、同一sourceの二重apply、import競合 / retryを別セッションで実施し、stale拒否とtransition ledgerの重複防止を確認する。
+5. **rollback受入:** 既存 `tests/*.rollback.sql` を完全なSupabase migration baselineを備えた隔離環境で実行する。リポジトリのmigration履歴欠落・同一timestamp問題を推測で補完せず、正しいlegacy baselineを別途用意する。
+
+#### 監査上の結論
+
+Identity resolver / persistence / Acting Guideには自動テストがあり、canonical loverから返答までのPreview E2Eも一度PASSしている。したがって「Identityから返答までの検証が一切ない」とは扱わない。一方、そのE2Eは匿名import・constraint・re-entryの全経路を網羅していないため、これらを完了済みとも扱わない。
+
+**停止位置:** Production migrationsは適用済み、Production Identity gate OFF、PR #67 Draft / 未merge。隔離Supabase受入・複数セッション競合・ownerレビューが終わるまでmerge / gate ONを行わない。PR #66 Forget Controlは対象外。
