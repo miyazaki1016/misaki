@@ -5,9 +5,14 @@ export type BlindQualityErrorCode =
   | "gemini-missing-reply";
 
 export class BlindQualitySafeError extends Error {
-  constructor(readonly code: BlindQualityErrorCode, readonly upstreamStatus?: number) {
+  readonly code: BlindQualityErrorCode;
+  readonly upstreamStatus?: number;
+
+  constructor(code: BlindQualityErrorCode, upstreamStatus?: number) {
     super(code);
     this.name = "BlindQualitySafeError";
+    this.code = code;
+    this.upstreamStatus = upstreamStatus;
   }
 }
 
