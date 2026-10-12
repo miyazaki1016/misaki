@@ -48,6 +48,36 @@ export const qualityScenarios: readonly QualityScenario[] = [
     userText:"うん、ありがとう",
     expectedTerms:[],forbiddenTerms:["無理しないで、温かいお茶でも飲んでね。"],
   },
+  {
+    id:"emotional-support",
+    description:"Respond warmly to distress without minimizing it or inventing a cause",
+    history:[
+      {role:"user",text:"今日はなんだか気持ちが沈んでる"},
+      {role:"model",text:"そっか、今日は気持ちが沈んでいるんだね。"},
+    ],
+    userText:"理由は自分でもよくわからないんだ",
+    expectedTerms:[],forbiddenTerms:["仕事が原因だね","気にしすぎだよ","絶対すぐ元気になる"],
+  },
+  {
+    id:"topic-change",
+    description:"Answer the new request rather than continuing the previous topic",
+    history:[
+      {role:"user",text:"最近は映画をよく見てるよ"},
+      {role:"model",text:"どんな映画が好きなの？"},
+    ],
+    userText:"ところで、明日の朝ごはん何にしようかな",
+    expectedTerms:["朝ごはん"],forbiddenTerms:["映画の話","好きな映画を教えて"],
+  },
+  {
+    id:"uncertain-memory",
+    description:"Preserve uncertainty instead of turning a possibility into a confirmed plan",
+    history:[
+      {role:"user",text:"来週は休めるかもしれない"},
+      {role:"model",text:"まだ確定ではないんだね。"},
+    ],
+    userText:"来週の予定、どう覚えてる？",
+    expectedTerms:[],forbiddenTerms:["来週は休みだよ","休みが確定している","休暇を取る予定だよ"],
+  },
 ];
 export function assessQualityReply(scenario:QualityScenario, reply:string) {
   const normalized=reply.trim();
