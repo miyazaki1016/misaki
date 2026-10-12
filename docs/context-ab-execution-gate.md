@@ -61,4 +61,4 @@ The synthetic runner uses a *small simplified prompt*, not the full Production-g
   - `npx tsc --noEmit`
   - Offline replay tests passed separately.
 - The checks validate test/harness behavior only; they do not run model-generated quality trials and do not establish A/B conversational equivalence.
-- Next gate remains blinded review of varied replies. Do not call Gemini again or send real conversation content until a separate explicit authorization and a defined call budget are provided.
+- Next gate remains blinded review of varied replies. The scoring, random left/right masking, stop rules, and review sheet are documented in [context-ab-blind-review.md](./context-ab-blind-review.md). The first live pair's raw replies were not retained, so it cannot be scored retrospectively. Do not call Gemini again or send real conversation content until a separate explicit authorization and a defined call budget are provided.
