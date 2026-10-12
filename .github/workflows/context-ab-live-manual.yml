@@ -1,4 +1,4 @@
-name: Isolated Gemini A/B (manual only)
+name: 【手動実行はこれだけ】Misaki Context A/B（Gemini 2回・課金あり）
 
 on:
   workflow_dispatch:
