@@ -48,3 +48,17 @@ The synthetic runner uses a *small simplified prompt*, not the full Production-g
 - Do not attempt live calls using a Vercel deployment URL: the script is not an HTTP endpoint.
 - Keep PR #78 as Draft and unmerged; keep Production unchanged.
 - Before any production decision, compare varied scenarios (continuation, emotional support, explicit memory reference, topic change, relationship-sensitive exchange), use blinded human review, inspect the actual Production prompt and all CI, and obtain explicit human approval.
+
+
+## Offline quality-harness update (2026-10-13)
+
+- Expanded deterministic synthetic quality scenarios from 4 to 7: explicit memory recall, unsupported schedule assumptions, relationship boundary, verbatim repetition, emotional support, topic change, and uncertain memory/plan.
+- Added a deterministic test for blind score aggregation across the five axes, including tie handling.
+- CI for commit `19cc84667a1a205a6b4b7193f74637197ba938df` passed:
+  - `npm ci`
+  - `npm test`
+  - `node --experimental-strip-types scripts/context-ab-smoke.ts`
+  - `npx tsc --noEmit`
+  - Offline replay tests passed separately.
+- The checks validate test/harness behavior only; they do not run model-generated quality trials and do not establish A/B conversational equivalence.
+- Next gate remains blinded review of varied replies. Do not call Gemini again or send real conversation content until a separate explicit authorization and a defined call budget are provided.
