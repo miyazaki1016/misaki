@@ -40,6 +40,8 @@ Record one row per scenario; do not record which arm is which until scoring is l
 | topic-change |  |  |  |  |  |  |  |  |  |  |  |
 | uncertain-memory |  |  |  |  |  |  |  |  |  |  |  |
 
+A blank CSV scoring sheet is available at [context-ab-blind-review-template.csv](./context-ab-blind-review-template.csv). Fill it only after the left/right order is randomized and the arm key is held separately; lock scores before unblinding.
+
 ## Analysis and stop rules
 
 - Lock scores before revealing the arm key.
