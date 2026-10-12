@@ -1,0 +1,8 @@
+scenario_id,left_memory,left_relationship,left_continuity,left_repetition,left_naturalness,right_memory,right_relationship,right_continuity,right_repetition,right_naturalness,left_critical_flag,left_critical_reason,right_critical_flag,right_critical_reason,reviewer_id,notes
+memory-continuity,,,,,,,,,,,,,,,
+no-unsupported-day,,,,,,,,,,,,,,,
+relationship-boundary,,,,,,,,,,,,,,,
+no-verbatim-repeat,,,,,,,,,,,,,,,
+emotional-support,,,,,,,,,,,,,,,
+topic-change,,,,,,,,,,,,,,,
+uncertain-memory,,,,,,,,,,,,,,,
