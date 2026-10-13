@@ -73,3 +73,35 @@
 - この文書の作成・更新は文書管理のみ。
 - 本番DB、migration ledger、アプリコード、RPC、権限、RLS、本番設定、デプロイは変更していない。
 - ここに記載した件数は2026-10-13の調査時点のもの。再調査時は再取得する。
+
+
+## 7. RPC定義とmigration台帳の具体照合（2026-10-13・読み取りのみ）
+
+調査対象を広げたところ、単なるファイル名の不一致だけでなく、**同じRPCを定義する別名・別versionのmigrationがmainに併存するケース**を確認した。
+
+### `get_relationship_time_context()`
+
+GitHub `main` には次の2ファイルがある。
+
+- `20260917023648_phase1_relationship_time_context_rpc.sql`
+- `20260917024500_phase1_relationship_time_context_rpc.sql`
+
+どちらも引数なしの `public.get_relationship_time_context()` を定義する。後者は `SECURITY INVOKER` を明示している。台帳には前者の `20260917023648` だけがある。接続先DBには引数なし関数があり、`SECURITY DEFINER=false`、`search_path=public`、実行ロールは `authenticated, postgres, service_role`。関数本文には本人の `auth.uid()` と匿名ユーザー拒否のチェックがある。DB定義の意味はinvokerであることと整合するが、本文全体の同一性まではこの確認だけで断定しない。
+
+### `record_relationship_chat_turn(timestamptz, timestamptz)`
+
+GitHub `main` には次の2ファイルがある。
+
+- `20260917023657_phase1_record_chat_turn_rpc.sql`
+- `20260917024600_phase1_record_chat_turn_rpc.sql`
+
+両方とも同じ署名のRPCを定義するが、内容は同一ではない。後者には、両タイムスタンプの未来値拒否、既存時刻を後退させない更新、通常チャットターンのイベント記録、経過秒数の返却が含まれる。前者には同じ更新ロジックがない。台帳には前者の `20260917023657` だけがある。
+
+接続先DBの同署名関数は `SECURITY DEFINER=true`、`search_path=public`、実行ロール `postgres, service_role`。本文の読み取り照合では、未来タイムスタンプ拒否、時刻の単調更新、`normal chat turn completed` イベント記録、経過秒数返却の4点が存在する。つまり、DBの現在の関数は後者の主要な動作特性と整合している一方、台帳には後者のmigration versionが見当たらない。
+
+### この差分の意味と安全な対応
+
+これは**台帳に記録されたversionと、mainにある後続migration・本番RPC定義の由来を照合する必要がある具体例**。現在の本番DBの関数が、mainの後続migrationで意図した動作を含んでいることは部分的に確認できたが、どの経路で本番へ反映されたかはまだ確定していない。
+
+次の手順は、関連コミットの前後差分・適用履歴・本番関数本文を照合し、後続migrationが実際に適用されたことを裏付けられるか確認すること。証拠が揃うまではmigration repair、ledger更新、再適用を行わない。これらのRPCはRelationship Engineの時間コンテキストと会話履歴に関わるため、無条件の再実行はしない。
+
