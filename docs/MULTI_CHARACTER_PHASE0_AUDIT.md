@@ -154,3 +154,45 @@
 - [ ] 通知予約・配送台帳・写真選択・retryを含むpair scopeの設計
 - [ ] 評価用会話セット作成と現行品質ベースライン実測
 - [ ] 論理ER図・backfill・compatibility window・rollback案をレビュー
+
+
+## 10. 追加監査：DB書き込み境界と配送の原子性
+
+2026-10-13に関連migrationのDDL/RPC本体を追加確認。これはmigrationファイル上の契約確認であり、接続先本番DBに対する実テーブル状態・実grant・実データの検査ではない。
+
+### 10.1 Relationship state / eventの既存キー
+
+- `20260917023000_phase1_relationship_state_and_events_foundation.sql` では `misaki_relationship_state.user_id` が主キーで、関係状態は1ユーザー1行。RLSを有効化し、`public/anon/authenticated` の書き込みを剥奪、authenticatedにはSELECT、service_roleにはCRUDを付与する構成。
+- `misaki_relationship_events` は `user_id` を所有者とし、`source_message_id` と `source_delivery_id` にFKを持つ。これらのイベントはペアIDを明示しないため、既存行は現行美咲の履歴として保持する移行候補が自然だが、実データの意味づけはソラのレビューで確定する。
+- `20261003081605_relationship_engine_v1_foundation.sql` では evidenceの一意制約が `(user_id, request_id, evidence_key, analyzer_version)`、episodeが `(user_id, episode_key, analyzer_version)`、patternが `(user_id, pattern_key, pattern_version)`、critical pendingが `(user_id, request_id, candidate_type)`。character/pair scopeを導入する場合、各一意制約と関連インデックス・参照テーブルをまとめて設計する必要がある。
+
+### 10.2 Canonical turn / lease fencingは書き込みの前提
+
+- `20261003081902_relationship_engine_v1_analysis_write_surface.sql` のv1 evidence/episode/pattern等の書き込み経路はcanonical chat turnの存在確認や、参照するevidence/episodeが同じuser所有であることの確認を行う。
+- `20261003094200_relationship_engine_v1_full_lease_fencing.sql` はv2 RPCの書き込み前に `assert_misaki_relationship_lease_v1` を呼び、`user_id + request_id + processing_version + lease_token` に対応する有効期限内leaseをDBトランザクション内で確認する。またprocessing/analyzer versionの整合性も検証する。
+- `20261003100600_relationship_engine_v1_remove_legacy_write_bypass.sql` はv2の書き込み処理を直接実装し、旧v1の書き込みbypassを廃止する方向のmigration。したがってpair scope化は「新しい列を追加するだけ」では済まず、全v2署名・内部所有権検証・grant/revoke・worker leaseのスコープを揃える必要がある。
+- 今後の変更では、旧RPCの直接呼び出しが残っていないか、service_roleのEXECUTE grantが意図どおりかを、migrationと実DBの双方で確認する。migrationテキストだけでは現在の本番grantを断定しない。
+
+### 10.3 Body Clock配送は状態・履歴・日次上限を一括確定
+
+- `20260916002657_misaki_body_clock_atomic_delivery_and_vault_auth.sql` の `finish_misaki_body_clock_delivery` は、`background_push_state` のlease時刻を検証して行ロックを取得し、日次送信上限を確認した後、proactive deliveryの作成、`misaki_user_conversation_state.history` への追加、message count更新、次回送信時刻と日次回数更新を1トランザクションで行う。
+- 同migrationはcron secretをVaultで保持・検証し、関数の実行権限も制限する。 `20260916010326_misaki_body_clock_push_relay_attempts.sql` はdelivery IDを主キーとするpush attempt台帳を持つ。
+- pair scope導入時は、deliveryだけにcharacter IDを足すのでは不十分。lease/予約キー、会話履歴の保存先、日次上限の適用単位、写真選択、push attemptの再送・同一性をまとめて設計し、現行の原子性と秘密管理を維持する必要がある。
+
+### 10.4 この時点での設計上の帰結
+
+1. 最初の実装はDB変更ではなく、現行Misakiに対する会話品質ベースラインとRPC呼び出し元一覧を作ること。
+2. 既存Misakiデータの移行は、pair IDを機械的に付けるだけでなく、canonical chat turn・event・deliveryの関連性と一意制約を維持して検証すること。
+3. 将来のcharacter IDは、request context、conversation state/memory、relationship engine、persona evolution、proactive deliveryの各境界で必須扱いにする範囲を設計する。未指定時に別キャラクターへ暗黙fallbackしない。
+4. 本番DBの実状態・RLS/grants・データ件数・バックフィル可能性はまだ未確認。接続DBへクエリを実行したかのように扱わない。
+
+## 11. 次の実作業
+
+- [x] 関係状態/evidence/episode/pattern/critical pendingの主要キーと一意制約をmigrationで確認
+- [x] canonical turn、lease fencing、legacy write bypass廃止の契約を確認
+- [x] Body Clock deliveryの履歴・日次上限・予約時刻更新が原子的であることをmigrationで確認
+- [ ] 全RPCの署名とGRANT/REVOKEの一覧を作り、実際の呼び出し元と照合
+- [ ] Persona Evolution candidate/reviewのRPC所有権・grant・scopeを確認
+- [ ] 通常チャット、履歴編集、Evolution、Body Clock、push relayを横断する「データ所有者／スコープ／書き込み境界」表を完成
+- [ ] 既存Misakiの会話ケースで品質ベースラインを実測
+- [ ] Soraレビュー用の論理ER・backfill・rollback案を作成
