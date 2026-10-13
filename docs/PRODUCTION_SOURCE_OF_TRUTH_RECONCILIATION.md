@@ -159,6 +159,10 @@ lib/relationship-time.ts（GitHub main）を確認したところ、現行アプ
 
 したがって、現時点で有力な仮説は「本番で使うUUID overloadが、現在確認できたmigration群の外から本番DBに追加されたか、SQLの出所を含む履歴がmain／調査済みブランチに残っていない」というもの。ただし、これは未発見に基づく仮説であって確定原因ではない。GitHubの全ブランチ・全コミットを網羅的に証明できたわけではないため、「手動SQL適用」と断定しない。
 
+### PR change-setの追加確認（2026-10-14）
+
+PR #31（関係時間v2）とPR #32（canonical memory統合）の変更ファイル一覧も確認した。PR #31には関係時間のアプリコードと後続のRelationship v2 migrationが含まれるが、`get_relationship_time_context(uuid)` または `record_relationship_chat_turn(timestamptz,timestamptz,uuid)` を定義するmigrationは含まれない。PR #32にもUUID overload定義は含まれない。これは出所探索の範囲を狭める追加証拠だが、手動SQLで作成された証明ではない。別PR、SQL適用記録、他の変更経路を引き続き確認する。
+
 ### 次の切り分け
 
 1. 本番DBのUUID overload本文を保存し、該当関数の全定義とACLを署名単位で照合できる記録を作る。
