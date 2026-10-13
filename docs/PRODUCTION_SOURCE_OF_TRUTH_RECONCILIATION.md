@@ -217,14 +217,15 @@ GitHub main の `lib/relationship-emotion-store.ts` は、会話後の感情・�
 
 本番DBの読み取り専用カタログ照会で確認した定義も、署名は10引数、`SECURITY DEFINER`、空 `search_path`、EXECUTEは `postgres, service_role` のみであり、主要なユーザーID検証・永続アカウント確認・状態競合検出・状態とイベントの記録という契約は現在mainのmigrationと整合している。
 
-ただし、関数本文の完全一致と、migration ledger上の適用履歴を含む適用経路までは今回確認していない。したがって、現時点で残る論点は「mainと本番の署名・主要なセキュリティ契約が違う」ことではなく、**本番関数本文の完全照合と、現在のmigrationが本番へ反映された履歴の確認**である。
+本番DBの `pg_get_functiondef` と現在main migrationの関数定義を照合したところ、関数本文も一致した（関数本文の空白・改行差を正規化して比較）。署名・主要なセキュリティ契約だけでなく、関数ロジックも同一であることを確認した。migration ledger上の適用履歴を含む適用経路は、なお未確認。
 
 - 確認済み：現行main callerは10引数を渡す。現行main migrationと本番DBは、10引数・SECURITY DEFINER・空 search_path・service-only EXECUTEという主要契約が一致する。
+- 確認済み：main migrationと本番関数本文は、空白・改行差を除いて一致する。
 - 訂正：初回コミット時の9引数定義を、現在mainのmigration定義と誤認していた。
-- 未確認：main migrationと本番関数本文の完全一致、migration ledger／適用ログによる反映経路の証跡。
+- 未確認：migration ledger／適用ログによる本番への反映経路の証跡。
 - 未実施：本番DB、migration ledger、RPC、ACL、アプリコード、デプロイの変更。
 
-次は、本番の `pg_get_functiondef` と現在main migrationの本文を安全に比較し、差がある場合だけ具体的な差分と履歴を追う。差が確認できるまでは、既存RPCの置換やGRANT変更、ledger修正は行わない。
+次はmigration ledger／適用ログを照合し、本番で同じ定義が稼働していることと、履歴上の適用記録を切り分けて整理する。関数本文の差は確認されていないため、既存RPCの置換やGRANT変更、ledger修正は行わない。
 
 
 ## 12. 旧統合PRのProduction記述は時点を分けて読む（2026-10-13）
