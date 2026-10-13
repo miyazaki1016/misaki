@@ -101,3 +101,56 @@
 - `lib/canonical-state.ts`
 - `lib/relationship-runtime-v1.ts`
 - `lib/user-profile.ts`
+
+
+## 8. 追加監査：長期記憶・人格進化・Body Clockの実際のscope
+
+以下はソースを追加確認した結果。前節の「完全なscope監査」は引き続き未完了だが、具体的な要注意箇所が判明した。
+
+### 8.1 長期記憶と会話履歴は現在ユーザー単位
+
+- `lib/persona/natural-memory.ts` は長期記憶を「ユーザー本人についての安定した情報」と定義し、最大30件へ統合する。キャラクター別の記憶scopeはこのガイド内にはない。
+- `lib/canonical-state.ts` の `loadCanonicalState(userId)` は `misaki_user_conversation_state` を `user_id` で読み、`history`, `memory`, `today_memory` を一括で取得する。
+- `supabase/functions/body-clock/conversation-root.ts` も同じ `misaki_user_conversation_state` を `user_id` で読む。恒久アカウントの通常会話とBody Clockは同じ会話正本を使う設計である。
+- `app/api/persona/history/route.ts` の明示編集も、現行のユーザー状態を更新するRPCへつながる。複数キャラクター導入時は、記憶削除・履歴クリアの対象範囲もUIとAPIで明示しないと、意図しない一括削除／誤ったキャラクターへの適用が起こりうる。
+
+**結論:** 今ある `memory` をそのまま「全キャラクター共有記憶」と見なすのは危険。ユーザー共通プロフィールとして許可する事実と、美咲との会話履歴・二人だけの思い出を分ける必要がある。現行データの全件を他キャラクターへ自動公開しない。
+
+### 8.2 Persona Evolutionもユーザー単位
+
+- `lib/persona/evolution-analyzer.ts` の分析対象は美咲との履歴・記憶・既存traitsで、プロンプトは「このユーザーとの関係だけに使う」調整候補を作る前提。
+- `lib/persona/evolution-runner.ts` は `misaki_user_relationship_traits` を `user_id` で読み、候補保存を `create_user_evolution_candidate` RPC経由で行う。分析slotのclaimも履歴fingerprintとcadenceに基づく。
+- `app/api/persona/evolution/analyze/route.ts` は恒久アカウントの保存済み履歴・記憶を優先して分析する。現行のリクエストにはcharacter IDがなく、candidate/reviewの所有権も現状のユーザー単位設計に沿っている。
+- `lib/persona/persona-store.ts` と `supabase/functions/body-clock/persona-store.ts` はユーザー別traitsを人格プロンプトへ追加するが、character/pairキーによる分離は確認できない。
+
+**結論:** キャラクターAとの関係で学習した「嫉妬しやすさ」「呼び方」「愛情表現」などをキャラクターBへ漏らさないため、trait・evolution candidate・review RPCにもpair scopeを通す必要がある。既存のGlobal Persona modulesと、ユーザー別の関係特性を同じスコープとして扱わない。
+
+### 8.3 Body Clockは美咲固定のまま
+
+- `supabase/functions/body-clock/index.ts` は会話rootから履歴・記憶を読み、`loadPersonaPrompt(supabase, userId, "proactive")` で人格をロードする。
+- 自発文のプロンプトには「美咲」「美咲の体内時計」等の固定表現があり、写真選択・関係性判断・delivery ledgerもユーザー単位の配送フローに接続している。
+- したがって、通常チャットにcharacter IDを追加するだけでは、通知で別キャラクターが送る／誤ったペアの記憶を参照する問題を防げない。キャラクター別通知設定、配送予約、送信時のpersona/state snapshot、retry時の同一性を一体で設計する必要がある。
+
+### 8.4 会話品質の検証対象を明確化
+
+実測評価では、少なくとも次を別々に判定する。
+
+1. **関係状態反映:** 5軸、親密度、関係ステータス、感情・行動状態が返信の語調・距離感に実際に反映されるか。
+2. **記憶の正確性:** 明示されたユーザー事実を保持し、訂正・忘却を反映し、存在しない思い出を作らないか。
+3. **会話継続性:** 直前の話題、長期テーマ、生活イベントを必要なときに参照し、関係ないときは無理に持ち出さないか。
+4. **人格一貫性:** 固定人格とユーザー別の関係特性を区別し、人格進化がコア設定を変えていないか。
+5. **ペア間隔離:** Aとの恋愛・喧嘩・告白・秘密・思い出・進化traitsがBへ混入しないか。
+6. **失敗時の安全性:** Gemini失敗、retry、二重送信、並列会話、通知とチャットの競合で、状態や記憶が巻き戻ったり二重適用されないか。
+7. **コストとの比較:** 品質の合格を先に確認してから、token量・遅延・Gemini呼び出し数を比較する。コスト差だけで品質劣化を正当化しない。
+
+## 9. 監査の更新ステータス
+
+- [x] 自然記憶ガイドとcanonical conversation stateを確認
+- [x] 通常チャットとBody Clockが同じ恒久会話正本を読むことを確認
+- [x] Persona Evolutionのuser単位traits/candidate処理を確認
+- [x] Body Clockの人格・文面が美咲固定であることを確認
+- [ ] 各RPCの全署名・grant・RLS・一意制約・呼び出し元を完全照合
+- [ ] Persona Evolution review/candidateのDB側所有権とスコープを照合
+- [ ] 通知予約・配送台帳・写真選択・retryを含むpair scopeの設計
+- [ ] 評価用会話セット作成と現行品質ベースライン実測
+- [ ] 論理ER図・backfill・compatibility window・rollback案をレビュー
