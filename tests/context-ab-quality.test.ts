@@ -42,6 +42,7 @@ test("blind quality summary compares all five axes and detects ties",()=>{
     right:{memory:1,relationship:1,continuity:1,repetition:1,naturalness:1},
   });
   assert.equal(tied.overall,"tie");
+  assert.deepEqual(tied.safetyBlocker,{left:true,right:true,any:true});
 });
 
 
@@ -54,4 +55,5 @@ test("blind quality summary supports the documented five-point scale",()=>{
   assert.equal(result.rightTotal,17);
   assert.equal(result.overall,"left");
   assert.equal(result.scores.find(s=>s.axis==="naturalness")?.right,2);
+  assert.deepEqual(result.safetyBlocker,{left:false,right:true,any:true});
 });
