@@ -194,3 +194,42 @@ lib/relationship-time.ts（GitHub main）を確認したところ、現行アプ
 本番に存在するUUID overloadは、単に同名関数があるだけでなく、mainの呼び出し引数と合致し、サービス専用の実行権限と空search_pathを持つことを確認できた。一方、現在のmainのmigration群からこの2 overloadを再現する定義元は依然見つかっていない。これは**実行時に壊れていると確認した事実ではなく、履歴再現性のギャップ**である。ユーザーによる本番実機受入結果を否定する根拠ではない。
 
 次の調査は、関数の作成元を探すだけでなく、PR #32など統合ブランチのレビュー・コメントと、production migration/deployの記録を追い、DBへの投入経路を裏付けること。もし出所を特定できなくても、即座に本番修正は行わず、別途新規環境再現用SQLと安全な検証手順をレビュー対象として作成する。今回も本番DB・ledger・アプリコード・権限・デプロイは変更していない。
+
+
+## 11. 感情・行動状態RPCのmigration契約と本番実体の差分（2026-10-13・読み取りのみ）
+
+### mainのアプリ呼び出し
+
+GitHub main の `lib/relationship-emotion-store.ts` は、会話後の感情・行動状態を `apply_relationship_emotion_action_v2` に保存する。呼び出し引数には `p_user_id` を含む10引数の契約があり、`app/api/chat/route.ts` からは `createServerSupabase()` で作成したサーバー側クライアントと、認証済みユーザーIDが渡される。会話保存完了後の `after()` 処理で実行される。
+
+### main migrationにある元の定義
+
+コミット `6136daad1b8beacebea88c471a9b9f85e760f1d1`（2026-09-26、`Add permanent relationship emotion action v2 persistence RPC`）で追加された `supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql` は、次の契約を定義している。
+
+- 9引数：`p_primary, p_intensity, p_action, p_direction, p_emotion_reason, p_action_reason, p_evidence, p_signal_summary, p_expected_state_updated_at`
+- `SECURITY INVOKER)、空 `search_path`
+- `authenticated, service_role` にEXECUTEを付与
+- `auth.uid()` を本人IDとし、匿名JWT／永続アカウント要件、入力値、state version conflictを検証
+
+このmigration自体には `p_user_id uuid` 引数がない。
+
+### 本番DBの実体
+
+本番DBの読み取り専用カタログ照会では、関数は次の実体だった。
+
+- 署名：`apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz,uuid)`（10引数）
+- `SECURITY DEFINER)、空 `search_path`
+- EXECUTE：`postgres, service_role` のみ
+- `v_user_id := coalesce(auth.uid(), p_user_id)`。通常の認証呼び出しとサービスロール呼び出しを分け、非service_roleで引数IDが `auth.uid()` と異なる場合は拒否。対象ユーザーの存在と非匿名アカウントを確認。
+- 感情／行動値を検証し、状態行をロック。期待する `state_updated_at` と異なればconflictを返す。成功時は状態と `emotion_action_v2_after_chat` イベントを同一関数内で記録する。
+
+### 判定
+
+これは関係時間RPCと同様、**mainのmigration定義と本番関数の署名・実行権限・本人IDの受け渡し契約が一致していない**ことを示す。現行アプリは本番DBの10引数版と整合する呼び出しを行っており、ユーザーの実機受入結果を否定するものではない。一方、現在のmain migrationだけで新規環境を構築したとき、同じ10引数版・ACL・SECURITY DEFINER契約が再現されることは未証明。
+
+- 確認済み：main callerは `p_user_id` を渡す。本番関数は10引数版で、サービスロールのみ実行可能。空 `search_path`、ユーザーID検証、状態競合検出を備える。
+- 確認済み：mainにある最初のmigration定義は9引数・SECURITY INVOKERであり、本番実体と異なる。
+- 未確定：本番の10引数版へ変わったSQL／コミット／適用経路。既存migrationの後続修正、別migration、または別の適用経路のどれかはまだ証明できていない。
+- 未実施：本番DB、migration ledger、RPC、ACL、アプリコード、デプロイの変更。
+
+次はこのRPCの後続定義・PR・migration ledgerを同じ手順で追い、元の9引数定義から本番10引数定義へ移行した証跡を探す。由来が確定するまでは、既存RPCの置換やGRANT変更、ledger修正は行わない。
