@@ -10,7 +10,7 @@ Before introducing `character_id` / User×Character Pair scope, identify write p
 
 1. The Relationship Engine v1 worker write surface is deliberately service-role-only and lease-fenced through v2 RPCs. The final migration explicitly revokes service-role execution on the legacy v1 mutators. Keep this invariant.
 2. Relationship state, relationship events, Relationship Engine evidence/episodes/patterns/critical candidates, and the current Persona Evolution candidate pipeline are user-scoped today. Adding a character selector only to chat would not isolate them.
-3. Persona Evolution is a distinct pipeline from Relationship Engine v1. It loads the user's conversation history and traits, calls Gemini, then saves candidate proposals through `create_user_evolution_candidate`; it reports `autoApplied: false`. The complete SQL/grant/state-transition definition for this older RPC was not located in the migration files reviewed here and remains an explicit follow-up.
+3. Persona Evolution is a distinct pipeline from Relationship Engine v1. It loads the user's conversation history and traits, calls Gemini, then saves candidate proposals through `create_user_evolution_candidate`; it reports `autoApplied: false`. A full scan of the 35 tracked SQL migration files found grant/revoke statements for these RPCs in `20260917022900_phase0_reduce_anon_surface_and_trigger_rpc_exposure.sql`, but did not find their function bodies or the candidate table definition. The intended grants are therefore partially visible, while ownership checks and state transitions remain unverified.
 4. Body Clock uses canonical conversation state, character prompt loading without a character key, and a transactional delivery completion path. Character isolation must cover proactive messages and delivery state, not only chat.
 5. This source audit cannot establish current live database grants, deployed migration parity, or production feature-gate state.
 
@@ -26,8 +26,8 @@ Before introducing `character_id` / User×Character Pair scope, identify write p
 | Relationship patterns | `upsert_misaki_relationship_pattern_v2(...)` | Lease/version checked; verifies episode ownership; v1 execution revoked from service_role | Pattern uniqueness currently `(user_id, pattern_key, pattern_version)`; pair scope must be included in ownership and uniqueness. |
 | Critical pending candidate | `upsert_misaki_relationship_critical_pending_v2(...)`, `advance_misaki_relationship_critical_pending_v2(...)` | Lease/version checked; canonical completed turn required for upsert; service-role-only v2; legacy v1 grants revoked | Current primary key `(user_id, request_id, candidate_type)`. A proposal for one character must not be applied to another. |
 | Temporary relationship import | `import_misaki_temporary_relationship_v2(...)` | Lease/version checked; validates email checkpoint and import idempotency; legacy v1 execution revoked from service_role | Import target must be an explicit User×Character pair; do not automatically copy Misaki state into new characters. |
-| Persona Evolution analysis claim | `claim_user_evolution_analysis({p_fingerprint, p_min_hours})` in `lib/persona/evolution-runner.ts` | Called with the authenticated Supabase client; 12-hour cadence; errors fail closed for the analysis run | Current fingerprint is built from the user's last 20 user messages; it has no character key. Character-specific histories can collide or share cadence. |
-| Persona Evolution candidate save | `create_user_evolution_candidate(...)` in `lib/persona/evolution-runner.ts` | Saves proposed trait, reason, confidence, risk and evidence; save errors are logged and skipped; route returns `autoApplied: false` | Existing traits are loaded from `misaki_user_relationship_traits` by `user_id`; the candidate RPC call has no character/pair argument. Must define proposal ownership, review/approval states, and grants before changing. |
+| Persona Evolution analysis claim | `claim_user_evolution_analysis({p_fingerprint, p_min_hours})` in `lib/persona/evolution-runner.ts` | Migration `20260917022900_phase0_reduce_anon_surface_and_trigger_rpc_exposure.sql` revokes EXECUTE from `PUBLIC`/`anon` and grants it to `authenticated`; function body is not present in the tracked migrations scanned | Current fingerprint is built from the user's last 20 user messages; it has no character key. Character-specific histories can collide or share cadence. Verify caller ownership and fingerprint persistence in the live definition. |
+| Persona Evolution candidate save | `create_user_evolution_candidate(...)` in `lib/persona/evolution-runner.ts` | Migration `20260917022900_phase0_reduce_anon_surface_and_trigger_rpc_exposure.sql` grants EXECUTE to `authenticated`; function body is not present in the tracked migrations scanned | Existing traits are loaded from `misaki_user_relationship_traits` by `user_id`; the candidate RPC call has no character/pair argument. Verify internal `auth.uid()` ownership enforcement in the live definition before altering grants or adding pair scope. |
 | Conversation history API | `app/api/persona/history/route.ts`; canonical state via `loadCanonicalState(user.id)`; anonymous checkpoint via `save_misaki_temporary_state` | Authenticated user context; anonymous root uses revision-aware encrypted temporary state and replay recovery | History, memory and today-memory are currently user-rooted. Preserve temporary root encryption, expiry, revision, and replay semantics while adding a pair-private root. |
 | Body Clock root | `loadBodyClockRoot(s, userId)` in `supabase/functions/body-clock/conversation-root.ts` | Permanent user reads `misaki_user_conversation_state`; anonymous user reads encrypted temporary root and returns null when expired/unavailable | Proactive message uses same user-level root; must select the correct pair and never mix history/memory. |
 | Body Clock persona | `loadPersonaPrompt(s, row.user_id, "proactive")` in `supabase/functions/body-clock/index.ts` | No character ID supplied; generation prompt explicitly names Misaki and uses canonical history/memory | A chat-only character ID would leave proactive messages speaking as Misaki or using the wrong pair's memory. |
@@ -52,11 +52,22 @@ Before introducing `character_id` / User×Character Pair scope, identify write p
 - `supabase/migrations/20260916002657_misaki_body_clock_atomic_delivery_and_vault_auth.sql`
 - `supabase/migrations/20260916010326_misaki_body_clock_push_relay_attempts.sql`
 
+## Additional grant finding (migration history only)
+
+`20260917022900_phase0_reduce_anon_surface_and_trigger_rpc_exposure.sql` contains these intended ACL changes:
+
+- `claim_user_evolution_analysis(text, integer)`: revoke EXECUTE from `PUBLIC` and `anon`; grant to `authenticated`.
+- `create_user_evolution_candidate(text,text,text,text,numeric,text,jsonb)`: grant EXECUTE to `authenticated`.
+- `review_user_evolution_candidate(uuid,text)`: revoke EXECUTE from `PUBLIC` and `anon`; grant to `authenticated`.
+- `misaki_evolution_candidates`: revoke all table privileges from `anon` only in this migration.
+
+A scan of all 35 SQL migration files on `main` found no tracked `CREATE FUNCTION` / function body for these three RPCs and no additional matching ACL statements. This is a source-repository finding, not proof of current live privileges. In particular, granting EXECUTE to `authenticated` does not by itself prove a cross-user access flaw: the function bodies may enforce ownership internally, but those checks cannot be verified from the tracked migrations. Treat this as a verification blocker, not as a confirmed vulnerability.
+
 ## Remaining audit work
 
 - Search all source files for callers of every RPC listed above and record exact file/line, including the Relationship Engine worker and critical-event validator.
-- Locate the SQL definitions and grants for `claim_user_evolution_analysis` and `create_user_evolution_candidate`; document candidate states, ownership, and review/approval transitions.
-- Inspect all relevant migrations for actual function ACL changes, but treat them as intended migration history only; separately query the live database read-only to verify deployed schema, grants and migration parity.
+- Obtain the deployed SQL definitions for `claim_user_evolution_analysis`, `create_user_evolution_candidate`, and `review_user_evolution_candidate`; verify `auth.uid()` / candidate-owner checks, candidate states, and review/approval side effects.
+- Query the live database read-only to verify deployed function ACLs, table grants, schema and migration parity; treat migration files as intended history only.
 - Build a cross-surface ownership matrix for chat, memory, persona evolution, relationship events, proactive delivery, photos, notifications, history export/deletion and anonymous-to-permanent account transition.
 - Do not implement schema/backfill until the ownership model and rollback path are reviewed.
 
