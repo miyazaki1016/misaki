@@ -43,3 +43,15 @@ test("blind quality summary compares all five axes and detects ties",()=>{
   });
   assert.equal(tied.overall,"tie");
 });
+
+
+test("blind quality summary supports the documented five-point scale",()=>{
+  const result=summarizeBlindQuality({
+    left:{memory:5,relationship:4,continuity:5,repetition:4,naturalness:5},
+    right:{memory:4,relationship:4,continuity:3,repetition:4,naturalness:2},
+  });
+  assert.equal(result.leftTotal,23);
+  assert.equal(result.rightTotal,17);
+  assert.equal(result.overall,"left");
+  assert.equal(result.scores.find(s=>s.axis==="naturalness")?.right,2);
+});
