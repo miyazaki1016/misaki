@@ -8,10 +8,22 @@ test("quality scenarios have unique IDs and deterministic checks",()=>{
   for(const scenario of qualityScenarios){
     assert.ok(scenario.history.length>0);
     assert.equal(assessQualityReply(scenario,"").nonempty,false);
-    const violating=scenario.forbiddenTerms[0];
-    if(violating) assert.equal(assessQualityReply(scenario,violating).unsupportedClaimsAbsent,false);
-    const expected=scenario.expectedTerms.join(" ");
-    assert.equal(assessQualityReply(scenario,expected).expectedFactsPresent,true);
+    for(const forbidden of scenario.forbiddenTerms){
+      assert.equal(
+        assessQualityReply(scenario,forbidden).unsupportedClaimsAbsent,
+        false,
+        `Scenario ${scenario.id} should reject forbidden text: ${forbidden}`,
+      );
+    }
+    assert.equal(assessQualityReply(scenario,"自然な返答です").unsupportedClaimsAbsent,true);
+    for(const expected of scenario.expectedTerms){
+      assert.equal(
+        assessQualityReply(scenario,expected).expectedFactsPresent,
+        true,
+        `Scenario ${scenario.id} should accept expected fact: ${expected}`,
+      );
+    }
+    assert.equal(assessQualityReply(scenario,"関係ない文章").expectedFactsPresent,scenario.expectedTerms.length===0);
   }
 });
 
