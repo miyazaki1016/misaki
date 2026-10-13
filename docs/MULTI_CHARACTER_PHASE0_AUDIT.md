@@ -223,7 +223,19 @@
 - [x] Persona Evolutionの3 RPCの実定義・実行ロール・所有者チェックを読み取り確認
 - [ ] 全migrationの履歴由来を分類し、mainに存在しない履歴のソースを追跡
 - [ ] traitsへの直接書き込み経路をリポジトリ全体で特定し、RPC専用にすべきか仕様判断
-- [ ] Relationship Engine Ver2の現行DB関数・権限・呼び出し元の照合結果を、実機受入項目と合わせて記録
+- [x] Relationship Engine Ver2の主要な現行DB関数・実行ロールを本番DBで読み取り確認（主要関数の呼び出し元全件照合は継続）
 - [ ] pair scopeの論理ER・backfill・rollback案は、履歴由来と書き込み境界の棚卸し完了後にレビューへ回す
 
 本節の追加も文書変更のみであり、本番DB・アプリコード・RPC・権限・本番設定は変更していない。
+
+
+### Relationship Engine Ver2：本番関数カタログの読み取り確認
+
+2026-10-13に本番DBの `pg_proc` / ACL を読み取り、Relationship Engine関連関数の署名、`SECURITY DEFINER`、`search_path`、EXECUTEロールを確認した。定義本文のMD5はスナップショット照合用であり、セキュリティの正しさを単独で証明する値ではない。
+
+- lease引数（`p_processing_version`、`p_lease_token`）を持つ主要v2更新関数は、今回のカタログ結果ではEXECUTEが `postgres` と `service_role` に限定され、`SECURITY DEFINER=false`、空の `search_path` 設定だった。
+- 対象例：`record_misaki_relationship_evidence_v2`、`upsert_misaki_relationship_episode_v2`、`upsert_misaki_relationship_pattern_v2`、`upsert_misaki_relationship_critical_pending_v2`、`advance_misaki_relationship_processing_v2`、`apply_misaki_relationship_state_v2`、`apply_misaki_relationship_critical_event_v2`、`import_misaki_temporary_relationship_v2`。
+- 旧v1の `advance_misaki_relationship_critical_pending_v1` と `upsert_misaki_relationship_critical_pending_v1` は、今回のACL結果では `postgres` のみがEXECUTE可能だった。
+- `apply_relationship_emotion_action_v2` は別の署名・書き込み面で、今回の結果では `SECURITY DEFINER=true`、`search_path=public`、EXECUTEロールは `postgres` と `service_role`。この関数の呼び出し元と所有者検証は、ペアスコープ設計前に本文まで含めて照合する。
+- これは本番DBの関数カタログとACLの読み取り結果であり、すべての呼び出し元がmainと一致していることや、全経路の動作がテスト済みであることを意味しない。次はmainのRPC呼び出し元と関数本文を照合する。
+
