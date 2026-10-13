@@ -164,3 +164,33 @@ lib/relationship-time.ts（GitHub main）を確認したところ、現行アプ
 1. 本番DBのUUID overload本文を保存し、該当関数の全定義とACLを署名単位で照合できる記録を作る。
 2. 過去PR・workflow・デプロイ／SQL適用記録を検索し、DB変更の実行経路を探す。
 3. 由来が特定できない場合は、現在の本番定義を根拠に、別途レビュー可能な再現用migrationを作る案を検討する。ただし、本番適用・ledger修正・既存RPCの置換は、依存関係と新規環境での検証が終わるまで行わない。
+
+
+## 10. 本番UUID overloadの定義・権限を実体記録（2026-10-13・読み取りのみ）
+
+本番DBから `pg_get_functiondef`、`prosecdef`、`proconfig`、`proacl` を取得し、UUID付き2関数の実定義を確認した。完全な定義は調査記録として保持し、ここでは重要な契約と差分を要約する。
+
+### `get_relationship_time_context(uuid)`
+
+- 署名：`public.get_relationship_time_context(p_user_id uuid DEFAULT NULL)`
+- 戻り値：`jsonb`
+- `SECURITY DEFINER`、`search_path TO ''`（空search_path）
+- EXECUTE：`postgres`, `service_role` のみ（`PUBLIC` / `anon` / `authenticated` への付与なし）
+- ユーザーIDは `coalesce(auth.uid(), p_user_id)` で決定。認証済みユーザーと引数の不一致を拒否し、匿名JWTと非永続アカウントを拒否する。
+- `misaki_relationship_state` から経過秒数・時間帯・親密度・感情／行動状態・最終会話時刻を読み取り、状態がない場合も初期値を返す。読み取り専用の関数本文で、ここから状態更新は行わない。
+
+### `record_relationship_chat_turn(timestamptz, timestamptz, uuid)`
+
+- 署名：`public.record_relationship_chat_turn(p_user_message_at timestamptz, p_misaki_message_at timestamptz, p_user_id uuid DEFAULT NULL)`
+- 戻り値：`jsonb`
+- `SECURITY DEFINER`、`search_path TO ''`（空search_path）
+- EXECUTE：`postgres`, `service_role` のみ（`PUBLIC` / `anon` / `authenticated` への付与なし）
+- 同様に本人IDの不一致、匿名JWT、非永続アカウントを拒否し、5分を超える未来時刻を拒否する。
+- 対象状態を `FOR UPDATE` でロックし、会話時刻を既存値より後退させず更新する。更新後状態と `chat_turn` イベントを記録し、`silence_before_seconds` を返す。
+- 書込み経路なので、正本の会話時刻・イベント履歴に影響する重要RPC。現在の本文を根拠なく置換・再実行しない。
+
+### 調査上の意味
+
+本番に存在するUUID overloadは、単に同名関数があるだけでなく、mainの呼び出し引数と合致し、サービス専用の実行権限と空search_pathを持つことを確認できた。一方、現在のmainのmigration群からこの2 overloadを再現する定義元は依然見つかっていない。これは**実行時に壊れていると確認した事実ではなく、履歴再現性のギャップ**である。ユーザーによる本番実機受入結果を否定する根拠ではない。
+
+次の調査は、関数の作成元を探すだけでなく、PR #32など統合ブランチのレビュー・コメントと、production migration/deployの記録を追い、DBへの投入経路を裏付けること。もし出所を特定できなくても、即座に本番修正は行わず、別途新規環境再現用SQLと安全な検証手順をレビュー対象として作成する。今回も本番DB・ledger・アプリコード・権限・デプロイは変更していない。
