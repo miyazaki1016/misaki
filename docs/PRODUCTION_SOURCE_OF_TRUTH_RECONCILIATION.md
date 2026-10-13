@@ -141,3 +141,26 @@ lib/relationship-time.ts（GitHub main）を確認したところ、現行アプ
 - 未実施：DB・ledger・RPC・権限・アプリコードの変更、migrationの再適用。
 
 次は、GitHub全履歴とPRブランチにあるUUID付き関数定義を探索し、実際に本番へ入ったSQLの出所を特定する。根拠を見つけるまでは、既存の関数を作り直したり、GRANTを広げたり、migration ledgerを書き換えたりしない。
+
+
+## 9. UUID overloadの出所探索・途中結果（2026-10-13）
+
+関連する既存ブランチのmigration一覧も追加で確認した。
+
+- `main`
+- `sora/canonical-relationship-integration`（PR #32の統合系ブランチ）
+- `sora/relationship-time-v2-design`
+- `codex/server-canonical-foundation`
+- `sora/relationship-control-rpcs-v1`
+- `work/relationship-engine-v1`
+- `docs/audit-overview-against-source`
+
+これらのmigration一覧では、関係時間の主要ファイルは引数なし／2引数版の同系統で、`p_user_id uuid` 付きの `get_relationship_time_context(uuid)` と `record_relationship_chat_turn(timestamptz, timestamptz, uuid)` を作るSQLはまだ発見できていない。`sora/relationship-time-v2-design` の `20260920073100_relationship_context_state_version.sql` も引数なし版の再定義であり、UUID overloadの出所ではなかった。
+
+したがって、現時点で有力な仮説は「本番で使うUUID overloadが、現在確認できたmigration群の外から本番DBに追加されたか、SQLの出所を含む履歴がmain／調査済みブランチに残っていない」というもの。ただし、これは未発見に基づく仮説であって確定原因ではない。GitHubの全ブランチ・全コミットを網羅的に証明できたわけではないため、「手動SQL適用」と断定しない。
+
+### 次の切り分け
+
+1. 本番DBのUUID overload本文を保存し、該当関数の全定義とACLを署名単位で照合できる記録を作る。
+2. 過去PR・workflow・デプロイ／SQL適用記録を検索し、DB変更の実行経路を探す。
+3. 由来が特定できない場合は、現在の本番定義を根拠に、別途レビュー可能な再現用migrationを作る案を検討する。ただし、本番適用・ledger修正・既存RPCの置換は、依存関係と新規環境での検証が終わるまで行わない。
