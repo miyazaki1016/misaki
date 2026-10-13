@@ -196,43 +196,35 @@ lib/relationship-time.ts（GitHub main）を確認したところ、現行アプ
 次の調査は、関数の作成元を探すだけでなく、PR #32など統合ブランチのレビュー・コメントと、production migration/deployの記録を追い、DBへの投入経路を裏付けること。もし出所を特定できなくても、即座に本番修正は行わず、別途新規環境再現用SQLと安全な検証手順をレビュー対象として作成する。今回も本番DB・ledger・アプリコード・権限・デプロイは変更していない。
 
 
-## 11. 感情・行動状態RPCのmigration契約と本番実体の差分（2026-10-13・読み取りのみ）
+## 11. 感情・行動状態RPC：初回コミットと現在mainの定義を区別（2026-10-14・読み取りのみ）
 
-### mainのアプリ呼び出し
+### mainの現行呼び出しとmigration
 
-GitHub main の `lib/relationship-emotion-store.ts` は、会話後の感情・行動状態を `apply_relationship_emotion_action_v2` に保存する。呼び出し引数には `p_user_id` を含む10引数の契約があり、`app/api/chat/route.ts` からは `createServerSupabase()` で作成したサーバー側クライアントと、認証済みユーザーIDが渡される。会話保存完了後の `after()` 処理で実行される。
+GitHub main の `lib/relationship-emotion-store.ts` は、会話後の感情・行動状態を `apply_relationship_emotion_action_v2` に保存する。呼び出し引数には `p_user_id` を含む10引数の契約があり、`app/api/chat/route.ts` からサーバー側Supabaseクライアントと認証済みユーザーIDが渡される。
 
-### main migrationにある元の定義
+ここは前回の記録を訂正する。コミット `6136daad1b8beacebea88c471a9b9f85e760f1d1` の**初回追加時のdiff**は9引数・`SECURITY INVOKER`・`authenticated, service_role` へのEXECUTE付与だった。しかし、**現在のmainにある同じmigrationファイル** `supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql` は、すでに次の10引数定義になっている。
 
-コミット `6136daad1b8beacebea88c471a9b9f85e760f1d1`（2026-09-26、`Add permanent relationship emotion action v2 persistence RPC`）で追加された `supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql` は、次の契約を定義している。
+- 10引数：上記9引数に `p_user_id uuid default null` を追加
+- `SECURITY DEFINER`、空 `search_path`
+- EXECUTE：`service_role` のみ（`PUBLIC, anon, authenticated` をrevoke）
+- `coalesce(auth.uid(), p_user_id)` によるユーザー決定と、service role以外のID不一致拒否
+- 対象ユーザーが存在し、匿名アカウントでないことを検証
+- 感情／行動値、状態バージョン競合を検証し、状態更新と `emotion_action_v2_after_chat` イベント記録を同じ関数内で実施
 
-- 9引数：`p_primary, p_intensity, p_action, p_direction, p_emotion_reason, p_action_reason, p_evidence, p_signal_summary, p_expected_state_updated_at`
-- `SECURITY INVOKER)、空 `search_path`
-- `authenticated, service_role` にEXECUTEを付与
-- `auth.uid()` を本人IDとし、匿名JWT／永続アカウント要件、入力値、state version conflictを検証
+したがって、「現在のmain migrationは9引数のまま」「mainから新規環境を構築しても10引数契約を再現できない」とした前回の判定は誤りだった。初回コミットのdiffを現在のファイル内容として扱ってしまったため、訂正する。
 
-このmigration自体には `p_user_id uuid` 引数がない。
+### 本番DBとの照合結果
 
-### 本番DBの実体
+本番DBの読み取り専用カタログ照会で確認した定義も、署名は10引数、`SECURITY DEFINER`、空 `search_path`、EXECUTEは `postgres, service_role` のみであり、主要なユーザーID検証・永続アカウント確認・状態競合検出・状態とイベントの記録という契約は現在mainのmigrationと整合している。
 
-本番DBの読み取り専用カタログ照会では、関数は次の実体だった。
+ただし、関数本文の完全一致と、migration ledger上の適用履歴を含む適用経路までは今回確認していない。したがって、現時点で残る論点は「mainと本番の署名・主要なセキュリティ契約が違う」ことではなく、**本番関数本文の完全照合と、現在のmigrationが本番へ反映された履歴の確認**である。
 
-- 署名：`apply_relationship_emotion_action_v2(text,integer,text,text,text,text,jsonb,jsonb,timestamptz,uuid)`（10引数）
-- `SECURITY DEFINER)、空 `search_path`
-- EXECUTE：`postgres, service_role` のみ
-- `v_user_id := coalesce(auth.uid(), p_user_id)`。通常の認証呼び出しとサービスロール呼び出しを分け、非service_roleで引数IDが `auth.uid()` と異なる場合は拒否。対象ユーザーの存在と非匿名アカウントを確認。
-- 感情／行動値を検証し、状態行をロック。期待する `state_updated_at` と異なればconflictを返す。成功時は状態と `emotion_action_v2_after_chat` イベントを同一関数内で記録する。
-
-### 判定
-
-これは関係時間RPCと同様、**mainのmigration定義と本番関数の署名・実行権限・本人IDの受け渡し契約が一致していない**ことを示す。現行アプリは本番DBの10引数版と整合する呼び出しを行っており、ユーザーの実機受入結果を否定するものではない。一方、現在のmain migrationだけで新規環境を構築したとき、同じ10引数版・ACL・SECURITY DEFINER契約が再現されることは未証明。
-
-- 確認済み：main callerは `p_user_id` を渡す。本番関数は10引数版で、サービスロールのみ実行可能。空 `search_path`、ユーザーID検証、状態競合検出を備える。
-- 確認済み：mainにある最初のmigration定義は9引数・SECURITY INVOKERであり、本番実体と異なる。
-- 未確定：本番の10引数版へ変わったSQL／コミット／適用経路。既存migrationの後続修正、別migration、または別の適用経路のどれかはまだ証明できていない。
+- 確認済み：現行main callerは10引数を渡す。現行main migrationと本番DBは、10引数・SECURITY DEFINER・空 search_path・service-only EXECUTEという主要契約が一致する。
+- 訂正：初回コミット時の9引数定義を、現在mainのmigration定義と誤認していた。
+- 未確認：main migrationと本番関数本文の完全一致、migration ledger／適用ログによる反映経路の証跡。
 - 未実施：本番DB、migration ledger、RPC、ACL、アプリコード、デプロイの変更。
 
-次はこのRPCの後続定義・PR・migration ledgerを同じ手順で追い、元の9引数定義から本番10引数定義へ移行した証跡を探す。由来が確定するまでは、既存RPCの置換やGRANT変更、ledger修正は行わない。
+次は、本番の `pg_get_functiondef` と現在main migrationの本文を安全に比較し、差がある場合だけ具体的な差分と履歴を追う。差が確認できるまでは、既存RPCの置換やGRANT変更、ledger修正は行わない。
 
 
 ## 12. 旧統合PRのProduction記述は時点を分けて読む（2026-10-13）
