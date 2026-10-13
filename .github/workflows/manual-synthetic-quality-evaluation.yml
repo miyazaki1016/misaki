@@ -1,0 +1,42 @@
+name: Manual Synthetic Quality Evaluation
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_synthetic_only:
+        description: "Confirm this run uses only the seven fixed fictional fixtures"
+        required: true
+        type: choice
+        options:
+          - "NO"
+          - "YES"
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-evaluation:
+    if: ${{ inputs.confirm_synthetic_only == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: work/context-no-duplicate-replies-ab
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Run capped evaluation on fictional fixtures only
+        env:
+          MISAKI_AB_GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}
+          CONFIRM_SYNTHETIC_ONLY: ${{ inputs.confirm_synthetic_only }}
+        run: node --experimental-strip-types scripts/run-live-synthetic-quality-eval.ts
+      - name: Upload synthetic-only results
+        if: always() && hashFiles('synthetic-quality-results.json') != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: misaki-synthetic-quality-results
+          path: synthetic-quality-results.json
+          retention-days: 3
