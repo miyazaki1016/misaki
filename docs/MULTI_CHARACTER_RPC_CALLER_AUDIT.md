@@ -119,3 +119,25 @@ The last item is a **design-integrity question, not evidence of cross-user acces
 - Queries were read-only catalog SELECTs; no row data was selected and no database mutation was performed.
 - This confirms the connected `misaki` project's current definitions/ACLs and RLS metadata only. It does not prove parity across other Supabase projects or environments.
 - The project migration ledger and live schema parity still need separate review; catalog results are not a substitute for that comparison.
+
+
+## Follow-up: trait write boundary and migration ledger (read-only, 2026-10-13)
+
+### Direct trait-write boundary
+
+A catalog query found no non-internal triggers on `public.misaki_user_relationship_traits` or `public.misaki_evolution_candidates` in the connected database. The previously observed authenticated RLS policies allow a signed-in user to INSERT/UPDATE their own trait rows (`auth.uid() = user_id`). Therefore, the database currently does not make the evolution-review RPC the exclusive write path for a user's own traits.
+
+This is not a cross-user isolation finding. It is a product/security boundary decision: if users are intentionally allowed to edit their own traits, document and test that capability; if only reviewed evolution proposals should change traits, direct table writes must eventually be constrained and all legitimate write paths routed through a canonical contract. No policy or grant was changed. A complete repository-wide direct-writer inventory remains open; do not assume that the absence of triggers proves there are no other write paths.
+
+### Live migration ledger versus repository history
+
+The connected project's migration ledger and the current `main` branch do not use identical migration version/name pairs for several related changes. For example, the live ledger reports `20260917022914_phase0_reduce_anon_surface_and_trigger_rpc_exposure`, while the tracked file is `20260917022900_phase0_reduce_anon_surface_and_trigger_rpc_exposure.sql`; similar timestamp/name differences appear in the relationship foundation and Body Clock entries.
+
+This is a **migration-history parity discrepancy to reconcile**, not proof that the deployed schema is wrong: migrations may have been renamed/rebased in source after application, or the environments may have different histories. Before a character-scope schema migration is designed, compare the complete live ledger with repository migration files and inspect the relevant live table/function definitions. Do not blindly reapply or reset migrations to make the lists match.
+
+### Current audit conclusion
+
+- The three inspected Persona Evolution RPCs have explicit authenticated-user ownership checks in the connected database.
+- The traits table allows users to write their own trait rows directly under RLS, and neither relevant table has a user-defined trigger in the inspected catalog.
+- The connected project's migration ledger differs from the repository's migration version/name pairs; schema-history parity is not yet established.
+- All queries in this follow-up were read-only. No application code, database schema/data, grants, policies, production gate, or deployment was changed.
