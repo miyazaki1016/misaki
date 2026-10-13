@@ -79,3 +79,43 @@ A scan of all 35 SQL migration files on `main` found no tracked `CREATE FUNCTION
 - Do not auto-copy existing Misaki memories or relationship state to a future character.
 - Gemini suggestions must remain proposals; they must not independently establish relationship status, marriage, divorce or consent.
 - This is documentation only; no application code, database, production gate or deployment was changed.
+
+
+## Live database verification (read-only, 2026-10-13)
+
+The connected Supabase project named `misaki` was inspected using SELECT-only catalog queries. This verifies the current connected database state at inspection time; it does not prove that every deployment environment is identical.
+
+### Deployed function definitions and ACLs
+
+All three RPCs exist in `public`, are owned by `postgres`, and are marked `SECURITY DEFINER`. Their current ACLs are:
+
+- `claim_user_evolution_analysis(text, integer)`: EXECUTE for `postgres`, `authenticated`, and `service_role`; no `PUBLIC` or `anon` entry in the function ACL.
+- `create_user_evolution_candidate(text,text,text,text,numeric,text,jsonb)`: EXECUTE for `postgres`, `authenticated`, and `service_role`; no `PUBLIC` or `anon` entry in the function ACL.
+- `review_user_evolution_candidate(uuid,text)`: EXECUTE for `postgres`, `authenticated`, and `service_role`; no `PUBLIC` or `anon` entry in the function ACL.
+
+Function-body review found the following ownership controls:
+
+- All three initialize the acting user from `auth.uid()` and raise an error when it is null.
+- The claim RPC locks/reads analysis state by that authenticated user ID.
+- Candidate creation writes `user_id = auth.uid()`, uses `scope = 'user'`, and applies a per-user daily limit and duplicate-pending check.
+- Review selects the requested candidate using all of `id = p_candidate_id`, `scope = 'user'`, and `user_id = auth.uid()`, locks that row, and rejects missing/non-owned candidates. Approval updates only that user's trait row and records the decision in evolution history.
+- The three functions use fixed `search_path` settings. They are privileged functions, so future changes must preserve the explicit ownership predicates and avoid introducing unqualified object resolution hazards.
+
+**Conclusion for the original cross-user concern:** the deployed definitions do contain explicit per-user checks; the source-only uncertainty is resolved for these three RPCs in this connected database. No confirmed cross-user candidate-review flaw was found in the inspected function bodies.
+
+### Live table grants and RLS policies
+
+The four relevant tables have RLS enabled:
+
+- `misaki_evolution_candidates`: authenticated table ACL includes CRUD privileges, but the observed authenticated RLS policy is SELECT-only and restricts rows to `scope = 'user'` and `auth.uid() = user_id`. No authenticated INSERT/UPDATE/DELETE policy appeared in the catalog query, so those operations should not pass RLS for this role.
+- `misaki_evolution_analysis_state`: authenticated SELECT policy restricts reads to the caller's own `user_id`.
+- `misaki_evolution_history`: authenticated SELECT policy restricts reads to the caller's own `user_id` and `scope = 'user'`.
+- `misaki_user_relationship_traits`: authenticated SELECT is restricted to the caller's own rows, but authenticated INSERT and UPDATE policies also allow writes where `auth.uid() = user_id`.
+
+The last item is a **design-integrity question, not evidence of cross-user access**: a signed-in user appears able to insert/update their own relationship traits directly through the table API, subject to table grants, RLS, constraints and any triggers. That may be intentional, but it means the approved-evolution RPC is not necessarily the only path that can alter a user's own traits. Before treating human review as an enforcement boundary, inspect all direct trait write callers, constraints and triggers, and decide whether direct self-editing is an accepted product capability. Do not change grants or policies as part of this audit.
+
+### Inspection boundaries
+
+- Queries were read-only catalog SELECTs; no row data was selected and no database mutation was performed.
+- This confirms the connected `misaki` project's current definitions/ACLs and RLS metadata only. It does not prove parity across other Supabase projects or environments.
+- The project migration ledger and live schema parity still need separate review; catalog results are not a substitute for that comparison.
