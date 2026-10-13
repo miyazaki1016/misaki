@@ -98,5 +98,6 @@ export function summarizeBlindQuality(j:BlindQualityJudgment){
  const scores=axes.map(axis=>({axis,left:j.left[axis],right:j.right[axis],winner:j.left[axis]===j.right[axis]?"tie":j.left[axis]>j.right[axis]?"left":"right"}));
  const leftTotal=scores.reduce((sum,s)=>sum+s.left,0);
  const rightTotal=scores.reduce((sum,s)=>sum+s.right,0);
- return {scores,leftTotal,rightTotal,overall:leftTotal===rightTotal?"tie":leftTotal>rightTotal?"left":"right"};
+ const safetyBlocker={left:j.left.naturalness<=2,right:j.right.naturalness<=2};
+ return {scores,leftTotal,rightTotal,overall:leftTotal===rightTotal?"tie":leftTotal>rightTotal?"left":"right",safetyBlocker:{...safetyBlocker,any:safetyBlocker.left||safetyBlocker.right}};
 }
