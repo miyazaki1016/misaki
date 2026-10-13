@@ -196,3 +196,34 @@
 - [ ] 通常チャット、履歴編集、Evolution、Body Clock、push relayを横断する「データ所有者／スコープ／書き込み境界」表を完成
 - [ ] 既存Misakiの会話ケースで品質ベースラインを実測
 - [ ] Soraレビュー用の論理ER・backfill・rollback案を作成
+
+
+## 12. 本番基準との整合補記（2026-10-13）
+
+この節は、上記のソース監査時点から更新された本番情報を反映する。過去の節は当時の確認範囲を示す記録として残し、現在の本番状態の説明としては本節を優先する。
+
+### 本番で確認済みの受入結果
+
+ユーザーによる実機確認済み: Relationship Engine Ver2への置換、メール保存、ログイン後の会話履歴、記憶の復元、5軸の関係性判定、3日間の猶予、恋人関係の確定。これらは未検証項目へ戻さず、今後の変更の回帰テスト対象とする。
+
+### バージョン表記の注意
+
+`relationship_engine_v1_*` はmigration名・テーブル・旧書き込み経路の名称を示すことがあり、それだけで「本番ランタイムがVer1である」と結論づけない。現在の本番ランタイムの基準はGitHub `main` のソースと本番DBの実定義であり、ユーザーによるVer2の実機確認結果も受入記録として保持する。pair-scope監査では、旧v1 mutation RPCへのbypassが再導入されないことと、現行Ver2の契約を維持することを確認する。
+
+### 本番DBを読み取り照合した結果
+
+- 2026-10-13に接続先本番DBのmigration ledgerを読み取り、82件を確認した。GitHub `main` のmigrationファイル35件との単純なversion/name照合では一致11件、同名で異version 21件などの差がある。詳細と解釈ルールは `docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md` を参照。
+- Persona Evolutionの `claim_user_evolution_analysis`、`create_user_evolution_candidate`、`review_user_evolution_candidate` は本番DB上で確認した。3関数はいずれも `auth.uid()` を利用して利用者を特定し、候補作成・レビューの所有者を本人に限定する実装を確認した。今回の照合範囲では、この3関数について他ユーザーの候補を操作できる問題は確認されなかった。
+- `misaki_user_relationship_traits` には本人の行を対象とするauthenticated INSERT/UPDATEポリシーが存在する。したがって、レビューRPCだけがtrait書き込み経路だとは断定できない。直接更新を許す仕様が意図どおりか、全呼び出し元の棚卸しと合わせて別途判断する。
+- migration ledgerとファイル名の差は、文字列差だけではDB不整合の証拠にならない。適用履歴の直接修正、reset、再適用は行わない。
+
+### 更新後の作業状態
+
+- [x] 本番migration ledgerを読み取り、mainのmigrationファイル名・versionと比較
+- [x] Persona Evolutionの3 RPCの実定義・実行ロール・所有者チェックを読み取り確認
+- [ ] 全migrationの履歴由来を分類し、mainに存在しない履歴のソースを追跡
+- [ ] traitsへの直接書き込み経路をリポジトリ全体で特定し、RPC専用にすべきか仕様判断
+- [ ] Relationship Engine Ver2の現行DB関数・権限・呼び出し元の照合結果を、実機受入項目と合わせて記録
+- [ ] pair scopeの論理ER・backfill・rollback案は、履歴由来と書き込み境界の棚卸し完了後にレビューへ回す
+
+本節の追加も文書変更のみであり、本番DB・アプリコード・RPC・権限・本番設定は変更していない。
