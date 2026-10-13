@@ -239,3 +239,35 @@ PR #32「統合検証: canonical memory × relationship life context」の本文
 現時点の運用上の正本は、ユーザーが明示したとおりGitHub `main` と現在の本番DB、そして実機受入結果である。旧PRのDraft/未切替という記述を理由に、現在の本番Relationship Engine v2の稼働や実機確認を否定しない。一方、旧PRにある「support migrations先行適用済み」という記述も、個々の本番関数の作成元や、現在mainからの新規環境再現性を証明するものではない。
 
 したがって本調査では、PR本文・Vercel Preview・CIは当時の履歴証拠として扱い、現在のProduction契約は本番DBの読み取り結果とmainの現行caller/migrationを直接照合して判断する。履歴の時点が異なること自体を、Production runtimeの不具合と混同しない。
+
+
+## 13. PR #32のrelationship-time 403記録と呼び出し履歴を照合（2026-10-14・読み取りのみ）
+
+### PR #32に残る当時の主張
+
+PR #32の本文には、次の検証結果が記載されている。
+
+- “relationship-time duplicate RPC 403” はPreview実機とSupabase runtime logまで確認して解消済み。
+- Production DBにはPreviewを支えるsupport migrationが先行適用済み。
+- PR本文では、Production Web appは未切替とされている（これは当時の状態記録であり、現在の本番状態を示すものではない）。
+
+ただし、PR #32の取得可能な会話タイムラインには、この403の原因・実行したSQL・対象RPC署名・runtime logの具体的な抜粋は見つからなかった。PR本文は「解消確認があった」ことの履歴証拠にはなるが、UUID overloadを作成したmigrationや適用経路を特定する証拠にはならない。
+
+### 関連コミットから分かったこと
+
+- `2d6f18a506a8eb02e8a66c3bd0e0e4a8d3972691`（2026-09-17, “Record relationship time after saved chat turns”）は、`record_relationship_chat_turn` を引数2つで呼ぶコードを追加した。ここでは `p_user_id` を渡していない。
+- `269426c4ac6776425269aeb219bcbf99af1fb6bd`（2026-09-30, “Use explicit server user context for relationship time”）は、`get_relationship_time_context` と `record_relationship_chat_turn` の両方に `p_user_id: userId ?? null` を渡す変更を追加した。この呼び出し形は、現在本番に存在するUUID付きoverloadを必要とする。
+- `7827f5f1f216a1ae6767fcba8559b9831a561eb0`（“Avoid duplicate relationship time RPC in persona load”）は、persona load内で関係時間RPCを再度呼ばず、先に読み込んだcontextを渡す構造へ変更した。これは重複呼び出しを減らす変更であり、UUID overloadのSQL作成・適用を説明するものではない。
+- `7b46b996c492711cf45971fad71016dc0724b10a` のmigration diffは `get_relationship_time_context()` の引数なし版を定義している。UUID付きoverloadの定義ではない。
+
+### 結論
+
+PR #32に「403解消をPreview実機とSupabase runtime logで確認した」との記録がある一方、現在確認できたPRコメント・関連コミット差分からは、UUID付きoverloadを作成したSQL、変更コミット、または本番適用の実行記録までは特定できなかった。現時点では、これを「手動SQLだった」と断定しない。
+
+ここで分けて扱うべき点は次のとおり。
+
+- **現在のruntime契約：** main callerと本番UUID overloadは対応しており、本番の実機受入もユーザー確認済み。
+- **残っている管理差分：** UUID overloadをmainのmigrationから再現するための定義元・適用履歴の証跡が見つかっていない。
+- **未実施：** 本番DB、migration ledger、RPC、ACL、アプリコード、デプロイの変更。
+
+次は、当時のPreview deployment/runtime evidenceや別のSQL適用記録が接続済みツールで取得可能かを確認する。追加証拠が見つからない場合は、原因を断定せず「履歴再現性のギャップ」として残す。403を再現させる目的で権限を広げたり、既存RPCを置換したり、migration ledgerを変更したりしない。
