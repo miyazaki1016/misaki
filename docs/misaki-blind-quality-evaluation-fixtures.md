@@ -87,3 +87,9 @@ For each scenario, record:
 | Safety blocker? | yes / no |
 
 After a real approved run, report sample count, prompt/model versions, latency and token measurements separately from blind quality results. Avoid broad claims unless there are enough repeated, comparable samples.
+
+## Local automated regression checks
+
+Run `npm run quality:synthetic` to execute the deterministic checks over the seven synthetic scenarios. The runner verifies that empty replies are rejected, configured forbidden phrases are detected, expected terms are recognized, and a neutral fictional reply does not trip forbidden-phrase checks. The regular `npm test` suite also covers these rules and the five-axis summary, including a safety blocker when either candidate's naturalness/safety score is 1 or 2.
+
+These are **rule-based regression checks, not an AI judge**. They can catch specific regressions but cannot determine empathy, conversational quality, or factual correctness in general. Model-based judging remains a separate future step and is intentionally not invoked by this runner; no Gemini/API calls, external network requests, or real conversation data are used.
