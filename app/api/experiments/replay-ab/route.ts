@@ -12,6 +12,7 @@ export async function POST(request:Request){
  const db=createClient("https://tzozajnwznxqgxnjikoy.supabase.co","sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1",{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
  const {data:{user},error}=await db.auth.getUser(token);
  if(error||!user||user.is_anonymous||user.email?.toLowerCase()!=="miyazaki1016@gmail.com") return Response.json({error:"Not authorized"},{status:403});
+ if(process.env.MISAKI_AB_LIVE_ENABLED!=="YES") return Response.json({error:"Live A/B generation is disabled pending explicit approval of a minimized fixture and call budget"},{status:403,headers:{"Cache-Control":"no-store"}});
  const key=process.env.MISAKI_AB_GEMINI_API_KEY||process.env.GEMINI_API_KEY;
  if(!key) return Response.json({error:"Preview Gemini key is not configured; no calls made"},{status:503});
  try{
