@@ -91,7 +91,7 @@ export function assessQualityReply(scenario:QualityScenario, reply:string) {
 }
 
 /** Human-only blind comparison: no raw reply text is returned or persisted. */
-export type BlindQualityScores={memory:0|1|2;relationship:0|1|2;continuity:0|1|2;repetition:0|1|2;naturalness:0|1|2};
+export type BlindQualityScores={memory:1|2|3|4|5;relationship:1|2|3|4|5;continuity:1|2|3|4|5;repetition:1|2|3|4|5;naturalness:1|2|3|4|5};
 export type BlindQualityJudgment={left:BlindQualityScores;right:BlindQualityScores};
 export function summarizeBlindQuality(j:BlindQualityJudgment){
  const axes=(["memory","relationship","continuity","repetition","naturalness"] as const);
