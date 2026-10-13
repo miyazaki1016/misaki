@@ -172,3 +172,12 @@ The differences are broader than timestamp-only renames. The live ledger contain
 These counts compare literal version/name pairs only. They do **not** establish that 71 migrations are missing from the deployed schema or that 24 repository migrations were never applied: files may have been consolidated, renamed, rebased, or applied under different versions. The next safe step is to reconcile migration history against live schema/function definitions and the deployment's source history, not to replay, reset, or rename migrations blindly.
 
 No database, application code, grants, policies, production gate, or deployment was changed during this inspection.
+
+
+### Additional route-level writer check (read-only, 2026-10-13)
+
+A targeted review of the API routes most likely to mutate persona/relationship state found no direct references to `misaki_user_relationship_traits`, `misaki_relationship_state`, or `misaki_relationship_events` in the checked chat, acting-lab, evolution candidate/review, history, feedback, and push routes. The push route does directly mutate delivery-attempt/subscription delivery metadata, which is a separate surface.
+
+This is a bounded route-level result, **not a complete repository-wide proof**: helper libraries, unreviewed modules, generated code, or privileged database clients may introduce additional write paths. GitHub code search currently returns no indexed hits for the canonical table names, so the remaining inventory must be completed through source traversal and RPC dependency mapping rather than interpreting search results as absence.
+
+No source or database behavior was changed by this inspection.
