@@ -233,3 +233,12 @@ GitHub main の `lib/relationship-emotion-store.ts` は、会話後の感情・�
 - 未実施：本番DB、migration ledger、RPC、ACL、アプリコード、デプロイの変更。
 
 次はこのRPCの後続定義・PR・migration ledgerを同じ手順で追い、元の9引数定義から本番10引数定義へ移行した証跡を探す。由来が確定するまでは、既存RPCの置換やGRANT変更、ledger修正は行わない。
+
+
+## 12. 旧統合PRのProduction記述は時点を分けて読む（2026-10-13）
+
+PR #32「統合検証: canonical memory × relationship life context」の本文には、作成当時の状態として「Production Web appは未切替」「Production DBにはPreview用support migrationsが先行適用済み」と記載されている。これは2026年9月末時点の統合PRの切替判断を記録した歴史資料であり、2026-10-13時点のProduction runtimeが何を動かしているかを単独で決める根拠にはしない。
+
+現時点の運用上の正本は、ユーザーが明示したとおりGitHub `main` と現在の本番DB、そして実機受入結果である。旧PRのDraft/未切替という記述を理由に、現在の本番Relationship Engine v2の稼働や実機確認を否定しない。一方、旧PRにある「support migrations先行適用済み」という記述も、個々の本番関数の作成元や、現在mainからの新規環境再現性を証明するものではない。
+
+したがって本調査では、PR本文・Vercel Preview・CIは当時の履歴証拠として扱い、現在のProduction契約は本番DBの読み取り結果とmainの現行caller/migrationを直接照合して判断する。履歴の時点が異なること自体を、Production runtimeの不具合と混同しない。
