@@ -62,5 +62,6 @@ export default function ReplaySelfCheckPage(){
   {status.kind==="ok"&&<><p>合計: {status.total}件／ユーザー: {status.users}件／美咲: {status.misaki}件</p>
   <p><strong>次のステップ（任意）</strong>：会話本文を含むJSONファイルを、この端末に保存できます。個人的な発言も含まれます。保存したファイルは自動送信されません。内容を確認し、共有してよい場合だけアップロードしてください。</p>
   <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button>
-  <hr/><section style={{border:"1px solid #b45309",padding:12,borderRadius:8}}><strong>Gemini実会話A/B比較は停止中</strong><p>誤操作による有料API呼び出しや実会話の外部送信を防ぐため、実会話を使う比較ボタンはこの画面から外しました。比較を再開するには、匿名化した評価用データ・送信内容・呼び出し回数と費用上限を別途確認し、明示的に承認する必要があります。ここでの履歴確認と端末への手動保存は、Geminiへの送信を行いません。</p></section>\n </main>;
+  <hr/><section style={{border:"1px solid #b45309",padding:12,borderRadius:8}}><strong>Gemini実会話A/B比較は停止中</strong><p>誤操作による有料API呼び出しや実会話の外部送信を防ぐため、実会話を使う比較ボタンはこの画面から外しました。比較を再開するには、匿名化した評価用データ・送信内容・呼び出し回数と費用上限を別途確認し、明示的に承認する必要があります。ここでの履歴確認と端末への手動保存は、Geminiへの送信を行いません。</p></section>
+ </main>;
 }
