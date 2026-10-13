@@ -141,3 +141,34 @@ This is a **migration-history parity discrepancy to reconcile**, not proof that 
 - The traits table allows users to write their own trait rows directly under RLS, and neither relevant table has a user-defined trigger in the inspected catalog.
 - The connected project's migration ledger differs from the repository's migration version/name pairs; schema-history parity is not yet established.
 - All queries in this follow-up were read-only. No application code, database schema/data, grants, policies, production gate, or deployment was changed.
+
+
+## Follow-up: repository caller sample and complete ledger count (read-only, 2026-10-13)
+
+### Confirmed Persona Evolution caller paths
+
+A targeted source review of the current repository branch confirmed:
+
+- `lib/persona/evolution-runner.ts` reads `misaki_user_relationship_traits` filtered by `user_id`; candidate creation is done through `create_user_evolution_candidate`, not a direct trait INSERT/UPDATE in this runner.
+- `app/api/persona/evolution/analyze/route.ts` authenticates the bearer token, loads canonical conversation state for signed-in users, and calls the runner. Its response retains `autoApplied: false`.
+- `app/api/persona/evolution/candidates/route.ts` is read-only and filters candidate listing by both `scope = 'user'` and the authenticated `user_id`.
+- `app/api/persona/evolution/review/route.ts` calls `review_user_evolution_candidate`; it does not directly update the traits table.
+- `app/admin/evolution/page.tsx` invokes these API routes for analysis and review.
+
+This targeted review confirms the intended reviewed-evolution path, but **does not close the repository-wide direct-writer inventory**. GitHub code-search returned no indexed matches for the table name, so a zero-result search must not be treated as proof that no other callers exist. The live RLS allowance for own-row INSERT/UPDATE remains the decisive write-boundary question.
+
+### Full migration-ledger comparison
+
+A read-only comparison of the connected Supabase project's migration ledger with SQL filenames on repository `main` found:
+
+- Repository SQL migration files: **35**
+- Live ledger entries: **82**
+- Exact version-and-name pairs in both lists: **11**
+- Repository-only pairs: **24**
+- Live-ledger-only pairs: **71**
+
+The differences are broader than timestamp-only renames. The live ledger contains many entries for which no same-version-and-name file exists on current `main`, including early schema/entitlement/conversation migrations and later canonical-root and relationship-identity migrations. Conversely, current `main` has files whose version/name pairs differ from the live ledger (including multiple relationship phase migrations and Relationship Engine lease-fencing migrations).
+
+These counts compare literal version/name pairs only. They do **not** establish that 71 migrations are missing from the deployed schema or that 24 repository migrations were never applied: files may have been consolidated, renamed, rebased, or applied under different versions. The next safe step is to reconcile migration history against live schema/function definitions and the deployment's source history, not to replay, reset, or rename migrations blindly.
+
+No database, application code, grants, policies, production gate, or deployment was changed during this inspection.
