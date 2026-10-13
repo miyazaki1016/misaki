@@ -14,6 +14,9 @@ export async function POST(request:Request){
  const {data:{user},error}=await db.auth.getUser(token);
  if(error||!user||user.is_anonymous||user.email?.toLowerCase()!=="miyazaki1016@gmail.com")return Response.json({error:"Not authorized"},{status:403,headers:noStore});
  if(request.headers.get("x-misaki-quality-consent")!=="YES")return Response.json({error:"Explicit consent required"},{status:400,headers:noStore});
+ // Fail closed: a click in the UI must not send real conversation history to Google
+ // until a separate explicit approval enables this live experiment.
+ if(process.env.MISAKI_BLIND_QUALITY_LIVE_ENABLED!=="YES")return Response.json({error:"Live generation is disabled pending explicit approval of a minimized fixture"},{status:403,headers:noStore});
  const key=process.env.MISAKI_AB_GEMINI_API_KEY||process.env.GEMINI_API_KEY;
  if(!key)return Response.json({error:"Gemini key unavailable"},{status:503,headers:noStore});
  let stage="load-history";
