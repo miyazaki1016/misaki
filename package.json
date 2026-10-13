@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "node --test --experimental-strip-types tests/*.test.ts tests/*.test.cjs"
+    "test": "node --test --experimental-strip-types tests/*.test.ts tests/*.test.cjs && npm run quality:synthetic",
+    "quality:synthetic": "node --experimental-strip-types scripts/run-synthetic-quality-checks.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.57.4",

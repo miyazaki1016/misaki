@@ -1,0 +1,67 @@
+"use client";
+
+import {useState} from "react";
+import {supabase} from "../../../lib/supabase";
+
+type HistoryTurn={role?:unknown;text?:unknown};
+type Status={kind:"idle"|"loading"|"ok"|"error";message:string;total?:number;users?:number;misaki?:number};
+
+/**
+ * Experimental, read-only self-check. Runs entirely in the signed-in browser.
+ * Does not transmit conversation text to another service or save it anywhere.
+ */
+export default function ReplaySelfCheckPage(){
+ const [status,setStatus]=useState<Status>({kind:"idle",message:"未確認"});
+ const [expectedEmail,setExpectedEmail]=useState("");
+ const [approvedTurns,setApprovedTurns]=useState<{role:string;text:string}[]|null>(null);
+ async function check(){
+  setApprovedTurns(null);
+  setStatus({kind:"loading",message:"本人確認と履歴件数を確認中…"});
+  try{
+   const {data:{session},error:sessionError}=await supabase.auth.getSession();
+   if(sessionError||!session?.access_token) throw new Error("美咲にログインしてください");
+   const {data:{user},error:userError}=await supabase.auth.getUser();
+   if(userError||!user||user.is_anonymous) throw new Error("メールアカウントでログインしてください");
+   if(!expectedEmail.trim()||user.email?.toLowerCase()!==expectedEmail.trim().toLowerCase()){
+    throw new Error("入力したメールとログイン中のアカウントが一致しません");
+   }
+   const response=await fetch("/api/persona/history",{
+    method:"GET",headers:{Authorization:`Bearer ${session.access_token}`},cache:"no-store",
+   });
+   if(!response.ok) throw new Error("履歴の読み込みに失敗しました");
+   const state=await response.json();
+   if(!Array.isArray(state.history)) throw new Error("履歴形式が想定と異なります");
+   const turns=state.history as HistoryTurn[];
+   if(turns.some(turn=>!turn||typeof turn.text!=="string"||!["user","misaki","model"].includes(String(turn.role)))){
+    throw new Error("一部の履歴形式が想定と異なります");
+   }
+   setApprovedTurns(turns.map(t=>({role:String(t.role),text:String(t.text)})));
+   setStatus({kind:"ok",message:"本人の履歴を読み取り専用で確認しました。Geminiには送っていません。",total:turns.length,
+    users:turns.filter(t=>t.role==="user").length,misaki:turns.filter(t=>t.role==="misaki"||t.role==="model").length});
+  }catch(error){
+   setStatus({kind:"error",message:error instanceof Error?error.message:"確認できませんでした"});
+  }
+ }
+ function saveLocalCopy(){
+  if(!approvedTurns) return;
+  const payload={format:"misaki-approved-replay-v1",exportedAt:new Date().toISOString(),history:approvedTurns};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const anchor=document.createElement("a");
+  anchor.href=url;anchor.download="misaki-approved-replay.json";anchor.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+ }
+ return <main style={{maxWidth:620,margin:"40px auto",padding:24,fontFamily:"sans-serif",lineHeight:1.7}}>
+  <h1>美咲・実会話A/B事前確認</h1>
+  <p>この画面は実験用です。履歴確認は読み取り専用で、Geminiへの送信は行いません。会話本文・認証トークンは画面に表示しません。</p>
+  <label htmlFor="email">ログインしているメールアドレス</label>
+  <input id="email" type="email" value={expectedEmail} onChange={e=>setExpectedEmail(e.target.value)}
+   autoComplete="email" style={{display:"block",width:"100%",padding:12,margin:"8px 0 16px"}}/>
+  <button onClick={check} disabled={status.kind==="loading"} style={{padding:"10px 20px"}}>本人の履歴件数を確認</button>
+  <p role="status">{status.message}</p>
+  {status.kind==="ok"&&<><p>合計: {status.total}件／ユーザー: {status.users}件／美咲: {status.misaki}件</p>
+  <p><strong>次のステップ（任意）</strong>：会話本文を含むJSONファイルを、この端末に保存できます。個人的な発言も含まれます。保存したファイルは自動送信されません。内容を確認し、共有してよい場合だけアップロードしてください。</p>
+  <button onClick={saveLocalCopy} style={{padding:"10px 20px"}}>会話履歴をこの端末に保存（JSON）</button>
+  <hr/><section style={{border:"1px solid #b45309",padding:12,borderRadius:8}}><strong>Gemini実会話A/B比較は停止中</strong><p>誤操作による有料API呼び出しや実会話の外部送信を防ぐため、実会話を使う比較ボタンはこの画面から外しました。比較を再開するには、匿名化した評価用データ・送信内容・呼び出し回数と費用上限を別途確認し、明示的に承認する必要があります。ここでの履歴確認と端末への手動保存は、Geminiへの送信を行いません。</p></section></>}
+ </main>;
+}
