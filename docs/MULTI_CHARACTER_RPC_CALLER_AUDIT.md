@@ -131,7 +131,7 @@ This is not a cross-user isolation finding. It is a product/security boundary de
 
 ### Live migration ledger versus repository history
 
-A fresh read-only comparison of the connected project's migration ledger and SQL filenames on repository `main` gives 82 live ledger entries and 35 tracked migration files. Only 11 version/name pairs match exactly; 24 repository pairs are absent from the live ledger, and 71 live pairs have no exact pair on current `main`. Importantly, there are **no shared version numbers with different names** in this comparison. So the mismatch is not just a timestamp/name mismatch on the same version: most entries have no matching version at all.
+A fresh read-only comparison of the connected project's migration ledger and SQL filenames on repository `main` gives 82 live ledger entries and 35 tracked migration files. Only 11 version/name pairs match exactly. A name-based comparison adds an important distinction: **21 migration names exist in both places but have different version numbers**; 3 repository migration names have no match in the live ledger, and 50 live migration names have no match on current `main`. No version number is shared with a different name. So this is a mixture of version drift for same-named migrations and a much larger set of entries that have no matching filename in the other list.
 
 This is a **migration-history parity discrepancy to reconcile**, not proof that the deployed schema is wrong or that migrations are missing. Files may have been consolidated, rebased, applied from another branch/source snapshot, or recorded in a different deployment history. Before a character-scope schema migration is designed, compare the deployment's source history and relevant live table/function definitions against the full ledger. Do not blindly reapply, reset, or rename migrations to make the lists match.
 
@@ -166,9 +166,12 @@ A second programmatic comparison of the same read-only sources confirmed:
 - Exact version/name pairs shared: **11**
 - Repository-only version/name pairs: **24**
 - Live-only version/name pairs: **71**
+- Same migration names present in both lists with different versions: **21**
+- Repository migration names with no live-ledger name match: **3**
+- Live migration names with no repository filename match: **50**
 - Shared version numbers whose names differ: **0**
 
-The live-only set includes early schema/entitlement/conversation migrations and later canonical-root and relationship-identity migrations. The repository-only set includes relationship phase files and Relationship Engine lease-fencing files. Since the version numbers themselves do not overlap for these unmatched items, we cannot resolve the discrepancy by renaming files alone.
+The 21 same-name/different-version pairs include the relationship phase migrations, duplicate-chat-turn sync, relationship-point/emotion changes, reply feedback, and Relationship Engine worker/lease-fencing migrations. The 3 repo-only names and 50 live-only names account for the rest of the name-level mismatch. This indicates that some entries may be version-rebased while many others reflect a different source snapshot or history; it is not safely explained by a single global timestamp offset.
 
 These are literal ledger-to-filename comparisons, not a schema diff. They do **not** establish that 71 migrations are missing from the deployed schema or that 24 repository migrations were never applied. The safe next step is to identify the deployment/source snapshot that produced the live ledger and compare relevant live table/function definitions to that source before planning new migrations. Do not replay, reset, or rename migrations blindly.
 
