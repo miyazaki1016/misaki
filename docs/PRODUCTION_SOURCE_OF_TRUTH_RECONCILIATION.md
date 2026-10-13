@@ -105,3 +105,39 @@ GitHub `main` には次の2ファイルがある。
 
 次の手順は、関連コミットの前後差分・適用履歴・本番関数本文を照合し、後続migrationが実際に適用されたことを裏付けられるか確認すること。証拠が揃うまではmigration repair、ledger更新、再適用を行わない。これらのRPCはRelationship Engineの時間コンテキストと会話履歴に関わるため、無条件の再実行はしない。
 
+
+
+## 8. 現行mainの呼び出しと本番RPC overloadの不一致（2026-10-13・読み取りのみ）
+
+### main側の呼び出し契約
+
+lib/relationship-time.ts（GitHub main）を確認したところ、現行アプリは次の引数でRPCを呼び出している。
+
+- get_relationship_time_context: { p_user_id: userId ?? null }
+- record_relationship_chat_turn: { p_user_message_at, p_misaki_message_at, p_user_id: userId ?? null }
+
+呼び出し契約は、引数なし／2引数版ではなく、p_user_id uuid を含むoverloadを前提にしている。関連変更コミット 269426c4ac6776425269aeb219bcbf99af1fb6bd（“Use explicit server user context for relationship time”、2026-09-30）で、userId が呼び出し元から渡されるようになったことも確認した。
+
+### main migrationと本番DBの照合
+
+現在mainにある関係時間migration 4ファイル（引数なし／2引数版を定義するファイル）には、p_user_id uuid 付きoverloadの定義が見当たらない。一方、接続先本番DBには次の関数が存在する。
+
+| 本番DBの署名 | SECURITY DEFINER | search_path | EXECUTE |
+|---|---|---|---|
+| get_relationship_time_context() | false | public | authenticated, postgres, service_role |
+| get_relationship_time_context(uuid) | true | 空（安全な空search_path） | postgres, service_role |
+| record_relationship_chat_turn(timestamptz, timestamptz) | true | public | postgres, service_role |
+| record_relationship_chat_turn(timestamptz, timestamptz, uuid) | true | 空（安全な空search_path） | postgres, service_role |
+
+本番のUUID overloadは、呼び出しユーザーと p_user_id の不一致を拒否し、永続アカウントを確認する。UUID付きのchat-turn版には、未来時刻拒否、時刻の単調更新、chat_turn event記録、silence_before_seconds返却も確認できた。アプリはこのUUID付きoverloadを指定して呼ぶため、引数なし／2引数版だけを見て本番呼び出しの全経路を説明することはできない。
+
+### 結論と未確定事項
+
+これは、前節のmigration台帳差分より具体的な本番RPCの由来・再現性の不一致である。
+
+- 確認済み：mainの呼び出し元はUUID付き引数を渡す。本番DBには対応するUUID overloadがあり、EXECUTEは postgres, service_role に限定されている。主要な本人照合・永続アカウント確認も関数本文に存在する。
+- 確認済み：mainに存在する現行migrationファイル群は、UUID付きoverloadを再現するSQLの所在を説明できていない。
+- 未確定：UUID overloadを作成した実際のSQL／コミット／適用経路、現在mainから新規環境を構築した場合に同じ契約が再現されるか。
+- 未実施：DB・ledger・RPC・権限・アプリコードの変更、migrationの再適用。
+
+次は、GitHub全履歴とPRブランチにあるUUID付き関数定義を探索し、実際に本番へ入ったSQLの出所を特定する。根拠を見つけるまでは、既存の関数を作り直したり、GRANTを広げたり、migration ledgerを書き換えたりしない。
