@@ -75,7 +75,10 @@ export function createIntegratedActingGuideExperiment(state: RelationshipActingS
   for (const axis of candidates) {
     const scoreBand = band(state[axis]);
     if (scoreBand === 1 || scoreBand === 2) {
-      // The baseline already covers playfulness low/high and all very-high axes.
+      // Baseline playfulness below 30 explicitly discourages teasing; do not
+      // append an intermediate note that might invite contradictory playfulness.
+      if (axis === "playfulness" && state.playfulness < 30) continue;
+      // Baseline already covers very-high axes and playfulness >=80.
       intermediate.push(axisNotes[axis][scoreBand]);
     }
   }
