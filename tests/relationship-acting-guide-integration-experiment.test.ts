@@ -26,7 +26,7 @@ test("integration candidate keeps explicit status and intimacy guards", () => {
   assert.match(guide, /現在の交際状態は明示的に成立済み/);
   assert.match(guide, /かなり近い相手/);
   assert.match(guide, /交際も会話上成立済み/);
-  assert.match(guide, /信頼/);
+  assert.match(guide, /相談を受け止める落ち着き/);
   assert.equal(createIntegratedActingGuideExperiment({ ...partner, trust: 0 }),
     createRelationshipActingGuide({ ...partner, trust: 0 }));
 });
