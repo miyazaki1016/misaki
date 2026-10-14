@@ -1,3 +1,4 @@
+import type { RelationshipIdentity, RelationshipTrait, RelationshipConstraint } from "./relationship-identity-resolver";
 export type RelationshipActingState = {
   intimacyStage: 0 | 1 | 2 | 3 | 4 | 5;
   friendship: number;
@@ -27,7 +28,8 @@ function level(value: number) {
  * Scores must not automatically establish a relationship status.
  */
 export function createRelationshipActingGuide(
-  input: RelationshipActingState
+  input: RelationshipActingState,
+  identity?: { primaryIdentity: RelationshipIdentity; traits?: RelationshipTrait[]; constraint?: RelationshipConstraint }
 ) {
   const state = {
     ...input,
@@ -48,6 +50,23 @@ export function createRelationshipActingGuide(
       ? "現在の交際状態は明示的に成立済み。過去の記憶や点数からこの事実を変更しない。"
       : "現在の交際状態は未成立。過去の記憶や点数だけで現在の恋人扱いをしない。",
   ];
+
+  if (identity) {
+    const labels: Partial<Record<RelationshipIdentity,string>> = {
+      acquaintance:"顔見知り", conversation_partner:"話し相手", friend:"友達", compatible_friend:"気の合う友達",
+      trusted_friend:"信頼できる友達", partner_in_crime:"相棒", best_friend:"親友", important_person:"大切な人",
+      person_of_interest:"気になる人", special_person:"特別な人", lover:"恋人"
+    };
+    notes.push(`現在の関係の自己認識は「${labels[identity.primaryIdentity] ?? identity.primaryIdentity}」。通常はラベルを台詞として読み上げず距離感の前提として使う。ただしユーザーから「私たちはどういう関係？」「俺たちって何？」のように関係を直接聞かれた時は、この自己認識と明示的な交際状態に沿って、美咲自身の一人称の言葉で自然に答えてよい。DB名・内部ラベル名・点数・判定基準は説明しない。`);
+    if (identity.primaryIdentity !== "lover") notes.push("Primary Identityが恋人以外なら、親密さや恋愛意識が高くても恋人として既成事実化しない。");
+    if (identity.traits?.includes("deep_trust")) notes.push("深い信頼があるので、必要以上に聞き出さず自然に受け止められる。");
+    if (identity.traits?.includes("playful_sync")) notes.push("呼吸の合う軽いやり取りを文脈に合う時だけ自然に使える。");
+    if (identity.traits?.includes("strong_affection")) notes.push("強い親愛を温かさとしてにじませるが、それだけで恋愛表現へ変換しない。");
+    if (identity.traits?.includes("romantic_awareness")) notes.push("恋愛的な意識は背景にあるが、Primary Identityと明示的な交際状態を越えない。");
+    if (identity.constraint === "post_breakup") notes.push("交際終了後で関係を作り直している途中。過去から残る高い数値だけで以前の恋愛関係を復活させない。");
+    if (identity.constraint === "post_rejection") notes.push("恋愛的な拒否の後。過去から残る恋愛方向の数値だけで関係を押し進めない。");
+    if (identity.constraint === "boundary") notes.push("現在は関係上の境界を親密さより優先する。");
+  }
 
   if (state.intimacyStage <= 1) {
     notes.push("まだ距離を作っている途中。感じよく親しみやすく話すが、相手をよく知っている前提の省略・馴れ馴れしさ・強い甘え・嫉妬・独占的な言い方は避ける。少しだけよそ行きの距離を残す。");
