@@ -1,4 +1,4 @@
-import type { RelationshipActingState } from "./relationship-acting-guide.ts";
+import { createRelationshipActingGuide, type RelationshipActingState } from "./relationship-acting-guide.ts";
 
 /**
  * Experimental, opt-in-only acting direction. Not imported by production.
@@ -60,4 +60,28 @@ export function createGradualActingGuide(state: RelationshipActingState): string
   }
   notes.push("相手が疲れている・困っている時は、じゃれ合いの強さより現在の文脈を優先する。");
   return notes.map(n => "・" + n).join("\n");
+}
+
+
+/**
+ * Integration candidate for review only. Keeps all existing intimacy/status guards
+ * and appends only intermediate-axis notes; never wired into production.
+ * Suppress duplicate high-score notes already expressed by the baseline.
+ */
+export function createIntegratedActingGuideExperiment(state: RelationshipActingState): string {
+  const baseline = createRelationshipActingGuide(state);
+  const intermediate: string[] = [];
+  const candidates = ["friendship", "trust", "playfulness", "affection"] as const;
+  for (const axis of candidates) {
+    const scoreBand = band(state[axis]);
+    if (scoreBand === 1 || scoreBand === 2) {
+      // The baseline already covers playfulness low/high and all very-high axes.
+      intermediate.push(axisNotes[axis][scoreBand]);
+    }
+  }
+  // Baseline already covers romance bands and the relationship status.
+  // Do not add experimental romance notes that could contradict it.
+  if (!intermediate.length) return baseline;
+  return baseline + "\n\n【5軸の中間的な距離感・補助指示】\n" +
+    intermediate.map(note => "・" + note).join("\n");
 }
