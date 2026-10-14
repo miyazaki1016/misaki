@@ -3925,3 +3925,37 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+### 2026-10-15 — Relationship Engine 5軸の成長速度・総覧思想との整合レビュー（設計検討／未実装）
+
+**位置づけ:** 本節は総覧の既存思想（関係を攻略ゲージにしない、関係の歴史を会話・自発行動・感情へ反映する）と、現行実装を照合した設計上の論点を記録する。**新しい加点係数・閾値・Momentumの保存方式・実装方針は未承認／未確定。** Productionコード・DB・設定の変更を意味しない。
+
+#### 既存の思想・守るべき境界
+
+- 親密度（Intimacy）、長期的な関係5軸（friendship / trust / playfulness / affection / romance）、交際等の明示的Status、直近のMomentum、現在のEmotion/Action、共有Memoryは別概念。5軸scoreだけで交際Statusを成立させない。恋人でなくても深い親友になれる。
+- 関係の変化は、単なる会話回数や甘い台詞の反復ではなく、実際の会話根拠の**新規性・継続性・相互性・文脈**に基づく。美咲が生成した言葉だけを独立したpositive Evidenceとして加点しない。
+- 長期的な信頼と、喧嘩直後の気まずさのような一時的な空気を混同しない。長期Stateを一時的なEmotionで急変させず、直近の空気も無視しない。
+- 5軸は「何を答えるか」を強制するのでなく、距離感、冗談、遠慮、省略、気遣い、照れなどの**どう振る舞うか**に自然に作用する。通常chat / Body Clock / proactive / photo / Push等で一人の美咲として整合させる。
+- 「序盤は変化を感じやすく、後半ほど時間がかかる」「1〜2日で関係レベルが次々上がらない」「Premium会話量だけで攻略できない」は主に**親密度の6段階設計**に関する既存方針であり、5軸すべてに同一の数値速度を確定したものではない。
+
+#### 2026-10-15時点のソース照合で確認した実装上の事実
+
+- 現行 `relationship-v1.1` は Evidence → Episode → Pattern → bounded State を採用。直接的なuser_to_misaki Evidence、confidence ≥0.8、strength ≥50等の条件を満たすものがEpisode候補。Patternは同種・同軸・同極性の**独立したTokyo日付3日分**を要求し、成立したPatternの極性に応じて原則±1、同一処理の軸別deltaは±3に制限する。**「3日経過すれば必ず1点」ではなく、該当する根拠とPatternが必要。**
+- `romantic_declaration` は言い換え告白の連打による水増しを防ぐためEpisodeの識別子を固定する。既存テストは10日間の同種告白からPatternが成立しないことを確認する。これは意図的な反復防止だが、romance軸をどの多様な実出来事で育てるかは追加検証が必要。
+- 現行 `relationship-acting-guide.ts` は友情・信頼・親愛について80以上で明示的な高水準ガイドを付与し、じゃれ合い・恋愛には別の帯域判定がある。**低〜中程度の5軸変化が返信へどれだけ自然に反映されるかは未実証。** ガイドの変化と実Gemini返信の変化は区別する。
+- Productionでaffection 0→1とEvidence→Episode→Pattern→State適用の実例は確認済み。他4軸の実データ分布や、変更後の返信への因果的影響は未確認。直近の追加read-only SQL照会は安全性チェックでブロックされ、DB変更は行っていない。
+- Draft PR #83の合成テストはStatus差によるGeminiへの**prompt差**を示すが、実モデル返信の差や5軸の微小差の実効性を証明しない。未merge、Production未適用。
+
+#### 検討するシステム構成（案・未確定）
+
+1. **Pattern Engine:** 現行のEvidence→Episode→Patternを維持し、新規性・継続性・相互性・文脈・重要度をどう決定的な加減点規則に変換するか検証する。Geminiは候補の意味を抽出する役割に限定し、数値更新はサーバーの監査可能・冪等な規則で確定する。単純な日数倍率や会話回数加点へ置換しない。
+2. **Momentum:** 最近の出来事による二人の空気を長期5軸と分離する。既存設計書の初期方針はrecent Patterns/Eventsからの導出であり、**新しいDBテーブルを作ることは決定していない**。長期信頼と直近の気まずさを同時に表現できるかを検証する。
+3. **Relationship Interpreter:** 長期5軸・Status・Intimacy・Momentum・Emotion/Action・Memory・現在の会話を統合して演技指示へ変換する。0→1のような微小差で不自然に人格を切り替えず、成長の実感も80点までゼロにしない設計を比較する。
+
+#### 次の検証と変更境界
+
+- 現行source・RPC・DB schema・既存テスト・総覧を差分表で突き合わせ、「実装済み／部分実装／未実装／未決定」を明記する。
+- 同一の合成会話履歴で、成長速度・反復防止・仲直り・非恋愛親友・恋人Status・長期信頼と短期不和をシミュレーションする。演技研究室では同一条件のprompt差と**実返信差**を区別して比較する。新規の課金対象Gemini実行は別途承認が必要。
+- 数値係数、閾値、Momentum保存方式、Interpreterの新規指示は比較結果を見てからオーナー判断。**本節の文書追記だけでは本番コード／DB／migration／環境変数／mergeを変更しない。**
+- 参照正本: `docs/RELATIONSHIP_ENGINE_V1.md`、`docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md`、`lib/relationship-engine-v1.ts`、`lib/relationship-analyzer-v1.ts`、`lib/relationship-acting-guide.ts`、`tests/relationship-engine-v1.test.ts`。
