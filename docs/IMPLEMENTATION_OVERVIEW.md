@@ -3959,3 +3959,21 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - 同一の合成会話履歴で、成長速度・反復防止・仲直り・非恋愛親友・恋人Status・長期信頼と短期不和をシミュレーションする。演技研究室では同一条件のprompt差と**実返信差**を区別して比較する。新規の課金対象Gemini実行は別途承認が必要。
 - 数値係数、閾値、Momentum保存方式、Interpreterの新規指示は比較結果を見てからオーナー判断。**本節の文書追記だけでは本番コード／DB／migration／環境変数／mergeを変更しない。**
 - 参照正本: `docs/RELATIONSHIP_ENGINE_V1.md`、`docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md`、`lib/relationship-engine-v1.ts`、`lib/relationship-analyzer-v1.ts`、`lib/relationship-acting-guide.ts`、`tests/relationship-engine-v1.test.ts`。
+
+
+#### 追加照合：5軸から演技への反映マトリクス（2026-10-15、設計レビュー追記）
+
+現行 `lib/relationship-acting-guide.ts` を直接確認した結果。下記は**5軸以外の条件（Intimacy / Status / 会話文脈）が同一**の場合の演技指示文の差を表す。実際のGemini出力の差を保証するものではない。
+
+| 軸 | 現行ガイドが明示的に変化する境界 | 変化しない帯域の例 | 検証論点 |
+| --- | --- | --- | --- |
+| friendship | 80以上で「友情は深い」を追加 | 0〜79 | 気楽さ・自然な省略が中間段階で育つか |
+| trust | 80以上で「信頼は深い」を追加 | 0〜79 | 本音の受け止め方が段階的に変わるか |
+| playfulness | 0〜29で控えめ、80以上で自然なじゃれ合い | 30〜79 | 軽い冗談への移行をどう表現するか |
+| affection | 80以上で「親愛が深い」を追加 | 0〜79 | 日常的な気遣いが段階的に表れるか |
+| romance（Status none） | 0〜44／45〜79／80〜100 | 各帯域内 | 好意の揺れを関係事実の先取りなしに表現できるか |
+| romance（Status romantic_partner） | Statusの専用指示が優先 | romance値の違いで専用文言は変わらない | 恋人という事実と愛情の強さを分けて表現できるか |
+
+**注意:** `level()` は0〜29 / 30〜54 / 55〜79 / 80〜100の4段階を計算するが、各軸で全段階を演技文へ使っているわけではない。Intimacyは別途stage 0〜1 / 2〜3 / 4〜5で演技指示を変えるため、5軸の影響だけを検証する際はstageを固定すること。
+
+**次の検証順（まだ実施していない）:** (1) 5軸の各値を0/1/29/30/44/45/54/55/79/80/100に固定したguideスナップショット差分、(2) 同一会話履歴・同一Status・同一Intimacyでの合成シナリオ比較、(3) 既存のrecent Patterns/EventsからMomentum相当を導出できるかsource/RPC確認、(4) 課金対象モデル実行は承認後に限定。数値の新閾値・加点量・新テーブル作成は未決定。
