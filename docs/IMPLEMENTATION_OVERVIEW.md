@@ -8,7 +8,7 @@
 > **未来のソラを信用するな。総覧を信用しろ。**
 
 
-最終更新: 2026-10-13  
+最終更新: 2026-10-14  
 実装ソース照合基準: `main` の既存実装を読み取り照合（本追記前のHEAD。追記は文書のみ）
 
 この文書は、直近の統合作業・本番検証・会話実地テストで入った変更を、漏れなく追えるようにまとめた総覧です。
@@ -3925,3 +3925,53 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+---
+
+## 2026-10-14 追補：新チャット引き継ぎ・作業棚卸し
+
+### 現在地と運用原則
+- 正本はGitHub mainのアプリケーションソースと接続先Supabase本番DBの実状態。PR/Preview/Workの提案を本番実装済みと扱わない。
+- ユーザーが実機で確認した本番Relationship Engine v2、メール保存、ログイン後の会話履歴、記憶復元、5軸、3日間の猶予、恋人関係の確定を、未検証扱いに戻さない。
+- 環境の意味：Main＝本番実機検証、Preview＝修正・機能拡張の検証（PR/branchごとの分離デプロイ）、Work＝調査・実験。
+- 今回のソース／DB履歴調査は文書・読み取り作業。DB、migration ledger、RPC、ACL/RLS、production gate/config、デプロイを変更しない。
+- 仕掛かりが散らばった背景は、機能実装の途中で依存問題が見つかり、関連調査にも着手していること。今後は各項目に「完成条件／依存関係／次の一手／本番影響」を持たせ、緊急の本番・データ安全問題以外は着手中の作業を閉じてから次へ進む。
+
+### 直近の品質・コスト判断
+- WorkのGemini軽量化／会話履歴の重複削減実験について、ユーザーは約5.9%のコスト削減に対して品質が下がるなら価値が薄く、生活イベント対応など別の改善の方が効果的ではないかと問題提起している。
+- コスト削減率だけで採用しない。人格、会話接続、反復、感情・関係性、最新発言の反映、日本語品質などを評価し、品質低下を許容するだけの実利があるかを判断する。合成データA/Bや実トークン削減が未測定なら、採用済みと書かない。
+- work/context-no-duplicate-replies-ab と work/conversation-context-compression-spike は実験・診断用。Mainの挙動を変えるものではない。
+- 生活イベント対応は改善候補として優先度を比較するが、実装範囲・効果は測定して決める。
+
+### 仕掛かり一覧（最新確認時点。再開時にPR/branch/CIを再取得）
+1. Main / Relationship Engine v2：本番導入済み、ユーザー実機確認済み。基準線であり、再実装対象ではない。
+2. Forget Control v1（PR #66）：忘却済み情報が古い履歴・派生コンテキストから再出現するのを防ぐ候補。soft forget、UI hard delete、匿名checkpoint continuity、再学習は本人が再提示し確認・明示承認した後のみ。Preview検証とMainとの差分・受入条件の確認が必要。
+3. Relationship Identity v1（PR #67）：既存RE canonical出力を購読する独立した第二層。Primary Identity、履歴、hysteresis、constraintを扱う。PR記載の「Production applied / gate OFF」は記述上の主張であり、ユーザー向け有効化を意味すると推定しない。post-breakup/rejection constraint解除条件とclassifier閾値は未freeze。RE v2の5軸・status・lease意味論を変えない。
+4. Relationship time v2（PR #31）：長期構想・一部コードと現行実装の重なりをMainと差分比較する。Draftであることだけを理由に関連機能すべてが本番未実装と判断しない。
+5. Gemini軽量化／重複返信／prompt overlap：Workの測定・実験。品質と実コストの比較後に採否を判断する。
+6. 複数キャラクター Phase 0（PR #79/#80、PR #81の監査資料）：データスコープ、RPC caller/ACL、依存関係の監査段階。複数キャラクター機能そのものは完成していない。
+7. 本番ソース／migration由来の照合（PR #81）：Draft、文書のみ。RPC/UUID overloadのmigration由来を含む履歴再現性ギャップを調査中。文書を更新しても本番DBの状態は変わらない。
+
+### 複数キャラクター化：次のソラが守る最終設計
+- MVPは当面美咲一人でよい。ただし内部モデルは将来の複数キャラクターを前提にし、後から全DBを作り直す構造を避ける。
+- 独立した概念：User / Character / User×Character Pair / canonical relationship events / Memory scope / Work knowledge / External context / shared Reply Core / channel & delivery。
+- 各キャラクターはデータ駆動で人格、価値観、口調、生活設定、地域、恋愛観、境界、嫉妬傾向等を持つ。コード分岐で一人ずつ別システムを増殖させない。
+- ペア状態はUser×Characterごとに独立。親密度、5軸、感情、恋愛状態、イベント履歴、ペア固有の思い出を別キャラクターへ自動共有しない。
+- 共有プロフィールは共有ポリシーに従う。美咲にだけ打ち明けた相談・記憶を他キャラクターが当然知っている状態にしない。記憶scope/ACLは検索・取得時点で適用する。外部知識は共有可能でも、出所・確度・鮮度・共有許可を分ける。
+- キャラクター人格・恋愛観は個別設定。例：一途なキャラクターは同時に恋人一人まで、別のキャラクターは複数交際を受け入れる設計も可能。ただし各キャラクターの交際可能人数の具体値は未決定。
+- ユーザーは同時に複数の相手と婚姻関係を持たない方向を現時点の制約とする。キャラクター側が複数ユーザーと同時婚姻できるかは未決定であり、勝手に決めない。
+- 交際と婚姻は別。告白、承諾、拒否、別れ、プロポーズ、結婚、離婚、復縁は検証済みcanonical event/stateとして扱う。Geminiの演技や5軸スコアだけで交際・婚姻を成立させない。排他制約はDB/RPCで原子的に保証する。
+- Intimacy stagesは親密さの深さ（他人→知り合い→友達→親友→大親友→第6段階）であり、relationship type/statusではない。最終ラベルと6段階の具体仕様は別途freezeする。5軸はfriendship/trust/playfulness/affection/romanceで、Identityやrelationship statusと混ぜない。
+- 共通Reply Coreを再利用しつつ、persona、pair state、memory retrieval、地域・生活イベント、通知の文脈は対象キャラクターに正しくスコープする。Chatだけ切り替えてBody Clock/通知側を旧人格・旧関係のまま残さない。
+- 既存のDB/RPC/lease fencing/retry/idempotency/canonical turn/匿名root暗号化・期限・revision/email checkpointを迂回しない。直接INSERT/UPDATE/mergeでcanonical stateを変更しない。まず依存関係監査と論理ER/backfill/rollback/互換計画をレビューし、明示承認後に最小変更へ進む。
+- 実装順序：現行美咲を安定維持 → データ所有権と全caller/RPC/ACL/worker/temporary import/Body Clockの棚卸し完了 → 後方互換を保つpairモデル・移行計画レビュー → 最小実装・Preview受入 → 明示承認後にProduction。全機能を一度に広げない。
+
+### 新チャットでの最初の作業
+1. docs/HANDOFF_NEXT_SORA_2026-10-14.md を読む。
+2. GitHub mainの最新HEAD、PR #66/#67/#79/#80/#81の状態、関連CI、Vercel deploymentを再取得してから状態を更新する。
+3. Mainとの差分を基準に、全仕掛かりを「本番完成／Preview実装・未受入／調査のみ／保留」に分類し、各々の完成条件・依存・次の一手を明示する。
+4. 本番migration ledgerの件数は読み取り再比較の最新値を使う。2026-10-14再取得では同名migrationでversionが異なるものは19件（前の21件から訂正）。migration履歴や本番DBを推測で修正しない。
+5. ユーザーに同じ説明を求めない。新たな問題は台帳へ記録し、緊急でない限り進行中の項目を閉じてから次へ。
+
+この追補は引き継ぎ・管理情報の更新であり、将来機能の実装済み宣言ではない。
