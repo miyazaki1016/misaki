@@ -1,5 +1,5 @@
 import type { CanonicalConversationTurn, GeminiConversationTurn } from "./history.ts";
-import { toGeminiConversationHistory } from "./history";
+import { toGeminiConversationHistory } from "./history.ts";
 import {
   buildExpressionAdjustmentGuide,
   buildReplyRetryGuide,
