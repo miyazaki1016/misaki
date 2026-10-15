@@ -1,9 +1,9 @@
-import type { CanonicalConversationTurn, GeminiConversationTurn } from "./history";
+import type { CanonicalConversationTurn, GeminiConversationTurn } from "./history.ts";
 import { toGeminiConversationHistory } from "./history";
 import {
   buildExpressionAdjustmentGuide,
   buildReplyRetryGuide,
-} from "./retry-guides";
+} from "./retry-guides.ts";
 
 /**
  * Immutable resolved input for a single Gemini conversation attempt.
