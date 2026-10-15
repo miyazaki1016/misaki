@@ -3949,3 +3949,55 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 **実装前ゲート**：①全SQL/アプリ/Edge writerの網羅照合、②行ロック順序とデッドロック確認、③恒久versionと匿名revisionの独立性、④Emotion/Action競合の保護範囲、⑤delivery/history/countの原子的ロールバックと冪等性、⑥migration適用確認、⑦競合テスト。これらを終えるまで本番接続しない。
 
 **状態**：PR #85 Draftの監査追記のみ。Production・DB・Edge Function未変更、実Gemini検証未実施。
+
+
+---
+
+## 2026-10-15 — 会話育成フェーズ移行・検証資産引継ぎ（新チャット開始用／Draft、未本番適用）
+
+### 意思決定：仕組みの整備と会話の育成を並行する
+
+せいちゃんと合意した開発方針。記憶、感情、行動、親密度、Relationship Engine（5軸）、Relationship Status、Body Clock、自発メッセージ等の実装は相当に進んでいる。ただし**実装が進んだこと、構造テストが通ったこと、実際の美咲の会話が自然で魅力的なことは別の事実**。今までの主な成果は仕組みの実装・整合性試験・設計監査であり、実Gemini会話を多角的に観察して継続的にチューニングする工程は本格着手前。実測していない会話品質を「検証済み」「完成」と表現しない。
+
+仕組み側の未解決問題を放置しない一方、全機能の完成を待たず会話育成を開始する。**美咲の基本人格と自然な会話を実例で磨く → 感情・行動による表現差を確認・調整 → 5軸・親密度・Identity・交際状態による関係変化を確認・調整**。この順は会話観察の主な順序であり、仕組みの修正を後回しにする意味ではない。
+
+### 新チャットで最初に読むもの（正本・実装・実験）
+
+- 正本：本ファイル `docs/IMPLEMENTATION_OVERVIEW.md`。過去の設計・未完了・検証を消さず、本節を引継ぎ入口とする。
+- 会話育成の初回調査・10シナリオ・安全ゲート：`docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md`（PR #85）。
+- 実装：`app/api/acting-lab/route.ts`、`lib/gemini-json-generator.ts`、`lib/persona/fallback-persona.ts`、`lib/relationship-acting-guide.ts`、`app/api/chat/route.ts`、`supabase/functions/body-clock/index.ts`。
+- 5軸の中間演技案（本番未接続）：`lib/relationship-acting-guide-gradual-experiment.ts` と関連テスト（PR #85）。
+- 会話の現状と実験を混同しない：acting-labはSupabase書込なし・production 404・APIキー必須の単発Gemini生成だが、`contents: []` 固定、fallback persona使用、実運用の記憶/感情/行動/Root State/プロンプト全体を再現しない。**複数往復・AIユーザー役・AI評価役・ログ比較・自動チューニングは未実装**。開発環境での認証/レート制限/費用上限を確認するまで公開・大量実行しない。
+
+### ここまでの検証・監査の棚卸し（種類と限界を保持）
+
+| 対象 | 実施済み・存在する成果 | 未実施・残件 |
+|---|---|---|
+| canonical root / 匿名→メール保存 / 復元 | 過去の回帰試験、RPC/SQL照合、再試行・二重加点・失敗時非加点等の構造確認。PR #29時点で29/29回帰成功という過去記録あり | 当時のP1（保存再試行時の追加会話、匿名Body Clockの反映）の**現時点解消・本番適用は再確認要**。古い試験結果を現在のProduction保証としない |
+| Relationship Engine v1/v1.1 | Evidence→Episode→Pattern→5-axis、critical event、lease/idempotency、SQL/RPC、匿名importの設計と多数の自動試験。3独立Tokyo日等の仕様あり | 実ユーザーとの長期会話での成長速度・質感の実測は未実施。DB本番migration状態は別途照合 |
+| Relationship Acting Guide | `tests/relationship-acting-guide.test.ts`、PR #83の演技指示比較、PR #84の5軸成長速度・閾値レビュー、PR #85の中間段階（0–19/20–49/50–79/80–100）純関数・統合候補・playfulness境界テスト | **Geminiの実返答の自然さ、魅力、差分は未測定**。PR #85は実験・未接続。0–19等は提案で本番閾値の確定ではない |
+| Prompt / DTO / 正本接続 | `docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md`、`RELATIONSHIP_ACTING_DTO_CANONICAL_CONTRACT_20261015.md`、関連source/contractテスト | 一部テストはソース文字列照合であり実行時のend-to-end証明ではない。実モデル会話でのプロンプト競合・優先順位は未観察 |
+| Body Clock と5軸/交際状態 | PR #85に parity、romantic/miss_youタグ、prompt境界、adapter、source normalizationの監査とテスト。関連文書 `docs/RELATIONSHIP_BODY_CLOCK_*_20261015.md` | EdgeのBody Clockに5軸Acting Guideを正式接続していない。交際前のromanticタグや通常チャットとの人格差を実Geminiで評価していない |
+| Relationship version / race | v2 state/critical event RPC、匿名importが `relationship_state_version` を増分するSQLを確認。Body Clock finishは会話updated_at/匿名revisionを比較する実装を確認 | Body Clock finishは5軸version未照合。legacy emotion/action/intimacy writerはversion非増分。全writer網羅、DB実効定義、競合・rollbackテストは未完了。詳細 `RELATIONSHIP_BODY_CLOCK_EXISTING_VERSION_AUDIT_20261015.md`、`RELATIONSHIP_BODY_CLOCK_IMPORT_VERSION_AUDIT_20261015.md`、`RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md` |
+| Relationship Identity | 意味論・11候補・hysteresis・constraint・canonical persistence/worker順序を総覧に仕様化 | Identityを実装済みと扱わない。classifier値/constraint解除条件未freeze。5軸との混同禁止 |
+| Gemini Shadow / 性能最適化 | PR #66のShadow障害と未測定指標を記録。3-call置換を無条件適用しない方針 | 実Gemini Shadow未実施（当時APIキーなし、正本を書かない専用入口なし）。品質・性能の実測なし |
+| 会話育成 | 2026-10-15に既存 acting-lab のソースを確認、会話シナリオ・評価軸・安全ゲートを `CONVERSATION_TUNING_LAB_PLAN_20261015.md` に作成 | 実会話の収集、複数往復、AIユーザー役、AI評価、改善前後比較、プロンプトの反復調整は**これから** |
+
+上記は**既存の検証を捨てないための引継ぎ索引**であり、リポジトリ内の全テスト・全PRの網羅的再実行完了を意味しない。詳細は既存各節と実ファイルを優先し、変更前に最新mainとの差分を再照合すること。
+
+### Draft PR と本番境界（2026-10-15 確認）
+- PR #66：Forget Control / Shadow関連の記録あり、Draft・未merge。
+- PR #83：canonical関係性演技指示の比較テスト、Draft・未merge。
+- PR #84：5軸成長速度・設計レビュー、Draft・未merge。
+- PR #85：5軸中間演技実験、Body Clock関連の各監査・実験テスト、会話育成計画、**本節**。Draft・未merge。
+- この引継ぎ更新はPR #85の文書のみ。**mainへのmerge、Production deploy、DB migration、Edge Function変更、Gemini有料呼出しは行っていない。** PRの内容を本番実装と混同しない。
+
+### 新チャットでの実行順（最初の具体作業）
+1. 本総覧と最新main、PR #85の差分を照合し、`acting-lab` の認証・呼出回数・リトライ費用・ログ保存方針を確定する。
+2. 本番の正本・記憶・親密度・関係性を変更しない**隔離された会話実験runner**を設計・実装する。まず固定された人間作成シナリオを使い、モデル履歴 `contents` を使う5〜20往復を再現可能にする。ユーザー役AI・評価役AIは段階的に追加。
+3. 人格・感情・関係性を固定して「素の美咲」の実際の発話を集め、自然さ・個性・文脈・質問連打・作話・距離感・反復をレビュー。実例に基づき小さくチューニングする。
+4. 同じシナリオで感情・行動差、次に5軸・Identity・交際状態差を確認。単発演技指示テストを会話品質の実測と混同しない。
+5. せいちゃんには代表会話の良否・美咲らしさの判断を依頼。**API利用料が発生する実Gemini呼出しは、想定回数と上限を提示して明示承認後に実行**。Productionへの変更・PR mergeも別途承認。
+
+### 新チャット開始文（コピー用）
+「美咲の会話育成を始めよう。GitHub `miyazaki1016/misaki` の `docs/IMPLEMENTATION_OVERVIEW.md` 最新版とPR #85の `docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md`、最新mainの実装を照合して。まず既存acting-labの安全性を点検し、本番正本を書かずに多角的・複数往復の会話を観察・チューニングできる環境を整えて。過去の構造テストと実Gemini会話の品質評価を混同しないこと。課金実行と本番変更は承認前にしないこと。未来のソラを信用するな、総覧を信用しろ。」
