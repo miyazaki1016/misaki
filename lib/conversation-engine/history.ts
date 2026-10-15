@@ -48,6 +48,6 @@ export function sanitizeConversationHistory(
         (item.role === "user" || item.role === "misaki") &&
         typeof item.text === "string",
     )
-    .slice(-maxHistory)
+    .slice(maxHistory === 0 ? Infinity : -maxHistory)
     .map((item) => ({ role: item.role, text: item.text }));
 }
