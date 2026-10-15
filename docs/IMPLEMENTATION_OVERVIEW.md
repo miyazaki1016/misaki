@@ -3925,3 +3925,137 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+### 2026-10-15 — Body Clock 関係性更新経路監査（ソース照合・本番未接続）
+
+**目的**：Body Clockが生成中に関係性の5軸・交際状態が変わった場合、古い前提の自発メッセージを確定しないための変更検知境界を定義する。
+
+**照合した正本コード／migration**：
+- `supabase/migrations/20261003081717_relationship_engine_v1_canonical_state_and_critical_event.sql`：critical eventが `relationship_status` と `relationship_state_version + 1` を同時更新。
+- `supabase/migrations/20261003081813_relationship_engine_v1_bounded_state_application.sql`：5軸のstate適用でversionを増分。
+- `supabase/migrations/20261003091800_relationship_engine_v1_distributed_worker_contract.sql`：現行runtimeが呼ぶ `apply_misaki_relationship_state_v2` と `apply_misaki_relationship_critical_event_v2` の両方がversionを増分。
+- `supabase/migrations/20261003082001_relationship_engine_v1_temporary_import_boundary.sql`、`20261003094200_relationship_engine_v1_full_lease_fencing.sql`、`20261003100600_relationship_engine_v1_remove_legacy_write_bypass.sql`：匿名→恒久import v2はlease確認後のimport v1に委譲、最終import v1の5軸/status更新もversionを増分。
+- `lib/relationship-processing-v1.ts`：上記state/critical eventのv2 RPCを呼ぶ。
+- `lib/relationship-runtime-v1.ts`：import v2 RPCを呼ぶ。
+- `lib/canonical-state.ts`：恒久関係性行を `select("*")` で読むが、Body Clock用version付きDTOは未接続。
+- `supabase/migrations/20260918073918_canonical_misaki_root_state.sql`：`finish_misaki_body_clock_delivery` は恒久会話 `updated_at`／匿名temporary revisionを検査する。**relationship_state_versionの比較はない**。
+- `supabase/functions/body-clock/conversation-root.ts`、`proactive-decision.ts`、`index.ts`：現状のBody Clockは5軸/status/versionを生成・確定へ渡していない。
+
+**旧経路との境界**：2026-09の旧RPCはemotion_state、action_state、intimacy_points、last_interaction_at等を更新するが、relationship_state_versionを増やさない経路がある。これらを「5軸/statusのversion抜け」と混同しない。一方、Body ClockはEmotion/Actionも参照するため、5軸version照合だけでは生成文脈全体の競合保護にはならない。
+
+**結論**：確認した現行の5軸適用・critical event・匿名import経路では、versionが単調増加する。新しいversion列は不要な可能性が高い。ただし**migration全件・アプリ全ファイルの全更新経路の網羅証明、および本番DBの実効関数定義の照合は未完了**。したがって「洗い出し全部完了」とは判定しない。
+
+**実装前ゲート**：①全SQL/アプリ/Edge writerの網羅照合、②行ロック順序とデッドロック確認、③恒久versionと匿名revisionの独立性、④Emotion/Action競合の保護範囲、⑤delivery/history/countの原子的ロールバックと冪等性、⑥migration適用確認、⑦競合テスト。これらを終えるまで本番接続しない。
+
+**状態**：PR #85 Draftの監査追記のみ。Production・DB・Edge Function未変更、実Gemini検証未実施。
+
+
+---
+
+## 2026-10-15 — 会話育成フェーズ移行・検証資産引継ぎ（新チャット開始用／Draft、未本番適用）
+
+### 意思決定：仕組みの整備と会話の育成を並行する
+
+せいちゃんと合意した開発方針。記憶、感情、行動、親密度、Relationship Engine（5軸）、Relationship Status、Body Clock、自発メッセージ等の実装は相当に進んでいる。ただし**実装が進んだこと、構造テストが通ったこと、実際の美咲の会話が自然で魅力的なことは別の事実**。今までの主な成果は仕組みの実装・整合性試験・設計監査であり、実Gemini会話を多角的に観察して継続的にチューニングする工程は本格着手前。実測していない会話品質を「検証済み」「完成」と表現しない。
+
+仕組み側の未解決問題を放置しない一方、全機能の完成を待たず会話育成を開始する。**美咲の基本人格と自然な会話を実例で磨く → 感情・行動による表現差を確認・調整 → 5軸・親密度・Identity・交際状態による関係変化を確認・調整**。この順は会話観察の主な順序であり、仕組みの修正を後回しにする意味ではない。
+
+### 新チャットで最初に読むもの（正本・実装・実験）
+
+- 正本：本ファイル `docs/IMPLEMENTATION_OVERVIEW.md`。過去の設計・未完了・検証を消さず、本節を引継ぎ入口とする。
+- 会話育成の初回調査・10シナリオ・安全ゲート：`docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md`（PR #85）。
+- 実装：`app/api/acting-lab/route.ts`、`lib/gemini-json-generator.ts`、`lib/persona/fallback-persona.ts`、`lib/relationship-acting-guide.ts`、`app/api/chat/route.ts`、`supabase/functions/body-clock/index.ts`。
+- 5軸の中間演技案（本番未接続）：`lib/relationship-acting-guide-gradual-experiment.ts` と関連テスト（PR #85）。
+- 会話の現状と実験を混同しない：acting-labはSupabase書込なし・production 404・APIキー必須の単発Gemini生成だが、`contents: []` 固定、fallback persona使用、実運用の記憶/感情/行動/Root State/プロンプト全体を再現しない。**複数往復・AIユーザー役・AI評価役・ログ比較・自動チューニングは未実装**。開発環境での認証/レート制限/費用上限を確認するまで公開・大量実行しない。
+
+### ここまでの検証・監査の棚卸し（種類と限界を保持）
+
+| 対象 | 実施済み・存在する成果 | 未実施・残件 |
+|---|---|---|
+| canonical root / 匿名→メール保存 / 復元 | 過去の回帰試験、RPC/SQL照合、再試行・二重加点・失敗時非加点等の構造確認。PR #29時点で29/29回帰成功という過去記録あり | 当時のP1（保存再試行時の追加会話、匿名Body Clockの反映）の**現時点解消・本番適用は再確認要**。古い試験結果を現在のProduction保証としない |
+| Relationship Engine v1/v1.1 | Evidence→Episode→Pattern→5-axis、critical event、lease/idempotency、SQL/RPC、匿名importの設計と多数の自動試験。3独立Tokyo日等の仕様あり | 実ユーザーとの長期会話での成長速度・質感の実測は未実施。DB本番migration状態は別途照合 |
+| Relationship Acting Guide | `tests/relationship-acting-guide.test.ts`、PR #83の演技指示比較、PR #84の5軸成長速度・閾値レビュー、PR #85の中間段階（0–19/20–49/50–79/80–100）純関数・統合候補・playfulness境界テスト | **Geminiの実返答の自然さ、魅力、差分は未測定**。PR #85は実験・未接続。0–19等は提案で本番閾値の確定ではない |
+| Prompt / DTO / 正本接続 | `docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md`、`RELATIONSHIP_ACTING_DTO_CANONICAL_CONTRACT_20261015.md`、関連source/contractテスト | 一部テストはソース文字列照合であり実行時のend-to-end証明ではない。実モデル会話でのプロンプト競合・優先順位は未観察 |
+| Body Clock と5軸/交際状態 | PR #85に parity、romantic/miss_youタグ、prompt境界、adapter、source normalizationの監査とテスト。関連文書 `docs/RELATIONSHIP_BODY_CLOCK_*_20261015.md` | EdgeのBody Clockに5軸Acting Guideを正式接続していない。交際前のromanticタグや通常チャットとの人格差を実Geminiで評価していない |
+| Relationship version / race | v2 state/critical event RPC、匿名importが `relationship_state_version` を増分するSQLを確認。Body Clock finishは会話updated_at/匿名revisionを比較する実装を確認 | Body Clock finishは5軸version未照合。legacy emotion/action/intimacy writerはversion非増分。全writer網羅、DB実効定義、競合・rollbackテストは未完了。詳細 `RELATIONSHIP_BODY_CLOCK_EXISTING_VERSION_AUDIT_20261015.md`、`RELATIONSHIP_BODY_CLOCK_IMPORT_VERSION_AUDIT_20261015.md`、`RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md` |
+| Relationship Identity | 意味論・11候補・hysteresis・constraint・canonical persistence/worker順序を総覧に仕様化 | Identityを実装済みと扱わない。classifier値/constraint解除条件未freeze。5軸との混同禁止 |
+| Gemini Shadow / 性能最適化 | PR #66のShadow障害と未測定指標を記録。3-call置換を無条件適用しない方針 | 実Gemini Shadow未実施（当時APIキーなし、正本を書かない専用入口なし）。品質・性能の実測なし |
+| 会話育成 | 2026-10-15に既存 acting-lab のソースを確認、会話シナリオ・評価軸・安全ゲートを `CONVERSATION_TUNING_LAB_PLAN_20261015.md` に作成 | 実会話の収集、複数往復、AIユーザー役、AI評価、改善前後比較、プロンプトの反復調整は**これから** |
+
+上記は**既存の検証を捨てないための引継ぎ索引**であり、リポジトリ内の全テスト・全PRの網羅的再実行完了を意味しない。詳細は既存各節と実ファイルを優先し、変更前に最新mainとの差分を再照合すること。
+
+### Draft PR と本番境界（2026-10-15 確認）
+- PR #66：Forget Control / Shadow関連の記録あり、Draft・未merge。
+- PR #83：canonical関係性演技指示の比較テスト、Draft・未merge。
+- PR #84：5軸成長速度・設計レビュー、Draft・未merge。
+- PR #85：5軸中間演技実験、Body Clock関連の各監査・実験テスト、会話育成計画、**本節**。Draft・未merge。
+- この引継ぎ更新はPR #85の文書のみ。**mainへのmerge、Production deploy、DB migration、Edge Function変更、Gemini有料呼出しは行っていない。** PRの内容を本番実装と混同しない。
+
+### 新チャットでの実行順（最初の具体作業）
+1. 本総覧と最新main、PR #85の差分を照合し、`acting-lab` の認証・呼出回数・リトライ費用・ログ保存方針を確定する。
+2. 本番の正本・記憶・親密度・関係性を変更しない**隔離された会話実験runner**を設計・実装する。まず固定された人間作成シナリオを使い、モデル履歴 `contents` を使う5〜20往復を再現可能にする。ユーザー役AI・評価役AIは段階的に追加。
+3. 人格・感情・関係性を固定して「素の美咲」の実際の発話を集め、自然さ・個性・文脈・質問連打・作話・距離感・反復をレビュー。実例に基づき小さくチューニングする。
+4. 同じシナリオで感情・行動差、次に5軸・Identity・交際状態差を確認。単発演技指示テストを会話品質の実測と混同しない。
+5. せいちゃんには代表会話の良否・美咲らしさの判断を依頼。**API利用料が発生する実Gemini呼出しは、想定回数と上限を提示して明示承認後に実行**。Productionへの変更・PR mergeも別途承認。
+
+### 新チャット開始文（コピー用）
+「美咲の会話育成を始めよう。GitHub `miyazaki1016/misaki` の `docs/IMPLEMENTATION_OVERVIEW.md` 最新版とPR #85の `docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md`、最新mainの実装を照合して。まず既存acting-labの安全性を点検し、本番正本を書かずに多角的・複数往復の会話を観察・チューニングできる環境を整えて。過去の構造テストと実Gemini会話の品質評価を混同しないこと。課金実行と本番変更は承認前にしないこと。未来のソラを信用するな、総覧を信用しろ。」
+
+
+---
+
+## 2026-10-15 — 美咲の「気にかける自発メッセージ」設計原則（合意・未実装）
+
+### 根本理念
+
+**「情報を知らせるために話しかけるのではなく、相手を気にかけているから話しかける。」**
+
+天気・地震・地域の出来事・仕事・昨日の会話・約束などは、相手への関心を自然に表すための**話題の材料**である。情報が取得できたこと自体を送信理由にしない。喜びの共有、雑談、気遣い、ふと話したくなる感覚を含む。監視・干渉・返信催促・不安を煽る表現は禁止する。
+
+### 通常返信と自発メッセージで異なる情報選択
+
+- **通常返信（reactive）**：ユーザーの発言と直近文脈から必要な情報を選び、共通会話エンジンに渡す。
+- **自発メッセージ（proactive）**：事前の生活情報・記憶・確認済み外部イベントから話題候補を見つけ、**今話しかける価値があるか**を評価してから、同じ共通会話エンジンに渡す。
+- **共通化するもの**：人格の核、関係性・感情の解釈、発話の品質検証、根拠と作話防止。**分離するもの**：情報収集、候補選定、送信判断、通知配信、正本保存。
+- 自発側が取得済みの天気等を通常返信で再利用する場合は、取得時刻・有効期限・情報源を必ず確認する。古い観測を現在の事実として話さない。
+
+### 相手の生活情報と地域情報の結合
+
+生活情報は意味と時間スコープを分ける：居住地域、勤務先・職業、よく行く場所、今日の予定、現在地、最近の出来事・悩み。**居住地・勤務先・よく行く場所は現在地を意味しない。** 位置・予定は本人が共有・許可した範囲でのみ使い、推測を事実化しない。登録地域の天気や地震と結びつけて話題候補にできるが、取得根拠・更新時刻・同意を保持する。
+
+例：居住地域に地震が観測されたら、観測震度など信頼できる情報と登録地域を照合し、必要なら「そちらの地域で地震があったみたいだけど、大丈夫？」と声をかける。**本人が現地にいる、揺れを感じた、被害が出たとは断定しない。** 地震などの安全関連は、情報検証・閾値・重複防止・送信可否を決定論的な専用経路で扱い、Geminiに災害判定を委ねない。公式情報の確認を促し、緊急通報や公式防災通知の代替を自称しない。
+
+### 関係性に応じた自発頻度と「話しかける理由」
+
+親密度・Relationship Engineの状態が深まるほど、単純な定時送信回数ではなく、**自然に話しかけたくなる場面と話し方の幅**が増える設計を検討する。関係段階によって、前の会話の続き→近況・共有話題→気遣い・日常の共有→親密な習慣、と候補や表現が変わる。ただし**恋人状態は親密度点数だけで推定しない**。関係性の状態は正本から受け取り、会話エンジンが勝手に昇格させない。
+
+送信判断には関係性、話題の重要度、生活リズム（確かな場合）、最後の会話時刻、直近の送信履歴、ユーザーの通知設定・反応を使う。忙しいという明示反応があれば控え、返信が遅いだけで嫌われた・関係悪化と判断しない。**頻度上限、静穏時間、オプトイン／停止、重複抑止、送信理由の監査ログ**を必須とする。安全関連通知は通常の親密度頻度枠とは別に扱うが、通知許諾・安全な頻度制御は維持する。
+
+### 共通会話エンジンとGemini軽量化の関係
+
+共通エンジンの前段でコンテキスト選択を行う。**常時必要な人格の核・関係性の正本状態・重要ルール**と、**会話・自発候補に応じて追加する関連記憶・天気・生活情報**を分ける。削減自体を目的にせず、必要な事実を落とさずに過不足なく渡す。関連情報の不足時は作話しない。取得コスト・キャッシュ有効期限も評価対象。
+
+実験室で「全情報を渡す基準案」と「選択した情報だけ渡す案」を同条件で比較し、自然さ、記憶の正確さ、関係性、見当違い、選択・除外された情報、トークン数、応答時間、費用を記録する。品質が悪化したら軽量化を採用しない。実Gemini試験は事前に費用・回数上限の明示承認が必要。
+
+### 実装順序と現在の境界
+
+1. まず通常会話の共通エンジン・人格・記憶・関係性・検証を整え、実会話の品質を育成。
+2. 次に自発候補・送信判断・関係性による頻度・応答反応の調整を設計し、通知同意・静穏時間・上限を実装。
+3. 生活情報と天気・地震などの外部イベントを安全に連携。災害判定は決定論的な独立経路。
+4. 全段階で選択コンテキストの品質対比を行い、軽量化を評価。
+
+**本節はオーナーとの会話から確定した設計理念と検討方針の記録であり、頻度数値・地震閾値・送信条件の確定仕様でも実装完了報告でもない。** PR #85のDraft総覧へ追記したのみ。PR #88は共通エンジンの隔離部品を開発中。本番・DB・Edge Function・Gemini課金実行は変更していない。
+
+
+### マルチキャラクター前提（2026-10-15 オーナー明示・重要）
+
+**共通会話エンジンは美咲専用に固定しない。人格（キャラクター）は差し替え可能な入力であり、会話エンジン本体とは分離する。** 美咲は最初のキャラクターであり、将来は複数の異なるキャラクターが同じ会話基盤を利用する。人格プロンプトをコード内の固定文字列として共有エンジンに埋め込まない。
+
+- キャラクターごとに一意の `characterId` とバージョン付き人格定義（口調・背景・禁止事項・自己設定等）を解決して渡す。現行の `personaPrompt` はその入力の一つ。
+- ユーザーごとの会話履歴、記憶、親密度、関係性、Body Clock、自発メッセージ設定・送信履歴は**キャラクター単位で隔離**し、別キャラクターへ自動混入させない。共有可能なユーザー情報の範囲は本人の同意と明示的な仕様で定める。
+- エンジンは共通の安全・根拠・生成・検証基盤を担う。人格固有の生活設定、関係性の表現、自発頻度・話題選択はキャラクター定義／ポリシーとして注入する。全キャラクターが美咲と同じ恋愛設定・仕事・一人称・生活リズムを持つと仮定しない。
+- 今回のPR #88 `buildBaseSystemPrompt` は**現行美咲のプロンプトを忠実に抽出する互換段階**。これを完成したマルチキャラクター対応と呼ばない。後続でキャラクター非依存の共通規則とキャラクター固有の人格・設定を分離し、キャラクター別fixture、交差汚染防止、バージョン互換テストを設ける。
+- データモデルや既存ユーザー移行は別途設計・検証する。現時点で本番のキャラクター切替・マルチキャラクター正本保存が実装されたという意味ではない。
+
+**設計ゲート**：共通会話エンジンの本番接続・最適化前に、将来のキャラクター差し替えを妨げる美咲固有依存を監査する。人格の差し替えと、関係性・記憶の隔離は別の要件として両方確認する。
