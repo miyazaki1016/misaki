@@ -3925,3 +3925,27 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+### 2026-10-15 — Body Clock 関係性更新経路監査（ソース照合・本番未接続）
+
+**目的**：Body Clockが生成中に関係性の5軸・交際状態が変わった場合、古い前提の自発メッセージを確定しないための変更検知境界を定義する。
+
+**照合した正本コード／migration**：
+- `supabase/migrations/20261003081717_relationship_engine_v1_canonical_state_and_critical_event.sql`：critical eventが `relationship_status` と `relationship_state_version + 1` を同時更新。
+- `supabase/migrations/20261003081813_relationship_engine_v1_bounded_state_application.sql`：5軸のstate適用でversionを増分。
+- `supabase/migrations/20261003091800_relationship_engine_v1_distributed_worker_contract.sql`：現行runtimeが呼ぶ `apply_misaki_relationship_state_v2` と `apply_misaki_relationship_critical_event_v2` の両方がversionを増分。
+- `supabase/migrations/20261003082001_relationship_engine_v1_temporary_import_boundary.sql`、`20261003094200_relationship_engine_v1_full_lease_fencing.sql`、`20261003100600_relationship_engine_v1_remove_legacy_write_bypass.sql`：匿名→恒久import v2はlease確認後のimport v1に委譲、最終import v1の5軸/status更新もversionを増分。
+- `lib/relationship-processing-v1.ts`：上記state/critical eventのv2 RPCを呼ぶ。
+- `lib/relationship-runtime-v1.ts`：import v2 RPCを呼ぶ。
+- `lib/canonical-state.ts`：恒久関係性行を `select("*")` で読むが、Body Clock用version付きDTOは未接続。
+- `supabase/migrations/20260918073918_canonical_misaki_root_state.sql`：`finish_misaki_body_clock_delivery` は恒久会話 `updated_at`／匿名temporary revisionを検査する。**relationship_state_versionの比較はない**。
+- `supabase/functions/body-clock/conversation-root.ts`、`proactive-decision.ts`、`index.ts`：現状のBody Clockは5軸/status/versionを生成・確定へ渡していない。
+
+**旧経路との境界**：2026-09の旧RPCはemotion_state、action_state、intimacy_points、last_interaction_at等を更新するが、relationship_state_versionを増やさない経路がある。これらを「5軸/statusのversion抜け」と混同しない。一方、Body ClockはEmotion/Actionも参照するため、5軸version照合だけでは生成文脈全体の競合保護にはならない。
+
+**結論**：確認した現行の5軸適用・critical event・匿名import経路では、versionが単調増加する。新しいversion列は不要な可能性が高い。ただし**migration全件・アプリ全ファイルの全更新経路の網羅証明、および本番DBの実効関数定義の照合は未完了**。したがって「洗い出し全部完了」とは判定しない。
+
+**実装前ゲート**：①全SQL/アプリ/Edge writerの網羅照合、②行ロック順序とデッドロック確認、③恒久versionと匿名revisionの独立性、④Emotion/Action競合の保護範囲、⑤delivery/history/countの原子的ロールバックと冪等性、⑥migration適用確認、⑦競合テスト。これらを終えるまで本番接続しない。
+
+**状態**：PR #85 Draftの監査追記のみ。Production・DB・Edge Function未変更、実Gemini検証未実施。
