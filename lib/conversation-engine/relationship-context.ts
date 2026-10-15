@@ -9,7 +9,7 @@ import {
   createLegacyRelationshipActingState,
   createRelationshipActingGuide,
   type RelationshipActingState,
-} from "../relationship-acting-guide";
+} from "../relationship-acting-guide.ts";
 
 export type RelationshipGuideSnapshot = Readonly<{
   points: number;
