@@ -68,3 +68,5 @@
 3. Anti-leakage tests need contrasting characters, unrelated user-character memories, diverse occupations, cities, stages and schedules.
 4. Maintain production original for Misaki until **full prompt comparison**, structured JSON validation, retry and canonical persistence are verified.
 5. No production wiring, PR merge, DB migration or paid model call without explicit authorization.
+
+Schema key checklist: `reply`, `memory`, `relationshipSignals`, `signals`, `relationshipFacts`, `mutualAffectionExplicit`, `datingEstablishedExplicit`, `misakiTodayMemory`, `date`, `items`. These names belong to the old contract pending a reviewed adapter.
