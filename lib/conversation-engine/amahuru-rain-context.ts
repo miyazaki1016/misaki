@@ -52,7 +52,7 @@ export function selectUsableRainContext(raw: unknown, expectedAreaCode: string, 
       (s.payload.rainStartMinutes !== undefined && (!Number.isFinite(s.payload.rainStartMinutes) || s.payload.rainStartMinutes < 0))) {
     return { usable: false, reason: "MALFORMED" };
   }
-  if (parseTime(s.validFrom) > nowMs || parseTime(s.validUntil) <= nowMs ||
+  if ((s.status === "observation" && parseTime(s.validFrom) > nowMs) || parseTime(s.validUntil) <= nowMs ||
       parseTime(s.issuedAt) > nowMs || parseTime(s.receivedAt) > nowMs) {
     return { usable: false, reason: "OUTSIDE_VALIDITY" };
   }
