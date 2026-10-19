@@ -66,3 +66,22 @@ test("malformed model reply fails without another physical attempt", async () =>
   await assert.rejects(runLiveSmokeProbe({ apiKey: "test", approved: true, fetcher, manifest }), /INCOMPLETE_1/);
   assert.equal(calls, 1);
 });
+
+test("invalid manifest never spends a physical API request", async () => {
+  let calls = 0;
+  const fetcher: typeof fetch = async () => { calls++; return mock("", {}); };
+  const base = { apiKey: "test", approved: true, fetcher };
+  await assert.rejects(runLiveSmokeProbe({
+    ...base, manifest: { ...manifest, timeFixture: "invalid" },
+  }), /TIME_INVALID/);
+  await assert.rejects(runLiveSmokeProbe({
+    ...base, manifest: { ...manifest, captureId: "" },
+  }), /MANIFEST_INVALID/);
+  await assert.rejects(runLiveSmokeProbe({
+    ...base, manifest: { ...manifest, modelName: "different-model" },
+  }), /MODEL_MISMATCH/);
+  await assert.rejects(runLiveSmokeProbe({
+    ...base, manifest: { ...manifest, memoryFixtureId: "actual-user-memory" },
+  }), /FIXTURE_MISMATCH/);
+  assert.equal(calls, 0);
+});
