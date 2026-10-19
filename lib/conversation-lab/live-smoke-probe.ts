@@ -9,9 +9,13 @@ const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/" + LI
 
 export type SmokeFailureCode = "api_auth" | "api_rate_limit" | "api_model" | "api_server" | "api_other" | "timeout_or_network" | "response_shape" | "response_json" | "response_size" | "unknown";
 export class SmokeProbeFailure extends Error {
-  constructor(public readonly code: SmokeFailureCode, public readonly physicalCalls: number) {
+  readonly code: SmokeFailureCode;
+  readonly physicalCalls: number;
+  constructor(code: SmokeFailureCode, physicalCalls: number) {
     super("SMOKE_PROBE_FAILED");
     this.name = "SmokeProbeFailure";
+    this.code = code;
+    this.physicalCalls = physicalCalls;
   }
 }
 function classifyHttp(status: number): SmokeFailureCode {
