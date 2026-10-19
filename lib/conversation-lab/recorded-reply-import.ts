@@ -54,7 +54,7 @@ export function importRecordedQualityReplies(input: {
     throw new Error("RECORDED_QUALITY_CONSENT_STATUS_INVALID");
   }
   const parsedDate = Date.parse(manifest.timeFixture);
-  if (!Number.isFinite(parsedDate) || !/Z$|[+-]\\d\\d:\\d\\d$/.test(manifest.timeFixture)) {
+  if (!Number.isFinite(parsedDate) || !/(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(manifest.timeFixture)) {
     throw new Error("RECORDED_QUALITY_TIME_INVALID");
   }
   const turns: LabRun["turns"] = [];
