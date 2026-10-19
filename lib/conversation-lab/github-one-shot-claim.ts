@@ -41,3 +41,40 @@ export async function claimOneShotInGitHub(input: {
   // auth errors or uncertain network outcome must NEVER trigger Gemini.
   return response.status === 201 ? "claimed" : "denied";
 }
+
+
+/**
+ * Read-only quota check for the Preview status screen.
+ * This never creates a reservation or touches Gemini.
+ * Unknown/failed GitHub lookups fail closed.
+ */
+export async function readOneShotStatusInGitHub(input: {
+  token: string;
+  repository: string;
+  branch: string;
+  runKey: "q02-preview-v1";
+  fetcher?: typeof fetch;
+}): Promise<"available" | "used" | "unknown"> {
+  const { token, repository, branch, runKey, fetcher = fetch } = input;
+  if (!token || repository !== "miyazaki1016/misaki-q02-smoke-quota" ||
+      branch !== "main" || runKey !== "q02-preview-v1") return "unknown";
+  const url = "https://api.github.com/repos/" + repository +
+    "/contents/one-shot-claims/" + runKey + ".json?ref=" + encodeURIComponent(branch);
+  try {
+    const response = await fetcher(url, {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + token,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (response.status === 200) return "used";
+    if (response.status === 404) return "available";
+    return "unknown";
+  } catch {
+    return "unknown";
+  }
+}
