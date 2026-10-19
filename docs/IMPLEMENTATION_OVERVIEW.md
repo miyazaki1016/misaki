@@ -3968,3 +3968,12 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - ユーザーのiPhone実画面で `このPreviewではログイン情報がありません` を確認。異なるPreviewドメインにはセッションが共有されないため、正常な状態。
 - `/conversation-review` に本人の明示的な確認ダイアログ付き `テスト用ログインを作る` ボタンを追加。ユーザー操作後にSupabase Authの `signInAnonymously()` を実行し、発行されたユーザーUIDを画面に表示/コピー可能にする。**ボタンを押す前はAuth書き込みなし**。Authユーザー1件作成は美咲の既存Supabaseプロジェクトに対する書き込みであり、本番データベースに全く変更がないという主張は不可。ただし会話履歴/記憶を変更するAPIは呼ばない。
 - 自動生成のQ02ボタンは引き続き未設定・無効のまま。匿名UIDを確認した後、サーバーの専用オーナーUID設定・GitHub quota設定・事前検証が必要。
+
+
+### 2026-10-19 Q02 Previewの固定URLと匿名ログインの注意（PR #86）
+
+- Vercel自動生成のブランチ固定alias: `https://misaki-git-experiment-conversation-lab-offlin-186654-kishibojim.vercel.app/conversation-review`。commit別の一時URLではなく、このaliasをiPhoneのブックマークとして使う。ブランチの新しいPreviewデプロイで自動的に宛先が更新されることをVercel alias APIで確認。
+- 2026-10-19 にユーザーが作った匿名テストUIDを `MISAKI_SMOKE_OWNER_UID` として**Preview・当該ブランチ限定**でVercelに登録済み。ただし、UIDを作った時のcommit個別URLと固定aliasは異なるオリジンなので、SafariのlocalStorageセッションは自動引き継ぎされない。
+- ユーザーに固定aliasでのAuth状態を確認してもらい、必要なら**明示同意のうえ別のテスト匿名UIDを作成**する。作成されたUIDを受け取ってからPreview-onlyのOWNER_UIDを更新する。古いUIDがログインできると誤認しない。
+- `MISAKI_SMOKE_GITHUB_TOKEN` はVercelのSensitiveとして登録を確認。環境設定は**デプロイ単位**で固定されるため、登録後に新しいPreviewデプロイを作って初めて反映される。実行フラグは未登録でOFF。Secret値を取得・ログ出力しない。
+- 新規Supabaseプロジェクト、本番アプリ/DBの会話履歴・記憶変更なし。Q02モデルの実呼び出しは未実施。
