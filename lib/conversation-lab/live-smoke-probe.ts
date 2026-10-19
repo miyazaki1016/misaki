@@ -36,6 +36,8 @@ export async function runLiveSmokeProbe(input: {
   apiKey: string;
   approved: boolean;
   fetcher?: typeof fetch;
+  /** For deterministic offline timeout tests; production never exceeds 15 seconds. */
+  timeoutMs?: number;
   manifest: RecordedReplyManifest;
 }) {
   if (input.approved !== true || !input.apiKey.trim()) {
@@ -72,7 +74,8 @@ export async function runLiveSmokeProbe(input: {
       "JSONのみ返してください。形式: {\"reply\":\"美咲の返事\"}",
     ].join("\n\n");
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15_000);
+    const duration = Number.isFinite(input.timeoutMs) ? Math.min(15_000, Math.max(1, input.timeoutMs!)) : 15_000;
+    const timeout = setTimeout(() => controller.abort(), duration);
     let response: Response;
     try {
       try {
