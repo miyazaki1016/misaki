@@ -24,6 +24,30 @@ export default function ConversationReviewPage() {
   const [running, setRunning] = useState(false);
   const [runMessage, setRunMessage] = useState("");
   const [smokeReady, setSmokeReady] = useState(false);
+  const [identityStatus, setIdentityStatus] = useState<"checking" | "signed-in" | "missing">("checking");
+  const [ownerUid, setOwnerUid] = useState("");
+  const [copiedUid, setCopiedUid] = useState(false);
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!active) return;
+      const uid = error ? "" : data.session?.user?.id || "";
+      setOwnerUid(uid);
+      setIdentityStatus(uid ? "signed-in" : "missing");
+    }).catch(() => {
+      if (active) setIdentityStatus("missing");
+    });
+    return () => { active = false; };
+  }, []);
+  const copyOwnerUid = async () => {
+    if (!ownerUid) return;
+    try {
+      await navigator.clipboard.writeText(ownerUid);
+      setCopiedUid(true);
+    } catch {
+      setCopiedUid(false);
+    }
+  };
   useEffect(() => {
     let active = true;
     fetch("/api/conversation-review/smoke", { cache: "no-store" })
@@ -99,6 +123,18 @@ export default function ConversationReviewPage() {
         <strong>手入力レビューと実験用の入口</strong>
         <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンはPreview・本人認証・別の専用GitHubリポジトリでの1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
       </div>
+      <section style={{ border: "1px solid #ddd4e1", borderRadius: 12, padding: 14, marginBottom: 18 }}>
+        <strong>実験の準備状況</strong>
+        <p style={{ margin: "6px 0" }}>{smokeReady ? "サーバー設定済み（実行前に最終確認あり）" : "未設定・実験は停止中"}</p>
+        {identityStatus === "checking" && <p>iPhoneのログイン情報を確認中…</p>}
+        {identityStatus === "missing" && <p>このPreviewではログイン情報がありません。<a href="/chat">同じPreviewのチャット画面</a>でアカウントを準備してから戻ってね。</p>}
+        {identityStatus === "signed-in" && <>
+          <p style={{ fontSize: 13, margin: "8px 0" }}>この端末のテスト用ユーザーID（パスワードではありません）</p>
+          <code style={{ display: "block", overflowWrap: "anywhere", fontSize: 13 }}>{ownerUid}</code>
+          <button type="button" onClick={copyOwnerUid} style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", background: "#fff" }}>IDをコピー</button>
+          {copiedUid && <span role="status" style={{ marginLeft: 10 }}>コピーしたよ</span>}
+        </>}
+      </section>
       <button type="button" disabled={running || !smokeReady} onClick={runOneShot}
         style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running || !smokeReady ? 0.55 : 1 }}>
         {running ? "実験を確認中…" : smokeReady ? "実Geminiの2往復を試す" : "実験準備中（まだ押せません）"}
