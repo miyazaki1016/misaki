@@ -52,3 +52,7 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - **実施には**秘密鍵を安全に注入できる認可済みローカル/保護実行環境と予算上限確認が必要。現在のChatGPT実行環境には認証済みのVercel CLIも環境変数シークレットもない。VercelのプレビューはREADYだが、サーバーの環境変数をこのCLIが自動で引き継ぐわけではない。
 - この入口も本番の美咲と完全に同じコンテキストにはならない。成功してもFallback PersonaでのQ02試験の結果であり、実データの長期記憶/Relationship Engine/Body Clockは評価しない。
 - 本追補時点で、Gemini呼出しは**まだ0回**。CLI作成は実測ではない。
+
+## 実行手順の正本（2026-10-19）
+
+認証済み開発者によるワンショットCLI手順は `docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md` に固定。PR #86実験branchの `scripts/run-conversation-smoke.ts` を呼ぶ。Vercel CLIは`env run`をサポートするがSecret/Sensitive値を必ずCLIへ提供できる保証はないため、**正規のキーが利用不可なら0回で中止**。この会話内で秘密鍵を復号・転記しない。実Geminiの返信は未取得。成果判定はCI/Preview READYではなくraw応答と人手レビューの実測を待つ。
