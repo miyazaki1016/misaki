@@ -3954,3 +3954,10 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - Preview画面 `/conversation-review` にSupabaseログイン確認・端末ユーザーIDの表示/コピー機能を実装。未ログイン時は同一Previewの `/chat` へ案内。外部にIDを自動送信せず、コピーも利用者操作が必要。
 - 研究用実行ボタンは `GET /api/conversation-review/smoke` のサーバー準備状態に加え、当該iPhoneでログイン済みの条件で有効化。サーバーの本人UID照合・別private GitHub repo一度きりclaimは引き続き必須。
 - 接続済みGitHub機能には新規repo作成/PAT発行のアクションがない。これらは未実施で、生成は無効のまま。Supabase2件はそのまま。最新コミットのCI/Previewは確認完了してから記録する。
+
+
+### 2026-10-19 夜・Q02 Preview安全性追補（PR #86）
+
+- Freeプラン継続のため、専用GitHub quota repo名を `miyazaki1016/misaki-q02-smoke-quota`、ブランチを `main` に固定。別のrepo/branchが環境変数に入った場合はGemini実行前に停止。
+- iPhone画面では、Previewのログインがない場合に `/chat` へ移動させる案内を撤回。現行Previewのチャットが本番Supabaseデータへ書き込む可能性があるため、本人が誤ってテストチャットを触らないよう注意表示に変更。UI側は匿名ログインを作成せず既存セッションの読み取りのみ。
+- 専用private repo作成、最小権限PAT発行、Vercel Preview secret投入は**未実施**。現接続ツールにこれらを安全に自動作成する機能がない。本人認証のUIDも未確定。したがって実Gemini実験は引き続きOFF。実行回数0、本番DB・アメふるDBは変更なし。
