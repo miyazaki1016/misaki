@@ -4003,3 +4003,13 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - 思考部分と本文が分割されるケースに備え、レスポンスのpartsから `thought === true` でない本文テキストを選択するようにした。模擬fetcherのリクエスト形状・思考part混在のテストを追加。
 - 公式資料: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md 、https://ai.google.dev/gemini-api/docs/generate-content/thinking
 - 次の実Geminiの予約・実行は新しい明示承認まで行わない。Q02現行実験の使用済みマーカーを削除/再利用しない。
+
+
+### 2026-10-20 Q02 v2 の事前準備（追加API通信なし）
+
+- ユーザーから開発の継続指示を受けたため、v2の隔離Previewコード準備のみ行う。**有料となり得るGemini実リクエストは実行しない**。新しい実験枠の解放と実実行は具体的な上限・同意の確認後のみ。
+- v1 GitHub one-shot marker `one-shot-claims/q02-preview-v1.json` は使用済みのまま。v1 markerを削除・再利用しない。
+- 次のQ02には**別のrun key** `q02-preview-v2` を使うよう、GitHub claim helperとPreview API routeを変更。既存 `MISAKI_SMOKE_ENABLED=yes` だけでは動かさず、新たな `MISAKI_SMOKE_V2_EXPLICIT_APPROVAL=yes` と `MISAKI_SMOKE_RUN_KEY=q02-preview-v2` の両方がPreviewの限定ブランチに存在するときだけ有効。**この2つは未設定**。したがってPreviewではGET `ready=false`、POSTは404。
+- 個人Auth UIDとGitHub専用リポジトリ・PAT・Preview branch isolationを維持。GitHubのv2 one-shot remote fileに対する重複防止、1試験あたり物理リクエスト2回上限と再試行禁止を維持。
+- 実験で得た品質情報はあくまでfallbackペルソナの架空Q02二往復であり、本番美咲のパーソナリティや記憶・関係性と同一である証明には使えない。
+- 公式モデル仕様: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md , thinking: https://ai.google.dev/gemini-api/docs/generate-content/thinking.md
