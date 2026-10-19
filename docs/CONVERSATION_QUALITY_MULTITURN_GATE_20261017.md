@@ -58,3 +58,13 @@
 - これは採点結果ではない。`state: awaiting-human-review` であり、`pass` や改善率は出さない。人が根拠と判断を記録した後にのみ別の `assessQualityProbe` を用いる。
 - packet自体は**保存も送信もしない純粋なメモリ上の変換**。本物のユーザー会話を取り込む前には明示同意、秘匿化、保存先・保持期間・アクセス制限・run provenance（Geminiモデル版、prompt版、固定状態）を別途決める。`sourceClaim` は呼出側の自己申告であり真正性は検証しない。
 - Gemini API呼出し・Production DB・本番会話route・PR mergeは実施していない。GitHub Actionsを確認するまで追加変更のテストは未検証。
+
+## 2026-10-19 追補：既存返信記録のオフライン取込ゲート
+
+- `lib/conversation-lab/recorded-reply-import.ts` を追加。**他所で事前に記録された**モデル返信文字列を、固定fixtureのユーザー発話と交互に並べた完全なLabRunへ変換する。モデルAPI、Supabase、本番route、ファイル保存は一切呼ばない。
+- 取込時にはcapture ID、モデル名／版、prompt/persona版、関係性・記憶・時刻・外部情報のfixture識別子、会話の同意済み／架空fixtureの自己申告を要求。ユーザー発話は既存fixtureに固定し、返信数が不足・過剰の場合や空本文を拒否。
+- `compareRecordedReplyManifests` は比較対象の関係性・記憶・時刻・外部情報などが一致しているか確認する。prompt/モデル版は候補として変更を許すが、差分を明示して解釈する必要がある。
+- `sourceClaim: recorded-model-output` および `verification: caller-attested-unverified` は真正性を**証明しない**。第三者のスクリーンショットや人工返信を「実Gemini結果」として通す保証はない。取込後も人手で発話・根拠を照合すること。
+- 本物の会話をこの仕組みに渡すのは、本人同意、個人情報の匿名化、保管先・保持期間・権限、実モデルの生成経路・設定・ログによる出所確認を整備してから。評価のための本番ユーザー会話の無断抽出は禁止。
+- `tests/conversation-lab-recorded-reply-import.test.ts` は**架空文字列のみ**で、取り込み検証・レビューシート変換・不正な入力の拒否・比較可能性をテストする。実Gemini呼び出しや会話品質の改善は未測定。
+- Gemini実呼び出しやProduction切替、DB操作、マージは未実施。CI結果の確認まで、この追補のテスト合格を宣言しない。
