@@ -7,7 +7,7 @@ export const LIVE_SMOKE_MODEL = "gemini-3.1-flash-lite";
 export const LIVE_SMOKE_MAX_CALLS = 2;
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/" + LIVE_SMOKE_MODEL + ":generateContent";
 
-export type SmokeFailureCode = "api_auth" | "api_rate_limit" | "api_model" | "api_server" | "api_other" | "timeout_or_network" | "response_shape" | "response_json" | "response_size" | "unknown";
+export type SmokeFailureCode = "api_auth" | "api_rate_limit" | "api_model" | "api_server" | "api_other" | "timeout_or_network" | "timeout" | "network" | "response_shape" | "response_json" | "response_size" | "unknown";
 export class SmokeProbeFailure extends Error {
   readonly code: SmokeFailureCode;
   readonly physicalCalls: number;
@@ -76,7 +76,7 @@ export async function runLiveSmokeProbe(input: {
     let response: Response;
     try {
       try {
-      response = await fetcher(ENDPOINT, {
+        response = await fetcher(ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -92,15 +92,17 @@ export async function runLiveSmokeProbe(input: {
             thinkingConfig: { thinkingLevel: "minimal" },
           },
         }),
-      });
+        });
       } catch {
-        failure = "timeout_or_network";
+        // Only report timeout when OUR 15-second AbortController fired.
+        // Other transport errors (including external cancellation) are not proof of a timeout.
+        failure = controller.signal.aborted ? "timeout" : "network";
         throw new Error("MODEL_TRANSPORT_FAILED");
       }
       if (!response.ok) { failure = classifyHttp(response.status); throw new Error("MODEL_HTTP_FAILED"); }
       let raw: string;
       try { raw = await response.text(); }
-      catch { failure = "timeout_or_network"; throw new Error("MODEL_READ_FAILED"); }
+      catch { failure = controller.signal.aborted ? "timeout" : "network"; throw new Error("MODEL_READ_FAILED"); }
       if (raw.length > 50_000) { failure = "response_size"; throw new Error("MODEL_TOO_LARGE"); }
       let payload: any;
       try { payload = JSON.parse(raw); }
