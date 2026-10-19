@@ -6,6 +6,24 @@ import type { RecordedReplyManifest } from "../../../../lib/conversation-lab/rec
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+const EXPECTED_BRANCH = "experiment/conversation-lab-offline-v1-20261015";
+function isConfigured() {
+  return process.env.VERCEL_ENV === "preview" &&
+    process.env.VERCEL_GIT_COMMIT_REF === EXPECTED_BRANCH &&
+    process.env.MISAKI_SMOKE_ENABLED === "yes" &&
+    process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED === "yes" &&
+    Boolean(process.env.MISAKI_SMOKE_OWNER_UID &&
+      process.env.MISAKI_SMOKE_GITHUB_TOKEN &&
+      process.env.MISAKI_SMOKE_GITHUB_REPO &&
+      process.env.MISAKI_SMOKE_GITHUB_BRANCH &&
+      process.env.GEMINI_API_KEY);
+}
+
+export async function GET() {
+  return Response.json({ ready: isConfigured(), description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
+}
+
+
 /**
  * Preview-only, owner-only, globally one-shot smoke experiment.
  * The one-shot claim is created in a separate dedicated GitHub repository.
@@ -13,9 +31,7 @@ export const dynamic = "force-dynamic";
  * No public anonymous or cookie-only access.
  */
 export async function POST(request: Request) {
-  if (process.env.VERCEL_ENV !== "preview" ||
-      process.env.MISAKI_SMOKE_ENABLED !== "yes" ||
-      process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED !== "yes") {
+  if (!isConfigured()) {
     return Response.json({ error: "disabled" }, { status: 404 });
   }
   const bearer = request.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
