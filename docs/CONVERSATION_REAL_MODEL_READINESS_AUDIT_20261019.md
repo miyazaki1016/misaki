@@ -73,3 +73,9 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - 認証済みiPhone画面からの実行ボタンは**まだ有効化していない**。実行条件が揃っていない段階で「押せば生成できる」と見せないため。iPhone画面は引き続き手入力レビューのみ。
 - 注意：routeの回数制限は「run1回・物理最大2回」だが**課金額の絶対上限ではない**。Google側の課金監視・隔離DB・オーナーUID・Vercel環境設定の実地検証が必要。Secret値をチャットやGitHubへ出さない。
 - 今回はDraft PR #86 branchへのコード・SQL案のみ。**実Gemini 0回、SQL適用0回、Main/Production変更なし**。CIとPreview buildは新commitについて別途確認する。
+
+## 2026-10-19 iPhone UI接続
+
+- `app/conversation-review/page.tsx` で研究用ボタンを実装。タップ後に利用者確認を出し、SupabaseセッションのBearer tokenで `/api/conversation-review/smoke` を呼ぶ。成功時だけQ02の2返信を評価欄へ反映。404/403/429/失敗をユーザーに区別して説明。
+- ただしサーバーの二重オプトイン環境変数は未設定のままで、隔離DBのSQLも未適用。**現時点ではボタンを押してもGemini実行はできない**。本番DB/Productionには変更なし。
+- 既存チャットのSupabaseセッションとPreviewの認証プロジェクトが同一であるか未検証。専用Preview DB/認証への分離と本人UIDを先に確認すること。隔離環境を検証するまで実験を有効化しない。
