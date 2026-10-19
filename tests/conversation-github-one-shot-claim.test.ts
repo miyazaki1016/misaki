@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { claimOneShotInGitHub } from "../lib/conversation-lab/github-one-shot-claim.ts";
+import { claimOneShotInGitHub, readOneShotStatusInGitHub } from "../lib/conversation-lab/github-one-shot-claim.ts";
 
 const base = {
   token: "test-token",
@@ -32,4 +32,28 @@ test("conflicts, denied permissions, unusual update responses all fail closed", 
     const fetcher = (async () => ({ status })) as unknown as typeof fetch;
     assert.equal(await claimOneShotInGitHub({ ...base, fetcher }), "denied");
   }
+});
+
+test("read-only quota probe disables already-claimed runs and never sends PUT", async () => {
+  const hits: string[] = [];
+  const build = (status: number) => (async (_url: string, init: RequestInit) => {
+    hits.push(String(init.method));
+    assert.equal(init.method, "GET");
+    assert.match(_url, /one-shot-claims\/q02-preview-v1\.json\?ref=main$/);
+    return { status };
+  }) as unknown as typeof fetch;
+  const input = { ...base, repository: "miyazaki1016/misaki-q02-smoke-quota" };
+  assert.equal(await readOneShotStatusInGitHub({ ...input, fetcher: build(200) }), "used");
+  assert.equal(await readOneShotStatusInGitHub({ ...input, fetcher: build(404) }), "available");
+  for (const status of [401, 403, 409, 500]) {
+    assert.equal(await readOneShotStatusInGitHub({ ...input, fetcher: build(status) }), "unknown");
+  }
+  assert.deepEqual(hits, Array(6).fill("GET"));
+});
+test("read-only quota probe fails closed on misconfiguration or network error", async () => {
+  let called = false;
+  const fetcher = (async () => { called = true; throw new Error("offline"); }) as unknown as typeof fetch;
+  assert.equal(await readOneShotStatusInGitHub({ ...base, fetcher }), "unknown");
+  assert.equal(called, false);
+  assert.equal(await readOneShotStatusInGitHub({ ...base, repository: "miyazaki1016/misaki-q02-smoke-quota", fetcher }), "unknown");
 });
