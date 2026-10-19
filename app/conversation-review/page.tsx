@@ -94,10 +94,26 @@ export default function ConversationReviewPage() {
         cache: "no-store",
       });
       if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        const failureLabels: Record<string, string> = {
+          api_auth: "Gemini APIの認証または権限エラー",
+          api_rate_limit: "Gemini APIの利用上限エラー",
+          api_model: "Gemini APIのリクエストまたはモデル設定エラー",
+          api_server: "Gemini API側のサーバーエラー",
+          api_other: "Gemini APIがエラー応答を返しました",
+          timeout_or_network: "Geminiへの通信または応答待ちで失敗",
+          response_shape: "Geminiの返答形式が想定と異なりました",
+          response_json: "GeminiのJSON返答の読み取りに失敗",
+          response_size: "Geminiの返答がサイズ上限を超えました",
+          unknown: "原因は特定できませんでした",
+        };
+        const failureText = typeof body?.failureCode === "string" ? failureLabels[body.failureCode] : undefined;
         setRunMessage(response.status === 404 ? "安全設定がまだ未完了なので、Geminiは実行されていません。" :
-          response.status === 429 ? "実験枠が未設定、または使用済みです。" :
+          response.status === 429 ? "今回の実験枠は使用済み、または利用できません。" :
           response.status === 403 ? "このアカウントには実験権限がありません。" :
-          "実験が完了しませんでした。実験枠が消費された可能性があります。");
+          response.status === 502 && failureText
+            ? "実験は完了しませんでした（診断: " + failureText + "）。実験枠は使用済みです。追加実行はできません。"
+            : "実験が完了しませんでした。実験枠が消費された可能性があります。");
         return;
       }
       const result: { probeId?: string; turns?: {role: string; text: string}[] } = await response.json();
