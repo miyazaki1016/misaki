@@ -3961,3 +3961,10 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - Freeプラン継続のため、専用GitHub quota repo名を `miyazaki1016/misaki-q02-smoke-quota`、ブランチを `main` に固定。別のrepo/branchが環境変数に入った場合はGemini実行前に停止。
 - iPhone画面では、Previewのログインがない場合に `/chat` へ移動させる案内を撤回。現行Previewのチャットが本番Supabaseデータへ書き込む可能性があるため、本人が誤ってテストチャットを触らないよう注意表示に変更。UI側は匿名ログインを作成せず既存セッションの読み取りのみ。
 - 専用private repo作成、最小権限PAT発行、Vercel Preview secret投入は**未実施**。現接続ツールにこれらを安全に自動作成する機能がない。本人認証のUIDも未確定。したがって実Gemini実験は引き続きOFF。実行回数0、本番DB・アメふるDBは変更なし。
+
+
+### 2026-10-19 iPhone Previewログインなし対策（PR #86）
+
+- ユーザーのiPhone実画面で `このPreviewではログイン情報がありません` を確認。異なるPreviewドメインにはセッションが共有されないため、正常な状態。
+- `/conversation-review` に本人の明示的な確認ダイアログ付き `テスト用ログインを作る` ボタンを追加。ユーザー操作後にSupabase Authの `signInAnonymously()` を実行し、発行されたユーザーUIDを画面に表示/コピー可能にする。**ボタンを押す前はAuth書き込みなし**。Authユーザー1件作成は美咲の既存Supabaseプロジェクトに対する書き込みであり、本番データベースに全く変更がないという主張は不可。ただし会話履歴/記憶を変更するAPIは呼ばない。
+- 自動生成のQ02ボタンは引き続き未設定・無効のまま。匿名UIDを確認した後、サーバーの専用オーナーUID設定・GitHub quota設定・事前検証が必要。
