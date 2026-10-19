@@ -3925,3 +3925,17 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+---
+
+## 2026-10-19 追記 — 会話品質検証 PR #86 の実測直前ゲート（Draft限定）
+
+**正本参照**：`docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md`、`docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md`、`docs/CONVERSATION_LONG_TERM_PROBES_20261019.md`（いずれもPR #86 branch内）。本追記は**実験ブランチの記録**であり、main/Productionに同内容が反映されたことを意味しない。
+
+- 18件の2〜3往復の品質fixture、人手評価シート、保存済み返信のoffline import、同一条件の人手比較ゲートをDraftとして作成。記憶/想い出の区別、長期関係、別れ/復縁、Free/Premium自発連絡・Forget Control・通知停止が検証観点に追加された。**実Geminiの品質合格を証明していない。**
+- `lib/conversation-lab/live-smoke-probe.ts` は、架空Q02のみ、明示approved、最大2物理APIリクエスト、リトライなし、timeout、出力上限、DB書込なしの**ライブラリ関数**。モデル名とmemory/relationship等のmanifest preflightを呼出前に検証。CI success確認済み（`4918ec7`および後続preflight修正 `43de98d`）。CIのmock試験は**課金APIの実行ではない**。
+- Vercel `misaki` Previewでは `4918ec7` のデプロイがREADY、`GEMINI_API_KEY` の設定名がPreview対象として存在。シークレット値は取得していない。**有効な単発実行口・保護・費用総額上限・実Geminiの実測記録は未確認/未完了。**
+- オーナーは少額・少回数の実Gemini検証へ進むことを了承済み。これは公開実行口の追加、秘密鍵の抽出、無制限課金、Production切替の承認ではない。利用可能な実行経路は未成立のため、**未実施のGemini返答を捏造したり、課金実行済みと書いてはいけない**。
+- 既存 `/api/acting-lab` は1回単位の実験用生成であり、user memory/Shared Memory/Body Clockを含む本番会話の再現でもPR #86の多往復品質測定経路でもない。しかもroute内部の認証と回数上限が不足しているため、安易に利用しない。
+- 次のゲート：オーナーが認可された隔離実行口とAPI利用額監視を準備できた時点で、Q02の2往復だけを**実モデル**で実行し、raw返答・設定・呼出回数と出所証拠を保持したうえで評価シートで人手レビュー。続行は結果に基づき判断。PR #86のmainマージ、DB/Production変更は別承認。
