@@ -24,6 +24,7 @@ export default function ConversationReviewPage() {
   const [running, setRunning] = useState(false);
   const [runMessage, setRunMessage] = useState("");
   const [smokeReady, setSmokeReady] = useState(false);
+  const [quotaStatus, setQuotaStatus] = useState<"checking" | "available" | "used" | "unknown" | "unconfigured">("checking");
   const [identityStatus, setIdentityStatus] = useState<"checking" | "signed-in" | "missing">("checking");
   const [ownerUid, setOwnerUid] = useState("");
   const [copiedUid, setCopiedUid] = useState(false);
@@ -73,8 +74,8 @@ export default function ConversationReviewPage() {
     let active = true;
     fetch("/api/conversation-review/smoke", { cache: "no-store" })
       .then(response => response.ok ? response.json() : null)
-      .then(data => { if (active) setSmokeReady(data?.ready === true); })
-      .catch(() => { if (active) setSmokeReady(false); });
+      .then(data => { if (active) { setSmokeReady(data?.ready === true); setQuotaStatus(["available", "used", "unknown", "unconfigured"].includes(data?.quota) ? data.quota : "unknown"); } })
+      .catch(() => { if (active) { setSmokeReady(false); setQuotaStatus("unknown"); } });
     return () => { active = false; };
   }, []);
   const runOneShot = async () => {
@@ -110,6 +111,10 @@ export default function ConversationReviewPage() {
     } catch {
       setRunMessage("通信に失敗しました。実験枠が消費された可能性があります。");
     } finally {
+      // A POST may have reserved the one-shot slot, even if the model failed.
+      // Always disable locally; a fresh GET displays the durable GitHub status.
+      setSmokeReady(false);
+      setQuotaStatus("used");
       setRunning(false);
     }
   };
@@ -149,7 +154,7 @@ export default function ConversationReviewPage() {
       </div>
       <section style={{ border: "1px solid #ddd4e1", borderRadius: 12, padding: 14, marginBottom: 18 }}>
         <strong>実験の準備状況</strong>
-        <p style={{ margin: "6px 0" }}>{smokeReady ? "サーバー設定済み（実行前に最終確認あり）" : "未設定・実験は停止中"}</p>
+        <p style={{ margin: "6px 0" }}>{quotaStatus === "used" ? "今回の実験枠は使用済みです。Geminiの再実行はできません。" : quotaStatus === "unknown" ? "利用枠の状態を確認できません。安全のため実験は停止中です。" : smokeReady ? "未使用の実験枠があります（実行前に最終確認あり）" : "未設定・実験は停止中"}</p>
         {identityStatus === "checking" && <p>iPhoneのログイン情報を確認中…</p>}
         {identityStatus === "missing" && <>
           <p>このPreviewにはログイン情報がないよ。チャット画面は開かずに、ここからテスト専用の匿名ユーザーを作成できるよ。</p>
