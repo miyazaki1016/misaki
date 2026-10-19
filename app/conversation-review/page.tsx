@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { supabase } from "../../lib/supabase";
 
 /**
  * Mobile-only local review workspace.
- * Never triggers /api/chat, /api/acting-lab, or Gemini.
+ * Manual review is local-only. Explicit opt-in can call the guarded Preview smoke endpoint.
  * Text is held in component state and not sent to any service.
  */
 const TURNS = ["この前の約束、覚えてる？", "本当に覚えてないの？"] as const;
@@ -20,12 +21,50 @@ export default function ConversationReviewPage() {
   const [ratings, setRatings] = useState<Record<number, "ok" | "ng" | "pending">>({});
   const [note, setNote] = useState("");
   const [showCopied, setShowCopied] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [runMessage, setRunMessage] = useState("");
+  const runOneShot = async () => {
+    if (running || !window.confirm("隔離PreviewでGeminiの2往復テストを1回だけ試しますか？最大2リクエストで、費用が発生する場合があります。")) return;
+    setRunning(true);
+    setRunMessage("");
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data.session?.access_token) {
+        setRunMessage("ログイン情報がありません。美咲のチャットにログインしてから戻ってください。");
+        return;
+      }
+      const response = await fetch("/api/conversation-review/smoke", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${data.session.access_token}` },
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        setRunMessage(response.status === 404 ? "安全設定がまだ未完了なので、Geminiは実行されていません。" :
+          response.status === 429 ? "実験枠が未設定、または使用済みです。" :
+          response.status === 403 ? "このアカウントには実験権限がありません。" :
+          "実験が完了しませんでした。実験枠が消費された可能性があります。");
+        return;
+      }
+      const result: { probeId?: string; turns?: {role: string; text: string}[] } = await response.json();
+      const modelReplies = result.turns?.filter(turn => turn.role === "model").map(turn => turn.text);
+      if (result.probeId !== "Q02" || modelReplies?.length !== 2 || modelReplies.some(text => typeof text !== "string")) {
+        throw new Error("INVALID_RESULT");
+      }
+      setReplies([modelReplies[0], modelReplies[1]]);
+      setRatings({});
+      setRunMessage("実Geminiの研究用返答を取得したよ。4項目を評価してね。※本番美咲と同一条件ではありません。");
+    } catch {
+      setRunMessage("通信に失敗しました。実験枠が消費された可能性があります。");
+    } finally {
+      setRunning(false);
+    }
+  };
 
   const ready = replies.every(text => text.trim().length > 0);
   const copy = async () => {
     const text = [
-      "美咲 Q02 実会話レビュー（手入力・未検証）",
-      "※このページはGeminiを呼び出さない。入力した返答の出所は検証していない。",
+      "美咲 Q02 会話レビュー（手入力または研究用実験）",
+      "※入力された返答の出所は、このコピーからは検証できない。",
       ...TURNS.flatMap((turn, i) => [
         `ユーザー${i + 1}: ${turn}`,
         `美咲${i + 1}: ${replies[i] || "未入力"}`,
@@ -48,9 +87,15 @@ export default function ConversationReviewPage() {
       <h1 style={{ fontSize: 27, margin: "12px 0" }}>記憶の自然さを確かめる</h1>
       <p style={{ marginBottom: 12 }}>iPhoneで、2往復の会話を確認できる評価画面だよ。</p>
       <div role="status" style={{ padding: 16, borderRadius: 12, background: "#fff3dd", border: "1px solid #d49e54", marginBottom: 24 }}>
-        <strong>現在は手入力レビュー専用</strong>
-        <div style={{ fontSize: 14 }}>この画面は実Geminiを呼び出さず、課金も発生しないよ。美咲の実際の返答を自動生成するボタンは、安全な認証・総回数制限が整うまで設置していない。未入力の内容を実測と表示しないよ。</div>
+        <strong>手入力レビューと実験用の入口</strong>
+        <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンは隔離Preview・本人認証・原子的な1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
       </div>
+      <button type="button" disabled={running} onClick={runOneShot}
+        style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running ? 0.6 : 1 }}>
+        {running ? "実験を確認中…" : "実Geminiの2往復を試す（安全設定完了後）"}
+      </button>
+      <p style={{ fontSize: 13, marginTop: 0 }}>押すと確認が表示されます。安全設定が未完了なら実行されません。成功した場合だけ返答が自動入力されます。</p>
+      {runMessage && <p role="status" style={{ padding: 12, background: "#f1e9f0", borderRadius: 8 }}>{runMessage}</p>}
       {TURNS.map((turn, i) => (
         <section key={turn} style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 18, margin: "0 0 10px" }}>会話 {i + 1} / 2</h2>
@@ -85,7 +130,7 @@ export default function ConversationReviewPage() {
         評価内容をコピー
       </button>
       {showCopied && <p role="status">コピーできたよ。このチャットに貼り付けてね。</p>}
-      <p style={{ color: "#666", fontSize: 12, marginTop: 20 }}>入力内容は送信・保存しません。ページを閉じると消えます。評価は主観的な記録であり、実モデル出力の真正性や品質改善の証明ではありません。</p>
+      <p style={{ color: "#666", fontSize: 12, marginTop: 20 }}>手入力・評価内容は送信・保存しません。実験ボタンを押した場合に限り認証情報をサーバーに送信し、設定が揃えば固定の架空会話でGeminiを呼びます。ページを閉じると評価内容は消えます。評価は主観的な記録であり、実モデル出力の真正性や品質改善の証明ではありません。</p>
     </main>
   );
 }
