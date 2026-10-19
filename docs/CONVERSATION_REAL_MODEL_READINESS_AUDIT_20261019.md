@@ -43,3 +43,12 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - The 2-call adapter currently is a **library function, with no safe protected one-shot invocation endpoint**. Therefore no real Gemini inference has been triggered; the owner approval allows proceeding once a protected, auditable single-run execution path exists and an enforceable total spending policy is known.
 - Fix applied: validate capture manifest, model identity, empty-memory and unknown-relationship fixtures **before** any potential billable request. Previously malformed metadata could be discovered only after 2 requests. New tests ensure invalid inputs result in zero network requests.
 - Do not invoke the older `/api/acting-lab`: it lacks the intended identity, budget and long-conversation constraints. Do not build a publicly callable endpoint merely to access the key.
+
+
+## 2026-10-19 追補：CLI専用ワンショット入口
+
+- `scripts/run-conversation-smoke.ts` を実験ブランチに新設。**公開Web APIではなく、承認済みオペレーターが隔離環境の秘密鍵を継承して一度だけ起動する**コマンド。プロジェクト固有 `GEMINI_API_KEY` の値をログや引数に書かない。
+- コマンドは `--approved-small-test` と `MISAKI_LIVE_SMOKE_APPROVED=yes` の両方を必須にする。内部ではQ02合成ユーザーの2往復、最大2回、retryなし、入力固定。未評価の返答シートを標準出力へ出す。stdoutの保存・取り扱いはオペレーターが保護すること。
+- **実施には**秘密鍵を安全に注入できる認可済みローカル/保護実行環境と予算上限確認が必要。現在のChatGPT実行環境には認証済みのVercel CLIも環境変数シークレットもない。VercelのプレビューはREADYだが、サーバーの環境変数をこのCLIが自動で引き継ぐわけではない。
+- この入口も本番の美咲と完全に同じコンテキストにはならない。成功してもFallback PersonaでのQ02試験の結果であり、実データの長期記憶/Relationship Engine/Body Clockは評価しない。
+- 本追補時点で、Gemini呼出しは**まだ0回**。CLI作成は実測ではない。
