@@ -3994,3 +3994,12 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - 将来別途承認された検証のために、`lib/conversation-lab/live-smoke-probe.ts` 内でHTTP認証(401/403)、rate limit(429)、モデル/リクエスト(400/404)、APIサーバー(5xx)、通信、JSON、形式、応答サイズを**固定カテゴリー**に分類し、`SmokeProbeFailure`に試行数とともに付与。`app/api/conversation-review/smoke/route.ts` は認証済みPOSTの失敗時、固定カテゴリーと試行数のみ返し、任意の上流本文・プロンプト・トークン・ユーザー情報を返さない。Web画面で固定日本語メッセージに変換。
 - 全て模型fetcherによるオフライン単体テストを追加し、`Gemini`の実通信はしない。以前作成したQ02使用済み予約ファイルはそのまま残り、GET status=usedにより再試行は不可能。
 - 本変更はPR #86の実験ブランチ限定、本番コード・本番の会話履歴・記憶は変更しない。
+
+
+### 2026-10-19 Q02 失敗調査・次回向けの無課金修正
+
+- 既存のQ02予約ファイル `one-shot-claims/q02-preview-v1.json` は使用済みのまま。**実Geminiの再実行・quota reset・Production変更は行わない**。
+- Google公式のGemini 3.1 Flash-Lite API仕様ではStructured Outputと思考レベル `minimal` をサポート。thinking tokenを含む出力上限についてGoogleの説明を確認し、研究専用の次回用コードを `maxOutputTokens: 300` → `1024` と `thinkingConfig: { thinkingLevel: 'minimal' }` に変更。理由は短いJSON応答が途中で切れる可能性を減らすため。**これが過去の失敗原因だったと断定はしない**。
+- 思考部分と本文が分割されるケースに備え、レスポンスのpartsから `thought === true` でない本文テキストを選択するようにした。模擬fetcherのリクエスト形状・思考part混在のテストを追加。
+- 公式資料: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md 、https://ai.google.dev/gemini-api/docs/generate-content/thinking
+- 次の実Geminiの予約・実行は新しい明示承認まで行わない。Q02現行実験の使用済みマーカーを削除/再利用しない。
