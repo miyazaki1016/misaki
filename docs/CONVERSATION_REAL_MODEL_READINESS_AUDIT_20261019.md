@@ -35,3 +35,11 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - `tests/conversation-lab-live-smoke-probe.test.ts` はfetchをmockし、ゼロ回認可、2回上限、履歴転送、429/不正JSONで再試行しないことを検証する。CIで実APIキーは渡さず、課金発生なし。
 - **次の実Gemini実行は未実施**。接続済み実行環境のAPIキーをこの会話から安全に使えることが確認できず、勝手なPreview公開・本番トークンの取得や実験デプロイはしない。運用上の総金額予算上限や呼出履歴の可視化はAPI/Google側の設定との照合が必要。試行数上限は費用の絶対上限そのものではない。
 - 利用者に見せる前にGitHub Actionsの新コードテスト結果を確認し、セキュリティ境界・実行許可・費用上限を再確認する。Main/本番/DBに触れない。
+
+## 2026-10-19 Follow-up: Preview readiness check and preflight fix
+
+- GitHub Actions for `4918ec7` was successful; the connected Vercel project `misaki` had a READY Preview deployment for that commit. A READY Preview is a deployment/build result, **not** confirmation that the experimental adapter was executed.
+- `GEMINI_API_KEY` exists as a sensitive Vercel environment-variable name for Preview, but this audit did **not** decrypt or reveal its value. Availability in Preview does not authorize arbitrary public requests.
+- The 2-call adapter currently is a **library function, with no safe protected one-shot invocation endpoint**. Therefore no real Gemini inference has been triggered; the owner approval allows proceeding once a protected, auditable single-run execution path exists and an enforceable total spending policy is known.
+- Fix applied: validate capture manifest, model identity, empty-memory and unknown-relationship fixtures **before** any potential billable request. Previously malformed metadata could be discovered only after 2 requests. New tests ensure invalid inputs result in zero network requests.
+- Do not invoke the older `/api/acting-lab`: it lacks the intended identity, budget and long-conversation constraints. Do not build a publicly callable endpoint merely to access the key.
