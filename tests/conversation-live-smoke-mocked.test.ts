@@ -110,3 +110,44 @@ test("thought parts are ignored when a later normal reply part is present", asyn
   assert.equal(calls, 2);
   assert.deepEqual(result.imported.run.turns.filter(turn => turn.role === "model").map(turn => turn.text), ["通常の返答1", "通常の返答2"]);
 });
+
+test("model transport error is classified as network without retry", async () => {
+  let calls = 0;
+  const fetcher = (async () => { calls++; throw new TypeError("private upstream detail"); }) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest }),
+    (error: unknown) => {
+      assert.ok(error instanceof SmokeProbeFailure);
+      assert.equal(error.code, "network");
+      assert.equal(error.physicalCalls, 1);
+      assert.doesNotMatch(error.message, /private upstream/);
+      return true;
+    });
+  assert.equal(calls, 1);
+});
+
+test("our timer-aborted model fetch is classified as timeout without retry", async () => {
+  let calls = 0;
+  const fetcher = (async (_url: string, init: RequestInit) => {
+    calls++;
+    await new Promise<void>((_resolve, reject) => {
+      const signal = init.signal;
+      if (!signal) throw new Error("missing abort signal");
+      signal.addEventListener("abort", () => reject(new Error("private abort detail")), { once: true });
+    });
+    throw new Error("unreachable");
+  }) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest, timeoutMs: 5 }),
+    (error: unknown) => {
+      assert.ok(error instanceof SmokeProbeFailure);
+      assert.equal(error.code, "timeout");
+      assert.equal(error.physicalCalls, 1);
+      return true;
+    });
+  assert.equal(calls, 1);
+});
+
+test("failed response body read distinguishes network from our timeout", async () => {
+  const fetcher = (async () => ({ok:true, text: async () => { throw new Error("private read error"); }})) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest }),
+    (error: unknown) => { assert.ok(error instanceof SmokeProbeFailure); assert.equal(error.code, "network"); return true; });
+});
