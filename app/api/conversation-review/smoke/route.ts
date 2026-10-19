@@ -13,7 +13,8 @@ export const dynamic = "force-dynamic";
  */
 export async function POST(request: Request) {
   if (process.env.VERCEL_ENV !== "preview" ||
-      process.env.MISAKI_SMOKE_ENABLED !== "yes") {
+      process.env.MISAKI_SMOKE_ENABLED !== "yes" ||
+      process.env.MISAKI_SMOKE_ISOLATED_DB_CONFIRMED !== "yes") {
     return Response.json({ error: "disabled" }, { status: 404 });
   }
   const bearer = request.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
