@@ -135,9 +135,9 @@ export default function ConversationReviewPage() {
           {copiedUid && <span role="status" style={{ marginLeft: 10 }}>コピーしたよ</span>}
         </>}
       </section>
-      <button type="button" disabled={running || !smokeReady} onClick={runOneShot}
-        style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running || !smokeReady ? 0.55 : 1 }}>
-        {running ? "実験を確認中…" : smokeReady ? "実Geminiの2往復を試す" : "実験準備中（まだ押せません）"}
+      <button type="button" disabled={running || !smokeReady || identityStatus !== "signed-in"} onClick={runOneShot}
+        style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running || !smokeReady || identityStatus !== "signed-in" ? 0.55 : 1 }}>
+        {running ? "実験を確認中…" : smokeReady && identityStatus === "signed-in" ? "実Geminiの2往復を試す" : "実験準備中（まだ押せません）"}
       </button>
       <p style={{ fontSize: 13, marginTop: 0 }}>安全設定が全て揃うとボタンが有効になります。有効になった場合も、押す前に確認が表示されます。成功した場合だけ返答が自動入力されます。</p>
       {runMessage && <p role="status" style={{ padding: 12, background: "#f1e9f0", borderRadius: 8 }}>{runMessage}</p>}
