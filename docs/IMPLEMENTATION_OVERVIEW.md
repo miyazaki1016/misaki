@@ -3985,3 +3985,12 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - モデル識別子 `gemini-3.1-flash-lite` はGoogle公式モデル一覧に存在。モデルID誤記と断定しない。API権限/課金、JSON出力形式、出力トークン・thinking設定の影響は候補だが未証明。
 - 原因調査は**追加の実Gemini呼び出しゼロ**で実施。`readOneShotStatusInGitHub` で専用GitHubのclaim fileをGETするだけの確認を追加。200=used、404=available、その他=unknownで安全側に倒す。Q02 PreviewのGET準備状態はquota=used/unknownなら `ready=false`。クライアントでは使用済みを明示し、POST後も再度押せないようにする。既存POSTのclaim先行・最大2呼び出しは維持。
 - GitHub ActionsにはGETのread-only・fail-closedのテストを追加。PR #86内のみでProductionにはマージしない。
+
+
+### 2026-10-19 Q02失敗時の安全な診断分類（PR #86）
+
+- 既存の一度限りのQ02実Gemini検証はGitHub claimで使用済み。**再試行しない／GitHub claimを削除しない／追加のGemini課金を発生させない**。
+- 旧プログラムではrunQualityProbeが具体例外を内部で握って結果status=errorに変換し、上位がすべて `LIVE_SMOKE_INCOMPLETE_*` にするため、当初の実験が失敗した原因は過去ログから復元できない。過去の原因を判定済みと記さない。
+- 将来別途承認された検証のために、`lib/conversation-lab/live-smoke-probe.ts` 内でHTTP認証(401/403)、rate limit(429)、モデル/リクエスト(400/404)、APIサーバー(5xx)、通信、JSON、形式、応答サイズを**固定カテゴリー**に分類し、`SmokeProbeFailure`に試行数とともに付与。`app/api/conversation-review/smoke/route.ts` は認証済みPOSTの失敗時、固定カテゴリーと試行数のみ返し、任意の上流本文・プロンプト・トークン・ユーザー情報を返さない。Web画面で固定日本語メッセージに変換。
+- 全て模型fetcherによるオフライン単体テストを追加し、`Gemini`の実通信はしない。以前作成したQ02使用済み予約ファイルはそのまま残り、GET status=usedにより再試行は不可能。
+- 本変更はPR #86の実験ブランチ限定、本番コード・本番の会話履歴・記憶は変更しない。
