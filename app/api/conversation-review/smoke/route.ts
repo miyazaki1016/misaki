@@ -7,11 +7,15 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const EXPECTED_BRANCH = "experiment/conversation-lab-offline-v1-20261015";
+const EXPECTED_QUOTA_REPO = "miyazaki1016/misaki-q02-smoke-quota";
+const EXPECTED_QUOTA_BRANCH = "main";
 function isConfigured() {
   return process.env.VERCEL_ENV === "preview" &&
     process.env.VERCEL_GIT_COMMIT_REF === EXPECTED_BRANCH &&
     process.env.MISAKI_SMOKE_ENABLED === "yes" &&
     process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED === "yes" &&
+    process.env.MISAKI_SMOKE_GITHUB_REPO === EXPECTED_QUOTA_REPO &&
+    process.env.MISAKI_SMOKE_GITHUB_BRANCH === EXPECTED_QUOTA_BRANCH &&
     Boolean(process.env.MISAKI_SMOKE_OWNER_UID &&
       process.env.MISAKI_SMOKE_GITHUB_TOKEN &&
       process.env.MISAKI_SMOKE_GITHUB_REPO &&
