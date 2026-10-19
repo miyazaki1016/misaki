@@ -1,6 +1,6 @@
 import { createFallbackPersonaPrompt } from "../persona/fallback-persona.ts";
 import { runQualityProbe } from "./quality-probe-runner.ts";
-import { importRecordedQualityReplies, type RecordedReplyManifest } from "./recorded-reply-import.ts";
+import { importRecordedQualityReplies, validateRecordedReplyManifest, type RecordedReplyManifest } from "./recorded-reply-import.ts";
 import { QUALITY_PROBES } from "./quality-probes.ts";
 
 export const LIVE_SMOKE_MODEL = "gemini-3.1-flash-lite";
@@ -21,6 +21,15 @@ export async function runLiveSmokeProbe(input: {
 }) {
   if (input.approved !== true || !input.apiKey.trim()) {
     throw new Error("LIVE_SMOKE_NOT_AUTHORIZED");
+  }
+  validateRecordedReplyManifest(input.manifest);
+  if (input.manifest.modelName !== LIVE_SMOKE_MODEL) {
+    throw new Error("LIVE_SMOKE_MODEL_MISMATCH");
+  }
+  if (input.manifest.memoryFixtureId !== "none" ||
+      input.manifest.relationshipFixtureId !== "unknown" ||
+      input.manifest.externalContextFixtureId !== "none") {
+    throw new Error("LIVE_SMOKE_FIXTURE_MISMATCH");
   }
   if (input.manifest.userConsentOrSyntheticFixture !== "synthetic-fixture") {
     throw new Error("LIVE_SMOKE_SYNTHETIC_ONLY");
