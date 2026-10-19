@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { runLiveSmokeProbe, LIVE_SMOKE_MODEL } from "../lib/conversation-lab/live-smoke-probe.ts";
+import { runLiveSmokeProbe, LIVE_SMOKE_MODEL, SmokeProbeFailure } from "../lib/conversation-lab/live-smoke-probe.ts";
 
 const manifest = {
   captureId: "mock-q02",
@@ -62,4 +62,33 @@ test("no opt-in means no network request", async () => {
   const fetcher = (async () => { called = true; throw new Error("should not be called"); }) as unknown as typeof fetch;
   await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: false, fetcher, manifest }));
   assert.equal(called, false);
+});
+
+test("safe failure category and physical attempt count without upstream data leakage", async () => {
+  for (const [status, expected] of [[401,"api_auth"],[429,"api_rate_limit"],[404,"api_model"],[503,"api_server"]] as const) {
+    let calls = 0;
+    const fetcher = (async () => { calls++; return { ok: false, status }; }) as unknown as typeof fetch;
+    await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest }),
+      (error: unknown) => {
+        assert.ok(error instanceof SmokeProbeFailure);
+        assert.equal(error.code, expected);
+        assert.equal(error.physicalCalls, 1);
+        assert.equal(error.message, "SMOKE_PROBE_FAILED");
+        return true;
+      });
+    assert.equal(calls, 1);
+  }
+});
+test("malformed Gemini JSON classified without raw model output", async () => {
+  const fetcher = (async () => ({ ok: true, text: async () => JSON.stringify({
+    candidates: [{ content: { parts: [{ text: "bad private content" }] } }],
+  }) })) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest }),
+    (error: unknown) => {
+      assert.ok(error instanceof SmokeProbeFailure);
+      assert.equal(error.code, "response_json");
+      assert.equal(error.physicalCalls, 1);
+      assert.doesNotMatch(error.message, /private/);
+      return true;
+    });
 });
