@@ -35,7 +35,8 @@ test("two-turn history and strict physical request budget", async () => {
   assert.equal(bodies.length, 2);
   assert.equal(bodies[0].contents.length, 1);
   assert.equal(bodies[1].contents.length, 3);
-  assert.equal(bodies[0].generationConfig.maxOutputTokens, 300);
+  assert.equal(bodies[0].generationConfig.maxOutputTokens, 1024);
+  assert.equal(bodies[0].generationConfig.thinkingConfig.thinkingLevel, "minimal");
   assert.equal(observed.imported.run.completedPairs, 2);
   assert.equal(observed.imported.verification, "caller-attested-unverified");
 });
