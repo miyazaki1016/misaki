@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { claimOneShotInGitHub } from "../../../../lib/conversation-lab/github-one-shot-claim";
+import { claimOneShotInGitHub, readOneShotStatusInGitHub } from "../../../../lib/conversation-lab/github-one-shot-claim";
 import { runLiveSmokeProbe, LIVE_SMOKE_MODEL } from "../../../../lib/conversation-lab/live-smoke-probe";
 import type { RecordedReplyManifest } from "../../../../lib/conversation-lab/recorded-reply-import";
 
@@ -24,7 +24,17 @@ function isConfigured() {
 }
 
 export async function GET() {
-  return Response.json({ ready: isConfigured(), description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
+  if (!isConfigured()) {
+    return Response.json({ ready: false, quota: "unconfigured", description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
+  }
+  // Reading status is safe: no claim write and no Gemini call.
+  const quota = await readOneShotStatusInGitHub({
+    token: process.env.MISAKI_SMOKE_GITHUB_TOKEN!,
+    repository: EXPECTED_QUOTA_REPO,
+    branch: EXPECTED_QUOTA_BRANCH,
+    runKey: "q02-preview-v1",
+  });
+  return Response.json({ ready: quota === "available", quota, description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
 }
 
 
