@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabase";
 
 /**
@@ -23,8 +23,17 @@ export default function ConversationReviewPage() {
   const [showCopied, setShowCopied] = useState(false);
   const [running, setRunning] = useState(false);
   const [runMessage, setRunMessage] = useState("");
+  const [smokeReady, setSmokeReady] = useState(false);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/conversation-review/smoke", { cache: "no-store" })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => { if (active) setSmokeReady(data?.ready === true); })
+      .catch(() => { if (active) setSmokeReady(false); });
+    return () => { active = false; };
+  }, []);
   const runOneShot = async () => {
-    if (running || !window.confirm("隔離PreviewでGeminiの2往復テストを1回だけ試しますか？最大2リクエストで、費用が発生する場合があります。")) return;
+    if (running || !smokeReady || !window.confirm("隔離PreviewでGeminiの2往復テストを1回だけ試しますか？最大2リクエストで、費用が発生する場合があります。")) return;
     setRunning(true);
     setRunMessage("");
     try {
@@ -90,11 +99,11 @@ export default function ConversationReviewPage() {
         <strong>手入力レビューと実験用の入口</strong>
         <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンはPreview・本人認証・別の専用GitHubリポジトリでの1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
       </div>
-      <button type="button" disabled={running} onClick={runOneShot}
-        style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running ? 0.6 : 1 }}>
-        {running ? "実験を確認中…" : "実Geminiの2往復を試す（安全設定完了後）"}
+      <button type="button" disabled={running || !smokeReady} onClick={runOneShot}
+        style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running || !smokeReady ? 0.55 : 1 }}>
+        {running ? "実験を確認中…" : smokeReady ? "実Geminiの2往復を試す" : "実験準備中（まだ押せません）"}
       </button>
-      <p style={{ fontSize: 13, marginTop: 0 }}>押すと確認が表示されます。安全設定が未完了なら実行されません。成功した場合だけ返答が自動入力されます。</p>
+      <p style={{ fontSize: 13, marginTop: 0 }}>安全設定が全て揃うとボタンが有効になります。有効になった場合も、押す前に確認が表示されます。成功した場合だけ返答が自動入力されます。</p>
       {runMessage && <p role="status" style={{ padding: 12, background: "#f1e9f0", borderRadius: 8 }}>{runMessage}</p>}
       {TURNS.map((turn, i) => (
         <section key={turn} style={{ marginBottom: 24 }}>
