@@ -140,6 +140,9 @@ export default function ConversationReviewPage() {
       <div style={{ color: "#8b4776", fontWeight: 700, fontSize: 13 }}>美咲・会話育成研究室 / Q02</div>
       <h1 style={{ fontSize: 27, margin: "12px 0" }}>記憶の自然さを確かめる</h1>
       <p style={{ marginBottom: 12 }}>iPhoneで、2往復の会話を確認できる評価画面だよ。</p>
+      <p style={{ fontSize: 13, background: "#edf4fa", border: "1px solid #bdd2e6", padding: 12, borderRadius: 10 }}>
+        この研究室は<b>固定のPreviewアドレス</b>で開いてね。異なるvercel.appアドレス間では匿名ログインが引き継がれません。アカウントを作ったら同じアドレスを使い続けてください。
+      </p>
       <div role="status" style={{ padding: 16, borderRadius: 12, background: "#fff3dd", border: "1px solid #d49e54", marginBottom: 24 }}>
         <strong>手入力レビューと実験用の入口</strong>
         <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンはPreview・本人認証・別の専用GitHubリポジトリでの1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
