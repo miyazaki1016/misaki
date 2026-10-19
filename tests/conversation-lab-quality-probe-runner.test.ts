@@ -20,10 +20,10 @@ test("replays every supplied user turn in order and carries exact prior history"
   assert.deepEqual(result.turns.map(x => x.role), ["user", "model", "user", "model", "user", "model"]);
 });
 
-test("runs all 12 scenarios with injected synthetic replies only", async () => {
+test("runs all 18 scenarios with injected synthetic replies only", async () => {
   let count = 0;
   const runs = await runQualityProbeSuite(async () => { count++; return "synthetic"; });
-  assert.equal(runs.length, 12);
+  assert.equal(runs.length, 18);
   assert.ok(runs.every(x => x.status === "complete"));
   assert.equal(count, QUALITY_PROBES.reduce((n, p) => n + p.turns.length, 0));
 });
