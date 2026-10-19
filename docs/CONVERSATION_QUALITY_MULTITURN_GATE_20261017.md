@@ -50,3 +50,11 @@
 - Q13〜Q18を追加。既存Q01〜Q12に加えて、計18ケース。記憶と共有した想い出の区別、恋人関係の成熟と仲直り、Free自発メッセージの話題制限、PremiumでもForget Control優先、別れた後の過去の恋愛記憶、無料への変更と通知停止を扱う。
 - 設計背景は `docs/CONVERSATION_LONG_TERM_PROBES_20261019.md` を参照。
 - 全ケースは人手レビュー用の合成入力。実Geminiの自然さ、Free/Premium実装、記憶保存や通知の本番挙動を検証した証拠ではない。実モデル評価には別途オーナー承認と環境整備が必要。
+
+## 2026-10-19 追補：人手評価用の未採点レビューシート
+
+- `lib/conversation-lab/quality-review-packet.ts` に `prepareQualityReviewPacket` を追加。既存の完全な多往復runから、ターン番号付き会話全文と、期待項目・禁止項目の **全件** の未評価チェックリストをインメモリ生成する。
+- `tests/conversation-lab-quality-review-packet.test.ts` で完全なrun、シナリオとの発話一致、未評価のまま出力すること、失敗/改変runの拒否、自己申告のprovenanceに保証がないことを検査する。
+- これは採点結果ではない。`state: awaiting-human-review` であり、`pass` や改善率は出さない。人が根拠と判断を記録した後にのみ別の `assessQualityProbe` を用いる。
+- packet自体は**保存も送信もしない純粋なメモリ上の変換**。本物のユーザー会話を取り込む前には明示同意、秘匿化、保存先・保持期間・アクセス制限・run provenance（Geminiモデル版、prompt版、固定状態）を別途決める。`sourceClaim` は呼出側の自己申告であり真正性は検証しない。
+- Gemini API呼出し・Production DB・本番会話route・PR mergeは実施していない。GitHub Actionsを確認するまで追加変更のテストは未検証。
