@@ -7,6 +7,21 @@ export const LIVE_SMOKE_MODEL = "gemini-3.1-flash-lite";
 export const LIVE_SMOKE_MAX_CALLS = 2;
 const ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/" + LIVE_SMOKE_MODEL + ":generateContent";
 
+export type SmokeFailureCode = "api_auth" | "api_rate_limit" | "api_model" | "api_server" | "api_other" | "timeout_or_network" | "response_shape" | "response_json" | "response_size" | "unknown";
+export class SmokeProbeFailure extends Error {
+  constructor(public readonly code: SmokeFailureCode, public readonly physicalCalls: number) {
+    super("SMOKE_PROBE_FAILED");
+    this.name = "SmokeProbeFailure";
+  }
+}
+function classifyHttp(status: number): SmokeFailureCode {
+  if (status === 401 || status === 403) return "api_auth";
+  if (status === 429) return "api_rate_limit";
+  if (status === 400 || status === 404) return "api_model";
+  if (status >= 500) return "api_server";
+  return "api_other";
+}
+
 /**
  * Explicitly opted-in, isolated smoke experiment with a hard bound of two
  * physical requests, no retries, no DB, no prod chat endpoint, no logging.
@@ -41,6 +56,7 @@ export async function runLiveSmokeProbe(input: {
   const fetcher = input.fetcher ?? fetch;
   let physicalCalls = 0;
   const replies: string[] = [];
+  let failure: SmokeFailureCode = "unknown";
   const result = await runQualityProbe(probe, async ({ message, history }) => {
     if (physicalCalls >= LIVE_SMOKE_MAX_CALLS) throw new Error("LIVE_SMOKE_BUDGET_EXCEEDED");
     physicalCalls += 1; // count before network attempt, including failures
@@ -55,6 +71,7 @@ export async function runLiveSmokeProbe(input: {
     const timeout = setTimeout(() => controller.abort(), 15_000);
     let response: Response;
     try {
+      try {
       response = await fetcher(ENDPOINT, {
         method: "POST",
         headers: {
@@ -71,15 +88,26 @@ export async function runLiveSmokeProbe(input: {
           },
         }),
       });
-      if (!response.ok) throw new Error("LIVE_SMOKE_HTTP_" + response.status);
-      const raw = await response.text();
-      if (raw.length > 50_000) throw new Error("LIVE_SMOKE_RESPONSE_TOO_LARGE");
-      const payload = JSON.parse(raw);
+      } catch {
+        failure = "timeout_or_network";
+        throw new Error("MODEL_TRANSPORT_FAILED");
+      }
+      if (!response.ok) { failure = classifyHttp(response.status); throw new Error("MODEL_HTTP_FAILED"); }
+      let raw: string;
+      try { raw = await response.text(); }
+      catch { failure = "timeout_or_network"; throw new Error("MODEL_READ_FAILED"); }
+      if (raw.length > 50_000) { failure = "response_size"; throw new Error("MODEL_TOO_LARGE"); }
+      let payload: any;
+      try { payload = JSON.parse(raw); }
+      catch { failure = "response_json"; throw new Error("MODEL_OUTER_JSON_INVALID"); }
       const content = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (typeof content !== "string") throw new Error("LIVE_SMOKE_MISSING_REPLY");
-      const parsed = JSON.parse(content);
+      if (typeof content !== "string") { failure = "response_shape"; throw new Error("MODEL_REPLY_MISSING"); }
+      let parsed: any;
+      try { parsed = JSON.parse(content); }
+      catch { failure = "response_json"; throw new Error("MODEL_INNER_JSON_INVALID"); }
       if (typeof parsed?.reply !== "string" || !parsed.reply.trim() || parsed.reply.length > 4000) {
-        throw new Error("LIVE_SMOKE_INVALID_REPLY");
+        failure = "response_shape";
+        throw new Error("MODEL_REPLY_INVALID");
       }
       replies.push(parsed.reply);
       return parsed.reply;
@@ -89,7 +117,7 @@ export async function runLiveSmokeProbe(input: {
   });
   // A failed reply is not a valid comparison or a successful observation.
   if (result.status !== "complete" || replies.length !== LIVE_SMOKE_MAX_CALLS) {
-    throw new Error("LIVE_SMOKE_INCOMPLETE_" + physicalCalls);
+    throw new SmokeProbeFailure(failure, physicalCalls);
   }
   return {
     physicalCalls,
