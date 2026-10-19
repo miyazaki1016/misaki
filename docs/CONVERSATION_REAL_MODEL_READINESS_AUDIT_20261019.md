@@ -79,3 +79,12 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - `app/conversation-review/page.tsx` で研究用ボタンを実装。タップ後に利用者確認を出し、SupabaseセッションのBearer tokenで `/api/conversation-review/smoke` を呼ぶ。成功時だけQ02の2返信を評価欄へ反映。404/403/429/失敗をユーザーに区別して説明。
 - ただしサーバーの二重オプトイン環境変数は未設定のままで、隔離DBのSQLも未適用。**現時点ではボタンを押してもGemini実行はできない**。本番DB/Productionには変更なし。
 - 既存チャットのSupabaseセッションとPreviewの認証プロジェクトが同一であるか未検証。専用Preview DB/認証への分離と本人UIDを先に確認すること。隔離環境を検証するまで実験を有効化しない。
+
+## 2026-10-19 夜 安全性レビュー／DB分離修正
+
+- 本番Supabase `tzozajnwznxqgxnjikoy` 以外に、Misaki専用の隔離Preview Supabaseプロジェクトは現時点で存在しない（プロジェクト一覧を照合）。EmergencyAlertのDBは他アプリなので流用禁止。
+- Vercel既存環境は `SUPABASE_SERVICE_ROLE_KEY` がProduction/Preview共有。**これを実験のclaim先に使う設計は危険**なので、実装を修正した。
+- 本人確認は現在の美咲アプリと同じSupabase Authで行い、実験回数の記録は新しい別Supabaseプロジェクトに限定。
+- 新規専用環境変数 `MISAKI_SMOKE_QUOTA_SUPABASE_URL`, `MISAKI_SMOKE_QUOTA_SERVICE_ROLE_KEY`, `MISAKI_SMOKE_QUOTA_PROJECT_REF` が必要。接続先のURLとref一致・本番ref不一致をコードで検査し、未設定・本番宛は生成前に停止。公開鍵は現行アプリと同じ固定publishableキー。
+- 2026-10-19 時点で実験用環境変数・隔離DBは未設定。既存Previewはビルド完了し、CI通過。新しい修正コミットのCIは別途確認。
+- **ユーザーの追加課金／プロジェクト作成が必要になり得るため、新規Supabaseプロジェクトは未作成。** 現状は安全優先で生成OFF。
