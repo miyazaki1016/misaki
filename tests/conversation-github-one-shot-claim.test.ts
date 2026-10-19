@@ -57,3 +57,21 @@ test("read-only quota probe fails closed on misconfiguration or network error", 
   assert.equal(called, false);
   assert.equal(await readOneShotStatusInGitHub({ ...base, repository: "miyazaki1016/misaki-q02-smoke-quota", fetcher }), "unknown");
 });
+
+test("Q02 v2 has a distinct safe read and reservation key; v1 marker remains untouched", async () => {
+  const seen: string[] = [];
+  const fetcher = (async (url: string, init: RequestInit) => {
+    seen.push(String(init.method) + " " + url);
+    if (init.method === "GET") return { status: 404 };
+    if (init.method === "PUT") return { status: 201 };
+    throw new Error("unexpected method");
+  }) as unknown as typeof fetch;
+  const input = { ...base, repository: "miyazaki1016/misaki-q02-smoke-quota", runKey: "q02-preview-v2" as const, fetcher };
+  assert.equal(await readOneShotStatusInGitHub(input), "available");
+  assert.equal(await claimOneShotInGitHub(input), "claimed");
+  assert.equal(seen.length, 2);
+  for (const item of seen) {
+    assert.match(item, /q02-preview-v2\.json/);
+    assert.doesNotMatch(item, /q02-preview-v1\.json/);
+  }
+});
