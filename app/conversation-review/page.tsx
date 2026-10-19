@@ -88,7 +88,7 @@ export default function ConversationReviewPage() {
       <p style={{ marginBottom: 12 }}>iPhoneで、2往復の会話を確認できる評価画面だよ。</p>
       <div role="status" style={{ padding: 16, borderRadius: 12, background: "#fff3dd", border: "1px solid #d49e54", marginBottom: 24 }}>
         <strong>手入力レビューと実験用の入口</strong>
-        <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンは隔離Preview・本人認証・原子的な1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
+        <div style={{ fontSize: 14 }}>手入力レビューは無料。実験ボタンはPreview・本人認証・別の専用GitHubリポジトリでの1回限りの利用制限が揃うまでサーバー側で無効です。未設定ならGeminiは呼び出されません。</div>
       </div>
       <button type="button" disabled={running} onClick={runOneShot}
         style={{ width: "100%", border: 0, borderRadius: 12, padding: 15, background: "#6d3f67", color: "white", fontSize: 16, fontWeight: 700, marginBottom: 12, opacity: running ? 0.6 : 1 }}>
