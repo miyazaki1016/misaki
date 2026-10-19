@@ -151,3 +151,49 @@ test("failed response body read distinguishes network from our timeout", async (
   await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest }),
     (error: unknown) => { assert.ok(error instanceof SmokeProbeFailure); assert.equal(error.code, "network"); return true; });
 });
+
+
+test("second-turn timeout counts exactly two attempted requests and never retries", async () => {
+  let calls = 0;
+  const fetcher = (async (_url: string, init: RequestInit) => {
+    calls++;
+    if (calls === 1) return { ok: true, text: async () => JSON.stringify({
+      candidates: [{ content: { parts: [{ text: '{"reply":"最初の返答"}' }] } }],
+    }) };
+    await new Promise<void>((_resolve, reject) => {
+      if (!init.signal) throw new Error("missing signal");
+      init.signal.addEventListener("abort", () => reject(new Error("private timeout")), { once: true });
+    });
+    throw new Error("unreachable");
+  }) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest, timeoutMs: 5 }),
+    (error: unknown) => {
+      assert.ok(error instanceof SmokeProbeFailure);
+      assert.equal(error.code, "timeout");
+      assert.equal(error.physicalCalls, 2);
+      return true;
+    });
+  assert.equal(calls, 2);
+});
+
+test("response-body stall is classified as own timeout without another request", async () => {
+  let calls = 0;
+  const fetcher = (async (_url: string, init: RequestInit) => {
+    calls++;
+    return { ok: true, text: async () => {
+      await new Promise<void>((_resolve, reject) => {
+        if (!init.signal) throw new Error("missing signal");
+        init.signal.addEventListener("abort", () => reject(new Error("private body timeout")), { once: true });
+      });
+      throw new Error("unreachable");
+    } };
+  }) as unknown as typeof fetch;
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest, timeoutMs: 5 }),
+    (error: unknown) => {
+      assert.ok(error instanceof SmokeProbeFailure);
+      assert.equal(error.code, "timeout");
+      assert.equal(error.physicalCalls, 1);
+      return true;
+    });
+  assert.equal(calls, 1);
+});
