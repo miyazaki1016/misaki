@@ -68,3 +68,10 @@
 - 本物の会話をこの仕組みに渡すのは、本人同意、個人情報の匿名化、保管先・保持期間・権限、実モデルの生成経路・設定・ログによる出所確認を整備してから。評価のための本番ユーザー会話の無断抽出は禁止。
 - `tests/conversation-lab-recorded-reply-import.test.ts` は**架空文字列のみ**で、取り込み検証・レビューシート変換・不正な入力の拒否・比較可能性をテストする。実Gemini呼び出しや会話品質の改善は未測定。
 - Gemini実呼び出しやProduction切替、DB操作、マージは未実施。CI結果の確認まで、この追補のテスト合格を宣言しない。
+
+## 2026-10-19 追補：人手レビュー済みの比較ゲート
+
+- `lib/conversation-lab/quality-reviewed-comparison.ts` を追加。入力済みの2件の会話記録と各観点の**人手判定**から、同一fixture条件で比較可能な場合に限りpass/fail/needs-reviewを返す。数値の改善率は生成しない。
+- `compareRecordedReplyManifests` でPersona/記憶/Relationship/時刻/外部情報/データ同意区分の一致を必須とし、差異がある比較を拒否。別capture IDと完整な判定根拠も必要。
+- 比較可能とは**同一条件で評価したという入力申告**のみを指す。モデルから本当に生成されたか、判定が公正か、コンテキストが漏れていないか、実運用品質が良いかは別途検証する。
+- `tests/conversation-lab-quality-reviewed-comparison.test.ts` では合成fixtureのみ使用。Gemini/API/Production/DBは未使用。今回のCI成功を確認するまでテスト合格を宣言しない。
