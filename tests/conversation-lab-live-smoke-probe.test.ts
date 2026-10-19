@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { runLiveSmokeProbe, LIVE_SMOKE_MAX_CALLS } from "../lib/conversation-lab/live-smoke-probe.ts";
+import { runLiveSmokeProbe, LIVE_SMOKE_MAX_CALLS, SmokeProbeFailure } from "../lib/conversation-lab/live-smoke-probe.ts";
 import type { RecordedReplyManifest } from "../lib/conversation-lab/recorded-reply-import.ts";
 
 const manifest: RecordedReplyManifest = {
@@ -43,7 +43,8 @@ test("two-turn history and strict physical request budget", async () => {
 test("non-200 response fails closed without retry", async () => {
   let calls = 0;
   const fetcher: typeof fetch = async () => { calls++; return new Response("rate limited", { status: 429 }); };
-  await assert.rejects(runLiveSmokeProbe({ apiKey: "test", approved: true, fetcher, manifest }), /INCOMPLETE_1/);
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "test", approved: true, fetcher, manifest }),
+    (error: unknown) => error instanceof SmokeProbeFailure && error.code === "api_rate_limit" && error.physicalCalls === 1);
   assert.equal(calls, 1);
 });
 
@@ -63,7 +64,8 @@ test("malformed model reply fails without another physical attempt", async () =>
     calls++;
     return new Response(JSON.stringify({ candidates: [{ content: { parts: [{ text: "not-json" }] } }] }), { status: 200 });
   };
-  await assert.rejects(runLiveSmokeProbe({ apiKey: "test", approved: true, fetcher, manifest }), /INCOMPLETE_1/);
+  await assert.rejects(runLiveSmokeProbe({ apiKey: "test", approved: true, fetcher, manifest }),
+    (error: unknown) => error instanceof SmokeProbeFailure && error.code === "response_json" && error.physicalCalls === 1);
   assert.equal(calls, 1);
 });
 
