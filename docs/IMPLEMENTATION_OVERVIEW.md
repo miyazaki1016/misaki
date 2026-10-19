@@ -3939,3 +3939,11 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - オーナーは少額・少回数の実Gemini検証へ進むことを了承済み。これは公開実行口の追加、秘密鍵の抽出、無制限課金、Production切替の承認ではない。利用可能な実行経路は未成立のため、**未実施のGemini返答を捏造したり、課金実行済みと書いてはいけない**。
 - 既存 `/api/acting-lab` は1回単位の実験用生成であり、user memory/Shared Memory/Body Clockを含む本番会話の再現でもPR #86の多往復品質測定経路でもない。しかもroute内部の認証と回数上限が不足しているため、安易に利用しない。
 - 次のゲート：オーナーが認可された隔離実行口とAPI利用額監視を準備できた時点で、Q02の2往復だけを**実モデル**で実行し、raw返答・設定・呼出回数と出所証拠を保持したうえで評価シートで人手レビュー。続行は結果に基づき判断。PR #86のmainマージ、DB/Production変更は別承認。
+
+
+## 2026-10-19 会話Q02 iPhone実験・無料プラン維持（Draft PR #86のみ）
+
+- SupabaseのFreeプロジェクト2件（美咲、EmergencyAlert）を維持。3件目は作らない。新規SQLも本番DB変更も不要。
+- iPhone用 `/conversation-review` で手入力評価、研究用ボタンを実装。API `/api/conversation-review/smoke` はデフォルト無効で、本人UID、Preview限定、別の専用GitHub repoでの1回限りのclaim成功を要求する。
+- 一度だけのclaim成功後に最大2物理リクエストのGemini Q02試験を可能にする設計。GitHub quota repoを新設し、専用の最低権限tokenをVercel Previewに設定するまでは、実ボタンを押しても実行されない。
+- 旧隔離Supabase案は廃止。詳細と未実行事項は `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` 最末尾を参照。Main/Production未変更、実Gemini呼び出し未実施。
