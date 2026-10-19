@@ -26,3 +26,12 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - 将来の実行経路の安全設計とコード差分はDraft PRで提案可能だが、Previewで課金を発生させる実動作は承認まで実施しない。
 
 **今回の実行結果**：前回コミット `9a24cff` のPRテストCIは success。今回の監査は読み取りと文書追加のみ。Mainへのmerge、DB変更、Production deploy、Gemini呼出しなし。
+
+## 2026-10-19 承認後の隔離Smokeアダプター（PR #86、まだ実呼出しなし）
+
+- `lib/conversation-lab/live-smoke-probe.ts`: Q02「過去の約束を覚えている？」だけを使用する2往復の最小実験。**APIキー注入と `approved: true` の両方がないと呼出し拒否**。ユーザー記憶は空、人物は合成fixture。
+- 物理API呼び出しは**1 runあたり最大2回**。再試行なし、15秒で中断、出力最大300 tokens、50 KB超応答拒否、ログ保存なし。失敗runはcomplete扱いにせず、不一致・空返答を正常として扱わない。
+- これはfallback personaを使う**研究用Smoke**。本番の全プロンプトや記憶・生活エンジン、Relationship Engineの同等性を示さない。
+- `tests/conversation-lab-live-smoke-probe.test.ts` はfetchをmockし、ゼロ回認可、2回上限、履歴転送、429/不正JSONで再試行しないことを検証する。CIで実APIキーは渡さず、課金発生なし。
+- **次の実Gemini実行は未実施**。接続済み実行環境のAPIキーをこの会話から安全に使えることが確認できず、勝手なPreview公開・本番トークンの取得や実験デプロイはしない。運用上の総金額予算上限や呼出履歴の可視化はAPI/Google側の設定との照合が必要。試行数上限は費用の絶対上限そのものではない。
+- 利用者に見せる前にGitHub Actionsの新コードテスト結果を確認し、セキュリティ境界・実行許可・費用上限を再確認する。Main/本番/DBに触れない。
