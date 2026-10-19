@@ -102,6 +102,8 @@ export default function ConversationReviewPage() {
           api_server: "Gemini API側のサーバーエラー",
           api_other: "Gemini APIがエラー応答を返しました",
           timeout_or_network: "Geminiへの通信または応答待ちで失敗",
+          timeout: "Geminiへの応答待ちが15秒の制限時間を超えました",
+          network: "Geminiへの通信に失敗しました（制限時間超過とは未確認）",
           response_shape: "Geminiの返答形式が想定と異なりました",
           response_json: "GeminiのJSON返答の読み取りに失敗",
           response_size: "Geminiの返答がサイズ上限を超えました",
