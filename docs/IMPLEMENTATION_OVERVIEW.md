@@ -3977,3 +3977,11 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - ユーザーに固定aliasでのAuth状態を確認してもらい、必要なら**明示同意のうえ別のテスト匿名UIDを作成**する。作成されたUIDを受け取ってからPreview-onlyのOWNER_UIDを更新する。古いUIDがログインできると誤認しない。
 - `MISAKI_SMOKE_GITHUB_TOKEN` はVercelのSensitiveとして登録を確認。環境設定は**デプロイ単位**で固定されるため、登録後に新しいPreviewデプロイを作って初めて反映される。実行フラグは未登録でOFF。Secret値を取得・ログ出力しない。
 - 新規Supabaseプロジェクト、本番アプリ/DBの会話履歴・記憶変更なし。Q02モデルの実呼び出しは未実施。
+
+
+### 2026-10-19 Q02 一度限り実Gemini失敗後の安全対策
+
+- Safariの実行後、ユーザーが「実験が完了しませんでした。実験枠が消費された可能性があります。」を確認。quota repo `miyazaki1016/misaki-q02-smoke-quota` に `one-shot-claims/q02-preview-v1.json` が作成済みであることをGitHub APIで確認。**使用済み**を確定し、再試行やclaim削除はしない。Geminiへの物理リクエスト件数・実際の失敗理由は未確認。Vercel runtimeログでも確定理由なし。
+- モデル識別子 `gemini-3.1-flash-lite` はGoogle公式モデル一覧に存在。モデルID誤記と断定しない。API権限/課金、JSON出力形式、出力トークン・thinking設定の影響は候補だが未証明。
+- 原因調査は**追加の実Gemini呼び出しゼロ**で実施。`readOneShotStatusInGitHub` で専用GitHubのclaim fileをGETするだけの確認を追加。200=used、404=available、その他=unknownで安全側に倒す。Q02 PreviewのGET準備状態はquota=used/unknownなら `ready=false`。クライアントでは使用済みを明示し、POST後も再度押せないようにする。既存POSTのclaim先行・最大2呼び出しは維持。
+- GitHub ActionsにはGETのread-only・fail-closedのテストを追加。PR #86内のみでProductionにはマージしない。
