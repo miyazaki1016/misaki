@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { claimOneShotInGitHub } from "../../../../lib/conversation-lab/github-one-shot-claim";
 import { runLiveSmokeProbe, LIVE_SMOKE_MODEL } from "../../../../lib/conversation-lab/live-smoke-probe";
 import type { RecordedReplyManifest } from "../../../../lib/conversation-lab/recorded-reply-import";
 
@@ -7,48 +8,45 @@ export const dynamic = "force-dynamic";
 
 /**
  * Preview-only, owner-only, globally one-shot smoke experiment.
- * The atomic claim RPC must live in an isolated Preview Supabase project.
- * Absent configuration / RPC errors always fail closed before Gemini.
+ * The one-shot claim is created in a separate dedicated GitHub repository.
+ * Absent configuration / GitHub claim failures always fail closed before Gemini.
  * No public anonymous or cookie-only access.
  */
 export async function POST(request: Request) {
   if (process.env.VERCEL_ENV !== "preview" ||
       process.env.MISAKI_SMOKE_ENABLED !== "yes" ||
-      process.env.MISAKI_SMOKE_ISOLATED_DB_CONFIRMED !== "yes") {
+      process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED !== "yes") {
     return Response.json({ error: "disabled" }, { status: 404 });
   }
   const bearer = request.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
-  // Existing Auth identity can be verified without touching its database.
-  // The quota database must be a wholly different Supabase project.
   const authUrl = "https://tzozajnwznxqgxnjikoy.supabase.co";
   const authKey = "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
-  const quotaUrl = process.env.MISAKI_SMOKE_QUOTA_SUPABASE_URL;
-  const quotaService = process.env.MISAKI_SMOKE_QUOTA_SERVICE_ROLE_KEY;
-  const quotaRef = process.env.MISAKI_SMOKE_QUOTA_PROJECT_REF;
-  let quotaHost = "";
-  try { quotaHost = new URL(quotaUrl || "").hostname; } catch { /* fail closed below */ }
-  if (!quotaRef || !/^[a-z]{20}$/.test(quotaRef) ||
-      quotaRef === "tzozajnwznxqgxnjikoy" || quotaHost !== quotaRef + ".supabase.co") {
-    return Response.json({ error: "isolated quota database missing" }, { status: 503 });
-  }
+  const quotaToken = process.env.MISAKI_SMOKE_GITHUB_TOKEN;
+  const quotaRepo = process.env.MISAKI_SMOKE_GITHUB_REPO;
+  const quotaBranch = process.env.MISAKI_SMOKE_GITHUB_BRANCH;
   const owner = process.env.MISAKI_SMOKE_OWNER_UID;
   const key = process.env.GEMINI_API_KEY;
-  if (!bearer || !quotaService || !owner || !key) {
+  if (!bearer || !quotaToken || !quotaRepo || !quotaBranch || !owner || !key) {
     return Response.json({ error: "not configured" }, { status: 503 });
   }
-  const client = createClient(authUrl, authKey, { auth: { persistSession: false } });
+  const client = createClient(authUrl, authKey, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: userResult, error: authError } = await client.auth.getUser(bearer);
   if (authError || !userResult.user || userResult.user.id !== owner) {
     return Response.json({ error: "forbidden" }, { status: 403 });
   }
-  // Database RPC MUST atomically reserve the sole lifetime run before spending tokens.
-  // Never reset the reservation on failure, and never trust a browser-side counter.
-  const admin = createClient(quotaUrl!, quotaService, { auth: { persistSession: false } });
-  const { data: claim, error: claimError } = await admin.rpc("misaki_claim_one_shot_smoke_v1", {
-    p_owner_uid: owner,
-    p_run_key: "q02-preview-v1",
-  });
-  if (claimError || claim !== true) {
+  // Durable GitHub reservation: missing or uncertain claims never spend tokens.
+  let claimed = false;
+  try {
+    claimed = (await claimOneShotInGitHub({
+      token: quotaToken,
+      repository: quotaRepo,
+      branch: quotaBranch,
+      runKey: "q02-preview-v1",
+    })) === "claimed";
+  } catch {
+    claimed = false;
+  }
+  if (!claimed) {
     return Response.json({ error: "smoke quota unavailable or already used" }, { status: 429 });
   }
   const manifest: RecordedReplyManifest = {
