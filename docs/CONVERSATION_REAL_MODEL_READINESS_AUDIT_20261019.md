@@ -101,3 +101,11 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - 旧 `docs/sql/DRAFT_PREVIEW_ONLY_SMOKE_CLAIM_20261019.sql` は削除した。SQL適用不要。
 - 注意：最大2リクエストの上限であり、Gemini料金の金額上限を厳密に保証するものではない。全ての許可条件が揃った後でも、Previewデプロイの実地確認前には実行しない。
 - この時点で**実Gemini 0回、Main/Production未変更、Supabase DB未変更**。
+
+
+## 2026-10-19 続き：実行ボタンの安全な待機表示・Previewブランチ固定
+
+- GitHubのcommit `da92da1`: POSTの検証条件に `VERCEL_GIT_COMMIT_REF === "experiment/conversation-lab-offline-v1-20261015"` を追加。Preview全般でなく、この固定ブランチだけが対象。GETは秘密値を返さず、`{ready:boolean}` を返す。
+- commit `8fa15a3`: iPhone画面はGETで準備状態を確認し、`ready=false` なら実行ボタンを**disabled**にして「実験準備中（まだ押せません）」と表示。必要設定完了後のみボタンが有効化。
+- 既存GitHubの接続済みリポジトリ一覧は美咲・アメふる系のみで、専用quotaリポジトリは未作成。GitHub connectorには新規repo作成機能が見つからないため、作成やPAT生成を実施したとは主張しない。
+- 本番DB、アメふる、Production、実Geminiコールは未変更。テスト結果とPreview準備完了は最終コミットを基準に再確認すること。
