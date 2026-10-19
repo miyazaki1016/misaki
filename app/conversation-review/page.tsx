@@ -63,7 +63,7 @@ export default function ConversationReviewPage() {
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error || !data.session?.access_token) {
-        setRunMessage("ログイン情報がありません。美咲のチャットにログインしてから戻ってください。");
+        setRunMessage("このPreviewにはログイン情報がありません。設定が整うまでは実行できません。");
         return;
       }
       const response = await fetch("/api/conversation-review/smoke", {
@@ -127,9 +127,9 @@ export default function ConversationReviewPage() {
         <strong>実験の準備状況</strong>
         <p style={{ margin: "6px 0" }}>{smokeReady ? "サーバー設定済み（実行前に最終確認あり）" : "未設定・実験は停止中"}</p>
         {identityStatus === "checking" && <p>iPhoneのログイン情報を確認中…</p>}
-        {identityStatus === "missing" && <p>このPreviewではログイン情報がありません。<a href="/chat">同じPreviewのチャット画面</a>でアカウントを準備してから戻ってね。</p>}
+        {identityStatus === "missing" && <p>このPreviewではログイン情報がありません。研究用Previewのチャットを開くと本番の会話データが更新される可能性があるため、自動ログインやチャットへの誘導は行いません。</p>}
         {identityStatus === "signed-in" && <>
-          <p style={{ fontSize: 13, margin: "8px 0" }}>この端末のテスト用ユーザーID（パスワードではありません）</p>
+          <p style={{ fontSize: 13, margin: "8px 0" }}>このブラウザーのログインユーザーID（秘密のトークンではありません。むやみに公開しないでください）</p>
           <code style={{ display: "block", overflowWrap: "anywhere", fontSize: 13 }}>{ownerUid}</code>
           <button type="button" onClick={copyOwnerUid} style={{ marginTop: 8, padding: "8px 12px", borderRadius: 8, border: "1px solid #ccc", background: "#fff" }}>IDをコピー</button>
           {copiedUid && <span role="status" style={{ marginLeft: 10 }}>コピーしたよ</span>}
