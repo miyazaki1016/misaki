@@ -63,3 +63,13 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - **ページ単体ではGeminiを呼び出さない**。バックエンドへの送信、DB保存、課金、実モデル起動は一切行わない。チャット欄の空欄は未取得と表示し、模擬返信を実測と偽らない。
 - 公開の課金APIには繋がない。自動生成ボタンには引き続きオーナー認証、耐久的で全体を通じた呼び出し上限、費用管理が必要。Preview保護と単一ブラウザーのdisabledボタンでは乱用防止にならない。
 - この画面は評価対象を実際に見せる準備であり、『iPhoneから実Geminiテストを実行できた』という成果ではない。
+
+
+## 2026-10-19 iPhone生成ルートの実装（**無効化状態**）
+
+- `app/api/conversation-review/smoke/route.ts` にPreview専用・Supabaseアクセストークン検証・オーナーUID照合・DB原子的claimを要求するPOST経路を追加。**公開URLを知っているだけでは生成不可**。Productionは404。
+- `MISAKI_SMOKE_ENABLED=yes` と `MISAKI_SMOKE_ISOLATED_DB_CONFIRMED=yes` が両方ない限り404。認証情報、service-roleキー、Geminiキー、DB claim RPCが一つでも不足すると**Geminiを呼ばず停止**。
+- `docs/sql/DRAFT_PREVIEW_ONLY_SMOKE_CLAIM_20261019.sql` はPreview隔離DB向けの**未適用ドラフト**。専用DBでレビュー・適用するまでは利用不可。本番DBへの適用は禁止。claimは生涯1件だけ成功し、Gemini失敗時も払い戻さない。
+- 認証済みiPhone画面からの実行ボタンは**まだ有効化していない**。実行条件が揃っていない段階で「押せば生成できる」と見せないため。iPhone画面は引き続き手入力レビューのみ。
+- 注意：routeの回数制限は「run1回・物理最大2回」だが**課金額の絶対上限ではない**。Google側の課金監視・隔離DB・オーナーUID・Vercel環境設定の実地検証が必要。Secret値をチャットやGitHubへ出さない。
+- 今回はDraft PR #86 branchへのコード・SQL案のみ。**実Gemini 0回、SQL適用0回、Main/Production変更なし**。CIとPreview buildは新commitについて別途確認する。
