@@ -3947,3 +3947,10 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - iPhone用 `/conversation-review` で手入力評価、研究用ボタンを実装。API `/api/conversation-review/smoke` はデフォルト無効で、本人UID、Preview限定、別の専用GitHub repoでの1回限りのclaim成功を要求する。
 - 一度だけのclaim成功後に最大2物理リクエストのGemini Q02試験を可能にする設計。GitHub quota repoを新設し、専用の最低権限tokenをVercel Previewに設定するまでは、実ボタンを押しても実行されない。
 - 旧隔離Supabase案は廃止。詳細と未実行事項は `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` 最末尾を参照。Main/Production未変更、実Gemini呼び出し未実施。
+
+
+### 2026-10-19 続報：iPhoneオーナーUID確認を実装（PR #86）
+
+- Preview画面 `/conversation-review` にSupabaseログイン確認・端末ユーザーIDの表示/コピー機能を実装。未ログイン時は同一Previewの `/chat` へ案内。外部にIDを自動送信せず、コピーも利用者操作が必要。
+- 研究用実行ボタンは `GET /api/conversation-review/smoke` のサーバー準備状態に加え、当該iPhoneでログイン済みの条件で有効化。サーバーの本人UID照合・別private GitHub repo一度きりclaimは引き続き必須。
+- 接続済みGitHub機能には新規repo作成/PAT発行のアクションがない。これらは未実施で、生成は無効のまま。Supabase2件はそのまま。最新コミットのCI/Previewは確認完了してから記録する。
