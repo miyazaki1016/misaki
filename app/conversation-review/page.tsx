@@ -27,6 +27,27 @@ export default function ConversationReviewPage() {
   const [identityStatus, setIdentityStatus] = useState<"checking" | "signed-in" | "missing">("checking");
   const [ownerUid, setOwnerUid] = useState("");
   const [copiedUid, setCopiedUid] = useState(false);
+  const [creatingTestIdentity, setCreatingTestIdentity] = useState(false);
+  const [identityMessage, setIdentityMessage] = useState("");
+  const createTestIdentity = async () => {
+    if (creatingTestIdentity || !window.confirm("検証用の匿名ユーザーを1つ作成します。美咲の既存Supabase Authに匿名アカウントが追加されますが、会話履歴・記憶には書き込みません。続けますか？")) return;
+    setCreatingTestIdentity(true);
+    setIdentityMessage("");
+    try {
+      const { data, error } = await supabase.auth.signInAnonymously();
+      if (error || !data.user || !data.session) {
+        setIdentityMessage("匿名ログインに失敗しました。認証設定を確認してください。");
+        return;
+      }
+      setOwnerUid(data.user.id);
+      setIdentityStatus("signed-in");
+      setIdentityMessage("テスト用ユーザーIDができたよ。IDをコピーして、このチャットに貼ってね（認証トークンは貼らないで）。");
+    } catch {
+      setIdentityMessage("通信に失敗しました。もう一度画面を開き直して確認してね。");
+    } finally {
+      setCreatingTestIdentity(false);
+    }
+  };
   useEffect(() => {
     let active = true;
     supabase.auth.getSession().then(({ data, error }) => {
@@ -127,7 +148,15 @@ export default function ConversationReviewPage() {
         <strong>実験の準備状況</strong>
         <p style={{ margin: "6px 0" }}>{smokeReady ? "サーバー設定済み（実行前に最終確認あり）" : "未設定・実験は停止中"}</p>
         {identityStatus === "checking" && <p>iPhoneのログイン情報を確認中…</p>}
-        {identityStatus === "missing" && <p>このPreviewではログイン情報がありません。研究用Previewのチャットを開くと本番の会話データが更新される可能性があるため、自動ログインやチャットへの誘導は行いません。</p>}
+        {identityStatus === "missing" && <>
+          <p>このPreviewにはログイン情報がないよ。チャット画面は開かずに、ここからテスト専用の匿名ユーザーを作成できるよ。</p>
+          <p style={{ fontSize: 13 }}>※美咲の既存Supabase Authに新しい匿名アカウントが1つ追加されます。既存の会話履歴・記憶は変更しません。作成は確認後のみ。</p>
+          <button type="button" disabled={creatingTestIdentity} onClick={createTestIdentity}
+            style={{ padding: "12px 16px", border: 0, borderRadius: 10, background: "#6d3f67", color: "white", fontWeight: 700 }}>
+            {creatingTestIdentity ? "作成中…" : "テスト用ログインを作る"}
+          </button>
+        </>}
+        {identityMessage && <p role="status">{identityMessage}</p>}
         {identityStatus === "signed-in" && <>
           <p style={{ fontSize: 13, margin: "8px 0" }}>このブラウザーのログインユーザーID（秘密のトークンではありません。むやみに公開しないでください）</p>
           <code style={{ display: "block", overflowWrap: "anywhere", fontSize: 13 }}>{ownerUid}</code>
