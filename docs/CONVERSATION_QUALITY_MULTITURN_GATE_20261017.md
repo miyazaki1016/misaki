@@ -75,3 +75,7 @@
 - `compareRecordedReplyManifests` でPersona/記憶/Relationship/時刻/外部情報/データ同意区分の一致を必須とし、差異がある比較を拒否。別capture IDと完整な判定根拠も必要。
 - 比較可能とは**同一条件で評価したという入力申告**のみを指す。モデルから本当に生成されたか、判定が公正か、コンテキストが漏れていないか、実運用品質が良いかは別途検証する。
 - `tests/conversation-lab-quality-reviewed-comparison.test.ts` では合成fixtureのみ使用。Gemini/API/Production/DBは未使用。今回のCI成功を確認するまでテスト合格を宣言しない。
+
+## 2026-10-19 追補：実モデル検証入口の監査結果
+
+実行前のコード監査は [`CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md`](./CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md) を正本とする。既存 `/api/acting-lab` は単発・履歴なし・fallback personaの演技検証経路であり、PR #86の多往復/記憶/想い出/無料・有料の実機評価の代用にはできない。またpreview時の認証・モデル呼出し回数上限等がroute内にない。実課金呼出しはオーナーの明示承認と隔離・予算制限を整えてから行う。前コミット `9a24cff` のCI successを確認済み。今回、実Geminiの呼出し・本番変更はない。
