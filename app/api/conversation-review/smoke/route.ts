@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { claimOneShotInGitHub, readOneShotStatusInGitHub } from "../../../../lib/conversation-lab/github-one-shot-claim";
-import { runLiveSmokeProbe, LIVE_SMOKE_MODEL } from "../../../../lib/conversation-lab/live-smoke-probe";
+import { runLiveSmokeProbe, LIVE_SMOKE_MODEL, SmokeProbeFailure } from "../../../../lib/conversation-lab/live-smoke-probe";
 import type { RecordedReplyManifest } from "../../../../lib/conversation-lab/recorded-reply-import";
 
 export const runtime = "nodejs";
@@ -100,8 +100,12 @@ export async function POST(request: Request) {
       verification: "caller-attested-unverified",
       limitation: "Synthetic Q02 fallback persona only; not production Misaki",
     }, { headers: { "Cache-Control": "no-store" } });
-  } catch {
-    // Do not refund a claimed run; the request may already have spent tokens.
-    return Response.json({ error: "smoke failed; claim consumed" }, { status: 502 });
+  } catch (error) {
+    // Never include the upstream response, prompts, credentials, or arbitrary exception message.
+    // Reservation stays consumed; number counts physical attempts, NOT confirmed billable calls.
+    const failureCode = error instanceof SmokeProbeFailure ? error.code : "unknown";
+    const attemptedCalls = error instanceof SmokeProbeFailure ? error.physicalCalls : null;
+    return Response.json({ error: "smoke_failed", failureCode, attemptedCalls, quota: "used" },
+      { status: 502, headers: { "Cache-Control": "no-store" } });
   }
 }
