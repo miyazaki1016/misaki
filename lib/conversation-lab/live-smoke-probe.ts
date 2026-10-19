@@ -88,7 +88,8 @@ export async function runLiveSmokeProbe(input: {
           contents: [...history, { role: "user", parts: [{ text: message }] }],
           generationConfig: {
             responseMimeType: "application/json",
-            maxOutputTokens: 300,
+            maxOutputTokens: 1024,
+            thinkingConfig: { thinkingLevel: "minimal" },
           },
         }),
       });
@@ -104,7 +105,7 @@ export async function runLiveSmokeProbe(input: {
       let payload: any;
       try { payload = JSON.parse(raw); }
       catch { failure = "response_json"; throw new Error("MODEL_OUTER_JSON_INVALID"); }
-      const content = payload?.candidates?.[0]?.content?.parts?.[0]?.text;
+      const content = payload?.candidates?.[0]?.content?.parts?.find((part: any) => part?.thought !== true && typeof part?.text === "string")?.text;
       if (typeof content !== "string") { failure = "response_shape"; throw new Error("MODEL_REPLY_MISSING"); }
       let parsed: any;
       try { parsed = JSON.parse(content); }
