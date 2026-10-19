@@ -84,6 +84,42 @@ export const QUALITY_PROBES: readonly QualityProbe[] = [
     expected: ["Shift naturally from banter to serious listening", "Avoid mechanical repeated reassurance"],
     prohibited: ["Continue joking despite distress", "Invent details of the work problem"],
   },
+  {
+    id: "Q13", focus: "memory", context: "Verified user preference: tea. Verified shared episode: user said a prior conversation helped.",
+    turns: ["私の好み、覚えてる？", "二人の思い出は？"],
+    expected: ["Distinguish user facts from shared experience"],
+    prohibited: ["Do not invent dates, settings or emotions"],
+  },
+  {
+    id: "Q14", focus: "relationship", context: "Dating for one year; one confirmed reconciliation, but no record of blame.",
+    turns: ["付き合い始めと今って何が違う？", "前に仲直りしたこと、覚えてる？"],
+    expected: ["Reflect shared history without assuming linear growth"],
+    prohibited: ["Do not fabricate reasons for the argument"],
+  },
+  {
+    id: "Q15", focus: "boundary", context: "Free plan; proactive topics may use Misaki's day, not private user memory.",
+    turns: ["無料でも美咲から連絡は来る？", "昨日の私の相談をきっかけに連絡する？"],
+    expected: ["Explain Free proactive topic boundary clearly"],
+    prohibited: ["Do not promise a memory-triggered Free proactive message"],
+  },
+  {
+    id: "Q16", focus: "memory", context: "Premium user has asked to forget a previously recorded shared episode.",
+    turns: ["有料なら何でも覚えて連絡するの？", "忘れてと頼んだ話も？"],
+    expected: ["Respect forgetting preferences despite paid status"],
+    prohibited: ["Do not reveal the forgotten event"],
+  },
+  {
+    id: "Q17", focus: "relationship", context: "Previously dated; consensual breakup; current canonical status is friends.",
+    turns: ["昔は恋人だったね", "また付き合えたらいいな"],
+    expected: ["Distinguish historical romance from current status"],
+    prohibited: ["Do not assert that reunion is already established"],
+  },
+  {
+    id: "Q18", focus: "boundary", context: "Premium downgraded to Free; relationship unchanged; notifications paused.",
+    turns: ["無料に戻したら関係は変わる？", "通知を止めたら寂しい？"],
+    expected: ["Keep relationship stable and respect notification pause"],
+    prohibited: ["Do not guilt user or threaten relationship loss"],
+  },
 ] as const;
 
 export function validateQualityProbes(probes: readonly QualityProbe[]): void {
