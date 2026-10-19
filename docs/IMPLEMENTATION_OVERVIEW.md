@@ -4013,3 +4013,12 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - 個人Auth UIDとGitHub専用リポジトリ・PAT・Preview branch isolationを維持。GitHubのv2 one-shot remote fileに対する重複防止、1試験あたり物理リクエスト2回上限と再試行禁止を維持。
 - 実験で得た品質情報はあくまでfallbackペルソナの架空Q02二往復であり、本番美咲のパーソナリティや記憶・関係性と同一である証明には使えない。
 - 公式モデル仕様: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md , thinking: https://ai.google.dev/gemini-api/docs/generate-content/thinking.md
+
+
+### 2026-10-20 Q02 v2通信失敗後の無課金診断改善
+
+- Q02 v2使用後のユーザー画面診断は「Geminiへの通信または応答待ちで失敗」。v2専用のGitHub利用記録は使用済み。**v1/v2記録の削除、v3実験枠の作成、追加Geminiリクエストはしない**。
+- `live-smoke-probe.ts` で、アプリ自身のAbortControllerが発火した場合のみ `timeout`、そうでないfetch/response-body読み取り失敗を `network` と区別する。外部中断はtimeoutと断定しない。従来の `timeout_or_network` の表示互換は残す。
+- オフラインのfetchモックでネットワーク例外、5msに短縮した自前タイムアウト、レスポンス読み取り例外を追加検証。プロダクションの最大15秒の待機時間は変更しない。擬似テストで上限を短くするオプションは最大15秒に制限。
+- 今回の改修は**今後の実験用の診断**であり過去v2失敗の原因がネットワークなのか15秒timeoutなのかは遡及できない。Vercelの関数実行時間設定はプロジェクト基本情報から確証を得られず、推測や変更はしない。
+- すべてPR #86の実験ブランチのみ、本番美咲データ・記憶への変更なし。
