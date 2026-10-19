@@ -88,3 +88,16 @@ PR #86 の18ケースのオフライン試験・レビュー記録・比較ゲ�
 - 新規専用環境変数 `MISAKI_SMOKE_QUOTA_SUPABASE_URL`, `MISAKI_SMOKE_QUOTA_SERVICE_ROLE_KEY`, `MISAKI_SMOKE_QUOTA_PROJECT_REF` が必要。接続先のURLとref一致・本番ref不一致をコードで検査し、未設定・本番宛は生成前に停止。公開鍵は現行アプリと同じ固定publishableキー。
 - 2026-10-19 時点で実験用環境変数・隔離DBは未設定。既存Previewはビルド完了し、CI通過。新しい修正コミットのCIは別途確認。
 - **ユーザーの追加課金／プロジェクト作成が必要になり得るため、新規Supabaseプロジェクトは未作成。** 現状は安全優先で生成OFF。
+
+
+## 2026-10-19 最終方針修正：新規Supabase不要・GitHub単発claim（上記DB案を廃止）
+
+**この節が上記の隔離Supabase案・SQL案を置き換える。** FreeのSupabase枠は美咲とEmergencyAlertで2件使用済み。3つ目は増やさず、Production美咲DBも、アメふるDBも変更しない。
+
+- `lib/conversation-lab/github-one-shot-claim.ts`: **別の専用プライベートGitHubリポジトリ**のmainに `one-shot-claims/q02-preview-v1.json` を初回だけ作成する。GitHub Contents APIは既存ファイル更新時にSHAが必要なため、SHAなしの2回目は失敗する。成功応答HTTP 201の場合のみ、研究用Geminiを最大2回呼び出す。
+- `app/api/conversation-review/smoke/route.ts`: Productionで常に404。Previewでも `MISAKI_SMOKE_ENABLED=yes`、`MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED=yes` の両方がない限り404。認証済みの指定UIDだけが使える。GitHubエラー/重複/不明結果はGemini実行前に停止、claim後の失敗時も再実行不可。
+- Vercel Preview専用で必要な新しい環境変数（未設定）：`MISAKI_SMOKE_ENABLED`、`MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED`、`MISAKI_SMOKE_OWNER_UID`、`MISAKI_SMOKE_GITHUB_REPO`、`MISAKI_SMOKE_GITHUB_BRANCH`、`MISAKI_SMOKE_GITHUB_TOKEN`。Gemini keyは既存のサーバー側Secretを再利用。tokenは**別の専用private repoだけContents write可能なfine-grained PAT**としてVercel PreviewのSecretに保持し、ブラウザー・git・ログに公開しない。
+- 専用private repoは他の作業では変更・削除せず、claimファイルも消さない。GitHubリポジトリのbranch保護/トークン権限/Secret設定を確認するまで有効化禁止。テスト前にユーザーの認証UIDを実測確認する。新規repo作成やPAT発行、Vercel Secret設定はまだ実施していない。
+- 旧 `docs/sql/DRAFT_PREVIEW_ONLY_SMOKE_CLAIM_20261019.sql` は削除した。SQL適用不要。
+- 注意：最大2リクエストの上限であり、Gemini料金の金額上限を厳密に保証するものではない。全ての許可条件が揃った後でも、Previewデプロイの実地確認前には実行しない。
+- この時点で**実Gemini 0回、Main/Production未変更、Supabase DB未変更**。
