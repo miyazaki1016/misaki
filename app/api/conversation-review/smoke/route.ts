@@ -9,10 +9,13 @@ export const dynamic = "force-dynamic";
 const EXPECTED_BRANCH = "experiment/conversation-lab-offline-v1-20261015";
 const EXPECTED_QUOTA_REPO = "miyazaki1016/misaki-q02-smoke-quota";
 const EXPECTED_QUOTA_BRANCH = "main";
+const V2_RUN_KEY = "q02-preview-v2" as const;
 function isConfigured() {
   return process.env.VERCEL_ENV === "preview" &&
     process.env.VERCEL_GIT_COMMIT_REF === EXPECTED_BRANCH &&
     process.env.MISAKI_SMOKE_ENABLED === "yes" &&
+    process.env.MISAKI_SMOKE_V2_EXPLICIT_APPROVAL === "yes" &&
+    process.env.MISAKI_SMOKE_RUN_KEY === V2_RUN_KEY &&
     process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED === "yes" &&
     process.env.MISAKI_SMOKE_GITHUB_REPO === EXPECTED_QUOTA_REPO &&
     process.env.MISAKI_SMOKE_GITHUB_BRANCH === EXPECTED_QUOTA_BRANCH &&
@@ -32,7 +35,7 @@ export async function GET() {
     token: process.env.MISAKI_SMOKE_GITHUB_TOKEN!,
     repository: EXPECTED_QUOTA_REPO,
     branch: EXPECTED_QUOTA_BRANCH,
-    runKey: "q02-preview-v1",
+    runKey: V2_RUN_KEY,
   });
   return Response.json({ ready: quota === "available", quota, description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
 }
@@ -71,7 +74,7 @@ export async function POST(request: Request) {
       token: quotaToken,
       repository: quotaRepo,
       branch: quotaBranch,
-      runKey: "q02-preview-v1",
+      runKey: V2_RUN_KEY,
     })) === "claimed";
   } catch {
     claimed = false;
@@ -80,7 +83,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "smoke quota unavailable or already used" }, { status: 429 });
   }
   const manifest: RecordedReplyManifest = {
-    captureId: "q02-preview-v1",
+    captureId: V2_RUN_KEY,
     modelName: LIVE_SMOKE_MODEL,
     modelVersion: "request-model-name-only",
     promptRevision: "fallback-smoke-v1",
