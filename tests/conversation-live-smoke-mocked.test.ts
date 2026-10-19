@@ -22,6 +22,8 @@ test("mocked Q02 returns two ordered replies and only two physical attempts", as
     assert.equal(init.method, "POST");
     const body = JSON.parse(String(init.body));
     assert.equal(body.contents.at(-1).role, "user");
+    assert.equal(body.generationConfig.maxOutputTokens, 1024);
+    assert.equal(body.generationConfig.thinkingConfig.thinkingLevel, "minimal");
     assert.equal(body.contents.length, calls === 1 ? 1 : 3);
     return { ok: true, text: async () => JSON.stringify({
       candidates: [{ content: { parts: [{ text: JSON.stringify({ reply: "テスト返答" + calls }) }] } }],
@@ -91,4 +93,20 @@ test("malformed Gemini JSON classified without raw model output", async () => {
       assert.doesNotMatch(error.message, /private/);
       return true;
     });
+});
+
+
+test("thought parts are ignored when a later normal reply part is present", async () => {
+  let calls = 0;
+  const fetcher = (async () => {
+    calls++;
+    return { ok: true, text: async () => JSON.stringify({ candidates: [{ content: { parts: [
+      { thought: true, text: "hidden reasoning" },
+      { text: JSON.stringify({ reply: "通常の返答" + calls }) },
+    ] } }] }) };
+  }) as unknown as typeof fetch;
+  const result = await runLiveSmokeProbe({ apiKey: "mock-key", approved: true, fetcher, manifest });
+  assert.equal(result.physicalCalls, 2);
+  assert.equal(calls, 2);
+  assert.deepEqual(result.imported.run.turns.filter(turn => turn.role === "model").map(turn => turn.text), ["通常の返答1", "通常の返答2"]);
 });
