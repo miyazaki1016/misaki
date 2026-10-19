@@ -32,18 +32,8 @@ const required: readonly (keyof RecordedReplyManifest)[] = [
   "timeFixture", "externalContextFixtureId", "userConsentOrSyntheticFixture",
 ];
 
-export function importRecordedQualityReplies(input: {
-  probe: QualityProbe;
-  replies: readonly string[];
-  manifest: RecordedReplyManifest;
-}): ImportedQualityTranscript {
-  const { probe, replies, manifest } = input;
-  if (!probe.id.trim() || probe.turns.length < 2 || probe.turns.length > 20 ||
-      replies.length !== probe.turns.length ||
-      probe.turns.some(t => typeof t !== "string" || !t.trim() || t.length > 4000) ||
-      replies.some(t => typeof t !== "string" || !t.trim() || t.length > 4000)) {
-    throw new Error("RECORDED_QUALITY_TRANSCRIPT_INVALID");
-  }
+/** Validate all manifest fields *before* a live experiment spends tokens. */
+export function validateRecordedReplyManifest(manifest: RecordedReplyManifest): void {
   for (const key of required) {
     const value = manifest[key];
     if (typeof value !== "string" || !value.trim() || value.length > 256) {
@@ -57,6 +47,21 @@ export function importRecordedQualityReplies(input: {
   if (!Number.isFinite(parsedDate) || !/(?:Z|[+-][0-9]{2}:[0-9]{2})$/.test(manifest.timeFixture)) {
     throw new Error("RECORDED_QUALITY_TIME_INVALID");
   }
+}
+
+export function importRecordedQualityReplies(input: {
+  probe: QualityProbe;
+  replies: readonly string[];
+  manifest: RecordedReplyManifest;
+}): ImportedQualityTranscript {
+  const { probe, replies, manifest } = input;
+  if (!probe.id.trim() || probe.turns.length < 2 || probe.turns.length > 20 ||
+      replies.length !== probe.turns.length ||
+      probe.turns.some(t => typeof t !== "string" || !t.trim() || t.length > 4000) ||
+      replies.some(t => typeof t !== "string" || !t.trim() || t.length > 4000)) {
+    throw new Error("RECORDED_QUALITY_TRANSCRIPT_INVALID");
+  }
+  validateRecordedReplyManifest(manifest);
   const turns: LabRun["turns"] = [];
   for (let i = 0; i < replies.length; i++) {
     turns.push({ role: "user", text: probe.turns[i] });
