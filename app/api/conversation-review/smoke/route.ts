@@ -1,0 +1,114 @@
+import { createClient } from "@supabase/supabase-js";
+import { claimOneShotInGitHub, readOneShotStatusInGitHub } from "../../../../lib/conversation-lab/github-one-shot-claim";
+import { runLiveSmokeProbe, LIVE_SMOKE_MODEL, SmokeProbeFailure } from "../../../../lib/conversation-lab/live-smoke-probe";
+import type { RecordedReplyManifest } from "../../../../lib/conversation-lab/recorded-reply-import";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+const EXPECTED_BRANCH = "experiment/conversation-lab-offline-v1-20261015";
+const EXPECTED_QUOTA_REPO = "miyazaki1016/misaki-q02-smoke-quota";
+const EXPECTED_QUOTA_BRANCH = "main";
+const V2_RUN_KEY = "q02-preview-v2" as const;
+function isConfigured() {
+  return process.env.VERCEL_ENV === "preview" &&
+    process.env.VERCEL_GIT_COMMIT_REF === EXPECTED_BRANCH &&
+    process.env.MISAKI_SMOKE_ENABLED === "yes" &&
+    process.env.MISAKI_SMOKE_V2_EXPLICIT_APPROVAL === "yes" &&
+    process.env.MISAKI_SMOKE_RUN_KEY === V2_RUN_KEY &&
+    process.env.MISAKI_SMOKE_GITHUB_QUOTA_CONFIRMED === "yes" &&
+    process.env.MISAKI_SMOKE_GITHUB_REPO === EXPECTED_QUOTA_REPO &&
+    process.env.MISAKI_SMOKE_GITHUB_BRANCH === EXPECTED_QUOTA_BRANCH &&
+    Boolean(process.env.MISAKI_SMOKE_OWNER_UID &&
+      process.env.MISAKI_SMOKE_GITHUB_TOKEN &&
+      process.env.MISAKI_SMOKE_GITHUB_REPO &&
+      process.env.MISAKI_SMOKE_GITHUB_BRANCH &&
+      process.env.GEMINI_API_KEY);
+}
+
+export async function GET() {
+  if (!isConfigured()) {
+    return Response.json({ ready: false, quota: "unconfigured", description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
+  }
+  // Reading status is safe: no claim write and no Gemini call.
+  const quota = await readOneShotStatusInGitHub({
+    token: process.env.MISAKI_SMOKE_GITHUB_TOKEN!,
+    repository: EXPECTED_QUOTA_REPO,
+    branch: EXPECTED_QUOTA_BRANCH,
+    runKey: V2_RUN_KEY,
+  });
+  return Response.json({ ready: quota === "available", quota, description: "Q02 one-shot research only" }, { headers: { "Cache-Control": "no-store" } });
+}
+
+
+/**
+ * Preview-only, owner-only, globally one-shot smoke experiment.
+ * The one-shot claim is created in a separate dedicated GitHub repository.
+ * Absent configuration / GitHub claim failures always fail closed before Gemini.
+ * No public anonymous or cookie-only access.
+ */
+export async function POST(request: Request) {
+  if (!isConfigured()) {
+    return Response.json({ error: "disabled" }, { status: 404 });
+  }
+  const bearer = request.headers.get("authorization")?.match(/^Bearer (.+)$/i)?.[1];
+  const authUrl = "https://tzozajnwznxqgxnjikoy.supabase.co";
+  const authKey = "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
+  const quotaToken = process.env.MISAKI_SMOKE_GITHUB_TOKEN;
+  const quotaRepo = process.env.MISAKI_SMOKE_GITHUB_REPO;
+  const quotaBranch = process.env.MISAKI_SMOKE_GITHUB_BRANCH;
+  const owner = process.env.MISAKI_SMOKE_OWNER_UID;
+  const key = process.env.GEMINI_API_KEY;
+  if (!bearer || !quotaToken || !quotaRepo || !quotaBranch || !owner || !key) {
+    return Response.json({ error: "not configured" }, { status: 503 });
+  }
+  const client = createClient(authUrl, authKey, { auth: { persistSession: false, autoRefreshToken: false } });
+  const { data: userResult, error: authError } = await client.auth.getUser(bearer);
+  if (authError || !userResult.user || userResult.user.id !== owner) {
+    return Response.json({ error: "forbidden" }, { status: 403 });
+  }
+  // Durable GitHub reservation: missing or uncertain claims never spend tokens.
+  let claimed = false;
+  try {
+    claimed = (await claimOneShotInGitHub({
+      token: quotaToken,
+      repository: quotaRepo,
+      branch: quotaBranch,
+      runKey: V2_RUN_KEY,
+    })) === "claimed";
+  } catch {
+    claimed = false;
+  }
+  if (!claimed) {
+    return Response.json({ error: "smoke quota unavailable or already used" }, { status: 429 });
+  }
+  const manifest: RecordedReplyManifest = {
+    captureId: V2_RUN_KEY,
+    modelName: LIVE_SMOKE_MODEL,
+    modelVersion: "request-model-name-only",
+    promptRevision: "fallback-smoke-v1",
+    personaRevision: "fallback-current",
+    relationshipFixtureId: "unknown",
+    memoryFixtureId: "none",
+    timeFixture: new Date().toISOString(),
+    externalContextFixtureId: "none",
+    userConsentOrSyntheticFixture: "synthetic-fixture",
+  };
+  try {
+    const observed = await runLiveSmokeProbe({ apiKey: key, approved: true, manifest });
+    return Response.json({
+      probeId: observed.imported.run.scenarioId,
+      turns: observed.imported.run.turns,
+      physicalCalls: observed.physicalCalls,
+      verification: "caller-attested-unverified",
+      limitation: "Synthetic Q02 fallback persona only; not production Misaki",
+    }, { headers: { "Cache-Control": "no-store" } });
+  } catch (error) {
+    // Never include the upstream response, prompts, credentials, or arbitrary exception message.
+    // Reservation stays consumed; number counts physical attempts, NOT confirmed billable calls.
+    const failureCode = error instanceof SmokeProbeFailure ? error.code : "unknown";
+    const attemptedCalls = error instanceof SmokeProbeFailure ? error.physicalCalls : null;
+    return Response.json({ error: "smoke_failed", failureCode, attemptedCalls, quota: "used" },
+      { status: 502, headers: { "Cache-Control": "no-store" } });
+  }
+}

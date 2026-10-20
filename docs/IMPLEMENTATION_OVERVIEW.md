@@ -3925,3 +3925,140 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+---
+
+## 2026-10-19 追記 — 会話品質検証 PR #86 の実測直前ゲート（Draft限定）
+
+**正本参照**：`docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md`、`docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md`、`docs/CONVERSATION_LONG_TERM_PROBES_20261019.md`（いずれもPR #86 branch内）。本追記は**実験ブランチの記録**であり、main/Productionに同内容が反映されたことを意味しない。
+
+- 18件の2〜3往復の品質fixture、人手評価シート、保存済み返信のoffline import、同一条件の人手比較ゲートをDraftとして作成。記憶/想い出の区別、長期関係、別れ/復縁、Free/Premium自発連絡・Forget Control・通知停止が検証観点に追加された。**実Geminiの品質合格を証明していない。**
+- `lib/conversation-lab/live-smoke-probe.ts` は、架空Q02のみ、明示approved、最大2物理APIリクエスト、リトライなし、timeout、出力上限、DB書込なしの**ライブラリ関数**。モデル名とmemory/relationship等のmanifest preflightを呼出前に検証。CI success確認済み（`4918ec7`および後続preflight修正 `43de98d`）。CIのmock試験は**課金APIの実行ではない**。
+- Vercel `misaki` Previewでは `4918ec7` のデプロイがREADY、`GEMINI_API_KEY` の設定名がPreview対象として存在。シークレット値は取得していない。**有効な単発実行口・保護・費用総額上限・実Geminiの実測記録は未確認/未完了。**
+- オーナーは少額・少回数の実Gemini検証へ進むことを了承済み。これは公開実行口の追加、秘密鍵の抽出、無制限課金、Production切替の承認ではない。利用可能な実行経路は未成立のため、**未実施のGemini返答を捏造したり、課金実行済みと書いてはいけない**。
+- 既存 `/api/acting-lab` は1回単位の実験用生成であり、user memory/Shared Memory/Body Clockを含む本番会話の再現でもPR #86の多往復品質測定経路でもない。しかもroute内部の認証と回数上限が不足しているため、安易に利用しない。
+- 次のゲート：オーナーが認可された隔離実行口とAPI利用額監視を準備できた時点で、Q02の2往復だけを**実モデル**で実行し、raw返答・設定・呼出回数と出所証拠を保持したうえで評価シートで人手レビュー。続行は結果に基づき判断。PR #86のmainマージ、DB/Production変更は別承認。
+
+
+## 2026-10-19 会話Q02 iPhone実験・無料プラン維持（Draft PR #86のみ）
+
+- SupabaseのFreeプロジェクト2件（美咲、EmergencyAlert）を維持。3件目は作らない。新規SQLも本番DB変更も不要。
+- iPhone用 `/conversation-review` で手入力評価、研究用ボタンを実装。API `/api/conversation-review/smoke` はデフォルト無効で、本人UID、Preview限定、別の専用GitHub repoでの1回限りのclaim成功を要求する。
+- 一度だけのclaim成功後に最大2物理リクエストのGemini Q02試験を可能にする設計。GitHub quota repoを新設し、専用の最低権限tokenをVercel Previewに設定するまでは、実ボタンを押しても実行されない。
+- 旧隔離Supabase案は廃止。詳細と未実行事項は `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` 最末尾を参照。Main/Production未変更、実Gemini呼び出し未実施。
+
+
+### 2026-10-19 続報：iPhoneオーナーUID確認を実装（PR #86）
+
+- Preview画面 `/conversation-review` にSupabaseログイン確認・端末ユーザーIDの表示/コピー機能を実装。未ログイン時は同一Previewの `/chat` へ案内。外部にIDを自動送信せず、コピーも利用者操作が必要。
+- 研究用実行ボタンは `GET /api/conversation-review/smoke` のサーバー準備状態に加え、当該iPhoneでログイン済みの条件で有効化。サーバーの本人UID照合・別private GitHub repo一度きりclaimは引き続き必須。
+- 接続済みGitHub機能には新規repo作成/PAT発行のアクションがない。これらは未実施で、生成は無効のまま。Supabase2件はそのまま。最新コミットのCI/Previewは確認完了してから記録する。
+
+
+### 2026-10-19 夜・Q02 Preview安全性追補（PR #86）
+
+- Freeプラン継続のため、専用GitHub quota repo名を `miyazaki1016/misaki-q02-smoke-quota`、ブランチを `main` に固定。別のrepo/branchが環境変数に入った場合はGemini実行前に停止。
+- iPhone画面では、Previewのログインがない場合に `/chat` へ移動させる案内を撤回。現行Previewのチャットが本番Supabaseデータへ書き込む可能性があるため、本人が誤ってテストチャットを触らないよう注意表示に変更。UI側は匿名ログインを作成せず既存セッションの読み取りのみ。
+- 専用private repo作成、最小権限PAT発行、Vercel Preview secret投入は**未実施**。現接続ツールにこれらを安全に自動作成する機能がない。本人認証のUIDも未確定。したがって実Gemini実験は引き続きOFF。実行回数0、本番DB・アメふるDBは変更なし。
+
+
+### 2026-10-19 iPhone Previewログインなし対策（PR #86）
+
+- ユーザーのiPhone実画面で `このPreviewではログイン情報がありません` を確認。異なるPreviewドメインにはセッションが共有されないため、正常な状態。
+- `/conversation-review` に本人の明示的な確認ダイアログ付き `テスト用ログインを作る` ボタンを追加。ユーザー操作後にSupabase Authの `signInAnonymously()` を実行し、発行されたユーザーUIDを画面に表示/コピー可能にする。**ボタンを押す前はAuth書き込みなし**。Authユーザー1件作成は美咲の既存Supabaseプロジェクトに対する書き込みであり、本番データベースに全く変更がないという主張は不可。ただし会話履歴/記憶を変更するAPIは呼ばない。
+- 自動生成のQ02ボタンは引き続き未設定・無効のまま。匿名UIDを確認した後、サーバーの専用オーナーUID設定・GitHub quota設定・事前検証が必要。
+
+
+### 2026-10-19 Q02 Previewの固定URLと匿名ログインの注意（PR #86）
+
+- Vercel自動生成のブランチ固定alias: `https://misaki-git-experiment-conversation-lab-offlin-186654-kishibojim.vercel.app/conversation-review`。commit別の一時URLではなく、このaliasをiPhoneのブックマークとして使う。ブランチの新しいPreviewデプロイで自動的に宛先が更新されることをVercel alias APIで確認。
+- 2026-10-19 にユーザーが作った匿名テストUIDを `MISAKI_SMOKE_OWNER_UID` として**Preview・当該ブランチ限定**でVercelに登録済み。ただし、UIDを作った時のcommit個別URLと固定aliasは異なるオリジンなので、SafariのlocalStorageセッションは自動引き継ぎされない。
+- ユーザーに固定aliasでのAuth状態を確認してもらい、必要なら**明示同意のうえ別のテスト匿名UIDを作成**する。作成されたUIDを受け取ってからPreview-onlyのOWNER_UIDを更新する。古いUIDがログインできると誤認しない。
+- `MISAKI_SMOKE_GITHUB_TOKEN` はVercelのSensitiveとして登録を確認。環境設定は**デプロイ単位**で固定されるため、登録後に新しいPreviewデプロイを作って初めて反映される。実行フラグは未登録でOFF。Secret値を取得・ログ出力しない。
+- 新規Supabaseプロジェクト、本番アプリ/DBの会話履歴・記憶変更なし。Q02モデルの実呼び出しは未実施。
+
+
+### 2026-10-19 Q02 一度限り実Gemini失敗後の安全対策
+
+- Safariの実行後、ユーザーが「実験が完了しませんでした。実験枠が消費された可能性があります。」を確認。quota repo `miyazaki1016/misaki-q02-smoke-quota` に `one-shot-claims/q02-preview-v1.json` が作成済みであることをGitHub APIで確認。**使用済み**を確定し、再試行やclaim削除はしない。Geminiへの物理リクエスト件数・実際の失敗理由は未確認。Vercel runtimeログでも確定理由なし。
+- モデル識別子 `gemini-3.1-flash-lite` はGoogle公式モデル一覧に存在。モデルID誤記と断定しない。API権限/課金、JSON出力形式、出力トークン・thinking設定の影響は候補だが未証明。
+- 原因調査は**追加の実Gemini呼び出しゼロ**で実施。`readOneShotStatusInGitHub` で専用GitHubのclaim fileをGETするだけの確認を追加。200=used、404=available、その他=unknownで安全側に倒す。Q02 PreviewのGET準備状態はquota=used/unknownなら `ready=false`。クライアントでは使用済みを明示し、POST後も再度押せないようにする。既存POSTのclaim先行・最大2呼び出しは維持。
+- GitHub ActionsにはGETのread-only・fail-closedのテストを追加。PR #86内のみでProductionにはマージしない。
+
+
+### 2026-10-19 Q02失敗時の安全な診断分類（PR #86）
+
+- 既存の一度限りのQ02実Gemini検証はGitHub claimで使用済み。**再試行しない／GitHub claimを削除しない／追加のGemini課金を発生させない**。
+- 旧プログラムではrunQualityProbeが具体例外を内部で握って結果status=errorに変換し、上位がすべて `LIVE_SMOKE_INCOMPLETE_*` にするため、当初の実験が失敗した原因は過去ログから復元できない。過去の原因を判定済みと記さない。
+- 将来別途承認された検証のために、`lib/conversation-lab/live-smoke-probe.ts` 内でHTTP認証(401/403)、rate limit(429)、モデル/リクエスト(400/404)、APIサーバー(5xx)、通信、JSON、形式、応答サイズを**固定カテゴリー**に分類し、`SmokeProbeFailure`に試行数とともに付与。`app/api/conversation-review/smoke/route.ts` は認証済みPOSTの失敗時、固定カテゴリーと試行数のみ返し、任意の上流本文・プロンプト・トークン・ユーザー情報を返さない。Web画面で固定日本語メッセージに変換。
+- 全て模型fetcherによるオフライン単体テストを追加し、`Gemini`の実通信はしない。以前作成したQ02使用済み予約ファイルはそのまま残り、GET status=usedにより再試行は不可能。
+- 本変更はPR #86の実験ブランチ限定、本番コード・本番の会話履歴・記憶は変更しない。
+
+
+### 2026-10-19 Q02 失敗調査・次回向けの無課金修正
+
+- 既存のQ02予約ファイル `one-shot-claims/q02-preview-v1.json` は使用済みのまま。**実Geminiの再実行・quota reset・Production変更は行わない**。
+- Google公式のGemini 3.1 Flash-Lite API仕様ではStructured Outputと思考レベル `minimal` をサポート。thinking tokenを含む出力上限についてGoogleの説明を確認し、研究専用の次回用コードを `maxOutputTokens: 300` → `1024` と `thinkingConfig: { thinkingLevel: 'minimal' }` に変更。理由は短いJSON応答が途中で切れる可能性を減らすため。**これが過去の失敗原因だったと断定はしない**。
+- 思考部分と本文が分割されるケースに備え、レスポンスのpartsから `thought === true` でない本文テキストを選択するようにした。模擬fetcherのリクエスト形状・思考part混在のテストを追加。
+- 公式資料: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md 、https://ai.google.dev/gemini-api/docs/generate-content/thinking
+- 次の実Geminiの予約・実行は新しい明示承認まで行わない。Q02現行実験の使用済みマーカーを削除/再利用しない。
+
+
+### 2026-10-20 Q02 v2 の事前準備（追加API通信なし）
+
+- ユーザーから開発の継続指示を受けたため、v2の隔離Previewコード準備のみ行う。**有料となり得るGemini実リクエストは実行しない**。新しい実験枠の解放と実実行は具体的な上限・同意の確認後のみ。
+- v1 GitHub one-shot marker `one-shot-claims/q02-preview-v1.json` は使用済みのまま。v1 markerを削除・再利用しない。
+- 次のQ02には**別のrun key** `q02-preview-v2` を使うよう、GitHub claim helperとPreview API routeを変更。既存 `MISAKI_SMOKE_ENABLED=yes` だけでは動かさず、新たな `MISAKI_SMOKE_V2_EXPLICIT_APPROVAL=yes` と `MISAKI_SMOKE_RUN_KEY=q02-preview-v2` の両方がPreviewの限定ブランチに存在するときだけ有効。**この2つは未設定**。したがってPreviewではGET `ready=false`、POSTは404。
+- 個人Auth UIDとGitHub専用リポジトリ・PAT・Preview branch isolationを維持。GitHubのv2 one-shot remote fileに対する重複防止、1試験あたり物理リクエスト2回上限と再試行禁止を維持。
+- 実験で得た品質情報はあくまでfallbackペルソナの架空Q02二往復であり、本番美咲のパーソナリティや記憶・関係性と同一である証明には使えない。
+- 公式モデル仕様: https://ai.google.dev/gemini-api/docs/models/gemini-3.1-flash-lite.md , thinking: https://ai.google.dev/gemini-api/docs/generate-content/thinking.md
+
+
+### 2026-10-20 Q02 v2通信失敗後の無課金診断改善
+
+- Q02 v2使用後のユーザー画面診断は「Geminiへの通信または応答待ちで失敗」。v2専用のGitHub利用記録は使用済み。**v1/v2記録の削除、v3実験枠の作成、追加Geminiリクエストはしない**。
+- `live-smoke-probe.ts` で、アプリ自身のAbortControllerが発火した場合のみ `timeout`、そうでないfetch/response-body読み取り失敗を `network` と区別する。外部中断はtimeoutと断定しない。従来の `timeout_or_network` の表示互換は残す。
+- オフラインのfetchモックでネットワーク例外、5msに短縮した自前タイムアウト、レスポンス読み取り例外を追加検証。プロダクションの最大15秒の待機時間は変更しない。擬似テストで上限を短くするオプションは最大15秒に制限。
+- 今回の改修は**今後の実験用の診断**であり過去v2失敗の原因がネットワークなのか15秒timeoutなのかは遡及できない。Vercelの関数実行時間設定はプロジェクト基本情報から確証を得られず、推測や変更はしない。
+- すべてPR #86の実験ブランチのみ、本番美咲データ・記憶への変更なし。
+
+
+### 2026-10-20 Q02 v2障害の非課金調査（追加）
+
+- 追加の第2ターン・応答本文タイムアウトのオフラインモックテストを含むCIは success（commit 0e8171ff797ecb73dd85b9980bf00edd5e4f8d94）。Gemini呼び出しなし。
+- Vercelの最後に確認できたREADY Previewは commit 6b3f061f14372337c2e38fb5680844d4bf0880c0。後続のコミットはテスト追加のみで、アプリ本体の変更はない。
+- Vercelの対象Preview deployment regionは iad1。これだけで通信失敗原因を断定できない。
+- vercel.json に関数の maxDuration 指定なし。Vercelプロジェクト情報から実際の関数実行時間上限を取得できず、15秒がプラットフォーム上限かどうかは未確認。
+- 失敗時刻（2026-10-19 18:28 UTC頃）のVercel runtime logsはHobbyプランの保存期限外でAPIが400を返した。ログなしと誤解しない。過去v2の通信失敗とタイムアウトの区別は遡及不能。
+- 次回の有料Gemini実験は承認されておらず、追加枠も作成しない。根拠なく15秒を延長したり、本番環境・Supabase・使用済み枠を変更しない。
+
+
+## 2026-10-20 新チャット引継ぎ：会話品質検証・実験枠・現在の障害
+
+> **新しいソラは最初にこの節と文書冒頭を読むこと。** ユーザーは開発最優先で、同じ説明の反復ではなくGitHub/Vercel上の実作業を望んでいる。報告では「実装済み」「CI確認済み」「未確認」「未実施」を必ず区別する。アメふるは別プロジェクトなので触れない。
+
+### 対象・安全な作業範囲
+- アプリ：美咲。GitHub `miyazaki1016/misaki`、実験ブランチ `experiment/conversation-lab-offline-v1-20261015`、draft PR #86。
+- **main / Production / 本番Supabase / 美咲の実記憶を変更しない。** 今回のコミットはすべて実験ブランチのみ。
+- 正本はこの `docs/IMPLEMENTATION_OVERVIEW.md`。実際の状態はGitHubの最新commit・CI・Vercelで再確認すること。
+
+### このチャットで実施・確認した内容
+1. `lib/conversation-lab/quality-probes.ts` にQ19〜Q22を追加（commit `430f205ee63a51a37802fc2a598ccff5ebc4e2b2`）。計22項目。これは**合成会話用の評価ケース追加**であり、美咲のモデル応答改善やGemini実測の証明ではない。
+2. テストが旧件数18を期待してCI失敗（316件中314成功・2失敗）。`tests/conversation-lab-quality-probes.test.ts` と `tests/conversation-lab-quality-probe-runner.test.ts` を22件へ修正（`e55945b`, `ab50dac`）。`ab50dac` のCIは **success**。
+3. 件数を固定せず、品質プローブIDの連番を検証し、実行件数を`QUALITY_PROBES.length`から取得するようテスト改善（`b72ec28`, `13cdf0b`）。`13cdf0b` のCIは **success**。
+4. 品質プローブ一括実行で、途中の不正データにより一部だけ実行されないよう、**全プローブを実行前に事前検証**（`lib/conversation-lab/quality-probe-runner.ts`、commit `22f78c8`）。後続に不正データがある場合、コールバックが0回のまま失敗するテスト追加（`tests/conversation-lab-quality-probe-runner.test.ts`、commit `d51c9cb`）。`d51c9cb` のGitHub CI **success**（2026-10-20確認）。
+5. この引継ぎ追記は文書のみ。追加Gemini API呼び出しは実施していない。
+
+### Gemini実通信テストの障害とユーザーの最新意向
+- Q02 v1・v2とも実通信が正常完了せず。v2画面の診断は「Geminiへの通信または応答待ちで失敗」。**通信とタイムアウトのどちらが原因か未確定**。当時のVercelログは保存期限外で遡及診断不能。
+- v1/v2のGitHub one-shot claimは使用済み。使用済み記録は消さず、再利用もしない。既存のPreview API `app/api/conversation-review/smoke/route.ts` はv2専用run keyとGitHub claimに依存し、現状のままでは新規実験を実行できない。
+- ユーザーは「**実験枠なくして**」と明示的に方針変更を依頼し、続けて「うん、進めて」。**固定の第n回実験枠をなくし、Previewで継続的に安全に検証したい**という希望。無制限API呼び出しを望むと決めつけないこと。1回あたりの呼出数・課金・再試行防止、owner認証、Preview隔離を維持する代替設計を検討する。
+- 以前、GitHubツールでone-shot制限に関するコード変更がOpenAI安全性チェックでブロックされた。**ブロックを迂回する書換えはしない**。実験枠廃止は**未実装**。ユーザーは過去にGemini呼び出しを許可したが、実際の追加呼び出しは行っていない。
+- 今回のオフライン検証テスト成功を、Gemini実通信の成功・本番美咲の会話品質改善と混同しない。
+
+### 次のソラが最初にやること
+1. この総覧を読み、実験ブランチHEAD、PR #86、最新CIを確認する。
+2. 実験枠廃止の希望を尊重しつつ、ブロック済み変更の迂回をせずに進められる安全な開発を実施する。必要ならユーザーに制約を明確に伝える。
+3. 合成評価ケースの追加だけで終わらず、**美咲本体の会話・記憶・継続性の具体的改善**を優先し、実装・検証結果を分けて報告する。
+4. 失敗原因の未確定事項を推測で断定せず、本番へマージしない。
