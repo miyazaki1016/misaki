@@ -388,3 +388,8 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 **判定：** A/B本体の主要な実装は、少なくとも上記のパスではmain未反映。補助workflowの統合と実験本体の統合は別。移植は品質・プライバシー・課金ゲートを通した後に判断。現時点でmainへ実装コピーしない。
 
 次はmainに存在するworkflowの参照スクリプトと、旧ブランチのworkflowにおけるcheckout refを照合して、実行経路の成立条件を確認する。
+
+
+## 2026-10-21 A/B workflowのcheckout先に関する訂正
+
+前節の「mainに実験スクリプトがないため実行経路が欠けている可能性」は、checkout先を確認した結果、修正が必要。mainの `.github/workflows/isolated-gemini-ab-manual.yml` は `actions/checkout@v4` で固定commit `9a40d98c4ecec2f17eef1489a687acc1e24f338e` を指定している。このcommitには `scripts/context-ab-live.ts`、`scripts/context-ab-quality-live.ts`、`tests/context-ab-prompt.test.ts` が実在することをGitHubから直接確認した。したがってmainに同名スクリプトが存在しないことだけで、workflowが壊れているとは判断できない。実験コードを固定commitから取得する隔離構成である。main未統合のA/B本体という判定は維持。workflow実行成功・secret設定状況は未確認。有料実行なし。
