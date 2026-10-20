@@ -485,3 +485,12 @@ GitHub Actions run **38966516004** (`Canonical relationship integration tests` #
 Vercel接続でbranch head `2ae90d70ff143c8de935f25ec12f291e9b82613a` のdeployment **`dpl_6mfszaNd85cgbx4HKsWF7FacbBxD`** が **READY** と確認（`https://misaki-99419osjm-kishibojim.vercel.app`）。READYはPreviewビルド完了であり、機能がPreviewで接続・受入済みという意味ではない。
 
 **判定：** 共通会話エンジンの多数の純粋モジュールとテストがmain外に実装済み、CIのテスト・型チェック・build成功、head Preview READYまで独立確認。**しかしmain/実chat route未統合、実モデルの会話品質・機能同等性・運用受入は未完了**。実験ブランチの成果を失わないよう保持。Amahuruへの統合は別プロジェクトにつき実施しない。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 Gradual Interpreter PR #85：停止理由・再開条件・CI確認
+
+PR #85 (`experiment/interpreter-gradual-acting-20261015`) は **open / draft / unmerged**、head `ef5bd23246a75b02a0df60302263f971de061843`。main比 **ahead 36 / behind 0、28ファイル**。`lib/relationship-acting-guide-gradual-experiment.ts` と段階的playfulness/acting、Body Clock境界、DTO、prompt precedence等のテストと多数の監査・契約文書がmain外に存在。PR本文は「純粋関数とテストのみ、既存Interpreter/本番chat/DB/環境変数には未接続、閾値20/50/80は未承認の比較仮説、実Gemini A/B未実施」と明記。
+
+GitHub Actions **run 39186862912**（`Canonical relationship integration tests` #554）は **completed/success**。job **117851011382** で `npm ci` / `npm test` / `npx tsc --noEmit` / `npm run build` が全てsuccess。Vercel接続でも同headのdeployment **`dpl_2DThKw2YVkNj6474D4xpbVdGratZ`** が **READY** と独立確認。ただしPreview READYは隔離実験の純粋コードのビルド完了であり、実チャットへの接続や実Gemini検証を意味しない。
+
+**開発目的：** 5軸関係性に応じた美咲の表現を段階的に調整するacting/Interpreter仮説の検証。**停止理由：** PR記録上、未承認閾値の採否判断と実Gemini A/B・レビュー待ち。作業が中断した真の経緯は未確認であり推測しない。**再開条件：** 仕様・閾値の合意、現行actingとの比較と実モデルの品質/安全性検証、Body Clock/DTO境界のレビュー、必要なら独立Previewで受入。**判定：** 実験コード/テスト実装済み・CI成功・Preview READYだが、main未反映かつruntime未接続。無条件merge不可。main/Production/DB変更なし。
