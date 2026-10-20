@@ -52,3 +52,42 @@
 ## 引き継ぎスナップショット
 
 2026-10-20: 91ブランチのGit比較、主要8ブランチの変更ファイル調査、主要6資料の読取、5 PRのhead検索、mainに存在しない代表5パスの確認を実施。**現時点で本番変更なし、main変更なし、branch削除なし、実Gemini呼出しなし。** 次は「PR状態・mainの同等機能・総覧の整合」から再開する。
+
+
+## 2026-10-20 追加監査：PR・main実体・総覧
+
+### 新たに確認したPR
+
+- [#67 Relationship Identity v1](https://github.com/miyazaki1016/misaki/pull/67): PR本文では **「Production適用済み・Identity gate OFF・Draft維持・merge禁止」** と明記。これは「Productionに何もない」と同義ではない。DB適用済みの主張とアプリ機能のmain未統合は分けて扱う。4 migrationの本番履歴一致はPR本文の記録であり、この棚卸しでProduction DBに再接続して検証したわけではない。
+- [#31 Relationship Time v2](https://github.com/miyazaki1016/misaki/pull/31): 感情・行動・Body Clock・関係ストーリーの統合実装をPR本文で確認。**mainに `lib/relationship-time.ts` が実在**するため、旧ブランチの大量aheadをもって「v2が丸ごと未統合」と判断しない。ファイル単位の差分・実動作を継続監査。
+- [#81 Production source-of-truth reconciliation](https://github.com/miyazaki1016/misaki/pull/81): GitHub mainをアプリの基準、Production SupabaseをDB実体の基準とする文書監査。RPCの複数overload・migration台帳と実DBの不一致可能性を記録。**migrationファイル名だけでProduction未適用と判断しない**。
+
+### mainでの実体照合
+
+- `docs/IMPLEMENTATION_OVERVIEW.md` はmainに存在。先頭記載の最終更新は **2026-10-13**。長期ビジョン・複数キャラ構想を「将来設計であり実装済みではない」と明示している。
+- `lib/relationship-time.ts` はmainに存在（blob SHA `1283b6cd5d67073d91cd0b028a3cdcb96a286bbb`）。**Relationship Time関連をすべてB扱いにしない**。
+- `lib/relationship-identity-resolver.ts` はmainの同名パスに存在しない。PR #67のProduction migration適用主張とは矛盾しない。mainの別名実装・gate状態は未確認。
+- **現mainの総覧は約151k文字**。総覧があること自体は個々の機能の完成・本番稼働を証明しない。差分の証拠と照合する。
+
+### 判定更新（追加根拠）
+
+| 対象 | 暫定判定 | 理由 |
+| --- | --- | --- |
+| Relationship Time v2 | **Aの一部を確認 / 全体U** | mainにrelationship-time.tsあり。PR #31の全構成要素・Body Clock等の現行稼働は未確認。 |
+| Relationship Identity v1 | **B + DB適用主張あり / 全体U** | mainに同名resolverなし。PR #67にはProduction適用済み・gate OFFと明記。DBを再検証していないため主張と事実を区別。 |
+| Production source-of-truth audit | **D（文書監査）** | PR #81に調査結果。アプリ実装やmigration完了の証明ではない。 |
+
+### 重要な運用上の教訓
+
+**「mainにない＝本番DBにもない」は誤り。** 特にIdentityは本番migrationとfeature gateを分けて確認する。  
+**「古い枝がmainよりahead＝機能未統合」も誤り。** Time v2のようにmainに同名コードがある。  
+**「PR本文のProduction適用済み＝現時点のDB実測」でもない。** 接続による再検証をしていない限り、資料上の主張として記録する。
+
+### 次の照合順序
+
+1. mainのrelationship-time、Body Clock、relationship state周辺のファイルとPR #31の機能表を照合。
+2. Identityのmigration 4本とmainの現在のgate・resolver/consumer経路を確認（本番DBは読み取りすら明示的な目的と範囲を決めてから）。
+3. 総覧のForget/Identity/Time/5軸の節を見出し単位で索引化し、台帳と突き合わせ。
+4. 全ブランチを機能別にグルーピングし、PRと現mainの重複実装を精査。
+
+**更新は台帳専用ブランチのみ。main・本番・DBは無変更。**
