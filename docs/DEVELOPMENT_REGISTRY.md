@@ -527,3 +527,12 @@ GitHub PR API直接確認：**PR #29 `codex/server-canonical-foundation` は `cl
 ただしheadのGitHub Actions **run 35470658292** (`Legacy maintenance drain` #14) は **completed/success**。PG **17.6 / 18.4** の両matrix jobで `node --test tests/*.test.cjs`、`npx tsc --noEmit --incremental false`、`deno check` がsuccess。**PR本文が引用する古いrun 35453044077の52 PASS/2 FAILとは異なる最新headのCI結果**である。最新CI greenが以前のMVCC反例の解消を証明するとは限らず、現行テストで反例をassertしているか/skip・条件分岐・fixture差分があるかの個別調査が必要。安全判定は引き続きBLOCKEDとする。
 
 **停止理由：** DB freezeの安全性を破る具体的反例とcoverage不足があるため、安全停止ゲートが働いた。**再開条件：** 既知MVCC反例を再現・解消する設計、全write surfaceとSECURITY DEFINER/triggerのcoverage、旧処理引継ぎ、隔離PG17/18と実境界での安全性回帰、operator rollback検証。PR #29 merge済みとPR #30 blockedの関係を再評価し、現行mainへの適用可否を決める。**PR #31 Relationship Time v2の依存記述も、この新しいPR #29 merge状態で更新判断すること。**main/Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #30重要訂正：最新headで既知MVCC二反例はCI PASS
+
+前節の「最新CI greenだが過去のMVCC反例が解消したか不明」を、**headソースと実ジョブログの独立確認により精密化**。PR #30 head `17449c7ec4e8ff50605ef931b04ae76584c6304f` の `supabase/legacy-maintenance-drain.sql` は、以前の通常SELECTと異なり、**`control`行を `FOR SHARE` でlocking read**している：`admit_misaki_legacy_operation` line 41、operation progression line 55、`misaki_drain.guard_write` line 97。advisory xact lockとの組合せで、古いMVCC snapshotが制御行の過去phaseを通常SELECTで読み抜ける旧問題への対策が**実装済み**。ただしlocking readだけで全isolation/全write surfaceの安全を一般化しない。
+
+GitHub Actions run **35470658292** のPG18.4 job **105970897363** の生ログを直接取得。`freeze rejects new operation admission from a pre-stop REPEATABLE READ snapshot` は **ok 21**、`freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot` は **ok 22**、集計 **56 tests / 56 pass / 0 fail / 0 skipped**。つまり**旧2件の回帰テストは削除・skipされたのではなく、現行headで実際に成功している**。PG17.6 jobもステップ成功だが個別テストログの件数は今回未抽出。
+
+**訂正：** 旧PR本文や古い監査文書の「この2件はFAIL」は旧commitの事実で、最新headの同2件に関しては**既知反例が再現しなくなったことをCIで確認済み**。前節の『現行でも未解消の可能性』はこの2件に限り解消済みへ更新する。一方、旧監査が指摘した**guard coverage 12/22、SECURITY DEFINER経由、auth trigger、pre-gate evidence、全旧Production境界、PR #29 merge後の互換性**はこの2テストで解消されない。**Production導入の全体判定は依然BLOCKED**。停止理由は「MVCC2件が未修正」ではなく「局所修正済みでも全write surface・引継ぎ・運用の安全証明が未完了」と再分類。main/Production/Supabase変更なし。
