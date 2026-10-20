@@ -616,3 +616,14 @@ PR #31 `tests/relationship-naturalness-repair.test.ts`：謝罪後の修復で�
 main `lib/relationship-turn-expression.ts` を確認：`createCurrentTurnActionGuide` に `unresolved_hurt`、`repair_in_progress`、`repair_demonstrated`、`repeated_harm` 各ガイドが**実装済み**。傷/警戒の即リセット防止、修復の段階性、根拠のない心配の禁止、甘さと冷酷さの両極端回避が明文化。main `lib/relationship-patterns.ts` に `deriveRelationshipStory` の4状態判定が存在。main `app/api/chat/route.ts` で `deriveRelationshipStory` import/呼出し（約1864行）、`createRelationshipActingGuide` 呼出し（約2063行）、`createCurrentTurnActionGuide` 呼出し（約2643行）を確認。**単なる未使用コードではなく、mainの会話ルートに関連表現制御が接続されている**。
 
 **判断：** PR #31の『傷→謝罪→段階的修復』『無根拠な恋愛捏造禁止』という重要な設計思想はmainにも実装・ルート配線済み。一方PR #31の `relationship-conversation-*` / naturalness scenarioの隔離テストハーネスはmain同名パスなしで、検証資産として残る。テストの網羅性/実モデル品質/本番DB適用は未証明。旧promptを本番へ上書きしない。次にmainのテストとbranchテストのassertion対応表を作り、未カバーだけ追加候補とする。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #31テスト対照表：mainの修復テストとBody Clock動機・抑制の差
+
+mainのテストを直接読取り：`tests/relationship-patterns.test.ts` は未解消の傷、謝罪だけでは修復完了しない、後続の行動による修復、繰返しの傷、匿名→恒久のイベント継承を検証。`tests/relationship-acting-guide.test.ts` は交際事実の捏造禁止、数値の非露出、時間経過だけで感情を捏造しない等。`tests/relationship-v2-rpc.test.ts` はv2 event型、匿名/古い状態の拒否、入力境界、明示ユーザー指定、旧trigger廃止等。これらは**PR #31 `tests/relationship-story.test.ts` の傷/修復/繰返しシナリオの一部と意味的に重複**。ただしPR #31には通常chatとBody Clockで同じ意味を導くテスト、時刻順逆転や旧signal_summary互換のassertもあり、mainの同名テストはない。意味同等性の全面保証ではない。
+
+**より大きい未統合候補：** PR #31 `tests/body-clock-proactive-urge.test.ts` は『時刻が来ただけで送らない』『傷/警戒なら送信を見送る』『根拠ある心配のみcheck-in』『修復後の穏やかな再接触』『直近接触のcooldown』『写真を送りたい明示動機』『外部安全情報の例外』『未解消の傷なら親愛からの自発送信を抑制』等の独立した意思決定をassert。`tests/body-clock-proactive-motive.test.ts` は直近会話/関係記憶/生活証拠の鮮度と、誰の何を理由に話すかを区別。mainのtreeには同名proactive urge/motiveモジュールとテストなし。
+
+mainの実Body Clock `supabase/functions/body-clock/index.ts` は `buildProactiveDecisionContext` / `createProactiveDecisionGuide` を使用してGemini文面を生成し、`supabase/functions/body-clock/proactive-decision.ts` は `shouldSend: true` のdecision contextとタグ/ガイドを構築。**mainにも既存の送信判定・予定・lease等があるため『無条件に送る』とは断定しない**が、PR #31の `deriveProactiveUrge` と `deriveProactiveMotive` の**独立した意思決定/根拠選択モデルが同じ形で統合済みとは確認できない**。mainの `tests/body-clock-proactive-life-context-v2.test.ts` は生活根拠の鮮度・期限・誤推定を検証するが、上記urge/motiveのassertを代替しない。
+
+**優先調査候補：** 現行Body Clockの既存DB claim/cadence/leaseとPR #31のurge/motiveの責務境界を静的に突き合わせ、送信可否の新ロジックを直接Productionに入れず、隔離テストで不足シナリオを検証する。安全/品質上の意味が大きいが本番切替と別管理。Production/Supabase変更なし。
