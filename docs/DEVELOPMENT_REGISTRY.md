@@ -107,3 +107,24 @@
 **注意：** GitHubのmainコード検索はこの環境では空結果が返り、網羅的な参照検索として利用できなかった。個別ファイルの実在確認のみを証拠とする。総覧の最終更新表記は2026-10-13であり、2026-10-20の全成果を網羅している保証はない。
 
 次回: `app/api/chat/route.ts` の依存先と実験ブランチの変更箇所を比較し、mainの同等実装をファイル単位で判定。Identity migrationはDB変更なしで履歴証拠の照合を継続。
+
+
+## 2026-10-20 追加監査：現行チャットの依存経路
+
+mainの現行ファイルを直接読み取り、次を確認。
+
+| mainのファイル | 確認内容 | 監査上の意味 |
+| --- | --- | --- |
+| `app/api/chat/route.ts` | `engineEnabled`、`enqueueTemporaryTurn`、`resumeRelationshipProcessing`、`pendingRelationshipGuide`、`createRecallAwareMessage`、`loadCanonicalState`、`completeCanonicalTurn`、`loadRelationshipTimeContext`、`recordRelationshipChatTurn` をimport | 既存の会話・関係性・記憶・canonical保存経路がある。新しい実験エンジンを直接置換しない。 |
+| `lib/relationship-engine-v1.ts` | `PROCESSING_VERSION = "relationship-v1.1"`、5軸 `friendship/trust/playfulness/affection/romance`、`engineEnabled()` は環境変数 `MISAKI_RELATIONSHIP_ENGINE_VERSION` と一致する場合にtrue | **mainに5軸の基盤実装が存在**。5軸の実験ブランチがすべて未実装という意味ではない。環境変数の実値・本番有効化は未確認。 |
+| `lib/relationship-runtime-v1.ts` | `engineEnabled()` でのゲート、`relationshipEngine` snapshot、requestId重複抑止、pending turn、canonical処理 | 既存の実行・再試行・保存経路がある。Identity v1や段階的acting実験とは別レイヤー。 |
+| `lib/chat-recall.ts` | 記憶想起質問の検出と`createRecallAwareMessage` | 既存の記憶想起機能はあるが、**Forget Controlの復活防止と同等とは限らない**。 |
+
+### 誤認を防ぐための判定補正
+
+- 「5軸関係性」はmainに既存基盤あり（**Aの一部**）。PR #85は5軸そのものの初導入ではなく、段階的な表現方法を比較する**Cの実験**。
+- 「記憶想起」はmainに存在するが、PR #66の「忘れた情報を旧historyから復活させない」機能と混同しない。
+- mainのコード上にfeature gateがあっても、ProductionでONかどうかは環境変数と稼働検証が必要。今回確認していない。
+- ここまでの結果はソース読取であり、テストの再実行・Production稼働確認ではない。
+
+次の優先作業: 現行acting guideとPR #85の差分、現行記憶・保存経路とPR #66の差分、Identity v1のゲート・DB証拠の分離を続ける。
