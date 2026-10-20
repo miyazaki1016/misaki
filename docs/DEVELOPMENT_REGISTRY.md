@@ -259,3 +259,18 @@ mainと `work/relationship-identity-v1` の同名ファイルを直接比較（�
 **重要な区別：** テストコードに検証が書かれていることと、今回テストを再実行して成功したことは別。PR #67に過去の検証・Production適用済みとの記録はあるが、今回の確認はソース読取のみ。**本番適用やgate ONは行わない。**
 
 **次の課題：** テスト実行記録の日時・結果をPR/CIから検証し、migration 4本とmainの現行schemaとの差分を履歴として整理。現在の本番DBの実測は未実施。
+
+
+## 2026-10-21 Identity v1：過去CI成功の独立確認と残存ゲート
+
+PR #67本文とGitHub Actionsのコミット紐付けを照合した。
+
+- PR #67には、`npm ci`、UTCとAsia/Tokyoで各320件のfull suite、Identity関連57件、TypeScript型検査、Next build成功と記載。
+- **GitHub Actions側でも独立確認**：commit `3c8a2e746e833859f32b05f6eb0993bdaa549970` に紐づく run ID `37616664677`、workflow `Canonical relationship integration tests`、run #430 は **status=completed / conclusion=success**。リンク： https://github.com/miyazaki1016/misaki/actions/runs/37616664677 。ただし今回ジョブログの個別ステップは未閲覧であり、320件などの細目はPR本文に基づく。
+- PR本文には、別のコードcommit `555d35bc19e7003dd9b051d02762b4bdfac1b192` のCI #427 success、Vercel Preview READY、改名後ローカルテスト成功の記録もある。これらは今回の独立照合対象外。
+- PR記録によれば、空PGlite上で4 migrationを順に適用しRPCを検証、ACL/stale/replay/ledger rollback/anonymous checkpoint等を確認した。**ただしPGliteはsingle-sessionで複数セッションのロック競合未検証**。完全なSupabase初期migration履歴がないため、全アプリの空Supabase reset成功は主張できない。
+- **停止条件**：隔離Supabase Previewでの実機受入と既存rollback SQL suiteの確認が残る。PR #67はDraft維持・merge禁止・gate ON禁止と明記。Production migration適用済みはPR本文の過去記録であり、今回本番DB実測なし。
+
+**監査判定更新：** Identity v1は「未テスト」ではない。**過去のCI成功がGitHub Actions上で確認できた、ただし受入・競合・rollbackに未完了がある実装**。本番で機能を有効化してよいという結論ではない。
+
+次はCI #430のジョブ単位の結果と、既存rollback SQL suiteの記録を照合する。先にこの節の保存成功を確認する。
