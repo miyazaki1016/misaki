@@ -574,3 +574,14 @@ GitHub REST `git/trees/main?recursive=1` で**main全207エントリ、truncated
 **重要な訂正：** 旧PR #31の特定ファイル `20260920073000_apply_relationship_emotion_v2_rpc.sql` がmainにないことをもって「v2 emotion/action DB切替がmainにない」とは言えない。実際mainには**別名の** `20260926003000_relationship_emotion_action_v2_rpc.sql` が存在し、`apply_relationship_emotion_action_v2` を定義（permanent user用、emotion/action/signal summaryを原子的に反映）。さらに `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql` が存在し、旧keyword emotion triggerとderived-action triggerの2つをDROPする設計。つまり**Relationship v2のDB側成果の一部は別名でmainに移植・再実装済み**。以前の『PR #31の同名SQLがmainにない』はファイルパス比較の事実としてのみ保持し、**機能全体未統合の根拠にしない**。
 
 **現在の整理：** canonical RPC定義とv2 emotion/action RPC＋旧trigger廃止migrationはmainに同梱済み。PR #31独自の9 migrations/Body Clock/proactive/relationshipStoryなどがどこまで機能同等かは未比較。mainにあることはProductionでmigration適用済み/有効を意味しない。**次の作業はパス名ではなく、RPC名・関数本文・呼出元・テストの機能単位で差分を調べること。** Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #31機能単位比較：v2の中核3ファイルはmainとblob完全一致
+
+GitHubのmain tree全207項目と `sora/relationship-time-v2-design` tree全175項目を取得して機能群を比較。**重要：** `lib/relationship-emotion-reducer.ts` (blob `baceeb186...`)、`lib/relationship-action-reducer.ts` (`2c7e2286...`)、`lib/relationship-signal.ts` (`935dc7d5...`) は**mainとPR #31 branchのGit blob SHAが完全一致**。すなわち、PR #31がopen/Draftであっても**感情reducer・行動reducer・会話signal抽出の中核3実装はmainに同一内容で既存**。二重実装/丸ごとmergeは避ける。
+
+一方 `lib/relationship-emotion-store.ts` はmain blob `fd981ab0...` とbranch `d8d979e0...`、`lib/relationship-patterns.ts` はmain `51b44844...` とbranch `415ec52c...` で**内容が異なる**。これはbranch側が進んでいる証拠とは限らず、mainの後続変更や設計分岐を精査する必要がある。
+
+branchにあってmainのtreeに**同じパスがない**もの：`lib/relationship-conversation-generator.ts`、`lib/relationship-conversation-preview.ts`、`lib/relationship-conversation-prompt.ts`、`lib/relationship-naturalness-scenario.ts`、`tests/relationship-story.test.ts`、`tests/relationship-naturalness-repair.test.ts`、`tests/body-clock-proactive-motive.test.ts`、`tests/body-clock-proactive-urge.test.ts` 等。mainには別の `lib/relationship-acting-guide.ts`、`lib/relationship-analyzer-v1.ts`、`lib/relationship-engine-v1.ts` 等も存在し、**未存在パスをそのまま未実装機能と断定しない**。
+
+**暫定分類：** (A) v2中核3ファイルはmainに完全統合済み、(B) store/patternsは差分レビュー必要、(C) conversation generation/naturalness/Body Clock motive/urgeは機能同等性・安全性・テスト照合が必要。mainには別名のv2 SQLも存在。Production runtimeでの有効化/DB適用は未確認。main/Production/Supabase変更なし。
