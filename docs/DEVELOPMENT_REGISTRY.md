@@ -640,3 +640,16 @@ PR #31 `supabase/functions/body-clock/index.ts` は `deriveProactiveUrge` と `d
 PR #31 `proactive-urge.ts` は未解消の傷/繰返し傷・PULL・WAIT・最近の接触・心配の根拠・写真動機・親密度・1日送信回数等で `shouldSend` とdesireを選択。`proactive-motive.ts` は会話・関係イベント・記憶・生活根拠の鮮度とtopicIntent/topicSourceを分離。mainのdecision tags/生活根拠ガイドとは責務が異なる。
 
 **結論：** PR #31の**内的動機に基づく送信見送り機能は、main Body Clockの実際の処理経路には同じ形で入っていない**。価値ある未統合候補。ただしPR #31は旧canonical root参照（branch `row.recent_history`/`row.long_term_memory`）でmainは `loadBodyClockRoot`、mainの `finish_misaki_body_clock_delivery` には revision/token/updated_at 整合性引数あり。**PR #31のindex.tsを丸ごと上書きするとcanonical安全性が退行する危険が大きい**。次はmainのcanonical整合性を保持した隔離統合設計とRPC no-actionの安全性を監査。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 方針確定：埋もれた成果はコード移植だけでなく思想・検証・不採用理由を継承
+
+ユーザー方針：『埋もれるものをそのまま組み込むんじゃなくて、考え方を取り入れる場合もある』。以降の棚卸しは **①現行に整合しそのまま活かす実装/テスト、②思想を採用し現行設計で再実装、③失敗/検証結果を継承、④採用しない（理由を明記）** に分類。単なる同名ファイルの有無や未merge状態で実装判断をしない。採用/非採用理由と安全前提を残す。
+
+### Body Clock no-action SQLの静的安全性監査
+
+PR #31 `supabase/migrations/20260920083000_body_clock_no_action_finish.sql` を全文確認。`finish_misaki_body_clock_no_action(uuid,timestamptz,integer)` は `SECURITY INVOKER`、`search_path=''`、public/anon/authenticatedへのexecuteをREVOKEしservice_roleにGRANT。`background_push_state` を `FOR UPDATE` でロック、`next_push_at` とlease引数一致・lease未失効を検証し、55〜210分の次回時刻へ更新。`pushes_today` を加算せず、deliveryも作成せず、`nextPushAt` と既存countを返す。**SQL上の基本的なlease・権限・無送信カウント設計は妥当な候補**。ただし実DBでの同時実行/ロール/タイムゾーン検証、mainの後続migrationとの互換性は未確認。
+
+main `20260916002657_misaki_body_clock_atomic_delivery_and_vault_auth.sql` には `finish_misaki_body_clock_delivery` があり、同様にlease一致・未失効を検査して送信countを増加。main `20260917143500_fix_body_clock_claim_rpc.sql` には `claim_misaki_body_clock_due_users`、due対象のclaim・次回時刻調整が存在。**mainのcanonical root/temporary revision整合性引数を保ち、PR #31のno-action概念を現行RPC仕様に合わせて設計し直す**のが有力。PR #31 SQLを即移植しない。実装着手前に現在のmigrationでの最新RPC署名とclaim状態遷移を確認する。
+
+**採用候補の分類：** 『美咲が内的理由なしに送らず、見送り理由を残す』は②思想を採用して再設計。PR #31のシナリオテストは①/③検証資産として再利用検討。旧 `index.ts` 丸ごと移植は④不採用候補（canonical退行リスク）。この分類は設計上の暫定判断で、mainのコード変更やproduction rollout承認ではない。
