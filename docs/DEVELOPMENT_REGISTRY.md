@@ -441,3 +441,14 @@ head commitに紐づくGitHub Actions run **37533221342**（`Canonical relations
 PR本文の過去検証記録：PGliteのmigration/RPC原子性・rollback・checkpoint/refund、UTC/JST各251→261→284のテスト成功、23件のbatch検証、Preview READYなど。ただし**CI step成功は個別テスト件数・実Gemini精度・本番DB適用状況を証明しない**。Deno独立型検査・隔離Preview実機・匿名/別端末・Body Clock・実モデルlatency/cost・rollback受入はPR上の未完了項目。実Gemini batch比較は未実施。
 
 **結論：** Forget ControlのPR headは、npm test・TypeScript・Next buildのCI成功を実際に確認できた。機能全体は依然Draft・未merge。安全な本番導入判断には独立DB/Preview、実モデルの意味判定、移行・復旧手順の確認が必要。main/Productionへの変更は行わない。
+
+
+## 2026-10-21 Context compression spike：埋もれた計測成果の確認
+
+`main...work/conversation-context-compression-spike` は ahead 85 / behind 24、差分27ファイル。ただしIdentity resolverと4本のIdentity migrationも含むため、**27件すべてを圧縮機能の成果として数えない**。
+
+このブランチにmainにはない `lib/context-size-measurement.ts`（blob `36a944a`）、`lib/context-overlap-analysis.ts`（blob `8d10394`）、`tests/context-size-measurement.test.ts`、`tests/context-overlap-analysis.test.ts`、`docs/conversation-context-compression-spike.md`（blob `b5a6296`）が存在。前者はsystem/history/user/persona/relationship/memory/repeated replies/environmentの**UTF-16文字数**を集計し、`contextSizeMeasurementEnabled` は文字列 `1` でのみ有効。**トークン計測ではない**。後者はpromptの重複文字数とhistory中のrecent reply重複数を数える純粋な診断helper。いずれも会話内容をログに出さず、promptを変更しない設計。
+
+設計文書は「research only; no runtime behavior changes」。現行60件historyとrecent Misaki repliesの重複、20件history・要約・重複除去などの候補、盲検の会話品質比較、usageMetadataとの照合を提案。2026-10-08の単発例（初回30,002ms timeout、再試行16,881ms、input 8,378 tokens）は**ベンチマークではない**。圧縮・要約を実運用した証拠ではない。
+
+同名head PRの検索結果は0件（この検索で見つからなかっただけでPRの不存在を完全保証しない）。**現時点の判定：計測helper・重複分析・ユニットテスト・研究設計はブランチに存在。main未反映。実運用の圧縮・品質非劣化・複数回latency/token実測は未確認。** 他機能（Identity）の差分と混同せず、削除・main merge・Production変更を行わない。次は該当ブランチのCI/テスト実績とmain routeの計測接続状況を検証する。
