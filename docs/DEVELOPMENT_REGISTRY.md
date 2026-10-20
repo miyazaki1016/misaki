@@ -366,3 +366,25 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 - **数値実測済み（過去記録）**：限定された合成1ペアおよび簡略Previewのtoken削減。
 - **未完了**：Production相当promptでの検証、複数場面でのブラインド人手品質評価、実会話品質の同等性証明、mainへのA/B本体の統合。PR #78はDraftの実験であり、token節約だけでは採用不可。
 - **注意**：mainにあるA/B workflowの存在と、`lib/context-ab-balanced.ts` のmain統合は別の話。mainの同名実装の有無は次に個別path確認する。追加の有料Gemini呼出し・実会話送信・Production変更は行わない。
+
+
+## 2026-10-21 Context A/B：mainの具体的な未反映ファイル確認
+
+`main` に対してGitHub `fetch_file` で**正確なパスを指定して実在を検証**した。以下の8パスはmainで404（NOT_FOUND）であり、`work/context-no-duplicate-replies-ab` との差分一覧では追加ファイルとして記録されている。
+
+| mainに存在しないパス | 役割 |
+| --- | --- |
+| `lib/context-ab-balanced.ts` | ABBA比較・数値集計 |
+| `lib/context-ab-prompt.ts` | A/B prompt差分生成 |
+| `lib/context-ab-quality.ts` | 品質評価補助 |
+| `lib/context-size-measurement.ts` | 文脈サイズ測定 |
+| `scripts/context-ab-live.ts` | live合成A/B runner |
+| `scripts/context-ab-quality-live.ts` | live品質A/B runner |
+| `app/api/experiments/blind-quality/route.ts` | 隔離実験API |
+| `.github/workflows/context-ab-validation.yml` | A/B検証用workflow |
+
+一方、**`.github/workflows/isolated-gemini-ab-manual.yml` はmainに存在**し、blob `edffcd3d81dffc084fb655a5014af901f33383a2`。ただしmainにある手動workflowが呼ぶ `scripts/context-ab-live.ts` と `scripts/context-ab-quality-live.ts` は**mainで両方404**。よって**mainのworkflowが存在するだけでは、そのまま正常実行できると判断できない**。手動実行の実効性は別途検証が必要（dispatchは行わない）。
+
+**判定：** A/B本体の主要な実装は、少なくとも上記のパスではmain未反映。補助workflowの統合と実験本体の統合は別。移植は品質・プライバシー・課金ゲートを通した後に判断。現時点でmainへ実装コピーしない。
+
+次はmainに存在するworkflowの参照スクリプトと、旧ブランチのworkflowにおけるcheckout refを照合して、実行経路の成立条件を確認する。
