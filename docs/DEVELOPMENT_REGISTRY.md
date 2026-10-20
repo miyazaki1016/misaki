@@ -565,3 +565,12 @@ main `docs/SERVER_CANONICAL_STATE.md` では正式切替手順を「旧main互�
 main `lib/relationship-time.ts` は `get_relationship_time_context` RPCによる読込みと、別の記録RPC呼出しを持つ。一方PR #31のv2 migration `20260920073000_apply_relationship_emotion_v2_rpc.sql` はmainに同パスなし。**関係時間の一部がmainにあっても、v2 emotion/action/Body ClockのDB切替がmain統合済みとは言えない**。
 
 **次の安全な確認：** mainの関連migrationファイルとRPC定義を静的照合し、(a) mainコード依存、(b) main migration同梱、(c) Production適用証拠を別欄で管理。PR #29 merge済み≠DB施工済み。Productionの実DBやユーザーデータにはアクセスせず、変更しない。
+
+
+## 2026-10-21 main migration全件一覧での訂正：Relationship v2は一部main実装済み
+
+GitHub REST `git/trees/main?recursive=1` で**main全207エントリ、truncated=false**を取得し、`supabase/migrations/` の全ファイル名を照合。mainにはcanonical基盤 `20260918073918_canonical_misaki_root_state.sql` が存在し、実ファイル本文で `complete_misaki_chat_turn`、`complete_misaki_temporary_turn`、`write_misaki_temporary_root` の**3 RPC定義が同梱**されていることを確認。`20260926004000_preserve_temporary_relationship_on_email_save.sql` にも一時root RPC更新が存在。**DB migrationコード同梱は確認済み、本番適用は未確認**。
+
+**重要な訂正：** 旧PR #31の特定ファイル `20260920073000_apply_relationship_emotion_v2_rpc.sql` がmainにないことをもって「v2 emotion/action DB切替がmainにない」とは言えない。実際mainには**別名の** `20260926003000_relationship_emotion_action_v2_rpc.sql` が存在し、`apply_relationship_emotion_action_v2` を定義（permanent user用、emotion/action/signal summaryを原子的に反映）。さらに `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql` が存在し、旧keyword emotion triggerとderived-action triggerの2つをDROPする設計。つまり**Relationship v2のDB側成果の一部は別名でmainに移植・再実装済み**。以前の『PR #31の同名SQLがmainにない』はファイルパス比較の事実としてのみ保持し、**機能全体未統合の根拠にしない**。
+
+**現在の整理：** canonical RPC定義とv2 emotion/action RPC＋旧trigger廃止migrationはmainに同梱済み。PR #31独自の9 migrations/Body Clock/proactive/relationshipStoryなどがどこまで機能同等かは未比較。mainにあることはProductionでmigration適用済み/有効を意味しない。**次の作業はパス名ではなく、RPC名・関数本文・呼出元・テストの機能単位で差分を調べること。** Production/Supabase変更なし。
