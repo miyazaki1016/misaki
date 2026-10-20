@@ -91,3 +91,19 @@
 4. 全ブランチを機能別にグルーピングし、PRと現mainの重複実装を精査。
 
 **更新は台帳専用ブランチのみ。main・本番・DBは無変更。**
+
+
+## 2026-10-20 追加監査：mainの現行コードとmigrationパス
+
+読み取りのみで次を確認した。
+
+| mainの対象 | 結果 | 意味 |
+| --- | --- | --- |
+| `app/api/chat/route.ts` | **存在**、blob `5600ad37f2660049a570c4dd340e8ed140d9843b` | 現行チャットの実体。冒頭で`relationship-engine-v1`、`relationship-runtime-v1`、`chat-recall`、canonical state等をimport。新しい実験機能の統合判定はこのルートと依存関係を基準に行う。 |
+| `lib/relationship-time.ts` | **存在**、blob `1283b6cd5d67073d91cd0b028a3cdcb96a286bbb` | 時間経過・intimacy・emotion・actionの文脈型と読込処理を確認。v2全体の導入証明ではない。 |
+| `lib/relationship-identity-resolver.ts` | **同名パスなし** | Identityの作業ブランチ実装が同じパスではmainにない。別実装やDBの適用有無は別問題。 |
+| `supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql` | **同名パスなし** | PR #67に記録されたProduction適用済みとの記述を否定しない。migrationのリネーム・適用履歴・schemaを区別する。 |
+
+**注意：** GitHubのmainコード検索はこの環境では空結果が返り、網羅的な参照検索として利用できなかった。個別ファイルの実在確認のみを証拠とする。総覧の最終更新表記は2026-10-13であり、2026-10-20の全成果を網羅している保証はない。
+
+次回: `app/api/chat/route.ts` の依存先と実験ブランチの変更箇所を比較し、mainの同等実装をファイル単位で判定。Identity migrationはDB変更なしで履歴証拠の照合を継続。
