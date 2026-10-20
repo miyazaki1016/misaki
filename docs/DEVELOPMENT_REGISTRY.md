@@ -223,3 +223,20 @@ mainと `work/relationship-identity-v1` の同一ファイルを直接比較し�
 **結論：** IdentityはDBだけの機能ではない。会話ルート、エンジンゲート、acting guideの3か所にまたがるアプリ側配線があり、mainには同等の配線が確認できない。PR #67の「Production migration適用済み、gate OFF、Draft・merge禁止」という記録と整合的。Productionの実環境変数やDB状態は今回未確認。**本番ゲートをONにしない。**
 
 **次回：** Identityブランチの `canonical-state.ts` / relationship runtimeの保存・復元経路と、mainの実装差分を調べる。調査結果は先に台帳へ保存する。
+
+
+## 2026-10-21 深掘り：Identityの保存・復元・リトライ経路
+
+mainと `work/relationship-identity-v1` の同名ファイルを直接比較（ソース読み取りのみ）。
+
+| 対象 | main | Identityブランチ |
+| --- | --- | --- |
+| `lib/canonical-state.ts` | 207行、Identityへの参照なし | 220行。`RootState.relationshipIdentity`を追加。86–91行目でgate ON時のみ `misaki_relationship_identity_state` を読み込み、112–120行目でrelationship stateのversionと一致した場合のみIdentityを採用。 |
+| `lib/relationship-runtime-v1.ts` | 119行、Identityへの参照なし | 232行。temporary snapshotで `resolveRelationshipIdentity` を実行。permanent側では `processPermanentIdentity` を呼び、`misaki_relationship_identity_state` を参照し `apply_misaki_relationship_identity_v1` RPCで反映。 |
+| `lib/relationship-processing-v1.ts` | 245行 | Identityブランチでも**同じblob SHA** `bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5`。Identity実装のためにこの既存処理自体を変更していない。 |
+
+追加の重要点：Identityブランチのruntimeでは、関係性ターン処理の後に `processPermanentIdentity` を呼び、関係性ターンがスキップされたケースでもIdentity再処理を試みるコードがある（100–103行目）。また保存時のsource relationship state versionを照合するため、古いIdentityをそのまま会話に使わない意図が読み取れる。
+
+**暫定結論：** Identity v1は単なるUI表示・プロンプト文言ではなく、`canonical-state`の条件付き読み込み、temporary state更新、permanent state処理、専用DB/RPCを横断する機能。mainにはこの3ファイルのうち前2つのIdentity配線がない。3つ目のrelationship-processingは同一内容。**PR #67のProduction適用記録は今回DBで再検証していない。** gate ON・migration実行・main統合はしない。
+
+次の調査はIdentityのテスト・migrationの安全条件を確認し、差分を台帳へ保存してから進める。
