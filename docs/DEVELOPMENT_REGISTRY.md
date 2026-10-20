@@ -328,3 +328,23 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 **費用・安全：** ワークフローに有料Gemini呼出しが存在するが、今回はコードを読んだだけでdispatchもAPI呼出しもしていない。明示許可条件を回避しない。mainのworkflowが存在することは、品質A/Bの盲検レビューが完了した証拠ではない。
 
 次は残る補助ブランチのworkflow blobとmainの一致状況を確認し、検証済み/未実施を台帳へ保存する。
+
+
+## 2026-10-21 A/B補助ブランチ残り6本のworkflow本文照合
+
+残る6ブランチの `.github/workflows/isolated-gemini-ab-manual.yml` を直接取得してmainのblob `edffcd3d81dffc084fb655a5014af901f33383a2`（104行）と比較した。全6本とも**mainとblob SHAは異なる**が、段階的に拡張された旧版と見られる。
+
+| ブランチ | workflow blob（先頭7桁） | 行数 | 確認できた特徴 |
+| --- | --- | ---: | --- |
+| `work/ab-http-diagnostics-dispatch` | `b3ba117` | 57 | 手動dispatch、fixture、runs、Gemini live |
+| `work/ab-long-fixture-dispatch` | `5937ffb` | 57 | 手動dispatch、fixture、runs、Gemini live |
+| `work/ab-paced-dispatch` | `889638d` | 66 | 上記にdelay_ms入力を追加 |
+| `work/ab-quality-diagnostics-workflow` | `ab45477` | 78 | quality-live と latency-live を分岐 |
+| `work/ab-quality-manual-workflow` | `ab6c57c` | 78 | quality-live と latency-live を分岐 |
+| `work/ab-quality-reply-schema-dispatch` | `e3535d7` | 78 | quality-live と latency-live を分岐 |
+
+全6本に `confirm_billable_requests == 'YES'` と `MISAKI_AB_GEMINI_API_KEY` secretを確認。mainの統合版にも手動dispatch、fixture、quality/live分岐、明示的な有料実行確認がある。mainにはさらに `quality_history`、blind-reviewとblind-keyのartifact出力がある。**したがって上記の主要なworkflow操作はmainにも残っているが、旧版固有の診断ログやエラー処理が一字一句同等かは未検証。**
+
+10本全体の暫定判定：`work/quality-long-history-workflow` はmainとworkflow blob完全一致、残り9本は内容が異なる旧版。全10本とも比較上はworkflow以外の変更なし。**未統合アプリ機能10件として扱わず、CI支援ブランチとして追跡継続。削除・main変更・有料API呼出しなし。**
+
+次の優先調査：`work/context-no-duplicate-replies-ab` 本体の実装・検証状況とmainの差分。補助workflowと実験本体を混同しない。
