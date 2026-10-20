@@ -516,3 +516,14 @@ Vercel branch検索では複数の古いcommitのREADY deploymentsを確認し�
 **停止/保留理由（記録上）：** v2 migrationが既存phase1〜phase5/Body Clock基盤の後に順序適用され、旧keyword emotion trigger・旧action trigger・silence-only claimを段階的に置換するため、**途中状態でProduction運用不可**。PR #29サーバー正本化・PR #30本番切替安全工事と協調必要。mainが323 commits先行しており、現在のcanonical state / 5軸 / DB RPC / Body Clockとの再整合も必要。開発中断の人的な理由は不明。
 
 **再開条件：** mainに実装済みの同等機能を照合して残存差分を機能単位で抽出、migrations依存・RPC writer・Body Clockとの互換性とrollbackを隔離DBで検証、実モデル/Previewの受入、PR #29/#30との依存解消。**判定：** 実装・テスト・CI成功のある重要成果だが、大きく乖離した旧branchの無条件mergeは危険。branch保護、main/Production/Supabase不変更。
+
+
+## 2026-10-21 Canonical切替の依存関係 PR #29/#30：重要な状態差異
+
+GitHub PR API直接確認：**PR #29 `codex/server-canonical-foundation` は `closed / merged=true`**（head `685fbb7baee4a542555f939fabaecd674658c148`）。PR本文に残る「merge未実施」は作成・更新当時の記述で、**現在のPR metadataと矛盾するため現在のmerge状況の根拠に使わない**。ただしmerge済みは本番DB migration/切替実施を意味せず、Production稼働状態は未確認。
+
+**PR #30 `codex/legacy-maintenance-drain` は open / Draft / unmerged**、head `17449c7ec4e8ff50605ef931b04ae76584c6304f`。main比 **7 ahead / 323 behind、25ファイル**。目的はcanonical migrationに先立つ旧main互換maintenance/drain。PR本文とbranch `docs/LEGACY_MAINTENANCE_DRAIN.md`、`docs/WRITE_SURFACE_INVENTORY.md` に、**凍結後でも古いREPEATABLE READ snapshotからwriteと新規受付を突破できるMVCC反例**、guard漏れ（public 22 tables中12 guard、10未guard）、SECURITY DEFINER RPCとauth trigger経由の書込み、pre-gate evidence欠如が記録されている。snapshot前後のadvisory lockでは安全が証明されず、PR本文・設計文書は**Production先行導入BLOCKED**を明記。
+
+ただしheadのGitHub Actions **run 35470658292** (`Legacy maintenance drain` #14) は **completed/success**。PG **17.6 / 18.4** の両matrix jobで `node --test tests/*.test.cjs`、`npx tsc --noEmit --incremental false`、`deno check` がsuccess。**PR本文が引用する古いrun 35453044077の52 PASS/2 FAILとは異なる最新headのCI結果**である。最新CI greenが以前のMVCC反例の解消を証明するとは限らず、現行テストで反例をassertしているか/skip・条件分岐・fixture差分があるかの個別調査が必要。安全判定は引き続きBLOCKEDとする。
+
+**停止理由：** DB freezeの安全性を破る具体的反例とcoverage不足があるため、安全停止ゲートが働いた。**再開条件：** 既知MVCC反例を再現・解消する設計、全write surfaceとSECURITY DEFINER/triggerのcoverage、旧処理引継ぎ、隔離PG17/18と実境界での安全性回帰、operator rollback検証。PR #29 merge済みとPR #30 blockedの関係を再評価し、現行mainへの適用可否を決める。**PR #31 Relationship Time v2の依存記述も、この新しいPR #29 merge状態で更新判断すること。**main/Production/Supabase変更なし。
