@@ -430,3 +430,14 @@ branch実装を直接取得して確認：共有policy `forget-control.ts` はSo
 `tests/reports/forget-batch-evaluation.md`（2026-10-07 JST）を確認。20シナリオの**scripted port比較**で現行armは多くが7〜9回、batch armは2〜3回のsemantic呼出し。人工false negativeを両armに注入した場合、両方が同じ誤りを犯すことも明示。**これは実Geminiの性能・安全性証明ではない。** token・Gemini latencyはすべて未測定、API key未設定でliveは未実施。記録上は検証専用23/23、UTC/JST各284/284回帰成功、TypeScript検査成功。**今回のGitHub CI独立検証はまだしていない。**
 
 **判定：** 実装・scripted検証は具体的に存在するが、live意味判定同等性、実測token/latency、誤判定の人手レビュー、migration/rollbackと本番整合の確認が未完了。main/Productionへ移行しない。PR #66はDraftと記載。次はPRとCI実行記録を独立照合し、残件を整理する。
+
+
+## 2026-10-21 Forget Control PR #66：GitHub CI独立確認
+
+GitHub PR APIで #66 `Forget Control v1: canonical忘却と確認付き再学習` を確認。**open / draft=true / merged=false**、head `work/forget-control-v1`、head SHA `84d147ba5b46698d3b46fb727a9859f87f79f3d2`、変更34ファイル。PR記載のProduction未適用・隔離Supabaseなし・Preview実機受入未完了は**PR作成者の記録**であり、今回Productionを直接確認した事実ではない。
+
+head commitに紐づくGitHub Actions run **37533221342**（`Canonical relationship integration tests` #358）は **completed/success**。job **112507554141**（`test`）のstepで **`npm ci`、`npm test`、`npx tsc --noEmit`、`npm run build` がすべてsuccess** とGitHub APIで独立確認した。
+
+PR本文の過去検証記録：PGliteのmigration/RPC原子性・rollback・checkpoint/refund、UTC/JST各251→261→284のテスト成功、23件のbatch検証、Preview READYなど。ただし**CI step成功は個別テスト件数・実Gemini精度・本番DB適用状況を証明しない**。Deno独立型検査・隔離Preview実機・匿名/別端末・Body Clock・実モデルlatency/cost・rollback受入はPR上の未完了項目。実Gemini batch比較は未実施。
+
+**結論：** Forget ControlのPR headは、npm test・TypeScript・Next buildのCI成功を実際に確認できた。機能全体は依然Draft・未merge。安全な本番導入判断には独立DB/Preview、実モデルの意味判定、移行・復旧手順の確認が必要。main/Productionへの変更は行わない。
