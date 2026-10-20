@@ -653,3 +653,14 @@ PR #31 `supabase/migrations/20260920083000_body_clock_no_action_finish.sql` を�
 main `20260916002657_misaki_body_clock_atomic_delivery_and_vault_auth.sql` には `finish_misaki_body_clock_delivery` があり、同様にlease一致・未失効を検査して送信countを増加。main `20260917143500_fix_body_clock_claim_rpc.sql` には `claim_misaki_body_clock_due_users`、due対象のclaim・次回時刻調整が存在。**mainのcanonical root/temporary revision整合性引数を保ち、PR #31のno-action概念を現行RPC仕様に合わせて設計し直す**のが有力。PR #31 SQLを即移植しない。実装着手前に現在のmigrationでの最新RPC署名とclaim状態遷移を確認する。
 
 **採用候補の分類：** 『美咲が内的理由なしに送らず、見送り理由を残す』は②思想を採用して再設計。PR #31のシナリオテストは①/③検証資産として再利用検討。旧 `index.ts` 丸ごと移植は④不採用候補（canonical退行リスク）。この分類は設計上の暫定判断で、mainのコード変更やproduction rollout承認ではない。
+
+
+## 2026-10-21 Body Clock claim SQLの実際の見送り機能と設計継承判定
+
+main `supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql` の `claim_misaki_body_clock_due_users` **全文**を確認。**重要な精密化：mainは既にDB claim段階で送信見送りを実装済み**。`PULL` は100%見送り、`WAIT` は75%見送り、`SULK` は55%見送り（`roll < .25` / `< .45` の場合だけ送信）、その他は送信候補。見送りは `background_push_state.next_push_at` を55〜210分延期し、`misaki_relationship_events` に `proactive_decision` / `relationship_action_deferred` を記録。送信候補は15分leaseを取得、JST日付でpushes_todayをリセットし、1日4回未満の条件あり。`FOR UPDATE OF b SKIP LOCKED` による候補claim。従って『現行Body Clockは時間が来たら全件送る』『見送り理由を記録しない』は**誤り**。以前の『claim後に独立した内的動機のno-action分岐がない』という記述は引き続き正確だが、DB側の見送りを必ず併記する。
+
+PR #31はこのDB事前ゲート**に加えて**、claim後に `deriveProactiveUrge`（傷/関係story、最近の接触、根拠ある心配、写真/親密度、内的動機）を評価し、`shouldSend=false` なら `finish_misaki_body_clock_no_action` でlease解除・延期、`proactive_no_action` event記録。つまり**機能の全面欠落ではなく、判断基準の深さ・判断タイミング・理由の粒度の差**。mainのDB側ゲートと新しい判断を重複実装すると、確率的見送りと内的見送りが二重に効き、送信が過度に減る可能性。無条件でPR31の閾値を移植しない。
+
+main `20260918073918_canonical_misaki_root_state.sql` の最新 `finish_misaki_body_clock_delivery` 署名は旧7引数をDROPして11引数版をCREATE（expected revision/token/state/updated_atを追加）。現行index.tsもこれを渡す。PR31 index.tsの旧7引数版をそのまま移植しない。
+
+**継承方針（暫定②思想を活かす）：** DB claimは候補抽出/lease/レート制限に責務を絞り、アプリ側で根拠・関係story・直近接触を加味した『今話す理由』を評価する構想を現行canonical構成に合わせて検討。ただしDB側既存PULL/WAIT/SULK判定の移行/統合、no-action lease処理、重複見送りの影響、silent failure、送信頻度、理由ログの整合性を隔離テストで比較してから採否判断。これは実装承認ではない。main/Production/Supabase変更なし。
