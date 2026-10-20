@@ -494,3 +494,12 @@ PR #85 (`experiment/interpreter-gradual-acting-20261015`) は **open / draft / u
 GitHub Actions **run 39186862912**（`Canonical relationship integration tests` #554）は **completed/success**。job **117851011382** で `npm ci` / `npm test` / `npx tsc --noEmit` / `npm run build` が全てsuccess。Vercel接続でも同headのdeployment **`dpl_2DThKw2YVkNj6474D4xpbVdGratZ`** が **READY** と独立確認。ただしPreview READYは隔離実験の純粋コードのビルド完了であり、実チャットへの接続や実Gemini検証を意味しない。
 
 **開発目的：** 5軸関係性に応じた美咲の表現を段階的に調整するacting/Interpreter仮説の検証。**停止理由：** PR記録上、未承認閾値の採否判断と実Gemini A/B・レビュー待ち。作業が中断した真の経緯は未確認であり推測しない。**再開条件：** 仕様・閾値の合意、現行actingとの比較と実モデルの品質/安全性検証、Body Clock/DTO境界のレビュー、必要なら独立Previewで受入。**判定：** 実験コード/テスト実装済み・CI成功・Preview READYだが、main未反映かつruntime未接続。無条件merge不可。main/Production/DB変更なし。
+
+
+## 2026-10-21 Conversation Lab PR #86：中断理由と再開ゲートの再確認
+
+PR #86 (`experiment/conversation-lab-offline-v1-20261015`) は **open / draft / unmerged**、head `f92250fc1ac79efa44c72468e00449d3fdc7ce6e`。main差分 **112 ahead / 0 behind、32ファイル**。初期PR本文の「tests not yet verified」は**作成当時の記述**で、後続のCI成功記録と混同しない。後続で `app/conversation-review/page.tsx`（iPhone手動評価画面）、`app/api/conversation-review/smoke/route.ts`、`lib/conversation-lab/live-smoke-probe.ts`、`scripts/run-conversation-smoke.ts`、複数のreview/quality/runner helperとテストが追加されている。既存台帳にhead `f92250fc` のCI成功・Preview READYを記録済み。
+
+ブランチ文書 `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` と `docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md` を直接確認。**実Gemini呼出し0回・実モデル品質評価未実施**と記録。旧 `/api/acting-lab` はPreviewで認証/予算上限が不足し、かつ本番の記憶/関係/Body Clock/60件historyと非同等のため、代用禁止。隔離Q02 2往復アダプターはキー＋明示承認、最大2物理呼出し、retryなし、15秒timeout、出力300 tokens上限。CLI入口は `--approved-small-test` と `MISAKI_LIVE_SMOKE_APPROVED=yes` の双方必須。**安全な実行環境・正規の開発キー・費用管理の確認なしに起動しない。** iPhone画面は人手レビュー用で、画面があることは実モデル呼出し成功の証拠ではない。
+
+**開発目的：** 美咲の会話品質を複数ターンで比較・評価する再現可能な基盤。**停止/保留理由（文書上）：** 本番相当のprompt/contextでない、実モデルの認可・費用・実行環境・品質受入ゲートが未解決。中断した真の人的経緯は不明。**再開条件：** (1) offline tests/CI再確認、(2) 既存smoke endpointの認可・停止ゲートをソース検証、(3) ownerが費用・回数・隔離環境を承認してから実Gemini最小試験、(4) raw結果を人手評価、(5) production parityは別設計・別PRで検証。**判定：** 評価基盤/画面/安全設計の多くは実装済みで保護対象、実Geminiの会話品質は未実証。main/Production/Supabase変更なし、課金実行なし。
