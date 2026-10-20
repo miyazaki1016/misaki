@@ -585,3 +585,12 @@ GitHubのmain tree全207項目と `sora/relationship-time-v2-design` tree全175�
 branchにあってmainのtreeに**同じパスがない**もの：`lib/relationship-conversation-generator.ts`、`lib/relationship-conversation-preview.ts`、`lib/relationship-conversation-prompt.ts`、`lib/relationship-naturalness-scenario.ts`、`tests/relationship-story.test.ts`、`tests/relationship-naturalness-repair.test.ts`、`tests/body-clock-proactive-motive.test.ts`、`tests/body-clock-proactive-urge.test.ts` 等。mainには別の `lib/relationship-acting-guide.ts`、`lib/relationship-analyzer-v1.ts`、`lib/relationship-engine-v1.ts` 等も存在し、**未存在パスをそのまま未実装機能と断定しない**。
 
 **暫定分類：** (A) v2中核3ファイルはmainに完全統合済み、(B) store/patternsは差分レビュー必要、(C) conversation generation/naturalness/Body Clock motive/urgeは機能同等性・安全性・テスト照合が必要。mainには別名のv2 SQLも存在。Production runtimeでの有効化/DB適用は未確認。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #31 store/patterns差分の意味を確定：main側に後続拡張
+
+`lib/relationship-emotion-store.ts` をmain/PR #31双方で全文比較。実質差分は**mainの関数 `persistRelationshipEmotionFromSignals` に任意 `userId?: string` 引数が追加**され、RPC `apply_relationship_emotion_action_v2` に **`p_user_id: userId ?? null`** が渡されること。PR #31版には両方ない。これはmain側の明示的ユーザー指定を可能にする後続拡張であり、**旧branch版をmainへ単純上書きすると機能退行のおそれ**。main migration `20260926003000_relationship_emotion_action_v2_rpc.sql` に `p_user_id uuid default null` が定義済みで整合。
+
+`lib/relationship-patterns.ts` は両者ほぼ同じで、差分はイベント取得条件の1行：PR #31は `emotion_action_v2_after_chat` のみを `.eq`、mainは `.in(["emotion_action_v2_after_chat", "temporary_relationship_checkpoint"])` として**匿名→恒久化チェックポイントもパターン履歴に含める**。main側の記憶継続の拡張であり、旧branch版へ戻すとイベントを取りこぼす可能性がある。
+
+前節の『store/patternsの差分レビュー必要』を更新：**この2ファイルはmain側が追加機能を持つ**ことを静的確認。PR #31の古い2ファイルを丸ごとmergeしない。branch固有のconversation-generator / naturalness / Body Clock motive/urgeなどは別途mainとの機能比較が必要。CIや本番の挙動はこの差分比較だけで証明されない。main/Production/Supabase変更なし。
