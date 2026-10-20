@@ -452,3 +452,14 @@ PR本文の過去検証記録：PGliteのmigration/RPC原子性・rollback・che
 設計文書は「research only; no runtime behavior changes」。現行60件historyとrecent Misaki repliesの重複、20件history・要約・重複除去などの候補、盲検の会話品質比較、usageMetadataとの照合を提案。2026-10-08の単発例（初回30,002ms timeout、再試行16,881ms、input 8,378 tokens）は**ベンチマークではない**。圧縮・要約を実運用した証拠ではない。
 
 同名head PRの検索結果は0件（この検索で見つからなかっただけでPRの不存在を完全保証しない）。**現時点の判定：計測helper・重複分析・ユニットテスト・研究設計はブランチに存在。main未反映。実運用の圧縮・品質非劣化・複数回latency/token実測は未確認。** 他機能（Identity）の差分と混同せず、削除・main merge・Production変更を行わない。次は該当ブランチのCI/テスト実績とmain routeの計測接続状況を検証する。
+
+
+## 2026-10-21 Context compression：実chat route接続の追加発見とCI照合
+
+**前節の「計測helperのみ」という印象を訂正：branchでは実chat routeへの接続まで実装済み。** branch head `10275b666387115ced06312570111b21d0276e17` のコミット差分をGitHubで確認。`app/api/chat/route.ts` に `analyzePromptSectionOverlap` と `countRepeatedRepliesInHistory` を追加し、既存の `measureContextSize` と合わせて `console.log('MISAKI CONTEXT SIZE:', ...)` に**数値診断**を出す。traceIdと文字数・重複件数のみで本文をログに出さない設計。
+
+実chat routeをmain/branch双方から直接取得して比較：main blob `5600ad37f2660049a570c4dd340e8ed140d9843b` には `contextSizeMeasurementEnabled`、`measureContextSize`、`analyzePromptSectionOverlap`、`MISAKI CONTEXT SIZE` のいずれも0件。branch blob `f7037edeb071468b1f5b5c017fea1e4b8412f1c8` には4項目すべて存在。branchでの計測条件は `MISAKI_CONTEXT_SIZE_METRICS=1` **または** `VERCEL_ENV=preview` かつ `VERCEL_GIT_COMMIT_REF=work/conversation-context-compression-spike`。つまり指定Previewでは環境フラグなしでも診断有効となる条件がある。Productionへの適用は確認されず、mainは未接続。
+
+branch head SHAに対する `fetch_commit_workflow_runs` は空配列。ただしこのAPIはPR runに限定されるため、**CI不成功・未実行の証拠ではない**。branch head commitは2026-10-08 `feat: connect numeric prompt overlap diagnostics in isolated Preview`。PR head検索も結果なし。**今回独立にCI成功を証明できたわけではない。**
+
+**判定：** 計測・重複診断はbranchの実chat routeまで接続済みで、単なるhelperより進んだ実装。mainには未反映。実際のPreviewログ出力、実測token/latency、複数ケースの品質検証、CI結果は未確認。圧縮・要約によるruntime最適化は未実装の研究候補として区別。削除・merge・Production変更なし。
