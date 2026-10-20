@@ -240,3 +240,22 @@ mainと `work/relationship-identity-v1` の同名ファイルを直接比較（�
 **暫定結論：** Identity v1は単なるUI表示・プロンプト文言ではなく、`canonical-state`の条件付き読み込み、temporary state更新、permanent state処理、専用DB/RPCを横断する機能。mainにはこの3ファイルのうち前2つのIdentity配線がない。3つ目のrelationship-processingは同一内容。**PR #67のProduction適用記録は今回DBで再検証していない。** gate ON・migration実行・main統合はしない。
 
 次の調査はIdentityのテスト・migrationの安全条件を確認し、差分を台帳へ保存してから進める。
+
+
+## 2026-10-21 深掘り：Identity migration 4本とテストの実体
+
+`work/relationship-identity-v1` のSQLとテストファイルを直接読んだ（本番DBには接続していない）。
+
+1. `20261007114143_relationship_identity_v1_canonical.sql`（126行）：`misaki_relationship_identity_state` と `misaki_relationship_identity_transitions` を作成。RLS有効、anon/authenticatedの直接権限をrevoke、service_roleに権限付与。`apply_misaki_relationship_identity_v1` RPCとsource version検証を含む。
+2. `20261007114154_relationship_identity_v1_atomic_temporary_import.sql`（90行）：匿名temporaryからcanonical relationshipとIdentityを原子的に移行する `import_misaki_temporary_relationship_v3`。lease検証、processing version一致、遷移記録の重複抑止がある。
+3. `20261007114158_relationship_identity_v1_romance_reentry_provenance.sql`（102行）：別れ・拒否の後に恋愛関係を再構築した根拠を `romance_reentry_version` で保持し、古い状態・不正なversionを拒否する条件を追加。
+4. `20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql`（96行）：匿名側の再構築根拠をversion数値ではなくboolean事実として移し、canonical側のversionへ対応付ける。
+
+### テストに書かれた検証内容（実行結果ではない）
+
+- `tests/relationship-identity-resolver.test.ts`（134行）：5軸の組み合わせ、2回のcanonical確認、同じversionの重複を確認回数に数えないこと、明示的な恋人状態、別れた後の元の安全な関係への復帰、古い恋愛値による復活阻止をテスト。
+- `tests/relationship-identity-sql.test.ts`（186行）：独立PostgreSQL上でmigration 4段階の適用、RPCの引数数、service-only権限、古いsource versionの拒否、リプレイと遷移履歴の不変性をテストする設計。
+
+**重要な区別：** テストコードに検証が書かれていることと、今回テストを再実行して成功したことは別。PR #67に過去の検証・Production適用済みとの記録はあるが、今回の確認はソース読取のみ。**本番適用やgate ONは行わない。**
+
+**次の課題：** テスト実行記録の日時・結果をPR/CIから検証し、migration 4本とmainの現行schemaとの差分を履歴として整理。現在の本番DBの実測は未実施。
