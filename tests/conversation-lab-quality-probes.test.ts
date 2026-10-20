@@ -4,7 +4,7 @@ import { QUALITY_PROBES, validateQualityProbes } from "../lib/conversation-lab/q
 
 test("all eight quality dimensions have nonempty multi-turn probes", () => {
   assert.doesNotThrow(() => validateQualityProbes(QUALITY_PROBES));
-  assert.equal(QUALITY_PROBES.length, 18);
+  assert.equal(QUALITY_PROBES.length, 22);
   assert.ok(QUALITY_PROBES.every(p => p.turns.length >= 2));
 });
 
