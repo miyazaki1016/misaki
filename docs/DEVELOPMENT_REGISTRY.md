@@ -664,3 +664,24 @@ PR #31はこのDB事前ゲート**に加えて**、claim後に `deriveProactiveU
 main `20260918073918_canonical_misaki_root_state.sql` の最新 `finish_misaki_body_clock_delivery` 署名は旧7引数をDROPして11引数版をCREATE（expected revision/token/state/updated_atを追加）。現行index.tsもこれを渡す。PR31 index.tsの旧7引数版をそのまま移植しない。
 
 **継承方針（暫定②思想を活かす）：** DB claimは候補抽出/lease/レート制限に責務を絞り、アプリ側で根拠・関係story・直近接触を加味した『今話す理由』を評価する構想を現行canonical構成に合わせて検討。ただしDB側既存PULL/WAIT/SULK判定の移行/統合、no-action lease処理、重複見送りの影響、silent failure、送信頻度、理由ログの整合性を隔離テストで比較してから採否判断。これは実装承認ではない。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 Body Clock動機思想の現行設計への対応表（実装は未着手）
+
+main `supabase/functions/body-clock/proactive-decision.ts` は `misaki_relationship_state` の `intimacy_level,intimacy_points,emotion_state,action_state,last_interaction_at` を読んで方向/感情/行動/親密度/生活根拠を生成。これは**文章の温度・話題方向を決める役割**。PR #31 `proactive-urge.ts` は別責務の `shouldSend`（送信意思）/`desire`（連絡したい種類）/`focus` を導く。`proactive-motive.ts` は `topicIntent`（美咲自身の共有/相手への気遣い/関係継続）と `topicSource`（美咲/ユーザー/関係）を分離し、根拠の時刻・鮮度を扱う。**mainのdirectionタグをmotiveと同一視しない**。
+
+### 既存と候補の責務
+1. main DB `claim_misaki_body_clock_due_users`：送信候補抽出、日次上限、PULL/WAIT/SULKの確率的延期、15分lease、defer理由ログ（**既存**）。
+2. main Edge `buildProactiveDecisionContext`：関係/感情/生活の根拠、文面の方向・温度（**既存**）。
+3. PR31 `deriveProactiveUrge`：関係story/接触直後/動機なしを含む**送信意思の追加判定**（**未統合の思想候補**）。
+4. PR31 `deriveProactiveMotive`：ユーザーの現在情報と古い記憶を区別し、なぜ・誰について話すかを文章生成へ渡す（**未統合の思想候補**）。
+5. PR31 `finish_misaki_body_clock_no_action`：claim後に送信しない場合のlease解放/延期/送信数不加算（**DB実装候補だが現行互換性未検証**）。
+
+### 移植前に解決する設計課題
+- **二重見送り**：DB側PULL/WAIT/SULKとEdge側urgeが重複すると連絡頻度が意図せず下がる。既存のDB claimを変更するか否かは送信頻度の再現テストで判断。
+- **データの鮮度**：PR31は旧rowのrecent_history/long_term_memoryを使用。mainは `loadBodyClockRoot` からcanonical履歴を読む。現行のsource-of-truthを優先。
+- **見送りの原子性**：no-action RPCはlease一致/期限を検査し、delivery/pushes_todayを作らない。現行migration・並行claim・失敗再試行との整合性が必要。
+- **安全上の例外**：PR31は `externalConcern` と `concerned` を組み合わせた例外送信を想定するが、根拠の出所/鮮度/同意/送信上限を明示してから検討。現行本番へ自動で有効化しない。
+- **評価**：現行と候補で同じ入力を使い、送信率、誤った心配、関係の傷の扱い、連投、誤った記憶参照を隔離テストで比較。実Gemini送信は承認なしに実施しない。
+
+**分類決定：** PR31のBody Clockの価値は主に②『思想を現行設計に適合させて再実装』と③『境界テスト資産の継承』。旧index.ts/旧SQLを直接移植する判断はしない。今後の再開条件はDB claimとEdge判断の責務分割、no-action RPC整合性、offline A/B、段階的rollout/rollback計画の確認。main/Production/Supabase変更なし。
