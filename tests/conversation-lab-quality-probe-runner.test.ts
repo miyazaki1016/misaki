@@ -42,3 +42,13 @@ test("a failed reply marks transcript as error, not a successful quality evaluat
   assert.equal(run.status, "error");
   assert.equal(run.completedPairs, 0);
 });
+
+test("suite rejects a later invalid fixture before running any callbacks", async () => {
+  let calls = 0;
+  const invalid = { ...QUALITY_PROBES[1], turns: ["valid", " "] };
+  await assert.rejects(
+    runQualityProbeSuite(async () => { calls++; return "synthetic"; }, [QUALITY_PROBES[0], invalid]),
+    /INVALID_PROBE_TURNS/,
+  );
+  assert.equal(calls, 0);
+});
