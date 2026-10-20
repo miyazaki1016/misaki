@@ -289,3 +289,25 @@ Identityブランチの `docs/IMPLEMENTATION_OVERVIEW.md` 3564–3578行およ�
 - PR #67はDraft / 未merge、gate OFFを維持し、ownerレビューと隔離環境受入まではmerge・gate ONをしない。
 
 **判定：** Identity v1のCI・ビルドは過去成功を確認済み。一方、rollback SQLと複数DBセッション競合、隔離Preview実機受入は「未実施」と明示されている。今回もmain・Production・DB・gateは変更していない。
+
+
+## 2026-10-21 横断棚卸し：A/B検証の補助ブランチ10本
+
+GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべてahead=1、変更ファイルは `.github/workflows/isolated-gemini-ab-manual.yml` の1ファイルのみ。** アプリ本体・DB migrationの差分はこの10本の比較結果には含まれない。
+
+| ブランチ | ahead / behind | 変更対象 |
+| --- | --- | --- |
+| `work/ab-20-pair-dispatch` | 1 / 23 | A/B手動ワークフロー |
+| `work/ab-blind-review-artifact-workflow` | 1 / 16 | 同上 |
+| `work/ab-http-diagnostics-dispatch` | 1 / 21 | 同上 |
+| `work/ab-long-fixture-dispatch` | 1 / 22 | 同上 |
+| `work/ab-manual-workflow-only` | 1 / 24 | 同上 |
+| `work/ab-paced-dispatch` | 1 / 20 | 同上 |
+| `work/ab-quality-diagnostics-workflow` | 1 / 18 | 同上 |
+| `work/ab-quality-manual-workflow` | 1 / 19 | 同上 |
+| `work/ab-quality-reply-schema-dispatch` | 1 / 17 | 同上 |
+| `work/quality-long-history-workflow` | 1 / 15 | 同上 |
+
+**分類：** 10本はA/B実験のCI・手動dispatch支援に関わる補助ブランチ（暫定D：検証インフラ）。**未統合の会話エンジン実装10件と数えない**。ただし実際のworkflow YAMLの中身、実行実績、後継workflowに機能が引き継がれたかは未確認。ahead=1なので、削除してよいとは判断しない。
+
+**次の調査：** このworkflowのmain版と代表的な補助ブランチ版を読み、A/B検証で現在使える機能・古い検証経路・有料Gemini呼出しの条件を整理する。調査結果を先に台帳へ保存する。
