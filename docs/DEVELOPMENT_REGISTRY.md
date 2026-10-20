@@ -419,3 +419,14 @@ mainの手動workflowがcheckoutする固定commit `9a40d98c4ecec2f17eef1489a687
 - 固定commitには `.github/workflows/isolated-gemini-ab-manual.yml` は存在しない（main側にあるworkflowがcheckout後に実験コードを実行する構成と整合）。
 
 **結論：** 固定commitにはmainのworkflowが呼ぶ実験コードと事前テストの少なくとも一部が存在し、live実行には二重の明示的な環境変数・secret条件がある。現時点で固定commitの手動実行成功・失敗の有無は未判定。既存のoffline replay CI成功（run 38319587040）は別commitの別workflowであり混同しない。有料APIは呼び出していない。
+
+
+## 2026-10-21 Forget Control v1：差分とbatch検証の精査
+
+`main...work/forget-control-v1` はahead 5 / behind 28、差分34ファイル。チャットAPI、persona、Body Clock、canonical-stateに加え、mainにない `supabase/functions/_shared/forget-control.ts` と `supabase/migrations/20261006200002_forget_control_v1.sql` を含む。単一UI機能ではなく、**会話・自発処理・人格・DBの横断変更**であり、部分移植は危険。
+
+branch実装を直接取得して確認：共有policy `forget-control.ts` はSoft Forget/Hard Delete、active/released、対象の曖昧さ拒否、履歴・memory・返信のmask、reoffer確認を扱う。migrationは暗号化payloadを保存する `misaki_forget_controls`、RLS、権限制限、persist関数、chat turn原子的完了処理への接続を含む。migration冒頭に `Branch-only` / `No Production execution` と明記。
+
+`tests/reports/forget-batch-evaluation.md`（2026-10-07 JST）を確認。20シナリオの**scripted port比較**で現行armは多くが7〜9回、batch armは2〜3回のsemantic呼出し。人工false negativeを両armに注入した場合、両方が同じ誤りを犯すことも明示。**これは実Geminiの性能・安全性証明ではない。** token・Gemini latencyはすべて未測定、API key未設定でliveは未実施。記録上は検証専用23/23、UTC/JST各284/284回帰成功、TypeScript検査成功。**今回のGitHub CI独立検証はまだしていない。**
+
+**判定：** 実装・scripted検証は具体的に存在するが、live意味判定同等性、実測token/latency、誤判定の人手レビュー、migration/rollbackと本番整合の確認が未完了。main/Productionへ移行しない。PR #66はDraftと記載。次はPRとCI実行記録を独立照合し、残件を整理する。
