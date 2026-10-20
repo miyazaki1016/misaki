@@ -393,3 +393,16 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 ## 2026-10-21 A/B workflowのcheckout先に関する訂正
 
 前節の「mainに実験スクリプトがないため実行経路が欠けている可能性」は、checkout先を確認した結果、修正が必要。mainの `.github/workflows/isolated-gemini-ab-manual.yml` は `actions/checkout@v4` で固定commit `9a40d98c4ecec2f17eef1489a687acc1e24f338e` を指定している。このcommitには `scripts/context-ab-live.ts`、`scripts/context-ab-quality-live.ts`、`tests/context-ab-prompt.test.ts` が実在することをGitHubから直接確認した。したがってmainに同名スクリプトが存在しないことだけで、workflowが壊れているとは判断できない。実験コードを固定commitから取得する隔離構成である。main未統合のA/B本体という判定は維持。workflow実行成功・secret設定状況は未確認。有料実行なし。
+
+
+## 2026-10-21 A/B関連CI実行履歴の独立照合
+
+`work/context-no-duplicate-replies-ab` のPR #78は「Test isolated conversation replay adapter」、本文は `Draft for automated tests only. No production merge.`。このPRの記述は本番採用承認を意味しない。
+
+過去の検証ドキュメントが挙げるcommit `19cc84667a1a205a6b4b7193f74637197ba938df` をGitHub Actions APIで直接照合したところ、workflow run **38319587040**、`Isolated Replay Tests` #49 は `completed/success`。job **115044210136** (`replay-tests`) も `completed/success`。step単位で `npm ci` と `Run offline replay tests only` の成功を確認した。
+
+**確認できた事実：** このcommitのoffline replay CIは実際に成功していた。**確認できないこと：** このrunだけから、全体の `npm test`、TypeScript型チェック、Next build、Gemini有料live試験、盲検の人手品質評価が完了したとは言えない。過去の実験記録の数値は別証拠であり、このrunの成功と混同しない。
+
+mainの手動A/B workflowは固定commit checkoutを使うため、mainに実験スクリプトがないことだけで破損とは言えない。現時点でworkflowのdispatch、Gemini API呼出し、mainへのmergeは実施していない。
+
+次の照合対象：固定checkout commit `9a40d98c4ecec2f17eef1489a687acc1e24f338e` の実行記録と、実験ブランチのその他CI結果を分けて検証する。
