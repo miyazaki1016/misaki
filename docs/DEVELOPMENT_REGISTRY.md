@@ -406,3 +406,16 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 mainの手動A/B workflowは固定commit checkoutを使うため、mainに実験スクリプトがないことだけで破損とは言えない。現時点でworkflowのdispatch、Gemini API呼出し、mainへのmergeは実施していない。
 
 次の照合対象：固定checkout commit `9a40d98c4ecec2f17eef1489a687acc1e24f338e` の実行記録と、実験ブランチのその他CI結果を分けて検証する。
+
+
+## 2026-10-21 固定A/B実験commitの履歴照合
+
+mainの手動workflowがcheckoutする固定commit `9a40d98c4ecec2f17eef1489a687acc1e24f338e` に対して、GitHubの `fetch_commit_workflow_runs` を実行した結果は **`workflow_runs: []`**。**重要：このAPIはpull_request関連のrunに絞る実装なので、結果ゼロを「手動workflowの実行履歴が一切ない」証拠とは扱わない。** 手動dispatchの実行履歴はこの取得方法では網羅できない。
+
+固定commitを直接読んで確認したこと：
+- `scripts/context-ab-live.ts`（blob `83e826d`）は存在。`MISAKI_AB_LIVE=YES`、`GEMINI_API_KEY`、`MISAKI_AB_MODEL` が必須。実行回数は1〜20に制限し、fixtureはshort/longのみ。
+- `scripts/context-ab-quality-live.ts`（blob `198e58d`）も存在。同じくlive明示許可・key・modelを要求。`MISAKI_AB_EXPORT_REVIEW=YES` の場合、synthetic回答のblind-review JSONと対応キーJSONをローカル出力する処理がある。
+- `tests/context-ab-prompt.test.ts`（blob `618d5db`）も存在。
+- 固定commitには `.github/workflows/isolated-gemini-ab-manual.yml` は存在しない（main側にあるworkflowがcheckout後に実験コードを実行する構成と整合）。
+
+**結論：** 固定commitにはmainのworkflowが呼ぶ実験コードと事前テストの少なくとも一部が存在し、live実行には二重の明示的な環境変数・secret条件がある。現時点で固定commitの手動実行成功・失敗の有無は未判定。既存のoffline replay CI成功（run 38319587040）は別commitの別workflowであり混同しない。有料APIは呼び出していない。
