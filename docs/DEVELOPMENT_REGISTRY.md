@@ -607,3 +607,12 @@ PR #31 branch `sora/relationship-time-v2-design` の以下4実装を直接読取
 これらは**会話自然さの隔離検証装置**として価値がある一方、mainの既存会話ルートへの本番組込みや実Gemini品質検証は未証明。mainには `lib/relationship-turn-expression.ts` が存在するがbranchとblob不一致（main `d7b2b66...` / branch `58c9712...`）。さらにmainにのみ `lib/relationship-acting-guide.ts` がある。**プロンプト/表現制御の重複・設計競合**があり得るため、検証モジュールを無条件にmainへコピーしない。
 
 **次の検証：** PR #31のnaturalness testsが何をassertするか、main acting-guide/turn-expressionの現在の制約と重複するかを照合。Gemini呼出しは有料・外部送信のためユーザー承認なしに実行しない。Production変更なし。
+
+
+## 2026-10-21 PR #31 naturalness testsとmain本番ルートの意味照合
+
+PR #31 `tests/relationship-naturalness-repair.test.ts`：謝罪後の修復でも急にcloserへ戻らない（emotion intensity <62、direction != closer）、対立中の気遣いでaffectionateに即復帰しない、生成したsystemPromptに傷/警戒の制約を含むことをassert。`tests/relationship-naturalness-boundary.test.ts`：明示的拒絶後の静寂を隠れた愛情と誤認しない、継続的気遣いで警戒が徐々に和らいでも恋愛関係を捏造しないことをassert。`tests/relationship-conversation-prompt.test.ts`：実人格prompt＋共有記憶＋直近会話＋表現ガイドを組み、存在しない履歴を勝手に補わないことをassert。**これらはunit/scenario assertionであり、実Gemini自然さの人間評価ではない**。
+
+main `lib/relationship-turn-expression.ts` を確認：`createCurrentTurnActionGuide` に `unresolved_hurt`、`repair_in_progress`、`repair_demonstrated`、`repeated_harm` 各ガイドが**実装済み**。傷/警戒の即リセット防止、修復の段階性、根拠のない心配の禁止、甘さと冷酷さの両極端回避が明文化。main `lib/relationship-patterns.ts` に `deriveRelationshipStory` の4状態判定が存在。main `app/api/chat/route.ts` で `deriveRelationshipStory` import/呼出し（約1864行）、`createRelationshipActingGuide` 呼出し（約2063行）、`createCurrentTurnActionGuide` 呼出し（約2643行）を確認。**単なる未使用コードではなく、mainの会話ルートに関連表現制御が接続されている**。
+
+**判断：** PR #31の『傷→謝罪→段階的修復』『無根拠な恋愛捏造禁止』という重要な設計思想はmainにも実装・ルート配線済み。一方PR #31の `relationship-conversation-*` / naturalness scenarioの隔離テストハーネスはmain同名パスなしで、検証資産として残る。テストの網羅性/実モデル品質/本番DB適用は未証明。旧promptを本番へ上書きしない。次にmainのテストとbranchテストのassertion対応表を作り、未カバーだけ追加候補とする。main/Production/Supabase変更なし。
