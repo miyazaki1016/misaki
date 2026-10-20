@@ -311,3 +311,20 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 **分類：** 10本はA/B実験のCI・手動dispatch支援に関わる補助ブランチ（暫定D：検証インフラ）。**未統合の会話エンジン実装10件と数えない**。ただし実際のworkflow YAMLの中身、実行実績、後継workflowに機能が引き継がれたかは未確認。ahead=1なので、削除してよいとは判断しない。
 
 **次の調査：** このworkflowのmain版と代表的な補助ブランチ版を読み、A/B検証で現在使える機能・古い検証経路・有料Gemini呼出しの条件を整理する。調査結果を先に台帳へ保存する。
+
+
+## 2026-10-21 A/Bワークフロー実体：mainに引き継がれた機能
+
+`.github/workflows/isolated-gemini-ab-manual.yml` をmainと代表4ブランチで直接比較した。
+
+- **main**：104行、blob `edffcd3d81dffc084fb655a5014af901f33383a2`。`workflow_dispatch` による手動実行、`confirm_billable_requests == 'YES'` の明示的な有料Gemini呼出し許可、`MISAKI_AB_GEMINI_API_KEY` secret、事前の `npm ci` / `tests/context-ab-*.test.ts`、latency/tokenとqualityの実験分岐を確認。quality側は `scripts/context-ab-quality-live.ts`、それ以外は `scripts/context-ab-live.ts`。quality成功時は匿名化レビュー用の `synthetic-blind-review` と照合キー `synthetic-review-key` を別々のartifactとして出力。`fixture` と `quality_history` の入力あり。
+- **`work/ab-20-pair-dispatch`**：48行、blob `22f0d48c919c6bc24042917ef07ba457fe1da63a`。mainより古い小規模な手動実行形態。明示許可、secret、テスト、`context-ab-live.ts` がある。
+- **`work/ab-blind-review-artifact-workflow`**：95行、blob `bd20ddcd41e5c6efc7c8aae1a33fa4423ac6453d`。qualityモードとblind-review/keyの分離artifactを備えるが、mainはさらに `quality_history` 入力などを持つ。
+- **`work/ab-manual-workflow-only`**：40行、blob `4a637d5bb985d173e56c211230710e1a66302e5e`。2回の有料呼出しを明示確認する初期形態。
+- **`work/quality-long-history-workflow`**：mainと**blob SHAが完全一致**。このブランチにある当該workflowの内容はmainへ反映済み（GitHub比較でahead=1でも、内容が同一であり得る）。
+
+**分類更新：** 10本のA/B補助ブランチを一律「未統合」と数えるのは誤り。少なくとも `quality-long-history-workflow` のworkflow本文はmainと同一。mainは品質レビューartifactと長文履歴入力を含む統合版を保持。残りの補助ブランチは各々の機能・実行履歴までの完全同等性は未確認。**枝の削除判断は保留。**
+
+**費用・安全：** ワークフローに有料Gemini呼出しが存在するが、今回はコードを読んだだけでdispatchもAPI呼出しもしていない。明示許可条件を回避しない。mainのworkflowが存在することは、品質A/Bの盲検レビューが完了した証拠ではない。
+
+次は残る補助ブランチのworkflow blobとmainの一致状況を確認し、検証済み/未実施を台帳へ保存する。
