@@ -627,3 +627,16 @@ mainのテストを直接読取り：`tests/relationship-patterns.test.ts` は�
 mainの実Body Clock `supabase/functions/body-clock/index.ts` は `buildProactiveDecisionContext` / `createProactiveDecisionGuide` を使用してGemini文面を生成し、`supabase/functions/body-clock/proactive-decision.ts` は `shouldSend: true` のdecision contextとタグ/ガイドを構築。**mainにも既存の送信判定・予定・lease等があるため『無条件に送る』とは断定しない**が、PR #31の `deriveProactiveUrge` と `deriveProactiveMotive` の**独立した意思決定/根拠選択モデルが同じ形で統合済みとは確認できない**。mainの `tests/body-clock-proactive-life-context-v2.test.ts` は生活根拠の鮮度・期限・誤推定を検証するが、上記urge/motiveのassertを代替しない。
 
 **優先調査候補：** 現行Body Clockの既存DB claim/cadence/leaseとPR #31のurge/motiveの責務境界を静的に突き合わせ、送信可否の新ロジックを直接Productionに入れず、隔離テストで不足シナリオを検証する。安全/品質上の意味が大きいが本番切替と別管理。Production/Supabase変更なし。
+
+
+## 2026-10-21 Body Clockの送信可否：mainとPR #31の実配線差分を確認
+
+**パス訂正：** PR #31の `proactive-urge.ts` と `proactive-motive.ts` は `lib/` ではなく `supabase/functions/body-clock/` 配下。PR #31 branch treeと実ファイル本文で確認。mainには同パスなし。
+
+main `supabase/functions/body-clock/index.ts` は `claim_misaki_body_clock_due_users` でDBのdue/leaseを取得し、`processUser` でcanonical rootを読み、`buildProactiveDecisionContext` → **直ちに `generateMessage`（Gemini）** → `finish_misaki_body_clock_delivery` → push relay の順。main `proactive-decision.ts` の `ProactiveDecisionContext` は `shouldSend: true`、理由 `claimed_after_relationship_action_gate`。これは**DBのclaim後に独立した『内的動機なし→送らない』分岐が見当たらない**という静的観察。DB claim/relationship gate/cadence等は別に存在し得るので『全員に無条件送信』ではない。
+
+PR #31 `supabase/functions/body-clock/index.ts` は `deriveProactiveUrge` と `deriveProactiveMotive` を実際にimport・呼出し、`urge.shouldSend === false` なら**Gemini生成前に** `finish_misaki_body_clock_no_action` RPCでleaseを終了/次回予定を更新し、`proactive_no_action` イベントに理由を記録して**送信しない**。送る場合はdesire/focus/motiveをpromptに反映し `proactive_decision` eventへ記録。branchには `supabase/migrations/20260920083000_body_clock_no_action_finish.sql` があり、mainの同名migrationなし。したがって**mainのBody Clockへこの分岐だけをコピペするとDB RPC欠落のおそれ**。
+
+PR #31 `proactive-urge.ts` は未解消の傷/繰返し傷・PULL・WAIT・最近の接触・心配の根拠・写真動機・親密度・1日送信回数等で `shouldSend` とdesireを選択。`proactive-motive.ts` は会話・関係イベント・記憶・生活根拠の鮮度とtopicIntent/topicSourceを分離。mainのdecision tags/生活根拠ガイドとは責務が異なる。
+
+**結論：** PR #31の**内的動機に基づく送信見送り機能は、main Body Clockの実際の処理経路には同じ形で入っていない**。価値ある未統合候補。ただしPR #31は旧canonical root参照（branch `row.recent_history`/`row.long_term_memory`）でmainは `loadBodyClockRoot`、mainの `finish_misaki_body_clock_delivery` には revision/token/updated_at 整合性引数あり。**PR #31のindex.tsを丸ごと上書きするとcanonical安全性が退行する危険が大きい**。次はmainのcanonical整合性を保持した隔離統合設計とRPC no-actionの安全性を監査。main/Production/Supabase変更なし。
