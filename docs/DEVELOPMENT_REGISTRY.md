@@ -274,3 +274,18 @@ PR #67本文とGitHub Actionsのコミット紐付けを照合した。
 **監査判定更新：** Identity v1は「未テスト」ではない。**過去のCI成功がGitHub Actions上で確認できた、ただし受入・競合・rollbackに未完了がある実装**。本番で機能を有効化してよいという結論ではない。
 
 次はCI #430のジョブ単位の結果と、既存rollback SQL suiteの記録を照合する。先にこの節の保存成功を確認する。
+
+
+## 2026-10-21 Identity CI #430ジョブ詳細とrollback受入の停止位置
+
+GitHub Actions run `37616664677` のjob一覧を直接取得。job ID `112776539139`、name `test`、status `completed`、conclusion `success`。以下の個別ステップも全て `success`：`npm ci`（step 4）、`npm test`（5）、`npx tsc --noEmit`（6）、`npm run build`（7）。**これはジョブ・ステップの成功を独立確認した結果**。テスト件数（UTC/JST各320、Identity57）はPR #67本文に記載された値で、ログの件数は今回未検証。
+
+Identityブランチの `docs/IMPLEMENTATION_OVERVIEW.md` 3564–3578行および3623–3633行に、未実施の受入事項が明記されていた：
+
+- PGliteはsingle-sessionであり、実Postgresの複数セッションlock待機・競合は未検証。State update対Identity apply、同一source二重apply、import競合/retryを隔離DBで試す必要。
+- Preview READYは隔離Supabaseでの実機受入を意味しない。anonymous → email → 別端末restore/retry、別れ/拒否/境界、恋愛関係再構築の一連の受入が残る。
+- 既存 `tests/*.rollback.sql` は、**完全なlegacy Supabase migration baselineを備えた隔離環境**で実行する必要。現リポジトリのmigration履歴は完全ではなく、推測で欠落を補完しない。
+- 同文書3572行は「ProductionへのIdentity migration 4本の再適用は不要・禁止」と明記。これは当該ブランチの過去の運用記録であり、今回Production実測はしていない。
+- PR #67はDraft / 未merge、gate OFFを維持し、ownerレビューと隔離環境受入まではmerge・gate ONをしない。
+
+**判定：** Identity v1のCI・ビルドは過去成功を確認済み。一方、rollback SQLと複数DBセッション競合、隔離Preview実機受入は「未実施」と明示されている。今回もmain・Production・DB・gateは変更していない。
