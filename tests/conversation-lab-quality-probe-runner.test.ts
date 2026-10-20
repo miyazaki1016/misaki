@@ -52,3 +52,15 @@ test("suite rejects a later invalid fixture before running any callbacks", async
   );
   assert.equal(calls, 0);
 });
+
+// The suite must not execute any callbacks if a later probe exceeds the
+// offline runner's maximum transcript length.
+test("suite rejects an oversized later probe before executing earlier probes", async () => {
+  let calls = 0;
+  const oversized = { ...QUALITY_PROBES[1], turns: Array(21).fill("synthetic user turn") };
+  await assert.rejects(
+    runQualityProbeSuite(async () => { calls++; return "synthetic"; }, [QUALITY_PROBES[0], oversized]),
+    /INVALID_PROBE_TURNS/,
+  );
+  assert.equal(calls, 0);
+});
