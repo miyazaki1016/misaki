@@ -193,3 +193,18 @@ mainの `app/api/chat/route.ts` と `work/forget-control-v1` の同ファイル�
 確認した作業ブランチ側の行：2（関連関数import）、1809/1817/1825（古いforgetControlVersionなら409）、1833-1839（判定と履歴・記憶のマスク）、2271（復活禁止のモデル指示）、2715/2784-2788（出力と返答の検証）、2792-2793/2824（結果と一時状態への保存）。
 
 判定：Forget Control v1はmainの会話本線に未統合の可能性が高い。実Gemini品質・処理時間・migration/rollbackは未検証。部分統合や本番適用は行わない。
+
+
+## 2026-10-21 棚卸し：mainとの差分ファイルをGitHub比較APIで再確認
+
+今回の比較は `main...作業ブランチ` のGitHub比較結果であり、実際のProduction適用状態とは別。既存台帳を更新してから次へ進む。
+
+| ブランチ | ahead/behind | 重要な差分 | 判定 |
+| --- | --- | --- | --- |
+| `work/relationship-identity-v1` | 81/24 | `lib/relationship-identity-resolver.ts` がadded（92行相当）。`app/api/chat/route.ts` modified（14変更行）、`lib/relationship-acting-guide.ts` modified（21変更行）。Identity migration 4本がadded。Identity関連テスト6ファイル以上を確認。 | main未統合のアプリ構成要素がある。PR #67のProduction適用記録と矛盾しない。 |
+| `work/forget-control-v1` | 5/28 | `app/api/chat/route.ts` modified（44変更行）、`supabase/functions/_shared/forget-control.ts` added（243変更行）、`supabase/migrations/20261006200002_forget_control_v1.sql` added（296変更行）。複数のforget関連テスト・評価レポート・scripted JSONあり。 | mainの会話・保存経路との差分が明確。DB migrationと検証を伴うため単純統合禁止。 |
+| `experiment/interpreter-gradual-acting-20261015` | 36/0 | `lib/relationship-acting-guide-gradual-experiment.ts` added（90変更行）。段階的表現、playfulness境界、Body Clockとのparityなどのテストが追加。 | mainの既存5軸エンジンとは別の表現実験。品質確認前に本番採用しない。 |
+
+**検証方法の補足：** `ahead` はmainにないコミット数であり、未統合機能数ではない。`behind` はmain側の進行。`changes` はGitHub比較上の変更行数で、ファイルの現在の総行数ではない。IdentityのPR #67にある「Production適用済み・gate OFF」は資料上の記録で、今回DBの実測はしていない。
+
+**次に行うこと：** Identityブランチの `app/api/chat/route.ts` とmainの同ファイルの具体的な呼び出し差分を追跡し、ゲート・読み込み経路を特定する。先に本節の保存を確認する。
