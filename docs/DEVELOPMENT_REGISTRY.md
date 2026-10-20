@@ -554,3 +554,14 @@ GitHub compare `main...codex/server-canonical-foundation` を直接確認：**ah
 対照的にPR #30は `open / Draft / unmerged`、mainに `supabase/legacy-maintenance-drain.sql` と `lib/legacy-drain.ts` は**同じパスで存在しない**。main `app/api/chat/route.ts` は存在。つまり旧main互換の先行maintenance/drain装置はmainに取り込まれていない一方、PR #29のcanonical foundationはmainに反映済み。**PR #30の『PR #29 migration前の旧mainを安全に停止する』という当初目的と現在のmain構成がずれている可能性が高い**。旧PR #30をそのままmergeしても安全な現行canonical切替になるとは言えない。
 
 PR #31 v2のSQL `supabase/migrations/20260920070000_relationship_time_v2_no_silence_only_mutation.sql` はmainに同パスなし。**再開順序：** (1) mainのcanonical foundationが実際にどのschema/feature flagを必要とするかソース照合、(2) PR #30旧設備の必要性と再設計範囲を現行main基準で判断、(3) v2の9 migrationsとの順序・依存・安全な隔離DB手順を組み直す。Productionの状態・適用済みmigration・稼働中Edgeは今回未確認。無断の本番DB read/write、migration、merge、deployなし。
+
+
+## 2026-10-21 mainのcanonical実装・migration依存の静的照合
+
+main `lib/canonical-state.ts` を直接読取り：`loadCanonicalState` は `misaki_relationship_state` と `misaki_user_conversation_state` の履歴/記憶/今日記憶を取得し、`misaki_temporary_roots` 等の一時正本も参照。成功ターンのcommitはRPC `complete_misaki_chat_turn`、匿名は `complete_misaki_temporary_turn`、一時rootは `write_misaki_temporary_root`。**mainのコードがこれらDB objectsの存在・権限・migration適用を前提とする**ことを確認したが、Production DBで存在/稼働することは今回未確認。
+
+main `docs/SERVER_CANONICAL_STATE.md` では正式切替手順を「旧main互換の入口設備→受付停止→drain→凍結→checkpoint→DB/アプリ/Edge整合→検証→再開」とし、当時のProductionには入口gateがないことを阻害事項として記録。mainには `supabase/maintenance-gate.sql` が**存在**し、別系統のPR #30 `supabase/legacy-maintenance-drain.sql` は**存在しない**。この2設備は目的/制御正本が異なるため、同時適用や互換性を未検証で仮定しない。
+
+main `lib/relationship-time.ts` は `get_relationship_time_context` RPCによる読込みと、別の記録RPC呼出しを持つ。一方PR #31のv2 migration `20260920073000_apply_relationship_emotion_v2_rpc.sql` はmainに同パスなし。**関係時間の一部がmainにあっても、v2 emotion/action/Body ClockのDB切替がmain統合済みとは言えない**。
+
+**次の安全な確認：** mainの関連migrationファイルとRPC定義を静的照合し、(a) mainコード依存、(b) main migration同梱、(c) Production適用証拠を別欄で管理。PR #29 merge済み≠DB施工済み。Productionの実DBやユーザーデータにはアクセスせず、変更しない。
