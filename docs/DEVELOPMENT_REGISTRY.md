@@ -503,3 +503,16 @@ PR #86 (`experiment/conversation-lab-offline-v1-20261015`) は **open / draft / 
 ブランチ文書 `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` と `docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md` を直接確認。**実Gemini呼出し0回・実モデル品質評価未実施**と記録。旧 `/api/acting-lab` はPreviewで認証/予算上限が不足し、かつ本番の記憶/関係/Body Clock/60件historyと非同等のため、代用禁止。隔離Q02 2往復アダプターはキー＋明示承認、最大2物理呼出し、retryなし、15秒timeout、出力300 tokens上限。CLI入口は `--approved-small-test` と `MISAKI_LIVE_SMOKE_APPROVED=yes` の双方必須。**安全な実行環境・正規の開発キー・費用管理の確認なしに起動しない。** iPhone画面は人手レビュー用で、画面があることは実モデル呼出し成功の証拠ではない。
 
 **開発目的：** 美咲の会話品質を複数ターンで比較・評価する再現可能な基盤。**停止/保留理由（文書上）：** 本番相当のprompt/contextでない、実モデルの認可・費用・実行環境・品質受入ゲートが未解決。中断した真の人的経緯は不明。**再開条件：** (1) offline tests/CI再確認、(2) 既存smoke endpointの認可・停止ゲートをソース検証、(3) ownerが費用・回数・隔離環境を承認してから実Gemini最小試験、(4) raw結果を人手評価、(5) production parityは別設計・別PRで検証。**判定：** 評価基盤/画面/安全設計の多くは実装済みで保護対象、実Geminiの会話品質は未実証。main/Production/Supabase変更なし、課金実行なし。
+
+
+## 2026-10-21 Relationship Time v2 PR #31：大規模未統合成果と導入停止理由
+
+PR #31 `sora/relationship-time-v2-design` は **open / draft / unmerged**、head `e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64`。main比 **276 ahead / 323 behind、60ファイル**。古い大規模branchであり、mainにも同名 `lib/relationship-time.ts` が存在するため「全未実装」とは判定しない。差分には新規 `lib/relationship-emotion-reducer.ts`、`lib/relationship-action-reducer.ts`、`lib/relationship-signal.ts`、`lib/relationship-emotion-store.ts`、`lib/relationship-conversation-*`、Body Clock `proactive-urge.ts` / `proactive-motive.ts`、**9本のv2 SQL migrations**、関連テストが存在。mainの現行5軸runtimeとの意味・schema・writer差分の個別照合が必須。
+
+PR記録上の開発目的は「会話→関係時間→感情→行動→言葉/自発行動」を一貫させ、傷・修復・再発を `relationshipStory` として保持し、通常チャット/Body Clock/写真の行動整合性を確保すること。PR本文では270 tests passと主張。独立にGitHub Actions **run 36121699019** (`PR relationship v2 tests` #432) **completed/success**、job `test` の **npm ci / npm test / npm run build 成功**を確認。**このjobには独立した `npx tsc --noEmit` stepは存在しない**。個別270件という数はPR本文の記録であり、今回job stepから直接件数を確認したわけではない。
+
+Vercel branch検索では複数の古いcommitのREADY deploymentsを確認したが、今回取得した先頭4件はhead SHAと一致せず、**head Preview READYとは判定しない**。
+
+**停止/保留理由（記録上）：** v2 migrationが既存phase1〜phase5/Body Clock基盤の後に順序適用され、旧keyword emotion trigger・旧action trigger・silence-only claimを段階的に置換するため、**途中状態でProduction運用不可**。PR #29サーバー正本化・PR #30本番切替安全工事と協調必要。mainが323 commits先行しており、現在のcanonical state / 5軸 / DB RPC / Body Clockとの再整合も必要。開発中断の人的な理由は不明。
+
+**再開条件：** mainに実装済みの同等機能を照合して残存差分を機能単位で抽出、migrations依存・RPC writer・Body Clockとの互換性とrollbackを隔離DBで検証、実モデル/Previewの受入、PR #29/#30との依存解消。**判定：** 実装・テスト・CI成功のある重要成果だが、大きく乖離した旧branchの無条件mergeは危険。branch保護、main/Production/Supabase不変更。
