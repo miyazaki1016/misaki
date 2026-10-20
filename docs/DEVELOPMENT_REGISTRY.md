@@ -463,3 +463,14 @@ PR本文の過去検証記録：PGliteのmigration/RPC原子性・rollback・che
 branch head SHAに対する `fetch_commit_workflow_runs` は空配列。ただしこのAPIはPR runに限定されるため、**CI不成功・未実行の証拠ではない**。branch head commitは2026-10-08 `feat: connect numeric prompt overlap diagnostics in isolated Preview`。PR head検索も結果なし。**今回独立にCI成功を証明できたわけではない。**
 
 **判定：** 計測・重複診断はbranchの実chat routeまで接続済みで、単なるhelperより進んだ実装。mainには未反映。実際のPreviewログ出力、実測token/latency、複数ケースの品質検証、CI結果は未確認。圧縮・要約によるruntime最適化は未実装の研究候補として区別。削除・merge・Production変更なし。
+
+
+## 2026-10-21 Context compression：Vercel Preview実在とActions履歴
+
+Vercel接続からbranch `work/conversation-context-compression-spike` のdeploymentsを直接検索し、**8件**を確認。**READY 7件、CANCELED 1件**。最新head `10275b666387115ced06312570111b21d0276e17` のdeployment **`dpl_3atm4VMq7J6cgFbSiQmbW1dCRSYe`** は `READY`、URL `https://misaki-khw4f34x4-kishibojim.vercel.app`、Vercel inspector `https://vercel.com/kishibojim/misaki/3atm4VMq7J6cgFbSiQmbW1dCRSYe`。直前の重複診断テストcommit `0e2b616bc12aaec9a22cd651b938e627d49c8a0e` もdeployment `dpl_CPj3uB3gwTpQo1vNEXTRo56hxgPC` がREADY。
+
+**重要な区別：** Vercel `READY` はビルド・デプロイの準備完了を示すが、計測ログの実発生、実会話リクエスト、テストスイート成功、隔離DBでの受入完了は意味しない。Previewにアクセスしたり実会話を送ったりはしていない。
+
+GitHub Actions REST `GET /repos/miyazaki1016/misaki/actions/runs?head_sha=10275b666387115ced06312570111b21d0276e17&per_page=20` は `total_count:0`。このAPIは前のPR限定検索より広いが、**head SHAに一致するrunがAPI結果にない**という範囲の確認であり、過去の他commitでのCI成功・ローカルテスト結果の不存在は証明しない。branchのユニットテストファイルは存在するが、最新headのGitHub Actions CI成功は未確認。
+
+**更新判定：** branch headのPreview READYは独立確認済み。main未反映、実ログ・計測効果・品質評価・GitHub CI成功は未確認。削除・main merge・Production変更なし。
