@@ -536,3 +536,12 @@ GitHub PR API直接確認：**PR #29 `codex/server-canonical-foundation` は `cl
 GitHub Actions run **35470658292** のPG18.4 job **105970897363** の生ログを直接取得。`freeze rejects new operation admission from a pre-stop REPEATABLE READ snapshot` は **ok 21**、`freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot` は **ok 22**、集計 **56 tests / 56 pass / 0 fail / 0 skipped**。つまり**旧2件の回帰テストは削除・skipされたのではなく、現行headで実際に成功している**。PG17.6 jobもステップ成功だが個別テストログの件数は今回未抽出。
 
 **訂正：** 旧PR本文や古い監査文書の「この2件はFAIL」は旧commitの事実で、最新headの同2件に関しては**既知反例が再現しなくなったことをCIで確認済み**。前節の『現行でも未解消の可能性』はこの2件に限り解消済みへ更新する。一方、旧監査が指摘した**guard coverage 12/22、SECURITY DEFINER経由、auth trigger、pre-gate evidence、全旧Production境界、PR #29 merge後の互換性**はこの2テストで解消されない。**Production導入の全体判定は依然BLOCKED**。停止理由は「MVCC2件が未修正」ではなく「局所修正済みでも全write surface・引継ぎ・運用の安全証明が未完了」と再分類。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #30 PG17/18再確認とguard coverageの未実装境界
+
+GitHub Actions run `35470658292` の**PG17.6 job 105970897567** 生ログも取得：`freeze rejects new operation admission from a pre-stop REPEATABLE READ snapshot` **ok 21**、`freeze rejects a protected write from a pre-stop REPEATABLE READ snapshot` **ok 22**、**56 tests / 56 pass / 0 fail / 0 skipped**。前節のPG18.4でも同様に56/56。従って**既知2件のMVCC反例は両バージョンの現在の隔離fixtureで回帰PASS**。本番PostgreSQLの実schemaや全isolation levelへの外挿は禁止。
+
+現行head `supabase/legacy-maintenance-drain.sql` を再読し、最後のtrigger設置ブロックがpublicの**必須9テーブル＋存在時3テーブル**のみを対象とすることをソース確認。`misaki_evolution_analysis_state`、`proactive_message_usage`、`user_entitlements`、`misaki_persona_versions`、`misaki_prompt_modules`、`background_push_config`、`conversations`、`memories`、`profiles`、`work_logs` は設置対象に含まれない。旧 `docs/WRITE_SURFACE_INVENTORY.md` の **12/22 guard、10/22未guard**という当時のcatalog母集団との照合は、**現行SQLの対象リストとも整合**。ただし現在のProduction catalogが22のままとは断定しない。`auth.users` trigger、SECURITY DEFINER経由のwriteは引き続き評価対象。
+
+**今回の判断：** 以前の『MVCC2件がFAIL』は過去の記録として保持し、現在はPG17.6/18.4ともPASSへ更新。一方、**全書込み経路の網羅的なfreeze保護は未実装・未証明**。PR #30は未マージ/Draft、Production先行導入はBLOCKEDのまま。次に必要なのは最新schema inventoryと全write surfaceの分類・guard設計・隔離DB再現・pre-gate/rollback受入であり、未承認の本番DB変更を行わない。
