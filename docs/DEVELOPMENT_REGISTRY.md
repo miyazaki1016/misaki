@@ -208,3 +208,18 @@ mainの `app/api/chat/route.ts` と `work/forget-control-v1` の同ファイル�
 **検証方法の補足：** `ahead` はmainにないコミット数であり、未統合機能数ではない。`behind` はmain側の進行。`changes` はGitHub比較上の変更行数で、ファイルの現在の総行数ではない。IdentityのPR #67にある「Production適用済み・gate OFF」は資料上の記録で、今回DBの実測はしていない。
 
 **次に行うこと：** Identityブランチの `app/api/chat/route.ts` とmainの同ファイルの具体的な呼び出し差分を追跡し、ゲート・読み込み経路を特定する。先に本節の保存を確認する。
+
+
+## 2026-10-21 深掘り：Relationship Identityの実際の接続とゲート
+
+mainと `work/relationship-identity-v1` の同一ファイルを直接比較した。
+
+- **mainの `app/api/chat/route.ts`**（blob `5600ad37f2660049a570c4dd340e8ed140d9843b`）には `identity` / `Identity` の文字列を含むコードが見つからなかった。
+- **Identityブランチの同ファイル**（blob `f568646c0ced8c676bdd8f129f03de8fa89cb5e2`）2行目で `identityEnabled`、3行目で `deriveRelationshipTraits` をimport。2068–2075行目で `rootState.relationshipIdentity` を優先し、なければ `identityEnabled()` と `rootState.relationshipEngine?.identity` を使って関係性の自己認識・制約を組み立てる。
+- **mainの `lib/relationship-engine-v1.ts`**（blob `969f26a2c02e823a298e88f7908b60cfc7871553`）には `identityEnabled` がない。
+- **Identityブランチの同ファイル**（blob `591ebb10e928c7c4e3fac84ce3e529bc763b73cc`）28行目で `identityEnabled()` を定義。`engineEnabled()` かつ環境変数 `MISAKI_RELATIONSHIP_IDENTITY_VERSION === "relationship-identity-v1"` のときだけ有効。
+- **Identityブランチの `lib/relationship-acting-guide.ts`**（blob `c12ac2d42f3fccfbbba725566322cfb32380da9d`）はIdentityとtraits/constraintを受け取り、関係の自己認識を表現ガイドへ接続。`post_breakup`、`post_rejection`、`boundary` は高い親密度でも恋愛関係を既成事実化させない制約として使う。
+
+**結論：** IdentityはDBだけの機能ではない。会話ルート、エンジンゲート、acting guideの3か所にまたがるアプリ側配線があり、mainには同等の配線が確認できない。PR #67の「Production migration適用済み、gate OFF、Draft・merge禁止」という記録と整合的。Productionの実環境変数やDB状態は今回未確認。**本番ゲートをONにしない。**
+
+**次回：** Identityブランチの `canonical-state.ts` / relationship runtimeの保存・復元経路と、mainの実装差分を調べる。調査結果は先に台帳へ保存する。
