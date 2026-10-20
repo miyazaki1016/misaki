@@ -474,3 +474,14 @@ Vercel接続からbranch `work/conversation-context-compression-spike` のdeploy
 GitHub Actions REST `GET /repos/miyazaki1016/misaki/actions/runs?head_sha=10275b666387115ced06312570111b21d0276e17&per_page=20` は `total_count:0`。このAPIは前のPR限定検索より広いが、**head SHAに一致するrunがAPI結果にない**という範囲の確認であり、過去の他commitでのCI成功・ローカルテスト結果の不存在は証明しない。branchのユニットテストファイルは存在するが、最新headのGitHub Actions CI成功は未確認。
 
 **更新判定：** branch headのPreview READYは独立確認済み。main未反映、実ログ・計測効果・品質評価・GitHub CI成功は未確認。削除・main merge・Production変更なし。
+
+
+## 2026-10-21 Shared conversation engine PR #88：CI・Preview実証
+
+`experiment/shared-conversation-history-v1-20261015` のPR #88をGitHub APIで確認：**open / draft / unmerged**、head `2ae90d70ff143c8de935f25ec12f291e9b82613a`。`main...head` は **35 ahead / 0 behind、29ファイル全てadded**。`lib/conversation-engine/` にhistory、attempt、base/character/layered prompt、memory、relationship、retry、context、Amahuru rain context等の**13個のモジュール**、`tests/conversation-engine-*.test.ts` に対応テスト群、設計/監査文書が存在。main側に同じ追加差分はない。PR本文は最初のpure history adapterの説明で、**最新headの全モジュールを網羅した説明ではない**。現状も実chat routeの切替・production parityの証明はない。
+
+GitHub Actions run **38966516004** (`Canonical relationship integration tests` #545、event pull_request) は **completed/success**。job **117194210775** の `npm ci` / `npm test` / `npx tsc --noEmit` / `npm run build` は**全てsuccess**とGitHub APIで独立確認。CI成功は実Gemini/本番の動作同等性までは証明しない。
+
+Vercel接続でbranch head `2ae90d70ff143c8de935f25ec12f291e9b82613a` のdeployment **`dpl_6mfszaNd85cgbx4HKsWF7FacbBxD`** が **READY** と確認（`https://misaki-99419osjm-kishibojim.vercel.app`）。READYはPreviewビルド完了であり、機能がPreviewで接続・受入済みという意味ではない。
+
+**判定：** 共通会話エンジンの多数の純粋モジュールとテストがmain外に実装済み、CIのテスト・型チェック・build成功、head Preview READYまで独立確認。**しかしmain/実chat route未統合、実モデルの会話品質・機能同等性・運用受入は未完了**。実験ブランチの成果を失わないよう保持。Amahuruへの統合は別プロジェクトにつき実施しない。main/Production/Supabase変更なし。
