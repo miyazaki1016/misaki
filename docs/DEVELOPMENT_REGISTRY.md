@@ -594,3 +594,16 @@ branchにあってmainのtreeに**同じパスがない**もの：`lib/relations
 `lib/relationship-patterns.ts` は両者ほぼ同じで、差分はイベント取得条件の1行：PR #31は `emotion_action_v2_after_chat` のみを `.eq`、mainは `.in(["emotion_action_v2_after_chat", "temporary_relationship_checkpoint"])` として**匿名→恒久化チェックポイントもパターン履歴に含める**。main側の記憶継続の拡張であり、旧branch版へ戻すとイベントを取りこぼす可能性がある。
 
 前節の『store/patternsの差分レビュー必要』を更新：**この2ファイルはmain側が追加機能を持つ**ことを静的確認。PR #31の古い2ファイルを丸ごとmergeしない。branch固有のconversation-generator / naturalness / Body Clock motive/urgeなどは別途mainとの機能比較が必要。CIや本番の挙動はこの差分比較だけで証明されない。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 PR #31未統合の会話自然さ検証モジュールを機能分類
+
+PR #31 branch `sora/relationship-time-v2-design` の以下4実装を直接読取り、main treeに同名パスがないことを確認：
+- `lib/relationship-conversation-generator.ts` (1647文字)：`createGeminiConversationGenerator`、Gemini `gemini-3.1-flash-lite:generateContent` を呼ぶ単独のfetchアダプタ。**実API呼出し機能はあるが、実行済み/本番接続済みを意味しない**。
+- `lib/relationship-conversation-preview.ts` (1266文字)：`previewRelationshipConversation`、現在の感情/行動/表現ガイドを**read-only**で算出。コメント上DB read/writeなし。
+- `lib/relationship-conversation-prompt.ts` (1032文字)：`createRelationshipConversationPrompt`、人格、共有記憶、直近会話、表現ガイドを結合した**検証用**JSON reply形式のプロンプト。傷/警戒/修復途中に唐突に甘く戻らない制約。
+- `lib/relationship-naturalness-scenario.ts` (1507文字)：`buildNaturalnessScenarioPreview`、シナリオからemotion/action/systemPromptを作る検証ヘルパー。
+
+これらは**会話自然さの隔離検証装置**として価値がある一方、mainの既存会話ルートへの本番組込みや実Gemini品質検証は未証明。mainには `lib/relationship-turn-expression.ts` が存在するがbranchとblob不一致（main `d7b2b66...` / branch `58c9712...`）。さらにmainにのみ `lib/relationship-acting-guide.ts` がある。**プロンプト/表現制御の重複・設計競合**があり得るため、検証モジュールを無条件にmainへコピーしない。
+
+**次の検証：** PR #31のnaturalness testsが何をassertするか、main acting-guide/turn-expressionの現在の制約と重複するかを照合。Gemini呼出しは有料・外部送信のためユーザー承認なしに実行しない。Production変更なし。
