@@ -545,3 +545,12 @@ GitHub Actions run `35470658292` の**PG17.6 job 105970897567** 生ログも取�
 現行head `supabase/legacy-maintenance-drain.sql` を再読し、最後のtrigger設置ブロックがpublicの**必須9テーブル＋存在時3テーブル**のみを対象とすることをソース確認。`misaki_evolution_analysis_state`、`proactive_message_usage`、`user_entitlements`、`misaki_persona_versions`、`misaki_prompt_modules`、`background_push_config`、`conversations`、`memories`、`profiles`、`work_logs` は設置対象に含まれない。旧 `docs/WRITE_SURFACE_INVENTORY.md` の **12/22 guard、10/22未guard**という当時のcatalog母集団との照合は、**現行SQLの対象リストとも整合**。ただし現在のProduction catalogが22のままとは断定しない。`auth.users` trigger、SECURITY DEFINER経由のwriteは引き続き評価対象。
 
 **今回の判断：** 以前の『MVCC2件がFAIL』は過去の記録として保持し、現在はPG17.6/18.4ともPASSへ更新。一方、**全書込み経路の網羅的なfreeze保護は未実装・未証明**。PR #30は未マージ/Draft、Production先行導入はBLOCKEDのまま。次に必要なのは最新schema inventoryと全write surfaceの分類・guard設計・隔離DB再現・pre-gate/rollback受入であり、未承認の本番DB変更を行わない。
+
+
+## 2026-10-21 PR #29のmain反映範囲とPR #30との依存再整理
+
+GitHub compare `main...codex/server-canonical-foundation` を直接確認：**ahead 0 / behind 174 / changed files 0**。PR #29は `merged=true`、merge commit `fe9df9585f092b88055b96f0c727106fd1c81d25`。したがってPR #29の旧branch headのコード変更は、現在のmainに対する未統合差分ではない。mainに `docs/SERVER_CANONICAL_STATE.md` が存在することも確認。ただし**コードmain反映は本番DB migration適用や安全な切替の実施証拠ではない**。
+
+対照的にPR #30は `open / Draft / unmerged`、mainに `supabase/legacy-maintenance-drain.sql` と `lib/legacy-drain.ts` は**同じパスで存在しない**。main `app/api/chat/route.ts` は存在。つまり旧main互換の先行maintenance/drain装置はmainに取り込まれていない一方、PR #29のcanonical foundationはmainに反映済み。**PR #30の『PR #29 migration前の旧mainを安全に停止する』という当初目的と現在のmain構成がずれている可能性が高い**。旧PR #30をそのままmergeしても安全な現行canonical切替になるとは言えない。
+
+PR #31 v2のSQL `supabase/migrations/20260920070000_relationship_time_v2_no_silence_only_mutation.sql` はmainに同パスなし。**再開順序：** (1) mainのcanonical foundationが実際にどのschema/feature flagを必要とするかソース照合、(2) PR #30旧設備の必要性と再設計範囲を現行main基準で判断、(3) v2の9 migrationsとの順序・依存・安全な隔離DB手順を組み直す。Productionの状態・適用済みmigration・稼働中Edgeは今回未確認。無断の本番DB read/write、migration、merge、deployなし。
