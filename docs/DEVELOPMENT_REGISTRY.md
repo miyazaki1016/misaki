@@ -153,3 +153,34 @@ mainの現行ファイルを直接読み取り、次を確認。
 3. **Identity：高**。PR #67のProduction migration適用記録とmainアプリgate OFFを分けて確認。
 
 今回もソース読取のみ。テスト実行・main変更・DB操作・課金API実行なし。
+
+
+## 2026-10-20 深掘り：canonical stateの行単位差分・Identity resolver
+
+### Forget Control — 実装差分を特定
+
+同一パス`lib/canonical-state.ts`をmainと`work/forget-control-v1`で比較。
+
+| 確認点 | main | Forgetブランチ |
+| --- | --- | --- |
+| `RootState.forgetControls` | なし | **9行目にあり** |
+| `loadCanonicalState`内の忘却control読込 | なし | **91行目に`loadForgetControls(userId)`** |
+| 専用DB読込 | 同ファイル内になし | **117–118行目に`misaki_forget_controls`からpayload読込** |
+| 通常会話の保存 | `completeCanonicalTurn`あり | **161–164行目でforgetControlsを公開結果から分離し`forgetControlPayload`をcanonical commitに渡す** |
+| 匿名/temporary保存 | canonical state処理あり | **198・217行目に忘却payloadを保存状態へ追加** |
+
+**重要:** これで「忘却制御が単にmainに別ファイル名で存在するかも」という疑問を一段狭められた。**少なくとも同一canonical stateファイルの主要保存境界にはForget v1相当の配線がない。** ただしmain全体の網羅調査・DB実体照合はまだ未了。Forgetの取り込みにはmigration、認証、rollback、過去履歴の漏れ防止の整合監査が必要。
+
+### Identity — 純粋resolverの意味
+
+- `work/relationship-identity-v1/lib/relationship-identity-resolver.ts` は93行、blob `63279032c8a9708e3f4899c9661d5676146a5ba0`。
+- `deriveRelationshipTraits`と`resolveRelationshipIdentity`を公開し、5軸の数値とrelationshipStatusからidentity候補を計算する。
+- **`relationshipStatus === "romantic_partner"`はlover候補を優先**する。
+- 複数候補の距離が同点なら、宣言順で恣意的に選ばず曖昧扱いする`uniqueClosest`がある。
+- 隣接状態への遷移と制約を別ロジックとして持つ。単純な「点数が高い＝恋人」の変換ではない。
+- main `lib/relationship-acting-guide.ts` にはrelationshipStatusの表現ガードがあるが、**Identity resolverとは別の責務**。同名resolverはmainにない。
+- PR #67の本番migration適用済み記録は引き続き**未再検証の資料上の主張**。Identity gateの本番実値は未確認。
+
+### 次の実装判断
+
+**優先度はForgetの保存境界整合 → Identityのgateと移行整合 → actingの品質比較。** この監査結果を根拠に、いきなりDB migrationや本番gateを有効化しない。
