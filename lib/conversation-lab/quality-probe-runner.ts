@@ -7,13 +7,17 @@ import { QUALITY_PROBES, type QualityProbe } from "./quality-probes.ts";
  * Never call a model or database directly. This returns transcripts for review,
  * NOT numeric quality scores, factual correctness, or evidence of model parity.
  */
+function assertValidProbeTurns(probe: QualityProbe): void {
+  if (!probe.turns.length || probe.turns.length > 20 || probe.turns.some(t => !t.trim())) {
+    throw new Error("INVALID_PROBE_TURNS");
+  }
+}
+
 export async function runQualityProbe(
   probe: QualityProbe,
   reply: LabReply,
 ): Promise<LabRun> {
-  if (!probe.turns.length || probe.turns.length > 20 || probe.turns.some(t => !t.trim())) {
-    throw new Error("INVALID_PROBE_TURNS");
-  }
+  assertValidProbeTurns(probe);
   const maxTurns: 5 | 20 = probe.turns.length <= 5 ? 5 : 20;
   const scenario: LabScenario = {
     id: probe.id,
@@ -39,6 +43,8 @@ export async function runQualityProbeSuite(
   reply: LabReply,
   probes: readonly QualityProbe[] = QUALITY_PROBES,
 ): Promise<LabRun[]> {
+  // Validate the entire batch before invoking any reply callback.
+  for (const probe of probes) assertValidProbeTurns(probe);
   const runs: LabRun[] = [];
   for (const probe of probes) runs.push(await runQualityProbe(probe, reply));
   return runs;
