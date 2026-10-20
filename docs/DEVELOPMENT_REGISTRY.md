@@ -128,3 +128,28 @@ mainの現行ファイルを直接読み取り、次を確認。
 - ここまでの結果はソース読取であり、テストの再実行・Production稼働確認ではない。
 
 次の優先作業: 現行acting guideとPR #85の差分、現行記憶・保存経路とPR #66の差分、Identity v1のゲート・DB証拠の分離を続ける。
+
+
+## 2026-10-20 深掘り：忘却制御と段階的actingの構造差
+
+### Forget Control：現行canonical保存との相違
+
+- main `lib/canonical-state.ts`（blob `584989230ed0dc89a8aee961aa169e32d4646d3a`）の`RootState`には`history`、`memory`、`relationshipEngine`があるが、**`forgetControls`はこのファイル内で見つからない**。
+- mainの`loadCanonicalState`は`misaki_user_conversation_state`から`history,memory,today_memory,updated_at`を読み込む。この読込行にはforget controlsはない。
+- 作業ブランチ `work/forget-control-v1` の`supabase/functions/_shared/forget-control.ts`（244行、blob `e7763c96e7f94a896fef3323fddaef53fab8072a`）には`identifyForgetTargets`、`addForgetControls`、`maskForgetRows`、`forgetContext`、`prepareForgetTurn`、`sealForgetControls`、`openForgetControls`などがある。単純な記憶検索ではなく、忘却ポリシー・履歴マスク・暗号化を扱う別設計。
+- **暫定結論:** mainのcanonical-stateはForget Control v1と同一構造ではない。ほかのmainファイルでの実装やproduction DBの有無までは未検証。作業ブランチを無条件に統合してはならない。PR #66のDB移行・rollbackリスクがある。
+
+### 段階的acting：既存ガードを保持する統合候補あり
+
+- main `lib/relationship-acting-guide.ts`（131行、blob `9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf`）は`intimacyStage`、5軸、`relationshipStatus`を扱い、関係ステージや恋人状態を使って表現を制限する。
+- 実験ブランチ `experiment/interpreter-gradual-acting-20261015` の`lib/relationship-acting-guide-gradual-experiment.ts`（91行、blob `6d325cdd4ab545c4c6c3d9db239c77650ec2c04a`）には**2つの候補**がある：`createGradualActingGuide`と`createIntegratedActingGuideExperiment`。
+- 後者は既存`createRelationshipActingGuide`を呼び出し、既存のintimacy/statusガードを維持しつつ、5軸の中間表現を足す実験案。低いplayfulnessや既存romance条件との衝突を避ける分岐もある。
+- **前回記録の精密化:** 「実験版にガード未移植」は独立版`createGradualActingGuide`についての懸念。統合候補`createIntegratedActingGuideExperiment`は既存ガードを保持する設計。ただしモデル品質・副作用・実運用の採用は未検証で、mainには接続しない。
+
+### 優先度
+
+1. **Forget Control：高**。忘却ポリシーと旧history復活防止の欠落リスクを慎重に検証。DBとrollbackの整合性が必須。
+2. **段階的acting：中**。既存ガード保持版をbaselineと比較。安全・品質・実Gemini検証未実施。
+3. **Identity：高**。PR #67のProduction migration適用記録とmainアプリgate OFFを分けて確認。
+
+今回もソース読取のみ。テスト実行・main変更・DB操作・課金API実行なし。
