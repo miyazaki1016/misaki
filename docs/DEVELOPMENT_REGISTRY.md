@@ -348,3 +348,21 @@ GitHub比較APIで、次の10本を `main` と個別比較した。**10本すべ
 10本全体の暫定判定：`work/quality-long-history-workflow` はmainとworkflow blob完全一致、残り9本は内容が異なる旧版。全10本とも比較上はworkflow以外の変更なし。**未統合アプリ機能10件として扱わず、CI支援ブランチとして追跡継続。削除・main変更・有料API呼出しなし。**
 
 次の優先調査：`work/context-no-duplicate-replies-ab` 本体の実装・検証状況とmainの差分。補助workflowと実験本体を混同しない。
+
+
+## 2026-10-21 Context A/B本体：実装・実測・未完了の分離（PR #78）
+
+`main...work/context-no-duplicate-replies-ab` のGitHub比較は **ahead 211 / behind 24 / 79 changed files**。A/B実装のほか、Relationship Identityのresolver・4 migration・testsも同じ差分に含まれるため、**79件すべてをA/B固有の成果と数えない**。A/B専用には `lib/context-ab-{balanced,prompt,quality,...}.ts`、独立replay/privacy/measurement群、実験API・review UI・workflow・scripts・testsがある。`lib/context-ab-balanced.ts` は外部から渡したread-only model adapterで `ABBA` の4試行を行い、成功数、JSON妥当性、latency、token統計を返すpure isolated harness。`lib/context-ab-prompt.ts` はA=直近の美咲発話をsystem instructionに重複掲載、B=会話履歴参照と重複回避の短い指示、という明確な差分を作る。
+
+### 既存の実測（branch documents、今回再実行なし）
+
+- `docs/context-ab-execution-gate.md`：2026-10-13の**合成日本語1ペア（Gemini 2リクエスト）**でA/BともHTTP 200・JSON妥当、入力token A=322/B=233（Bは89 token、約27.6%減）。latency A=639ms/B=837ms。1件なので速度・品質の優劣は判断不能。本文は保存されず、後からblind review不可。
+- `docs/context-ab-real-history-quality-review.md`：本人同意の60ターン履歴を用いた簡略Preview実験でA/B各3回、入力token A=1922/B=1616（306 token、15.9%減）。latency A=[729,805,918]ms/B=[2051,717,1051]ms。常にA→Bの順で、生成本文は保存せず品質評価不可。**Productionと異なるpromptであり、Productionの削減率へ外挿禁止**。
+- `docs/context-ab-execution-gate.md` によれば、offline synthetic quality scenarioは4→7へ拡張、blind score集計testを追加し、commit `19cc84667a1a205a6b4b7193f74637197ba938df` のCI成功が記録されている。ただし今回はCIを独立再確認していない。
+
+### 判定・残作業
+
+- **実装済み**：A/B prompt差分、ABBA測定ハーネス、synthetic live runner、品質採点/盲検レビューの補助実装とドキュメント。
+- **数値実測済み（過去記録）**：限定された合成1ペアおよび簡略Previewのtoken削減。
+- **未完了**：Production相当promptでの検証、複数場面でのブラインド人手品質評価、実会話品質の同等性証明、mainへのA/B本体の統合。PR #78はDraftの実験であり、token節約だけでは採用不可。
+- **注意**：mainにあるA/B workflowの存在と、`lib/context-ab-balanced.ts` のmain統合は別の話。mainの同名実装の有無は次に個別path確認する。追加の有料Gemini呼出し・実会話送信・Production変更は行わない。
