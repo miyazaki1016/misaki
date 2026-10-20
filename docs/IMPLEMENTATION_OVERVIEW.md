@@ -4032,3 +4032,33 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - vercel.json に関数の maxDuration 指定なし。Vercelプロジェクト情報から実際の関数実行時間上限を取得できず、15秒がプラットフォーム上限かどうかは未確認。
 - 失敗時刻（2026-10-19 18:28 UTC頃）のVercel runtime logsはHobbyプランの保存期限外でAPIが400を返した。ログなしと誤解しない。過去v2の通信失敗とタイムアウトの区別は遡及不能。
 - 次回の有料Gemini実験は承認されておらず、追加枠も作成しない。根拠なく15秒を延長したり、本番環境・Supabase・使用済み枠を変更しない。
+
+
+## 2026-10-20 新チャット引継ぎ：会話品質検証・実験枠・現在の障害
+
+> **新しいソラは最初にこの節と文書冒頭を読むこと。** ユーザーは開発最優先で、同じ説明の反復ではなくGitHub/Vercel上の実作業を望んでいる。報告では「実装済み」「CI確認済み」「未確認」「未実施」を必ず区別する。アメふるは別プロジェクトなので触れない。
+
+### 対象・安全な作業範囲
+- アプリ：美咲。GitHub `miyazaki1016/misaki`、実験ブランチ `experiment/conversation-lab-offline-v1-20261015`、draft PR #86。
+- **main / Production / 本番Supabase / 美咲の実記憶を変更しない。** 今回のコミットはすべて実験ブランチのみ。
+- 正本はこの `docs/IMPLEMENTATION_OVERVIEW.md`。実際の状態はGitHubの最新commit・CI・Vercelで再確認すること。
+
+### このチャットで実施・確認した内容
+1. `lib/conversation-lab/quality-probes.ts` にQ19〜Q22を追加（commit `430f205ee63a51a37802fc2a598ccff5ebc4e2b2`）。計22項目。これは**合成会話用の評価ケース追加**であり、美咲のモデル応答改善やGemini実測の証明ではない。
+2. テストが旧件数18を期待してCI失敗（316件中314成功・2失敗）。`tests/conversation-lab-quality-probes.test.ts` と `tests/conversation-lab-quality-probe-runner.test.ts` を22件へ修正（`e55945b`, `ab50dac`）。`ab50dac` のCIは **success**。
+3. 件数を固定せず、品質プローブIDの連番を検証し、実行件数を`QUALITY_PROBES.length`から取得するようテスト改善（`b72ec28`, `13cdf0b`）。`13cdf0b` のCIは **success**。
+4. 品質プローブ一括実行で、途中の不正データにより一部だけ実行されないよう、**全プローブを実行前に事前検証**（`lib/conversation-lab/quality-probe-runner.ts`、commit `22f78c8`）。後続に不正データがある場合、コールバックが0回のまま失敗するテスト追加（`tests/conversation-lab-quality-probe-runner.test.ts`、commit `d51c9cb`）。`d51c9cb` のGitHub CI **success**（2026-10-20確認）。
+5. この引継ぎ追記は文書のみ。追加Gemini API呼び出しは実施していない。
+
+### Gemini実通信テストの障害とユーザーの最新意向
+- Q02 v1・v2とも実通信が正常完了せず。v2画面の診断は「Geminiへの通信または応答待ちで失敗」。**通信とタイムアウトのどちらが原因か未確定**。当時のVercelログは保存期限外で遡及診断不能。
+- v1/v2のGitHub one-shot claimは使用済み。使用済み記録は消さず、再利用もしない。既存のPreview API `app/api/conversation-review/smoke/route.ts` はv2専用run keyとGitHub claimに依存し、現状のままでは新規実験を実行できない。
+- ユーザーは「**実験枠なくして**」と明示的に方針変更を依頼し、続けて「うん、進めて」。**固定の第n回実験枠をなくし、Previewで継続的に安全に検証したい**という希望。無制限API呼び出しを望むと決めつけないこと。1回あたりの呼出数・課金・再試行防止、owner認証、Preview隔離を維持する代替設計を検討する。
+- 以前、GitHubツールでone-shot制限に関するコード変更がOpenAI安全性チェックでブロックされた。**ブロックを迂回する書換えはしない**。実験枠廃止は**未実装**。ユーザーは過去にGemini呼び出しを許可したが、実際の追加呼び出しは行っていない。
+- 今回のオフライン検証テスト成功を、Gemini実通信の成功・本番美咲の会話品質改善と混同しない。
+
+### 次のソラが最初にやること
+1. この総覧を読み、実験ブランチHEAD、PR #86、最新CIを確認する。
+2. 実験枠廃止の希望を尊重しつつ、ブロック済み変更の迂回をせずに進められる安全な開発を実施する。必要ならユーザーに制約を明確に伝える。
+3. 合成評価ケースの追加だけで終わらず、**美咲本体の会話・記憶・継続性の具体的改善**を優先し、実装・検証結果を分けて報告する。
+4. 失敗原因の未確定事項を推測で断定せず、本番へマージしない。
