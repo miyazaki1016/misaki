@@ -973,3 +973,12 @@ GitHub branches APIを再取得し92枝の実在を確認。前回404だった `
 `chore/restore-relationship-rpc-migration` の `20260930131930_relationship_server_rpc_user_context.sql` を精読。冒頭に『本番Supabase migration/logから復元したSQLで、すでに本番に適用済み。既存本番DBへ再適用しない』と明記。UUID引数付き `get_relationship_time_context` / `record_relationship_chat_turn` を定義、SECURITY DEFINER、空search_path、本人/永続アカウント照合、service_roleのみ実行許可。**前回のUUID overload出所不明問題に対する有力な復元資料を発見**。ただし復元SQLと現行本番関数の完全一致、migration台帳との一致、mainへの採用状況は未検証。DBへ実行せず、GitHub main/実DBの読取照合を優先。
 
 今後の順番は棚卸し完了→台帳全文再読→Gemini軽量化の計測・オフライン比較→複数キャラ基盤→美咲一人の成長実装。main/本番/Supabase/有料Gemini実行なし。
+
+
+## 2026-10-21 Proactive旧経路・maintenance/drainの10枝
+
+`main...branch` compareで10枝確認：`cleanup/legacy-proactive-tags` ahead2/behind349 (`lib/proactive-photo.ts`)、`cleanup/remove-legacy-proactive-path` ahead7/behind339 (body-clock/proactive API、chat UI、overview、photo)、`codex/legacy-maintenance-drain` ahead7/behind323 (API、chat、persona、push、workflow、docs)、`feature/proactive-derived-tags` ahead2/behind350、`refine/proactive-action-tags` ahead1/behind348、`refine/sleepy-tag` ahead3/behind347（いずれもBody Clockのproactive判断・タグ周辺）。`sora/cutover-cleanup` ahead0/behind161/files0、`sora/profile-aware-life-events` ahead0/behind166/files0、`sora/remove-false-busy-wait` ahead0/behind138/files0、`sora/update-overview-relationship-v1-production` ahead0/behind54/files0。
+
+`codex/legacy-maintenance-drain` の `docs/LEGACY_MAINTENANCE_DRAIN.md` と `docs/WRITE_SURFACE_INVENTORY.md` を精読。**最終判定BLOCKED**。2026-09-20の隔離DB監査では、freeze完了後に古いMVCC snapshotから新規operationを受付・COMMITできる反例、旧業務writeの反例の計2件が残り、既存52テストPASSでもsnapshot回帰2件FAIL。publicテーブル22に対しguard対象12の差分10、auth.users trigger経由の書込漏れも記録。これは隔離環境での検証であり、本番事故を示すものではない。**maintenance/drain機能を本番に導入・流用しない**。古いコードをそのまま移植せず、DB isolation/transaction・書込経路・認証triggerを含む再設計が必要。
+
+Proactive/Body Clock関連枝は現行mainの仕様と差分精読するまで採否保留。通知の原子性・重複防止・ユーザー/キャラのスコープは将来設計の要点。main/本番/Supabase変更なし。
