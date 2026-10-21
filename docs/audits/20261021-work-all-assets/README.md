@@ -1,5 +1,16 @@
 # Misaki 全ブランチ・開発資産監査 2026-10-21
 
+## 52c53fe以降：第5次Work再開（最新・未完了）
+
+38〜45のForget契約案、46〜55の文書54/85版を引き継ぐ。今回新規6版で**60/85版、残25版**。証拠不足枝6件を静的分類し**残24件**。動作受入ではない。
+
+- [56 文書6版](56_DOCUMENT_REVIEW_WORK_RESUMED_ROUND5.md)、[57 枝6件の所在・置換](57_BRANCH_RECONCILIATION_WORK_RESUMED_ROUND5.md)。
+- [58 派生19種の失効・保持契約案](58_DERIVED_USE_EXPIRY_CONTRACT_ROUND5.md)、[59 独立oracle試験計画](59_INDEPENDENT_ORACLE_TEST_PLAN_ROUND5.md)（16件すべてNOT_RUN）。
+- [60 固定source・差分証拠](60_FIXED_SOURCE_AND_LINEAGE_EVIDENCE_ROUND5.json)、[61 最新差分台帳・全pending](61_ROUND5_RESUMED_LEDGER.json)、[62 最新進捗・次回引継ぎ](62_REVIEW_PROGRESS_WORK_RESUMED_ROUND5.md)。
+
+新チャットは基本構想→本README→62→61→38〜45/58/59の順で読む。旧01〜55と全証拠は保持し、後述の古い「最新」は当時の記録として扱う。IDEA01〜13、重点7成果群、legacy BLOCKEDを維持。main/本番/DB/アメふる変更・実モデル・動作試験なし。監査全体は未完了。
+
+
 ## b56194e以降：第4次精査（最新・未完了）
 
 - [28 Forget全経路](28_FORGET_ALL_PATHS_ROUND4.md)、[29 Relationship worker](29_RELATIONSHIP_WORKER_ROUND4.md)、[30 Persona・Body Clock・cache](30_PERSONA_BODY_CLOCK_CACHE_ROUND4.md)。
