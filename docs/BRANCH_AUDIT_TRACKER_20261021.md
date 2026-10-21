@@ -18,14 +18,14 @@
 | `design/shared-conversation-engine-contract-20261015` | 記載あり | 2026-10-15 08:13 UTC | 要照合 | 要完了判定 |
 | `docs/audit-overview-against-source` | 記載あり | 2026-09-17 23:35 UTC | 要照合 | 要完了判定 |
 | `docs/development-registry-audit-20261020` | 監査作業ブランチ | 2026-10-21 01:26 UTC | 要照合 | 対象外または要確認 |
-| `docs/multi-character-data-scope-inventory` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/multi-character-rpc-caller-audit` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/production-source-of-truth-reconciliation` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/relationship-five-axis-design-review-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/relationship-v1-2-stage-growth-principles` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/update-implementation-overview` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/update-overview-relationship-growth` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `experiment/conversation-lab-offline-v1-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `docs/multi-character-data-scope-inventory` | 記載あり | 2026-10-13 07:40 UTC | 要照合 | 要完了判定 |
+| `docs/multi-character-rpc-caller-audit` | 記載あり | 2026-10-13 08:53 UTC | 要照合 | 要完了判定 |
+| `docs/production-source-of-truth-reconciliation` | 記載あり | 2026-10-14 00:30 UTC | 要照合 | 要完了判定 |
+| `docs/relationship-five-axis-design-review-20261015` | 記載あり | 2026-10-14 20:22 UTC | 要照合 | 要完了判定 |
+| `docs/relationship-v1-2-stage-growth-principles` | 記載あり | 2026-10-04 04:41 UTC | 要照合 | 要完了判定 |
+| `docs/update-implementation-overview` | 記載あり | 2026-09-17 23:29 UTC | 要照合 | 要完了判定 |
+| `docs/update-overview-relationship-growth` | 記載あり | 2026-09-18 03:15 UTC | 要照合 | 要完了判定 |
+| `experiment/conversation-lab-offline-v1-20261015` | 記載あり | 2026-10-20 11:36 UTC | 要照合 | 要完了判定 |
 | `experiment/interpreter-gradual-acting-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `experiment/shared-conversation-history-v1-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `feature/proactive-derived-tags` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,4 +111,6 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り84枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り76枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+
+2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
