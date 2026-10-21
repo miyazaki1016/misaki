@@ -59,3 +59,44 @@ test("legacy points never invent relationship direction or dating status", () =>
   assert.match(guide, /恋愛方向は弱い/);
   assert.doesNotMatch(guide, /交際も会話上成立済み/);
 });
+
+test("lover identity and explicit romantic-partner status reach the acting guide", () => {
+  const guide = createRelationshipActingGuide(
+    { intimacyStage: 5, friendship: 90, trust: 90, playfulness: 70, affection: 90, romance: 90, relationshipStatus: "romantic_partner" },
+    { primaryIdentity: "lover" }
+  );
+
+  assert.match(guide, /現在の関係の自己認識は「恋人」/);
+  assert.match(guide, /現在の交際状態は明示的に成立済み/);
+  assert.match(guide, /交際も会話上成立済み/);
+  assert.doesNotMatch(guide, /Primary Identityが恋人以外なら/);
+});
+
+test("high romance with a non-lover identity never implies established dating", () => {
+  const guide = createRelationshipActingGuide(
+    { intimacyStage: 5, friendship: 90, trust: 90, playfulness: 70, affection: 90, romance: 95, relationshipStatus: "none" },
+    { primaryIdentity: "friend" }
+  );
+
+  assert.match(guide, /現在の関係の自己認識は「友達」/);
+  assert.match(guide, /Primary Identityが恋人以外なら、親密さや恋愛意識が高くても恋人として既成事実化しない/);
+  assert.match(guide, /交際は成立していない/);
+  assert.doesNotMatch(guide, /交際も会話上成立済み/);
+});
+
+test("high intimacy and romance without identity never imply lover status", () => {
+  const guide = createRelationshipActingGuide({
+    intimacyStage: 5,
+    friendship: 95,
+    trust: 95,
+    playfulness: 80,
+    affection: 95,
+    romance: 95,
+    relationshipStatus: "none",
+  });
+
+  assert.match(guide, /現在の交際状態は未成立/);
+  assert.match(guide, /交際は成立していない/);
+  assert.doesNotMatch(guide, /現在の関係の自己認識は「恋人」/);
+  assert.doesNotMatch(guide, /交際も会話上成立済み/);
+});
