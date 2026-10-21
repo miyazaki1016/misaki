@@ -872,3 +872,18 @@ mainの現行対象を取得：`app/chat/conversation-history-sync.tsx` blob `3f
 main `lib/relationship-life-context.ts`（blob `d20d4f69...`）は `LifeFactKind=profile/schedule/routine/situation/preference/concern`、`source=user|memory`、`observedAt`、`validUntil`、`confidence` などの明示的な型を持つ。**生活の事実を文脈に応じて参照する設計資産**として、仕事日groundingや『寂しさを日数だけで決めない』方針との接続点。現行ルートでの実際の採用・品質は別途要検証。
 
 **開発史の観点**：恋人前提の発話を避ける原則、実在の生活事実に根拠を求める原則、関係性Evidenceの極性と出所を守る原則が、別々の枝から現在の一貫性に収束した可能性。因果・完成度はcommit履歴/テスト照合まで断定しない。main/production/Supabase変更なし。
+
+
+## 2026-10-21 Body Clock・Safari/PWA・見せ方の7新規枝＋1再確認
+
+GitHub `main...branch` compare：
+- `fix/body-clock-claim-rpc` ahead1/behind346、`20260917143500_fix_body_clock_claim_rpc.sql` added（比較上）。**同ファイルはmainに存在**（blob `a7bb0636...`）。現行のsilence/lonelinessルールについては既出の台帳項目を参照。DB適用状況未確認。
+- `fix/legacy-safari-cache` ahead2/behind364、`app/chat/anonymous-session-guard.tsx` と `tests/account-conversation.test.cjs` modified。Safariの旧キャッシュと匿名セッションの関係が調査対象だった可能性。現行guardはmainに存在（blob `b8756ce6...`）。
+- `fix/safari-load-failed-message` ahead1/behind355、`app/chat/page.tsx` modified。現行pageはmainに存在（blob `2221fcac...`）。
+- `fix/safari-load-failed-ui` ahead0/behind355、差分なし。
+- `sora/lp-pwa-mobile-layout` ahead0/behind40、差分なし。
+- `sora/lp-relationship-story` ahead0/behind45、差分なし。
+- `sora/update-overview-relationship-v1-production` ahead0/behind54、差分なし。
+- `fix/chat-reliability-cleanup` ahead1/behind357、旧chat-proxy modified。**前回のchat reliability 8枝ですでに記録済み**、重複再確認としてのみ記載。新規棚卸しは7枝。
+
+**区別**：ahead0/files0は『mainに未反映のファイル差分なし』であり、過去の実装が現在も有効・UX問題が解消済みという意味ではない。Safari/PWAでは端末実機・キャッシュ更新・匿名履歴の持続・エラー表示を分けて検証する必要がある。`lp-relationship-story`はユーザーに見せる物語、`grow_relationship_from_first_meeting`は内部人格原則であり、両者の表現一致を将来照合。Body Clockの機械的なlonely化は『寂しさの意味を文脈から考える』方針と要再検討。main/production/Supabase変更なし。
