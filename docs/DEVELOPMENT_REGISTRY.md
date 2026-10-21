@@ -838,3 +838,20 @@ GitHub `main...branch` を8件照合。**全8枝 ahead0 / files0**、すなわ�
 mainの関連ソースを直接取得：`lib/relationship-analyzer-v1.ts`（blob `05944b0a...`、6,387 bytes）、`lib/relationship-runtime-v1.ts`（`a5d22997...`、7,805 bytes）、`tests/relationship-engine-v1.test.ts`（`22b568c1...`、35,801 bytes）。単純文字列検査ではanalyzerにretry/evidence、runtimeにlease/evidence、testにlease/evidenceが多数存在。ただし**これだけで各過去枝の変更がそのままmainに残存することや、診断が適切に撤去されたことは証明できない**。歴史的に統合後、さらに修正・撤去された可能性がある。
 
 **重要な分類**：『未反映コードがない』と『過去の目的が今も満たされている』は別。stage/processing/evidence診断の追加と撤去が対になっている履歴を、障害原因・安全な一時観測・機微データのログ露出防止・診断撤去後の監視能力という観点で後日見直す。現時点で具体的な事故や残留ログは断定しない。次の精査候補は各枝のcommit/PR経緯とmain現行ログ/テストの対照。main/production/Supabase変更なし。
+
+
+## 2026-10-21 履歴トレース・同期・応答待機の8枝
+
+GitHub `main...branch` compareで**8件すべてahead0/files0**、未反映ファイル差分なし：
+- `sora/history-edge-trace` behind154
+- `sora/history-get-trace` behind156
+- `sora/history-sync-source-proof` behind158
+- `sora/remove-timestamp-history-poll` behind149
+- `sora/sync-free-usage-with-history` behind131
+- `sora/remove-false-busy-wait` behind138
+- `sora/fix-waiting-reply-layout` behind142
+- `sora/gemini-timeout-retry` behind135
+
+mainの現行対象を取得：`app/chat/conversation-history-sync.tsx` blob `3f39da15...`、`app/chat/page.tsx` `2221fcac...`、`app/api/chat/route.ts` `5600ad37...`。履歴取得・同期の証跡確認、timestamp poll除去、無料枠と履歴の整合、偽の待機表示、応答待機レイアウト、Gemini timeoutという問題群を示す**ブランチ名と現行ソースの存在**を確認。ただし個別の不具合の再現・修正内容・mainに残る機能的保証・本番状態は未検証。
+
+**開発史の仮説**：『履歴の出所を追う→同期を正す→無駄なpollを減らす→待機表示と再試行の誤解を減らす』という一連のユーザー体験課題が存在した可能性。実際の順序・因果はcommit履歴で確認するまで断定しない。履歴と利用枠の二重正本化、再試行による二重保存、画面上の偽busy状態を避ける観点で最終再評価。main/production/Supabase変更なし。
