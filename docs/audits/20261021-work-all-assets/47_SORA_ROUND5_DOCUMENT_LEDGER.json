@@ -1,0 +1,45 @@
+{
+  "schema": "misaki-round5-sora-document-overlay-v1",
+  "date": "2026-10-21",
+  "base_round4_ledger": "34_ROUND4_LEDGER.json",
+  "apply_rule": "Apply on top of prior round ledgers; original ID+blob as unit; do not count newly authored audit docs.",
+  "evidence": "46_SORA_DOCUMENT_FULL_REVIEW_ROUND5.md",
+  "documents": [
+    {
+      "id": "DOC-013",
+      "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+      "blob": "804407c3dcbb0ca3e6a0d1e765be2d8a9a3cca4a",
+      "review_state": "full-text-and-static-code-reviewed",
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-014",
+      "path": "docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md",
+      "blob": "5ee661407d2da6d1bd50007bb6393d4d213fa86c",
+      "review_state": "full-text-and-static-code-reviewed",
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-079",
+      "path": "docs/conversation-context-compression-spike.md",
+      "blob": "b5a6296987c955879d540226f14c60d2ae8df9b2",
+      "review_state": "full-text-and-static-code-reviewed",
+      "runtime_acceptance": false
+    }
+  ],
+  "progress": {
+    "prior_documents_total": 40,
+    "reviewed_this_round": 3,
+    "documents_total": 43,
+    "documents_denominator": 85,
+    "documents_pending": 42,
+    "branches_insufficient": 30,
+    "branches_resolved_this_round": 0,
+    "legacy_blocked": true,
+    "production_verified_new_assets": 0
+  },
+  "runtime_executed": false,
+  "database_accessed": false,
+  "paid_model_called": false,
+  "all_assets_audit_complete": false
+}
