@@ -1,0 +1,3916 @@
+{
+  "schema": "misaki-round5-final-fixed-coverage-v1",
+  "date": "2026-10-21",
+  "timezone": "Asia/Tokyo",
+  "baseline_commit": "57be547b532e57fa1574e93e61df28f91d5deb7c",
+  "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "scope": "original 85-version document corpus and static classification; not all-assets runtime acceptance",
+  "new_documents": [
+    {
+      "id": "DOC-015",
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "docs/development-registry-audit-20261020"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-015",
+      "latest_path_change": {
+        "sha": "399f93472de181c5da254748767b6a97f7b2fed6",
+        "date": "2026-10-21T01:23:11Z",
+        "message": "docs: audit conversation lab and Free Premium memory design"
+      }
+    },
+    {
+      "id": "DOC-019",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "0715dd8a2e80829584525c639c79060eda89369c",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "work/forget-control-v1"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-019",
+      "latest_path_change": {
+        "sha": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+        "date": "2026-10-06T21:20:42Z",
+        "message": "Document Forget Control Preview acceptance gate"
+      }
+    },
+    {
+      "id": "DOC-021",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "work/conversation-context-compression-spike"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-021",
+      "latest_path_change": {
+        "sha": "ece799c20d685f00c007cb2f897bdd6b2443a2d3",
+        "date": "2026-10-07T23:23:35Z",
+        "message": "docs: record Acting Guide lover acceptance"
+      }
+    },
+    {
+      "id": "DOC-022",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "docs/relationship-five-axis-design-review-20261015"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-022",
+      "latest_path_change": {
+        "sha": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+        "date": "2026-10-14T20:22:04Z",
+        "message": "docs: define incremental relationship interpreter design and acceptance gates"
+      }
+    },
+    {
+      "id": "DOC-023",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/lp-relationship-story",
+        "sora/update-overview-relationship-v1-production",
+        "work/gemini-unit-cost-telemetry"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-023",
+      "latest_path_change": {
+        "sha": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2",
+        "date": "2026-10-03T15:36:07Z",
+        "message": "Document Relationship Engine v1.1 behavior and backend contracts"
+      }
+    },
+    {
+      "id": "DOC-026",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/canonical-relationship-integration"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-026",
+      "latest_path_change": {
+        "sha": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+        "date": "2026-10-02T13:09:00Z",
+        "message": "docs: record completed production canonical cutover"
+      }
+    },
+    {
+      "id": "DOC-027",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "experiment/conversation-lab-offline-v1-20261015"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-027",
+      "latest_path_change": {
+        "sha": "4efa62b017ca80fe79403a55c172f22a754f2d29",
+        "date": "2026-10-20T11:17:21Z",
+        "message": "docs: hand off October 20 conversation lab progress and unresolved smoke-test blockers"
+      }
+    },
+    {
+      "id": "DOC-028",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/lp-pwa-mobile-layout"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-028",
+      "latest_path_change": {
+        "sha": "3c679a30952287371645cb3186f31aa9a0026e8b",
+        "date": "2026-10-04T06:53:09Z",
+        "message": "docs: record PR 62 landing page completion"
+      }
+    },
+    {
+      "id": "DOC-029",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "test/relationship-acting-state-comparison",
+        "main",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "experiment/shared-conversation-history-v1-20261015",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-029",
+      "latest_path_change": {
+        "sha": "b45d083785bcb456c72c65e00a61af1b7c7a9b34",
+        "date": "2026-10-13T07:19:11Z",
+        "message": "docs: consolidate long-term Misaki product and architecture vision"
+      }
+    },
+    {
+      "id": "DOC-030",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "work/context-no-duplicate-replies-ab"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-030",
+      "latest_path_change": {
+        "sha": "b98733f159760560b8ababa80fcc35dc9f92fa76",
+        "date": "2026-10-12T01:20:18Z",
+        "message": "docs: clarify memory certainty handoff status"
+      }
+    },
+    {
+      "id": "DOC-031",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/misaki-acting-lab"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-031",
+      "latest_path_change": {
+        "sha": "1a8852b9fc42c7a337855156bd43ae1af4a683db",
+        "date": "2026-10-02T23:00:44Z",
+        "message": "docs: checkpoint multi-browser quota sync and Work handoff"
+      }
+    },
+    {
+      "id": "DOC-033",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "98551eeb0693a352aaf2c639babec34c95ff6484",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "fix/expired-temporary-relationship-import",
+        "fix/relationship-analyzer-bounded-retry"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-033",
+      "latest_path_change": {
+        "sha": "3b06b33582c6651240f59acd5a4108c5cf39b34d",
+        "date": "2026-10-05T15:43:05Z",
+        "message": "docs: add hidden persona progressive self-disclosure plan"
+      }
+    },
+    {
+      "id": "DOC-034",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/quality-long-history-workflow"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-034",
+      "latest_path_change": {
+        "sha": "18e2c0bdfa007c980858f85341eb8c78e0e5301a",
+        "date": "2026-10-07T06:02:14Z",
+        "message": "docs: freeze relationship identity persistence boundary"
+      }
+    },
+    {
+      "id": "DOC-035",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "docs/production-source-of-truth-reconciliation"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-035",
+      "latest_path_change": {
+        "sha": "11b0e771d81cb034fbc6595b3ae18de0856aea38",
+        "date": "2026-10-14T00:30:00Z",
+        "message": "docs: add Oct 14 handoff and work inventory"
+      }
+    },
+    {
+      "id": "DOC-037",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b48887633360762cb4821e0027893d30a92cde52",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/fix-waiting-reply-layout",
+        "sora/gemini-timeout-retry",
+        "sora/gemini-transient-retry",
+        "sora/history-edge-trace",
+        "sora/history-get-trace",
+        "sora/history-sync-source-proof",
+        "sora/anonymous-history-get-noop",
+        "sora/cutover-cleanup",
+        "sora/profile-aware-life-events",
+        "sora/remove-false-busy-wait",
+        "sora/remove-timestamp-history-poll",
+        "sora/sync-free-usage-with-history",
+        "codex/server-canonical-foundation"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-037",
+      "latest_path_change": {
+        "sha": "db5b6e17c77f94f54bb4764da3fcf01b764d313e",
+        "date": "2026-10-02T08:07:11Z",
+        "message": "Document production DB and Body Clock cutover audit"
+      }
+    },
+    {
+      "id": "DOC-038",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "work/relationship-identity-v1"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-038",
+      "latest_path_change": {
+        "sha": "6266cf8c367da4e822d33c92fae89a0588718962",
+        "date": "2026-10-11T08:48:01Z",
+        "message": "docs: distinguish preview deployment from acceptance"
+      }
+    },
+    {
+      "id": "DOC-039",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "experiment/interpreter-gradual-acting-20261015"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-039",
+      "latest_path_change": {
+        "sha": "170f4d76d39c3521ff62a1bf032c066007a632d3",
+        "date": "2026-10-15T14:42:17Z",
+        "message": "docs: establish multi-character persona and state isolation as shared engine design gate"
+      }
+    },
+    {
+      "id": "DOC-040",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "docs/relationship-v1-2-stage-growth-principles"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-040",
+      "latest_path_change": {
+        "sha": "bc35eb6231ee93b9843f0bfbf967fde71fc97561",
+        "date": "2026-10-04T04:39:37Z",
+        "message": "Define Gemini unit cost telemetry contract"
+      }
+    },
+    {
+      "id": "DOC-041",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3",
+      "full_text": true,
+      "review_state": "full-text-and-semantic-delta-reviewed",
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "70_REMAINING_DOCUMENTS_FULL_REVIEW_ROUND5.md",
+      "coverage_index": "74_FINAL_SOURCE_COVERAGE_ROUND5.json",
+      "branches": [
+        "sora/drop-ungrounded-relationship-evidence",
+        "sora/fix-relationship-polarity-transport",
+        "work/relationship-engine-v1",
+        "work/relationship-error-diagnostics",
+        "work/relationship-polarity-integer",
+        "sora/relationship-analyzer-stage-diagnostics",
+        "sora/relationship-analyzer-structured-output-hotfix",
+        "sora/relationship-control-rpcs-v1",
+        "sora/relationship-evidence-validation-diagnostics",
+        "sora/relationship-processing-error-diagnostics",
+        "sora/remove-relationship-stage-diagnostics",
+        "sora/remove-relationship-temporary-diagnostics",
+        "work/relationship-analyzer-diagnostics"
+      ],
+      "original_text_archive_entry": "original-documents.json",
+      "original_text_json_key": "DOC-041",
+      "latest_path_change": {
+        "sha": "112b158a947b71d693c28c50597f63278b11b84d",
+        "date": "2026-10-03T08:25:32Z",
+        "message": "Close Relationship Engine v1 DB work area and hand off to Work"
+      }
+    }
+  ],
+  "full_text_coverage": [
+    {
+      "id": "DOC-037",
+      "source_id": "DOC-042",
+      "source_blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "target_blob": "b48887633360762cb4821e0027893d30a92cde52",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 1544,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            90
+          ],
+          "target_lines": [
+            1,
+            90
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            91,
+            90
+          ],
+          "target_lines": [
+            91,
+            96
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            91,
+            93
+          ],
+          "target_lines": [
+            97,
+            99
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            94,
+            93
+          ],
+          "target_lines": [
+            100,
+            110
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            94,
+            234
+          ],
+          "target_lines": [
+            111,
+            251
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            235,
+            234
+          ],
+          "target_lines": [
+            252,
+            267
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            235,
+            235
+          ],
+          "target_lines": [
+            268,
+            268
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            236,
+            318
+          ],
+          "target_lines": [
+            269,
+            268
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            319,
+            933
+          ],
+          "target_lines": [
+            269,
+            883
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            934,
+            934
+          ],
+          "target_lines": [
+            884,
+            883
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            935,
+            935
+          ],
+          "target_lines": [
+            884,
+            884
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            936,
+            937
+          ],
+          "target_lines": [
+            885,
+            885
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            938,
+            938
+          ],
+          "target_lines": [
+            886,
+            886
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            939,
+            942
+          ],
+          "target_lines": [
+            887,
+            891
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            943,
+            943
+          ],
+          "target_lines": [
+            892,
+            892
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            944,
+            946
+          ],
+          "target_lines": [
+            893,
+            894
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            947,
+            947
+          ],
+          "target_lines": [
+            895,
+            895
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            948,
+            950
+          ],
+          "target_lines": [
+            896,
+            897
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            951,
+            951
+          ],
+          "target_lines": [
+            898,
+            898
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            952,
+            951
+          ],
+          "target_lines": [
+            899,
+            1544
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-037-from-DOC-042.patch"
+    },
+    {
+      "id": "DOC-031",
+      "source_id": "DOC-037",
+      "source_blob": "b48887633360762cb4821e0027893d30a92cde52",
+      "target_blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 1606,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            1544
+          ],
+          "target_lines": [
+            1,
+            1544
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            1545,
+            1544
+          ],
+          "target_lines": [
+            1545,
+            1606
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-031-from-DOC-037.patch"
+    },
+    {
+      "id": "DOC-026",
+      "source_id": "DOC-037",
+      "source_blob": "b48887633360762cb4821e0027893d30a92cde52",
+      "target_blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 1645,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            1544
+          ],
+          "target_lines": [
+            1,
+            1544
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            1545,
+            1544
+          ],
+          "target_lines": [
+            1545,
+            1645
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-026-from-DOC-037.patch"
+    },
+    {
+      "id": "DOC-041",
+      "source_id": "DOC-031",
+      "source_blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1",
+      "target_blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 1916,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            12
+          ],
+          "target_lines": [
+            11,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            1606
+          ],
+          "target_lines": [
+            13,
+            1606
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            1607,
+            1606
+          ],
+          "target_lines": [
+            1607,
+            1916
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-041-from-DOC-031.patch"
+    },
+    {
+      "id": "DOC-023",
+      "source_id": "DOC-041",
+      "source_blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3",
+      "target_blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 2540,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            12
+          ],
+          "target_lines": [
+            11,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            1916
+          ],
+          "target_lines": [
+            13,
+            1916
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            1917,
+            1916
+          ],
+          "target_lines": [
+            1917,
+            2540
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-023-from-DOC-041.patch"
+    },
+    {
+      "id": "DOC-028",
+      "source_id": "DOC-023",
+      "source_blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9",
+      "target_blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 2711,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            11
+          ],
+          "target_lines": [
+            1,
+            11
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            12,
+            12
+          ],
+          "target_lines": [
+            12,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            2540
+          ],
+          "target_lines": [
+            13,
+            2540
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            2541,
+            2540
+          ],
+          "target_lines": [
+            2541,
+            2711
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-028-from-DOC-023.patch"
+    },
+    {
+      "id": "DOC-033",
+      "source_id": "DOC-028",
+      "source_blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85",
+      "target_blob": "98551eeb0693a352aaf2c639babec34c95ff6484",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 2781,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            11
+          ],
+          "target_lines": [
+            1,
+            11
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            12,
+            12
+          ],
+          "target_lines": [
+            12,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            2688
+          ],
+          "target_lines": [
+            13,
+            2688
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            2689,
+            2688
+          ],
+          "target_lines": [
+            2689,
+            2758
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            2689,
+            2707
+          ],
+          "target_lines": [
+            2759,
+            2777
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            2708,
+            2708
+          ],
+          "target_lines": [
+            2778,
+            2778
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            2709,
+            2711
+          ],
+          "target_lines": [
+            2779,
+            2781
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-033-from-DOC-028.patch"
+    },
+    {
+      "id": "DOC-019",
+      "source_id": "DOC-033",
+      "source_blob": "98551eeb0693a352aaf2c639babec34c95ff6484",
+      "target_blob": "0715dd8a2e80829584525c639c79060eda89369c",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3227,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            12
+          ],
+          "target_lines": [
+            11,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            1785
+          ],
+          "target_lines": [
+            13,
+            1785
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            1786,
+            1785
+          ],
+          "target_lines": [
+            1786,
+            1880
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            1786,
+            2781
+          ],
+          "target_lines": [
+            1881,
+            2876
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            2782,
+            2781
+          ],
+          "target_lines": [
+            2877,
+            3227
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-019-from-DOC-033.patch"
+    },
+    {
+      "id": "DOC-034",
+      "source_id": "DOC-019",
+      "source_blob": "0715dd8a2e80829584525c639c79060eda89369c",
+      "target_blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3489,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            11
+          ],
+          "target_lines": [
+            1,
+            11
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            12,
+            12
+          ],
+          "target_lines": [
+            12,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            3123
+          ],
+          "target_lines": [
+            13,
+            3123
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            3124,
+            3124
+          ],
+          "target_lines": [
+            3124,
+            3123
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3125,
+            3125
+          ],
+          "target_lines": [
+            3124,
+            3124
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3126,
+            3126
+          ],
+          "target_lines": [
+            3125,
+            3125
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3127,
+            3127
+          ],
+          "target_lines": [
+            3126,
+            3126
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3128,
+            3133
+          ],
+          "target_lines": [
+            3127,
+            3127
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3134,
+            3134
+          ],
+          "target_lines": [
+            3128,
+            3128
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3135,
+            3136
+          ],
+          "target_lines": [
+            3129,
+            3129
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3137,
+            3137
+          ],
+          "target_lines": [
+            3130,
+            3130
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3138,
+            3138
+          ],
+          "target_lines": [
+            3131,
+            3137
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3139,
+            3139
+          ],
+          "target_lines": [
+            3138,
+            3138
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3140,
+            3141
+          ],
+          "target_lines": [
+            3139,
+            3140
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3142,
+            3142
+          ],
+          "target_lines": [
+            3141,
+            3141
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3143,
+            3153
+          ],
+          "target_lines": [
+            3142,
+            3142
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3154,
+            3154
+          ],
+          "target_lines": [
+            3143,
+            3143
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            3155,
+            3155
+          ],
+          "target_lines": [
+            3144,
+            3143
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3156,
+            3156
+          ],
+          "target_lines": [
+            3144,
+            3144
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3157,
+            3157
+          ],
+          "target_lines": [
+            3145,
+            3145
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3158,
+            3158
+          ],
+          "target_lines": [
+            3146,
+            3146
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3159,
+            3159
+          ],
+          "target_lines": [
+            3147,
+            3147
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3160,
+            3160
+          ],
+          "target_lines": [
+            3148,
+            3148
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3161,
+            3161
+          ],
+          "target_lines": [
+            3149,
+            3155
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3162,
+            3162
+          ],
+          "target_lines": [
+            3156,
+            3156
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3163,
+            3163
+          ],
+          "target_lines": [
+            3157,
+            3157
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3164,
+            3164
+          ],
+          "target_lines": [
+            3158,
+            3158
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            3165,
+            3165
+          ],
+          "target_lines": [
+            3159,
+            3158
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3166,
+            3166
+          ],
+          "target_lines": [
+            3159,
+            3159
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3167,
+            3175
+          ],
+          "target_lines": [
+            3160,
+            3160
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3176,
+            3176
+          ],
+          "target_lines": [
+            3161,
+            3161
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3177,
+            3177
+          ],
+          "target_lines": [
+            3162,
+            3162
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3178,
+            3178
+          ],
+          "target_lines": [
+            3163,
+            3163
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3179,
+            3179
+          ],
+          "target_lines": [
+            3164,
+            3165
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3180,
+            3180
+          ],
+          "target_lines": [
+            3166,
+            3166
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3181,
+            3181
+          ],
+          "target_lines": [
+            3167,
+            3180
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3182,
+            3182
+          ],
+          "target_lines": [
+            3181,
+            3181
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3183,
+            3183
+          ],
+          "target_lines": [
+            3182,
+            3182
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3184,
+            3184
+          ],
+          "target_lines": [
+            3183,
+            3183
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3185,
+            3186
+          ],
+          "target_lines": [
+            3184,
+            3195
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3187,
+            3187
+          ],
+          "target_lines": [
+            3196,
+            3196
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3188,
+            3188
+          ],
+          "target_lines": [
+            3197,
+            3197
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3189,
+            3189
+          ],
+          "target_lines": [
+            3198,
+            3198
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3190,
+            3190
+          ],
+          "target_lines": [
+            3199,
+            3204
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3191,
+            3191
+          ],
+          "target_lines": [
+            3205,
+            3205
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3192,
+            3192
+          ],
+          "target_lines": [
+            3206,
+            3216
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3193,
+            3193
+          ],
+          "target_lines": [
+            3217,
+            3217
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3194,
+            3194
+          ],
+          "target_lines": [
+            3218,
+            3236
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3195,
+            3195
+          ],
+          "target_lines": [
+            3237,
+            3237
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3196,
+            3196
+          ],
+          "target_lines": [
+            3238,
+            3244
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3197,
+            3197
+          ],
+          "target_lines": [
+            3245,
+            3245
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3198,
+            3198
+          ],
+          "target_lines": [
+            3246,
+            3250
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3199,
+            3199
+          ],
+          "target_lines": [
+            3251,
+            3251
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3200,
+            3200
+          ],
+          "target_lines": [
+            3252,
+            3252
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3201,
+            3201
+          ],
+          "target_lines": [
+            3253,
+            3253
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3202,
+            3212
+          ],
+          "target_lines": [
+            3254,
+            3260
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3213,
+            3213
+          ],
+          "target_lines": [
+            3261,
+            3261
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3214,
+            3218
+          ],
+          "target_lines": [
+            3262,
+            3263
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3219,
+            3219
+          ],
+          "target_lines": [
+            3264,
+            3264
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3220,
+            3225
+          ],
+          "target_lines": [
+            3265,
+            3265
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3226,
+            3226
+          ],
+          "target_lines": [
+            3266,
+            3266
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3227,
+            3227
+          ],
+          "target_lines": [
+            3267,
+            3489
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-034-from-DOC-019.patch"
+    },
+    {
+      "id": "DOC-021",
+      "source_id": "DOC-034",
+      "source_blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea",
+      "target_blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3604,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            3489
+          ],
+          "target_lines": [
+            1,
+            3489
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3490,
+            3489
+          ],
+          "target_lines": [
+            3490,
+            3604
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-021-from-DOC-034.patch"
+    },
+    {
+      "id": "DOC-038",
+      "source_id": "DOC-021",
+      "source_blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb",
+      "target_blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3639,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            3603
+          ],
+          "target_lines": [
+            1,
+            3603
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3604,
+            3604
+          ],
+          "target_lines": [
+            3604,
+            3639
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-038-from-DOC-021.patch"
+    },
+    {
+      "id": "DOC-030",
+      "source_id": "DOC-021",
+      "source_blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb",
+      "target_blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3877,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            11
+          ],
+          "target_lines": [
+            11,
+            11
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            12,
+            3603
+          ],
+          "target_lines": [
+            12,
+            3603
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            3604,
+            3604
+          ],
+          "target_lines": [
+            3604,
+            3877
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-030-from-DOC-021.patch"
+    },
+    {
+      "id": "DOC-029",
+      "source_id": "DOC-034",
+      "source_blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea",
+      "target_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3927,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            12
+          ],
+          "target_lines": [
+            11,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            14
+          ],
+          "target_lines": [
+            13,
+            14
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            15,
+            14
+          ],
+          "target_lines": [
+            15,
+            452
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            15,
+            3489
+          ],
+          "target_lines": [
+            453,
+            3927
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-029-from-DOC-034.patch"
+    },
+    {
+      "id": "DOC-035",
+      "source_id": "DOC-029",
+      "source_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "target_blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3977,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            11
+          ],
+          "target_lines": [
+            11,
+            11
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            12,
+            3927
+          ],
+          "target_lines": [
+            12,
+            3927
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3928,
+            3927
+          ],
+          "target_lines": [
+            3928,
+            3977
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-035-from-DOC-029.patch"
+    },
+    {
+      "id": "DOC-022",
+      "source_id": "DOC-029",
+      "source_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "target_blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3993,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            3927
+          ],
+          "target_lines": [
+            1,
+            3927
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3928,
+            3927
+          ],
+          "target_lines": [
+            3928,
+            3993
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-022-from-DOC-029.patch"
+    },
+    {
+      "id": "DOC-039",
+      "source_id": "DOC-029",
+      "source_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "target_blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 4061,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            3927
+          ],
+          "target_lines": [
+            1,
+            3927
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3928,
+            3927
+          ],
+          "target_lines": [
+            3928,
+            4061
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-039-from-DOC-029.patch"
+    },
+    {
+      "id": "DOC-027",
+      "source_id": "DOC-029",
+      "source_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+      "target_blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 4064,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            3927
+          ],
+          "target_lines": [
+            1,
+            3927
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3928,
+            3927
+          ],
+          "target_lines": [
+            3928,
+            4064
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-027-from-DOC-029.patch"
+    },
+    {
+      "id": "DOC-040",
+      "source_id": "DOC-023",
+      "source_blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9",
+      "target_blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b",
+      "method": "previously reviewed byte-identical blocks plus every added/changed/deleted block semantically reviewed",
+      "all_changed_hunks_reviewed": true,
+      "all_target_lines_accounted": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 3516,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            11
+          ],
+          "target_lines": [
+            1,
+            11
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            12,
+            12
+          ],
+          "target_lines": [
+            12,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            2540
+          ],
+          "target_lines": [
+            13,
+            2540
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            2541,
+            2540
+          ],
+          "target_lines": [
+            2541,
+            3516
+          ]
+        }
+      ],
+      "git_parenthood_claimed": false,
+      "delta_archive_path": "document-deltas/DOC-040-from-DOC-023.patch"
+    },
+    {
+      "id": "DOC-015",
+      "target_blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+      "method": "entire original text semantically reviewed, all 995 lines, plus beginning-to-end reevaluation",
+      "all_target_lines_accounted": true,
+      "all_changed_hunks_reviewed": true,
+      "reconstruction_hash_verified": true,
+      "target_line_count": 995,
+      "reviewed_lines": [
+        1,
+        995
+      ]
+    }
+  ],
+  "remote_heads": {
+    "chore/restore-relationship-rpc-migration": "4dd716a2c04c6864445cb8720a1921813bb50933",
+    "cleanup/legacy-proactive-tags": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+    "cleanup/remove-legacy-proactive-path": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+    "codex/legacy-maintenance-drain": "17449c7ec4e8ff50605ef931b04ae76584c6304f",
+    "codex/server-canonical-foundation": "685fbb7baee4a542555f939fabaecd674658c148",
+    "design/shared-conversation-engine-contract-20261015": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+    "docs/audit-overview-against-source": "f6d8baf94d037057ec94deb87b156a713445d37f",
+    "docs/development-registry-audit-20261020": "57be547b532e57fa1574e93e61df28f91d5deb7c",
+    "docs/multi-character-data-scope-inventory": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c",
+    "docs/multi-character-rpc-caller-audit": "83476dd2d347687c253a471557d9c27b82e1caf7",
+    "docs/production-source-of-truth-reconciliation": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+    "docs/relationship-five-axis-design-review-20261015": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+    "docs/relationship-v1-2-stage-growth-principles": "ed8359319181f20cf73aec87ab75c7a1405264f2",
+    "docs/update-implementation-overview": "621dea871afc4dca517071cc79666d81cb69e29c",
+    "docs/update-overview-relationship-growth": "1d9db32ea15fbea950ac46090cb6e1a8bc750001",
+    "experiment/conversation-lab-offline-v1-20261015": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e",
+    "experiment/interpreter-gradual-acting-20261015": "ef5bd23246a75b02a0df60302263f971de061843",
+    "experiment/shared-conversation-history-v1-20261015": "2ae90d70ff143c8de935f25ec12f291e9b82613a",
+    "feature/proactive-derived-tags": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+    "fix/anonymous-chat-session-drop": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+    "fix/anonymous-email-history": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+    "fix/anonymous-session-cache-reset": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+    "fix/body-clock-claim-rpc": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+    "fix/chat-failure-recovery": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+    "fix/chat-network-reliability": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a",
+    "fix/chat-reliability-cleanup": "a06baac8110ded425c07e2122117e89460868405",
+    "fix/chat-request-diagnostics": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+    "fix/chat-turn-dedupe": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5",
+    "fix/expired-temporary-relationship-import": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+    "fix/gemini-chat-timeout": "469578ea12663c594a32c62a05263b23e7190891",
+    "fix/gemini-json-retry": "f93a9444565ce1029cd46c0d466456f651ee7c9e",
+    "fix/grow-relationship-from-first-meeting": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+    "fix/legacy-safari-cache": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+    "fix/preserve-active-chat-history": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+    "fix/recall-history-grounding": "475410541b700562e0f535484cb3fd02d9f76b1a",
+    "fix/recall-keep-recent-history": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+    "fix/relationship-analyzer-bounded-retry": "90ac90bba86f716ccf46e50542097d1b81e23702",
+    "fix/safari-load-failed-message": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+    "fix/safari-load-failed-ui": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab",
+    "fix/use-chat-proxy": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+    "fix/workday-grounding": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+    "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+    "perf/chat-stage-timing": "ead9d6283b68579f6014e07bef46add2a41fb791",
+    "refine/proactive-action-tags": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+    "refine/sleepy-tag": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+    "sora/anonymous-history-get-noop": "368afb0dfbf9ea66837c83834d8fc24837813554",
+    "sora/canonical-relationship-integration": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+    "sora/cutover-cleanup": "f5424c06c92b3f51535dd44ec54ef0a25f790370",
+    "sora/drop-ungrounded-relationship-evidence": "ae0df66929f62bb804b37c35eebabb7e8c66b696",
+    "sora/fix-relationship-polarity-transport": "66bec2792d571c697aa891ff0142e78f4941456e",
+    "sora/fix-waiting-reply-layout": "f3a613291569a60e471065372135cbee07373702",
+    "sora/gemini-timeout-retry": "862cfa6c2ce6e45b7ccbc294270f3ba02548ed2a",
+    "sora/gemini-transient-retry": "0c77bad036d4bef73c82983c3ae3f800943a1ee5",
+    "sora/history-edge-trace": "e3a08db0c3dc97b297130a224919e73a69974c60",
+    "sora/history-get-trace": "524596dedf44806da95c8d84e2096f2a5411440d",
+    "sora/history-sync-source-proof": "850e2acccef3722fc487dd17df687056b3b58911",
+    "sora/lp-pwa-mobile-layout": "f65c3b2e56478634861e27193fbb5913ebfb84cb",
+    "sora/lp-relationship-story": "9bfa0760f56b3d1c3bf6d07af056410afde975ec",
+    "sora/misaki-acting-lab": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+    "sora/profile-aware-life-events": "610e50b6cd4d63ccdfcfd5aaf57516bb016468bb",
+    "sora/relationship-analyzer-stage-diagnostics": "0907d2ff24f6a584c032ece54f9289954ccbeb63",
+    "sora/relationship-analyzer-structured-output-hotfix": "319865a5f9351899ef260754aaad2604623552d5",
+    "sora/relationship-control-rpcs-v1": "e6bf2bc75aa5dd87e520724e5dbf3f4a5f0f6578",
+    "sora/relationship-evidence-validation-diagnostics": "b8607f3e92fde63fbc37dab85a30d9945c8ad649",
+    "sora/relationship-processing-error-diagnostics": "867e227b7d2efb31c214d248e94b26e390e9f845",
+    "sora/relationship-time-v2-design": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64",
+    "sora/remove-false-busy-wait": "1b77372a7e385a58f127d259a99e05e60cb8deb6",
+    "sora/remove-relationship-stage-diagnostics": "d41e673420637cd644587c5db42c38d432fd2e74",
+    "sora/remove-relationship-temporary-diagnostics": "e4f870f0ab76271daee76882fbd1b3fefae3a9bb",
+    "sora/remove-timestamp-history-poll": "829ee4671443140386043396ffb70c0a8a8daaae",
+    "sora/sync-free-usage-with-history": "f67b388e965bb9bfb3f8d6820fd62e9d273123b6",
+    "sora/update-overview-relationship-v1-production": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2",
+    "test/relationship-acting-state-comparison": "fd714bd8a82a4a48c9f33b368c35498aec6e65b5",
+    "work/ab-20-pair-dispatch": "f3b98d03475fdcc012a07de669cc628911e32239",
+    "work/ab-blind-review-artifact-workflow": "648e07cef9831c2d276b3cb2754ce49d53d2e27e",
+    "work/ab-http-diagnostics-dispatch": "76f066c05653374826f42c9ee1578719da975e2e",
+    "work/ab-long-fixture-dispatch": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+    "work/ab-manual-workflow-only": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+    "work/ab-paced-dispatch": "266c6a1ce74bc6ba0889e41590004854386fab31",
+    "work/ab-quality-diagnostics-workflow": "ab805d88148c6880238918e858ca5261564c1bdc",
+    "work/ab-quality-manual-workflow": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743",
+    "work/ab-quality-reply-schema-dispatch": "82848c976ef0f1602d4dc3f7c9556a91145f93a5",
+    "work/context-no-duplicate-replies-ab": "a849bec92059d326940ffc358635164ea7d391c9",
+    "work/conversation-context-compression-spike": "10275b666387115ced06312570111b21d0276e17",
+    "work/forget-control-v1": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+    "work/gemini-unit-cost-telemetry": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035",
+    "work/quality-long-history-workflow": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+    "work/relationship-analyzer-diagnostics": "42177230a0a3c8926689499ffb19de4f1044d8d7",
+    "work/relationship-engine-v1": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a",
+    "work/relationship-error-diagnostics": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+    "work/relationship-identity-v1": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4",
+    "work/relationship-polarity-integer": "68a2aebb98e5f800f7a6d334c815c2a7841b2873"
+  },
+  "remote_head_changes_since_66": [
+    {
+      "branch": "docs/development-registry-audit-20261020",
+      "previous": "2efc394c4c06b952545dda07fd590a094e7b42a8",
+      "current": "57be547b532e57fa1574e93e61df28f91d5deb7c"
+    }
+  ],
+  "audit_branch_snapshots": [
+    {
+      "ref": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "paths": [
+        {
+          "status": "A",
+          "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+          "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+          "sha256": "8ab4e6c7266bb4f0d19a16b113088abfec1158dccb74494c7c30909b100b3350",
+          "bytes": 5779
+        },
+        {
+          "status": "A",
+          "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+          "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+          "sha256": "9107e4cb3b5c3811db3f78f5f08887d8d2602eb707e6e1b1450accd9387b313c",
+          "bytes": 15809
+        },
+        {
+          "status": "A",
+          "path": "docs/DEVELOPMENT_REGISTRY.md",
+          "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+          "sha256": "d8047f30b7b8be0df512af0222e6abd6560aaf64d78d162de5cbd8217ef92388",
+          "bytes": 150333
+        },
+        {
+          "status": "A",
+          "path": "docs/MISAKI_CHAT_HANDOFF_20261021.md",
+          "blob": "5d3b44267c489de0b225020b37b50959f2cfe75e",
+          "sha256": "4069afe971b6d9fb3ebcbb4004b1edd27b2edf859aa09ac6f571f57dda8b14ca",
+          "bytes": 5528
+        },
+        {
+          "status": "A",
+          "path": "docs/MISAKI_SYSTEM_VISION_20261021.md",
+          "blob": "572f96e6a291133b4ca246825b262d0ebfbf9c93",
+          "sha256": "91e9c815ae2abaf1d5c0ab50a56df6f7d88897706c2070d6cb56d4e852ae1af3",
+          "bytes": 8804
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/01_BRANCHES.md",
+          "blob": "6e75de51bc26fd0637732fc8274fc82d00af7b4c",
+          "sha256": "73d8af83586080abcfac8cc83d00fccc2b6769b63f9e5384aae955a0db21c815",
+          "bytes": 25090
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/02_DOCUMENTS.md",
+          "blob": "b5a10a9e5c0b0403fc7d2dfa6b147246215f390a",
+          "sha256": "6a5a8a74d80f9bfaf5722a1234f9f37040190af4ac66874b8a4dc71beb1c637e",
+          "bytes": 105755
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/03_UNREFLECTED_RESULTS.md",
+          "blob": "1ac6ef06513eeb37e625f3622885b35398c03d1f",
+          "sha256": "e428b51283b31340c636cda9fc5a67168cd865e8571d0bf51f92e990c5e7ca63",
+          "bytes": 7138
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/04_DESIGN_HISTORY.md",
+          "blob": "8b0ee046dd8c2df9d063a0958ad99a2276b47592",
+          "sha256": "0f29bcf1b97a2aa8e8ba4583b75cc668e765b10a29a01a8991b0d0135845e37f",
+          "bytes": 5034
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/05_VISION_ALIGNMENT.md",
+          "blob": "e73292ada9852a637feff5971658efc701effecf",
+          "sha256": "86528dd6ab3d0400305ffcea8d144d30e031068161d39adbbdfdad5ce0de1eae",
+          "bytes": 4611
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/06_PRIORITIES.md",
+          "blob": "a5b27d71dd0e64e6b8deef44a5b489f3f99c2ac3",
+          "sha256": "7af19c41a66a12f11108bb57bc104435f4aeec0ff66ce807fcfdf79fb28bd57b",
+          "bytes": 5543
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/07_AUDIT_STATUS.md",
+          "blob": "d271ae50a1970395ec5394e69eda67fc775e2afe",
+          "sha256": "180aad18beaf7c32303efdfc9929478efdfa68cf8c18d62a486b89a9e8dc536c",
+          "bytes": 6451
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/08_LEGACY_UNDOCUMENTED_CHANGE.md",
+          "blob": "a7085c2fbd5f43217d5921af8b904d44cf7a77d4",
+          "sha256": "66c8309bea078ac3956e2a9786408bbb24033fbce7c9ab97417a0025cd08e8b9",
+          "bytes": 3591
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/README.md",
+          "blob": "6b3435f32eb2bb00d931fce0f32492159f97b1e1",
+          "sha256": "196fe3e2d26d6fd96a1f7a3c5986a29f78d3fdd2ff677d21a60a7ed1cdc0bc26",
+          "bytes": 2715
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/evidence.zip",
+          "blob": "2479a8dace0b2d6fbdd702c33382b7f4c7c92362",
+          "sha256": "b93d643f87890932c75c9faf178d395c73e1cc2706b10e0b0be31e2aa5b34f09",
+          "bytes": 1631749
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/legacy-latest-commit.json",
+          "blob": "2d763efa19bd8cd938490ef0cdf36b05f078e925",
+          "sha256": "5d3a6a74e42362942ae10bd9e999d4e936cec45803475158ebdade484258fc3b",
+          "bytes": 6144
+        }
+      ]
+    },
+    {
+      "ref": "57be547b532e57fa1574e93e61df28f91d5deb7c",
+      "paths": [
+        {
+          "status": "A",
+          "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+          "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+          "sha256": "8ab4e6c7266bb4f0d19a16b113088abfec1158dccb74494c7c30909b100b3350",
+          "bytes": 5779
+        },
+        {
+          "status": "A",
+          "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+          "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+          "sha256": "9107e4cb3b5c3811db3f78f5f08887d8d2602eb707e6e1b1450accd9387b313c",
+          "bytes": 15809
+        },
+        {
+          "status": "A",
+          "path": "docs/DEVELOPMENT_REGISTRY.md",
+          "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+          "sha256": "d8047f30b7b8be0df512af0222e6abd6560aaf64d78d162de5cbd8217ef92388",
+          "bytes": 150333
+        },
+        {
+          "status": "A",
+          "path": "docs/MISAKI_CHAT_HANDOFF_20261021.md",
+          "blob": "5d3b44267c489de0b225020b37b50959f2cfe75e",
+          "sha256": "4069afe971b6d9fb3ebcbb4004b1edd27b2edf859aa09ac6f571f57dda8b14ca",
+          "bytes": 5528
+        },
+        {
+          "status": "A",
+          "path": "docs/MISAKI_SYSTEM_VISION_20261021.md",
+          "blob": "572f96e6a291133b4ca246825b262d0ebfbf9c93",
+          "sha256": "91e9c815ae2abaf1d5c0ab50a56df6f7d88897706c2070d6cb56d4e852ae1af3",
+          "bytes": 8804
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/01_BRANCHES.md",
+          "blob": "6e75de51bc26fd0637732fc8274fc82d00af7b4c",
+          "sha256": "73d8af83586080abcfac8cc83d00fccc2b6769b63f9e5384aae955a0db21c815",
+          "bytes": 25090
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/02_DOCUMENTS.md",
+          "blob": "b5a10a9e5c0b0403fc7d2dfa6b147246215f390a",
+          "sha256": "6a5a8a74d80f9bfaf5722a1234f9f37040190af4ac66874b8a4dc71beb1c637e",
+          "bytes": 105755
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/03_UNREFLECTED_RESULTS.md",
+          "blob": "1ac6ef06513eeb37e625f3622885b35398c03d1f",
+          "sha256": "e428b51283b31340c636cda9fc5a67168cd865e8571d0bf51f92e990c5e7ca63",
+          "bytes": 7138
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/04_DESIGN_HISTORY.md",
+          "blob": "8b0ee046dd8c2df9d063a0958ad99a2276b47592",
+          "sha256": "0f29bcf1b97a2aa8e8ba4583b75cc668e765b10a29a01a8991b0d0135845e37f",
+          "bytes": 5034
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/05_VISION_ALIGNMENT.md",
+          "blob": "e73292ada9852a637feff5971658efc701effecf",
+          "sha256": "86528dd6ab3d0400305ffcea8d144d30e031068161d39adbbdfdad5ce0de1eae",
+          "bytes": 4611
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/06_PRIORITIES.md",
+          "blob": "a5b27d71dd0e64e6b8deef44a5b489f3f99c2ac3",
+          "sha256": "7af19c41a66a12f11108bb57bc104435f4aeec0ff66ce807fcfdf79fb28bd57b",
+          "bytes": 5543
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/07_AUDIT_STATUS.md",
+          "blob": "d271ae50a1970395ec5394e69eda67fc775e2afe",
+          "sha256": "180aad18beaf7c32303efdfc9929478efdfa68cf8c18d62a486b89a9e8dc536c",
+          "bytes": 6451
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/08_LEGACY_UNDOCUMENTED_CHANGE.md",
+          "blob": "a7085c2fbd5f43217d5921af8b904d44cf7a77d4",
+          "sha256": "66c8309bea078ac3956e2a9786408bbb24033fbce7c9ab97417a0025cd08e8b9",
+          "bytes": 3591
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/09_ASSET_CLASSIFICATIONS.md",
+          "blob": "024fbee0e9012471c139bd0647399200cd5e0ebd",
+          "sha256": "e534dccf8dd4d9d2490b145988bb822784ff9a05ca60536b470def71a20ccdfa",
+          "bytes": 53095
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/09_BRANCH_CLASSIFICATIONS.json",
+          "blob": "84d431e9face8d9aede612ee94990ce2efd63bc7",
+          "sha256": "02a09434c209f92711851350b8e1e327bcd5534e0fd3222e01ba120c5a4e3326",
+          "bytes": 96081
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/09_CLASSIFICATION_COVERAGE.json",
+          "blob": "d83e6bda50231e1c267acfd563ec54bc3132ab14",
+          "sha256": "ea538e45b165332a7104ea270d5bf52530537c1a4e76322bf034170ddfaf7d80",
+          "bytes": 1014
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/09_DOCUMENT_CLASSIFICATIONS.json",
+          "blob": "d1c387d1a6978003ed09a871411e5c3971b24e64",
+          "sha256": "f014c9ed51bf256115ad596b5d2e8668b7124aaf573a2c6cfb3b98be1aecad82",
+          "bytes": 97541
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/09_PR_CLASSIFICATIONS.json",
+          "blob": "7c4779a23cc39e7fa8ff91d2a18e8be849136d50",
+          "sha256": "1e3164733bc2bdd2afb71250a409c88fec4b73094d33337388d83aa59a57889f",
+          "bytes": 66241
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/10_LEGACY_SAFETY_MATRIX.md",
+          "blob": "93e176401775bb57aaa623b94883a2a11bf2c5d3",
+          "sha256": "41f778320c5b8b50872fd0f75a76b8fb4a6dca350e25d52a247d5c6f74d8799d",
+          "bytes": 6237
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/11_RECOVERY_AND_IDEAS.md",
+          "blob": "b89b3005f70d0e9a3a4a333392d90348c2b3d28f",
+          "sha256": "09cbd187e07fae0c0b19b7732dc140ef023bd86141014100e6817a516bb494d9",
+          "bytes": 8879
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/12_REVIEW_PROGRESS.md",
+          "blob": "7c7b684c0f240a4f9de996ce087d993ff33c48f3",
+          "sha256": "ce385c93e12d4929b97bbc26ab21e33f9c2692c82890c2ddca6675aacc49cb7f",
+          "bytes": 3979
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/13_DOCUMENT_REVIEW_ROUND2.md",
+          "blob": "72e64123b4d4899da0f6d0dd62cf0123cc313e02",
+          "sha256": "0cb5542cb5f67b3620d91ede33834a80853bb3d4ef3de4ec1c18e5a51cfdbc4c",
+          "bytes": 13257
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/14_BRANCH_RECONCILIATION_ROUND2.md",
+          "blob": "603a21ffc5c9e19a934511b3efb43f2085e05ac9",
+          "sha256": "0cea1428fec8ee1db027bd665e7d3de6df318b0c3c6e9dea57b247c3d5b41622",
+          "bytes": 6048
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/15_RECOVERY_SAFETY_PRIORITIES_ROUND2.md",
+          "blob": "f0b25ceeef2f3f05920f3953281d90ed90e3f4ed",
+          "sha256": "458a0d5876b31d8393cb59843d661d2020c755a6ce2d1f08be81f9463e9179d7",
+          "bytes": 10623
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/16_REVIEW_PROGRESS_ROUND2.md",
+          "blob": "2d1f2f0f4a3235ca37b63d3ed15d4d3b0018813e",
+          "sha256": "b439e42c4d14ed86e0bb19ceb4a6c0940a332f426f1cb4b6706b05348b7afa96",
+          "bytes": 4416
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/17_ROUND2_LEDGER.json",
+          "blob": "ce753e60956bc65cfc765ed1cd2d4d2e0a71f7b0",
+          "sha256": "02fc74d75f5891813fddbda98c9c0ba95934353bcc6a374e4c7ebf7c9241cb9b",
+          "bytes": 123646
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/18_PINNED_RUNNER_EVIDENCE.json",
+          "blob": "af385f465e946537464698742099aa49d548c09e",
+          "sha256": "9a9ebe05584621d36d6e99c27d92ffbf17b374c0f6e4e9d6672dbffa66ba130a",
+          "bytes": 17388
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/19_MEMORY_FORGET_IDENTITY_ROUND3.md",
+          "blob": "4e230bf7557d7378f3ef03cab48d9d47df14e901",
+          "sha256": "0d5054334ba97a362b774fd4d011e0ee46617a4bd3e845f147959227b6bb5b9f",
+          "bytes": 9709
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/20_LAB_QUALITY_BASELINE_ROUND3.md",
+          "blob": "8cf83829263c12b5d4439d6a4dbec5a6a6ccfd0a",
+          "sha256": "1aaaf1a4c878d45730817cfa455253cfd2152a3a858d7f11f43c41dc46d6b142",
+          "bytes": 5624
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/21_SHARED_ENGINE_PARITY_ROUND3.md",
+          "blob": "96e7d4133f00889f2a0adeb45112789a11bd0cd6",
+          "sha256": "a90ec267551a353b4bc81a0e482d7f105ea2beb0b15fa3d85e739b6eba2e54d2",
+          "bytes": 5228
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/22_DOCUMENT_REVIEW_ROUND3.md",
+          "blob": "6f01acccd3d16bcdfafaaac492b9c445c36fb4ea",
+          "sha256": "f22d6c23548bb28bd62d71ad421f574ccee4bce8f0acc2b65644eb83d7f07ba1",
+          "bytes": 5244
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/23_BRANCH_ASSET_SAFETY_ROUND3.md",
+          "blob": "46188382e29edec5ddcdd5b4dba76eda6eebd456",
+          "sha256": "8ebf716f3dcbf7a9fa9689f76c2e2c104c32847e96532e1106243f3d96e003de",
+          "bytes": 5246
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/24_ROUND3_LEDGER.json",
+          "blob": "e5561b6bd9aa5e2b53bead76cbb5155fcf57e753",
+          "sha256": "7388de5a2c5af36cd946e68a4282499e6d60344318ab8cb30132f107592202c2",
+          "bytes": 27059
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/25_ROUND3_SOURCE_EVIDENCE.json",
+          "blob": "a205bede872a2cd67984cbb61e293684af5bf90a",
+          "sha256": "21b8e1d13a3eac8ecaeab9c835101c85d3d016605a9d32611dada34cb22ca798",
+          "bytes": 75185
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/26_ROUND3_PR_SNAPSHOT.json",
+          "blob": "5120d5db79aed50eb5255d6eb58b60781c3dec69",
+          "sha256": "689fc39c0ce39d21b3d9d4c1f36ab676d0b6f091725b3973c5c9cf2ad643024b",
+          "bytes": 14371
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/27_REVIEW_PROGRESS_ROUND3.md",
+          "blob": "de7ea970b681ec3fd7819e14750933a700221896",
+          "sha256": "b472614eee42b844278b21a25be0e7b5e0b422778dc5d2791844cba52284ec19",
+          "bytes": 4774
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/28_FORGET_ALL_PATHS_ROUND4.md",
+          "blob": "4d2da1735504b6fc755e586b3b047d5bb4ad6997",
+          "sha256": "6fca1baf521b86a324fc489f31cc03012a29aa0cbcc1cec51e88071ea5c6ed37",
+          "bytes": 5957
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/29_RELATIONSHIP_WORKER_ROUND4.md",
+          "blob": "68972eac0176260a8ecebe6f7aba32751ceff7ff",
+          "sha256": "f58497a1392a61b386c010926ea1aabb4e86698e01cf44f01a6bfabbce16f3fd",
+          "bytes": 4237
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/30_PERSONA_BODY_CLOCK_CACHE_ROUND4.md",
+          "blob": "16ae74eae68df2c29babbcd1d1e4e46a95d78820",
+          "sha256": "690bd3a77fab0cfe5857b0dc51f1e79909fd6c48ff11cc7514856714aaa46b51",
+          "bytes": 5749
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/31_SQL_FINAL_DEFINITIONS_ROUND4.md",
+          "blob": "12e85cda87d162215899f555214800e795e8a57b",
+          "sha256": "634be2a110663d5f1481c1f4fb97ea87aa5ceee65d06508ce29d929618a28534",
+          "bytes": 3902
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/32_MEMORY_HISTORY_DECISIONS_ROUND4.md",
+          "blob": "a476f43033d250ca89c1784369006349316ff064",
+          "sha256": "04efada5748781f61ddca2de511a3cda244411ddcfc2cd07f5e4be8b512e53cf",
+          "bytes": 5416
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/33_DOCUMENT_BRANCH_REVIEW_ROUND4.md",
+          "blob": "a2ed73fe1a82a24c64909fe9ed7ba4992cd3dcb0",
+          "sha256": "fc475f04e010af803a774c451b6b37f5939c5c34222a21873b95aaea3c81847d",
+          "bytes": 3596
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/34_ROUND4_LEDGER.json",
+          "blob": "f1645ed357c3c7afa44b349a35ed0e299f0359b1",
+          "sha256": "f4937498f066d7edec5ac9b314410627483f0e921ed7e9721b0bce7b4709e269",
+          "bytes": 17296
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/35_ROUND4_SOURCE_EVIDENCE.json",
+          "blob": "bfaefb4b8fcf929e38a9d1284b27f7cd6979836b",
+          "sha256": "339bf59f0284d1b4be8af3c1042ef56f609ecd2d41c662be15ba9833bdbce4b4",
+          "bytes": 221829
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/36_ROUND4_FIXED_SOURCES.json",
+          "blob": "d17611f87d350b49ba85213589cc775e2a17273c",
+          "sha256": "4d2cc53481f1d035a54eb21a1184109f95eaa45f97224e841825aaf390e540cb",
+          "bytes": 487737
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/37_REVIEW_PROGRESS_ROUND4.md",
+          "blob": "a71e742281d8313de2df3f128f171a4f8a08039c",
+          "sha256": "99af269c8266da00f5c83b152269d5c56f6a03096e382dc7de3aa22a092a3747",
+          "bytes": 2990
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/38_SORA_HANDOFF_FORGET_RACE_TEST_CONTRACT.md",
+          "blob": "c19645f344a08b5c2fd10e4fa26230c4aceff5ef",
+          "sha256": "b25af32461bf6eaf214a31e675941d592978e26e803626a971faccd450a93638",
+          "bytes": 7183
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/39_SORA_SOURCE_RECHECK_ROUND5_PARTIAL.md",
+          "blob": "b8266d7d3c775723dc989db86cd27f4395cecef7",
+          "sha256": "f0cf7f797eb230b2ab664001a78758992fea6659ef6e5c410932d1930c82d694",
+          "bytes": 4527
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/40_SORA_RELATIONSHIP_WORKER_RPC_RECHECK.md",
+          "blob": "23988bd5057f5f8c5abf046147fca9adaf3d773c",
+          "sha256": "8938e238681dc4ba20e88c3cdebec98f90f26a039ea9210c506f910fb0266669",
+          "bytes": 5528
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/41_SORA_FORGET_SQL_WORKER_COMPATIBILITY.md",
+          "blob": "5eeb194c54787eeb2938d06af90081a9c3a933c1",
+          "sha256": "5e51c50817dfaeed931871008eca1ade2b64c054fc7dc2b57896a90b635122a7",
+          "bytes": 6367
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/42_SORA_FORGET_CONTROL_READERS_AND_GAPS.md",
+          "blob": "0d2fb936832a98d9a523b884ca181a9938fdebf3",
+          "sha256": "73e339b2d789d15c57dc49f26b5adcab124a98158454b4887fa5593cd74b8a3c",
+          "bytes": 8548
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/43_SORA_BROWSER_STALE_RESPONSE_REVIEW.md",
+          "blob": "b785c5269f2fe7bf168659c1f4d0523266f8a78b",
+          "sha256": "2f5ea5ebe0d76d2c3307f75765235f009d2f91114e959b6168c011f66c09c107",
+          "bytes": 6803
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/44_SORA_BROWSER_SERVER_FORGET_CONSISTENCY.md",
+          "blob": "d856dfed0f99fee63adb3161d766aebcfddd5eb8",
+          "sha256": "08b9710d5f518feff86e333997be94192ebc2a993adf8e6086a041e2f3ae6a53",
+          "bytes": 7486
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/45_SORA_CROSS_PATH_FORGET_SAFETY_CONTRACT_DRAFT.md",
+          "blob": "5e020c6afcd500b8c24660d1da8ade149fd8c939",
+          "sha256": "cd8005064c655bea57c016b3bd9af5e1371813d3da16caf0affd77e34e926e6e",
+          "bytes": 8883
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/46_SORA_DOCUMENT_FULL_REVIEW_ROUND5.md",
+          "blob": "60ba453d36f93ae9ebebdfaa2a4d1ac5e2234311",
+          "sha256": "c93ba8fd935c2c7278d41fad29479d6310b69e85cbb628075a3d551f169119e1",
+          "bytes": 6238
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/47_SORA_ROUND5_DOCUMENT_LEDGER.json",
+          "blob": "6a573f064cfa443ce3b49cadd737d3eaf1bc27f3",
+          "sha256": "5f054dfe2371f930aa869cac1481f718bebb260ee163320b1326b012e4a4e92d",
+          "bytes": 1529
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/48_SORA_CONTEXT_AB_DOCUMENT_REVIEW.md",
+          "blob": "6a9832fdcac9de5a1d50eac6235ad27acb111caa",
+          "sha256": "4e406160ede2c46ace109de93b4d25e011e52d398d94b31ccf1f39eab668e132",
+          "bytes": 5968
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/49_SORA_ROUND5_DOCUMENT_LEDGER_V2.json",
+          "blob": "d399f40b97b3d3e357b14a34b852259deed4efa8",
+          "sha256": "9c0c8d613b323cbc460fc704f8d94dbecf92505628628e6d1dedb6cc27e1e79c",
+          "bytes": 1440
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/50_SORA_RELATIONSHIP_DESIGN_DOCUMENT_REVIEW.md",
+          "blob": "43cdd3dfc0322588d02ded817021f024f311421f",
+          "sha256": "6c4caf97eeef85f1857903e5672a5541531c1642133adc55860185442937f2ba",
+          "bytes": 6058
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/51_SORA_ROUND5_DOCUMENT_LEDGER_V3.json",
+          "blob": "9a6c2cd318c62444682ab435deeb09475af4e006",
+          "sha256": "9befa6239bda25b76ee12a4c43066c31ca8b4533a1a9ae940e5392ecec73cc05",
+          "bytes": 1517
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/52_SORA_MULTI_CHARACTER_PHASE0_TWO_VERSIONS.md",
+          "blob": "dae8458646fed28090c009ccb47820c22a29e42c",
+          "sha256": "68f104a38a90d8c8ce040e887410cd2ba8cfba5aa6c243c06d57d3c205b473d8",
+          "bytes": 8615
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/53_SORA_ROUND5_DOCUMENT_LEDGER_V4.json",
+          "blob": "d3379bd9a077e786296a5caaa69cf6341219dc16",
+          "sha256": "5b82b471fc27060e4e952b4c7aade30ec68f7219b11da72e1d1d7b52b69ce256",
+          "bytes": 1346
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/54_SORA_HANDOFF_MEMORY_CERTAINTY_QUALITY_DOCS.md",
+          "blob": "76ce51b5d14fb5f26868c57d79327dbbd560b1f6",
+          "sha256": "ad2afd485c5875dddab3c539ae9902ad908b1228248684323ff98b0c21513f40",
+          "bytes": 8196
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/55_SORA_ROUND5_DOCUMENT_LEDGER_V5.json",
+          "blob": "393e8a3e290a937be55a794d9efb5c9b53f9a865",
+          "sha256": "3ffdcbbfdff39f013ed6e48e9dc13b392f8b17f7dce221b77817b0e717448e7b",
+          "bytes": 1494
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/56_DOCUMENT_REVIEW_WORK_RESUMED_ROUND5.md",
+          "blob": "247d3b35e3c37122c6c4a3d5e30e39cc595f9da1",
+          "sha256": "475f962c397975979ade87e38b50a909da14451ed6d238bb46492304f8947b91",
+          "bytes": 9060
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/57_BRANCH_RECONCILIATION_WORK_RESUMED_ROUND5.md",
+          "blob": "72e89d7afecf0931121304b3b51f7cf1ecc66fa5",
+          "sha256": "37675488830862a4a5d3c12a6ccecb86a9d8002dbc06d0ca01c95bf55311c28e",
+          "bytes": 6101
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/58_DERIVED_USE_EXPIRY_CONTRACT_ROUND5.md",
+          "blob": "4013aeb178cea5543b27a6e1789c414573350528",
+          "sha256": "3615dbc3de5567fdacaeac492ff1dc39faec214e437e5fb49cd1acfb6138c7b9",
+          "bytes": 10473
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/59_INDEPENDENT_ORACLE_TEST_PLAN_ROUND5.md",
+          "blob": "56a58e303141ac41635ea32db4558cb5cba7747d",
+          "sha256": "96a371a613172d8574c40c92861c9abe1c14795bdf765101d434ba1f9e9198d1",
+          "bytes": 10627
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/60_FIXED_SOURCE_AND_LINEAGE_EVIDENCE_ROUND5.json",
+          "blob": "485e7c1c11d37bc80482aa91121fa11d5a50d482",
+          "sha256": "78d497bce122df88da28f27c0fb56b68f90af39b1c996b36ced99a9a04e1da74",
+          "bytes": 173741
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/61_ROUND5_RESUMED_LEDGER.json",
+          "blob": "f8f50f0d094f9c644f8c6ef3650946fa043181ae",
+          "sha256": "b14567b1327d296951584795dcd31c8d37961b8b33b8287c7b5383511459d46d",
+          "bytes": 15515
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/62_REVIEW_PROGRESS_WORK_RESUMED_ROUND5.md",
+          "blob": "5622ed6f5c7a837e25ddb4d941e9a59e6f2bd852",
+          "sha256": "c0ca62d0a387f622a60073cc0eeb61e2af0ae6600e6a98a23267c6de6feba567",
+          "bytes": 6756
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+          "blob": "c9b07c8a73223f4a963df7bfce0809ab7455ac37",
+          "sha256": "2ac9573e205a3045c1da5cc88ba575b37700ba186d712c1a46434b8f1a9bd72d",
+          "bytes": 8050
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+          "blob": "55050e889ec0b94cc41bbdde36768f46657b64a8",
+          "sha256": "2ebfaaff3b169d58b5034a39d568f67b9a62df82d1ae6e7beca213ae7146826c",
+          "bytes": 10848
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/65_IDEAS_RECOVERY_AND_DEVELOPMENT_GATES_ROUND5.md",
+          "blob": "0d15143141588b8d2c44e5c561be1e7616032d67",
+          "sha256": "dfbf5d35b9ae2e138a7f891f014a4bdf7c3c0a926a8a2838d85284752c064b3a",
+          "bytes": 8169
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/66_CONTINUATION_SOURCE_INDEX_ROUND5.json",
+          "blob": "9a27e12c344628fe27f0dc7c3c1f1eebe3e8757e",
+          "sha256": "513313248bd58591bcfd54daf8ce0700326038b00810256df49af9945b269b42",
+          "bytes": 86071
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/67_CONTINUATION_FIXED_EVIDENCE_ROUND5.zip",
+          "blob": "1cc7d38b337927211d4627fc3c3d61b9e809fa08",
+          "sha256": "294cb622ff11cf3a2a4315f7f0b99bb8d0df8a50542f86a87e0ccf3d932b2e52",
+          "bytes": 295593
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/68_ROUND5_CONTINUATION_LEDGER.json",
+          "blob": "995742ec2ab1120868ec9489c5e10e0f99a41ff0",
+          "sha256": "df10c10c299469143392ffa5cccc2f050dc48c91689d4fc9264a74adf7ac50c9",
+          "bytes": 41864
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/69_ROUND5_PROGRESS_AND_ROUND6_READINESS.md",
+          "blob": "afbcf28ba36edc523941a4e845c0212e097cc473",
+          "sha256": "d5a2f0fda88bd0978c0a5da5aa4394b0c07ec59829a97f3ca2954e2cf2b9f254",
+          "bytes": 6225
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/README.md",
+          "blob": "9217adc4a867ee638f4d38d04f9c69e91a3281c8",
+          "sha256": "e3b6a08e7a48c639f08f87ebefc86324432060f0c546a1448c53e08f37e2da60",
+          "bytes": 8157
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/evidence.zip",
+          "blob": "2479a8dace0b2d6fbdd702c33382b7f4c7c92362",
+          "sha256": "b93d643f87890932c75c9faf178d395c73e1cc2706b10e0b0be31e2aa5b34f09",
+          "bytes": 1631749
+        },
+        {
+          "status": "A",
+          "path": "docs/audits/20261021-work-all-assets/legacy-latest-commit.json",
+          "blob": "2d763efa19bd8cd938490ef0cdf36b05f078e925",
+          "sha256": "5d3a6a74e42362942ae10bd9e999d4e936cec45803475158ebdade484258fc3b",
+          "bytes": 6144
+        }
+      ]
+    }
+  ],
+  "inherited_01_to_69_and_other_prior_paths": [
+    {
+      "status": "A",
+      "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+      "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+      "sha256": "8ab4e6c7266bb4f0d19a16b113088abfec1158dccb74494c7c30909b100b3350",
+      "bytes": 5779
+    },
+    {
+      "status": "A",
+      "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+      "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+      "sha256": "9107e4cb3b5c3811db3f78f5f08887d8d2602eb707e6e1b1450accd9387b313c",
+      "bytes": 15809
+    },
+    {
+      "status": "A",
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+      "sha256": "d8047f30b7b8be0df512af0222e6abd6560aaf64d78d162de5cbd8217ef92388",
+      "bytes": 150333
+    },
+    {
+      "status": "A",
+      "path": "docs/MISAKI_CHAT_HANDOFF_20261021.md",
+      "blob": "5d3b44267c489de0b225020b37b50959f2cfe75e",
+      "sha256": "4069afe971b6d9fb3ebcbb4004b1edd27b2edf859aa09ac6f571f57dda8b14ca",
+      "bytes": 5528
+    },
+    {
+      "status": "A",
+      "path": "docs/MISAKI_SYSTEM_VISION_20261021.md",
+      "blob": "572f96e6a291133b4ca246825b262d0ebfbf9c93",
+      "sha256": "91e9c815ae2abaf1d5c0ab50a56df6f7d88897706c2070d6cb56d4e852ae1af3",
+      "bytes": 8804
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/01_BRANCHES.md",
+      "blob": "6e75de51bc26fd0637732fc8274fc82d00af7b4c",
+      "sha256": "73d8af83586080abcfac8cc83d00fccc2b6769b63f9e5384aae955a0db21c815",
+      "bytes": 25090
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/02_DOCUMENTS.md",
+      "blob": "b5a10a9e5c0b0403fc7d2dfa6b147246215f390a",
+      "sha256": "6a5a8a74d80f9bfaf5722a1234f9f37040190af4ac66874b8a4dc71beb1c637e",
+      "bytes": 105755
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/03_UNREFLECTED_RESULTS.md",
+      "blob": "1ac6ef06513eeb37e625f3622885b35398c03d1f",
+      "sha256": "e428b51283b31340c636cda9fc5a67168cd865e8571d0bf51f92e990c5e7ca63",
+      "bytes": 7138
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/04_DESIGN_HISTORY.md",
+      "blob": "8b0ee046dd8c2df9d063a0958ad99a2276b47592",
+      "sha256": "0f29bcf1b97a2aa8e8ba4583b75cc668e765b10a29a01a8991b0d0135845e37f",
+      "bytes": 5034
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/05_VISION_ALIGNMENT.md",
+      "blob": "e73292ada9852a637feff5971658efc701effecf",
+      "sha256": "86528dd6ab3d0400305ffcea8d144d30e031068161d39adbbdfdad5ce0de1eae",
+      "bytes": 4611
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/06_PRIORITIES.md",
+      "blob": "a5b27d71dd0e64e6b8deef44a5b489f3f99c2ac3",
+      "sha256": "7af19c41a66a12f11108bb57bc104435f4aeec0ff66ce807fcfdf79fb28bd57b",
+      "bytes": 5543
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/07_AUDIT_STATUS.md",
+      "blob": "d271ae50a1970395ec5394e69eda67fc775e2afe",
+      "sha256": "180aad18beaf7c32303efdfc9929478efdfa68cf8c18d62a486b89a9e8dc536c",
+      "bytes": 6451
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/08_LEGACY_UNDOCUMENTED_CHANGE.md",
+      "blob": "a7085c2fbd5f43217d5921af8b904d44cf7a77d4",
+      "sha256": "66c8309bea078ac3956e2a9786408bbb24033fbce7c9ab97417a0025cd08e8b9",
+      "bytes": 3591
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/09_ASSET_CLASSIFICATIONS.md",
+      "blob": "024fbee0e9012471c139bd0647399200cd5e0ebd",
+      "sha256": "e534dccf8dd4d9d2490b145988bb822784ff9a05ca60536b470def71a20ccdfa",
+      "bytes": 53095
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/09_BRANCH_CLASSIFICATIONS.json",
+      "blob": "84d431e9face8d9aede612ee94990ce2efd63bc7",
+      "sha256": "02a09434c209f92711851350b8e1e327bcd5534e0fd3222e01ba120c5a4e3326",
+      "bytes": 96081
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/09_CLASSIFICATION_COVERAGE.json",
+      "blob": "d83e6bda50231e1c267acfd563ec54bc3132ab14",
+      "sha256": "ea538e45b165332a7104ea270d5bf52530537c1a4e76322bf034170ddfaf7d80",
+      "bytes": 1014
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/09_DOCUMENT_CLASSIFICATIONS.json",
+      "blob": "d1c387d1a6978003ed09a871411e5c3971b24e64",
+      "sha256": "f014c9ed51bf256115ad596b5d2e8668b7124aaf573a2c6cfb3b98be1aecad82",
+      "bytes": 97541
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/09_PR_CLASSIFICATIONS.json",
+      "blob": "7c4779a23cc39e7fa8ff91d2a18e8be849136d50",
+      "sha256": "1e3164733bc2bdd2afb71250a409c88fec4b73094d33337388d83aa59a57889f",
+      "bytes": 66241
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/10_LEGACY_SAFETY_MATRIX.md",
+      "blob": "93e176401775bb57aaa623b94883a2a11bf2c5d3",
+      "sha256": "41f778320c5b8b50872fd0f75a76b8fb4a6dca350e25d52a247d5c6f74d8799d",
+      "bytes": 6237
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/11_RECOVERY_AND_IDEAS.md",
+      "blob": "b89b3005f70d0e9a3a4a333392d90348c2b3d28f",
+      "sha256": "09cbd187e07fae0c0b19b7732dc140ef023bd86141014100e6817a516bb494d9",
+      "bytes": 8879
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/12_REVIEW_PROGRESS.md",
+      "blob": "7c7b684c0f240a4f9de996ce087d993ff33c48f3",
+      "sha256": "ce385c93e12d4929b97bbc26ab21e33f9c2692c82890c2ddca6675aacc49cb7f",
+      "bytes": 3979
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/13_DOCUMENT_REVIEW_ROUND2.md",
+      "blob": "72e64123b4d4899da0f6d0dd62cf0123cc313e02",
+      "sha256": "0cb5542cb5f67b3620d91ede33834a80853bb3d4ef3de4ec1c18e5a51cfdbc4c",
+      "bytes": 13257
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/14_BRANCH_RECONCILIATION_ROUND2.md",
+      "blob": "603a21ffc5c9e19a934511b3efb43f2085e05ac9",
+      "sha256": "0cea1428fec8ee1db027bd665e7d3de6df318b0c3c6e9dea57b247c3d5b41622",
+      "bytes": 6048
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/15_RECOVERY_SAFETY_PRIORITIES_ROUND2.md",
+      "blob": "f0b25ceeef2f3f05920f3953281d90ed90e3f4ed",
+      "sha256": "458a0d5876b31d8393cb59843d661d2020c755a6ce2d1f08be81f9463e9179d7",
+      "bytes": 10623
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/16_REVIEW_PROGRESS_ROUND2.md",
+      "blob": "2d1f2f0f4a3235ca37b63d3ed15d4d3b0018813e",
+      "sha256": "b439e42c4d14ed86e0bb19ceb4a6c0940a332f426f1cb4b6706b05348b7afa96",
+      "bytes": 4416
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/17_ROUND2_LEDGER.json",
+      "blob": "ce753e60956bc65cfc765ed1cd2d4d2e0a71f7b0",
+      "sha256": "02fc74d75f5891813fddbda98c9c0ba95934353bcc6a374e4c7ebf7c9241cb9b",
+      "bytes": 123646
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/18_PINNED_RUNNER_EVIDENCE.json",
+      "blob": "af385f465e946537464698742099aa49d548c09e",
+      "sha256": "9a9ebe05584621d36d6e99c27d92ffbf17b374c0f6e4e9d6672dbffa66ba130a",
+      "bytes": 17388
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/19_MEMORY_FORGET_IDENTITY_ROUND3.md",
+      "blob": "4e230bf7557d7378f3ef03cab48d9d47df14e901",
+      "sha256": "0d5054334ba97a362b774fd4d011e0ee46617a4bd3e845f147959227b6bb5b9f",
+      "bytes": 9709
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/20_LAB_QUALITY_BASELINE_ROUND3.md",
+      "blob": "8cf83829263c12b5d4439d6a4dbec5a6a6ccfd0a",
+      "sha256": "1aaaf1a4c878d45730817cfa455253cfd2152a3a858d7f11f43c41dc46d6b142",
+      "bytes": 5624
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/21_SHARED_ENGINE_PARITY_ROUND3.md",
+      "blob": "96e7d4133f00889f2a0adeb45112789a11bd0cd6",
+      "sha256": "a90ec267551a353b4bc81a0e482d7f105ea2beb0b15fa3d85e739b6eba2e54d2",
+      "bytes": 5228
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/22_DOCUMENT_REVIEW_ROUND3.md",
+      "blob": "6f01acccd3d16bcdfafaaac492b9c445c36fb4ea",
+      "sha256": "f22d6c23548bb28bd62d71ad421f574ccee4bce8f0acc2b65644eb83d7f07ba1",
+      "bytes": 5244
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/23_BRANCH_ASSET_SAFETY_ROUND3.md",
+      "blob": "46188382e29edec5ddcdd5b4dba76eda6eebd456",
+      "sha256": "8ebf716f3dcbf7a9fa9689f76c2e2c104c32847e96532e1106243f3d96e003de",
+      "bytes": 5246
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/24_ROUND3_LEDGER.json",
+      "blob": "e5561b6bd9aa5e2b53bead76cbb5155fcf57e753",
+      "sha256": "7388de5a2c5af36cd946e68a4282499e6d60344318ab8cb30132f107592202c2",
+      "bytes": 27059
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/25_ROUND3_SOURCE_EVIDENCE.json",
+      "blob": "a205bede872a2cd67984cbb61e293684af5bf90a",
+      "sha256": "21b8e1d13a3eac8ecaeab9c835101c85d3d016605a9d32611dada34cb22ca798",
+      "bytes": 75185
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/26_ROUND3_PR_SNAPSHOT.json",
+      "blob": "5120d5db79aed50eb5255d6eb58b60781c3dec69",
+      "sha256": "689fc39c0ce39d21b3d9d4c1f36ab676d0b6f091725b3973c5c9cf2ad643024b",
+      "bytes": 14371
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/27_REVIEW_PROGRESS_ROUND3.md",
+      "blob": "de7ea970b681ec3fd7819e14750933a700221896",
+      "sha256": "b472614eee42b844278b21a25be0e7b5e0b422778dc5d2791844cba52284ec19",
+      "bytes": 4774
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/28_FORGET_ALL_PATHS_ROUND4.md",
+      "blob": "4d2da1735504b6fc755e586b3b047d5bb4ad6997",
+      "sha256": "6fca1baf521b86a324fc489f31cc03012a29aa0cbcc1cec51e88071ea5c6ed37",
+      "bytes": 5957
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/29_RELATIONSHIP_WORKER_ROUND4.md",
+      "blob": "68972eac0176260a8ecebe6f7aba32751ceff7ff",
+      "sha256": "f58497a1392a61b386c010926ea1aabb4e86698e01cf44f01a6bfabbce16f3fd",
+      "bytes": 4237
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/30_PERSONA_BODY_CLOCK_CACHE_ROUND4.md",
+      "blob": "16ae74eae68df2c29babbcd1d1e4e46a95d78820",
+      "sha256": "690bd3a77fab0cfe5857b0dc51f1e79909fd6c48ff11cc7514856714aaa46b51",
+      "bytes": 5749
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/31_SQL_FINAL_DEFINITIONS_ROUND4.md",
+      "blob": "12e85cda87d162215899f555214800e795e8a57b",
+      "sha256": "634be2a110663d5f1481c1f4fb97ea87aa5ceee65d06508ce29d929618a28534",
+      "bytes": 3902
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/32_MEMORY_HISTORY_DECISIONS_ROUND4.md",
+      "blob": "a476f43033d250ca89c1784369006349316ff064",
+      "sha256": "04efada5748781f61ddca2de511a3cda244411ddcfc2cd07f5e4be8b512e53cf",
+      "bytes": 5416
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/33_DOCUMENT_BRANCH_REVIEW_ROUND4.md",
+      "blob": "a2ed73fe1a82a24c64909fe9ed7ba4992cd3dcb0",
+      "sha256": "fc475f04e010af803a774c451b6b37f5939c5c34222a21873b95aaea3c81847d",
+      "bytes": 3596
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/34_ROUND4_LEDGER.json",
+      "blob": "f1645ed357c3c7afa44b349a35ed0e299f0359b1",
+      "sha256": "f4937498f066d7edec5ac9b314410627483f0e921ed7e9721b0bce7b4709e269",
+      "bytes": 17296
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/35_ROUND4_SOURCE_EVIDENCE.json",
+      "blob": "bfaefb4b8fcf929e38a9d1284b27f7cd6979836b",
+      "sha256": "339bf59f0284d1b4be8af3c1042ef56f609ecd2d41c662be15ba9833bdbce4b4",
+      "bytes": 221829
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/36_ROUND4_FIXED_SOURCES.json",
+      "blob": "d17611f87d350b49ba85213589cc775e2a17273c",
+      "sha256": "4d2cc53481f1d035a54eb21a1184109f95eaa45f97224e841825aaf390e540cb",
+      "bytes": 487737
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/37_REVIEW_PROGRESS_ROUND4.md",
+      "blob": "a71e742281d8313de2df3f128f171a4f8a08039c",
+      "sha256": "99af269c8266da00f5c83b152269d5c56f6a03096e382dc7de3aa22a092a3747",
+      "bytes": 2990
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/38_SORA_HANDOFF_FORGET_RACE_TEST_CONTRACT.md",
+      "blob": "c19645f344a08b5c2fd10e4fa26230c4aceff5ef",
+      "sha256": "b25af32461bf6eaf214a31e675941d592978e26e803626a971faccd450a93638",
+      "bytes": 7183
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/39_SORA_SOURCE_RECHECK_ROUND5_PARTIAL.md",
+      "blob": "b8266d7d3c775723dc989db86cd27f4395cecef7",
+      "sha256": "f0cf7f797eb230b2ab664001a78758992fea6659ef6e5c410932d1930c82d694",
+      "bytes": 4527
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/40_SORA_RELATIONSHIP_WORKER_RPC_RECHECK.md",
+      "blob": "23988bd5057f5f8c5abf046147fca9adaf3d773c",
+      "sha256": "8938e238681dc4ba20e88c3cdebec98f90f26a039ea9210c506f910fb0266669",
+      "bytes": 5528
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/41_SORA_FORGET_SQL_WORKER_COMPATIBILITY.md",
+      "blob": "5eeb194c54787eeb2938d06af90081a9c3a933c1",
+      "sha256": "5e51c50817dfaeed931871008eca1ade2b64c054fc7dc2b57896a90b635122a7",
+      "bytes": 6367
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/42_SORA_FORGET_CONTROL_READERS_AND_GAPS.md",
+      "blob": "0d2fb936832a98d9a523b884ca181a9938fdebf3",
+      "sha256": "73e339b2d789d15c57dc49f26b5adcab124a98158454b4887fa5593cd74b8a3c",
+      "bytes": 8548
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/43_SORA_BROWSER_STALE_RESPONSE_REVIEW.md",
+      "blob": "b785c5269f2fe7bf168659c1f4d0523266f8a78b",
+      "sha256": "2f5ea5ebe0d76d2c3307f75765235f009d2f91114e959b6168c011f66c09c107",
+      "bytes": 6803
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/44_SORA_BROWSER_SERVER_FORGET_CONSISTENCY.md",
+      "blob": "d856dfed0f99fee63adb3161d766aebcfddd5eb8",
+      "sha256": "08b9710d5f518feff86e333997be94192ebc2a993adf8e6086a041e2f3ae6a53",
+      "bytes": 7486
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/45_SORA_CROSS_PATH_FORGET_SAFETY_CONTRACT_DRAFT.md",
+      "blob": "5e020c6afcd500b8c24660d1da8ade149fd8c939",
+      "sha256": "cd8005064c655bea57c016b3bd9af5e1371813d3da16caf0affd77e34e926e6e",
+      "bytes": 8883
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/46_SORA_DOCUMENT_FULL_REVIEW_ROUND5.md",
+      "blob": "60ba453d36f93ae9ebebdfaa2a4d1ac5e2234311",
+      "sha256": "c93ba8fd935c2c7278d41fad29479d6310b69e85cbb628075a3d551f169119e1",
+      "bytes": 6238
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/47_SORA_ROUND5_DOCUMENT_LEDGER.json",
+      "blob": "6a573f064cfa443ce3b49cadd737d3eaf1bc27f3",
+      "sha256": "5f054dfe2371f930aa869cac1481f718bebb260ee163320b1326b012e4a4e92d",
+      "bytes": 1529
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/48_SORA_CONTEXT_AB_DOCUMENT_REVIEW.md",
+      "blob": "6a9832fdcac9de5a1d50eac6235ad27acb111caa",
+      "sha256": "4e406160ede2c46ace109de93b4d25e011e52d398d94b31ccf1f39eab668e132",
+      "bytes": 5968
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/49_SORA_ROUND5_DOCUMENT_LEDGER_V2.json",
+      "blob": "d399f40b97b3d3e357b14a34b852259deed4efa8",
+      "sha256": "9c0c8d613b323cbc460fc704f8d94dbecf92505628628e6d1dedb6cc27e1e79c",
+      "bytes": 1440
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/50_SORA_RELATIONSHIP_DESIGN_DOCUMENT_REVIEW.md",
+      "blob": "43cdd3dfc0322588d02ded817021f024f311421f",
+      "sha256": "6c4caf97eeef85f1857903e5672a5541531c1642133adc55860185442937f2ba",
+      "bytes": 6058
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/51_SORA_ROUND5_DOCUMENT_LEDGER_V3.json",
+      "blob": "9a6c2cd318c62444682ab435deeb09475af4e006",
+      "sha256": "9befa6239bda25b76ee12a4c43066c31ca8b4533a1a9ae940e5392ecec73cc05",
+      "bytes": 1517
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/52_SORA_MULTI_CHARACTER_PHASE0_TWO_VERSIONS.md",
+      "blob": "dae8458646fed28090c009ccb47820c22a29e42c",
+      "sha256": "68f104a38a90d8c8ce040e887410cd2ba8cfba5aa6c243c06d57d3c205b473d8",
+      "bytes": 8615
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/53_SORA_ROUND5_DOCUMENT_LEDGER_V4.json",
+      "blob": "d3379bd9a077e786296a5caaa69cf6341219dc16",
+      "sha256": "5b82b471fc27060e4e952b4c7aade30ec68f7219b11da72e1d1d7b52b69ce256",
+      "bytes": 1346
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/54_SORA_HANDOFF_MEMORY_CERTAINTY_QUALITY_DOCS.md",
+      "blob": "76ce51b5d14fb5f26868c57d79327dbbd560b1f6",
+      "sha256": "ad2afd485c5875dddab3c539ae9902ad908b1228248684323ff98b0c21513f40",
+      "bytes": 8196
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/55_SORA_ROUND5_DOCUMENT_LEDGER_V5.json",
+      "blob": "393e8a3e290a937be55a794d9efb5c9b53f9a865",
+      "sha256": "3ffdcbbfdff39f013ed6e48e9dc13b392f8b17f7dce221b77817b0e717448e7b",
+      "bytes": 1494
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/56_DOCUMENT_REVIEW_WORK_RESUMED_ROUND5.md",
+      "blob": "247d3b35e3c37122c6c4a3d5e30e39cc595f9da1",
+      "sha256": "475f962c397975979ade87e38b50a909da14451ed6d238bb46492304f8947b91",
+      "bytes": 9060
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/57_BRANCH_RECONCILIATION_WORK_RESUMED_ROUND5.md",
+      "blob": "72e89d7afecf0931121304b3b51f7cf1ecc66fa5",
+      "sha256": "37675488830862a4a5d3c12a6ccecb86a9d8002dbc06d0ca01c95bf55311c28e",
+      "bytes": 6101
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/58_DERIVED_USE_EXPIRY_CONTRACT_ROUND5.md",
+      "blob": "4013aeb178cea5543b27a6e1789c414573350528",
+      "sha256": "3615dbc3de5567fdacaeac492ff1dc39faec214e437e5fb49cd1acfb6138c7b9",
+      "bytes": 10473
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/59_INDEPENDENT_ORACLE_TEST_PLAN_ROUND5.md",
+      "blob": "56a58e303141ac41635ea32db4558cb5cba7747d",
+      "sha256": "96a371a613172d8574c40c92861c9abe1c14795bdf765101d434ba1f9e9198d1",
+      "bytes": 10627
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/60_FIXED_SOURCE_AND_LINEAGE_EVIDENCE_ROUND5.json",
+      "blob": "485e7c1c11d37bc80482aa91121fa11d5a50d482",
+      "sha256": "78d497bce122df88da28f27c0fb56b68f90af39b1c996b36ced99a9a04e1da74",
+      "bytes": 173741
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/61_ROUND5_RESUMED_LEDGER.json",
+      "blob": "f8f50f0d094f9c644f8c6ef3650946fa043181ae",
+      "sha256": "b14567b1327d296951584795dcd31c8d37961b8b33b8287c7b5383511459d46d",
+      "bytes": 15515
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/62_REVIEW_PROGRESS_WORK_RESUMED_ROUND5.md",
+      "blob": "5622ed6f5c7a837e25ddb4d941e9a59e6f2bd852",
+      "sha256": "c0ca62d0a387f622a60073cc0eeb61e2af0ae6600e6a98a23267c6de6feba567",
+      "bytes": 6756
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "blob": "c9b07c8a73223f4a963df7bfce0809ab7455ac37",
+      "sha256": "2ac9573e205a3045c1da5cc88ba575b37700ba186d712c1a46434b8f1a9bd72d",
+      "bytes": 8050
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "blob": "55050e889ec0b94cc41bbdde36768f46657b64a8",
+      "sha256": "2ebfaaff3b169d58b5034a39d568f67b9a62df82d1ae6e7beca213ae7146826c",
+      "bytes": 10848
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/65_IDEAS_RECOVERY_AND_DEVELOPMENT_GATES_ROUND5.md",
+      "blob": "0d15143141588b8d2c44e5c561be1e7616032d67",
+      "sha256": "dfbf5d35b9ae2e138a7f891f014a4bdf7c3c0a926a8a2838d85284752c064b3a",
+      "bytes": 8169
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/66_CONTINUATION_SOURCE_INDEX_ROUND5.json",
+      "blob": "9a27e12c344628fe27f0dc7c3c1f1eebe3e8757e",
+      "sha256": "513313248bd58591bcfd54daf8ce0700326038b00810256df49af9945b269b42",
+      "bytes": 86071
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/67_CONTINUATION_FIXED_EVIDENCE_ROUND5.zip",
+      "blob": "1cc7d38b337927211d4627fc3c3d61b9e809fa08",
+      "sha256": "294cb622ff11cf3a2a4315f7f0b99bb8d0df8a50542f86a87e0ccf3d932b2e52",
+      "bytes": 295593
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/68_ROUND5_CONTINUATION_LEDGER.json",
+      "blob": "995742ec2ab1120868ec9489c5e10e0f99a41ff0",
+      "sha256": "df10c10c299469143392ffa5cccc2f050dc48c91689d4fc9264a74adf7ac50c9",
+      "bytes": 41864
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/69_ROUND5_PROGRESS_AND_ROUND6_READINESS.md",
+      "blob": "afbcf28ba36edc523941a4e845c0212e097cc473",
+      "sha256": "d5a2f0fda88bd0978c0a5da5aa4394b0c07ec59829a97f3ca2954e2cf2b9f254",
+      "bytes": 6225
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/README.md",
+      "blob": "9217adc4a867ee638f4d38d04f9c69e91a3281c8",
+      "sha256": "e3b6a08e7a48c639f08f87ebefc86324432060f0c546a1448c53e08f37e2da60",
+      "bytes": 8157
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/evidence.zip",
+      "blob": "2479a8dace0b2d6fbdd702c33382b7f4c7c92362",
+      "sha256": "b93d643f87890932c75c9faf178d395c73e1cc2706b10e0b0be31e2aa5b34f09",
+      "bytes": 1631749
+    },
+    {
+      "status": "A",
+      "path": "docs/audits/20261021-work-all-assets/legacy-latest-commit.json",
+      "blob": "2d763efa19bd8cd938490ef0cdf36b05f078e925",
+      "sha256": "5d3a6a74e42362942ae10bd9e999d4e936cec45803475158ebdade484258fc3b",
+      "bytes": 6144
+    }
+  ],
+  "main_source_files": [
+    {
+      "path": "lib/persona/persona-store.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c",
+      "sha256": "5d7bc6ba33b9dbd53e53abdf5404a218fb9a44e3e7c8a230826805971c18d0c2",
+      "archive_path": "source-main/lib/persona/persona-store.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/relationship-acting-guide.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf",
+      "sha256": "7fbea1319d64e720afc233f1831eb02895212bc235af99a9186d84534b24d389",
+      "archive_path": "source-main/lib/relationship-acting-guide.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/relationship-processing-v1.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5",
+      "sha256": "64e4b5a00494c97718f44a4c717b0ecbcd5efacfe56929bc803ca45fd4fb3ebf",
+      "archive_path": "source-main/lib/relationship-processing-v1.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f",
+      "sha256": "6898317deb3378b9b5554a62c559b1a6475366354ed74bce3f355edba0a8b9b3",
+      "archive_path": "source-main/lib/relationship-runtime-v1.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+      "sha256": "f9f20d786400c2d362a3c10980d3133d43f9e216659e7778b043df94d784fc4e",
+      "archive_path": "source-main/app/api/chat/route.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+      "sha256": "22a3fc4f5a0d1aae4f9bded6f947b37ad31c1521bfbc4b5b80463ec6cf2b93a9",
+      "archive_path": "source-main/supabase/functions/body-clock/proactive-decision.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "edffcd3d81dffc084fb655a5014af901f33383a2",
+      "sha256": "a52438f8de7e74f66245721215f684118456862dc3ded8f04250cd3f51ae893c",
+      "archive_path": "source-main/.github/workflows/isolated-gemini-ab-manual.yml",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/relationship-patterns.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712",
+      "sha256": "492d38864adee46408a27e3052ba253603e8f9dfc04fcb3866290bd88c3eefd5",
+      "archive_path": "source-main/lib/relationship-patterns.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/relationship-turn-expression.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b",
+      "sha256": "de99ade5ac55dd69a8d9e46c93f86b25be34d8e5b083e22dff0705ee27b67bee",
+      "archive_path": "source-main/lib/relationship-turn-expression.ts",
+      "verification": "static source only; no runtime execution"
+    },
+    {
+      "path": "lib/gemini-usage-telemetry.ts",
+      "ref": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2",
+      "sha256": "d4db572dc60b2f4bf8e0dce322a971b71744bfbba706d0e9ba438a1765fe02d7",
+      "archive_path": "source-main/lib/gemini-usage-telemetry.ts",
+      "verification": "static source only; no runtime execution"
+    }
+  ],
+  "archive": {
+    "path": "75_FINAL_FIXED_EVIDENCE_ROUND5.zip",
+    "bytes": 411746,
+    "sha256": "a9f767fbdc627e32b78c3aa7aeb84267f966c13383815b4330b4b16cc93125ae",
+    "entries": 34
+  },
+  "archive_manifest": [
+    {
+      "path": "baselines/DOC-042.md",
+      "bytes": 50659,
+      "sha256": "252719b1c258cc9c8af5ddeba09c09efbb64e513f44a8cf55643eac127572875",
+      "git_blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8"
+    },
+    {
+      "path": "document-deltas/DOC-019-from-DOC-033.patch",
+      "bytes": 43280,
+      "sha256": "dce365ff6043501b755698db68ae3d66c2e9e488d320038db87d4060d7f38792",
+      "git_blob": "3e1473102f60bf55b330dcc463674ec1b346456e"
+    },
+    {
+      "path": "document-deltas/DOC-021-from-DOC-034.patch",
+      "bytes": 18454,
+      "sha256": "428f02ed870b1dcafae84d2c548198560cb5af840bb5e9365d1e3ee46efb7638",
+      "git_blob": "14905ccdd742c31297ca2b56de693b5172b6bd5a"
+    },
+    {
+      "path": "document-deltas/DOC-022-from-DOC-029.patch",
+      "bytes": 11311,
+      "sha256": "35932f578c12429e915ff5540ce262b15d29e700ce499f62e3827b6c5d0faa56",
+      "git_blob": "0a59940dbaf94f3f4bedd96d417946ae42ffb707"
+    },
+    {
+      "path": "document-deltas/DOC-023-from-DOC-041.patch",
+      "bytes": 25718,
+      "sha256": "65b384df8bf52588b4d780c8f1591f97013617d29da5debb0e8ee5d594276b6c",
+      "git_blob": "fe8d2a0b4b4e6a6e2bb104d15480134960747d3c"
+    },
+    {
+      "path": "document-deltas/DOC-026-from-DOC-037.patch",
+      "bytes": 11210,
+      "sha256": "f3823c59f9cc8e3afc01a79e2a33930d9efe95daed65d1765187bdf73b760ec1",
+      "git_blob": "f72f949af1fe2efc4d9330b0242153320b5f828c"
+    },
+    {
+      "path": "document-deltas/DOC-027-from-DOC-029.patch",
+      "bytes": 21012,
+      "sha256": "4c27b8798f5950d8b22d74a6e1e0b66543b59e9dc046602df65759f2432c5670",
+      "git_blob": "34480ce6a15461fc209edffd3bc881a3dc12fb4c"
+    },
+    {
+      "path": "document-deltas/DOC-028-from-DOC-023.patch",
+      "bytes": 9386,
+      "sha256": "1ba2a35b7b49fe24bc4f3bddc3d8eabeaddb2ee2dc832bb9ea749adb0796dd69",
+      "git_blob": "4330c581b209016eba86f3f87efc98558ea84629"
+    },
+    {
+      "path": "document-deltas/DOC-029-from-DOC-034.patch",
+      "bytes": 52855,
+      "sha256": "1b7f0c154ea609ca5cfaa593695750226f1cb9cd8085866844b768ba2606508c",
+      "git_blob": "dfab4c49f84e0315518f379e3229772950675454"
+    },
+    {
+      "path": "document-deltas/DOC-030-from-DOC-021.patch",
+      "bytes": 33662,
+      "sha256": "dbac2d2822ba5c2fc37238bbad6935f2d07c8a824df8475d78a8a6521c7b0b3c",
+      "git_blob": "c80c9e0509920adeacae31f9f4e017deeefdb8c6"
+    },
+    {
+      "path": "document-deltas/DOC-031-from-DOC-037.patch",
+      "bytes": 7088,
+      "sha256": "f5d013c697fccba568486557a1ffb2bce50fc4afb804ac8ab8cdeb3dae092e2b",
+      "git_blob": "f7e023cc928c484e4f6b00b2e1c9f6cbde0a1a7c"
+    },
+    {
+      "path": "document-deltas/DOC-033-from-DOC-028.patch",
+      "bytes": 6951,
+      "sha256": "bb6fa3ae4c34d5eda7bc3106f490254fed05e51a30106eb691db66adbe6d1086",
+      "git_blob": "de67454d166f731ba1777c7e15ff9d228a15c676"
+    },
+    {
+      "path": "document-deltas/DOC-034-from-DOC-019.patch",
+      "bytes": 42061,
+      "sha256": "c29f2ba435d963cd4653384d8ec9c0c23dcd233b7e7a0847c44d175e0e4fdbbe",
+      "git_blob": "de34ca04549560f95e5467bbc7eb7ea5753eb931"
+    },
+    {
+      "path": "document-deltas/DOC-035-from-DOC-029.patch",
+      "bytes": 8961,
+      "sha256": "4fb67de113c8f5202c39b2439c760003dd34f0aa45696ca9c2b2380c2fc6e2ae",
+      "git_blob": "aec37d352d2a1f1bc371de329c4d6e736031e799"
+    },
+    {
+      "path": "document-deltas/DOC-037-from-DOC-042.patch",
+      "bytes": 71978,
+      "sha256": "94cef36bcc21d35b2a060862ba68af060e5dc00339bd4020b76599721ddf60e1",
+      "git_blob": "a359587ccc8d76eeb58720172e57078e7d0c9f03"
+    },
+    {
+      "path": "document-deltas/DOC-038-from-DOC-021.patch",
+      "bytes": 6392,
+      "sha256": "80818115a39c5c3665fb441adee6a9620d1a82f8ecba086ec7bdac8594bcd8d5",
+      "git_blob": "7f7deeed08b95ad9a39bbfa56223c67f4e8b34fe"
+    },
+    {
+      "path": "document-deltas/DOC-039-from-DOC-029.patch",
+      "bytes": 20441,
+      "sha256": "b8a4700a77306d911658bedb60ad02de3e70bfc72811477971c0be3a8b02f0e0",
+      "git_blob": "4fb31da952cbf865ca7ecc9ff3173e7da69c1236"
+    },
+    {
+      "path": "document-deltas/DOC-040-from-DOC-023.patch",
+      "bytes": 49568,
+      "sha256": "7243e28dcb4a5284c95b9337f42a18154fdb2840c10e112b36de3a0909de9c64",
+      "git_blob": "4393917ef285833191370c49107c1aabd4b14b6a"
+    },
+    {
+      "path": "document-deltas/DOC-041-from-DOC-031.patch",
+      "bytes": 21347,
+      "sha256": "f91338cbbf7fa0ff915279e1b56bddea6f32f5dc23632b3391250c895546cf0e",
+      "git_blob": "9b77029a2d543525a57de08998365b444a92103d"
+    },
+    {
+      "path": "original-documents.json",
+      "bytes": 3885942,
+      "sha256": "7742798d288a433f43dde90f15abbae45b61e259560b0b81aaab721522e61c12",
+      "git_blob": "d2411e98a3ba6ea47a907839c3ca5965bb9609cb"
+    },
+    {
+      "path": "snapshots/BR-008-paths.json",
+      "bytes": 28630,
+      "sha256": "8d6e79d9f230529200d1334fd5944d2c992e1b6ad0c2cdb6d99d973b414914f1",
+      "git_blob": "f74b3a028208d788096cb5e7d4d796fb7af69f51"
+    },
+    {
+      "path": "snapshots/remote-heads.tsv",
+      "bytes": 7886,
+      "sha256": "0c9799e07816fde6c41cebacfbbe415c20b241e9259833bf62952cedbdcbec14",
+      "git_blob": "26357dddaf6209511c3b5fecf5b60265a74e2624"
+    },
+    {
+      "path": "snapshots/review-edges.json",
+      "bytes": 2263,
+      "sha256": "9ba8ff66765bcf331360449a110af0bf3e20f384b3645600cf7662d3668ef447",
+      "git_blob": "6e14fbb510beebaef0c8d2193c6b08ec7273543f"
+    },
+    {
+      "path": "source-main/.github/workflows/isolated-gemini-ab-manual.yml",
+      "bytes": 3571,
+      "sha256": "a52438f8de7e74f66245721215f684118456862dc3ded8f04250cd3f51ae893c",
+      "git_blob": "edffcd3d81dffc084fb655a5014af901f33383a2"
+    },
+    {
+      "path": "source-main/app/api/chat/route.ts",
+      "bytes": 64772,
+      "sha256": "f9f20d786400c2d362a3c10980d3133d43f9e216659e7778b043df94d784fc4e",
+      "git_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b"
+    },
+    {
+      "path": "source-main/lib/gemini-usage-telemetry.ts",
+      "bytes": 3101,
+      "sha256": "d4db572dc60b2f4bf8e0dce322a971b71744bfbba706d0e9ba438a1765fe02d7",
+      "git_blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "path": "source-main/lib/persona/persona-store.ts",
+      "bytes": 5473,
+      "sha256": "5d7bc6ba33b9dbd53e53abdf5404a218fb9a44e3e7c8a230826805971c18d0c2",
+      "git_blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c"
+    },
+    {
+      "path": "source-main/lib/relationship-acting-guide.ts",
+      "bytes": 6548,
+      "sha256": "7fbea1319d64e720afc233f1831eb02895212bc235af99a9186d84534b24d389",
+      "git_blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf"
+    },
+    {
+      "path": "source-main/lib/relationship-patterns.ts",
+      "bytes": 7722,
+      "sha256": "492d38864adee46408a27e3052ba253603e8f9dfc04fcb3866290bd88c3eefd5",
+      "git_blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "path": "source-main/lib/relationship-processing-v1.ts",
+      "bytes": 18178,
+      "sha256": "64e4b5a00494c97718f44a4c717b0ecbcd5efacfe56929bc803ca45fd4fb3ebf",
+      "git_blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "path": "source-main/lib/relationship-runtime-v1.ts",
+      "bytes": 7929,
+      "sha256": "6898317deb3378b9b5554a62c559b1a6475366354ed74bce3f355edba0a8b9b3",
+      "git_blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f"
+    },
+    {
+      "path": "source-main/lib/relationship-turn-expression.ts",
+      "bytes": 6205,
+      "sha256": "de99ade5ac55dd69a8d9e46c93f86b25be34d8e5b083e22dff0705ee27b67bee",
+      "git_blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "path": "source-main/supabase/functions/body-clock/proactive-decision.ts",
+      "bytes": 10340,
+      "sha256": "22a3fc4f5a0d1aae4f9bded6f947b37ad31c1521bfbc4b5b80463ec6cf2b93a9",
+      "git_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    }
+  ],
+  "validation": {
+    "original_id_blob_unique": true,
+    "all19_were_pending_in_68": true,
+    "previous66_not_recounted": true,
+    "all18_delta_targets_fully_reconstructed": true,
+    "all_target_lines_accounted": true,
+    "new_documents_semantically_reviewed": true,
+    "archive_crc_and_hashes_checked": true,
+    "prior81_paths_unchanged": true,
+    "product_tests_executed": false,
+    "database_accessed": false
+  }
+}
