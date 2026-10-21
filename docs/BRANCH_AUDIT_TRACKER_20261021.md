@@ -4,104 +4,104 @@
 
 > **注意**：『台帳に記載あり』は調査完了・main反映済みを意味しない。全枝の最新コミット日時、mainとの比較、PR、Preview、未反映差分は今後この表で順次確定する。ブランチの作成日と最終コミット日は異なる。
 
-- 母集団：92枝（mainと本監査ブランチを含む）。取得順は名称順であり時系列ではない。
-- 作業順：この表で未確認項目を埋め、最終コミット日時の取得後に新しい順・古い順の表示を追加する。
+- 母集団：92枝（mainと本監査ブランチを含む）。表は最終コミット日時の新しい順（UTC）に並び替え済み。監査ブランチ自身の日時は記録時点のスナップショットで、監査コミットごとに更新される。
+- 作業順：この表で未確認項目を埋め、全92枝の日時確認は完了。次にmain差分・PR・Preview・未反映作業を検証する。
 - 判定基準：`main...branch` ahead/behindは分岐差分。PR統合履歴・本番反映・機能同等性は別途証拠が必要。
 
 | ブランチ | 台帳での言及 | 最終コミット日時 | main差分・PR・Preview | 追加精査 |
 |---|---|---|---|---|
-| `chore/restore-relationship-rpc-migration` | 記載あり | 2026-10-14 11:49 UTC | 要照合 | 要完了判定 |
-| `cleanup/legacy-proactive-tags` | 記載あり | 2026-09-17 13:59 UTC | 要照合 | 要完了判定 |
-| `cleanup/remove-legacy-proactive-path` | 記載あり | 2026-09-18 00:13 UTC | 要照合 | 要完了判定 |
-| `codex/legacy-maintenance-drain` | 記載あり | 2026-09-19 21:30 UTC | 要照合 | 要完了判定 |
-| `codex/server-canonical-foundation` | 記載あり | 2026-10-02 08:11 UTC | 要照合 | 要完了判定 |
-| `design/shared-conversation-engine-contract-20261015` | 記載あり | 2026-10-15 08:13 UTC | 要照合 | 要完了判定 |
-| `docs/audit-overview-against-source` | 記載あり | 2026-09-17 23:35 UTC | 要照合 | 要完了判定 |
 | `docs/development-registry-audit-20261020` | 監査作業ブランチ | 2026-10-21 01:26 UTC | 要照合 | 対象外または要確認 |
-| `docs/multi-character-data-scope-inventory` | 記載あり | 2026-10-13 07:40 UTC | 要照合 | 要完了判定 |
-| `docs/multi-character-rpc-caller-audit` | 記載あり | 2026-10-13 08:53 UTC | 要照合 | 要完了判定 |
-| `docs/production-source-of-truth-reconciliation` | 記載あり | 2026-10-14 00:30 UTC | 要照合 | 要完了判定 |
-| `docs/relationship-five-axis-design-review-20261015` | 記載あり | 2026-10-14 20:22 UTC | 要照合 | 要完了判定 |
-| `docs/relationship-v1-2-stage-growth-principles` | 記載あり | 2026-10-04 04:41 UTC | 要照合 | 要完了判定 |
-| `docs/update-implementation-overview` | 記載あり | 2026-09-17 23:29 UTC | 要照合 | 要完了判定 |
-| `docs/update-overview-relationship-growth` | 記載あり | 2026-09-18 03:15 UTC | 要照合 | 要完了判定 |
 | `experiment/conversation-lab-offline-v1-20261015` | 記載あり | 2026-10-20 11:36 UTC | 要照合 | 要完了判定 |
 | `experiment/interpreter-gradual-acting-20261015` | 記載あり | 2026-10-19 01:46 UTC | 要照合 | 要完了判定 |
 | `experiment/shared-conversation-history-v1-20261015` | 記載あり | 2026-10-16 21:02 UTC | 要照合 | 要完了判定 |
-| `feature/proactive-derived-tags` | 記載あり | 2026-09-17 13:47 UTC | 要照合 | 要完了判定 |
-| `fix/anonymous-chat-session-drop` | 記載あり | 2026-09-18 00:49 UTC | 要照合 | 要完了判定 |
-| `fix/anonymous-email-history` | 記載あり | 2026-09-17 05:22 UTC | 要照合 | 要完了判定 |
-| `fix/anonymous-session-cache-reset` | 記載あり | 2026-09-17 07:44 UTC | 要照合 | 要完了判定 |
-| `fix/body-clock-claim-rpc` | 記載あり | 2026-09-17 14:35 UTC | 要照合 | 要完了判定 |
-| `fix/chat-failure-recovery` | 記載あり | 2026-09-17 23:09 UTC | 要照合 | 要完了判定 |
-| `fix/chat-network-reliability` | 記載あり | 2026-09-17 09:17 UTC | 要照合 | 要完了判定 |
-| `fix/chat-reliability-cleanup` | 記載あり | 2026-09-17 09:04 UTC | 要照合 | 要完了判定 |
-| `fix/chat-request-diagnostics` | 記載あり | 2026-09-17 08:30 UTC | 要照合 | 要完了判定 |
-| `fix/chat-turn-dedupe` | 記載あり | 2026-09-17 16:47 UTC | 要照合 | 要完了判定 |
-| `fix/expired-temporary-relationship-import` | 記載あり | 2026-10-05 23:35 UTC | 要照合 | 要完了判定 |
-| `fix/gemini-chat-timeout` | 記載あり | 2026-09-18 01:23 UTC | 要照合 | 要完了判定 |
-| `fix/gemini-json-retry` | 記載あり | 2026-09-17 06:38 UTC | 要照合 | 要完了判定 |
-| `fix/grow-relationship-from-first-meeting` | 記載あり | 2026-09-18 03:01 UTC | 要照合 | 要完了判定 |
-| `fix/legacy-safari-cache` | 記載あり | 2026-09-17 05:42 UTC | 要照合 | 要完了判定 |
-| `fix/preserve-active-chat-history` | 記載あり | 2026-09-17 15:56 UTC | 要照合 | 要完了判定 |
-| `fix/recall-history-grounding` | 記載あり | 2026-09-17 08:44 UTC | 要照合 | 要完了判定 |
-| `fix/recall-keep-recent-history` | 記載あり | 2026-09-17 07:58 UTC | 要照合 | 要完了判定 |
-| `fix/relationship-analyzer-bounded-retry` | 記載あり | 2026-10-05 23:50 UTC | 要照合 | 要完了判定 |
-| `fix/safari-load-failed-message` | 記載あり | 2026-09-17 12:31 UTC | 要照合 | 要完了判定 |
-| `fix/safari-load-failed-ui` | 記載あり | 2026-09-17 09:19 UTC | 要照合 | 要完了判定 |
-| `fix/use-chat-proxy` | 記載あり | 2026-09-17 08:16 UTC | 要照合 | 要完了判定 |
-| `fix/workday-grounding` | 記載あり | 2026-09-17 23:21 UTC | 要照合 | 要完了判定 |
+| `design/shared-conversation-engine-contract-20261015` | 記載あり | 2026-10-15 08:13 UTC | 要照合 | 要完了判定 |
+| `docs/relationship-five-axis-design-review-20261015` | 記載あり | 2026-10-14 20:22 UTC | 要照合 | 要完了判定 |
+| `test/relationship-acting-state-comparison` | 記載あり | 2026-10-14 12:58 UTC | 要照合 | 要完了判定 |
 | `main` | 基準ブランチ | 2026-10-14 11:57 UTC | 要照合 | 対象外または要確認 |
-| `perf/chat-stage-timing` | 記載あり | 2026-09-18 02:31 UTC | 要照合 | 要完了判定 |
-| `refine/proactive-action-tags` | 記載あり | 2026-09-17 14:05 UTC | 要照合 | 要完了判定 |
-| `refine/sleepy-tag` | 記載あり | 2026-09-17 14:15 UTC | 要照合 | 要完了判定 |
-| `sora/anonymous-history-get-noop` | 記載あり | 2026-10-02 08:34 UTC | 要照合 | 要完了判定 |
-| `sora/canonical-relationship-integration` | 記載あり | 2026-10-02 13:09 UTC | 要照合 | 要完了判定 |
-| `sora/cutover-cleanup` | 記載あり | 2026-10-02 09:08 UTC | 要照合 | 要完了判定 |
+| `chore/restore-relationship-rpc-migration` | 記載あり | 2026-10-14 11:49 UTC | 要照合 | 要完了判定 |
+| `docs/production-source-of-truth-reconciliation` | 記載あり | 2026-10-14 00:30 UTC | 要照合 | 要完了判定 |
+| `docs/multi-character-rpc-caller-audit` | 記載あり | 2026-10-13 08:53 UTC | 要照合 | 要完了判定 |
+| `docs/multi-character-data-scope-inventory` | 記載あり | 2026-10-13 07:40 UTC | 要照合 | 要完了判定 |
+| `work/context-no-duplicate-replies-ab` | 記載あり | 2026-10-13 05:09 UTC | 要照合 | 要完了判定 |
+| `work/relationship-identity-v1` | 記載あり | 2026-10-11 16:44 UTC | 要照合 | 要完了判定 |
+| `work/quality-long-history-workflow` | 記載あり | 2026-10-08 09:12 UTC | 要照合 | 要完了判定 |
+| `work/ab-blind-review-artifact-workflow` | 記載あり | 2026-10-08 07:41 UTC | 要照合 | 要完了判定 |
+| `work/ab-quality-reply-schema-dispatch` | 記載あり | 2026-10-08 06:40 UTC | 要照合 | 要完了判定 |
+| `work/ab-quality-diagnostics-workflow` | 記載あり | 2026-10-08 05:30 UTC | 要照合 | 要完了判定 |
+| `work/ab-quality-manual-workflow` | 記載あり | 2026-10-08 04:52 UTC | 要照合 | 要完了判定 |
+| `work/ab-paced-dispatch` | 記載あり | 2026-10-08 03:44 UTC | 要照合 | 要完了判定 |
+| `work/ab-http-diagnostics-dispatch` | 記載あり | 2026-10-08 03:41 UTC | 要照合 | 要完了判定 |
+| `work/ab-long-fixture-dispatch` | 記載あり | 2026-10-08 03:35 UTC | 要照合 | 要完了判定 |
+| `work/ab-20-pair-dispatch` | 記載あり | 2026-10-08 02:49 UTC | 要照合 | 要完了判定 |
+| `work/ab-manual-workflow-only` | 記載あり | 2026-10-08 02:41 UTC | 要照合 | 要完了判定 |
+| `work/conversation-context-compression-spike` | 記載あり | 2026-10-08 01:25 UTC | 要照合 | 要完了判定 |
+| `work/forget-control-v1` | 記載あり | 2026-10-06 21:20 UTC | 要照合 | 要完了判定 |
+| `fix/relationship-analyzer-bounded-retry` | 記載あり | 2026-10-05 23:50 UTC | 要照合 | 要完了判定 |
+| `fix/expired-temporary-relationship-import` | 記載あり | 2026-10-05 23:35 UTC | 要照合 | 要完了判定 |
+| `sora/lp-pwa-mobile-layout` | 記載あり | 2026-10-04 06:57 UTC | 要照合 | 要完了判定 |
+| `sora/lp-relationship-story` | 記載あり | 2026-10-04 06:36 UTC | 要照合 | 要完了判定 |
+| `work/gemini-unit-cost-telemetry` | 記載あり | 2026-10-04 05:18 UTC | 要照合 | 要完了判定 |
+| `docs/relationship-v1-2-stage-growth-principles` | 記載あり | 2026-10-04 04:41 UTC | 要照合 | 要完了判定 |
+| `sora/update-overview-relationship-v1-production` | 記載あり | 2026-10-03 15:36 UTC | 要照合 | 要完了判定 |
+| `sora/remove-relationship-stage-diagnostics` | 記載あり | 2026-10-03 15:25 UTC | 要照合 | 要完了判定 |
 | `sora/drop-ungrounded-relationship-evidence` | 記載あり | 2026-10-03 14:20 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-evidence-validation-diagnostics` | 記載あり | 2026-10-03 13:58 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-analyzer-stage-diagnostics` | 記載あり | 2026-10-03 13:17 UTC | 要照合 | 要完了判定 |
 | `sora/fix-relationship-polarity-transport` | 記載あり | 2026-10-03 13:02 UTC | 要照合 | 要完了判定 |
-| `sora/fix-waiting-reply-layout` | 記載あり | 2026-10-02 11:53 UTC | 要照合 | 要完了判定 |
+| `sora/remove-relationship-temporary-diagnostics` | 記載あり | 2026-10-03 12:37 UTC | 要照合 | 要完了判定 |
+| `work/relationship-polarity-integer` | 記載あり | 2026-10-03 12:29 UTC | 要照合 | 要完了判定 |
+| `work/relationship-analyzer-diagnostics` | 記載あり | 2026-10-03 11:32 UTC | 要照合 | 要完了判定 |
+| `work/relationship-error-diagnostics` | 記載あり | 2026-10-03 11:16 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-processing-error-diagnostics` | 記載あり | 2026-10-03 10:57 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-analyzer-structured-output-hotfix` | 記載あり | 2026-10-03 10:55 UTC | 要照合 | 要完了判定 |
+| `work/relationship-engine-v1` | 記載あり | 2026-10-03 10:13 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-control-rpcs-v1` | 記載あり | 2026-10-03 10:07 UTC | 要照合 | 要完了判定 |
+| `sora/misaki-acting-lab` | 記載あり | 2026-10-03 06:18 UTC | 要照合 | 要完了判定 |
+| `sora/sync-free-usage-with-history` | 記載あり | 2026-10-02 23:34 UTC | 要照合 | 要完了判定 |
+| `sora/canonical-relationship-integration` | 記載あり | 2026-10-02 13:09 UTC | 要照合 | 要完了判定 |
 | `sora/gemini-timeout-retry` | 記載あり | 2026-10-02 12:51 UTC | 要照合 | 要完了判定 |
+| `sora/remove-false-busy-wait` | 記載あり | 2026-10-02 12:04 UTC | 要照合 | 要完了判定 |
+| `sora/fix-waiting-reply-layout` | 記載あり | 2026-10-02 11:53 UTC | 要照合 | 要完了判定 |
 | `sora/gemini-transient-retry` | 記載あり | 2026-10-02 11:43 UTC | 要照合 | 要完了判定 |
+| `sora/remove-timestamp-history-poll` | 記載あり | 2026-10-02 09:35 UTC | 要照合 | 要完了判定 |
 | `sora/history-edge-trace` | 記載あり | 2026-10-02 09:28 UTC | 要照合 | 要完了判定 |
 | `sora/history-get-trace` | 記載あり | 2026-10-02 09:24 UTC | 要照合 | 要完了判定 |
 | `sora/history-sync-source-proof` | 記載あり | 2026-10-02 09:18 UTC | 要照合 | 要完了判定 |
-| `sora/lp-pwa-mobile-layout` | 記載あり | 2026-10-04 06:57 UTC | 要照合 | 要完了判定 |
-| `sora/lp-relationship-story` | 記載あり | 2026-10-04 06:36 UTC | 要照合 | 要完了判定 |
-| `sora/misaki-acting-lab` | 記載あり | 2026-10-03 06:18 UTC | 要照合 | 要完了判定 |
+| `sora/cutover-cleanup` | 記載あり | 2026-10-02 09:08 UTC | 要照合 | 要完了判定 |
 | `sora/profile-aware-life-events` | 記載あり | 2026-10-02 08:59 UTC | 要照合 | 要完了判定 |
-| `sora/relationship-analyzer-stage-diagnostics` | 記載あり | 2026-10-03 13:17 UTC | 要照合 | 要完了判定 |
-| `sora/relationship-analyzer-structured-output-hotfix` | 記載あり | 2026-10-03 10:55 UTC | 要照合 | 要完了判定 |
-| `sora/relationship-control-rpcs-v1` | 記載あり | 2026-10-03 10:07 UTC | 要照合 | 要完了判定 |
-| `sora/relationship-evidence-validation-diagnostics` | 記載あり | 2026-10-03 13:58 UTC | 要照合 | 要完了判定 |
-| `sora/relationship-processing-error-diagnostics` | 記載あり | 2026-10-03 10:57 UTC | 要照合 | 要完了判定 |
+| `sora/anonymous-history-get-noop` | 記載あり | 2026-10-02 08:34 UTC | 要照合 | 要完了判定 |
+| `codex/server-canonical-foundation` | 記載あり | 2026-10-02 08:11 UTC | 要照合 | 要完了判定 |
 | `sora/relationship-time-v2-design` | 記載あり | 2026-09-25 10:01 UTC | 要照合 | 要完了判定 |
-| `sora/remove-false-busy-wait` | 記載あり | 2026-10-02 12:04 UTC | 要照合 | 要完了判定 |
-| `sora/remove-relationship-stage-diagnostics` | 記載あり | 2026-10-03 15:25 UTC | 要照合 | 要完了判定 |
-| `sora/remove-relationship-temporary-diagnostics` | 記載あり | 2026-10-03 12:37 UTC | 要照合 | 要完了判定 |
-| `sora/remove-timestamp-history-poll` | 記載あり | 2026-10-02 09:35 UTC | 要照合 | 要完了判定 |
-| `sora/sync-free-usage-with-history` | 記載あり | 2026-10-02 23:34 UTC | 要照合 | 要完了判定 |
-| `sora/update-overview-relationship-v1-production` | 記載あり | 2026-10-03 15:36 UTC | 要照合 | 要完了判定 |
-| `test/relationship-acting-state-comparison` | 記載あり | 2026-10-14 12:58 UTC | 要照合 | 要完了判定 |
-| `work/ab-20-pair-dispatch` | 記載あり | 2026-10-08 02:49 UTC | 要照合 | 要完了判定 |
-| `work/ab-blind-review-artifact-workflow` | 記載あり | 2026-10-08 07:41 UTC | 要照合 | 要完了判定 |
-| `work/ab-http-diagnostics-dispatch` | 記載あり | 2026-10-08 03:41 UTC | 要照合 | 要完了判定 |
-| `work/ab-long-fixture-dispatch` | 記載あり | 2026-10-08 03:35 UTC | 要照合 | 要完了判定 |
-| `work/ab-manual-workflow-only` | 記載あり | 2026-10-08 02:41 UTC | 要照合 | 要完了判定 |
-| `work/ab-paced-dispatch` | 記載あり | 2026-10-08 03:44 UTC | 要照合 | 要完了判定 |
-| `work/ab-quality-diagnostics-workflow` | 記載あり | 2026-10-08 05:30 UTC | 要照合 | 要完了判定 |
-| `work/ab-quality-manual-workflow` | 記載あり | 2026-10-08 04:52 UTC | 要照合 | 要完了判定 |
-| `work/ab-quality-reply-schema-dispatch` | 記載あり | 2026-10-08 06:40 UTC | 要照合 | 要完了判定 |
-| `work/context-no-duplicate-replies-ab` | 記載あり | 2026-10-13 05:09 UTC | 要照合 | 要完了判定 |
-| `work/conversation-context-compression-spike` | 記載あり | 2026-10-08 01:25 UTC | 要照合 | 要完了判定 |
-| `work/forget-control-v1` | 記載あり | 2026-10-06 21:20 UTC | 要照合 | 要完了判定 |
-| `work/gemini-unit-cost-telemetry` | 記載あり | 2026-10-04 05:18 UTC | 要照合 | 要完了判定 |
-| `work/quality-long-history-workflow` | 記載あり | 2026-10-08 09:12 UTC | 要照合 | 要完了判定 |
-| `work/relationship-analyzer-diagnostics` | 記載あり | 2026-10-03 11:32 UTC | 要照合 | 要完了判定 |
-| `work/relationship-engine-v1` | 記載あり | 2026-10-03 10:13 UTC | 要照合 | 要完了判定 |
-| `work/relationship-error-diagnostics` | 記載あり | 2026-10-03 11:16 UTC | 要照合 | 要完了判定 |
-| `work/relationship-identity-v1` | 記載あり | 2026-10-11 16:44 UTC | 要照合 | 要完了判定 |
-| `work/relationship-polarity-integer` | 記載あり | 2026-10-03 12:29 UTC | 要照合 | 要完了判定 |
+| `codex/legacy-maintenance-drain` | 記載あり | 2026-09-19 21:30 UTC | 要照合 | 要完了判定 |
+| `docs/update-overview-relationship-growth` | 記載あり | 2026-09-18 03:15 UTC | 要照合 | 要完了判定 |
+| `fix/grow-relationship-from-first-meeting` | 記載あり | 2026-09-18 03:01 UTC | 要照合 | 要完了判定 |
+| `perf/chat-stage-timing` | 記載あり | 2026-09-18 02:31 UTC | 要照合 | 要完了判定 |
+| `fix/gemini-chat-timeout` | 記載あり | 2026-09-18 01:23 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-chat-session-drop` | 記載あり | 2026-09-18 00:49 UTC | 要照合 | 要完了判定 |
+| `cleanup/remove-legacy-proactive-path` | 記載あり | 2026-09-18 00:13 UTC | 要照合 | 要完了判定 |
+| `docs/audit-overview-against-source` | 記載あり | 2026-09-17 23:35 UTC | 要照合 | 要完了判定 |
+| `docs/update-implementation-overview` | 記載あり | 2026-09-17 23:29 UTC | 要照合 | 要完了判定 |
+| `fix/workday-grounding` | 記載あり | 2026-09-17 23:21 UTC | 要照合 | 要完了判定 |
+| `fix/chat-failure-recovery` | 記載あり | 2026-09-17 23:09 UTC | 要照合 | 要完了判定 |
+| `fix/chat-turn-dedupe` | 記載あり | 2026-09-17 16:47 UTC | 要照合 | 要完了判定 |
+| `fix/preserve-active-chat-history` | 記載あり | 2026-09-17 15:56 UTC | 要照合 | 要完了判定 |
+| `fix/body-clock-claim-rpc` | 記載あり | 2026-09-17 14:35 UTC | 要照合 | 要完了判定 |
+| `refine/sleepy-tag` | 記載あり | 2026-09-17 14:15 UTC | 要照合 | 要完了判定 |
+| `refine/proactive-action-tags` | 記載あり | 2026-09-17 14:05 UTC | 要照合 | 要完了判定 |
+| `cleanup/legacy-proactive-tags` | 記載あり | 2026-09-17 13:59 UTC | 要照合 | 要完了判定 |
+| `feature/proactive-derived-tags` | 記載あり | 2026-09-17 13:47 UTC | 要照合 | 要完了判定 |
+| `fix/safari-load-failed-message` | 記載あり | 2026-09-17 12:31 UTC | 要照合 | 要完了判定 |
+| `fix/safari-load-failed-ui` | 記載あり | 2026-09-17 09:19 UTC | 要照合 | 要完了判定 |
+| `fix/chat-network-reliability` | 記載あり | 2026-09-17 09:17 UTC | 要照合 | 要完了判定 |
+| `fix/chat-reliability-cleanup` | 記載あり | 2026-09-17 09:04 UTC | 要照合 | 要完了判定 |
+| `fix/recall-history-grounding` | 記載あり | 2026-09-17 08:44 UTC | 要照合 | 要完了判定 |
+| `fix/chat-request-diagnostics` | 記載あり | 2026-09-17 08:30 UTC | 要照合 | 要完了判定 |
+| `fix/use-chat-proxy` | 記載あり | 2026-09-17 08:16 UTC | 要照合 | 要完了判定 |
+| `fix/recall-keep-recent-history` | 記載あり | 2026-09-17 07:58 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-session-cache-reset` | 記載あり | 2026-09-17 07:44 UTC | 要照合 | 要完了判定 |
+| `fix/gemini-json-retry` | 記載あり | 2026-09-17 06:38 UTC | 要照合 | 要完了判定 |
+| `fix/legacy-safari-cache` | 記載あり | 2026-09-17 05:42 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-email-history` | 記載あり | 2026-09-17 05:22 UTC | 要照合 | 要完了判定 |
 
 ## 更新ルール
 1. 全枝の最終コミット日時をGitHubコミット情報から取得する。作成日時として扱わない。
@@ -134,3 +134,5 @@
 2026-10-21: 8枝のcommitter.dateを取得。累計88/92、未取得4。Gemini単価テレメトリは10/04、会話圧縮は10/08、返信重複除去A/Bは10/13、forget controlは10/06、長履歴品質workflowは10/08。費用改善の判断は実行回数・トークン・品質の検証が必要。UTC表記。
 
 2026-10-21: 最終4枝のcommitter.dateを取得。累計92/92、未取得0（取得時点のGitHub branch listに基づく）。`work/relationship-identity-v1` は10/11、その他の関係性エンジン関連3枝は10/03。日時確認の完了はmainへの統合やPR・Preview精査の完了を意味しない。UTC表記。
+
+2026-10-21: 92枝の最終コミット日時を新しい順に並べ替え。監査ブランチの日時は動的に変わるためスナップショット扱い。時系列の完了はPR・Preview・main反映の監査完了ではない。
