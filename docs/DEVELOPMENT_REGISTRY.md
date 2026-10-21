@@ -904,3 +904,12 @@ GitHub `main...branch` compare：
 **設計思想との接続**：ユーザーの最新方針は、Misakiを複数キャラクター基盤とし、まず美咲一人を作り込むこと。ユーザー×キャラの秘密/関係記憶と、キャラ固有の知識・人格成長を分離し、婚姻の同時一人制約をDBで担保する。将来の大改修を防ぐため、識別子・所有権・データ分離・整合性は先に設計する一方、成長ロジックは検証可能に保つ。**これはユーザーとの設計議論であり、既存実装済みの主張ではない**。棚卸し完了後に台帳全体を冒頭から再読して適合性を評価する。
 
 本節は差分の存在と対象ファイルの確認まで。各branch内容・CI・preview・DB適用・本番稼働は未検証。main/production/Supabase/アメふる変更なし。
+
+
+## 2026-10-21 重点精読：正本照合と共有会話エンジン
+
+`docs/production-source-of-truth-reconciliation` の `docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md` を直接確認。2026-10-13時点の調査記録として、mainのSQL35件と当時のmigration ledger82件、完全一致11件という照合結果を記載。文字列の件数差だけで未適用や障害を断定できない。また、関係時間RPCのUUID引数版は当時の本番に存在した一方、mainのmigration群で作成元を特定できなかったと記録。**今回本番DBを再確認したわけではない**。新規環境の再現性を確認する課題として残す。
+
+`experiment/shared-conversation-history-v1-20261015` の `docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md` と `lib/conversation-engine/character-context.ts`、`history.ts` を精読。前者は実験コードが本番と同等ではないと明記。後者はuserId/characterIdの一致を調べる純粋関数と履歴のフィルタ・直近60件変換であり、DBのアクセス制御や本番ルートの配線を実現したものではない。persona版管理、関係性、記憶の分離、外部情報の鮮度、JSON出力、再試行、課金・保存・冪等性などは移行ゲートとして残る。
+
+**今後の設計判断**：ユーザー×キャラの個別記憶、キャラ単位の知識・成長、婚姻の一意性を分ける。まず美咲一人を作り込むが、将来の複数キャラを前提にID・所有権・権限境界を設計する。以上は方針であり実装済みの認定ではない。main・本番・DB変更なし。
