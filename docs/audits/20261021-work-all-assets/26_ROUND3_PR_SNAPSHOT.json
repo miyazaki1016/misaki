@@ -1,0 +1,122 @@
+{
+  "date": "2026-10-21",
+  "target_prs": [
+    {
+      "number": 66,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+      "ref": "work/forget-control-v1",
+      "body": "User Memoryから消した事実が古いhistoryや派生contextから復活する経路を防ぎます。Soft Forgetをchat commit、UI×/clearMemoryのHard Deleteをmemory削除と同じcanonical transactionへ保存し、匿名root/checkpointにも一度だけ引き継ぎます。共通policyをRecall/Profile/Natural Memory/reply/Body Clock/personaへ適用し、匿名persona evolutionはブラウザ由来のhistory/memoryを解析材料にせず、検証済rootを使います。\n\n再提示だけではreleaseしません。現在のユーザーの再提示→確認→直後の肯定によって新しい情報を学習し、古いhistoryはrelease後も根拠として遮断します。Relationship Engineの実装・意味論・Stateは変更せず、物理history削除、Shared Memory、30件上限変更その他の別工程は含みません。\n\n検証: UTC/JST各251/251の固有自動テスト成功（新規Forget48件を含む）、TypeScript・production build成功。PGliteで実migration/RPCの原子性・rollback・checkpoint・refundを検証。代表ケースはSoft/UI両方の直後・40turn後・確認後再学習をAPI統合テストで確認しています。意味判定はscripted doubleであり、実Gemini精度の証明ではありません。既存harnessの重複test登録を解消し、既存固有ケースは維持しています。\n\nMigration: 20261006200002_forget_control_v1.sql。暗号化control vector表/RLSを追加し、最新版commit/edit/checkpoint/temporary writerの保存境界を拡張。Production未適用。詳細な協調更新・rollback条件と必須15項目の検証対応はdocs/IMPLEMENTATION_OVERVIEW.md末尾に記載。Forget成立後に旧appへ単純rollbackすると復活防止を破るため、controlsを保持して保護を維持する必要があります。\n\nレビュー用Draft: merge/Production適用は行っていません。Vercel Preview buildはREADY: https://misaki-1jce3wanl-kishibojim.vercel.app （実機能受入は未実施）。隔離Supabase branchがなく、Production DBへのPreview試験書込みは行っていません。ローカル実画面試験はブラウザ環境準備失敗で未実施。実モデルPreviewで代表ケース・匿名保存/別端末・Body Clock・latency/costの検証が残ります。Production実機確認まで完成扱いしません。\n\nその他の未確認事項: Deno独立型検査はnpm依存取得が接続拒否となり実行できませんでした（Body Clock自動回帰は成功）。既存Life FactテストはAmerica/Phoenixで時刻依存の失敗があり、UTC/JSTは成功（対象コード未変更）。\n\n## レビュー追補（2026-10-07）\n\nSoft Forgetの対象は既にcanonical memoryから除外される実装でした。application/DDL修正は不要で、テスト・harness・総覧だけを追加しました。\n\n実chat route→実migration RPC→PGlite DB列の直接読取を追加しました。memory=['弟の名前は隆紀']→『隆紀のことは忘れて』のcommit後、misaki_user_conversation_state.memory=[]、暗号化controlを復号するとactive soft_forget、古いhistoryは保持されています。モデルが旧memoryを候補として再出力しても保存されません。無関係な事実保持、control保存失敗時の全体rollbackも確認しました。\n\n追加10件成功、全回帰UTC/JST各261/261成功（fail/skip 0）。\n\nGemini Forget追加fetch数（単一control、非空history/memory/Today Memory/生成memory/生成Today Memory、同値release、retryなし）:\n\n| 経路 | traitなし | traitあり |\n|---|---:|---:|\n| Controlなし通常reply | 0 | 0 |\n| Forget成立turn | 6 | 7 |\n| active後通常turn | 7 | 8 |\n| 再提示turn | 6 | 7 |\n| 確認肯定turn | 4 | 5 |\n| Body Clock・Today Memory空 | 3 | 4 |\n| Body Clock・Today Memoryあり | 4 | 5 |\n\n実route/実persona storeのfetchを数え、意味判定応答のみscripted doubleとしました。既存reply生成/retry/表現調整/Relationship workerのcallはForget追加数に含めません。空データは省略、複数肯定対象・訂正旧値・active/releasedの混在したhistory barrier groupでは増減します。実モデルのlatency/costは未測定です。各taskの内訳と条件は総覧末尾およびtests/forget-call-count.test.cjsに記載しました。\n\nDraft維持、merge/Production migration/Edge適用なし。\n\n## 検証専用batch比較（2026-10-07）\n\n本番の3-call化には進んでいません。追加はtests配下の比較runner/fixture/batch verifier/live計測transport/報告、および総覧のみ。cache・Relationship Engine・DB schema・Forget semantics・再学習条件・atomic commitは変更なし。\n\n20シナリオへ両armを適用。現行を正解扱いせず、独立に定義した仕様期待とも照合しました。scripted比較の不一致は3件（部分一致・人物事実節ではbatch側だけ期待一致、人工batch漏れでは現行側だけ期待一致）。人工共通漏れは「両者一致だが両方誤り」に分類。部分一致等は既存test doubleのregex不足であり、実Gemini/現行policyのバグを観測したものではありません。\n\nreofferは独立call維持。入力/出力batchは各rowの安定ID、全ID必須、欠落/重複/未知ID/不正span/parse失敗/曖昧判定のfail closedを検証。barrier/provenanceは変更していない現行policyからサーバー側で取得し、応答による変更を拒否します。\n\n検証専用23/23、UTC/JST full suite各284/284成功（fail/skip 0）。検証コードとprojectの型検査成功。\n\n各シナリオの現行/batch call数、tokens、latency観測欄、全raw結果・期待結果・不一致分類をtests/reports/forget-batch-scripted.jsonへ保存。結果説明と20行のcall数表はtests/reports/forget-batch-evaluation.md。実Geminiキー未設定なのでlive未実行、input/output tokensとlatencyは全件未測定(null)。scripted batch応答は期待値を返すため、意味判定同等性/安全性を証明済とは扱いません。--liveで実usageMetadataとresolver fetch時間を取得できる計測を用意しました。\n\nDraftを維持し、検証結果報告で停止。本番3-call化・cache・merge・Production適用なし。"
+    },
+    {
+      "number": 67,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4",
+      "ref": "work/relationship-identity-v1",
+      "body": "## 変更内容\nRelationship Engine v1.1のcanonical出力を購読するRelationship Identity v1第二層を追加します。pure resolver、Identity current-state / transition ledger、permanent retry worker、atomic anonymous checkpoint import、Acting Guide read pathを含みます。EngineのPattern条件、5軸更新、relationship_status、oldest-first / START_AT / fail-closed / lease semanticsは変更しません。\n\n今回の監査では、provenance列追加前のtemporary importを復元し、旧RPC overloadをrevoke後DROPしました。anonymous provenanceは数値versionではなくboolean factとして新permanent versionへmapします。import由来proofの後続保持、現在Identity支持時の維持、同率距離の保留、canonical versionによるapplication取得を修正しました。\n\n## 現在状態\n**Production適用済み・Identity gate OFF。Draft維持・merge禁止・gate ON禁止。**\n\nProduction履歴に合わせて4本のファイル名を整合。1本目の旧名・新名重複を除去、残り3本をgit mv。SQL本文は全4本とも監査済みcommit 636c3fdとbyte一致（コメントも変更なし）。テストのファイル参照と総覧を更新。\n\n## migration順序\n1. 20261007114143_relationship_identity_v1_canonical.sql\n2. 20261007114154_relationship_identity_v1_atomic_temporary_import.sql\n3. 20261007114158_relationship_identity_v1_romance_reentry_provenance.sql\n4. 20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql\n\n070000はc769243^とbyte一致。最終schemaは13引数Identity apply / 22引数importのみ、service_role実行、SECURITY INVOKER。\n\n## 検証\n- npm ci、UTC / Asia/Tokyo full suite各320件、Identity関連57件、tsc、Next build成功\n- 空PGlite上の明示baseline + tracked Relationship migrations + Identity全4本を時系列適用し、各段階のRPCを実呼出し\n- ACL / stale / replay / identity_since / ledger atomic rollback / checkpoint rollback / namespace分離 / distinct-version hysteresis / fresh Pattern provenance / 保持とresetを確認\n- 全11 Identityの6,336ケースでObject / neighbors配列の順序反転時にも結果一致\n- コードcommit 555d35bc19e7003dd9b051d02762b4bdfac1b192: GitHub CI #427 success、Vercel Preview READY\n- ファイル名整合・総覧更新commit: 3c8a2e746e833859f32b05f6eb0993bdaa549970\n- 改名後ローカル: UTC / Asia/Tokyo 各320件、tsc、Next build成功。最新HEADの全CI成功: [GitHub Actions #430](https://github.com/miyazaki1016/misaki/actions/runs/37616664677)（npm ci / 320 tests / tsc / build）、Vercel success。\n\n## 残存確認・停止条件\nPGliteはsingle-sessionで、複数DBセッションのlock競合は未確認。リポジトリには完全な初期Supabase migration履歴がなく、アプリ全体の空Supabase reset成功は主張しません。隔離Supabase接続のPreview実機受入・既存rollback SQL suiteはIdentity gate有効化前の残存確認です。詳細はdocs/IMPLEMENTATION_OVERVIEW.md末尾の監査記録を参照してください。\n\n**Draft維持。merge禁止・gate ON禁止。Production migrationは適用済み、Identity gate OFF。今回Production migration / deploy / env変更なし。PR #66 / Forget Control変更なし。ownerレビューと隔離環境受入後に次工程を判断します。**"
+    },
+    {
+      "number": 78,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "a849bec92059d326940ffc358635164ea7d391c9",
+      "ref": "work/context-no-duplicate-replies-ab",
+      "body": "Draft for automated tests only. No production merge."
+    },
+    {
+      "number": 86,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e",
+      "ref": "experiment/conversation-lab-offline-v1-20261015",
+      "body": "## Scope\n- Offline scenario fixtures (10 personas/situations)\n- Dependency-injected 5/20-turn runner and history validation\n- Eight-axis human/AI-judge review schema and baseline/candidate comparison\n- Node test fixtures for history, errors, budgets and regressions\n\n## Safety\n- Draft only; do not merge or deploy\n- No Gemini requests, production endpoint, Supabase or canonical writes\n- Synthetic transcripts explicitly labeled; not evidence of live conversation quality\n\n## Required gates before next phase\n- CI tests/typecheck and code review\n- Confirm canonical overview / PR #85 alignment\n- Design secured, capped, non-production real Gemini harness separately\n- Explicit owner approval before any paid API request\n\n## Caveat\nTests were added but not yet verified as passing. PR #85 is separate and unmerged."
+    },
+    {
+      "number": 87,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+      "ref": "design/shared-conversation-engine-contract-20261015",
+      "body": "Design-only Draft PR. Proposes a single pure conversation pipeline shared by production and offline lab, with strict separation of canonical state, auth, quota and writes. Includes parity invariants, phased extraction and rollout gates. No runtime edits, no model calls, no production deployment. Coordinate with PR #85 (draft overview) and PR #86 (offline harness). Owner approval required before any paid Gemini calls or production rollout."
+    },
+    {
+      "number": 88,
+      "state": "open",
+      "merged": false,
+      "draft": true,
+      "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a",
+      "ref": "experiment/shared-conversation-history-v1-20261015",
+      "body": "First small, isolated extraction step toward shared conversation engine (design PR #87). Adds pure canonical history sanitizer and Gemini-role mapping with tests. Existing production chat route remains unchanged; no activation or behavioral change, no DB or Gemini calls. This does NOT yet implement shared prompt generation or claim production parity. Draft pending CI and review. Coordinate with draft PRs #85, #86 and #87."
+    }
+  ],
+  "open_prs": [
+    {
+      "number": 88,
+      "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a"
+    },
+    {
+      "number": 87,
+      "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74"
+    },
+    {
+      "number": 86,
+      "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e"
+    },
+    {
+      "number": 85,
+      "head": "ef5bd23246a75b02a0df60302263f971de061843"
+    },
+    {
+      "number": 84,
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c"
+    },
+    {
+      "number": 83,
+      "head": "fd714bd8a82a4a48c9f33b368c35498aec6e65b5"
+    },
+    {
+      "number": 81,
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7"
+    },
+    {
+      "number": 80,
+      "head": "83476dd2d347687c253a471557d9c27b82e1caf7"
+    },
+    {
+      "number": 79,
+      "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c"
+    },
+    {
+      "number": 78,
+      "head": "a849bec92059d326940ffc358635164ea7d391c9"
+    },
+    {
+      "number": 67,
+      "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4"
+    },
+    {
+      "number": 66,
+      "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2"
+    },
+    {
+      "number": 60,
+      "head": "ed8359319181f20cf73aec87ab75c7a1405264f2"
+    },
+    {
+      "number": 31,
+      "head": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64"
+    },
+    {
+      "number": 30,
+      "head": "17449c7ec4e8ff50605ef931b04ae76584c6304f"
+    }
+  ],
+  "paid_calls": 0
+}

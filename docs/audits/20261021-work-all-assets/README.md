@@ -1,6 +1,18 @@
 # Misaki 全ブランチ・開発資産監査 2026-10-21
 
-## f55f6fe以降：第2次精査（最新）
+## 8d4050f以降：第3次精査（最新・未完了）
+
+- [19 Memory・Forget・Identity全参照経路](19_MEMORY_FORGET_IDENTITY_ROUND3.md)：保存/再提示14経路、現在の保護・不足・検証。#67は人物識別器ではない。
+- [20 Lab品質基準線](20_LAB_QUALITY_BASELINE_ROUND3.md)：期待結果・合格条件・既存試験、独立oracle/共通誤り注入。
+- [21 Shared Engine同等性条件](21_SHARED_ENGINE_PARITY_ROUND3.md)：現行/部品/不足/必要試験。現在#88のbase builderはmainのliteral templateと一致、全pipeline未検証。
+- [22 文書精査](22_DOCUMENT_REVIEW_ROUND3.md)：今回8版、累計32/85版、残53版。総覧2版の変遷。
+- [23 ブランチ・資産保護・pending・legacy](23_BRANCH_ASSET_SAFETY_ROUND3.md)：今回静的2件解消、旧44件中残32件。legacy BLOCKED維持。
+- [24 差分台帳](24_ROUND3_LEDGER.json)、[25 固定HEAD/Blob証拠](25_ROUND3_SOURCE_EVIDENCE.json)、[26 PR観測](26_ROUND3_PR_SNAPSHOT.json)。旧09/17/18を保持し重ねて読む。
+- [27 最新進捗と次回引継ぎ](27_REVIEW_PROGRESS_ROUND3.md)：新チャットは基本構想→本README→27→24 pending一覧を読む。
+
+実装/本番受入/全資産監査の完了ではない。実Gemini、DB、デプロイなし。以下は過去時点の記録。
+
+## f55f6fe以降：第2次精査
 
 - [13 文書本文・実装照合](13_DOCUMENT_REVIEW_ROUND2.md)：今回8版、累計24/85版。残61版。
 - [14 ブランチ・実行資産の照合](14_BRANCH_RECONCILIATION_ROUND2.md)：旧証拠不足10/44件を静的照合、残34件。workflowが参照するmain外資産を保全。

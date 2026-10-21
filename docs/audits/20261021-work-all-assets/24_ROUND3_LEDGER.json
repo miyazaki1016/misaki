@@ -1,0 +1,816 @@
+{
+  "schema": "misaki-audit-round3-overlay-v1",
+  "date": "2026-10-21",
+  "baseline_commit": "8d4050f43466a97d61efe1632eadee7a3a4766a2",
+  "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "completed": false,
+  "apply_rule": "09→17→24のID単位追補。旧分類/証拠は削除しない。",
+  "progress": {
+    "document_new": 8,
+    "document_reviewed": 32,
+    "document_total": 85,
+    "document_pending": 53,
+    "branch_new_resolved_static": 2,
+    "branch_total_resolved_static": 12,
+    "branch_insufficient_cohort": 44,
+    "branch_pending": 32,
+    "pr_open": 15,
+    "pr_insufficient": 4,
+    "ideas_preserved": 11,
+    "priority_recovery_groups": 7,
+    "new_verified_ready_unmerged_features": 0,
+    "blocked_branches": 1
+  },
+  "documents": [
+    {
+      "id": "DOC-006",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md",
+      "blob": "3232ab4753618f217efd1e78ed34ac1418dca4f9",
+      "classification": "未完成・要修正",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/shared-conversation-history-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "07dce6253d090770f4ee77c690269848ded101c5",
+        "date": "2026-10-15T09:54:33Z",
+        "message": "docs: establish exact prompt extraction parity gates and source order"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-007",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md",
+      "blob": "eac5633f006e86792864a672483afeca5b70c8fb",
+      "classification": "未反映で今後の実装候補",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/shared-conversation-history-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "918abffbe341d9264ee161c28d5d2e3b8b1ceb41",
+        "date": "2026-10-15T23:59:21Z",
+        "message": "docs: add explicit JSON schema key checklist for prompt drift gate"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-008",
+      "path": "docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md",
+      "blob": "2c0398dd17ee58c8b01e52b55abea195eee33dc0",
+      "classification": "未反映で今後の実装候補",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/conversation-lab-offline-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "2d5d2eddb5cabca44f50f3c498f64d7aa98160db",
+        "date": "2026-10-15T08:00:09Z",
+        "message": "docs: audit production chat versus isolated conversation lab and safety gates"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-009",
+      "path": "docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md",
+      "blob": "49122fdbd4436efbd9283387602c2a514077534e",
+      "classification": "未反映で今後の実装候補",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/conversation-lab-offline-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "f9f24a2f383855b2b4ec1437f929b5de4920579b",
+        "date": "2026-10-15T08:02:12Z",
+        "message": "docs: freeze production prompt parity contract before any extraction"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-010",
+      "path": "docs/CONVERSATION_LONG_TERM_PROBES_20261019.md",
+      "blob": "040a75d2e0e5b11a2bf2f447af67907533dff7ed",
+      "classification": "未反映で今後の実装候補",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/conversation-lab-offline-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "817349b518e884012c6c7ee99dd3c56751a597ac",
+        "date": "2026-10-19T02:05:54Z",
+        "message": "docs: outline long-term relationship conversation probes"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-011",
+      "path": "docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md",
+      "blob": "24c0c214054c0ea5e9a3c9c99aa7b5e21ca77133",
+      "classification": "未完成・要修正",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "no-same-path",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "experiment/conversation-lab-offline-v1-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "cb9e01cd3bed34f0e2ae8627a50993b8cabc963b",
+        "date": "2026-10-19T02:34:00Z",
+        "message": "docs: link real-model readiness audit from quality gate"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-025",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3e5c58a25344e9042c9245b4873158a97237ffb5",
+      "classification": "未完成・要修正",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "different-version",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "fix/gemini-chat-timeout",
+        "fix/grow-relationship-from-first-meeting",
+        "perf/chat-stage-timing",
+        "fix/anonymous-chat-session-drop",
+        "cleanup/remove-legacy-proactive-path"
+      ],
+      "latest_path_change": {
+        "sha": "15cb968736c6c4b2442f9363b7c55f5b299ae5cb",
+        "date": "2026-09-18T00:15:46Z",
+        "message": "旧ブラウザ自発メッセージ経路を削除する\n\nSupabase Edge Function Body Clockへ一本化済みのため、旧ブラウザ自発送信、旧proactive API、旧Vercel Body Clock route、旧互換写真selectorを削除し、実装総覧を更新する。"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-036",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b017757c16aa0435c8d39973da0f7f944247bfb5",
+      "classification": "未完成・要修正",
+      "asset_nature": "document-version",
+      "review_state": "full-text-reviewed-scope-noted",
+      "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+      "main_placement": "different-version",
+      "main_placement_is_feature_completion": false,
+      "branches": [
+        "docs/update-implementation-overview"
+      ],
+      "latest_path_change": {
+        "sha": "621dea871afc4dca517071cc79666d81cb69e29c",
+        "date": "2026-09-17T23:29:33Z",
+        "message": "Update Misaki implementation overview"
+      },
+      "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "22_DOCUMENT_REVIEW_ROUND3.md",
+      "current_behavior_verified": false
+    }
+  ],
+  "branches": [
+    {
+      "id": "BR-035",
+      "branch": "fix/recall-history-grounding",
+      "head": "475410541b700562e0f535484cb3fd02d9f76b1a",
+      "head_at_initial_snapshot": "475410541b700562e0f535484cb3fd02d9f76b1a",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "static-purpose-preserved-not-runtime-acceptance",
+      "review_state": "pending",
+      "reason": "関連PRと差分あり。merged記録だけでは現行機能の同等性を確定しない。",
+      "prs": [
+        8
+      ],
+      "merge_history": [
+        {
+          "number": 8,
+          "title": "記憶確認時に直近会話を回答根拠として再提示する",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-09-17T08:47:13Z",
+          "merge_commit_sha": "b1fc94970726313be721de14e5c7969a7c12a7a3",
+          "head_sha": "475410541b700562e0f535484cb3fd02d9f76b1a",
+          "url": "https://github.com/miyazaki1016/misaki/pull/8"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "10/11の対象又は元code-differencesを機能単位で確認。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "23_BRANCH_ASSET_SAFETY_ROUND3.md"
+    },
+    {
+      "id": "BR-036",
+      "branch": "fix/recall-keep-recent-history",
+      "head": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+      "head_at_initial_snapshot": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "static-purpose-preserved-not-runtime-acceptance",
+      "review_state": "pending",
+      "reason": "関連PRと差分あり。merged記録だけでは現行機能の同等性を確定しない。",
+      "prs": [
+        5
+      ],
+      "merge_history": [
+        {
+          "number": 5,
+          "title": "記憶確認の質問でも直近の会話履歴を保持する",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-09-17T08:03:40Z",
+          "merge_commit_sha": "14d80b91a39af33edea1332f71ba4a06a6763b31",
+          "head_sha": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+          "url": "https://github.com/miyazaki1016/misaki/pull/5"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "10/11の対象又は元code-differencesを機能単位で確認。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "evidence": "23_BRANCH_ASSET_SAFETY_ROUND3.md"
+    }
+  ],
+  "pending_documents": [
+    {
+      "id": "DOC-001",
+      "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+      "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657"
+    },
+    {
+      "id": "DOC-002",
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "blob": "fcfab902743c4918813de44ad2d797bd466eda7a"
+    },
+    {
+      "id": "DOC-003",
+      "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+      "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99"
+    },
+    {
+      "id": "DOC-004",
+      "path": "docs/CONTEXT_AB_EXPERIMENT.md",
+      "blob": "8dc57e97acfdf931d875cecbb7ac39ad35fa72cb"
+    },
+    {
+      "id": "DOC-012",
+      "path": "docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md",
+      "blob": "3b387da4876452a90eda5dca82c791be602de6c5"
+    },
+    {
+      "id": "DOC-013",
+      "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+      "blob": "804407c3dcbb0ca3e6a0d1e765be2d8a9a3cca4a"
+    },
+    {
+      "id": "DOC-014",
+      "path": "docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md",
+      "blob": "5ee661407d2da6d1bd50007bb6393d4d213fa86c"
+    },
+    {
+      "id": "DOC-015",
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410"
+    },
+    {
+      "id": "DOC-018",
+      "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+      "blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511"
+    },
+    {
+      "id": "DOC-019",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "0715dd8a2e80829584525c639c79060eda89369c"
+    },
+    {
+      "id": "DOC-020",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "083dd5663fb7d3dc3961f302d290cc490eb33ac0"
+    },
+    {
+      "id": "DOC-021",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb"
+    },
+    {
+      "id": "DOC-022",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb"
+    },
+    {
+      "id": "DOC-023",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9"
+    },
+    {
+      "id": "DOC-024",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3da8bad0e216589a006cb9862278e012c72f2dc3"
+    },
+    {
+      "id": "DOC-026",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc"
+    },
+    {
+      "id": "DOC-027",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c"
+    },
+    {
+      "id": "DOC-028",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85"
+    },
+    {
+      "id": "DOC-029",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859"
+    },
+    {
+      "id": "DOC-030",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d"
+    },
+    {
+      "id": "DOC-031",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1"
+    },
+    {
+      "id": "DOC-032",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "936f61c6363da27b384e37b00f08aec6b999cd75"
+    },
+    {
+      "id": "DOC-033",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "98551eeb0693a352aaf2c639babec34c95ff6484"
+    },
+    {
+      "id": "DOC-034",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea"
+    },
+    {
+      "id": "DOC-035",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7"
+    },
+    {
+      "id": "DOC-037",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b48887633360762cb4821e0027893d30a92cde52"
+    },
+    {
+      "id": "DOC-038",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb"
+    },
+    {
+      "id": "DOC-039",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c"
+    },
+    {
+      "id": "DOC-040",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b"
+    },
+    {
+      "id": "DOC-041",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3"
+    },
+    {
+      "id": "DOC-042",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8"
+    },
+    {
+      "id": "DOC-043",
+      "path": "docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md",
+      "blob": "ca2b53562d061f8fa01cf803b940173b783da8bb"
+    },
+    {
+      "id": "DOC-048",
+      "path": "docs/MULTI_CHARACTER_DATA_SCOPE_INVENTORY.md",
+      "blob": "949bd01677f83cd3bc88194697f30bb8dbc2a9fd"
+    },
+    {
+      "id": "DOC-049",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "0baf4f28d863f6e075f745afd5c903145887274f"
+    },
+    {
+      "id": "DOC-050",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f"
+    },
+    {
+      "id": "DOC-051",
+      "path": "docs/MULTI_CHARACTER_RPC_CALLER_AUDIT.md",
+      "blob": "143f329c7ef4e5d17fee63c06978c658f2f70c80"
+    },
+    {
+      "id": "DOC-052",
+      "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+      "blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af"
+    },
+    {
+      "id": "DOC-054",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_PARITY_AUDIT_20261015.md",
+      "blob": "465f21fa358d21c6050212ecf622fa23b8e8fa41"
+    },
+    {
+      "id": "DOC-055",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_WIRING_PLAN_20261015.md",
+      "blob": "c91e7e695fa69c2094412810ba881800f6bcd43a"
+    },
+    {
+      "id": "DOC-061",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md",
+      "blob": "bdc5a9b9ace3866149a0a536d1f64577dcc621bc"
+    },
+    {
+      "id": "DOC-062",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md",
+      "blob": "4e9d2d2286073b20df480f021f1b85de932f8dbc"
+    },
+    {
+      "id": "DOC-070",
+      "path": "docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md",
+      "blob": "bc11962d6fd31751f5c8f101a57a331d9844cc4d"
+    },
+    {
+      "id": "DOC-071",
+      "path": "docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md",
+      "blob": "0e6fd6be79d882b29055f3faabb3801b3009e7d6"
+    },
+    {
+      "id": "DOC-072",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "id": "DOC-075",
+      "path": "docs/context-ab-blind-review.md",
+      "blob": "66e283a33430cb7bc07dfd035122f60ba7482fd2"
+    },
+    {
+      "id": "DOC-076",
+      "path": "docs/context-ab-execution-gate.md",
+      "blob": "bb9da685cd80ca66db8e0771121304eda7d84949"
+    },
+    {
+      "id": "DOC-077",
+      "path": "docs/context-ab-real-history-quality-review.md",
+      "blob": "effb8c7139303de6c92523439612b56b67aed160"
+    },
+    {
+      "id": "DOC-078",
+      "path": "docs/context-ab-validation-protocol.md",
+      "blob": "fc5f3fdd4a68f244015b666f826093ea30522d11"
+    },
+    {
+      "id": "DOC-079",
+      "path": "docs/conversation-context-compression-spike.md",
+      "blob": "b5a6296987c955879d540226f14c60d2ae8df9b2"
+    },
+    {
+      "id": "DOC-081",
+      "path": "docs/misaki-blind-quality-evaluation-fixtures.md",
+      "blob": "9ac57367ca4c4bf9c6a50f90658e8799ec0c23d7"
+    },
+    {
+      "id": "DOC-082",
+      "path": "docs/misaki-synthetic-live-evaluation-runbook.md",
+      "blob": "395b5a68e712404520d6ce03b8e5052f8c330207"
+    },
+    {
+      "id": "DOC-083",
+      "path": "docs/misaki-synthetic-reference-replies-and-self-scores.md",
+      "blob": "fb14a7a5422fb4b15a6478fa1cfad3625bd76d3f"
+    },
+    {
+      "id": "DOC-084",
+      "path": "supabase/BODY_CLOCK.md",
+      "blob": "085e5eb74c62641e972ee4c4c547bf60e9fd62fc"
+    }
+  ],
+  "pending_branches": [
+    {
+      "id": "BR-002",
+      "branch": "cleanup/legacy-proactive-tags",
+      "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "prs": [
+        13
+      ]
+    },
+    {
+      "id": "BR-003",
+      "branch": "cleanup/remove-legacy-proactive-path",
+      "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "prs": [
+        23
+      ]
+    },
+    {
+      "id": "BR-007",
+      "branch": "docs/audit-overview-against-source",
+      "head": "f6d8baf94d037057ec94deb87b156a713445d37f",
+      "prs": [
+        22
+      ]
+    },
+    {
+      "id": "BR-008",
+      "branch": "docs/development-registry-audit-20261020",
+      "head": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "prs": []
+    },
+    {
+      "id": "BR-009",
+      "branch": "docs/multi-character-data-scope-inventory",
+      "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c",
+      "prs": [
+        79
+      ]
+    },
+    {
+      "id": "BR-010",
+      "branch": "docs/multi-character-rpc-caller-audit",
+      "head": "83476dd2d347687c253a471557d9c27b82e1caf7",
+      "prs": [
+        80
+      ]
+    },
+    {
+      "id": "BR-011",
+      "branch": "docs/production-source-of-truth-reconciliation",
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "prs": [
+        81
+      ]
+    },
+    {
+      "id": "BR-012",
+      "branch": "docs/relationship-five-axis-design-review-20261015",
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "prs": [
+        84
+      ]
+    },
+    {
+      "id": "BR-014",
+      "branch": "docs/update-implementation-overview",
+      "head": "621dea871afc4dca517071cc79666d81cb69e29c",
+      "prs": [
+        21
+      ]
+    },
+    {
+      "id": "BR-015",
+      "branch": "docs/update-overview-relationship-growth",
+      "head": "1d9db32ea15fbea950ac46090cb6e1a8bc750001",
+      "prs": [
+        28
+      ]
+    },
+    {
+      "id": "BR-019",
+      "branch": "feature/proactive-derived-tags",
+      "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "prs": [
+        12
+      ]
+    },
+    {
+      "id": "BR-020",
+      "branch": "fix/anonymous-chat-session-drop",
+      "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "prs": [
+        24
+      ]
+    },
+    {
+      "id": "BR-021",
+      "branch": "fix/anonymous-email-history",
+      "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "prs": [
+        1
+      ]
+    },
+    {
+      "id": "BR-022",
+      "branch": "fix/anonymous-session-cache-reset",
+      "head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "prs": [
+        4
+      ]
+    },
+    {
+      "id": "BR-023",
+      "branch": "fix/body-clock-claim-rpc",
+      "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "prs": [
+        16
+      ]
+    },
+    {
+      "id": "BR-024",
+      "branch": "fix/chat-failure-recovery",
+      "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "prs": [
+        19
+      ]
+    },
+    {
+      "id": "BR-025",
+      "branch": "fix/chat-network-reliability",
+      "head": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a",
+      "prs": [
+        10
+      ]
+    },
+    {
+      "id": "BR-026",
+      "branch": "fix/chat-reliability-cleanup",
+      "head": "a06baac8110ded425c07e2122117e89460868405",
+      "prs": [
+        9
+      ]
+    },
+    {
+      "id": "BR-027",
+      "branch": "fix/chat-request-diagnostics",
+      "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "prs": [
+        7
+      ]
+    },
+    {
+      "id": "BR-028",
+      "branch": "fix/chat-turn-dedupe",
+      "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5",
+      "prs": [
+        18
+      ]
+    },
+    {
+      "id": "BR-030",
+      "branch": "fix/gemini-chat-timeout",
+      "head": "469578ea12663c594a32c62a05263b23e7190891",
+      "prs": [
+        25
+      ]
+    },
+    {
+      "id": "BR-031",
+      "branch": "fix/gemini-json-retry",
+      "head": "f93a9444565ce1029cd46c0d466456f651ee7c9e",
+      "prs": [
+        3
+      ]
+    },
+    {
+      "id": "BR-032",
+      "branch": "fix/grow-relationship-from-first-meeting",
+      "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "prs": [
+        27
+      ]
+    },
+    {
+      "id": "BR-033",
+      "branch": "fix/legacy-safari-cache",
+      "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "prs": [
+        2
+      ]
+    },
+    {
+      "id": "BR-034",
+      "branch": "fix/preserve-active-chat-history",
+      "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "prs": [
+        17
+      ]
+    },
+    {
+      "id": "BR-038",
+      "branch": "fix/safari-load-failed-message",
+      "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "prs": [
+        11
+      ]
+    },
+    {
+      "id": "BR-040",
+      "branch": "fix/use-chat-proxy",
+      "head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "prs": [
+        6
+      ]
+    },
+    {
+      "id": "BR-041",
+      "branch": "fix/workday-grounding",
+      "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "prs": [
+        20
+      ]
+    },
+    {
+      "id": "BR-043",
+      "branch": "perf/chat-stage-timing",
+      "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "prs": [
+        26
+      ]
+    },
+    {
+      "id": "BR-044",
+      "branch": "refine/proactive-action-tags",
+      "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "prs": [
+        14
+      ]
+    },
+    {
+      "id": "BR-045",
+      "branch": "refine/sleepy-tag",
+      "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "prs": [
+        15
+      ]
+    },
+    {
+      "id": "BR-047",
+      "branch": "sora/canonical-relationship-integration",
+      "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "prs": [
+        32
+      ]
+    }
+  ],
+  "ideas": [
+    {
+      "id": "IDEA10",
+      "meaning": "人物同一性とRelationship Identityの責務分離",
+      "evidence": "19_MEMORY_FORGET_IDENTITY_ROUND3.md",
+      "nature": "audit-derived-principle-not-new-feature"
+    },
+    {
+      "id": "IDEA11",
+      "meaning": "忘却は全再提示経路の権限失効とbarrier世代の保護",
+      "evidence": "19_MEMORY_FORGET_IDENTITY_ROUND3.md",
+      "nature": "audit-derived-principle-not-new-feature"
+    }
+  ],
+  "runtime_executed": false,
+  "static_template_comparison_executed": true,
+  "database_accessed": false,
+  "paid_model_called": false,
+  "reproduced_defects": 0
+}

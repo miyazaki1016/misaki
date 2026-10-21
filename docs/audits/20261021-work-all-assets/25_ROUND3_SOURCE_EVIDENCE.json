@@ -1,0 +1,2472 @@
+{
+  "baseline": "8d4050f43466a97d61efe1632eadee7a3a4766a2",
+  "heads": {
+    "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+    "work/forget-control-v1": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+    "work/relationship-identity-v1": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4",
+    "work/context-no-duplicate-replies-ab": "a849bec92059d326940ffc358635164ea7d391c9",
+    "experiment/conversation-lab-offline-v1-20261015": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e",
+    "design/shared-conversation-engine-contract-20261015": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+    "experiment/shared-conversation-history-v1-20261015": "2ae90d70ff143c8de935f25ec12f291e9b82613a",
+    "codex/legacy-maintenance-drain": "17449c7ec4e8ff50605ef931b04ae76584c6304f"
+  },
+  "template_normalized_equal": true,
+  "template_comparison_scope": "literal template only; no execution or dynamic resolution parity",
+  "sources": [
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-engine-v1.ts",
+      "blob": "969f26a2c02e823a298e88f7908b60cfc7871553"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-signal.ts",
+      "blob": "935dc7d5124d479cd98e1c357dd7430d5c127bff"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-action.ts",
+      "blob": "ec986a2e6245c77fe7fe1bd4d5b4e91a5b6ef63b"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/push-notifications.ts",
+      "blob": "974a75fb857370f866d5509d48db1bc7c86e258e"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/gemini-usage-telemetry.ts",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-emotion-reducer.ts",
+      "blob": "baceeb186e4d55c3623c9abd53319d2e8ea5c57d"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-action-reducer.ts",
+      "blob": "2c7e22865ca1db27b7a69046a6e183b6943409eb"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-points.ts",
+      "blob": "8c7e7d35dadeb43ab8a2dc93f3a00f5e0f675349"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-turn-expression.ts",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/canonical-state.ts",
+      "blob": "584989230ed0dc89a8aee961aa169e32d4646d3a"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-emotion.ts",
+      "blob": "f0273fe241eb7424b8d9c6f02896c1a0d5385ad2"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/maintenance.ts",
+      "blob": "e7a535303f2178f593d746fcb980be573f8cc00b"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "blob": "0a3898beb90b8e0def5d7aaa5521f69d59a63148"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-runtime-v1.ts",
+      "blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-processing-v1.ts",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-analyzer-v1.ts",
+      "blob": "05944b0ab0fcd8e2afe47a0020af6735e852875e"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/supabase.ts",
+      "blob": "bbbd0ef06a4308501043e803d156064ec9d00617"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/relationship-emotion-store.ts",
+      "blob": "fd981ab0dca7618ec95b72eaa0642d551209ba93"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/user-profile.ts",
+      "blob": "a5cc92560077d7df4e54148031a4945f524a04e2"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/maintenance-result.ts",
+      "blob": "8b4e2620515dde19d9ee431c3a144a1c7adc572f"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "snapshot": "main",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-life-context.test.ts",
+      "blob": "62741123255324769838445d50fd7fa49c5f3591"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-v2-rpc.test.ts",
+      "blob": "5189ff021d94b7612a3bf59001cfe355acc20d00"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/temporary-continuity.test.cjs",
+      "blob": "9d1f00813458aefa4c39c879ca00de48ae41c5ce"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-points.test.ts",
+      "blob": "e874110a0844bc8c05a2ceefbed28b5da6c53ad1"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-life-extraction.test.ts",
+      "blob": "f2371b903f8460f29d9cbe76dfc111b9cba470c6"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/reply-feedback.test.ts",
+      "blob": "708138b0db011493cfdb0bbf599435ef04ff4a31"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/body-clock-silence-contract.test.cjs",
+      "blob": "6d3bc7bd41ae85035983b3cb61dad0f81d55e5ea"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-engine-v1.test.ts",
+      "blob": "22b568c1c91ff91319e645756ec3d8649b88e8bf"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/body-clock-canonical.test.cjs",
+      "blob": "f8162052e7e97d70e7fa32d14bceed000572cac9"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/server-canonical.test.cjs",
+      "blob": "3fd7c913fdc206e358c4f47efc5cfc315678b2b5"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "blob": "b31ecaa953d131e04d085e78d8fe3896dc6e9b59"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "blob": "af9b1dcfbd193194920825e8b73c9ad59502b5d1"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "blob": "b322a483ecb7e30bd876019a18da282816a84d7f"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "blob": "3392b656df8e70e3724c2ca7848a6bb06b3b0b19"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-patterns.test.ts",
+      "blob": "4e248b73d518ef62608e74ea699a4cfd9ed4ec2f"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-acting-guide.test.ts",
+      "blob": "743ac06f868fe17df3ca980597ecee67385760f0"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/maintenance.test.cjs",
+      "blob": "7464b5a5fb4e2944ae798c9b7b77a68dd3ad7768"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/account-conversation.test.cjs",
+      "blob": "c5f8059692c151860434a6e07957b1dd08e53ab9"
+    },
+    {
+      "snapshot": "main",
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "blob": "4b819d3b467ac3ed0b3d60343f436d3371ef5f27"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "blob": "85e3cab0514f42742c7f2f8bb6b45f0083bf14c6"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "blob": "9542912086152c0a51a68a70ea1329a72c14a4da"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "blob": "20f44c0f1faeb1aae81f38c1ffb5cb4b66dfd9ab"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "db885c0b2417255c061351c7160c0323763e7822"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "blob": "9a0e72fba0f0badf7a7db58b5a5d39e00f324836"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "main",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/persona/evolution-analyzer.ts",
+      "blob": "294b6c59e921e3425addcc82b5ad4e1ccab1fa1b"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/persona/natural-memory.ts",
+      "blob": "bc77222bcf213f8ba0453368e882761b542add9e"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/persona/evolution-runner.ts",
+      "blob": "d2ac4b323f74d726c5c0fc172519b1263fd5c3d4"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/persona/persona-store.ts",
+      "blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c"
+    },
+    {
+      "snapshot": "main",
+      "path": "lib/persona/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/chat/route.ts",
+      "blob": "5600ad37f2660049a570c4dd340e8ed140d9843b"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/acting-lab/route.ts",
+      "blob": "b046873065f41d26e294f87c419c772b33806a21"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/persona/evolution/_auth.ts",
+      "blob": "4d19e96bf40a64f43ec84daea527ef5c7f51226c"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/persona/evolution/review/route.ts",
+      "blob": "8e891146b826ed0655e2bbb2516975d65fc367fb"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "blob": "a6a1ab4d4a0a05aef491b79608f823656599ac10"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/persona/evolution/candidates/route.ts",
+      "blob": "a4131c71fef91a82ac5eb2df6c3fc764a616a6e8"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/push/body-clock/route.ts",
+      "blob": "c68f6afdfad7a6b904fcd0dc6341ead95f58b51b"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/push/test/route.ts",
+      "blob": "262dc0e058eac6d6aa518cf9ad83a79847585e44"
+    },
+    {
+      "snapshot": "main",
+      "path": "app/api/push/vapid-public-key/route.ts",
+      "blob": "b75c65d14fce58261aab032bd5590713f0cbe167"
+    },
+    {
+      "snapshot": "main",
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "blob": "edffcd3d81dffc084fb655a5014af901f33383a2"
+    },
+    {
+      "snapshot": "main",
+      "path": ".github/workflows/manual-synthetic-quality-evaluation.yml",
+      "blob": "98685476231da27fab15752477d0d3a85034f29a"
+    },
+    {
+      "snapshot": "main",
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "blob": "a534d7ebceaaa73830088377dabe43550be9ca58"
+    },
+    {
+      "snapshot": "main",
+      "path": ".github/workflows/context-ab-live-manual.yml",
+      "blob": "a0629a27b36697524b94d5b04d774868da23a6ee"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-engine-v1.ts",
+      "blob": "969f26a2c02e823a298e88f7908b60cfc7871553"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-signal.ts",
+      "blob": "935dc7d5124d479cd98e1c357dd7430d5c127bff"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-action.ts",
+      "blob": "ec986a2e6245c77fe7fe1bd4d5b4e91a5b6ef63b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/push-notifications.ts",
+      "blob": "974a75fb857370f866d5509d48db1bc7c86e258e"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/gemini-usage-telemetry.ts",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-emotion-reducer.ts",
+      "blob": "baceeb186e4d55c3623c9abd53319d2e8ea5c57d"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-action-reducer.ts",
+      "blob": "2c7e22865ca1db27b7a69046a6e183b6943409eb"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-points.ts",
+      "blob": "8c7e7d35dadeb43ab8a2dc93f3a00f5e0f675349"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-turn-expression.ts",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/canonical-state.ts",
+      "blob": "20445722e4ea90bc00a192fb8244f8614eeb0a44"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-emotion.ts",
+      "blob": "f0273fe241eb7424b8d9c6f02896c1a0d5385ad2"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/maintenance.ts",
+      "blob": "e7a535303f2178f593d746fcb980be573f8cc00b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "blob": "0a3898beb90b8e0def5d7aaa5521f69d59a63148"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-runtime-v1.ts",
+      "blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-processing-v1.ts",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-analyzer-v1.ts",
+      "blob": "05944b0ab0fcd8e2afe47a0020af6735e852875e"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/supabase.ts",
+      "blob": "bbbd0ef06a4308501043e803d156064ec9d00617"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/relationship-emotion-store.ts",
+      "blob": "fd981ab0dca7618ec95b72eaa0642d551209ba93"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/user-profile.ts",
+      "blob": "a5cc92560077d7df4e54148031a4945f524a04e2"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/maintenance-result.ts",
+      "blob": "8b4e2620515dde19d9ee431c3a144a1c7adc572f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "0715dd8a2e80829584525c639c79060eda89369c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "snapshot": "forget",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-life-context.test.ts",
+      "blob": "62741123255324769838445d50fd7fa49c5f3591"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-call-count.test.cjs",
+      "blob": "ba938f19ff517456385dc2f78134cbea813288d3"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-v2-rpc.test.ts",
+      "blob": "5189ff021d94b7612a3bf59001cfe355acc20d00"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/temporary-continuity.test.cjs",
+      "blob": "3aabda4ba86ad0b5302c16b05d2c3eb23efe97fa"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-points.test.ts",
+      "blob": "e874110a0844bc8c05a2ceefbed28b5da6c53ad1"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-fixture.cjs",
+      "blob": "01f471fab2ad8c94cf224398c1b24176c8c9d25b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-life-extraction.test.ts",
+      "blob": "f2371b903f8460f29d9cbe76dfc111b9cba470c6"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/reply-feedback.test.ts",
+      "blob": "708138b0db011493cfdb0bbf599435ef04ff4a31"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/body-clock-silence-contract.test.cjs",
+      "blob": "6d3bc7bd41ae85035983b3cb61dad0f81d55e5ea"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-database.test.cjs",
+      "blob": "ec0c748ac6e0304cc5d2950a038bea99e8e24d36"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-engine-v1.test.ts",
+      "blob": "22b568c1c91ff91319e645756ec3d8649b88e8bf"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/body-clock-canonical.test.cjs",
+      "blob": "83079100cbd8a11314929e62f2a789a35a4895f4"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/server-canonical.test.cjs",
+      "blob": "18b34b83467ab4ffbb0935300fe7ba2051a9ef4f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "blob": "b31ecaa953d131e04d085e78d8fe3896dc6e9b59"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "blob": "af9b1dcfbd193194920825e8b73c9ad59502b5d1"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "blob": "b322a483ecb7e30bd876019a18da282816a84d7f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-batch.test.ts",
+      "blob": "2bc599b8913819d0da119a08641bc64e79a18fe3"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-control.test.ts",
+      "blob": "6a23ec76a75624fce6549787e7c825531e7f5185"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "blob": "3392b656df8e70e3724c2ca7848a6bb06b3b0b19"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-integration.test.cjs",
+      "blob": "99b6057f570deaf18464fb87fe59c266498f1923"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-patterns.test.ts",
+      "blob": "4e248b73d518ef62608e74ea699a4cfd9ed4ec2f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-acting-guide.test.ts",
+      "blob": "743ac06f868fe17df3ca980597ecee67385760f0"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/forget-batch-evaluate.ts",
+      "blob": "b67cd2849585f1f48cc6d832eace33d30c8b05f5"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/maintenance.test.cjs",
+      "blob": "cf631649b275ab4d75a974f47313c8df25ded329"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/account-conversation.test.cjs",
+      "blob": "0492764c8e0e60e0cfbf6fce0f7d6de800ecfad2"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "blob": "4b819d3b467ac3ed0b3d60343f436d3371ef5f27"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "blob": "85e3cab0514f42742c7f2f8bb6b45f0083bf14c6"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "blob": "efbd90f3b9cee36d2a20174e24892201f454a435"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "blob": "b696fab69989532631463af5e0b0e6ad14c39cad"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "13aad1a52bc30f4dc0f2506735ef0a2286979d1c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "blob": "a83f7c94440b7a1fe4560b1c09229b6fed136086"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7"
+    },
+    {
+      "snapshot": "forget",
+      "path": "supabase/functions/_shared/forget-control.ts",
+      "blob": "e7763c96e7f94a896fef3323fddaef53fab8072a"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/persona/evolution-analyzer.ts",
+      "blob": "294b6c59e921e3425addcc82b5ad4e1ccab1fa1b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/persona/natural-memory.ts",
+      "blob": "bc77222bcf213f8ba0453368e882761b542add9e"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/persona/evolution-runner.ts",
+      "blob": "5586b1c63aa8938b2d4fb0838d220170c802403c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/persona/persona-store.ts",
+      "blob": "fb4395e2054b82110932163c78f5a29ec5a9eed7"
+    },
+    {
+      "snapshot": "forget",
+      "path": "lib/persona/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/helpers/forget-batch-runner.ts",
+      "blob": "553785ea8143f84dcb502e4caed6009d600319f3"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/helpers/canonical-harness.cjs",
+      "blob": "658a5d252f2e2a110112c3d4e69a2fd5c6494cec"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/helpers/forget-batch-fixtures.ts",
+      "blob": "adafa09fb6a72acf788cf920455afa70c7f849e1"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/helpers/forget-batch-evaluation.ts",
+      "blob": "194aa23460b7066a6d5d22e0e96282c809fae985"
+    },
+    {
+      "snapshot": "forget",
+      "path": "tests/reports/forget-batch-evaluation.md",
+      "blob": "fa3b7bcb6ea654f1777adff83c6481ca48af4fc9"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/chat/route.ts",
+      "blob": "9bf009f871eba55732986807445337cc557ac179"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/acting-lab/route.ts",
+      "blob": "b046873065f41d26e294f87c419c772b33806a21"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "c99434f06f76525339a46a22a8bf22d6ed2440b4"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/persona/evolution/_auth.ts",
+      "blob": "4d19e96bf40a64f43ec84daea527ef5c7f51226c"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/persona/evolution/review/route.ts",
+      "blob": "8e891146b826ed0655e2bbb2516975d65fc367fb"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "blob": "3c6815b0101e82bd951c8a0d30665635dc739993"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/persona/evolution/candidates/route.ts",
+      "blob": "a4131c71fef91a82ac5eb2df6c3fc764a616a6e8"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/push/body-clock/route.ts",
+      "blob": "c68f6afdfad7a6b904fcd0dc6341ead95f58b51b"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/push/test/route.ts",
+      "blob": "262dc0e058eac6d6aa518cf9ad83a79847585e44"
+    },
+    {
+      "snapshot": "forget",
+      "path": "app/api/push/vapid-public-key/route.ts",
+      "blob": "b75c65d14fce58261aab032bd5590713f0cbe167"
+    },
+    {
+      "snapshot": "forget",
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "blob": "a534d7ebceaaa73830088377dabe43550be9ca58"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-engine-v1.ts",
+      "blob": "591ebb10e928c7c4e3fac84ce3e529bc763b73cc"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-identity-resolver.ts",
+      "blob": "63279032c8a9708e3f4899c9661d5676146a5ba0"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-signal.ts",
+      "blob": "935dc7d5124d479cd98e1c357dd7430d5c127bff"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-action.ts",
+      "blob": "ec986a2e6245c77fe7fe1bd4d5b4e91a5b6ef63b"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/push-notifications.ts",
+      "blob": "974a75fb857370f866d5509d48db1bc7c86e258e"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/gemini-usage-telemetry.ts",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-emotion-reducer.ts",
+      "blob": "baceeb186e4d55c3623c9abd53319d2e8ea5c57d"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-action-reducer.ts",
+      "blob": "2c7e22865ca1db27b7a69046a6e183b6943409eb"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-points.ts",
+      "blob": "8c7e7d35dadeb43ab8a2dc93f3a00f5e0f675349"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-turn-expression.ts",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/canonical-state.ts",
+      "blob": "db18f2107c261e6bb3b54689087ace00629db2c7"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-emotion.ts",
+      "blob": "f0273fe241eb7424b8d9c6f02896c1a0d5385ad2"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/maintenance.ts",
+      "blob": "e7a535303f2178f593d746fcb980be573f8cc00b"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "blob": "0a3898beb90b8e0def5d7aaa5521f69d59a63148"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "c12ac2d42f3fccfbbba725566322cfb32380da9d"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-runtime-v1.ts",
+      "blob": "b6c18085703e994cc9b3e9c325759242d0bb6e6c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-processing-v1.ts",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-analyzer-v1.ts",
+      "blob": "de1276e74a387f80fced0355901e0336d7cab51d"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/supabase.ts",
+      "blob": "bbbd0ef06a4308501043e803d156064ec9d00617"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/relationship-emotion-store.ts",
+      "blob": "fd981ab0dca7618ec95b72eaa0642d551209ba93"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/user-profile.ts",
+      "blob": "a5cc92560077d7df4e54148031a4945f524a04e2"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/maintenance-result.ts",
+      "blob": "8b4e2620515dde19d9ee431c3a144a1c7adc572f"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "snapshot": "identity",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-life-context.test.ts",
+      "blob": "62741123255324769838445d50fd7fa49c5f3591"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-v2-rpc.test.ts",
+      "blob": "5189ff021d94b7612a3bf59001cfe355acc20d00"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-mutual-acceptance.test.ts",
+      "blob": "4c979a25dda3020212be0cc8fb53cadefba4d781"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/temporary-continuity.test.cjs",
+      "blob": "9d1f00813458aefa4c39c879ca00de48ae41c5ce"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-points.test.ts",
+      "blob": "e874110a0844bc8c05a2ceefbed28b5da6c53ad1"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-life-extraction.test.ts",
+      "blob": "f2371b903f8460f29d9cbe76dfc111b9cba470c6"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/reply-feedback.test.ts",
+      "blob": "708138b0db011493cfdb0bbf599435ef04ff4a31"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/body-clock-silence-contract.test.cjs",
+      "blob": "6d3bc7bd41ae85035983b3cb61dad0f81d55e5ea"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-engine-v1.test.ts",
+      "blob": "22b568c1c91ff91319e645756ec3d8649b88e8bf"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-sql.test.ts",
+      "blob": "5b1cd6dc73915a9b9d7f650c8883212b5c96feb0"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/body-clock-canonical.test.cjs",
+      "blob": "f8162052e7e97d70e7fa32d14bceed000572cac9"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/server-canonical.test.cjs",
+      "blob": "3fd7c913fdc206e358c4f47efc5cfc315678b2b5"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "blob": "b31ecaa953d131e04d085e78d8fe3896dc6e9b59"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-persistence.test.ts",
+      "blob": "a07918a1837eed12684d6e036188a1fd4db28067"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "blob": "af9b1dcfbd193194920825e8b73c9ad59502b5d1"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "blob": "b322a483ecb7e30bd876019a18da282816a84d7f"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "blob": "3392b656df8e70e3724c2ca7848a6bb06b3b0b19"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-resolver.test.ts",
+      "blob": "b928570b17c5cab97f8a8cfd598e6a27cc49d478"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-anonymous-runtime.test.ts",
+      "blob": "5ace5f7b5bf8f013da4db53d477796ec8dbdad3e"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-temporary-import.test.ts",
+      "blob": "e866e7eb51a5066cb9dbd711d0715bdf6a5bf225"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-patterns.test.ts",
+      "blob": "4e248b73d518ef62608e74ea699a4cfd9ed4ec2f"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-acting-guide.test.ts",
+      "blob": "5f69260ce8bd7b112ac6a0e058b4f78353381b05"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/maintenance.test.cjs",
+      "blob": "7464b5a5fb4e2944ae798c9b7b77a68dd3ad7768"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/account-conversation.test.cjs",
+      "blob": "c5f8059692c151860434a6e07957b1dd08e53ab9"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "blob": "4b819d3b467ac3ed0b3d60343f436d3371ef5f27"
+    },
+    {
+      "snapshot": "identity",
+      "path": "tests/relationship-identity-audit.test.ts",
+      "blob": "4322203297cd0b093b08a0a320c10512d60024fd"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "blob": "85e3cab0514f42742c7f2f8bb6b45f0083bf14c6"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "blob": "9542912086152c0a51a68a70ea1329a72c14a4da"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "blob": "20f44c0f1faeb1aae81f38c1ffb5cb4b66dfd9ab"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "db885c0b2417255c061351c7160c0323763e7822"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "blob": "9a0e72fba0f0badf7a7db58b5a5d39e00f324836"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/persona/evolution-analyzer.ts",
+      "blob": "294b6c59e921e3425addcc82b5ad4e1ccab1fa1b"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/persona/natural-memory.ts",
+      "blob": "bc77222bcf213f8ba0453368e882761b542add9e"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/persona/evolution-runner.ts",
+      "blob": "d2ac4b323f74d726c5c0fc172519b1263fd5c3d4"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/persona/persona-store.ts",
+      "blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "lib/persona/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/chat/route.ts",
+      "blob": "f568646c0ced8c676bdd8f129f03de8fa89cb5e2"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/acting-lab/route.ts",
+      "blob": "b046873065f41d26e294f87c419c772b33806a21"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/persona/evolution/_auth.ts",
+      "blob": "4d19e96bf40a64f43ec84daea527ef5c7f51226c"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/persona/evolution/review/route.ts",
+      "blob": "8e891146b826ed0655e2bbb2516975d65fc367fb"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "blob": "a6a1ab4d4a0a05aef491b79608f823656599ac10"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/persona/evolution/candidates/route.ts",
+      "blob": "a4131c71fef91a82ac5eb2df6c3fc764a616a6e8"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/push/body-clock/route.ts",
+      "blob": "c68f6afdfad7a6b904fcd0dc6341ead95f58b51b"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/push/test/route.ts",
+      "blob": "262dc0e058eac6d6aa518cf9ad83a79847585e44"
+    },
+    {
+      "snapshot": "identity",
+      "path": "app/api/push/vapid-public-key/route.ts",
+      "blob": "b75c65d14fce58261aab032bd5590713f0cbe167"
+    },
+    {
+      "snapshot": "identity",
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "blob": "a534d7ebceaaa73830088377dabe43550be9ca58"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-engine-v1.ts",
+      "blob": "969f26a2c02e823a298e88f7908b60cfc7871553"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-signal.ts",
+      "blob": "935dc7d5124d479cd98e1c357dd7430d5c127bff"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-action.ts",
+      "blob": "ec986a2e6245c77fe7fe1bd4d5b4e91a5b6ef63b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/push-notifications.ts",
+      "blob": "974a75fb857370f866d5509d48db1bc7c86e258e"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/gemini-usage-telemetry.ts",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-emotion-reducer.ts",
+      "blob": "baceeb186e4d55c3623c9abd53319d2e8ea5c57d"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-action-reducer.ts",
+      "blob": "2c7e22865ca1db27b7a69046a6e183b6943409eb"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-points.ts",
+      "blob": "8c7e7d35dadeb43ab8a2dc93f3a00f5e0f675349"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-turn-expression.ts",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/canonical-state.ts",
+      "blob": "584989230ed0dc89a8aee961aa169e32d4646d3a"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-emotion.ts",
+      "blob": "f0273fe241eb7424b8d9c6f02896c1a0d5385ad2"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/maintenance.ts",
+      "blob": "e7a535303f2178f593d746fcb980be573f8cc00b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "blob": "0a3898beb90b8e0def5d7aaa5521f69d59a63148"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-runtime-v1.ts",
+      "blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-processing-v1.ts",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-analyzer-v1.ts",
+      "blob": "05944b0ab0fcd8e2afe47a0020af6735e852875e"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/supabase.ts",
+      "blob": "bbbd0ef06a4308501043e803d156064ec9d00617"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/relationship-emotion-store.ts",
+      "blob": "fd981ab0dca7618ec95b72eaa0642d551209ba93"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/user-profile.ts",
+      "blob": "a5cc92560077d7df4e54148031a4945f524a04e2"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/maintenance-result.ts",
+      "blob": "8b4e2620515dde19d9ee431c3a144a1c7adc572f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_LONG_TERM_PROBES_20261019.md",
+      "blob": "040a75d2e0e5b11a2bf2f447af67907533dff7ed"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md",
+      "blob": "3b387da4876452a90eda5dca82c791be602de6c5"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md",
+      "blob": "2c0398dd17ee58c8b01e52b55abea195eee33dc0"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+      "blob": "804407c3dcbb0ca3e6a0d1e765be2d8a9a3cca4a"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md",
+      "blob": "49122fdbd4436efbd9283387602c2a514077534e"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md",
+      "blob": "24c0c214054c0ea5e9a3c9c99aa7b5e21ca77133"
+    },
+    {
+      "snapshot": "lab",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-life-context.test.ts",
+      "blob": "62741123255324769838445d50fd7fa49c5f3591"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-v2-rpc.test.ts",
+      "blob": "5189ff021d94b7612a3bf59001cfe355acc20d00"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-quality-probes.test.ts",
+      "blob": "b60278ddf37c81aa3909625b14fb151ae21782f0"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-quality-assessment.test.ts",
+      "blob": "a88e87bf06940da9bc2215bc58738c41b9d73801"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/temporary-continuity.test.cjs",
+      "blob": "9d1f00813458aefa4c39c879ca00de48ae41c5ce"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-quality-probe-runner.test.ts",
+      "blob": "053fe2f1606b6df6756583d35fa4444a869b6043"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-points.test.ts",
+      "blob": "e874110a0844bc8c05a2ceefbed28b5da6c53ad1"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-recorded-reply-import.test.ts",
+      "blob": "0a148b9e00550d852ed282f03ebe308199e7729b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-life-extraction.test.ts",
+      "blob": "f2371b903f8460f29d9cbe76dfc111b9cba470c6"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/reply-feedback.test.ts",
+      "blob": "708138b0db011493cfdb0bbf599435ef04ff4a31"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/body-clock-silence-contract.test.cjs",
+      "blob": "6d3bc7bd41ae85035983b3cb61dad0f81d55e5ea"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-live-smoke-probe.test.ts",
+      "blob": "fe055881c6d7b87d478c30f73041730fefd493b8"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-quality-reviewed-comparison.test.ts",
+      "blob": "fc176b07bf146d5f15d7bcdef579cc30ff0c3fb3"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-engine-v1.test.ts",
+      "blob": "22b568c1c91ff91319e645756ec3d8649b88e8bf"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/body-clock-canonical.test.cjs",
+      "blob": "f8162052e7e97d70e7fa32d14bceed000572cac9"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/server-canonical.test.cjs",
+      "blob": "3fd7c913fdc206e358c4f47efc5cfc315678b2b5"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-live-smoke-mocked.test.ts",
+      "blob": "1e1c0655e5659e4bfcbc588c14d31cc368981202"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "blob": "b31ecaa953d131e04d085e78d8fe3896dc6e9b59"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-quality-review-packet.test.ts",
+      "blob": "c417a0d1eaa134184e929317fe64d84627ebc0a2"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-evaluation.test.ts",
+      "blob": "17ee899a3229ab3ae40117b6e9b1bfc3031821f4"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "blob": "af9b1dcfbd193194920825e8b73c9ad59502b5d1"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "blob": "b322a483ecb7e30bd876019a18da282816a84d7f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "blob": "3392b656df8e70e3724c2ca7848a6bb06b3b0b19"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-patterns.test.ts",
+      "blob": "4e248b73d518ef62608e74ea699a4cfd9ed4ec2f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-acting-guide.test.ts",
+      "blob": "743ac06f868fe17df3ca980597ecee67385760f0"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-github-one-shot-claim.test.ts",
+      "blob": "b40aa29d784da1592306636c5023af4b22a23ff1"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/maintenance.test.cjs",
+      "blob": "7464b5a5fb4e2944ae798c9b7b77a68dd3ad7768"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/conversation-lab-runner.test.ts",
+      "blob": "8daebfb160e0fb8ab20801a6a9bd49bf7fa29d8c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/account-conversation.test.cjs",
+      "blob": "c5f8059692c151860434a6e07957b1dd08e53ab9"
+    },
+    {
+      "snapshot": "lab",
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "blob": "4b819d3b467ac3ed0b3d60343f436d3371ef5f27"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "blob": "85e3cab0514f42742c7f2f8bb6b45f0083bf14c6"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "blob": "9542912086152c0a51a68a70ea1329a72c14a4da"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "blob": "20f44c0f1faeb1aae81f38c1ffb5cb4b66dfd9ab"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "db885c0b2417255c061351c7160c0323763e7822"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "blob": "9a0e72fba0f0badf7a7db58b5a5d39e00f324836"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/quality-review-packet.ts",
+      "blob": "cc91100b1ec6776d221716cdc61bd0c8cdb6c3bf"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/quality-probes.ts",
+      "blob": "d01db22ae6f429e0b77b9441fdc9d7992f72cf09"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/live-smoke-probe.ts",
+      "blob": "103da434ee9943a0421a84d9410ce624852e46dc"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/quality-probe-runner.ts",
+      "blob": "755ee920b4525064c39f36f209511b8eae87629d"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/recorded-reply-import.ts",
+      "blob": "47f96bc01297e656e3945f44f7d1b8af97e2fa11"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/github-one-shot-claim.ts",
+      "blob": "75dd7e95bf9eac37ecfde305e064d31da6d1ffcc"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/quality-assessment.ts",
+      "blob": "3683bd8d1dbf2b355c3c11c65961871c5e3bdee1"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/evaluation.ts",
+      "blob": "4faa978de228e2418ba785285197fb156b4787ea"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/quality-reviewed-comparison.ts",
+      "blob": "f6a44db53ebe296c80169cc35b3bdd9b0157f46d"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/scenarios.ts",
+      "blob": "fbede0e3ffb8620a1801b0880d74b962ac236f63"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/conversation-lab/runner.ts",
+      "blob": "d6e0c76d7a03af89a2647fc3c219a82f02c742dd"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/persona/evolution-analyzer.ts",
+      "blob": "294b6c59e921e3425addcc82b5ad4e1ccab1fa1b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/persona/natural-memory.ts",
+      "blob": "bc77222bcf213f8ba0453368e882761b542add9e"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/persona/evolution-runner.ts",
+      "blob": "d2ac4b323f74d726c5c0fc172519b1263fd5c3d4"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/persona/persona-store.ts",
+      "blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "lib/persona/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/chat/route.ts",
+      "blob": "5600ad37f2660049a570c4dd340e8ed140d9843b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/acting-lab/route.ts",
+      "blob": "b046873065f41d26e294f87c419c772b33806a21"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/persona/evolution/_auth.ts",
+      "blob": "4d19e96bf40a64f43ec84daea527ef5c7f51226c"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/persona/evolution/review/route.ts",
+      "blob": "8e891146b826ed0655e2bbb2516975d65fc367fb"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "blob": "a6a1ab4d4a0a05aef491b79608f823656599ac10"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/persona/evolution/candidates/route.ts",
+      "blob": "a4131c71fef91a82ac5eb2df6c3fc764a616a6e8"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/push/body-clock/route.ts",
+      "blob": "c68f6afdfad7a6b904fcd0dc6341ead95f58b51b"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/push/test/route.ts",
+      "blob": "262dc0e058eac6d6aa518cf9ad83a79847585e44"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/push/vapid-public-key/route.ts",
+      "blob": "b75c65d14fce58261aab032bd5590713f0cbe167"
+    },
+    {
+      "snapshot": "lab",
+      "path": "app/api/conversation-review/smoke/route.ts",
+      "blob": "640ddc7042bb5bd752b1b446430d9e6dfba953c5"
+    },
+    {
+      "snapshot": "lab",
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "blob": "edffcd3d81dffc084fb655a5014af901f33383a2"
+    },
+    {
+      "snapshot": "lab",
+      "path": ".github/workflows/manual-synthetic-quality-evaluation.yml",
+      "blob": "98685476231da27fab15752477d0d3a85034f29a"
+    },
+    {
+      "snapshot": "lab",
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "blob": "a534d7ebceaaa73830088377dabe43550be9ca58"
+    },
+    {
+      "snapshot": "lab",
+      "path": ".github/workflows/context-ab-live-manual.yml",
+      "blob": "a0629a27b36697524b94d5b04d774868da23a6ee"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-engine-v1.ts",
+      "blob": "969f26a2c02e823a298e88f7908b60cfc7871553"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-signal.ts",
+      "blob": "935dc7d5124d479cd98e1c357dd7430d5c127bff"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-action.ts",
+      "blob": "ec986a2e6245c77fe7fe1bd4d5b4e91a5b6ef63b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/push-notifications.ts",
+      "blob": "974a75fb857370f866d5509d48db1bc7c86e258e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/gemini-usage-telemetry.ts",
+      "blob": "a1ef34771b7e61671d12f637c69f0959159670a2"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-emotion-reducer.ts",
+      "blob": "baceeb186e4d55c3623c9abd53319d2e8ea5c57d"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-action-reducer.ts",
+      "blob": "2c7e22865ca1db27b7a69046a6e183b6943409eb"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-points.ts",
+      "blob": "8c7e7d35dadeb43ab8a2dc93f3a00f5e0f675349"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-turn-expression.ts",
+      "blob": "d7b2b66e987a67168adac0b922e7f9eaf146e77b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/canonical-state.ts",
+      "blob": "584989230ed0dc89a8aee961aa169e32d4646d3a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-emotion.ts",
+      "blob": "f0273fe241eb7424b8d9c6f02896c1a0d5385ad2"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/maintenance.ts",
+      "blob": "e7a535303f2178f593d746fcb980be573f8cc00b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "blob": "0a3898beb90b8e0def5d7aaa5521f69d59a63148"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-runtime-v1.ts",
+      "blob": "a5d2299769ae2d5bf9b2a7ecd7baae7afd5c203f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-processing-v1.ts",
+      "blob": "bc89fbc00036b66b4f0b3d3500f853bf2bf38ed5"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-analyzer-v1.ts",
+      "blob": "05944b0ab0fcd8e2afe47a0020af6735e852875e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/supabase.ts",
+      "blob": "bbbd0ef06a4308501043e803d156064ec9d00617"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/relationship-emotion-store.ts",
+      "blob": "fd981ab0dca7618ec95b72eaa0642d551209ba93"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/user-profile.ts",
+      "blob": "a5cc92560077d7df4e54148031a4945f524a04e2"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/maintenance-result.ts",
+      "blob": "8b4e2620515dde19d9ee431c3a144a1c7adc572f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md",
+      "blob": "54c033dcf3549ed789175f59d966d34efcf2af0f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md",
+      "blob": "3232ab4753618f217efd1e78ed34ac1418dca4f9"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "blob": "fcfab902743c4918813de44ad2d797bd466eda7a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md",
+      "blob": "eac5633f006e86792864a672483afeca5b70c8fb"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "snapshot": "engine",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-history.test.ts",
+      "blob": "11658c1f6a600c40c73a923b870a0bd71d4ea98c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-life-context.test.ts",
+      "blob": "62741123255324769838445d50fd7fa49c5f3591"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-memory.test.ts",
+      "blob": "013484520c236581a140d834388303184ec89d1e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-relationship-context.test.ts",
+      "blob": "29339d09635261b83733fa0ea6bd6df86947b723"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-v2-rpc.test.ts",
+      "blob": "5189ff021d94b7612a3bf59001cfe355acc20d00"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-layered-context.test.ts",
+      "blob": "3511b5e6bb591371cd337a74366b747241c71a4b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/temporary-continuity.test.cjs",
+      "blob": "9d1f00813458aefa4c39c879ca00de48ae41c5ce"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-points.test.ts",
+      "blob": "e874110a0844bc8c05a2ceefbed28b5da6c53ad1"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-life-extraction.test.ts",
+      "blob": "f2371b903f8460f29d9cbe76dfc111b9cba470c6"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/reply-feedback.test.ts",
+      "blob": "708138b0db011493cfdb0bbf599435ef04ff4a31"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-character-prompt.test.ts",
+      "blob": "d561efa76eb3af5ec2f1c601828ccc9133ee0a08"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/body-clock-silence-contract.test.cjs",
+      "blob": "6d3bc7bd41ae85035983b3cb61dad0f81d55e5ea"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-engine-v1.test.ts",
+      "blob": "22b568c1c91ff91319e645756ec3d8649b88e8bf"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/body-clock-canonical.test.cjs",
+      "blob": "f8162052e7e97d70e7fa32d14bceed000572cac9"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/server-canonical.test.cjs",
+      "blob": "3fd7c913fdc206e358c4f47efc5cfc315678b2b5"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "blob": "b31ecaa953d131e04d085e78d8fe3896dc6e9b59"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "blob": "af9b1dcfbd193194920825e8b73c9ad59502b5d1"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "blob": "b322a483ecb7e30bd876019a18da282816a84d7f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-amahuru-rain-context.test.ts",
+      "blob": "82c6ec47343580e4d89e87404c70f2c281aa3bb3"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "blob": "3392b656df8e70e3724c2ca7848a6bb06b3b0b19"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-patterns.test.ts",
+      "blob": "4e248b73d518ef62608e74ea699a4cfd9ed4ec2f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-context-format.test.ts",
+      "blob": "a5589e3a1fdf58ad56a574c3876eb8827780e0ef"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-acting-guide.test.ts",
+      "blob": "743ac06f868fe17df3ca980597ecee67385760f0"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-prompt-inventory.test.ts",
+      "blob": "11ed36bb1d9d29d09cd4c463b89b3be87da7aa91"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-retry-guides.test.ts",
+      "blob": "3b071533de2299d44b2dea2d687075fac21cf464"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-base-prompt.test.ts",
+      "blob": "ad6520a99590324cfcbefda4090d2334985a7a3f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-layered-prompt.test.ts",
+      "blob": "36cadb5cd16d4a560b0cff70cc09c12179d0df1e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-character-context.test.ts",
+      "blob": "a24c2e3ff97b462f1a242c804ec064a2953ba23a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/maintenance.test.cjs",
+      "blob": "7464b5a5fb4e2944ae798c9b7b77a68dd3ad7768"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/conversation-engine-attempt.test.ts",
+      "blob": "0daaf2bde3fe6ab6568afa07e9dc9969bad951e1"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/account-conversation.test.cjs",
+      "blob": "c5f8059692c151860434a6e07957b1dd08e53ab9"
+    },
+    {
+      "snapshot": "engine",
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "blob": "4b819d3b467ac3ed0b3d60343f436d3371ef5f27"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "blob": "85e3cab0514f42742c7f2f8bb6b45f0083bf14c6"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "blob": "9542912086152c0a51a68a70ea1329a72c14a4da"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "blob": "20f44c0f1faeb1aae81f38c1ffb5cb4b66dfd9ab"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "db885c0b2417255c061351c7160c0323763e7822"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "blob": "9a0e72fba0f0badf7a7db58b5a5d39e00f324836"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/base-prompt.ts",
+      "blob": "311444c8f24540564eecd6fc9a322737ba946039"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/history.ts",
+      "blob": "477c4c30b5d714e04b0e0b6160675e8cb3ab45b9"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/memory.ts",
+      "blob": "c8ca1222ab8bde234f1c49ddb8d2a4f59e162e92"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/layered-prompt.ts",
+      "blob": "6228a0b0ba03ded8452217c46d8b8c85641d935d"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/amahuru-rain-context.ts",
+      "blob": "774dc3ffe8456ffd4a0e5cade6dcc4c33553619c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/retry-guides.ts",
+      "blob": "94fd28be75f6d94b39c473b84fcd89e903413fd8"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/character-context.ts",
+      "blob": "1473db4d559be1c6db5626fbd62ea3a66a64b27a"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/relationship-context.ts",
+      "blob": "82cc60c2a60586d22cb60798918704a2e93cd96f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/character-prompt.ts",
+      "blob": "b7991ca1319ce28a40273e14a65e5d6bf05d7f1e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/layered-context.ts",
+      "blob": "5c4416413eb304b8979efa1f594b7d53ec99e26d"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/attempt.ts",
+      "blob": "b5c6b271588e5e29c87784745915e5c325497a89"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/conversation-engine/context-format.ts",
+      "blob": "d75738ca6348edaede18d983a31cd6a0b442f362"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/persona/evolution-analyzer.ts",
+      "blob": "294b6c59e921e3425addcc82b5ad4e1ccab1fa1b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/persona/natural-memory.ts",
+      "blob": "bc77222bcf213f8ba0453368e882761b542add9e"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/persona/evolution-runner.ts",
+      "blob": "d2ac4b323f74d726c5c0fc172519b1263fd5c3d4"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/persona/persona-store.ts",
+      "blob": "ada61b2bf5da0944d9870385cc1227b6fe887b9c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "lib/persona/fallback-persona.ts",
+      "blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/chat/route.ts",
+      "blob": "5600ad37f2660049a570c4dd340e8ed140d9843b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/acting-lab/route.ts",
+      "blob": "b046873065f41d26e294f87c419c772b33806a21"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/persona/evolution/_auth.ts",
+      "blob": "4d19e96bf40a64f43ec84daea527ef5c7f51226c"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/persona/evolution/review/route.ts",
+      "blob": "8e891146b826ed0655e2bbb2516975d65fc367fb"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "blob": "a6a1ab4d4a0a05aef491b79608f823656599ac10"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/persona/evolution/candidates/route.ts",
+      "blob": "a4131c71fef91a82ac5eb2df6c3fc764a616a6e8"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/push/body-clock/route.ts",
+      "blob": "c68f6afdfad7a6b904fcd0dc6341ead95f58b51b"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/push/test/route.ts",
+      "blob": "262dc0e058eac6d6aa518cf9ad83a79847585e44"
+    },
+    {
+      "snapshot": "engine",
+      "path": "app/api/push/vapid-public-key/route.ts",
+      "blob": "b75c65d14fce58261aab032bd5590713f0cbe167"
+    },
+    {
+      "snapshot": "engine",
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "blob": "edffcd3d81dffc084fb655a5014af901f33383a2"
+    },
+    {
+      "snapshot": "engine",
+      "path": ".github/workflows/manual-synthetic-quality-evaluation.yml",
+      "blob": "98685476231da27fab15752477d0d3a85034f29a"
+    },
+    {
+      "snapshot": "engine",
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "blob": "a534d7ebceaaa73830088377dabe43550be9ca58"
+    },
+    {
+      "snapshot": "engine",
+      "path": ".github/workflows/context-ab-live-manual.yml",
+      "blob": "a0629a27b36697524b94d5b04d774868da23a6ee"
+    }
+  ]
+}
