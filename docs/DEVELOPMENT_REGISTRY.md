@@ -943,3 +943,18 @@ mainと旧2枝のworkflow本文を直接確認。main `.github/workflows/isolate
 **main現行ソース確認**：`lib/gemini-usage-telemetry.ts` は存在（blob `a1ef3477...`）。token数の正規化、記録列のallowlist、エラー詳細を出さない観測関数を実装。したがってbranch compareでahead2であっても『テレメトリ全体がmainに未実装』とは言えない。mainのmigration/実際の配線/DB適用/本番記録の網羅性は別途照合が必要。
 
 **今後の評価観点**：将来のキャラ単位コストとuser×characterの費用を分ける際、既存 `user_id/request_id/call_kind` のみで正しいキャラ帰属を推定できない。人格成長・知識検証・会話・Body Clock等の各コストをどう分類するか、後のDB設計段階で検討する。無断の有料Gemini呼び出し、main/production/Supabase変更なし。
+
+
+## 2026-10-21 関係性・基盤ブランチの照合と次工程の優先順位
+
+`main...branch` compare（差分があることと未実装は同義でない）：
+- `sora/relationship-time-v2-design` ahead276/behind323。chat route、関係性のaction/emotion reducer、conversation generator、life context、persona fallback、自然さテスト等に多数差分。**歴史的な大型分岐であり、丸ごと統合不可。** 詳細は現行mainの同機能と個別照合が必要。
+- `docs/relationship-v1-2-stage-growth-principles` ahead10/behind52。`docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md`、`docs/IMPLEMENTATION_OVERVIEW.md`、`docs/RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md` が差分。軽量化着手時の重要な手掛かり。
+- `sora/relationship-control-rpcs-v1` ahead0/behind87/files0。
+- `codex/server-canonical-foundation` ahead0/behind174/files0。
+- `work/relationship-engine-v1` ahead0/behind88/files0。
+- `sora/relationship-memory-integrity`、`sora/relationship-persona-evolution`、`sora/relationship-life-context` は指定refで404。**ブランチ不存在または名称違い**であり、削除済み・統合済みとは断定しない。正確な一覧との照合が必要。
+
+**ユーザーが明示した次工程の順番**：①全ブランチ/PR/実装の棚卸し完了、②台帳を冒頭から読み直し・現在の構想と突合、③**現状のGemini軽量化を最優先**（品質・記憶・関係性を保ち、実測で1会話あたり総コストを削減）、④複数キャラを見据えたDB/権限/所有権等の基盤設計、⑤美咲一人の知識・記憶・人格成長の作り込み。軽量化は無駄な重複呼び出し、再試行、長大prompt、履歴、キャッシュ、モデル単価だけでなく成功会話単位の総費用を比較。無承認の有料Gemini実験は行わない。
+
+本節は静的比較・設計方針の記録のみ。main/本番/Supabase変更なし。
