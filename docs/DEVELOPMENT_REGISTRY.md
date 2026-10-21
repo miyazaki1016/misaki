@@ -787,3 +787,20 @@ GitHub compare `main...branch`：
 - `chore/restore-relationship-rpc-migration` ahead1/behind1、`20260930131930_relationship_server_rpc_user_context.sql` がcompareに現れるが、**枝とmainの当該ファイルblob SHAがともに `8c2c8383...` で完全一致**。branch compareのファイル一覧だけを根拠に未反映実装と断定しない。SQL冒頭はproduction履歴からの再構築・既適用・既存本番への再適用禁止・rollback記録なしと明記。これは文書上の由来であり現在の本番適用を今回独立確認したわけではない。
 
 6枝とも**大幅に古いベース（behind339–350、復元枝はbehind1）**で、単純mergeは避ける。未反映差分の有無だけで価値を判断せず、タグの意味/旧経路廃止の安全性/SQL provenanceを分類。次に `compare_commits` のfile status・main routeの存在・Edge decisionの差分を精査する。main/production/Supabase変更なし。
+
+
+## 2026-10-21 匿名セッション・会話履歴・想起系8枝の棚卸し
+
+GitHub `main...branch` compare（ahead/behindとfile status）：
+- `fix/anonymous-chat-session-drop` **2/338**：`app/chat/anonymous-session-guard.tsx`、`tests/account-conversation.test.cjs` modified。
+- `fix/anonymous-email-history` **2/365**：account/history API/anonymous guard/history sync/layoutのmodified、`lib/device-conversation.ts`・匿名保存SQL・account-conversation testのadded（branch base比）。**mainにも `tests/account-conversation.test.cjs` と同SQLパスが存在する**ため、compare上のaddedだけで未実装と断定しない。
+- `fix/anonymous-session-cache-reset` **1/362**：anonymous session guard modified。
+- `fix/expired-temporary-relationship-import` **0/35 / files0**：main未反映差分なし。
+- `fix/preserve-active-chat-history` **1/345**：conversation-history-sync modified。
+- `fix/recall-history-grounding` **1/358**：chat-proxy route modified。
+- `fix/recall-keep-recent-history` **1/361**：chat-proxy route modified。
+- `sora/anonymous-history-get-noop` **0/170 / files0**：main未反映差分なし。
+
+main現行ファイルの存在とblob SHAを直接確認：`app/chat/anonymous-session-guard.tsx`=`b8756ce6...`、`app/chat/conversation-history-sync.tsx`=`3f39da15...`、`app/api/chat-proxy/route.ts`=`d1e9749f...`（わずか294 bytes）、`tests/account-conversation.test.cjs`=`c5f80596...`。古い枝の `chat-proxy` 修正が現在の正本 `app/api/chat/route.ts` に適用されるとは限らず、**旧proxy経路と現行canonical routeを区別**する。匿名のセッション終了/履歴保全/一時rootの有効期限・一回限りimportの安全境界は重要で、旧枝を丸ごとmergeせずテスト資産/再現ケース/思想を照合する。
+
+**状態**：6枝にmain差分あり（ただし古いベース338–365 behind）、2枝は差分なし。今回確認したのは差分の所在とmainファイルの存在であり、修正の機能的等価性・CI・本番適用は未検証。次の精査では匿名アカウントのログイン/ログアウト/履歴保存、期限切れtemporary receipt、想起の根拠保持を現行テストと比較する。main/production/Supabase変更なし。
