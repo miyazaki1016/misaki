@@ -1,0 +1,42 @@
+{
+  "schema": "misaki-round5-sora-document-overlay-v4",
+  "date": "2026-10-21",
+  "base_document_ledger": "51_SORA_ROUND5_DOCUMENT_LEDGER_V3.json",
+  "evidence": "52_SORA_MULTI_CHARACTER_PHASE0_TWO_VERSIONS.md",
+  "rule": "Original (ID,blob) counted once; no generated audit documents in 85 denominator.",
+  "new_reviewed": [
+    {
+      "id": "DOC-049",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "0baf4f28d863f6e075f745afd5c903145887274f",
+      "full_text": true,
+      "static_source_checked": true,
+      "appended_historical_production_report": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-050",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f",
+      "full_text": true,
+      "static_source_checked": true,
+      "appended_historical_production_report": false,
+      "runtime_acceptance": false
+    }
+  ],
+  "progress": {
+    "previous_documents_total": 49,
+    "new_reviewed_count": 2,
+    "documents_total": 51,
+    "documents_denominator": 85,
+    "documents_pending": 34,
+    "branches_insufficient": 30,
+    "branch_resolutions_new": 0,
+    "ideas_total": 13,
+    "legacy_blocked": true
+  },
+  "production_db_accessed": false,
+  "paid_model_called": false,
+  "tests_executed": false,
+  "all_assets_audit_complete": false
+}
