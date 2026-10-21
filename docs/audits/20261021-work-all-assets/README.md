@@ -1,5 +1,14 @@
 # Misaki 全ブランチ・開発資産監査 2026-10-21
 
+## b56194e以降：第4次精査（最新・未完了）
+
+- [28 Forget全経路](28_FORGET_ALL_PATHS_ROUND4.md)、[29 Relationship worker](29_RELATIONSHIP_WORKER_ROUND4.md)、[30 Persona・Body Clock・cache](30_PERSONA_BODY_CLOCK_CACHE_ROUND4.md)。
+- [31 SQL定義順](31_SQL_FINAL_DEFINITIONS_ROUND4.md)、[32 Memory開発史・設計判断台帳](32_MEMORY_HISTORY_DECISIONS_ROUND4.md)、[33 文書・枝照合](33_DOCUMENT_BRANCH_REVIEW_ROUND4.md)。
+- [34 差分台帳](34_ROUND4_LEDGER.json)、[35 Blob索引](35_ROUND4_SOURCE_EVIDENCE.json)、[36 固定ソース証拠](36_ROUND4_FIXED_SOURCES.json)、[37 最新進捗・次回引継ぎ](37_REVIEW_PROGRESS_ROUND4.md)。
+
+文書今回8版・累計40/85、残45。証拠不足枝今回2件静的分類、残30。IDEA12/13追加。legacy BLOCKED1維持。再現不具合0。worker journal・Evolution候補・確定済配送・遅着表示の利用権を追跡。全経路安全性/本番適用を認定しない。新チャットは基本構想→本README→37→34を読み、01〜27も保持する。
+
+
 ## 8d4050f以降：第3次精査（最新・未完了）
 
 - [19 Memory・Forget・Identity全参照経路](19_MEMORY_FORGET_IDENTITY_ROUND3.md)：保存/再提示14経路、現在の保護・不足・検証。#67は人物識別器ではない。
