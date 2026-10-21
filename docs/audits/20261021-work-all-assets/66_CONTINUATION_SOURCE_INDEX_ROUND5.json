@@ -1,0 +1,2399 @@
+{
+  "schema": "misaki-round5-continuation-evidence-v1",
+  "baseline_commit": "2efc394c4c06b952545dda07fd590a094e7b42a8",
+  "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "runtime_tests_executed": false,
+  "scope": "immutable source inventory, document semantic review and static branch lineage; not runtime acceptance",
+  "remote_heads": [
+    {
+      "branch": "chore/restore-relationship-rpc-migration",
+      "head": "4dd716a2c04c6864445cb8720a1921813bb50933"
+    },
+    {
+      "branch": "cleanup/legacy-proactive-tags",
+      "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd"
+    },
+    {
+      "branch": "cleanup/remove-legacy-proactive-path",
+      "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369"
+    },
+    {
+      "branch": "codex/legacy-maintenance-drain",
+      "head": "17449c7ec4e8ff50605ef931b04ae76584c6304f"
+    },
+    {
+      "branch": "codex/server-canonical-foundation",
+      "head": "685fbb7baee4a542555f939fabaecd674658c148"
+    },
+    {
+      "branch": "design/shared-conversation-engine-contract-20261015",
+      "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74"
+    },
+    {
+      "branch": "docs/audit-overview-against-source",
+      "head": "f6d8baf94d037057ec94deb87b156a713445d37f"
+    },
+    {
+      "branch": "docs/development-registry-audit-20261020",
+      "head": "2efc394c4c06b952545dda07fd590a094e7b42a8"
+    },
+    {
+      "branch": "docs/multi-character-data-scope-inventory",
+      "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c"
+    },
+    {
+      "branch": "docs/multi-character-rpc-caller-audit",
+      "head": "83476dd2d347687c253a471557d9c27b82e1caf7"
+    },
+    {
+      "branch": "docs/production-source-of-truth-reconciliation",
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7"
+    },
+    {
+      "branch": "docs/relationship-five-axis-design-review-20261015",
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c"
+    },
+    {
+      "branch": "docs/relationship-v1-2-stage-growth-principles",
+      "head": "ed8359319181f20cf73aec87ab75c7a1405264f2"
+    },
+    {
+      "branch": "docs/update-implementation-overview",
+      "head": "621dea871afc4dca517071cc79666d81cb69e29c"
+    },
+    {
+      "branch": "docs/update-overview-relationship-growth",
+      "head": "1d9db32ea15fbea950ac46090cb6e1a8bc750001"
+    },
+    {
+      "branch": "experiment/conversation-lab-offline-v1-20261015",
+      "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e"
+    },
+    {
+      "branch": "experiment/interpreter-gradual-acting-20261015",
+      "head": "ef5bd23246a75b02a0df60302263f971de061843"
+    },
+    {
+      "branch": "experiment/shared-conversation-history-v1-20261015",
+      "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a"
+    },
+    {
+      "branch": "feature/proactive-derived-tags",
+      "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86"
+    },
+    {
+      "branch": "fix/anonymous-chat-session-drop",
+      "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7"
+    },
+    {
+      "branch": "fix/anonymous-email-history",
+      "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8"
+    },
+    {
+      "branch": "fix/anonymous-session-cache-reset",
+      "head": "6a4eb039d356fe81262e1c55f870f563eaf51404"
+    },
+    {
+      "branch": "fix/body-clock-claim-rpc",
+      "head": "df2daf89f604bf80fab4e720060861862bdd2f6f"
+    },
+    {
+      "branch": "fix/chat-failure-recovery",
+      "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784"
+    },
+    {
+      "branch": "fix/chat-network-reliability",
+      "head": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a"
+    },
+    {
+      "branch": "fix/chat-reliability-cleanup",
+      "head": "a06baac8110ded425c07e2122117e89460868405"
+    },
+    {
+      "branch": "fix/chat-request-diagnostics",
+      "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965"
+    },
+    {
+      "branch": "fix/chat-turn-dedupe",
+      "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5"
+    },
+    {
+      "branch": "fix/expired-temporary-relationship-import",
+      "head": "63cf82a53600b0518c1d88e61df4b09665026e2d"
+    },
+    {
+      "branch": "fix/gemini-chat-timeout",
+      "head": "469578ea12663c594a32c62a05263b23e7190891"
+    },
+    {
+      "branch": "fix/gemini-json-retry",
+      "head": "f93a9444565ce1029cd46c0d466456f651ee7c9e"
+    },
+    {
+      "branch": "fix/grow-relationship-from-first-meeting",
+      "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c"
+    },
+    {
+      "branch": "fix/legacy-safari-cache",
+      "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5"
+    },
+    {
+      "branch": "fix/preserve-active-chat-history",
+      "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08"
+    },
+    {
+      "branch": "fix/recall-history-grounding",
+      "head": "475410541b700562e0f535484cb3fd02d9f76b1a"
+    },
+    {
+      "branch": "fix/recall-keep-recent-history",
+      "head": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc"
+    },
+    {
+      "branch": "fix/relationship-analyzer-bounded-retry",
+      "head": "90ac90bba86f716ccf46e50542097d1b81e23702"
+    },
+    {
+      "branch": "fix/safari-load-failed-message",
+      "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e"
+    },
+    {
+      "branch": "fix/safari-load-failed-ui",
+      "head": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab"
+    },
+    {
+      "branch": "fix/use-chat-proxy",
+      "head": "29d74e3483d4f06f5127364d7c5bdf528826301b"
+    },
+    {
+      "branch": "fix/workday-grounding",
+      "head": "6f25eba602fca1183383588ad0183d4c4a16d37c"
+    },
+    {
+      "branch": "main",
+      "head": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa"
+    },
+    {
+      "branch": "perf/chat-stage-timing",
+      "head": "ead9d6283b68579f6014e07bef46add2a41fb791"
+    },
+    {
+      "branch": "refine/proactive-action-tags",
+      "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab"
+    },
+    {
+      "branch": "refine/sleepy-tag",
+      "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5"
+    },
+    {
+      "branch": "sora/anonymous-history-get-noop",
+      "head": "368afb0dfbf9ea66837c83834d8fc24837813554"
+    },
+    {
+      "branch": "sora/canonical-relationship-integration",
+      "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359"
+    },
+    {
+      "branch": "sora/cutover-cleanup",
+      "head": "f5424c06c92b3f51535dd44ec54ef0a25f790370"
+    },
+    {
+      "branch": "sora/drop-ungrounded-relationship-evidence",
+      "head": "ae0df66929f62bb804b37c35eebabb7e8c66b696"
+    },
+    {
+      "branch": "sora/fix-relationship-polarity-transport",
+      "head": "66bec2792d571c697aa891ff0142e78f4941456e"
+    },
+    {
+      "branch": "sora/fix-waiting-reply-layout",
+      "head": "f3a613291569a60e471065372135cbee07373702"
+    },
+    {
+      "branch": "sora/gemini-timeout-retry",
+      "head": "862cfa6c2ce6e45b7ccbc294270f3ba02548ed2a"
+    },
+    {
+      "branch": "sora/gemini-transient-retry",
+      "head": "0c77bad036d4bef73c82983c3ae3f800943a1ee5"
+    },
+    {
+      "branch": "sora/history-edge-trace",
+      "head": "e3a08db0c3dc97b297130a224919e73a69974c60"
+    },
+    {
+      "branch": "sora/history-get-trace",
+      "head": "524596dedf44806da95c8d84e2096f2a5411440d"
+    },
+    {
+      "branch": "sora/history-sync-source-proof",
+      "head": "850e2acccef3722fc487dd17df687056b3b58911"
+    },
+    {
+      "branch": "sora/lp-pwa-mobile-layout",
+      "head": "f65c3b2e56478634861e27193fbb5913ebfb84cb"
+    },
+    {
+      "branch": "sora/lp-relationship-story",
+      "head": "9bfa0760f56b3d1c3bf6d07af056410afde975ec"
+    },
+    {
+      "branch": "sora/misaki-acting-lab",
+      "head": "be15cfea6039ff9e44be1a34ceff48a882f09c18"
+    },
+    {
+      "branch": "sora/profile-aware-life-events",
+      "head": "610e50b6cd4d63ccdfcfd5aaf57516bb016468bb"
+    },
+    {
+      "branch": "sora/relationship-analyzer-stage-diagnostics",
+      "head": "0907d2ff24f6a584c032ece54f9289954ccbeb63"
+    },
+    {
+      "branch": "sora/relationship-analyzer-structured-output-hotfix",
+      "head": "319865a5f9351899ef260754aaad2604623552d5"
+    },
+    {
+      "branch": "sora/relationship-control-rpcs-v1",
+      "head": "e6bf2bc75aa5dd87e520724e5dbf3f4a5f0f6578"
+    },
+    {
+      "branch": "sora/relationship-evidence-validation-diagnostics",
+      "head": "b8607f3e92fde63fbc37dab85a30d9945c8ad649"
+    },
+    {
+      "branch": "sora/relationship-processing-error-diagnostics",
+      "head": "867e227b7d2efb31c214d248e94b26e390e9f845"
+    },
+    {
+      "branch": "sora/relationship-time-v2-design",
+      "head": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64"
+    },
+    {
+      "branch": "sora/remove-false-busy-wait",
+      "head": "1b77372a7e385a58f127d259a99e05e60cb8deb6"
+    },
+    {
+      "branch": "sora/remove-relationship-stage-diagnostics",
+      "head": "d41e673420637cd644587c5db42c38d432fd2e74"
+    },
+    {
+      "branch": "sora/remove-relationship-temporary-diagnostics",
+      "head": "e4f870f0ab76271daee76882fbd1b3fefae3a9bb"
+    },
+    {
+      "branch": "sora/remove-timestamp-history-poll",
+      "head": "829ee4671443140386043396ffb70c0a8a8daaae"
+    },
+    {
+      "branch": "sora/sync-free-usage-with-history",
+      "head": "f67b388e965bb9bfb3f8d6820fd62e9d273123b6"
+    },
+    {
+      "branch": "sora/update-overview-relationship-v1-production",
+      "head": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2"
+    },
+    {
+      "branch": "test/relationship-acting-state-comparison",
+      "head": "fd714bd8a82a4a48c9f33b368c35498aec6e65b5"
+    },
+    {
+      "branch": "work/ab-20-pair-dispatch",
+      "head": "f3b98d03475fdcc012a07de669cc628911e32239"
+    },
+    {
+      "branch": "work/ab-blind-review-artifact-workflow",
+      "head": "648e07cef9831c2d276b3cb2754ce49d53d2e27e"
+    },
+    {
+      "branch": "work/ab-http-diagnostics-dispatch",
+      "head": "76f066c05653374826f42c9ee1578719da975e2e"
+    },
+    {
+      "branch": "work/ab-long-fixture-dispatch",
+      "head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab"
+    },
+    {
+      "branch": "work/ab-manual-workflow-only",
+      "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd"
+    },
+    {
+      "branch": "work/ab-paced-dispatch",
+      "head": "266c6a1ce74bc6ba0889e41590004854386fab31"
+    },
+    {
+      "branch": "work/ab-quality-diagnostics-workflow",
+      "head": "ab805d88148c6880238918e858ca5261564c1bdc"
+    },
+    {
+      "branch": "work/ab-quality-manual-workflow",
+      "head": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743"
+    },
+    {
+      "branch": "work/ab-quality-reply-schema-dispatch",
+      "head": "82848c976ef0f1602d4dc3f7c9556a91145f93a5"
+    },
+    {
+      "branch": "work/context-no-duplicate-replies-ab",
+      "head": "a849bec92059d326940ffc358635164ea7d391c9"
+    },
+    {
+      "branch": "work/conversation-context-compression-spike",
+      "head": "10275b666387115ced06312570111b21d0276e17"
+    },
+    {
+      "branch": "work/forget-control-v1",
+      "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2"
+    },
+    {
+      "branch": "work/gemini-unit-cost-telemetry",
+      "head": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035"
+    },
+    {
+      "branch": "work/quality-long-history-workflow",
+      "head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409"
+    },
+    {
+      "branch": "work/relationship-analyzer-diagnostics",
+      "head": "42177230a0a3c8926689499ffb19de4f1044d8d7"
+    },
+    {
+      "branch": "work/relationship-engine-v1",
+      "head": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a"
+    },
+    {
+      "branch": "work/relationship-error-diagnostics",
+      "head": "7b68b97c3feae99d21f9f1dd937b29218b40997b"
+    },
+    {
+      "branch": "work/relationship-identity-v1",
+      "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4"
+    },
+    {
+      "branch": "work/relationship-polarity-integer",
+      "head": "68a2aebb98e5f800f7a6d334c815c2a7841b2873"
+    }
+  ],
+  "documents": [
+    {
+      "id": "DOC-001",
+      "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+      "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 5779
+    },
+    {
+      "id": "DOC-002",
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "blob": "fcfab902743c4918813de44ad2d797bd466eda7a",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 2323
+    },
+    {
+      "id": "DOC-003",
+      "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+      "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 15809
+    },
+    {
+      "id": "DOC-024",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3da8bad0e216589a006cb9862278e012c72f2dc3",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 92511
+    },
+    {
+      "id": "DOC-042",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 50659
+    },
+    {
+      "id": "DOC-052",
+      "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+      "blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 27963
+    }
+  ],
+  "branches": [
+    {
+      "id": "BR-002",
+      "branch": "cleanup/legacy-proactive-tags",
+      "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "prs": [
+        13
+      ],
+      "observed_current_head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "merge_base_with_main": "47a616db7641ff3a9d30a2ffaec905349b8c6ed7",
+      "all_changed_paths": [
+        "M\tlib/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "lib/proactive-photo.ts",
+          "branch_blob": "c5c41cd436c6e1a51543c46aa6efb0d52a7b14bf",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "849944a5bd970db84ae34cfe0d8edaa086b674d22f3fa6e64d22a4dba682cc1b"
+    },
+    {
+      "id": "BR-003",
+      "branch": "cleanup/remove-legacy-proactive-path",
+      "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "prs": [
+        23
+      ],
+      "observed_current_head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "merge_base_with_main": "278f167b2376365e46fd0e97193f1d8c924e6f57",
+      "all_changed_paths": [
+        "D\tapp/api/body-clock/route.ts",
+        "D\tapp/api/proactive/route.ts",
+        "M\tapp/chat/page.tsx",
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "D\tlib/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/body-clock/route.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        },
+        {
+          "path": "app/api/proactive/route.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        },
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "03c6e85f6a914dc4146c78f51931780cdd9f2da7",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "3e5c58a25344e9042c9245b4873158a97237ffb5",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "lib/proactive-photo.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "a081735d00e6677c8628f84bddda669ca3199ec8f6d7eec8d3c4b56375cd1741"
+    },
+    {
+      "id": "BR-008",
+      "branch": "docs/development-registry-audit-20261020",
+      "head": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "prs": [],
+      "observed_current_head": "2efc394c4c06b952545dda07fd590a094e7b42a8",
+      "merge_base_with_main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "all_changed_paths": [
+        "A\tdocs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+        "A\tdocs/BRANCH_AUDIT_TRACKER_20261021.md",
+        "A\tdocs/DEVELOPMENT_REGISTRY.md",
+        "A\tdocs/MISAKI_CHAT_HANDOFF_20261021.md",
+        "A\tdocs/MISAKI_SYSTEM_VISION_20261021.md",
+        "A\tdocs/audits/20261021-work-all-assets/01_BRANCHES.md",
+        "A\tdocs/audits/20261021-work-all-assets/02_DOCUMENTS.md",
+        "A\tdocs/audits/20261021-work-all-assets/03_UNREFLECTED_RESULTS.md",
+        "A\tdocs/audits/20261021-work-all-assets/04_DESIGN_HISTORY.md",
+        "A\tdocs/audits/20261021-work-all-assets/05_VISION_ALIGNMENT.md",
+        "A\tdocs/audits/20261021-work-all-assets/06_PRIORITIES.md",
+        "A\tdocs/audits/20261021-work-all-assets/07_AUDIT_STATUS.md",
+        "A\tdocs/audits/20261021-work-all-assets/08_LEGACY_UNDOCUMENTED_CHANGE.md",
+        "A\tdocs/audits/20261021-work-all-assets/README.md",
+        "A\tdocs/audits/20261021-work-all-assets/evidence.zip",
+        "A\tdocs/audits/20261021-work-all-assets/legacy-latest-commit.json"
+      ],
+      "path_comparisons": [],
+      "review_state": "pending",
+      "reason": "Self-audit branch has advanced; original DEVELOPMENT_REGISTRY and remaining overview full semantics not reviewed. Not self-certified complete."
+    },
+    {
+      "id": "BR-011",
+      "branch": "docs/production-source-of-truth-reconciliation",
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "prs": [
+        81
+      ],
+      "observed_current_head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "merge_base_with_main": "1fb508c224cb85a492973078ea2f27c5dc5042e6",
+      "all_changed_paths": [
+        "A\tdocs/HANDOFF_NEXT_SORA_2026-10-14.md",
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "M\tdocs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+        "A\tdocs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+          "branch_blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+          "branch_blob": "0baf4f28d863f6e075f745afd5c903145887274f",
+          "main_blob": "4de727956e52cc8eeccd772631671af69a13536f",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+          "branch_blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "未反映の設計・監査・試験資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "1aaf7a1ad823d18746e33410d869b68907734cba4df8bb8cb9b62fc9e843b64b"
+    },
+    {
+      "id": "BR-012",
+      "branch": "docs/relationship-five-axis-design-review-20261015",
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "prs": [
+        84
+      ],
+      "observed_current_head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "merge_base_with_main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "all_changed_paths": [
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "A\ttests/relationship-acting-guide-sensitivity.test.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "tests/relationship-acting-guide-sensitivity.test.ts",
+          "branch_blob": "5f61fc245520a9acca756972959c0c8c4ad96e37",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "未反映の設計・監査・試験資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "d2a663f2019cd3b52b99703dc37c9d13b2781aa6d01512a9478090d6658e9349"
+    },
+    {
+      "id": "BR-019",
+      "branch": "feature/proactive-derived-tags",
+      "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "prs": [
+        12
+      ],
+      "observed_current_head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "merge_base_with_main": "a21673390a45cc96565ed64ed22d2e0f33d05acd",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/proactive-decision.ts",
+        "M\tsupabase/functions/body-clock/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "9ae1d8f7b5fb25bbd5fda1635872aaea86f52423",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-photo.ts",
+          "branch_blob": "0b1d2a8d059256adfc2724e87a5f7805ff8d7dba",
+          "main_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "4afcb1a97286edc5e68cf32930356feeccbd31020634055caef4004fea254337"
+    },
+    {
+      "id": "BR-020",
+      "branch": "fix/anonymous-chat-session-drop",
+      "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "prs": [
+        24
+      ],
+      "observed_current_head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "merge_base_with_main": "15cb968736c6c4b2442f9363b7c55f5b299ae5cb",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "same-blob"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "12d82b12ffc2f6a9f9e32a9451a30e46b27563b4",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "33d7fe7be1b6512f7c5746def89b8766ccee981828e70a3ea045027c1c8b8e31"
+    },
+    {
+      "id": "BR-021",
+      "branch": "fix/anonymous-email-history",
+      "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "prs": [
+        1
+      ],
+      "observed_current_head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "merge_base_with_main": "0ae531999ab7999ef6d8443b0001187522f4f7cb",
+      "all_changed_paths": [
+        "M\tapp/account/page.tsx",
+        "M\tapp/api/persona/history/route.ts",
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\tapp/chat/conversation-history-sync.tsx",
+        "M\tapp/chat/layout.tsx",
+        "A\tlib/device-conversation.ts",
+        "A\tsupabase/migrations/20260917051607_save_anonymous_conversation.sql",
+        "A\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/account/page.tsx",
+          "branch_blob": "9082429b2d82a805fb2207edc4015221087dc0c9",
+          "main_blob": "2644e942ab9f52fe5429189d92b61069c86bf9db",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/api/persona/history/route.ts",
+          "branch_blob": "f2b35fa80db684bd509b1a2be6ea55c852b97e9a",
+          "main_blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "22b105aef7a83f7311ef85ecc6bddd5d27f02550",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/conversation-history-sync.tsx",
+          "branch_blob": "879d659da3fc9b79cc225da4256ffc2db9329257",
+          "main_blob": "3f39da1597ed5b12c7effff2420a3c1f7f571fc4",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/layout.tsx",
+          "branch_blob": "36f7f42caf6fc8884a880e9b624e795c4bb1308f",
+          "main_blob": "36f7f42caf6fc8884a880e9b624e795c4bb1308f",
+          "relation": "same-blob"
+        },
+        {
+          "path": "lib/device-conversation.ts",
+          "branch_blob": "ede349809f7db4f5e34e4fdbad23accbb2d81377",
+          "main_blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+          "branch_blob": "7b0ca6fe1eef326081cc9555efdf3e704af669c2",
+          "main_blob": "7b0ca6fe1eef326081cc9555efdf3e704af669c2",
+          "relation": "same-blob"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "82cda9cba61da5122ff597a946d2f8bc6ba9848e",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "0278e1d316d3040732ae98454dc46a96c1f8ca86df135595aa18375a34a2efbb"
+    },
+    {
+      "id": "BR-022",
+      "branch": "fix/anonymous-session-cache-reset",
+      "head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "prs": [
+        4
+      ],
+      "observed_current_head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "merge_base_with_main": "ac5cccfbf2250204d13adf31fb05b15eb4652234",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "aad1c165ef823c5d8cec3c9ce8ba97a28bef4b4e",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "5b10d07fcccd502d7bdd1d597bd6b8f81ab3e278a1688661bd04c6839dbcc82e"
+    },
+    {
+      "id": "BR-023",
+      "branch": "fix/body-clock-claim-rpc",
+      "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "prs": [
+        16
+      ],
+      "observed_current_head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "merge_base_with_main": "24013d9ce1f7840de541738df856bdfbaffd7b22",
+      "all_changed_paths": [
+        "A\tsupabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql",
+          "branch_blob": "a7bb06364807186eb42454f7df5982bf743a8b8b",
+          "main_blob": "a7bb06364807186eb42454f7df5982bf743a8b8b",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "96a6d8b6b26aaca50f509f2b9ca34e96154b093c6a5c11323d91d4e21f2e993e"
+    },
+    {
+      "id": "BR-024",
+      "branch": "fix/chat-failure-recovery",
+      "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "prs": [
+        19
+      ],
+      "observed_current_head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "merge_base_with_main": "eeef18257945c16b1179618485872e3efa577186",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts",
+        "M\tapp/chat/page.tsx",
+        "A\tsupabase/migrations/20260918081000_refund_failed_chat_usage.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "cdad8a4030271743b55fc7ea49655a83a01583ff",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "141110cef33882bceac6d49ad03ee98b247fe4fe",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/migrations/20260918081000_refund_failed_chat_usage.sql",
+          "branch_blob": "b79b960674afccd99834fe93672c7740ffa4ad36",
+          "main_blob": "b79b960674afccd99834fe93672c7740ffa4ad36",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "f1cddc4b8c3bd64f2d5b250623dac01581775925b44e087a759d0cb76e3a23f4"
+    },
+    {
+      "id": "BR-026",
+      "branch": "fix/chat-reliability-cleanup",
+      "head": "a06baac8110ded425c07e2122117e89460868405",
+      "prs": [
+        9
+      ],
+      "observed_current_head": "a06baac8110ded425c07e2122117e89460868405",
+      "merge_base_with_main": "b1fc94970726313be721de14e5c7969a7c12a7a3",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "87fd79d7a83d3d591387e8e71bbd477b4aa35c1b",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "a867b1b599fb558fe648ef8ff070ecaa3bbe83b4b2901d510734ab1e319ac76e"
+    },
+    {
+      "id": "BR-027",
+      "branch": "fix/chat-request-diagnostics",
+      "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "prs": [
+        7
+      ],
+      "observed_current_head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "merge_base_with_main": "1d80a67899dd54ee1d73e6dd08b96b386ae88029",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "efb7e40c3d6e098a2e0829533a69f0cd4e473405",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "98446e33f378019bee103cf1fc05d03046b6af9a68540c3aed30818a7e664687"
+    },
+    {
+      "id": "BR-030",
+      "branch": "fix/gemini-chat-timeout",
+      "head": "469578ea12663c594a32c62a05263b23e7190891",
+      "prs": [
+        25
+      ],
+      "observed_current_head": "469578ea12663c594a32c62a05263b23e7190891",
+      "merge_base_with_main": "21a5dcd93cb69336a5486614762478be636f6aeb",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "891320b3e744a9f4dad10cad60261db4e307177b",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "19e9329292dac9f9ec3f281faeed85517bfa0115f13c3a4bca3b79813446518f"
+    },
+    {
+      "id": "BR-032",
+      "branch": "fix/grow-relationship-from-first-meeting",
+      "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "prs": [
+        27
+      ],
+      "observed_current_head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "merge_base_with_main": "7b64dbbef610aed66b3e2c7c8915cbd5d40745bf",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts",
+        "M\tlib/persona/fallback-persona.ts",
+        "M\tsupabase/functions/body-clock/fallback-persona.ts",
+        "A\tsupabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "efed72f74fb8f0c952e12c89789bdecf9b433897",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "lib/persona/fallback-persona.ts",
+          "branch_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "main_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "relation": "same-blob"
+        },
+        {
+          "path": "supabase/functions/body-clock/fallback-persona.ts",
+          "branch_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "main_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "relation": "same-blob"
+        },
+        {
+          "path": "supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql",
+          "branch_blob": "aa61e3b1e1529677992951a4250a80588f8ddf97",
+          "main_blob": "aa61e3b1e1529677992951a4250a80588f8ddf97",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "967b6f7839eacb67b48d642cefeb2d2c58213c5fe84d54e687d13acbc5ba4676"
+    },
+    {
+      "id": "BR-033",
+      "branch": "fix/legacy-safari-cache",
+      "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "prs": [
+        2
+      ],
+      "observed_current_head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "merge_base_with_main": "7595c2d1d935354a1c9127bc529cb268788c8e9b",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "3cb5bb483829e4662cbed63c10cf17e7d02709af",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "b8895a8bd68572f7da58161900c6c3f221fc3ede",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "60cd89984275d3b7be1e18e7f0d8903439857f1e44ca07769712b461ee880e46"
+    },
+    {
+      "id": "BR-034",
+      "branch": "fix/preserve-active-chat-history",
+      "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "prs": [
+        17
+      ],
+      "observed_current_head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "merge_base_with_main": "0042df16070a6f2cf6544363be3ee7cda02d5fbf",
+      "all_changed_paths": [
+        "M\tapp/chat/conversation-history-sync.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/conversation-history-sync.tsx",
+          "branch_blob": "cdedb681e51bd1dd3c5a2ebc46358272c9a1ee32",
+          "main_blob": "3f39da1597ed5b12c7effff2420a3c1f7f571fc4",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "914222d87a992d6569c3f3408c240339108a192950a55aac70da797ac2b2361d"
+    },
+    {
+      "id": "BR-038",
+      "branch": "fix/safari-load-failed-message",
+      "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "prs": [
+        11
+      ],
+      "observed_current_head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "merge_base_with_main": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab",
+      "all_changed_paths": [
+        "M\tapp/chat/page.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "a86d832934437d3cb51cd2049f20c6b933a52cdb",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "fab730953d23015fd625fd9c9db577bc0ac8ea59f8351ab733c346d10bcf8f9b"
+    },
+    {
+      "id": "BR-040",
+      "branch": "fix/use-chat-proxy",
+      "head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "prs": [
+        6
+      ],
+      "observed_current_head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "merge_base_with_main": "14d80b91a39af33edea1332f71ba4a06a6763b31",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "083c5512feff51cd47cf027987864ef080300d1b",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "72d725d087625bcb6df1c8ab1b90b33a11b059c143dccc19499482886e3efb77"
+    },
+    {
+      "id": "BR-041",
+      "branch": "fix/workday-grounding",
+      "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "prs": [
+        20
+      ],
+      "observed_current_head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "merge_base_with_main": "6db1524322d66d9bbba47a0c327f3b249e44d8ae",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "35d1e82730b171fa622949579cd35506ce351437",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "1d1e28f07677cce45d14912f48b09a362d31bf81c168dea03fdd081046700a78"
+    },
+    {
+      "id": "BR-043",
+      "branch": "perf/chat-stage-timing",
+      "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "prs": [
+        26
+      ],
+      "observed_current_head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "merge_base_with_main": "b3530b4e3569bd2796c1758eba8514f3b684d633",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "84a1089cddf47ec0d290438e52b617bcbe495e8f",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "baa924da036f4377cb535f6c5c885ec9d8e9b67837829e346d4a4851ab365dc4"
+    },
+    {
+      "id": "BR-044",
+      "branch": "refine/proactive-action-tags",
+      "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "prs": [
+        14
+      ],
+      "observed_current_head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "merge_base_with_main": "d35827487fbd1effbacc4b283aafdcf2d10b6b14",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/proactive-decision.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "deed63026892e64d564c6cb415f8f442ea80876a",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "67f90ac0d679008e632524987a6adb07e33b84ea8b6be428f8012790f1cec6a2"
+    },
+    {
+      "id": "BR-045",
+      "branch": "refine/sleepy-tag",
+      "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "prs": [
+        15
+      ],
+      "observed_current_head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "merge_base_with_main": "4e8c96a5bd5586cec54a9af006de8a91c65a4ab1",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/index.ts",
+        "M\tsupabase/functions/body-clock/proactive-decision.ts",
+        "M\tsupabase/functions/body-clock/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/index.ts",
+          "branch_blob": "6f1fc72bcbd9921e8475447bcf19a0f50ae98373",
+          "main_blob": "db885c0b2417255c061351c7160c0323763e7822",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "3f25cbbb70d51790d40b62751b2b354228804ef6",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-photo.ts",
+          "branch_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "main_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "700fbeb1ea0bb4c3ed0fcdb099e2c35bb11444cc01c958b431eba5d84311f663"
+    },
+    {
+      "id": "BR-047",
+      "branch": "sora/canonical-relationship-integration",
+      "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "prs": [
+        32
+      ],
+      "observed_current_head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "merge_base_with_main": "db5b6e17c77f94f54bb4764da3fcf01b764d313e",
+      "all_changed_paths": [
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "c7b01a1da77f7c108e94a85b0c08e1a05b913edf650c6bb54d3ac4e23c9f7ef8"
+    }
+  ],
+  "source_files": [
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/api/chat-proxy/route.ts",
+      "blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/api/persona/history/route.ts",
+      "blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/api/feedback/reply/route.ts",
+      "blob": "b5621db5491a29645ed938a90e471fe6fd3cca6f",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/account/page.tsx",
+      "blob": "2644e942ab9f52fe5429189d92b61069c86bf9db",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/chat/anonymous-session-guard.tsx",
+      "blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/chat/conversation-history-sync.tsx",
+      "blob": "3f39da1597ed5b12c7effff2420a3c1f7f571fc4",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "app/chat/page.tsx",
+      "blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/canonical-state.ts",
+      "blob": "584989230ed0dc89a8aee961aa169e32d4646d3a",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/chat-recall.ts",
+      "blob": "7728bdb25e72cd04cbbffed1e9e5de068d070b1c",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/device-conversation.ts",
+      "blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/gemini-json-generator.ts",
+      "blob": "d080f365802edb91b90b1c45a381e03563b7597a",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/relationship-acting-guide.ts",
+      "blob": "9f494a43e8bab0d928e48e9dc16e8fffc6dd6daf",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/relationship-patterns.ts",
+      "blob": "51b44844a89adc1c17f7df774b3cfbe56d21b712",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/relationship-life-context.ts",
+      "blob": "d20d4f698d54961ae291c6d747020a9840bee0a3",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/relationship-time.ts",
+      "blob": "1283b6cd5d67073d91cd0b028a3cdcb96a286bbb",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "lib/tokyo-life-events.ts",
+      "blob": "8bc64be89a5534cb8aa6620c0ffe954cb2ab8e70",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/functions/body-clock/index.ts",
+      "blob": "db885c0b2417255c061351c7160c0323763e7822",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "blob": "8c2c8383348ad290f3890b16488a3b0ef50e0798",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql",
+      "blob": "6024f352e8b77a369e94f84559c0f21057e47bbc",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260918073918_canonical_misaki_root_state.sql",
+      "blob": "3362d5c70449081bf6bc70dfb0164adbb152c959",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260926000000_semantic_relationship_point_delta.sql",
+      "blob": "716b809cfa25807e0c8894a7731f995f770507a0",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql",
+      "blob": "a7bb06364807186eb42454f7df5982bf743a8b8b",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    },
+    {
+      "commit": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "path": "supabase/migrations/20260927000000_reply_feedback.sql",
+      "blob": "a8560f0d3defea478c35148c1ab05bbbad1649f8",
+      "git_blob_hash_verified": true,
+      "review_scope": "relevant full helper or cited responsibility/boundary; large chat/page files not claimed wholly semantically audited"
+    }
+  ],
+  "inherited_01_to_62": [
+    {
+      "path": "docs/audits/20261021-work-all-assets/01_BRANCHES.md",
+      "blob": "6e75de51bc26fd0637732fc8274fc82d00af7b4c"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/02_DOCUMENTS.md",
+      "blob": "b5a10a9e5c0b0403fc7d2dfa6b147246215f390a"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/03_UNREFLECTED_RESULTS.md",
+      "blob": "1ac6ef06513eeb37e625f3622885b35398c03d1f"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/04_DESIGN_HISTORY.md",
+      "blob": "8b0ee046dd8c2df9d063a0958ad99a2276b47592"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/05_VISION_ALIGNMENT.md",
+      "blob": "e73292ada9852a637feff5971658efc701effecf"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/06_PRIORITIES.md",
+      "blob": "a5b27d71dd0e64e6b8deef44a5b489f3f99c2ac3"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/07_AUDIT_STATUS.md",
+      "blob": "d271ae50a1970395ec5394e69eda67fc775e2afe"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/08_LEGACY_UNDOCUMENTED_CHANGE.md",
+      "blob": "a7085c2fbd5f43217d5921af8b904d44cf7a77d4"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/09_ASSET_CLASSIFICATIONS.md",
+      "blob": "024fbee0e9012471c139bd0647399200cd5e0ebd"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/09_BRANCH_CLASSIFICATIONS.json",
+      "blob": "84d431e9face8d9aede612ee94990ce2efd63bc7"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/09_CLASSIFICATION_COVERAGE.json",
+      "blob": "d83e6bda50231e1c267acfd563ec54bc3132ab14"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/09_DOCUMENT_CLASSIFICATIONS.json",
+      "blob": "d1c387d1a6978003ed09a871411e5c3971b24e64"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/09_PR_CLASSIFICATIONS.json",
+      "blob": "7c4779a23cc39e7fa8ff91d2a18e8be849136d50"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/10_LEGACY_SAFETY_MATRIX.md",
+      "blob": "93e176401775bb57aaa623b94883a2a11bf2c5d3"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/11_RECOVERY_AND_IDEAS.md",
+      "blob": "b89b3005f70d0e9a3a4a333392d90348c2b3d28f"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/12_REVIEW_PROGRESS.md",
+      "blob": "7c7b684c0f240a4f9de996ce087d993ff33c48f3"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/13_DOCUMENT_REVIEW_ROUND2.md",
+      "blob": "72e64123b4d4899da0f6d0dd62cf0123cc313e02"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/14_BRANCH_RECONCILIATION_ROUND2.md",
+      "blob": "603a21ffc5c9e19a934511b3efb43f2085e05ac9"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/15_RECOVERY_SAFETY_PRIORITIES_ROUND2.md",
+      "blob": "f0b25ceeef2f3f05920f3953281d90ed90e3f4ed"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/16_REVIEW_PROGRESS_ROUND2.md",
+      "blob": "2d1f2f0f4a3235ca37b63d3ed15d4d3b0018813e"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/17_ROUND2_LEDGER.json",
+      "blob": "ce753e60956bc65cfc765ed1cd2d4d2e0a71f7b0"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/18_PINNED_RUNNER_EVIDENCE.json",
+      "blob": "af385f465e946537464698742099aa49d548c09e"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/19_MEMORY_FORGET_IDENTITY_ROUND3.md",
+      "blob": "4e230bf7557d7378f3ef03cab48d9d47df14e901"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/20_LAB_QUALITY_BASELINE_ROUND3.md",
+      "blob": "8cf83829263c12b5d4439d6a4dbec5a6a6ccfd0a"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/21_SHARED_ENGINE_PARITY_ROUND3.md",
+      "blob": "96e7d4133f00889f2a0adeb45112789a11bd0cd6"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/22_DOCUMENT_REVIEW_ROUND3.md",
+      "blob": "6f01acccd3d16bcdfafaaac492b9c445c36fb4ea"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/23_BRANCH_ASSET_SAFETY_ROUND3.md",
+      "blob": "46188382e29edec5ddcdd5b4dba76eda6eebd456"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/24_ROUND3_LEDGER.json",
+      "blob": "e5561b6bd9aa5e2b53bead76cbb5155fcf57e753"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/25_ROUND3_SOURCE_EVIDENCE.json",
+      "blob": "a205bede872a2cd67984cbb61e293684af5bf90a"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/26_ROUND3_PR_SNAPSHOT.json",
+      "blob": "5120d5db79aed50eb5255d6eb58b60781c3dec69"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/27_REVIEW_PROGRESS_ROUND3.md",
+      "blob": "de7ea970b681ec3fd7819e14750933a700221896"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/28_FORGET_ALL_PATHS_ROUND4.md",
+      "blob": "4d2da1735504b6fc755e586b3b047d5bb4ad6997"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/29_RELATIONSHIP_WORKER_ROUND4.md",
+      "blob": "68972eac0176260a8ecebe6f7aba32751ceff7ff"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/30_PERSONA_BODY_CLOCK_CACHE_ROUND4.md",
+      "blob": "16ae74eae68df2c29babbcd1d1e4e46a95d78820"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/31_SQL_FINAL_DEFINITIONS_ROUND4.md",
+      "blob": "12e85cda87d162215899f555214800e795e8a57b"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/32_MEMORY_HISTORY_DECISIONS_ROUND4.md",
+      "blob": "a476f43033d250ca89c1784369006349316ff064"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/33_DOCUMENT_BRANCH_REVIEW_ROUND4.md",
+      "blob": "a2ed73fe1a82a24c64909fe9ed7ba4992cd3dcb0"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/34_ROUND4_LEDGER.json",
+      "blob": "f1645ed357c3c7afa44b349a35ed0e299f0359b1"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/35_ROUND4_SOURCE_EVIDENCE.json",
+      "blob": "bfaefb4b8fcf929e38a9d1284b27f7cd6979836b"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/36_ROUND4_FIXED_SOURCES.json",
+      "blob": "d17611f87d350b49ba85213589cc775e2a17273c"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/37_REVIEW_PROGRESS_ROUND4.md",
+      "blob": "a71e742281d8313de2df3f128f171a4f8a08039c"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/38_SORA_HANDOFF_FORGET_RACE_TEST_CONTRACT.md",
+      "blob": "c19645f344a08b5c2fd10e4fa26230c4aceff5ef"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/39_SORA_SOURCE_RECHECK_ROUND5_PARTIAL.md",
+      "blob": "b8266d7d3c775723dc989db86cd27f4395cecef7"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/40_SORA_RELATIONSHIP_WORKER_RPC_RECHECK.md",
+      "blob": "23988bd5057f5f8c5abf046147fca9adaf3d773c"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/41_SORA_FORGET_SQL_WORKER_COMPATIBILITY.md",
+      "blob": "5eeb194c54787eeb2938d06af90081a9c3a933c1"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/42_SORA_FORGET_CONTROL_READERS_AND_GAPS.md",
+      "blob": "0d2fb936832a98d9a523b884ca181a9938fdebf3"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/43_SORA_BROWSER_STALE_RESPONSE_REVIEW.md",
+      "blob": "b785c5269f2fe7bf168659c1f4d0523266f8a78b"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/44_SORA_BROWSER_SERVER_FORGET_CONSISTENCY.md",
+      "blob": "d856dfed0f99fee63adb3161d766aebcfddd5eb8"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/45_SORA_CROSS_PATH_FORGET_SAFETY_CONTRACT_DRAFT.md",
+      "blob": "5e020c6afcd500b8c24660d1da8ade149fd8c939"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/46_SORA_DOCUMENT_FULL_REVIEW_ROUND5.md",
+      "blob": "60ba453d36f93ae9ebebdfaa2a4d1ac5e2234311"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/47_SORA_ROUND5_DOCUMENT_LEDGER.json",
+      "blob": "6a573f064cfa443ce3b49cadd737d3eaf1bc27f3"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/48_SORA_CONTEXT_AB_DOCUMENT_REVIEW.md",
+      "blob": "6a9832fdcac9de5a1d50eac6235ad27acb111caa"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/49_SORA_ROUND5_DOCUMENT_LEDGER_V2.json",
+      "blob": "d399f40b97b3d3e357b14a34b852259deed4efa8"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/50_SORA_RELATIONSHIP_DESIGN_DOCUMENT_REVIEW.md",
+      "blob": "43cdd3dfc0322588d02ded817021f024f311421f"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/51_SORA_ROUND5_DOCUMENT_LEDGER_V3.json",
+      "blob": "9a6c2cd318c62444682ab435deeb09475af4e006"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/52_SORA_MULTI_CHARACTER_PHASE0_TWO_VERSIONS.md",
+      "blob": "dae8458646fed28090c009ccb47820c22a29e42c"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/53_SORA_ROUND5_DOCUMENT_LEDGER_V4.json",
+      "blob": "d3379bd9a077e786296a5caaa69cf6341219dc16"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/54_SORA_HANDOFF_MEMORY_CERTAINTY_QUALITY_DOCS.md",
+      "blob": "76ce51b5d14fb5f26868c57d79327dbbd560b1f6"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/55_SORA_ROUND5_DOCUMENT_LEDGER_V5.json",
+      "blob": "393e8a3e290a937be55a794d9efb5c9b53f9a865"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/56_DOCUMENT_REVIEW_WORK_RESUMED_ROUND5.md",
+      "blob": "247d3b35e3c37122c6c4a3d5e30e39cc595f9da1"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/57_BRANCH_RECONCILIATION_WORK_RESUMED_ROUND5.md",
+      "blob": "72e89d7afecf0931121304b3b51f7cf1ecc66fa5"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/58_DERIVED_USE_EXPIRY_CONTRACT_ROUND5.md",
+      "blob": "4013aeb178cea5543b27a6e1789c414573350528"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/59_INDEPENDENT_ORACLE_TEST_PLAN_ROUND5.md",
+      "blob": "56a58e303141ac41635ea32db4558cb5cba7747d"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/60_FIXED_SOURCE_AND_LINEAGE_EVIDENCE_ROUND5.json",
+      "blob": "485e7c1c11d37bc80482aa91121fa11d5a50d482"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/61_ROUND5_RESUMED_LEDGER.json",
+      "blob": "f8f50f0d094f9c644f8c6ef3650946fa043181ae"
+    },
+    {
+      "path": "docs/audits/20261021-work-all-assets/62_REVIEW_PROGRESS_WORK_RESUMED_ROUND5.md",
+      "blob": "5622ed6f5c7a837e25ddb4d941e9a59e6f2bd852"
+    }
+  ],
+  "overview_full_coverage": [
+    {
+      "document": "DOC-042",
+      "source_document": "DOC-020",
+      "source_blob": "083dd5663fb7d3dc3961f302d290cc490eb33ac0",
+      "target_blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "target_line_count": 951,
+      "coverage_method": "previously reviewed identical blocks plus every changed/deleted block semantically reviewed; not chapter excerpts",
+      "reconstruction_hash_verified": true,
+      "all_target_lines_accounted": true,
+      "all_changed_hunks_reviewed": true,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            2
+          ],
+          "target_lines": [
+            1,
+            2
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            3,
+            2
+          ],
+          "target_lines": [
+            3,
+            10
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            3,
+            3
+          ],
+          "target_lines": [
+            11,
+            11
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            4,
+            4
+          ],
+          "target_lines": [
+            12,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            5,
+            47
+          ],
+          "target_lines": [
+            13,
+            55
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            48,
+            47
+          ],
+          "target_lines": [
+            56,
+            318
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            48,
+            104
+          ],
+          "target_lines": [
+            319,
+            375
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            105,
+            104
+          ],
+          "target_lines": [
+            376,
+            437
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            105,
+            423
+          ],
+          "target_lines": [
+            438,
+            756
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            424,
+            423
+          ],
+          "target_lines": [
+            757,
+            767
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            424,
+            475
+          ],
+          "target_lines": [
+            768,
+            819
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            476,
+            475
+          ],
+          "target_lines": [
+            820,
+            888
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            476,
+            519
+          ],
+          "target_lines": [
+            889,
+            932
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            520,
+            519
+          ],
+          "target_lines": [
+            933,
+            951
+          ]
+        }
+      ],
+      "delta_archive_path": "document-deltas/DOC-042-from-DOC-020.patch",
+      "git_parenthood_claimed": false
+    },
+    {
+      "document": "DOC-024",
+      "source_document": "DOC-042",
+      "source_blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "target_blob": "3da8bad0e216589a006cb9862278e012c72f2dc3",
+      "target_line_count": 1944,
+      "coverage_method": "previously reviewed identical blocks plus every changed/deleted block semantically reviewed; not chapter excerpts",
+      "reconstruction_hash_verified": true,
+      "all_target_lines_accounted": true,
+      "all_changed_hunks_reviewed": true,
+      "segments": [
+        {
+          "kind": "equal",
+          "source_lines": [
+            1,
+            10
+          ],
+          "target_lines": [
+            1,
+            10
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            11,
+            12
+          ],
+          "target_lines": [
+            11,
+            12
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            13,
+            236
+          ],
+          "target_lines": [
+            13,
+            236
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            237,
+            319
+          ],
+          "target_lines": [
+            237,
+            236
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            320,
+            446
+          ],
+          "target_lines": [
+            237,
+            363
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            447,
+            446
+          ],
+          "target_lines": [
+            364,
+            708
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            447,
+            933
+          ],
+          "target_lines": [
+            709,
+            1195
+          ]
+        },
+        {
+          "kind": "delete",
+          "source_lines": [
+            934,
+            934
+          ],
+          "target_lines": [
+            1196,
+            1195
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            935,
+            935
+          ],
+          "target_lines": [
+            1196,
+            1196
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            936,
+            937
+          ],
+          "target_lines": [
+            1197,
+            1197
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            938,
+            938
+          ],
+          "target_lines": [
+            1198,
+            1198
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            939,
+            942
+          ],
+          "target_lines": [
+            1199,
+            1199
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            943,
+            943
+          ],
+          "target_lines": [
+            1200,
+            1200
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            944,
+            946
+          ],
+          "target_lines": [
+            1201,
+            1203
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            947,
+            947
+          ],
+          "target_lines": [
+            1204,
+            1204
+          ]
+        },
+        {
+          "kind": "replace",
+          "source_lines": [
+            948,
+            950
+          ],
+          "target_lines": [
+            1205,
+            1217
+          ]
+        },
+        {
+          "kind": "equal",
+          "source_lines": [
+            951,
+            951
+          ],
+          "target_lines": [
+            1218,
+            1218
+          ]
+        },
+        {
+          "kind": "insert",
+          "source_lines": [
+            952,
+            951
+          ],
+          "target_lines": [
+            1219,
+            1944
+          ]
+        }
+      ],
+      "delta_archive_path": "document-deltas/DOC-024-from-DOC-042.patch",
+      "git_parenthood_claimed": false
+    }
+  ],
+  "partial_documents_not_counted": [
+    "DOC-022",
+    "DOC-035"
+  ],
+  "archive_manifest": [
+    {
+      "path": "documents/DOC-001.md",
+      "bytes": 5779,
+      "sha256": "8ab4e6c7266bb4f0d19a16b113088abfec1158dccb74494c7c30909b100b3350"
+    },
+    {
+      "path": "documents/DOC-002.md",
+      "bytes": 2323,
+      "sha256": "38102892cc689ccfae5926e5489279dad06fc8418b26b9ff07b87986fd3a3a6d"
+    },
+    {
+      "path": "documents/DOC-003.md",
+      "bytes": 15809,
+      "sha256": "9107e4cb3b5c3811db3f78f5f08887d8d2602eb707e6e1b1450accd9387b313c"
+    },
+    {
+      "path": "documents/DOC-024.md",
+      "bytes": 92511,
+      "sha256": "77b2c06ca20b0e018fc4e836b70da87f754e88c190f9f839fc28ab06cbce2346"
+    },
+    {
+      "path": "documents/DOC-042.md",
+      "bytes": 50659,
+      "sha256": "252719b1c258cc9c8af5ddeba09c09efbb64e513f44a8cf55643eac127572875"
+    },
+    {
+      "path": "documents/DOC-052.md",
+      "bytes": 27963,
+      "sha256": "e67ff1ddc4ff44290b704a781bcd2fa9f91326c80afd4d6e91dddfe96969de18"
+    },
+    {
+      "path": "document-deltas/DOC-042-from-DOC-020.patch",
+      "bytes": 36235,
+      "sha256": "0dae79f1bbc153b3607c57787eedc82ae74cf99f6c66d6a76d482f953b1e5471"
+    },
+    {
+      "path": "document-deltas/DOC-024-from-DOC-042.patch",
+      "bytes": 64222,
+      "sha256": "75bd323ad66fd3847cb28f7fb307d9008702dcdb1935323418c561a8d4a4586e"
+    },
+    {
+      "path": "partial-deltas/DOC-022-from-DOC-029.patch",
+      "bytes": 11179,
+      "sha256": "d685a693a63f36d83588c589e75bb610f926b3c732f744299b98988becc2d2fe"
+    },
+    {
+      "path": "partial-deltas/DOC-035-from-DOC-029.patch",
+      "bytes": 8600,
+      "sha256": "5d640e61c1940d03004bc2e0f835e4224d8c25a1e0b02bb474ff533437b16473"
+    },
+    {
+      "path": "branch-deltas/BR-002.patch",
+      "bytes": 4155,
+      "sha256": "849944a5bd970db84ae34cfe0d8edaa086b674d22f3fa6e64d22a4dba682cc1b"
+    },
+    {
+      "path": "branch-deltas/BR-003.patch",
+      "bytes": 87302,
+      "sha256": "a081735d00e6677c8628f84bddda669ca3199ec8f6d7eec8d3c4b56375cd1741"
+    },
+    {
+      "path": "branch-deltas/BR-011.patch",
+      "bytes": 51138,
+      "sha256": "1aaf7a1ad823d18746e33410d869b68907734cba4df8bb8cb9b62fc9e843b64b"
+    },
+    {
+      "path": "branch-deltas/BR-012.patch",
+      "bytes": 13797,
+      "sha256": "d2a663f2019cd3b52b99703dc37c9d13b2781aa6d01512a9478090d6658e9349"
+    },
+    {
+      "path": "branch-deltas/BR-019.patch",
+      "bytes": 18219,
+      "sha256": "4afcb1a97286edc5e68cf32930356feeccbd31020634055caef4004fea254337"
+    },
+    {
+      "path": "branch-deltas/BR-020.patch",
+      "bytes": 5373,
+      "sha256": "33d7fe7be1b6512f7c5746def89b8766ccee981828e70a3ea045027c1c8b8e31"
+    },
+    {
+      "path": "branch-deltas/BR-021.patch",
+      "bytes": 30018,
+      "sha256": "0278e1d316d3040732ae98454dc46a96c1f8ca86df135595aa18375a34a2efbb"
+    },
+    {
+      "path": "branch-deltas/BR-022.patch",
+      "bytes": 2214,
+      "sha256": "5b10d07fcccd502d7bdd1d597bd6b8f81ab3e278a1688661bd04c6839dbcc82e"
+    },
+    {
+      "path": "branch-deltas/BR-023.patch",
+      "bytes": 6367,
+      "sha256": "96a6d8b6b26aaca50f509f2b9ca34e96154b093c6a5c11323d91d4e21f2e993e"
+    },
+    {
+      "path": "branch-deltas/BR-024.patch",
+      "bytes": 9036,
+      "sha256": "f1cddc4b8c3bd64f2d5b250623dac01581775925b44e087a759d0cb76e3a23f4"
+    },
+    {
+      "path": "branch-deltas/BR-026.patch",
+      "bytes": 4552,
+      "sha256": "a867b1b599fb558fe648ef8ff070ecaa3bbe83b4b2901d510734ab1e319ac76e"
+    },
+    {
+      "path": "branch-deltas/BR-027.patch",
+      "bytes": 2208,
+      "sha256": "98446e33f378019bee103cf1fc05d03046b6af9a68540c3aed30818a7e664687"
+    },
+    {
+      "path": "branch-deltas/BR-030.patch",
+      "bytes": 5277,
+      "sha256": "19e9329292dac9f9ec3f281faeed85517bfa0115f13c3a4bca3b79813446518f"
+    },
+    {
+      "path": "branch-deltas/BR-032.patch",
+      "bytes": 15763,
+      "sha256": "967b6f7839eacb67b48d642cefeb2d2c58213c5fe84d54e687d13acbc5ba4676"
+    },
+    {
+      "path": "branch-deltas/BR-033.patch",
+      "bytes": 2854,
+      "sha256": "60cd89984275d3b7be1e18e7f0d8903439857f1e44ca07769712b461ee880e46"
+    },
+    {
+      "path": "branch-deltas/BR-034.patch",
+      "bytes": 4039,
+      "sha256": "914222d87a992d6569c3f3408c240339108a192950a55aac70da797ac2b2361d"
+    },
+    {
+      "path": "branch-deltas/BR-038.patch",
+      "bytes": 983,
+      "sha256": "fab730953d23015fd625fd9c9db577bc0ac8ea59f8351ab733c346d10bcf8f9b"
+    },
+    {
+      "path": "branch-deltas/BR-040.patch",
+      "bytes": 2020,
+      "sha256": "72d725d087625bcb6df1c8ab1b90b33a11b059c143dccc19499482886e3efb77"
+    },
+    {
+      "path": "branch-deltas/BR-041.patch",
+      "bytes": 3198,
+      "sha256": "1d1e28f07677cce45d14912f48b09a362d31bf81c168dea03fdd081046700a78"
+    },
+    {
+      "path": "branch-deltas/BR-043.patch",
+      "bytes": 5276,
+      "sha256": "baa924da036f4377cb535f6c5c885ec9d8e9b67837829e346d4a4851ab365dc4"
+    },
+    {
+      "path": "branch-deltas/BR-044.patch",
+      "bytes": 3904,
+      "sha256": "67f90ac0d679008e632524987a6adb07e33b84ea8b6be428f8012790f1cec6a2"
+    },
+    {
+      "path": "branch-deltas/BR-045.patch",
+      "bytes": 20574,
+      "sha256": "700fbeb1ea0bb4c3ed0fcdb099e2c35bb11444cc01c958b431eba5d84311f663"
+    },
+    {
+      "path": "branch-deltas/BR-047.patch",
+      "bytes": 11452,
+      "sha256": "c7b01a1da77f7c108e94a85b0c08e1a05b913edf650c6bb54d3ac4e23c9f7ef8"
+    },
+    {
+      "path": "main-source/app/api/chat-proxy/route.ts",
+      "bytes": 294,
+      "sha256": "5096ac676bd7a9a8643f939d29ebaba5c423febdd60ca6e810af7262b929278c"
+    },
+    {
+      "path": "main-source/app/api/persona/history/route.ts",
+      "bytes": 6170,
+      "sha256": "94a73bf35ed88acd744d5d1216cca0790ef5ece45703c7b258082457a7f6d864"
+    },
+    {
+      "path": "main-source/app/api/feedback/reply/route.ts",
+      "bytes": 1853,
+      "sha256": "7f3136409fe268d3d77f3863b82f8aa89d003323f949638dc6a2cb7fee18616c"
+    },
+    {
+      "path": "main-source/app/account/page.tsx",
+      "bytes": 14643,
+      "sha256": "7b6a41bb67274b0c5b8d465820b39259ffb267b833b1aec1219bfe7601b2ce46"
+    },
+    {
+      "path": "main-source/app/chat/anonymous-session-guard.tsx",
+      "bytes": 6524,
+      "sha256": "0ae3ad6ca35b330049d1649b4730324e627d689f88e0688ac0cdd24d09d16d90"
+    },
+    {
+      "path": "main-source/app/chat/conversation-history-sync.tsx",
+      "bytes": 5262,
+      "sha256": "0e91d6d1aa058bbf102b82649e3d613e8f0021e06387576724099ca2992f730e"
+    },
+    {
+      "path": "main-source/app/chat/page.tsx",
+      "bytes": 65844,
+      "sha256": "fd578779deb5cedfdfc9c230beaf76080c5b404792031917415f8f4f23502550"
+    },
+    {
+      "path": "main-source/lib/canonical-state.ts",
+      "bytes": 11332,
+      "sha256": "85dc1e542aced554ce4fb3405535766cfc954ae2e0fa3254b5bcc9924cfccab6"
+    },
+    {
+      "path": "main-source/lib/chat-recall.ts",
+      "bytes": 2580,
+      "sha256": "16940f387b143f681a484c8e0fe6ed4f3f4285960ccd13150dbccd103e8abf63"
+    },
+    {
+      "path": "main-source/lib/device-conversation.ts",
+      "bytes": 923,
+      "sha256": "1b56172daef27a121dababb416fb37403c7f63a1f47005160011d7fb8e782107"
+    },
+    {
+      "path": "main-source/lib/gemini-json-generator.ts",
+      "bytes": 5270,
+      "sha256": "b02449e300a02e7b88cb56ea9b1d0631ea8d7c25848460798fa8aad2ac2499ae"
+    },
+    {
+      "path": "main-source/lib/relationship-acting-guide.ts",
+      "bytes": 6548,
+      "sha256": "7fbea1319d64e720afc233f1831eb02895212bc235af99a9186d84534b24d389"
+    },
+    {
+      "path": "main-source/lib/relationship-patterns.ts",
+      "bytes": 7722,
+      "sha256": "492d38864adee46408a27e3052ba253603e8f9dfc04fcb3866290bd88c3eefd5"
+    },
+    {
+      "path": "main-source/lib/relationship-life-context.ts",
+      "bytes": 6034,
+      "sha256": "87da95b800e26940c9de27a689bd1d36133bde9b34227ab81ed2322f371dee5c"
+    },
+    {
+      "path": "main-source/lib/relationship-time.ts",
+      "bytes": 3985,
+      "sha256": "45ab1f8ec9bee8f5331037607de38d9ee7d11d1196ea1043868bb1cc3dc9b53b"
+    },
+    {
+      "path": "main-source/lib/tokyo-life-events.ts",
+      "bytes": 28780,
+      "sha256": "e1aabf36b2f9ba11240eb8b4c46483e6dbc5277de9c80d8e139e45a0e342f570"
+    },
+    {
+      "path": "main-source/supabase/functions/body-clock/index.ts",
+      "bytes": 9917,
+      "sha256": "ccf5548f458519746ca46ac61677eba04918a3fb8a80aa2270dc2f47ae3efa5e"
+    },
+    {
+      "path": "main-source/supabase/functions/body-clock/proactive-decision.ts",
+      "bytes": 10340,
+      "sha256": "22a3fc4f5a0d1aae4f9bded6f947b37ad31c1521bfbc4b5b80463ec6cf2b93a9"
+    },
+    {
+      "path": "main-source/supabase/functions/body-clock/proactive-photo.ts",
+      "bytes": 4925,
+      "sha256": "20031e7bb19a2c226447f8dcad996646952b61aef84acc35c4d4a6d458f678e1"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "bytes": 6055,
+      "sha256": "cabff272569f72a227b014b890064beaa7c25bed121ab6fca550f1988e5fe81b"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql",
+      "bytes": 3565,
+      "sha256": "6e08aec751e86f1eb6cba54b85b1e5897f509fc0c17cd1760089953252caa6fc"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260918073918_canonical_misaki_root_state.sql",
+      "bytes": 24959,
+      "sha256": "8c290b1a79b00972ddf0867bb0483620875c21a3eecd34695d231cf3ee0083fd"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260926000000_semantic_relationship_point_delta.sql",
+      "bytes": 6169,
+      "sha256": "e04342d456c919224765a65c77de4750b5ae41a9c46ad2e9436d33287a85d800"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql",
+      "bytes": 5907,
+      "sha256": "82fcc188f83648280bcc2e27c1be7bae445ad2aab681ac9a3294c4991f0bee8c"
+    },
+    {
+      "path": "main-source/supabase/migrations/20260927000000_reply_feedback.sql",
+      "bytes": 950,
+      "sha256": "fe5c34191d77dfae0b9d7f84b4a092f8553692bd87139b9afa55553c1a7be572"
+    },
+    {
+      "path": "remote-heads.tsv",
+      "bytes": 7886,
+      "sha256": "62c9def3b4b162dfd409f318adb9f858a805072964f2ca512071c9aac185cc99"
+    }
+  ],
+  "archive": {
+    "path": "67_CONTINUATION_FIXED_EVIDENCE_ROUND5.zip",
+    "bytes": 295593,
+    "sha256": "294cb622ff11cf3a2a4315f7f0b99bb8d0df8a50542f86a87e0ccf3d932b2e52"
+  }
+}

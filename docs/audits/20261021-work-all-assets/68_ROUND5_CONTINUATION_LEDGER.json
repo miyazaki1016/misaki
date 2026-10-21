@@ -1,0 +1,1105 @@
+{
+  "schema": "misaki-round5-continuation-overlay-v1",
+  "date": "2026-10-21",
+  "timezone": "Asia/Tokyo",
+  "baseline_commit": "2efc394c4c06b952545dda07fd590a094e7b42a8",
+  "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "inherit_ledger": "61_ROUND5_RESUMED_LEDGER.json",
+  "apply_rule": "Append after 61; original ID+blob counted once; unique-delta/static branch classification is not current runtime acceptance; preserve 01-62 and README byte-for-byte.",
+  "progress": {
+    "documents_previous": 60,
+    "documents_this_batch": 6,
+    "documents_total": 66,
+    "documents_denominator": 85,
+    "documents_pending": 19,
+    "branches_insufficient_previous": 24,
+    "branches_static_resolved_this_batch": 23,
+    "branches_static_resolved_total_of_original44": 43,
+    "branches_insufficient": 1,
+    "remote_heads_observed": 92,
+    "ideas_previous": 13,
+    "ideas_new": 2,
+    "ideas_total": 15,
+    "new_production_verified_assets": 0,
+    "legacy_blocked": true
+  },
+  "documents": [
+    {
+      "id": "DOC-001",
+      "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+      "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 5779
+    },
+    {
+      "id": "DOC-002",
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "blob": "fcfab902743c4918813de44ad2d797bd466eda7a",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 2323
+    },
+    {
+      "id": "DOC-003",
+      "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+      "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 15809
+    },
+    {
+      "id": "DOC-024",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3da8bad0e216589a006cb9862278e012c72f2dc3",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 92511
+    },
+    {
+      "id": "DOC-042",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 50659
+    },
+    {
+      "id": "DOC-052",
+      "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+      "blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false,
+      "evidence": "63_DOCUMENT_HISTORY_CONTINUATION_ROUND5.md",
+      "bytes": 27963
+    }
+  ],
+  "branches": [
+    {
+      "id": "BR-002",
+      "branch": "cleanup/legacy-proactive-tags",
+      "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "prs": [
+        13
+      ],
+      "observed_current_head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "merge_base_with_main": "47a616db7641ff3a9d30a2ffaec905349b8c6ed7",
+      "all_changed_paths": [
+        "M\tlib/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "lib/proactive-photo.ts",
+          "branch_blob": "c5c41cd436c6e1a51543c46aa6efb0d52a7b14bf",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "849944a5bd970db84ae34cfe0d8edaa086b674d22f3fa6e64d22a4dba682cc1b"
+    },
+    {
+      "id": "BR-003",
+      "branch": "cleanup/remove-legacy-proactive-path",
+      "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "prs": [
+        23
+      ],
+      "observed_current_head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "merge_base_with_main": "278f167b2376365e46fd0e97193f1d8c924e6f57",
+      "all_changed_paths": [
+        "D\tapp/api/body-clock/route.ts",
+        "D\tapp/api/proactive/route.ts",
+        "M\tapp/chat/page.tsx",
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "D\tlib/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/body-clock/route.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        },
+        {
+          "path": "app/api/proactive/route.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        },
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "03c6e85f6a914dc4146c78f51931780cdd9f2da7",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "3e5c58a25344e9042c9245b4873158a97237ffb5",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "lib/proactive-photo.ts",
+          "branch_blob": null,
+          "main_blob": null,
+          "relation": "absent-both"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "a081735d00e6677c8628f84bddda669ca3199ec8f6d7eec8d3c4b56375cd1741"
+    },
+    {
+      "id": "BR-011",
+      "branch": "docs/production-source-of-truth-reconciliation",
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "prs": [
+        81
+      ],
+      "observed_current_head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "merge_base_with_main": "1fb508c224cb85a492973078ea2f27c5dc5042e6",
+      "all_changed_paths": [
+        "A\tdocs/HANDOFF_NEXT_SORA_2026-10-14.md",
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "M\tdocs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+        "A\tdocs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+          "branch_blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+          "branch_blob": "0baf4f28d863f6e075f745afd5c903145887274f",
+          "main_blob": "4de727956e52cc8eeccd772631671af69a13536f",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+          "branch_blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "未反映の設計・監査・試験資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "1aaf7a1ad823d18746e33410d869b68907734cba4df8bb8cb9b62fc9e843b64b"
+    },
+    {
+      "id": "BR-012",
+      "branch": "docs/relationship-five-axis-design-review-20261015",
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "prs": [
+        84
+      ],
+      "observed_current_head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "merge_base_with_main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+      "all_changed_paths": [
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md",
+        "A\ttests/relationship-acting-guide-sensitivity.test.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "tests/relationship-acting-guide-sensitivity.test.ts",
+          "branch_blob": "5f61fc245520a9acca756972959c0c8c4ad96e37",
+          "main_blob": null,
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "未反映の設計・監査・試験資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "d2a663f2019cd3b52b99703dc37c9d13b2781aa6d01512a9478090d6658e9349"
+    },
+    {
+      "id": "BR-019",
+      "branch": "feature/proactive-derived-tags",
+      "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "prs": [
+        12
+      ],
+      "observed_current_head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "merge_base_with_main": "a21673390a45cc96565ed64ed22d2e0f33d05acd",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/proactive-decision.ts",
+        "M\tsupabase/functions/body-clock/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "9ae1d8f7b5fb25bbd5fda1635872aaea86f52423",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-photo.ts",
+          "branch_blob": "0b1d2a8d059256adfc2724e87a5f7805ff8d7dba",
+          "main_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "4afcb1a97286edc5e68cf32930356feeccbd31020634055caef4004fea254337"
+    },
+    {
+      "id": "BR-020",
+      "branch": "fix/anonymous-chat-session-drop",
+      "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "prs": [
+        24
+      ],
+      "observed_current_head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "merge_base_with_main": "15cb968736c6c4b2442f9363b7c55f5b299ae5cb",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "same-blob"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "12d82b12ffc2f6a9f9e32a9451a30e46b27563b4",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "33d7fe7be1b6512f7c5746def89b8766ccee981828e70a3ea045027c1c8b8e31"
+    },
+    {
+      "id": "BR-021",
+      "branch": "fix/anonymous-email-history",
+      "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "prs": [
+        1
+      ],
+      "observed_current_head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "merge_base_with_main": "0ae531999ab7999ef6d8443b0001187522f4f7cb",
+      "all_changed_paths": [
+        "M\tapp/account/page.tsx",
+        "M\tapp/api/persona/history/route.ts",
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\tapp/chat/conversation-history-sync.tsx",
+        "M\tapp/chat/layout.tsx",
+        "A\tlib/device-conversation.ts",
+        "A\tsupabase/migrations/20260917051607_save_anonymous_conversation.sql",
+        "A\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/account/page.tsx",
+          "branch_blob": "9082429b2d82a805fb2207edc4015221087dc0c9",
+          "main_blob": "2644e942ab9f52fe5429189d92b61069c86bf9db",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/api/persona/history/route.ts",
+          "branch_blob": "f2b35fa80db684bd509b1a2be6ea55c852b97e9a",
+          "main_blob": "4f8fccd9292d48286efb1bc9a5608d88c5946126",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "22b105aef7a83f7311ef85ecc6bddd5d27f02550",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/conversation-history-sync.tsx",
+          "branch_blob": "879d659da3fc9b79cc225da4256ffc2db9329257",
+          "main_blob": "3f39da1597ed5b12c7effff2420a3c1f7f571fc4",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/layout.tsx",
+          "branch_blob": "36f7f42caf6fc8884a880e9b624e795c4bb1308f",
+          "main_blob": "36f7f42caf6fc8884a880e9b624e795c4bb1308f",
+          "relation": "same-blob"
+        },
+        {
+          "path": "lib/device-conversation.ts",
+          "branch_blob": "ede349809f7db4f5e34e4fdbad23accbb2d81377",
+          "main_blob": "72247015ec7b6521ae461b1c468ee8cb6d44e97a",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+          "branch_blob": "7b0ca6fe1eef326081cc9555efdf3e704af669c2",
+          "main_blob": "7b0ca6fe1eef326081cc9555efdf3e704af669c2",
+          "relation": "same-blob"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "82cda9cba61da5122ff597a946d2f8bc6ba9848e",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "0278e1d316d3040732ae98454dc46a96c1f8ca86df135595aa18375a34a2efbb"
+    },
+    {
+      "id": "BR-022",
+      "branch": "fix/anonymous-session-cache-reset",
+      "head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "prs": [
+        4
+      ],
+      "observed_current_head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "merge_base_with_main": "ac5cccfbf2250204d13adf31fb05b15eb4652234",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "aad1c165ef823c5d8cec3c9ce8ba97a28bef4b4e",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "5b10d07fcccd502d7bdd1d597bd6b8f81ab3e278a1688661bd04c6839dbcc82e"
+    },
+    {
+      "id": "BR-023",
+      "branch": "fix/body-clock-claim-rpc",
+      "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "prs": [
+        16
+      ],
+      "observed_current_head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "merge_base_with_main": "24013d9ce1f7840de541738df856bdfbaffd7b22",
+      "all_changed_paths": [
+        "A\tsupabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql",
+          "branch_blob": "a7bb06364807186eb42454f7df5982bf743a8b8b",
+          "main_blob": "a7bb06364807186eb42454f7df5982bf743a8b8b",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "96a6d8b6b26aaca50f509f2b9ca34e96154b093c6a5c11323d91d4e21f2e993e"
+    },
+    {
+      "id": "BR-024",
+      "branch": "fix/chat-failure-recovery",
+      "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "prs": [
+        19
+      ],
+      "observed_current_head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "merge_base_with_main": "eeef18257945c16b1179618485872e3efa577186",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts",
+        "M\tapp/chat/page.tsx",
+        "A\tsupabase/migrations/20260918081000_refund_failed_chat_usage.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "cdad8a4030271743b55fc7ea49655a83a01583ff",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "141110cef33882bceac6d49ad03ee98b247fe4fe",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/migrations/20260918081000_refund_failed_chat_usage.sql",
+          "branch_blob": "b79b960674afccd99834fe93672c7740ffa4ad36",
+          "main_blob": "b79b960674afccd99834fe93672c7740ffa4ad36",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "f1cddc4b8c3bd64f2d5b250623dac01581775925b44e087a759d0cb76e3a23f4"
+    },
+    {
+      "id": "BR-026",
+      "branch": "fix/chat-reliability-cleanup",
+      "head": "a06baac8110ded425c07e2122117e89460868405",
+      "prs": [
+        9
+      ],
+      "observed_current_head": "a06baac8110ded425c07e2122117e89460868405",
+      "merge_base_with_main": "b1fc94970726313be721de14e5c7969a7c12a7a3",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "87fd79d7a83d3d591387e8e71bbd477b4aa35c1b",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "a867b1b599fb558fe648ef8ff070ecaa3bbe83b4b2901d510734ab1e319ac76e"
+    },
+    {
+      "id": "BR-027",
+      "branch": "fix/chat-request-diagnostics",
+      "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "prs": [
+        7
+      ],
+      "observed_current_head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "merge_base_with_main": "1d80a67899dd54ee1d73e6dd08b96b386ae88029",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "efb7e40c3d6e098a2e0829533a69f0cd4e473405",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "98446e33f378019bee103cf1fc05d03046b6af9a68540c3aed30818a7e664687"
+    },
+    {
+      "id": "BR-030",
+      "branch": "fix/gemini-chat-timeout",
+      "head": "469578ea12663c594a32c62a05263b23e7190891",
+      "prs": [
+        25
+      ],
+      "observed_current_head": "469578ea12663c594a32c62a05263b23e7190891",
+      "merge_base_with_main": "21a5dcd93cb69336a5486614762478be636f6aeb",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "891320b3e744a9f4dad10cad60261db4e307177b",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "19e9329292dac9f9ec3f281faeed85517bfa0115f13c3a4bca3b79813446518f"
+    },
+    {
+      "id": "BR-032",
+      "branch": "fix/grow-relationship-from-first-meeting",
+      "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "prs": [
+        27
+      ],
+      "observed_current_head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "merge_base_with_main": "7b64dbbef610aed66b3e2c7c8915cbd5d40745bf",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts",
+        "M\tlib/persona/fallback-persona.ts",
+        "M\tsupabase/functions/body-clock/fallback-persona.ts",
+        "A\tsupabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "efed72f74fb8f0c952e12c89789bdecf9b433897",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "lib/persona/fallback-persona.ts",
+          "branch_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "main_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "relation": "same-blob"
+        },
+        {
+          "path": "supabase/functions/body-clock/fallback-persona.ts",
+          "branch_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "main_blob": "f7f68d98a1644ff07a5c308eab4f4fe1cff81e0c",
+          "relation": "same-blob"
+        },
+        {
+          "path": "supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql",
+          "branch_blob": "aa61e3b1e1529677992951a4250a80588f8ddf97",
+          "main_blob": "aa61e3b1e1529677992951a4250a80588f8ddf97",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "967b6f7839eacb67b48d642cefeb2d2c58213c5fe84d54e687d13acbc5ba4676"
+    },
+    {
+      "id": "BR-033",
+      "branch": "fix/legacy-safari-cache",
+      "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "prs": [
+        2
+      ],
+      "observed_current_head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "merge_base_with_main": "7595c2d1d935354a1c9127bc529cb268788c8e9b",
+      "all_changed_paths": [
+        "M\tapp/chat/anonymous-session-guard.tsx",
+        "M\ttests/account-conversation.test.cjs"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/anonymous-session-guard.tsx",
+          "branch_blob": "3cb5bb483829e4662cbed63c10cf17e7d02709af",
+          "main_blob": "b8756ce6b0be5d45aaeb7172ceb0876b3b8601b6",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "tests/account-conversation.test.cjs",
+          "branch_blob": "b8895a8bd68572f7da58161900c6c3f221fc3ede",
+          "main_blob": "c5f8059692c151860434a6e07957b1dd08e53ab9",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "60cd89984275d3b7be1e18e7f0d8903439857f1e44ca07769712b461ee880e46"
+    },
+    {
+      "id": "BR-034",
+      "branch": "fix/preserve-active-chat-history",
+      "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "prs": [
+        17
+      ],
+      "observed_current_head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "merge_base_with_main": "0042df16070a6f2cf6544363be3ee7cda02d5fbf",
+      "all_changed_paths": [
+        "M\tapp/chat/conversation-history-sync.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/conversation-history-sync.tsx",
+          "branch_blob": "cdedb681e51bd1dd3c5a2ebc46358272c9a1ee32",
+          "main_blob": "3f39da1597ed5b12c7effff2420a3c1f7f571fc4",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "914222d87a992d6569c3f3408c240339108a192950a55aac70da797ac2b2361d"
+    },
+    {
+      "id": "BR-038",
+      "branch": "fix/safari-load-failed-message",
+      "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "prs": [
+        11
+      ],
+      "observed_current_head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "merge_base_with_main": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab",
+      "all_changed_paths": [
+        "M\tapp/chat/page.tsx"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/chat/page.tsx",
+          "branch_blob": "a86d832934437d3cb51cd2049f20c6b933a52cdb",
+          "main_blob": "2221fcac53f3406658a43c5bd6c9ab9655f27148",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "fab730953d23015fd625fd9c9db577bc0ac8ea59f8351ab733c346d10bcf8f9b"
+    },
+    {
+      "id": "BR-040",
+      "branch": "fix/use-chat-proxy",
+      "head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "prs": [
+        6
+      ],
+      "observed_current_head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "merge_base_with_main": "14d80b91a39af33edea1332f71ba4a06a6763b31",
+      "all_changed_paths": [
+        "M\tapp/api/chat-proxy/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat-proxy/route.ts",
+          "branch_blob": "083c5512feff51cd47cf027987864ef080300d1b",
+          "main_blob": "d1e9749fcb4d5b0e4e198d910c3214987f7280fe",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "72d725d087625bcb6df1c8ab1b90b33a11b059c143dccc19499482886e3efb77"
+    },
+    {
+      "id": "BR-041",
+      "branch": "fix/workday-grounding",
+      "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "prs": [
+        20
+      ],
+      "observed_current_head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "merge_base_with_main": "6db1524322d66d9bbba47a0c327f3b249e44d8ae",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "35d1e82730b171fa622949579cd35506ce351437",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "1d1e28f07677cce45d14912f48b09a362d31bf81c168dea03fdd081046700a78"
+    },
+    {
+      "id": "BR-043",
+      "branch": "perf/chat-stage-timing",
+      "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "prs": [
+        26
+      ],
+      "observed_current_head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "merge_base_with_main": "b3530b4e3569bd2796c1758eba8514f3b684d633",
+      "all_changed_paths": [
+        "M\tapp/api/chat/route.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "app/api/chat/route.ts",
+          "branch_blob": "84a1089cddf47ec0d290438e52b617bcbe495e8f",
+          "main_blob": "5600ad37f2660049a570c4dd340e8ed140d9843b",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "baa924da036f4377cb535f6c5c885ec9d8e9b67837829e346d4a4851ab365dc4"
+    },
+    {
+      "id": "BR-044",
+      "branch": "refine/proactive-action-tags",
+      "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "prs": [
+        14
+      ],
+      "observed_current_head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "merge_base_with_main": "d35827487fbd1effbacc4b283aafdcf2d10b6b14",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/proactive-decision.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "deed63026892e64d564c6cb415f8f442ea80876a",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "67f90ac0d679008e632524987a6adb07e33b84ea8b6be428f8012790f1cec6a2"
+    },
+    {
+      "id": "BR-045",
+      "branch": "refine/sleepy-tag",
+      "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "prs": [
+        15
+      ],
+      "observed_current_head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "merge_base_with_main": "4e8c96a5bd5586cec54a9af006de8a91c65a4ab1",
+      "all_changed_paths": [
+        "M\tsupabase/functions/body-clock/index.ts",
+        "M\tsupabase/functions/body-clock/proactive-decision.ts",
+        "M\tsupabase/functions/body-clock/proactive-photo.ts"
+      ],
+      "path_comparisons": [
+        {
+          "path": "supabase/functions/body-clock/index.ts",
+          "branch_blob": "6f1fc72bcbd9921e8475447bcf19a0f50ae98373",
+          "main_blob": "db885c0b2417255c061351c7160c0323763e7822",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-decision.ts",
+          "branch_blob": "3f25cbbb70d51790d40b62751b2b354228804ef6",
+          "main_blob": "b75fc031927c5a7c7450ff5e39f4c69ab1772f48",
+          "relation": "different-or-removed"
+        },
+        {
+          "path": "supabase/functions/body-clock/proactive-photo.ts",
+          "branch_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "main_blob": "b351f3c9d813178cbd77de823c482df744db97f7",
+          "relation": "same-blob"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "700fbeb1ea0bb4c3ed0fcdb099e2c35bb11444cc01c958b431eba5d84311f663"
+    },
+    {
+      "id": "BR-047",
+      "branch": "sora/canonical-relationship-integration",
+      "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "prs": [
+        32
+      ],
+      "observed_current_head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "merge_base_with_main": "db5b6e17c77f94f54bb4764da3fcf01b764d313e",
+      "all_changed_paths": [
+        "M\tdocs/IMPLEMENTATION_OVERVIEW.md"
+      ],
+      "path_comparisons": [
+        {
+          "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+          "branch_blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc",
+          "main_blob": "711b7674d9fa8547f73137016030c2a10195d859",
+          "relation": "different-or-removed"
+        }
+      ],
+      "review_state": "static-resolved-not-runtime",
+      "classification": "mainに反映・後続置換された歴史資産",
+      "classification_scope": "all-unique-branch-deltas-and-source-lineage-not-runtime",
+      "current_behavior_verified": false,
+      "evidence": "64_BRANCH_LINEAGE_CONTINUATION_ROUND5.md",
+      "full_delta_sha256": "c7b01a1da77f7c108e94a85b0c08e1a05b913edf650c6bb54d3ac4e23c9f7ef8"
+    }
+  ],
+  "pending_documents": [
+    {
+      "id": "DOC-015",
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410"
+    },
+    {
+      "id": "DOC-019",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "0715dd8a2e80829584525c639c79060eda89369c"
+    },
+    {
+      "id": "DOC-021",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb"
+    },
+    {
+      "id": "DOC-022",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb"
+    },
+    {
+      "id": "DOC-023",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9"
+    },
+    {
+      "id": "DOC-026",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc"
+    },
+    {
+      "id": "DOC-027",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c"
+    },
+    {
+      "id": "DOC-028",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85"
+    },
+    {
+      "id": "DOC-029",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859"
+    },
+    {
+      "id": "DOC-030",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d"
+    },
+    {
+      "id": "DOC-031",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1"
+    },
+    {
+      "id": "DOC-033",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "98551eeb0693a352aaf2c639babec34c95ff6484"
+    },
+    {
+      "id": "DOC-034",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea"
+    },
+    {
+      "id": "DOC-035",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7"
+    },
+    {
+      "id": "DOC-037",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b48887633360762cb4821e0027893d30a92cde52"
+    },
+    {
+      "id": "DOC-038",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb"
+    },
+    {
+      "id": "DOC-039",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c"
+    },
+    {
+      "id": "DOC-040",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b"
+    },
+    {
+      "id": "DOC-041",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3"
+    }
+  ],
+  "partial_document_reviews_not_counted": [
+    {
+      "id": "DOC-022",
+      "scope": "branch-unique appended section only; base DOC-029 still not fully reviewed"
+    },
+    {
+      "id": "DOC-035",
+      "scope": "branch-unique appended section only; base DOC-029 still not fully reviewed"
+    }
+  ],
+  "pending_branches": [
+    {
+      "id": "BR-008",
+      "branch": "docs/development-registry-audit-20261020",
+      "head": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "prs": [],
+      "observed_current_head": "2efc394c4c06b952545dda07fd590a094e7b42a8",
+      "original_head_retained": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "reason": "Original development registry and remaining overview semantics pending; audit branch itself not self-certified."
+    }
+  ],
+  "ideas": [
+    {
+      "id": "IDEA14",
+      "meaning": "Quality feedback must not reward/punish pair relationship or automatically change persona",
+      "source_document": "DOC-042",
+      "source_blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+      "nature": "historical-design-principle-not-new-runtime-acceptance"
+    },
+    {
+      "id": "IDEA15",
+      "meaning": "Shared-world natural acquisition privacy and home/life-area distinct from current place/activity",
+      "source_branch": "BR-047",
+      "nature": "historical-design-principle-not-new-runtime-acceptance"
+    }
+  ],
+  "inherited_test_plan": "59_INDEPENDENT_ORACLE_TEST_PLAN_ROUND5.md",
+  "test_cases": [
+    {
+      "id": "W-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "W-B",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "W-C",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "W-D",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "W-E",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "P-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "P-B",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "B-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "B-B",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "N-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "N-B",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "N-C",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "U-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "U-B",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "A-A",
+      "status": "NOT_RUN"
+    },
+    {
+      "id": "O-A",
+      "status": "NOT_RUN"
+    }
+  ],
+  "runtime_tests_executed": false,
+  "database_accessed": false,
+  "migration_executed": false,
+  "paid_model_called": false,
+  "main_changed": false,
+  "production_changed": false,
+  "amafuru_changed": false,
+  "reproduced_defects": 0,
+  "all_assets_audit_complete": false,
+  "blocked_assets": [
+    {
+      "branch": "codex/legacy-maintenance-drain",
+      "status": "BLOCKED",
+      "new_safety_acceptance": false
+    }
+  ],
+  "evidence": "66_CONTINUATION_SOURCE_INDEX_ROUND5.json",
+  "archive": "67_CONTINUATION_FIXED_EVIDENCE_ROUND5.zip",
+  "handoff": "69_ROUND5_PROGRESS_AND_ROUND6_READINESS.md"
+}
