@@ -1,0 +1,48 @@
+{
+  "schema": "misaki-round5-sora-document-overlay-v3",
+  "date": "2026-10-21",
+  "base_document_ledger": "49_SORA_ROUND5_DOCUMENT_LEDGER_V2.json",
+  "evidence": "50_SORA_RELATIONSHIP_DESIGN_DOCUMENT_REVIEW.md",
+  "rule": "Cumulative original-ID-plus-blob reviewed exactly once; audit-produced docs excluded.",
+  "new_reviewed": [
+    {
+      "id": "DOC-043",
+      "blob": "ca2b53562d061f8fa01cf803b940173b783da8bb",
+      "path": "docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-070",
+      "blob": "bc11962d6fd31751f5c8f101a57a331d9844cc4d",
+      "path": "docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-071",
+      "blob": "0e6fd6be79d882b29055f3faabb3801b3009e7d6",
+      "path": "docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    }
+  ],
+  "progress": {
+    "previous_documents_total": 46,
+    "new_reviewed_count": 3,
+    "documents_total": 49,
+    "documents_denominator": 85,
+    "documents_pending": 36,
+    "branches_insufficient": 30,
+    "branch_resolutions_new": 0,
+    "ideas_total": 13,
+    "legacy_blocked": true
+  },
+  "executed_tests": false,
+  "paid_model_called": false,
+  "production_access": false,
+  "audit_complete": false
+}
