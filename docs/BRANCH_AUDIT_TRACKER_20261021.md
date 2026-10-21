@@ -90,14 +90,14 @@
 | `work/ab-manual-workflow-only` | 記載あり | 2026-10-08 02:41 UTC | 要照合 | 要完了判定 |
 | `work/ab-paced-dispatch` | 記載あり | 2026-10-08 03:44 UTC | 要照合 | 要完了判定 |
 | `work/ab-quality-diagnostics-workflow` | 記載あり | 2026-10-08 05:30 UTC | 要照合 | 要完了判定 |
-| `work/ab-quality-manual-workflow` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/ab-quality-reply-schema-dispatch` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/context-no-duplicate-replies-ab` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/conversation-context-compression-spike` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/forget-control-v1` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/gemini-unit-cost-telemetry` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/quality-long-history-workflow` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `work/relationship-analyzer-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `work/ab-quality-manual-workflow` | 記載あり | 2026-10-08 04:52 UTC | 要照合 | 要完了判定 |
+| `work/ab-quality-reply-schema-dispatch` | 記載あり | 2026-10-08 06:40 UTC | 要照合 | 要完了判定 |
+| `work/context-no-duplicate-replies-ab` | 記載あり | 2026-10-13 05:09 UTC | 要照合 | 要完了判定 |
+| `work/conversation-context-compression-spike` | 記載あり | 2026-10-08 01:25 UTC | 要照合 | 要完了判定 |
+| `work/forget-control-v1` | 記載あり | 2026-10-06 21:20 UTC | 要照合 | 要完了判定 |
+| `work/gemini-unit-cost-telemetry` | 記載あり | 2026-10-04 05:18 UTC | 要照合 | 要完了判定 |
+| `work/quality-long-history-workflow` | 記載あり | 2026-10-08 09:12 UTC | 要照合 | 要完了判定 |
+| `work/relationship-analyzer-diagnostics` | 記載あり | 2026-10-03 11:32 UTC | 要照合 | 要完了判定 |
 | `work/relationship-engine-v1` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `work/relationship-error-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `work/relationship-identity-v1` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,7 +111,7 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り12枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り4枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
 
 2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
 
@@ -130,3 +130,5 @@
 2026-10-21: 8枝のcommitter.dateを取得。累計72/92、未取得20。relationship time v2設計は9/25、relationship診断・診断除去・Free usage/history同期は10/02〜03に最終更新。診断削除の枝は既存mainのログ/観測と照合して採否判断する。UTC表記。
 
 2026-10-21: 8枝のcommitter.dateを取得。累計80/92、未取得12。`test/relationship-acting-state-comparison` は10/14、Gemini A/B dispatch/quality/manual workflow系7枝は10/08最終更新。日時は実Gemini実行や課金発生の証拠ではない。UTC表記。
+
+2026-10-21: 8枝のcommitter.dateを取得。累計88/92、未取得4。Gemini単価テレメトリは10/04、会話圧縮は10/08、返信重複除去A/Bは10/13、forget controlは10/06、長履歴品質workflowは10/08。費用改善の判断は実行回数・トークン・品質の検証が必要。UTC表記。
