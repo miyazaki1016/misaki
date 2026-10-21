@@ -821,3 +821,20 @@ main現行ファイルの存在とblob SHAを直接確認：`app/chat/anonymous-
 **現行main正本の直接確認**：`app/api/chat/route.ts` は55,132 bytes（blob `5600ad37...`）、`app/api/chat-proxy/route.ts` は294 bytes（blob `d1e9749f...`）で、現在のproxyは `POST` をcanonical `../chat/route` に一度だけ委譲し、コメントで『認証・正本読取・利用枠消費/返金・成功ターン原子的確定はbase側、wrapperで再試行禁止』と明記。旧proxyのネットワーク/JSON retry/診断コードをそのまま戻すと**二重実行や重複課金・二重保存**の危険がある。retryは生成層と副作用の境界を分けて検討。
 
 **開発史としての読み取り（推論、確定事実ではない）**：ネットワーク失敗→診断/再試行→二重同期防止/返金→canonical単一路線、という問題群が見える。個々の枝の作成順・因果はcommit時刻/PR/issueで追加確認が必要。古い枝を『未反映だから戻す』ではなく、**障害再現ケース、返金・冪等性の不変条件、再試行境界**を抽出する。今回の確認は静的ソース/差分で、実稼働の障害再現・CI・production DB適用は未確認。main/production/Supabase変更なし。
+
+
+## 2026-10-21 Relationship Analyzer・一時診断の8枝（差分ゼロの意味）
+
+GitHub `main...branch` を8件照合。**全8枝 ahead0 / files0**、すなわち現在のmainから見て未取り込みの変更ファイルなし：
+- `fix/relationship-analyzer-bounded-retry` behind33
+- `sora/relationship-analyzer-stage-diagnostics` behind64
+- `sora/relationship-analyzer-structured-output-hotfix` behind79
+- `sora/relationship-evidence-validation-diagnostics` behind62
+- `sora/relationship-processing-error-diagnostics` behind78
+- `sora/remove-relationship-stage-diagnostics` behind57
+- `sora/remove-relationship-temporary-diagnostics` behind69
+- `work/relationship-analyzer-diagnostics` behind75
+
+mainの関連ソースを直接取得：`lib/relationship-analyzer-v1.ts`（blob `05944b0a...`、6,387 bytes）、`lib/relationship-runtime-v1.ts`（`a5d22997...`、7,805 bytes）、`tests/relationship-engine-v1.test.ts`（`22b568c1...`、35,801 bytes）。単純文字列検査ではanalyzerにretry/evidence、runtimeにlease/evidence、testにlease/evidenceが多数存在。ただし**これだけで各過去枝の変更がそのままmainに残存することや、診断が適切に撤去されたことは証明できない**。歴史的に統合後、さらに修正・撤去された可能性がある。
+
+**重要な分類**：『未反映コードがない』と『過去の目的が今も満たされている』は別。stage/processing/evidence診断の追加と撤去が対になっている履歴を、障害原因・安全な一時観測・機微データのログ露出防止・診断撤去後の監視能力という観点で後日見直す。現時点で具体的な事故や残留ログは断定しない。次の精査候補は各枝のcommit/PR経緯とmain現行ログ/テストの対照。main/production/Supabase変更なし。
