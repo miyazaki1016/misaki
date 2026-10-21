@@ -1,5 +1,16 @@
 # Misaki 全ブランチ・開発資産監査 2026-10-21
 
+## f55f6fe以降：第2次精査（最新）
+
+- [13 文書本文・実装照合](13_DOCUMENT_REVIEW_ROUND2.md)：今回8版、累計24/85版。残61版。
+- [14 ブランチ・実行資産の照合](14_BRANCH_RECONCILIATION_ROUND2.md)：旧証拠不足10/44件を静的照合、残34件。workflowが参照するmain外資産を保全。
+- [15 回収・設計思想・安全性・優先順位](15_RECOVERY_SAFETY_PRIORITIES_ROUND2.md)：重点7群、IDEA01〜09、legacy BLOCKED継続。
+- [16 最新進捗・未完了引継ぎ](16_REVIEW_PROGRESS_ROUND2.md)：現在の確認済み/未確認を記載。
+- [17 第2次差分台帳](17_ROUND2_LEDGER.json)：旧265資産台帳に重ねる追補。旧記録は削除しない。
+- [18 main外固定runner証拠](18_PINNED_RUNNER_EVIDENCE.json)：workflowから辿った固定commitの取得済み本文。実行はしていない。
+
+以下は過去時点の記録として保持。最新進捗は16を優先。監査完了・全機能受入とはしない。
+
 **中間成果。監査完了ではありません。** 全件取得と意味内容の精査を区別します。最初に [監査進捗・未完了報告](07_AUDIT_STATUS.md) を読んでください。
 
 監査対象は `miyazaki1016/misaki`。main基準は `c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa`、保存前監査枝HEADは `22a22826569fe06aa294b95afaac5e38cdc92642`。既存大文書は上書きせず、この独立ディレクトリに保存します。

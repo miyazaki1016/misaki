@@ -1,0 +1,2566 @@
+{
+  "schema": "misaki-audit-round2-overlay-v1",
+  "date": "2026-10-21",
+  "baseline_commit": "f55f6feb9a425a4d3ad4c9fa98bdd667a32e93f9",
+  "main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "completed": false,
+  "apply_rule": "旧09のID単位に本追補を重ねる。旧記録を削除しない。unchanged資産は旧判定を保持。",
+  "progress": {
+    "document_new": 8,
+    "document_reviewed": 24,
+    "document_total": 85,
+    "document_pending": 61,
+    "branch_resolved_static": 10,
+    "branch_insufficient_cohort": 44,
+    "branch_pending": 34,
+    "pr_open": 15,
+    "pr_insufficient": 4,
+    "ideas_preserved": 9,
+    "priority_recovery_groups": 7,
+    "new_verified_ready_unmerged_features": 0,
+    "blocked_branches": 1
+  },
+  "documents": [
+    {
+      "id": "DOC-016",
+      "path": "docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md",
+      "blob": "ce90e641d80b74eb852df5f317cb7837c9cc2ab8",
+      "branches": [
+        "docs/relationship-v1-2-stage-growth-principles"
+      ],
+      "latest_path_change": {
+        "sha": "ed8359319181f20cf73aec87ab75c7a1405264f2",
+        "date": "2026-10-04T04:41:44Z",
+        "message": "Add Gemini unit cost telemetry Work handoff"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-017",
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7",
+      "branches": [
+        "test/relationship-acting-state-comparison",
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/relationship-identity-v1",
+        "fix/expired-temporary-relationship-import",
+        "main",
+        "sora/lp-pwa-mobile-layout",
+        "sora/lp-relationship-story",
+        "fix/relationship-analyzer-bounded-retry",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "docs/production-source-of-truth-reconciliation",
+        "docs/relationship-five-axis-design-review-20261015",
+        "experiment/conversation-lab-offline-v1-20261015",
+        "experiment/interpreter-gradual-acting-20261015",
+        "experiment/shared-conversation-history-v1-20261015",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/context-no-duplicate-replies-ab",
+        "work/conversation-context-compression-spike",
+        "work/forget-control-v1",
+        "work/gemini-unit-cost-telemetry",
+        "work/quality-long-history-workflow",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "latest_path_change": {
+        "sha": "5422d450b843bc44137ce3938b419984e765acba",
+        "date": "2026-10-04T05:22:51Z",
+        "message": "Observe Gemini physical-call usage with server-only cost telemetry (#61)\n\n* Observe Gemini physical attempt usage without changing product behavior\n\n* Clarify Gemini telemetry auth identity and future cohort semantics"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-046",
+      "path": "docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md",
+      "blob": "be34a96cd15fb1a819f6415c9895726afe8a1cfe",
+      "branches": [
+        "experiment/interpreter-gradual-acting-20261015"
+      ],
+      "latest_path_change": {
+        "sha": "ef5bd23246a75b02a0df60302263f971de061843",
+        "date": "2026-10-19T01:46:09Z",
+        "message": "docs: record agreed Free/Premium proactive memory and shared-memories product baseline"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "未反映で今後の実装候補",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-063",
+      "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+      "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5",
+      "branches": [
+        "sora/drop-ungrounded-relationship-evidence",
+        "sora/fix-relationship-polarity-transport",
+        "test/relationship-acting-state-comparison",
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/relationship-engine-v1",
+        "work/relationship-error-diagnostics",
+        "work/relationship-identity-v1",
+        "work/relationship-polarity-integer",
+        "fix/expired-temporary-relationship-import",
+        "main",
+        "sora/lp-pwa-mobile-layout",
+        "sora/lp-relationship-story",
+        "sora/relationship-analyzer-stage-diagnostics",
+        "sora/relationship-analyzer-structured-output-hotfix",
+        "sora/relationship-control-rpcs-v1",
+        "sora/relationship-evidence-validation-diagnostics",
+        "sora/relationship-processing-error-diagnostics",
+        "sora/remove-relationship-stage-diagnostics",
+        "sora/remove-relationship-temporary-diagnostics",
+        "sora/update-overview-relationship-v1-production",
+        "fix/relationship-analyzer-bounded-retry",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "docs/production-source-of-truth-reconciliation",
+        "docs/relationship-five-axis-design-review-20261015",
+        "docs/relationship-v1-2-stage-growth-principles",
+        "experiment/conversation-lab-offline-v1-20261015",
+        "experiment/interpreter-gradual-acting-20261015",
+        "experiment/shared-conversation-history-v1-20261015",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/context-no-duplicate-replies-ab",
+        "work/conversation-context-compression-spike",
+        "work/forget-control-v1",
+        "work/gemini-unit-cost-telemetry",
+        "work/quality-long-history-workflow",
+        "work/relationship-analyzer-diagnostics",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "latest_path_change": {
+        "sha": "1937c316e9d3d4edcc11f1e447ee582ffc45357a",
+        "date": "2026-10-03T08:05:12Z",
+        "message": "Add Relationship Engine v1 design freeze"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-065",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+      "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2",
+      "branches": [
+        "sora/drop-ungrounded-relationship-evidence",
+        "sora/fix-relationship-polarity-transport",
+        "test/relationship-acting-state-comparison",
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/relationship-engine-v1",
+        "work/relationship-error-diagnostics",
+        "work/relationship-identity-v1",
+        "work/relationship-polarity-integer",
+        "fix/expired-temporary-relationship-import",
+        "main",
+        "sora/lp-pwa-mobile-layout",
+        "sora/lp-relationship-story",
+        "sora/relationship-analyzer-stage-diagnostics",
+        "sora/relationship-analyzer-structured-output-hotfix",
+        "sora/relationship-evidence-validation-diagnostics",
+        "sora/relationship-processing-error-diagnostics",
+        "sora/remove-relationship-stage-diagnostics",
+        "sora/remove-relationship-temporary-diagnostics",
+        "sora/update-overview-relationship-v1-production",
+        "fix/relationship-analyzer-bounded-retry",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "docs/production-source-of-truth-reconciliation",
+        "docs/relationship-five-axis-design-review-20261015",
+        "docs/relationship-v1-2-stage-growth-principles",
+        "experiment/conversation-lab-offline-v1-20261015",
+        "experiment/interpreter-gradual-acting-20261015",
+        "experiment/shared-conversation-history-v1-20261015",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/context-no-duplicate-replies-ab",
+        "work/conversation-context-compression-spike",
+        "work/forget-control-v1",
+        "work/gemini-unit-cost-telemetry",
+        "work/quality-long-history-workflow",
+        "work/relationship-analyzer-diagnostics",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "latest_path_change": {
+        "sha": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a",
+        "date": "2026-10-03T10:13:57Z",
+        "message": "Verify legacy Relationship mutation revocations against hardened DB contract"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-066",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+      "blob": "44aa021ec97d691e590354d7934851ad0de49e2a",
+      "branches": [
+        "sora/drop-ungrounded-relationship-evidence",
+        "sora/fix-relationship-polarity-transport",
+        "test/relationship-acting-state-comparison",
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/relationship-engine-v1",
+        "work/relationship-error-diagnostics",
+        "work/relationship-identity-v1",
+        "work/relationship-polarity-integer",
+        "fix/expired-temporary-relationship-import",
+        "main",
+        "sora/lp-pwa-mobile-layout",
+        "sora/lp-relationship-story",
+        "sora/relationship-analyzer-stage-diagnostics",
+        "sora/relationship-analyzer-structured-output-hotfix",
+        "sora/relationship-control-rpcs-v1",
+        "sora/relationship-evidence-validation-diagnostics",
+        "sora/relationship-processing-error-diagnostics",
+        "sora/remove-relationship-stage-diagnostics",
+        "sora/remove-relationship-temporary-diagnostics",
+        "sora/update-overview-relationship-v1-production",
+        "fix/relationship-analyzer-bounded-retry",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "docs/production-source-of-truth-reconciliation",
+        "docs/relationship-five-axis-design-review-20261015",
+        "docs/relationship-v1-2-stage-growth-principles",
+        "experiment/conversation-lab-offline-v1-20261015",
+        "experiment/interpreter-gradual-acting-20261015",
+        "experiment/shared-conversation-history-v1-20261015",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/context-no-duplicate-replies-ab",
+        "work/conversation-context-compression-spike",
+        "work/forget-control-v1",
+        "work/gemini-unit-cost-telemetry",
+        "work/quality-long-history-workflow",
+        "work/relationship-analyzer-diagnostics",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "latest_path_change": {
+        "sha": "50585d71760b7ded6a75012f3f39e19bda1032c7",
+        "date": "2026-10-03T08:12:24Z",
+        "message": "Add Relationship Engine v1 DB processing design"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-067",
+      "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+      "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641",
+      "branches": [
+        "sora/drop-ungrounded-relationship-evidence",
+        "sora/fix-relationship-polarity-transport",
+        "test/relationship-acting-state-comparison",
+        "work/ab-20-pair-dispatch",
+        "work/ab-blind-review-artifact-workflow",
+        "work/ab-http-diagnostics-dispatch",
+        "work/ab-long-fixture-dispatch",
+        "work/ab-manual-workflow-only",
+        "work/ab-paced-dispatch",
+        "work/ab-quality-diagnostics-workflow",
+        "work/relationship-engine-v1",
+        "work/relationship-error-diagnostics",
+        "work/relationship-identity-v1",
+        "work/relationship-polarity-integer",
+        "fix/expired-temporary-relationship-import",
+        "main",
+        "sora/lp-pwa-mobile-layout",
+        "sora/lp-relationship-story",
+        "sora/relationship-analyzer-stage-diagnostics",
+        "sora/relationship-analyzer-structured-output-hotfix",
+        "sora/relationship-control-rpcs-v1",
+        "sora/relationship-evidence-validation-diagnostics",
+        "sora/relationship-processing-error-diagnostics",
+        "sora/remove-relationship-stage-diagnostics",
+        "sora/remove-relationship-temporary-diagnostics",
+        "sora/update-overview-relationship-v1-production",
+        "fix/relationship-analyzer-bounded-retry",
+        "docs/multi-character-data-scope-inventory",
+        "docs/multi-character-rpc-caller-audit",
+        "docs/production-source-of-truth-reconciliation",
+        "docs/relationship-five-axis-design-review-20261015",
+        "docs/relationship-v1-2-stage-growth-principles",
+        "experiment/conversation-lab-offline-v1-20261015",
+        "experiment/interpreter-gradual-acting-20261015",
+        "experiment/shared-conversation-history-v1-20261015",
+        "work/ab-quality-manual-workflow",
+        "work/ab-quality-reply-schema-dispatch",
+        "work/context-no-duplicate-replies-ab",
+        "work/conversation-context-compression-spike",
+        "work/forget-control-v1",
+        "work/gemini-unit-cost-telemetry",
+        "work/quality-long-history-workflow",
+        "work/relationship-analyzer-diagnostics",
+        "chore/restore-relationship-rpc-migration",
+        "design/shared-conversation-engine-contract-20261015",
+        "docs/development-registry-audit-20261020"
+      ],
+      "latest_path_change": {
+        "sha": "32a9dfc4dd7afc0890f4997fe50a21eaf68fafad",
+        "date": "2026-10-03T08:25:21Z",
+        "message": "Add Relationship Engine v1 Work implementation handoff"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    },
+    {
+      "id": "DOC-085",
+      "path": "tests/reports/forget-batch-evaluation.md",
+      "blob": "fa3b7bcb6ea654f1777adff83c6481ca48af4fc9",
+      "branches": [
+        "work/forget-control-v1"
+      ],
+      "latest_path_change": {
+        "sha": "fb5768089494c62b35d11442d309bf3fe6df57fd",
+        "date": "2026-10-06T21:04:07Z",
+        "message": "Add verification-only Forget batch comparison and measurement harness"
+      },
+      "previous_classification": "判断に必要な証拠が不足",
+      "review_state": "reviewed-scope-noted",
+      "review": "13_DOCUMENT_REVIEW_ROUND2.md",
+      "classification": "未反映で今後の実装候補",
+      "classification_scope": "mixed-design-and-source-scope-see-review",
+      "current_behavior_verified": false
+    }
+  ],
+  "branches": [
+    {
+      "id": "BR-074",
+      "branch": "work/ab-20-pair-dispatch",
+      "head": "f3b98d03475fdcc012a07de669cc628911e32239",
+      "head_at_initial_snapshot": "f3b98d03475fdcc012a07de669cc628911e32239",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        69
+      ],
+      "merge_history": [
+        {
+          "number": 69,
+          "title": "ci: add optional 20-pair isolated Gemini A/B run",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T02:50:26Z",
+          "merge_commit_sha": "e94fa0cf950b08183d7d15eb03d6b12fb0ef20ee",
+          "head_sha": "f3b98d03475fdcc012a07de669cc628911e32239",
+          "url": "https://github.com/miyazaki1016/misaki/pull/69"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-075",
+      "branch": "work/ab-blind-review-artifact-workflow",
+      "head": "648e07cef9831c2d276b3cb2754ce49d53d2e27e",
+      "head_at_initial_snapshot": "648e07cef9831c2d276b3cb2754ce49d53d2e27e",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        76
+      ],
+      "merge_history": [
+        {
+          "number": 76,
+          "title": "ci: enable short-lived blinded synthetic reply artifacts",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T07:48:12Z",
+          "merge_commit_sha": "921db010c0b4093c7741418a2b33ccdce5f9389b",
+          "head_sha": "648e07cef9831c2d276b3cb2754ce49d53d2e27e",
+          "url": "https://github.com/miyazaki1016/misaki/pull/76"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-076",
+      "branch": "work/ab-http-diagnostics-dispatch",
+      "head": "76f066c05653374826f42c9ee1578719da975e2e",
+      "head_at_initial_snapshot": "76f066c05653374826f42c9ee1578719da975e2e",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        71
+      ],
+      "merge_history": [
+        {
+          "number": 71,
+          "title": "ci: pin HTTP and JSON diagnostics for manual Gemini A/B",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T03:41:34Z",
+          "merge_commit_sha": "16c414f1932927d6be2224aa2edd450cd4413b29",
+          "head_sha": "76f066c05653374826f42c9ee1578719da975e2e",
+          "url": "https://github.com/miyazaki1016/misaki/pull/71"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-077",
+      "branch": "work/ab-long-fixture-dispatch",
+      "head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+      "head_at_initial_snapshot": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        70
+      ],
+      "merge_history": [
+        {
+          "number": 70,
+          "title": "ci: select synthetic long-context Gemini A/B fixture",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T03:36:21Z",
+          "merge_commit_sha": "7fcb8322f7f141e5e38d5d3d37294fc5cfae7e6c",
+          "head_sha": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+          "url": "https://github.com/miyazaki1016/misaki/pull/70"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-078",
+      "branch": "work/ab-manual-workflow-only",
+      "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+      "head_at_initial_snapshot": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        68
+      ],
+      "merge_history": [
+        {
+          "number": 68,
+          "title": "ci: manual-only isolated Gemini A/B dispatcher (no app changes)",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T02:42:12Z",
+          "merge_commit_sha": "f99a3dfd88874c44ad4e3471e33e3e3600b05b13",
+          "head_sha": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+          "url": "https://github.com/miyazaki1016/misaki/pull/68"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-079",
+      "branch": "work/ab-paced-dispatch",
+      "head": "266c6a1ce74bc6ba0889e41590004854386fab31",
+      "head_at_initial_snapshot": "266c6a1ce74bc6ba0889e41590004854386fab31",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        72
+      ],
+      "merge_history": [
+        {
+          "number": 72,
+          "title": "ci: optional pacing for isolated Gemini A/B calls",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T03:45:29Z",
+          "merge_commit_sha": "8e47892840d97576d817f385eacef6bb8100ea57",
+          "head_sha": "266c6a1ce74bc6ba0889e41590004854386fab31",
+          "url": "https://github.com/miyazaki1016/misaki/pull/72"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-080",
+      "branch": "work/ab-quality-diagnostics-workflow",
+      "head": "ab805d88148c6880238918e858ca5261564c1bdc",
+      "head_at_initial_snapshot": "ab805d88148c6880238918e858ca5261564c1bdc",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        74
+      ],
+      "merge_history": [
+        {
+          "number": 74,
+          "title": "ci: add numeric-only quality failure diagnostics",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T05:30:43Z",
+          "merge_commit_sha": "504b7aadfe935f52119a3ad593b7f8f8cffea6dc",
+          "head_sha": "ab805d88148c6880238918e858ca5261564c1bdc",
+          "url": "https://github.com/miyazaki1016/misaki/pull/74"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-081",
+      "branch": "work/ab-quality-manual-workflow",
+      "head": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743",
+      "head_at_initial_snapshot": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        73
+      ],
+      "merge_history": [
+        {
+          "number": 73,
+          "title": "ci: add manual synthetic conversation-quality A/B",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T04:53:25Z",
+          "merge_commit_sha": "a0db78b3609030ee5c26491acae915c31d8d905e",
+          "head_sha": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743",
+          "url": "https://github.com/miyazaki1016/misaki/pull/73"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-082",
+      "branch": "work/ab-quality-reply-schema-dispatch",
+      "head": "82848c976ef0f1602d4dc3f7c9556a91145f93a5",
+      "head_at_initial_snapshot": "82848c976ef0f1602d4dc3f7c9556a91145f93a5",
+      "classification": "mainに同等機能が存在",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        75
+      ],
+      "merge_history": [
+        {
+          "number": 75,
+          "title": "ci: pin quality A/B runner with explicit reply JSON schema",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T07:06:29Z",
+          "merge_commit_sha": "d7941ee40449508a73b3bd7f96ce3556c3a8db3f",
+          "head_sha": "82848c976ef0f1602d4dc3f7c9556a91145f93a5",
+          "url": "https://github.com/miyazaki1016/misaki/pull/75"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    },
+    {
+      "id": "BR-087",
+      "branch": "work/quality-long-history-workflow",
+      "head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+      "head_at_initial_snapshot": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+      "classification": "main反映済み",
+      "classification_scope": "workflow-purpose-static-source-at-main-and-referenced-pin",
+      "review_state": "confirmed-source-scope-noted",
+      "reason": "14の現workflow/実行pin/後続変更を照合。実行受入ではない。",
+      "prs": [
+        77
+      ],
+      "merge_history": [
+        {
+          "number": 77,
+          "title": "ci: add manual long-history synthetic quality A/B option",
+          "state": "closed",
+          "draft": false,
+          "merged_at": "2026-10-08T10:49:35Z",
+          "merge_commit_sha": "9dbe888726996820bb9b6a5c53eabfc6be6b6b76",
+          "head_sha": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+          "url": "https://github.com/miyazaki1016/misaki/pull/77"
+        }
+      ],
+      "current_behavior_verified": false,
+      "next_review": "実行可能性・Preview・品質受入は未確認。枝削除/統合なし。",
+      "previous_classification": "判断に必要な証拠が不足",
+      "review": "14_BRANCH_RECONCILIATION_ROUND2.md"
+    }
+  ],
+  "pending_documents": [
+    {
+      "id": "DOC-001",
+      "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+      "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657"
+    },
+    {
+      "id": "DOC-002",
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "blob": "fcfab902743c4918813de44ad2d797bd466eda7a"
+    },
+    {
+      "id": "DOC-003",
+      "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+      "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99"
+    },
+    {
+      "id": "DOC-004",
+      "path": "docs/CONTEXT_AB_EXPERIMENT.md",
+      "blob": "8dc57e97acfdf931d875cecbb7ac39ad35fa72cb"
+    },
+    {
+      "id": "DOC-006",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md",
+      "blob": "3232ab4753618f217efd1e78ed34ac1418dca4f9"
+    },
+    {
+      "id": "DOC-007",
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md",
+      "blob": "eac5633f006e86792864a672483afeca5b70c8fb"
+    },
+    {
+      "id": "DOC-008",
+      "path": "docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md",
+      "blob": "2c0398dd17ee58c8b01e52b55abea195eee33dc0"
+    },
+    {
+      "id": "DOC-009",
+      "path": "docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md",
+      "blob": "49122fdbd4436efbd9283387602c2a514077534e"
+    },
+    {
+      "id": "DOC-010",
+      "path": "docs/CONVERSATION_LONG_TERM_PROBES_20261019.md",
+      "blob": "040a75d2e0e5b11a2bf2f447af67907533dff7ed"
+    },
+    {
+      "id": "DOC-011",
+      "path": "docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md",
+      "blob": "24c0c214054c0ea5e9a3c9c99aa7b5e21ca77133"
+    },
+    {
+      "id": "DOC-012",
+      "path": "docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md",
+      "blob": "3b387da4876452a90eda5dca82c791be602de6c5"
+    },
+    {
+      "id": "DOC-013",
+      "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+      "blob": "804407c3dcbb0ca3e6a0d1e765be2d8a9a3cca4a"
+    },
+    {
+      "id": "DOC-014",
+      "path": "docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md",
+      "blob": "5ee661407d2da6d1bd50007bb6393d4d213fa86c"
+    },
+    {
+      "id": "DOC-015",
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410"
+    },
+    {
+      "id": "DOC-018",
+      "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+      "blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511"
+    },
+    {
+      "id": "DOC-019",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "0715dd8a2e80829584525c639c79060eda89369c"
+    },
+    {
+      "id": "DOC-020",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "083dd5663fb7d3dc3961f302d290cc490eb33ac0"
+    },
+    {
+      "id": "DOC-021",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb"
+    },
+    {
+      "id": "DOC-022",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb"
+    },
+    {
+      "id": "DOC-023",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9"
+    },
+    {
+      "id": "DOC-024",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3da8bad0e216589a006cb9862278e012c72f2dc3"
+    },
+    {
+      "id": "DOC-025",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3e5c58a25344e9042c9245b4873158a97237ffb5"
+    },
+    {
+      "id": "DOC-026",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc"
+    },
+    {
+      "id": "DOC-027",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c"
+    },
+    {
+      "id": "DOC-028",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85"
+    },
+    {
+      "id": "DOC-029",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "711b7674d9fa8547f73137016030c2a10195d859"
+    },
+    {
+      "id": "DOC-030",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d"
+    },
+    {
+      "id": "DOC-031",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1"
+    },
+    {
+      "id": "DOC-032",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "936f61c6363da27b384e37b00f08aec6b999cd75"
+    },
+    {
+      "id": "DOC-033",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "98551eeb0693a352aaf2c639babec34c95ff6484"
+    },
+    {
+      "id": "DOC-034",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea"
+    },
+    {
+      "id": "DOC-035",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7"
+    },
+    {
+      "id": "DOC-036",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b017757c16aa0435c8d39973da0f7f944247bfb5"
+    },
+    {
+      "id": "DOC-037",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b48887633360762cb4821e0027893d30a92cde52"
+    },
+    {
+      "id": "DOC-038",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb"
+    },
+    {
+      "id": "DOC-039",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c"
+    },
+    {
+      "id": "DOC-040",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b"
+    },
+    {
+      "id": "DOC-041",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3"
+    },
+    {
+      "id": "DOC-042",
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8"
+    },
+    {
+      "id": "DOC-043",
+      "path": "docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md",
+      "blob": "ca2b53562d061f8fa01cf803b940173b783da8bb"
+    },
+    {
+      "id": "DOC-048",
+      "path": "docs/MULTI_CHARACTER_DATA_SCOPE_INVENTORY.md",
+      "blob": "949bd01677f83cd3bc88194697f30bb8dbc2a9fd"
+    },
+    {
+      "id": "DOC-049",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "0baf4f28d863f6e075f745afd5c903145887274f"
+    },
+    {
+      "id": "DOC-050",
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "blob": "4de727956e52cc8eeccd772631671af69a13536f"
+    },
+    {
+      "id": "DOC-051",
+      "path": "docs/MULTI_CHARACTER_RPC_CALLER_AUDIT.md",
+      "blob": "143f329c7ef4e5d17fee63c06978c658f2f70c80"
+    },
+    {
+      "id": "DOC-052",
+      "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+      "blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af"
+    },
+    {
+      "id": "DOC-054",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_PARITY_AUDIT_20261015.md",
+      "blob": "465f21fa358d21c6050212ecf622fa23b8e8fa41"
+    },
+    {
+      "id": "DOC-055",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_WIRING_PLAN_20261015.md",
+      "blob": "c91e7e695fa69c2094412810ba881800f6bcd43a"
+    },
+    {
+      "id": "DOC-061",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md",
+      "blob": "bdc5a9b9ace3866149a0a536d1f64577dcc621bc"
+    },
+    {
+      "id": "DOC-062",
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md",
+      "blob": "4e9d2d2286073b20df480f021f1b85de932f8dbc"
+    },
+    {
+      "id": "DOC-070",
+      "path": "docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md",
+      "blob": "bc11962d6fd31751f5c8f101a57a331d9844cc4d"
+    },
+    {
+      "id": "DOC-071",
+      "path": "docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md",
+      "blob": "0e6fd6be79d882b29055f3faabb3801b3009e7d6"
+    },
+    {
+      "id": "DOC-072",
+      "path": "docs/SERVER_CANONICAL_STATE.md",
+      "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe"
+    },
+    {
+      "id": "DOC-075",
+      "path": "docs/context-ab-blind-review.md",
+      "blob": "66e283a33430cb7bc07dfd035122f60ba7482fd2"
+    },
+    {
+      "id": "DOC-076",
+      "path": "docs/context-ab-execution-gate.md",
+      "blob": "bb9da685cd80ca66db8e0771121304eda7d84949"
+    },
+    {
+      "id": "DOC-077",
+      "path": "docs/context-ab-real-history-quality-review.md",
+      "blob": "effb8c7139303de6c92523439612b56b67aed160"
+    },
+    {
+      "id": "DOC-078",
+      "path": "docs/context-ab-validation-protocol.md",
+      "blob": "fc5f3fdd4a68f244015b666f826093ea30522d11"
+    },
+    {
+      "id": "DOC-079",
+      "path": "docs/conversation-context-compression-spike.md",
+      "blob": "b5a6296987c955879d540226f14c60d2ae8df9b2"
+    },
+    {
+      "id": "DOC-081",
+      "path": "docs/misaki-blind-quality-evaluation-fixtures.md",
+      "blob": "9ac57367ca4c4bf9c6a50f90658e8799ec0c23d7"
+    },
+    {
+      "id": "DOC-082",
+      "path": "docs/misaki-synthetic-live-evaluation-runbook.md",
+      "blob": "395b5a68e712404520d6ce03b8e5052f8c330207"
+    },
+    {
+      "id": "DOC-083",
+      "path": "docs/misaki-synthetic-reference-replies-and-self-scores.md",
+      "blob": "fb14a7a5422fb4b15a6478fa1cfad3625bd76d3f"
+    },
+    {
+      "id": "DOC-084",
+      "path": "supabase/BODY_CLOCK.md",
+      "blob": "085e5eb74c62641e972ee4c4c547bf60e9fd62fc"
+    }
+  ],
+  "pending_branches": [
+    {
+      "id": "BR-002",
+      "branch": "cleanup/legacy-proactive-tags",
+      "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "prs": [
+        13
+      ]
+    },
+    {
+      "id": "BR-003",
+      "branch": "cleanup/remove-legacy-proactive-path",
+      "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+      "prs": [
+        23
+      ]
+    },
+    {
+      "id": "BR-007",
+      "branch": "docs/audit-overview-against-source",
+      "head": "f6d8baf94d037057ec94deb87b156a713445d37f",
+      "prs": [
+        22
+      ]
+    },
+    {
+      "id": "BR-008",
+      "branch": "docs/development-registry-audit-20261020",
+      "head": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+      "prs": []
+    },
+    {
+      "id": "BR-009",
+      "branch": "docs/multi-character-data-scope-inventory",
+      "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c",
+      "prs": [
+        79
+      ]
+    },
+    {
+      "id": "BR-010",
+      "branch": "docs/multi-character-rpc-caller-audit",
+      "head": "83476dd2d347687c253a471557d9c27b82e1caf7",
+      "prs": [
+        80
+      ]
+    },
+    {
+      "id": "BR-011",
+      "branch": "docs/production-source-of-truth-reconciliation",
+      "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "prs": [
+        81
+      ]
+    },
+    {
+      "id": "BR-012",
+      "branch": "docs/relationship-five-axis-design-review-20261015",
+      "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "prs": [
+        84
+      ]
+    },
+    {
+      "id": "BR-014",
+      "branch": "docs/update-implementation-overview",
+      "head": "621dea871afc4dca517071cc79666d81cb69e29c",
+      "prs": [
+        21
+      ]
+    },
+    {
+      "id": "BR-015",
+      "branch": "docs/update-overview-relationship-growth",
+      "head": "1d9db32ea15fbea950ac46090cb6e1a8bc750001",
+      "prs": [
+        28
+      ]
+    },
+    {
+      "id": "BR-019",
+      "branch": "feature/proactive-derived-tags",
+      "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "prs": [
+        12
+      ]
+    },
+    {
+      "id": "BR-020",
+      "branch": "fix/anonymous-chat-session-drop",
+      "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+      "prs": [
+        24
+      ]
+    },
+    {
+      "id": "BR-021",
+      "branch": "fix/anonymous-email-history",
+      "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "prs": [
+        1
+      ]
+    },
+    {
+      "id": "BR-022",
+      "branch": "fix/anonymous-session-cache-reset",
+      "head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+      "prs": [
+        4
+      ]
+    },
+    {
+      "id": "BR-023",
+      "branch": "fix/body-clock-claim-rpc",
+      "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+      "prs": [
+        16
+      ]
+    },
+    {
+      "id": "BR-024",
+      "branch": "fix/chat-failure-recovery",
+      "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+      "prs": [
+        19
+      ]
+    },
+    {
+      "id": "BR-025",
+      "branch": "fix/chat-network-reliability",
+      "head": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a",
+      "prs": [
+        10
+      ]
+    },
+    {
+      "id": "BR-026",
+      "branch": "fix/chat-reliability-cleanup",
+      "head": "a06baac8110ded425c07e2122117e89460868405",
+      "prs": [
+        9
+      ]
+    },
+    {
+      "id": "BR-027",
+      "branch": "fix/chat-request-diagnostics",
+      "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "prs": [
+        7
+      ]
+    },
+    {
+      "id": "BR-028",
+      "branch": "fix/chat-turn-dedupe",
+      "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5",
+      "prs": [
+        18
+      ]
+    },
+    {
+      "id": "BR-030",
+      "branch": "fix/gemini-chat-timeout",
+      "head": "469578ea12663c594a32c62a05263b23e7190891",
+      "prs": [
+        25
+      ]
+    },
+    {
+      "id": "BR-031",
+      "branch": "fix/gemini-json-retry",
+      "head": "f93a9444565ce1029cd46c0d466456f651ee7c9e",
+      "prs": [
+        3
+      ]
+    },
+    {
+      "id": "BR-032",
+      "branch": "fix/grow-relationship-from-first-meeting",
+      "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+      "prs": [
+        27
+      ]
+    },
+    {
+      "id": "BR-033",
+      "branch": "fix/legacy-safari-cache",
+      "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+      "prs": [
+        2
+      ]
+    },
+    {
+      "id": "BR-034",
+      "branch": "fix/preserve-active-chat-history",
+      "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "prs": [
+        17
+      ]
+    },
+    {
+      "id": "BR-035",
+      "branch": "fix/recall-history-grounding",
+      "head": "475410541b700562e0f535484cb3fd02d9f76b1a",
+      "prs": [
+        8
+      ]
+    },
+    {
+      "id": "BR-036",
+      "branch": "fix/recall-keep-recent-history",
+      "head": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+      "prs": [
+        5
+      ]
+    },
+    {
+      "id": "BR-038",
+      "branch": "fix/safari-load-failed-message",
+      "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+      "prs": [
+        11
+      ]
+    },
+    {
+      "id": "BR-040",
+      "branch": "fix/use-chat-proxy",
+      "head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+      "prs": [
+        6
+      ]
+    },
+    {
+      "id": "BR-041",
+      "branch": "fix/workday-grounding",
+      "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+      "prs": [
+        20
+      ]
+    },
+    {
+      "id": "BR-043",
+      "branch": "perf/chat-stage-timing",
+      "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+      "prs": [
+        26
+      ]
+    },
+    {
+      "id": "BR-044",
+      "branch": "refine/proactive-action-tags",
+      "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+      "prs": [
+        14
+      ]
+    },
+    {
+      "id": "BR-045",
+      "branch": "refine/sleepy-tag",
+      "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+      "prs": [
+        15
+      ]
+    },
+    {
+      "id": "BR-047",
+      "branch": "sora/canonical-relationship-integration",
+      "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "prs": [
+        32
+      ]
+    }
+  ],
+  "snapshot": {
+    "branch_pages": [
+      92,
+      0
+    ],
+    "branches": [
+      {
+        "branch": "chore/restore-relationship-rpc-migration",
+        "head": "4dd716a2c04c6864445cb8720a1921813bb50933"
+      },
+      {
+        "branch": "cleanup/legacy-proactive-tags",
+        "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd"
+      },
+      {
+        "branch": "cleanup/remove-legacy-proactive-path",
+        "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369"
+      },
+      {
+        "branch": "codex/legacy-maintenance-drain",
+        "head": "17449c7ec4e8ff50605ef931b04ae76584c6304f"
+      },
+      {
+        "branch": "codex/server-canonical-foundation",
+        "head": "685fbb7baee4a542555f939fabaecd674658c148"
+      },
+      {
+        "branch": "design/shared-conversation-engine-contract-20261015",
+        "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74"
+      },
+      {
+        "branch": "docs/audit-overview-against-source",
+        "head": "f6d8baf94d037057ec94deb87b156a713445d37f"
+      },
+      {
+        "branch": "docs/development-registry-audit-20261020",
+        "head": "f55f6feb9a425a4d3ad4c9fa98bdd667a32e93f9"
+      },
+      {
+        "branch": "docs/multi-character-data-scope-inventory",
+        "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c"
+      },
+      {
+        "branch": "docs/multi-character-rpc-caller-audit",
+        "head": "83476dd2d347687c253a471557d9c27b82e1caf7"
+      },
+      {
+        "branch": "docs/production-source-of-truth-reconciliation",
+        "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7"
+      },
+      {
+        "branch": "docs/relationship-five-axis-design-review-20261015",
+        "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c"
+      },
+      {
+        "branch": "docs/relationship-v1-2-stage-growth-principles",
+        "head": "ed8359319181f20cf73aec87ab75c7a1405264f2"
+      },
+      {
+        "branch": "docs/update-implementation-overview",
+        "head": "621dea871afc4dca517071cc79666d81cb69e29c"
+      },
+      {
+        "branch": "docs/update-overview-relationship-growth",
+        "head": "1d9db32ea15fbea950ac46090cb6e1a8bc750001"
+      },
+      {
+        "branch": "experiment/conversation-lab-offline-v1-20261015",
+        "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e"
+      },
+      {
+        "branch": "experiment/interpreter-gradual-acting-20261015",
+        "head": "ef5bd23246a75b02a0df60302263f971de061843"
+      },
+      {
+        "branch": "experiment/shared-conversation-history-v1-20261015",
+        "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a"
+      },
+      {
+        "branch": "feature/proactive-derived-tags",
+        "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86"
+      },
+      {
+        "branch": "fix/anonymous-chat-session-drop",
+        "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7"
+      },
+      {
+        "branch": "fix/anonymous-email-history",
+        "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8"
+      },
+      {
+        "branch": "fix/anonymous-session-cache-reset",
+        "head": "6a4eb039d356fe81262e1c55f870f563eaf51404"
+      },
+      {
+        "branch": "fix/body-clock-claim-rpc",
+        "head": "df2daf89f604bf80fab4e720060861862bdd2f6f"
+      },
+      {
+        "branch": "fix/chat-failure-recovery",
+        "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784"
+      },
+      {
+        "branch": "fix/chat-network-reliability",
+        "head": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a"
+      },
+      {
+        "branch": "fix/chat-reliability-cleanup",
+        "head": "a06baac8110ded425c07e2122117e89460868405"
+      },
+      {
+        "branch": "fix/chat-request-diagnostics",
+        "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965"
+      },
+      {
+        "branch": "fix/chat-turn-dedupe",
+        "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5"
+      },
+      {
+        "branch": "fix/expired-temporary-relationship-import",
+        "head": "63cf82a53600b0518c1d88e61df4b09665026e2d"
+      },
+      {
+        "branch": "fix/gemini-chat-timeout",
+        "head": "469578ea12663c594a32c62a05263b23e7190891"
+      },
+      {
+        "branch": "fix/gemini-json-retry",
+        "head": "f93a9444565ce1029cd46c0d466456f651ee7c9e"
+      },
+      {
+        "branch": "fix/grow-relationship-from-first-meeting",
+        "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c"
+      },
+      {
+        "branch": "fix/legacy-safari-cache",
+        "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5"
+      },
+      {
+        "branch": "fix/preserve-active-chat-history",
+        "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08"
+      },
+      {
+        "branch": "fix/recall-history-grounding",
+        "head": "475410541b700562e0f535484cb3fd02d9f76b1a"
+      },
+      {
+        "branch": "fix/recall-keep-recent-history",
+        "head": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc"
+      },
+      {
+        "branch": "fix/relationship-analyzer-bounded-retry",
+        "head": "90ac90bba86f716ccf46e50542097d1b81e23702"
+      },
+      {
+        "branch": "fix/safari-load-failed-message",
+        "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e"
+      },
+      {
+        "branch": "fix/safari-load-failed-ui",
+        "head": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab"
+      },
+      {
+        "branch": "fix/use-chat-proxy",
+        "head": "29d74e3483d4f06f5127364d7c5bdf528826301b"
+      },
+      {
+        "branch": "fix/workday-grounding",
+        "head": "6f25eba602fca1183383588ad0183d4c4a16d37c"
+      },
+      {
+        "branch": "main",
+        "head": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa"
+      },
+      {
+        "branch": "perf/chat-stage-timing",
+        "head": "ead9d6283b68579f6014e07bef46add2a41fb791"
+      },
+      {
+        "branch": "refine/proactive-action-tags",
+        "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab"
+      },
+      {
+        "branch": "refine/sleepy-tag",
+        "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5"
+      },
+      {
+        "branch": "sora/anonymous-history-get-noop",
+        "head": "368afb0dfbf9ea66837c83834d8fc24837813554"
+      },
+      {
+        "branch": "sora/canonical-relationship-integration",
+        "head": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359"
+      },
+      {
+        "branch": "sora/cutover-cleanup",
+        "head": "f5424c06c92b3f51535dd44ec54ef0a25f790370"
+      },
+      {
+        "branch": "sora/drop-ungrounded-relationship-evidence",
+        "head": "ae0df66929f62bb804b37c35eebabb7e8c66b696"
+      },
+      {
+        "branch": "sora/fix-relationship-polarity-transport",
+        "head": "66bec2792d571c697aa891ff0142e78f4941456e"
+      },
+      {
+        "branch": "sora/fix-waiting-reply-layout",
+        "head": "f3a613291569a60e471065372135cbee07373702"
+      },
+      {
+        "branch": "sora/gemini-timeout-retry",
+        "head": "862cfa6c2ce6e45b7ccbc294270f3ba02548ed2a"
+      },
+      {
+        "branch": "sora/gemini-transient-retry",
+        "head": "0c77bad036d4bef73c82983c3ae3f800943a1ee5"
+      },
+      {
+        "branch": "sora/history-edge-trace",
+        "head": "e3a08db0c3dc97b297130a224919e73a69974c60"
+      },
+      {
+        "branch": "sora/history-get-trace",
+        "head": "524596dedf44806da95c8d84e2096f2a5411440d"
+      },
+      {
+        "branch": "sora/history-sync-source-proof",
+        "head": "850e2acccef3722fc487dd17df687056b3b58911"
+      },
+      {
+        "branch": "sora/lp-pwa-mobile-layout",
+        "head": "f65c3b2e56478634861e27193fbb5913ebfb84cb"
+      },
+      {
+        "branch": "sora/lp-relationship-story",
+        "head": "9bfa0760f56b3d1c3bf6d07af056410afde975ec"
+      },
+      {
+        "branch": "sora/misaki-acting-lab",
+        "head": "be15cfea6039ff9e44be1a34ceff48a882f09c18"
+      },
+      {
+        "branch": "sora/profile-aware-life-events",
+        "head": "610e50b6cd4d63ccdfcfd5aaf57516bb016468bb"
+      },
+      {
+        "branch": "sora/relationship-analyzer-stage-diagnostics",
+        "head": "0907d2ff24f6a584c032ece54f9289954ccbeb63"
+      },
+      {
+        "branch": "sora/relationship-analyzer-structured-output-hotfix",
+        "head": "319865a5f9351899ef260754aaad2604623552d5"
+      },
+      {
+        "branch": "sora/relationship-control-rpcs-v1",
+        "head": "e6bf2bc75aa5dd87e520724e5dbf3f4a5f0f6578"
+      },
+      {
+        "branch": "sora/relationship-evidence-validation-diagnostics",
+        "head": "b8607f3e92fde63fbc37dab85a30d9945c8ad649"
+      },
+      {
+        "branch": "sora/relationship-processing-error-diagnostics",
+        "head": "867e227b7d2efb31c214d248e94b26e390e9f845"
+      },
+      {
+        "branch": "sora/relationship-time-v2-design",
+        "head": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64"
+      },
+      {
+        "branch": "sora/remove-false-busy-wait",
+        "head": "1b77372a7e385a58f127d259a99e05e60cb8deb6"
+      },
+      {
+        "branch": "sora/remove-relationship-stage-diagnostics",
+        "head": "d41e673420637cd644587c5db42c38d432fd2e74"
+      },
+      {
+        "branch": "sora/remove-relationship-temporary-diagnostics",
+        "head": "e4f870f0ab76271daee76882fbd1b3fefae3a9bb"
+      },
+      {
+        "branch": "sora/remove-timestamp-history-poll",
+        "head": "829ee4671443140386043396ffb70c0a8a8daaae"
+      },
+      {
+        "branch": "sora/sync-free-usage-with-history",
+        "head": "f67b388e965bb9bfb3f8d6820fd62e9d273123b6"
+      },
+      {
+        "branch": "sora/update-overview-relationship-v1-production",
+        "head": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2"
+      },
+      {
+        "branch": "test/relationship-acting-state-comparison",
+        "head": "fd714bd8a82a4a48c9f33b368c35498aec6e65b5"
+      },
+      {
+        "branch": "work/ab-20-pair-dispatch",
+        "head": "f3b98d03475fdcc012a07de669cc628911e32239"
+      },
+      {
+        "branch": "work/ab-blind-review-artifact-workflow",
+        "head": "648e07cef9831c2d276b3cb2754ce49d53d2e27e"
+      },
+      {
+        "branch": "work/ab-http-diagnostics-dispatch",
+        "head": "76f066c05653374826f42c9ee1578719da975e2e"
+      },
+      {
+        "branch": "work/ab-long-fixture-dispatch",
+        "head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab"
+      },
+      {
+        "branch": "work/ab-manual-workflow-only",
+        "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd"
+      },
+      {
+        "branch": "work/ab-paced-dispatch",
+        "head": "266c6a1ce74bc6ba0889e41590004854386fab31"
+      },
+      {
+        "branch": "work/ab-quality-diagnostics-workflow",
+        "head": "ab805d88148c6880238918e858ca5261564c1bdc"
+      },
+      {
+        "branch": "work/ab-quality-manual-workflow",
+        "head": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743"
+      },
+      {
+        "branch": "work/ab-quality-reply-schema-dispatch",
+        "head": "82848c976ef0f1602d4dc3f7c9556a91145f93a5"
+      },
+      {
+        "branch": "work/context-no-duplicate-replies-ab",
+        "head": "a849bec92059d326940ffc358635164ea7d391c9"
+      },
+      {
+        "branch": "work/conversation-context-compression-spike",
+        "head": "10275b666387115ced06312570111b21d0276e17"
+      },
+      {
+        "branch": "work/forget-control-v1",
+        "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2"
+      },
+      {
+        "branch": "work/gemini-unit-cost-telemetry",
+        "head": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035"
+      },
+      {
+        "branch": "work/quality-long-history-workflow",
+        "head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409"
+      },
+      {
+        "branch": "work/relationship-analyzer-diagnostics",
+        "head": "42177230a0a3c8926689499ffb19de4f1044d8d7"
+      },
+      {
+        "branch": "work/relationship-engine-v1",
+        "head": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a"
+      },
+      {
+        "branch": "work/relationship-error-diagnostics",
+        "head": "7b68b97c3feae99d21f9f1dd937b29218b40997b"
+      },
+      {
+        "branch": "work/relationship-identity-v1",
+        "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4"
+      },
+      {
+        "branch": "work/relationship-polarity-integer",
+        "head": "68a2aebb98e5f800f7a6d334c815c2a7841b2873"
+      }
+    ],
+    "pr_pages": [
+      88,
+      0
+    ],
+    "prs": [
+      {
+        "number": 88,
+        "state": "open",
+        "draft": true,
+        "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a",
+        "updated_at": "2026-10-16T21:02:55Z",
+        "merged_at": null,
+        "merge_commit_sha": "c3944bc925cc1f615aadd0ecd21696a117a5a9f9"
+      },
+      {
+        "number": 87,
+        "state": "open",
+        "draft": true,
+        "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+        "updated_at": "2026-10-15T08:14:27Z",
+        "merged_at": null,
+        "merge_commit_sha": "dbd70ea807a31210346ad975e5445a7fb7365816"
+      },
+      {
+        "number": 86,
+        "state": "open",
+        "draft": true,
+        "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e",
+        "updated_at": "2026-10-20T11:36:42Z",
+        "merged_at": null,
+        "merge_commit_sha": "7599d93d0e5e7777166bc3d5bd0b96de217ae35e"
+      },
+      {
+        "number": 85,
+        "state": "open",
+        "draft": true,
+        "head": "ef5bd23246a75b02a0df60302263f971de061843",
+        "updated_at": "2026-10-19T01:46:50Z",
+        "merged_at": null,
+        "merge_commit_sha": "6ee2a8cef18317299b5adfdcd54eff4715c1be72"
+      },
+      {
+        "number": 84,
+        "state": "open",
+        "draft": true,
+        "head": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+        "updated_at": "2026-10-14T20:22:38Z",
+        "merged_at": null,
+        "merge_commit_sha": "654a3fad1a2359b81474d590140c3e0723725fb9"
+      },
+      {
+        "number": 83,
+        "state": "open",
+        "draft": true,
+        "head": "fd714bd8a82a4a48c9f33b368c35498aec6e65b5",
+        "updated_at": "2026-10-14T12:59:39Z",
+        "merged_at": null,
+        "merge_commit_sha": "973ca56dfbe43f2c9a95e067ac96ba50eef9a9da"
+      },
+      {
+        "number": 82,
+        "state": "closed",
+        "draft": false,
+        "head": "4dd716a2c04c6864445cb8720a1921813bb50933",
+        "updated_at": "2026-10-14T11:57:22Z",
+        "merged_at": "2026-10-14T11:57:22Z",
+        "merge_commit_sha": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa"
+      },
+      {
+        "number": 81,
+        "state": "open",
+        "draft": true,
+        "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+        "updated_at": "2026-10-14T00:31:07Z",
+        "merged_at": null,
+        "merge_commit_sha": "96a6081ec9a33f6445147fa4ce5c004184bf4d30"
+      },
+      {
+        "number": 80,
+        "state": "open",
+        "draft": true,
+        "head": "83476dd2d347687c253a471557d9c27b82e1caf7",
+        "updated_at": "2026-10-13T08:54:39Z",
+        "merged_at": null,
+        "merge_commit_sha": "0aa0e7e64bcc3856693866a8c4bf19af0a0e6e09"
+      },
+      {
+        "number": 79,
+        "state": "open",
+        "draft": true,
+        "head": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c",
+        "updated_at": "2026-10-13T07:41:29Z",
+        "merged_at": null,
+        "merge_commit_sha": "c5f4190547442612635b63187fdb69d53acc54b1"
+      },
+      {
+        "number": 78,
+        "state": "open",
+        "draft": true,
+        "head": "a849bec92059d326940ffc358635164ea7d391c9",
+        "updated_at": "2026-10-13T05:11:00Z",
+        "merged_at": null,
+        "merge_commit_sha": "72994b20867a7a590d3a16209a135d00629ba5c2"
+      },
+      {
+        "number": 77,
+        "state": "closed",
+        "draft": false,
+        "head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+        "updated_at": "2026-10-08T10:49:35Z",
+        "merged_at": "2026-10-08T10:49:35Z",
+        "merge_commit_sha": "9dbe888726996820bb9b6a5c53eabfc6be6b6b76"
+      },
+      {
+        "number": 76,
+        "state": "closed",
+        "draft": false,
+        "head": "648e07cef9831c2d276b3cb2754ce49d53d2e27e",
+        "updated_at": "2026-10-08T07:48:12Z",
+        "merged_at": "2026-10-08T07:48:12Z",
+        "merge_commit_sha": "921db010c0b4093c7741418a2b33ccdce5f9389b"
+      },
+      {
+        "number": 75,
+        "state": "closed",
+        "draft": false,
+        "head": "82848c976ef0f1602d4dc3f7c9556a91145f93a5",
+        "updated_at": "2026-10-08T07:06:29Z",
+        "merged_at": "2026-10-08T07:06:29Z",
+        "merge_commit_sha": "d7941ee40449508a73b3bd7f96ce3556c3a8db3f"
+      },
+      {
+        "number": 74,
+        "state": "closed",
+        "draft": false,
+        "head": "ab805d88148c6880238918e858ca5261564c1bdc",
+        "updated_at": "2026-10-08T05:30:43Z",
+        "merged_at": "2026-10-08T05:30:43Z",
+        "merge_commit_sha": "504b7aadfe935f52119a3ad593b7f8f8cffea6dc"
+      },
+      {
+        "number": 73,
+        "state": "closed",
+        "draft": false,
+        "head": "5a8f52da62da8ffbeb16705d1d7e2d23f85d5743",
+        "updated_at": "2026-10-08T04:53:25Z",
+        "merged_at": "2026-10-08T04:53:25Z",
+        "merge_commit_sha": "a0db78b3609030ee5c26491acae915c31d8d905e"
+      },
+      {
+        "number": 72,
+        "state": "closed",
+        "draft": false,
+        "head": "266c6a1ce74bc6ba0889e41590004854386fab31",
+        "updated_at": "2026-10-08T03:45:30Z",
+        "merged_at": "2026-10-08T03:45:29Z",
+        "merge_commit_sha": "8e47892840d97576d817f385eacef6bb8100ea57"
+      },
+      {
+        "number": 71,
+        "state": "closed",
+        "draft": false,
+        "head": "76f066c05653374826f42c9ee1578719da975e2e",
+        "updated_at": "2026-10-08T03:41:34Z",
+        "merged_at": "2026-10-08T03:41:34Z",
+        "merge_commit_sha": "16c414f1932927d6be2224aa2edd450cd4413b29"
+      },
+      {
+        "number": 70,
+        "state": "closed",
+        "draft": false,
+        "head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+        "updated_at": "2026-10-08T03:36:21Z",
+        "merged_at": "2026-10-08T03:36:21Z",
+        "merge_commit_sha": "7fcb8322f7f141e5e38d5d3d37294fc5cfae7e6c"
+      },
+      {
+        "number": 69,
+        "state": "closed",
+        "draft": false,
+        "head": "f3b98d03475fdcc012a07de669cc628911e32239",
+        "updated_at": "2026-10-08T02:50:26Z",
+        "merged_at": "2026-10-08T02:50:26Z",
+        "merge_commit_sha": "e94fa0cf950b08183d7d15eb03d6b12fb0ef20ee"
+      },
+      {
+        "number": 68,
+        "state": "closed",
+        "draft": false,
+        "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+        "updated_at": "2026-10-08T02:42:12Z",
+        "merged_at": "2026-10-08T02:42:12Z",
+        "merge_commit_sha": "f99a3dfd88874c44ad4e3471e33e3e3600b05b13"
+      },
+      {
+        "number": 67,
+        "state": "open",
+        "draft": true,
+        "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4",
+        "updated_at": "2026-10-11T16:44:42Z",
+        "merged_at": null,
+        "merge_commit_sha": "df648f01c877dff2d9e0a00b48744a587046ef49"
+      },
+      {
+        "number": 66,
+        "state": "open",
+        "draft": true,
+        "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+        "updated_at": "2026-10-06T21:21:23Z",
+        "merged_at": null,
+        "merge_commit_sha": null
+      },
+      {
+        "number": 65,
+        "state": "closed",
+        "draft": false,
+        "head": "90ac90bba86f716ccf46e50542097d1b81e23702",
+        "updated_at": "2026-10-05T23:52:24Z",
+        "merged_at": "2026-10-05T23:52:24Z",
+        "merge_commit_sha": "49a663258e93af88566be586d758442ad92dfaf1"
+      },
+      {
+        "number": 64,
+        "state": "closed",
+        "draft": false,
+        "head": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+        "updated_at": "2026-10-05T23:38:17Z",
+        "merged_at": "2026-10-05T23:38:17Z",
+        "merge_commit_sha": "b44c185497d3cc719e67c07c9ae1cde5e0daf61f"
+      },
+      {
+        "number": 63,
+        "state": "closed",
+        "draft": false,
+        "head": "f65c3b2e56478634861e27193fbb5913ebfb84cb",
+        "updated_at": "2026-10-04T07:03:50Z",
+        "merged_at": "2026-10-04T07:03:50Z",
+        "merge_commit_sha": "e51c3326357b6e6f12455d5063b00da88b703b23"
+      },
+      {
+        "number": 62,
+        "state": "closed",
+        "draft": false,
+        "head": "9bfa0760f56b3d1c3bf6d07af056410afde975ec",
+        "updated_at": "2026-10-04T06:45:22Z",
+        "merged_at": "2026-10-04T06:45:22Z",
+        "merge_commit_sha": "bec0a134b6fdef43f554602c2b6e029c565eb0e2"
+      },
+      {
+        "number": 61,
+        "state": "closed",
+        "draft": false,
+        "head": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035",
+        "updated_at": "2026-10-04T05:22:52Z",
+        "merged_at": "2026-10-04T05:22:51Z",
+        "merge_commit_sha": "5422d450b843bc44137ce3938b419984e765acba"
+      },
+      {
+        "number": 60,
+        "state": "open",
+        "draft": true,
+        "head": "ed8359319181f20cf73aec87ab75c7a1405264f2",
+        "updated_at": "2026-10-04T04:42:23Z",
+        "merged_at": null,
+        "merge_commit_sha": null
+      },
+      {
+        "number": 59,
+        "state": "closed",
+        "draft": false,
+        "head": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2",
+        "updated_at": "2026-10-03T15:37:45Z",
+        "merged_at": "2026-10-03T15:37:45Z",
+        "merge_commit_sha": "465075ce07c3b2129de51b14f790c54154521c49"
+      },
+      {
+        "number": 58,
+        "state": "closed",
+        "draft": false,
+        "head": "64253627bc5ee152c4b17389a6709e7481e9911b",
+        "updated_at": "2026-10-03T15:34:13Z",
+        "merged_at": "2026-10-03T15:34:13Z",
+        "merge_commit_sha": "f4b306ea9b1b25e2fa7446c6182e2b5b04a9ec2b"
+      },
+      {
+        "number": 57,
+        "state": "closed",
+        "draft": false,
+        "head": "d41e673420637cd644587c5db42c38d432fd2e74",
+        "updated_at": "2026-10-03T15:26:42Z",
+        "merged_at": "2026-10-03T15:26:41Z",
+        "merge_commit_sha": "b3811b4c91c37b567767b7c0294b524877c9ece9"
+      },
+      {
+        "number": 56,
+        "state": "closed",
+        "draft": false,
+        "head": "ae0df66929f62bb804b37c35eebabb7e8c66b696",
+        "updated_at": "2026-10-03T14:21:55Z",
+        "merged_at": "2026-10-03T14:21:55Z",
+        "merge_commit_sha": "0cf10fa6be208cc39b25e6376281433fe5a0b351"
+      },
+      {
+        "number": 55,
+        "state": "closed",
+        "draft": false,
+        "head": "b8607f3e92fde63fbc37dab85a30d9945c8ad649",
+        "updated_at": "2026-10-03T14:00:03Z",
+        "merged_at": "2026-10-03T14:00:02Z",
+        "merge_commit_sha": "e66e4df5d8b6471a0093e36d233ac91cad63f4c6"
+      },
+      {
+        "number": 54,
+        "state": "closed",
+        "draft": false,
+        "head": "0907d2ff24f6a584c032ece54f9289954ccbeb63",
+        "updated_at": "2026-10-03T13:26:58Z",
+        "merged_at": "2026-10-03T13:26:58Z",
+        "merge_commit_sha": "9dae0585f885c9491c1e6e65e11323d139b2023b"
+      },
+      {
+        "number": 53,
+        "state": "closed",
+        "draft": false,
+        "head": "66bec2792d571c697aa891ff0142e78f4941456e",
+        "updated_at": "2026-10-03T13:11:32Z",
+        "merged_at": "2026-10-03T13:11:32Z",
+        "merge_commit_sha": "51683e66bd83e326964c10386780ed96262e2717"
+      },
+      {
+        "number": 52,
+        "state": "closed",
+        "draft": false,
+        "head": "e4f870f0ab76271daee76882fbd1b3fefae3a9bb",
+        "updated_at": "2026-10-03T12:38:58Z",
+        "merged_at": "2026-10-03T12:38:58Z",
+        "merge_commit_sha": "095f4a33232231d1c92534ff6fdd9e602dfb0b65"
+      },
+      {
+        "number": 51,
+        "state": "closed",
+        "draft": false,
+        "head": "68a2aebb98e5f800f7a6d334c815c2a7841b2873",
+        "updated_at": "2026-10-03T12:32:33Z",
+        "merged_at": "2026-10-03T12:32:33Z",
+        "merge_commit_sha": "24d125777469b503026238eba946185607848133"
+      },
+      {
+        "number": 50,
+        "state": "closed",
+        "draft": false,
+        "head": "42177230a0a3c8926689499ffb19de4f1044d8d7",
+        "updated_at": "2026-10-03T12:15:17Z",
+        "merged_at": "2026-10-03T12:15:17Z",
+        "merge_commit_sha": "fd868ce198802a0c16b8d3cbba85c77c6c950982"
+      },
+      {
+        "number": 49,
+        "state": "closed",
+        "draft": false,
+        "head": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+        "updated_at": "2026-10-03T11:19:37Z",
+        "merged_at": "2026-10-03T11:19:37Z",
+        "merge_commit_sha": "0051cd39e2b7f75ee22eddb7c627cb48295e46c2"
+      },
+      {
+        "number": 48,
+        "state": "closed",
+        "draft": false,
+        "head": "319865a5f9351899ef260754aaad2604623552d5",
+        "updated_at": "2026-10-03T10:57:16Z",
+        "merged_at": "2026-10-03T10:57:16Z",
+        "merge_commit_sha": "867e227b7d2efb31c214d248e94b26e390e9f845"
+      },
+      {
+        "number": 47,
+        "state": "closed",
+        "draft": false,
+        "head": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a",
+        "updated_at": "2026-10-03T10:31:27Z",
+        "merged_at": "2026-10-03T10:31:27Z",
+        "merge_commit_sha": "13a038f2b05189285c17bb09c397d7a2de257668"
+      },
+      {
+        "number": 46,
+        "state": "closed",
+        "draft": false,
+        "head": "e6bf2bc75aa5dd87e520724e5dbf3f4a5f0f6578",
+        "updated_at": "2026-10-03T10:31:14Z",
+        "merged_at": "2026-10-03T10:31:13Z",
+        "merge_commit_sha": "57b33901cd6ebe297481c3220a165ffae230dd06"
+      },
+      {
+        "number": 45,
+        "state": "closed",
+        "draft": false,
+        "head": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+        "updated_at": "2026-10-03T06:24:13Z",
+        "merged_at": "2026-10-03T06:24:13Z",
+        "merge_commit_sha": "db32989c48f09be43686b7e3f7aee4f539fe518f"
+      },
+      {
+        "number": 44,
+        "state": "closed",
+        "draft": false,
+        "head": "f67b388e965bb9bfb3f8d6820fd62e9d273123b6",
+        "updated_at": "2026-10-02T23:46:49Z",
+        "merged_at": "2026-10-02T23:46:49Z",
+        "merge_commit_sha": "bfd63a393fc2399355c07bdcd0d66f70c3a069c7"
+      },
+      {
+        "number": 43,
+        "state": "closed",
+        "draft": false,
+        "head": "862cfa6c2ce6e45b7ccbc294270f3ba02548ed2a",
+        "updated_at": "2026-10-02T13:01:42Z",
+        "merged_at": "2026-10-02T13:01:42Z",
+        "merge_commit_sha": "37cf2140485869d8dda1b1b94b96a7954374f480"
+      },
+      {
+        "number": 42,
+        "state": "closed",
+        "draft": false,
+        "head": "1b77372a7e385a58f127d259a99e05e60cb8deb6",
+        "updated_at": "2026-10-02T12:05:38Z",
+        "merged_at": "2026-10-02T12:05:38Z",
+        "merge_commit_sha": "b6bd03cde1e44c77545978c2c144ac82e7c4b1b1"
+      },
+      {
+        "number": 41,
+        "state": "closed",
+        "draft": false,
+        "head": "f3a613291569a60e471065372135cbee07373702",
+        "updated_at": "2026-10-02T11:55:10Z",
+        "merged_at": "2026-10-02T11:55:10Z",
+        "merge_commit_sha": "3b068fcf970c7ddab5cf6cbdaf3490b76d3c5a58"
+      },
+      {
+        "number": 40,
+        "state": "closed",
+        "draft": false,
+        "head": "0c77bad036d4bef73c82983c3ae3f800943a1ee5",
+        "updated_at": "2026-10-02T11:45:36Z",
+        "merged_at": "2026-10-02T11:45:36Z",
+        "merge_commit_sha": "1b691e6cb352ee37b279f1608c2571d26053cbea"
+      },
+      {
+        "number": 39,
+        "state": "closed",
+        "draft": false,
+        "head": "829ee4671443140386043396ffb70c0a8a8daaae",
+        "updated_at": "2026-10-02T10:01:33Z",
+        "merged_at": "2026-10-02T10:01:33Z",
+        "merge_commit_sha": "a4bf950a0e7a4b1f2b67b8491417194357e8f95d"
+      },
+      {
+        "number": 38,
+        "state": "closed",
+        "draft": false,
+        "head": "e3a08db0c3dc97b297130a224919e73a69974c60",
+        "updated_at": "2026-10-02T09:31:01Z",
+        "merged_at": "2026-10-02T09:31:00Z",
+        "merge_commit_sha": "b6c9e5609fbcde16ee2cc057fcd3a86872ef0cda"
+      },
+      {
+        "number": 37,
+        "state": "closed",
+        "draft": false,
+        "head": "524596dedf44806da95c8d84e2096f2a5411440d",
+        "updated_at": "2026-10-02T09:25:51Z",
+        "merged_at": "2026-10-02T09:25:51Z",
+        "merge_commit_sha": "87ac0b6540cb3e2f141447ed60dcbfd1cdf49b2e"
+      },
+      {
+        "number": 36,
+        "state": "closed",
+        "draft": false,
+        "head": "850e2acccef3722fc487dd17df687056b3b58911",
+        "updated_at": "2026-10-02T09:20:56Z",
+        "merged_at": "2026-10-02T09:20:56Z",
+        "merge_commit_sha": "80f3e84fadbd7f71089ea955ec0b4f46b8b20bcc"
+      },
+      {
+        "number": 35,
+        "state": "closed",
+        "draft": false,
+        "head": "f5424c06c92b3f51535dd44ec54ef0a25f790370",
+        "updated_at": "2026-10-02T09:10:48Z",
+        "merged_at": "2026-10-02T09:10:48Z",
+        "merge_commit_sha": "7813000270523b8c6703ee633eb7e9892ac38989"
+      },
+      {
+        "number": 34,
+        "state": "closed",
+        "draft": false,
+        "head": "610e50b6cd4d63ccdfcfd5aaf57516bb016468bb",
+        "updated_at": "2026-10-02T09:00:56Z",
+        "merged_at": "2026-10-02T09:00:55Z",
+        "merge_commit_sha": "065f9844c9671941e2ef7b88424899ccd7e37881"
+      },
+      {
+        "number": 33,
+        "state": "closed",
+        "draft": false,
+        "head": "368afb0dfbf9ea66837c83834d8fc24837813554",
+        "updated_at": "2026-10-02T08:35:46Z",
+        "merged_at": "2026-10-02T08:35:46Z",
+        "merge_commit_sha": "477ed3bd21dd2dc2c8a615b7287b3439953372de"
+      },
+      {
+        "number": 32,
+        "state": "closed",
+        "draft": false,
+        "head": "db5b6e17c77f94f54bb4764da3fcf01b764d313e",
+        "updated_at": "2026-10-02T08:11:21Z",
+        "merged_at": "2026-10-02T08:11:20Z",
+        "merge_commit_sha": "685fbb7baee4a542555f939fabaecd674658c148"
+      },
+      {
+        "number": 31,
+        "state": "open",
+        "draft": true,
+        "head": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64",
+        "updated_at": "2026-09-25T10:03:16Z",
+        "merged_at": null,
+        "merge_commit_sha": null
+      },
+      {
+        "number": 30,
+        "state": "open",
+        "draft": true,
+        "head": "17449c7ec4e8ff50605ef931b04ae76584c6304f",
+        "updated_at": "2026-09-19T21:31:28Z",
+        "merged_at": null,
+        "merge_commit_sha": null
+      },
+      {
+        "number": 29,
+        "state": "closed",
+        "draft": false,
+        "head": "685fbb7baee4a542555f939fabaecd674658c148",
+        "updated_at": "2026-10-02T08:23:32Z",
+        "merged_at": "2026-10-02T08:23:31Z",
+        "merge_commit_sha": "fe9df9585f092b88055b96f0c727106fd1c81d25"
+      },
+      {
+        "number": 28,
+        "state": "closed",
+        "draft": false,
+        "head": "1d9db32ea15fbea950ac46090cb6e1a8bc750001",
+        "updated_at": "2026-09-18T03:16:04Z",
+        "merged_at": "2026-09-18T03:16:03Z",
+        "merge_commit_sha": "eaa398cb468bbfe4c909e3653a76e774dfe4ddc8"
+      },
+      {
+        "number": 27,
+        "state": "closed",
+        "draft": false,
+        "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+        "updated_at": "2026-09-18T03:02:52Z",
+        "merged_at": "2026-09-18T03:02:51Z",
+        "merge_commit_sha": "a87c0d753589d1014ff868cf5fe7c29581c11a0a"
+      },
+      {
+        "number": 26,
+        "state": "closed",
+        "draft": false,
+        "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+        "updated_at": "2026-09-18T02:32:49Z",
+        "merged_at": "2026-09-18T02:32:49Z",
+        "merge_commit_sha": "7b64dbbef610aed66b3e2c7c8915cbd5d40745bf"
+      },
+      {
+        "number": 25,
+        "state": "closed",
+        "draft": false,
+        "head": "469578ea12663c594a32c62a05263b23e7190891",
+        "updated_at": "2026-09-18T01:25:26Z",
+        "merged_at": "2026-09-18T01:25:26Z",
+        "merge_commit_sha": "b3530b4e3569bd2796c1758eba8514f3b684d633"
+      },
+      {
+        "number": 24,
+        "state": "closed",
+        "draft": false,
+        "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+        "updated_at": "2026-09-18T00:51:10Z",
+        "merged_at": "2026-09-18T00:51:10Z",
+        "merge_commit_sha": "21a5dcd93cb69336a5486614762478be636f6aeb"
+      },
+      {
+        "number": 23,
+        "state": "closed",
+        "draft": false,
+        "head": "242e1e8d1fac7dac1ff90e4d02a05c5f2afd6369",
+        "updated_at": "2026-09-18T00:15:47Z",
+        "merged_at": "2026-09-18T00:15:47Z",
+        "merge_commit_sha": "15cb968736c6c4b2442f9363b7c55f5b299ae5cb"
+      },
+      {
+        "number": 22,
+        "state": "closed",
+        "draft": false,
+        "head": "f6d8baf94d037057ec94deb87b156a713445d37f",
+        "updated_at": "2026-09-17T23:36:47Z",
+        "merged_at": "2026-09-17T23:36:47Z",
+        "merge_commit_sha": "278f167b2376365e46fd0e97193f1d8c924e6f57"
+      },
+      {
+        "number": 21,
+        "state": "closed",
+        "draft": false,
+        "head": "621dea871afc4dca517071cc79666d81cb69e29c",
+        "updated_at": "2026-09-17T23:30:48Z",
+        "merged_at": "2026-09-17T23:30:48Z",
+        "merge_commit_sha": "7131c4775f295ff9438da38a72f6d69b022353f4"
+      },
+      {
+        "number": 20,
+        "state": "closed",
+        "draft": false,
+        "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+        "updated_at": "2026-09-17T23:23:28Z",
+        "merged_at": "2026-09-17T23:23:28Z",
+        "merge_commit_sha": "323048ccbb5cc34f40ac9873195d60119878e070"
+      },
+      {
+        "number": 19,
+        "state": "closed",
+        "draft": false,
+        "head": "2cee1b7722cfe2e20d2b063226ba3d0b03522784",
+        "updated_at": "2026-09-17T23:10:25Z",
+        "merged_at": "2026-09-17T23:10:25Z",
+        "merge_commit_sha": "6db1524322d66d9bbba47a0c327f3b249e44d8ae"
+      },
+      {
+        "number": 18,
+        "state": "closed",
+        "draft": false,
+        "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5",
+        "updated_at": "2026-09-17T16:48:38Z",
+        "merged_at": "2026-09-17T16:48:38Z",
+        "merge_commit_sha": "eeef18257945c16b1179618485872e3efa577186"
+      },
+      {
+        "number": 17,
+        "state": "closed",
+        "draft": false,
+        "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+        "updated_at": "2026-09-17T15:58:10Z",
+        "merged_at": "2026-09-17T15:58:10Z",
+        "merge_commit_sha": "9690509c220eceb542834b0397dee8519d1d4bc3"
+      },
+      {
+        "number": 16,
+        "state": "closed",
+        "draft": false,
+        "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+        "updated_at": "2026-09-17T14:37:00Z",
+        "merged_at": "2026-09-17T14:37:00Z",
+        "merge_commit_sha": "0042df16070a6f2cf6544363be3ee7cda02d5fbf"
+      },
+      {
+        "number": 15,
+        "state": "closed",
+        "draft": false,
+        "head": "d6bdfd46f09d52c2cc432a01e36af324ec63f5f5",
+        "updated_at": "2026-09-17T14:17:20Z",
+        "merged_at": "2026-09-17T14:17:20Z",
+        "merge_commit_sha": "24013d9ce1f7840de541738df856bdfbaffd7b22"
+      },
+      {
+        "number": 14,
+        "state": "closed",
+        "draft": false,
+        "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+        "updated_at": "2026-09-17T14:06:52Z",
+        "merged_at": "2026-09-17T14:06:52Z",
+        "merge_commit_sha": "4e8c96a5bd5586cec54a9af006de8a91c65a4ab1"
+      },
+      {
+        "number": 13,
+        "state": "closed",
+        "draft": false,
+        "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+        "updated_at": "2026-09-17T14:00:30Z",
+        "merged_at": "2026-09-17T14:00:30Z",
+        "merge_commit_sha": "d35827487fbd1effbacc4b283aafdcf2d10b6b14"
+      },
+      {
+        "number": 12,
+        "state": "closed",
+        "draft": false,
+        "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+        "updated_at": "2026-09-17T13:49:47Z",
+        "merged_at": "2026-09-17T13:49:46Z",
+        "merge_commit_sha": "47a616db7641ff3a9d30a2ffaec905349b8c6ed7"
+      },
+      {
+        "number": 11,
+        "state": "closed",
+        "draft": false,
+        "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+        "updated_at": "2026-09-17T12:32:42Z",
+        "merged_at": "2026-09-17T12:32:42Z",
+        "merge_commit_sha": "d98735834463d5036707b1e7e47096c4ce9a6110"
+      },
+      {
+        "number": 10,
+        "state": "closed",
+        "draft": false,
+        "head": "7ba84c4d18e3f5b3ae012bd8b31eacebb0162f3a",
+        "updated_at": "2026-09-17T09:19:45Z",
+        "merged_at": "2026-09-17T09:19:45Z",
+        "merge_commit_sha": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab"
+      },
+      {
+        "number": 9,
+        "state": "closed",
+        "draft": false,
+        "head": "a06baac8110ded425c07e2122117e89460868405",
+        "updated_at": "2026-09-17T09:12:18Z",
+        "merged_at": "2026-09-17T09:12:18Z",
+        "merge_commit_sha": "b0c9b5c40fb027dc04239ab02306e369d2977ee5"
+      },
+      {
+        "number": 8,
+        "state": "closed",
+        "draft": false,
+        "head": "475410541b700562e0f535484cb3fd02d9f76b1a",
+        "updated_at": "2026-09-17T08:47:13Z",
+        "merged_at": "2026-09-17T08:47:13Z",
+        "merge_commit_sha": "b1fc94970726313be721de14e5c7969a7c12a7a3"
+      },
+      {
+        "number": 7,
+        "state": "closed",
+        "draft": false,
+        "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+        "updated_at": "2026-09-17T08:33:19Z",
+        "merged_at": "2026-09-17T08:33:19Z",
+        "merge_commit_sha": "c7eaf54f44b7e58f0fe88eee64b32f0efe841ca9"
+      },
+      {
+        "number": 6,
+        "state": "closed",
+        "draft": false,
+        "head": "29d74e3483d4f06f5127364d7c5bdf528826301b",
+        "updated_at": "2026-09-17T08:18:27Z",
+        "merged_at": "2026-09-17T08:18:27Z",
+        "merge_commit_sha": "1d80a67899dd54ee1d73e6dd08b96b386ae88029"
+      },
+      {
+        "number": 5,
+        "state": "closed",
+        "draft": false,
+        "head": "1fdd4d44a4ee53bcbda48e27d4065dc5f39cf7bc",
+        "updated_at": "2026-09-17T08:03:40Z",
+        "merged_at": "2026-09-17T08:03:40Z",
+        "merge_commit_sha": "14d80b91a39af33edea1332f71ba4a06a6763b31"
+      },
+      {
+        "number": 4,
+        "state": "closed",
+        "draft": false,
+        "head": "6a4eb039d356fe81262e1c55f870f563eaf51404",
+        "updated_at": "2026-09-17T07:47:04Z",
+        "merged_at": "2026-09-17T07:47:04Z",
+        "merge_commit_sha": "33176d7df0e1adf69183a0286144c99cfa948a18"
+      },
+      {
+        "number": 3,
+        "state": "closed",
+        "draft": false,
+        "head": "f93a9444565ce1029cd46c0d466456f651ee7c9e",
+        "updated_at": "2026-09-17T07:12:55Z",
+        "merged_at": "2026-09-17T07:12:55Z",
+        "merge_commit_sha": "ac5cccfbf2250204d13adf31fb05b15eb4652234"
+      },
+      {
+        "number": 2,
+        "state": "closed",
+        "draft": false,
+        "head": "0546426c9802665413ff47a16ad56f5cd7bb91b5",
+        "updated_at": "2026-09-17T05:46:28Z",
+        "merged_at": "2026-09-17T05:46:28Z",
+        "merge_commit_sha": "0e55a38b3e3040fbaac8047337b9dee77bd923e9"
+      },
+      {
+        "number": 1,
+        "state": "closed",
+        "draft": false,
+        "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+        "updated_at": "2026-09-17T05:26:43Z",
+        "merged_at": "2026-09-17T05:26:43Z",
+        "merge_commit_sha": "7595c2d1d935354a1c9127bc529cb268788c8e9b"
+      }
+    ]
+  },
+  "pin_comparisons": [
+    {
+      "base": "c1a66ecc3d6e1c913311873e0f0096f23d1ecd02",
+      "head": "9a40d98c4ecec2f17eef1489a687acc1e24f338e",
+      "status": "ahead",
+      "ahead": 11,
+      "behind": 0,
+      "merge_base": "c1a66ecc3d6e1c913311873e0f0096f23d1ecd02",
+      "files": [
+        {
+          "path": "lib/context-ab-quality-long-history.ts",
+          "sha": "7af62404361f41309fb539745e25ed0e690b9632",
+          "status": "added",
+          "patch": "@@ -0,0 +1,28 @@\n+import type { QualityScenario } from \"./context-ab-quality.ts\";\n+\n+/** Expand synthetic scenarios to 60 messages without real user data.\n+ * The first two turns preserve the scenario's original evidence.\n+ * Neutral filler is intentionally generic; this is NOT production-equivalent.\n+ */\n+export function makeLongQualityHistory(scenario: QualityScenario) {\n+  const history = [...scenario.history];\n+  const topics = [\n+    [\"最近は散歩の途中で季節の変化に気づくことがあるよ\",\"季節が少しずつ変わるのって面白いね。\"],\n+    [\"今日は新しい音楽を聴いてみたよ\",\"どんな曲が印象に残った？\"],\n+    [\"夕方の空の色がきれいだった\",\"夕方の空って表情が豊かだよね。\"],\n+    [\"週末に読みたい本を探してる\",\"気になるジャンルはある？\"],\n+    [\"近所の公園に花が咲いていたよ\",\"花が咲いているとちょっと嬉しくなるね。\"],\n+    [\"最近は朝の時間を大切にしたいな\",\"朝をどう過ごすかで気分も変わるよね。\"],\n+    [\"たまにはゆっくり映画を見たい\",\"どんな雰囲気の映画が見たい？\"],\n+    [\"今日は小さな発見があったよ\",\"それは気になるな。聞かせて？\"],\n+  ] as const;\n+  let i=0;\n+  while (history.length < 60) {\n+    const pair=topics[i++%topics.length];\n+    history.push({role:\"user\",text:pair[0]},{role:\"model\",text:pair[1]});\n+  }\n+  return history.slice(0,60);\n+}\n+export function recentModelReplies(history:readonly {role:\"user\"|\"model\";text:string}[]) {\n+  return history.filter(h=>h.role===\"model\").slice(-8).map(h=>h.text);\n+}"
+        },
+        {
+          "path": "lib/context-ab-quality.ts",
+          "sha": "d44b3ef0ad6c25dd28a8971ddd5ce0b66b7e6895",
+          "status": "added",
+          "patch": "@@ -0,0 +1,61 @@\n+/** Synthetic, deterministic quality checks. Not a substitute for human review. */\n+export type QualityScenario = {\n+  id: string;\n+  description: string;\n+  history: readonly {role:\"user\"|\"model\";text:string}[];\n+  userText: string;\n+  expectedTerms: readonly string[];\n+  forbiddenTerms: readonly string[];\n+};\n+export const qualityScenarios: readonly QualityScenario[] = [\n+  {\n+    id:\"memory-continuity\",\n+    description:\"Remember an explicitly mentioned favorite without inventing other facts\",\n+    history:[\n+      {role:\"user\",text:\"好きな飲み物は温かいほうじ茶だよ\"},\n+      {role:\"model\",text:\"温かいほうじ茶が好きなんだね。覚えておくね。\"},\n+    ],\n+    userText:\"私の好きな飲み物、覚えてる？\",\n+    expectedTerms:[\"ほうじ茶\"],forbiddenTerms:[\"コーヒーが好き\",\"紅茶が好き\"],\n+  },\n+  {\n+    id:\"no-unsupported-day\",\n+    description:\"Avoid assuming the user's work schedule\",\n+    history:[\n+      {role:\"user\",text:\"今日は窓から空を見てるよ\"},\n+      {role:\"model\",text:\"空を眺めているんだね。\"},\n+    ],\n+    userText:\"今日は何して過ごそうかな\",\n+    expectedTerms:[],forbiddenTerms:[\"仕事お疲れ\",\"仕事頑張って\",\"今日は休みなんだね\"],\n+  },\n+  {\n+    id:\"relationship-boundary\",\n+    description:\"Avoid declaring a romantic relationship without evidence\",\n+    history:[\n+      {role:\"user\",text:\"最近話すようになったね\"},\n+      {role:\"model\",text:\"そうだね、少しずつ知れてうれしいよ。\"},\n+    ],\n+    userText:\"これからもよろしくね\",\n+    expectedTerms:[],forbiddenTerms:[\"私たち恋人\",\"彼氏だもん\",\"付き合ってるんだから\"],\n+  },\n+  {\n+    id:\"no-verbatim-repeat\",\n+    description:\"Do not repeat the previous assistant reply verbatim\",\n+    history:[\n+      {role:\"user\",text:\"少し疲れたな\"},\n+      {role:\"model\",text:\"無理しないで、温かいお茶でも飲んでね。\"},\n+    ],\n+    userText:\"うん、ありがとう\",\n+    expectedTerms:[],forbiddenTerms:[\"無理しないで、温かいお茶でも飲んでね。\"],\n+  },\n+];\n+export function assessQualityReply(scenario:QualityScenario, reply:string) {\n+  const normalized=reply.trim();\n+  return {\n+    scenarioId:scenario.id,\n+    nonempty:normalized.length>0,\n+    expectedFactsPresent:scenario.expectedTerms.every(term=>normalized.includes(term)),\n+    unsupportedClaimsAbsent:scenario.forbiddenTerms.every(term=>!normalized.includes(term)),\n+    // Heuristic only: independent human review is still required.\n+  };\n+}"
+        },
+        {
+          "path": "scripts/context-ab-live.ts",
+          "sha": "83e826d7651aa5b86ffc07b103fbf71a2b258de5",
+          "status": "modified",
+          "patch": "@@ -64,16 +64,24 @@ const shortSnapshot = {\n const fixture = process.env.MISAKI_AB_FIXTURE ?? \"short\";\n if (![\"short\", \"long\"].includes(fixture)) throw new Error(\"MISAKI_AB_FIXTURE must be short or long.\");\n const snapshot = fixture === \"long\" ? makeSyntheticLongContext() : shortSnapshot;\n+const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"0\");\n+if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"MISAKI_AB_DELAY_MS must be 0..120000.\");\n const adapter = createIsolatedGeminiAdapter({\n   apiKey,\n   model,\n   allowLiveRequests: true,\n   timeoutMs: 30000,\n });\n-const result = await runOfflineContextComparison(snapshot, adapter, runs);\n+let requestCount = 0;\n+const pacedAdapter: typeof adapter = async (request) => {\n+  if (requestCount++ > 0 && delayMs > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));\n+  return adapter(request);\n+};\n+const result = await runOfflineContextComparison(snapshot, pacedAdapter, runs);\n console.log(JSON.stringify({\n   mode: \"synthetic-live-gemini\",\n   fixture,\n+  delayMs,\n   model,\n   runsPerVariant: runs,\n   promptChars: result.promptChars,"
+        },
+        {
+          "path": "scripts/context-ab-quality-live.ts",
+          "sha": "198e58d82c40f0a7466f8fc1d9842a670a99056c",
+          "status": "added",
+          "patch": "@@ -0,0 +1,86 @@\n+/**\n+ * Isolated synthetic quality A/B. No Supabase, production chat, or user data.\n+ * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.\n+ * Only aggregate numeric pass/fail counts are logged; no model text.\n+ */\n+import { writeFileSync, mkdirSync } from \"node:fs\";\n+import { randomInt } from \"node:crypto\";\n+import { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\n+import { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\n+import { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\n+import { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n+\n+if (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\n+const apiKey = process.env.GEMINI_API_KEY;\n+if (!apiKey) throw new Error(\"GEMINI_API_KEY is required\");\n+const model = process.env.MISAKI_AB_MODEL;\n+if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n+const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n+if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n+const fixture = makeSyntheticLongContext();\n+const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n+const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n+const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n+const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\n+const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\n+const reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\n+let count=0;\n+for (const scenario of qualityScenarios) {\n+  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n+  const replies=recentModelReplies(scenarioHistory);\n+  const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n+  const metrics:Record<string,boolean | number>={};\n+  const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n+  for (const variant of [\"A\",\"B\"] as const) {\n+    if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n+    const stats=totals[variant]; stats.calls++;\n+    try {\n+      const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{\n+        method:\"POST\",\n+        headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n+        signal:AbortSignal.timeout(30000),\n+        body:JSON.stringify({\n+          systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n+          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n+          generationConfig:{responseMimeType:\"application/json\",temperature:0},\n+        }),\n+      });\n+      metrics[variant+\"HttpStatus\"]=response.status;\n+      if(response.ok)stats.http200++;\n+      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[]};\n+      const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??\"\").join(\"\")??\"\";\n+      let parsed:unknown;\n+      try{parsed=JSON.parse(raw);}catch{parsed=null;}\n+      const valid=parsed!==null && typeof parsed===\"object\";\n+      if(valid)stats.jsonValid++;\n+      const reply=valid && typeof (parsed as {reply?:unknown}).reply===\"string\" ? (parsed as {reply:string}).reply : \"\";\n+      if (exportReview && response.ok) captured[variant]=reply;\n+      const result=assessQualityReply(scenario,reply);\n+      metrics[variant+\"ReplyFieldPresent\"]=valid && typeof (parsed as {reply?:unknown}).reply===\"string\";\n+      metrics[variant+\"Nonempty\"]=result.nonempty;\n+      metrics[variant+\"ExpectedFactsPresent\"]=result.expectedFactsPresent;\n+      metrics[variant+\"UnsupportedClaimsAbsent\"]=result.unsupportedClaimsAbsent;\n+      const passed=response.ok && valid && result.nonempty && result.expectedFactsPresent && result.unsupportedClaimsAbsent;\n+      metrics[variant+\"Passed\"]=passed;\n+      if(passed)stats.passed++;\n+    }catch{\n+      metrics[variant+\"HttpStatus\"]=0;\n+      metrics[variant+\"Passed\"]=false;\n+      metrics[variant+\"RequestError\"]=true;\n+    }\n+  }\n+  scenarioCounts[scenario.id]=metrics;\n+  if (exportReview && captured.A && captured.B) {\n+    const swap=randomInt(2)===1;\n+    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});\n+    reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n+  }\n+}\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+\n+if (exportReview) {\n+  mkdirSync(\"ab-review-output\",{recursive:true});\n+  writeFileSync(\"ab-review-output/blind-review.json\",JSON.stringify({notice:\"Synthetic scenarios only. Human ratings are not automatic quality proof.\",items:reviewItems},null,2),{mode:0o600});\n+  writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n+  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n+}"
+        },
+        {
+          "path": "tests/context-ab-quality-long-history.test.ts",
+          "sha": "23de4570c1d98a906a68624d5048a0904914e266",
+          "status": "added",
+          "patch": "@@ -0,0 +1,15 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import {qualityScenarios} from \"../lib/context-ab-quality.ts\";\n+import {makeLongQualityHistory,recentModelReplies} from \"../lib/context-ab-quality-long-history.ts\";\n+\n+test(\"extended quality scenarios have exactly 60 synthetic messages and eight recent replies\",()=>{\n+ for(const scenario of qualityScenarios){\n+   const history=makeLongQualityHistory(scenario);\n+   assert.equal(history.length,60);\n+   assert.deepEqual(history.slice(0,scenario.history.length),scenario.history);\n+   assert.equal(recentModelReplies(history).length,8);\n+   assert.ok(history.every((turn,i)=>turn.role===(i%2===0?\"user\":\"model\")));\n+   assert.equal(recentModelReplies(history)[7],history[59].text);\n+ }\n+});"
+        },
+        {
+          "path": "tests/context-ab-quality.test.ts",
+          "sha": "307964d0661226882af5bec2391a4b5fcca3c4aa",
+          "status": "added",
+          "patch": "@@ -0,0 +1,14 @@\n+import assert from \"node:assert/strict\";\n+import test from \"node:test\";\n+import {qualityScenarios,assessQualityReply} from \"../lib/context-ab-quality.ts\";\n+test(\"quality scenarios have unique IDs and deterministic checks\",()=>{\n+  assert.equal(new Set(qualityScenarios.map(s=>s.id)).size,qualityScenarios.length);\n+  for(const scenario of qualityScenarios){\n+    assert.ok(scenario.history.length>0);\n+    assert.equal(assessQualityReply(scenario,\"\").nonempty,false);\n+    const violating=scenario.forbiddenTerms[0];\n+    if(violating) assert.equal(assessQualityReply(scenario,violating).unsupportedClaimsAbsent,false);\n+    const expected=scenario.expectedTerms.join(\" \");\n+    assert.equal(assessQualityReply(scenario,expected).expectedFactsPresent,true);\n+  }\n+});"
+        }
+      ]
+    },
+    {
+      "base": "02b9885772bc67fbdf0170e5284d63acdb264437",
+      "head": "9a40d98c4ecec2f17eef1489a687acc1e24f338e",
+      "status": "ahead",
+      "ahead": 6,
+      "behind": 0,
+      "merge_base": "02b9885772bc67fbdf0170e5284d63acdb264437",
+      "files": [
+        {
+          "path": "lib/context-ab-quality-long-history.ts",
+          "sha": "7af62404361f41309fb539745e25ed0e690b9632",
+          "status": "added",
+          "patch": "@@ -0,0 +1,28 @@\n+import type { QualityScenario } from \"./context-ab-quality.ts\";\n+\n+/** Expand synthetic scenarios to 60 messages without real user data.\n+ * The first two turns preserve the scenario's original evidence.\n+ * Neutral filler is intentionally generic; this is NOT production-equivalent.\n+ */\n+export function makeLongQualityHistory(scenario: QualityScenario) {\n+  const history = [...scenario.history];\n+  const topics = [\n+    [\"最近は散歩の途中で季節の変化に気づくことがあるよ\",\"季節が少しずつ変わるのって面白いね。\"],\n+    [\"今日は新しい音楽を聴いてみたよ\",\"どんな曲が印象に残った？\"],\n+    [\"夕方の空の色がきれいだった\",\"夕方の空って表情が豊かだよね。\"],\n+    [\"週末に読みたい本を探してる\",\"気になるジャンルはある？\"],\n+    [\"近所の公園に花が咲いていたよ\",\"花が咲いているとちょっと嬉しくなるね。\"],\n+    [\"最近は朝の時間を大切にしたいな\",\"朝をどう過ごすかで気分も変わるよね。\"],\n+    [\"たまにはゆっくり映画を見たい\",\"どんな雰囲気の映画が見たい？\"],\n+    [\"今日は小さな発見があったよ\",\"それは気になるな。聞かせて？\"],\n+  ] as const;\n+  let i=0;\n+  while (history.length < 60) {\n+    const pair=topics[i++%topics.length];\n+    history.push({role:\"user\",text:pair[0]},{role:\"model\",text:pair[1]});\n+  }\n+  return history.slice(0,60);\n+}\n+export function recentModelReplies(history:readonly {role:\"user\"|\"model\";text:string}[]) {\n+  return history.filter(h=>h.role===\"model\").slice(-8).map(h=>h.text);\n+}"
+        },
+        {
+          "path": "scripts/context-ab-quality-live.ts",
+          "sha": "198e58d82c40f0a7466f8fc1d9842a670a99056c",
+          "status": "modified",
+          "patch": "@@ -3,9 +3,12 @@\n  * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.\n  * Only aggregate numeric pass/fail counts are logged; no model text.\n  */\n+import { writeFileSync, mkdirSync } from \"node:fs\";\n+import { randomInt } from \"node:crypto\";\n import { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\n import { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\n import { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\n+import { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n \n if (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\n const apiKey = process.env.GEMINI_API_KEY;\n@@ -15,13 +18,19 @@ if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n const fixture = makeSyntheticLongContext();\n+const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n+const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\n+const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\n+const reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\n let count=0;\n for (const scenario of qualityScenarios) {\n-  const replies=scenario.history.filter(h=>h.role===\"model\").map(h=>h.text);\n+  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n+  const replies=recentModelReplies(scenarioHistory);\n   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n   const metrics:Record<string,boolean | number>={};\n+  const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n   for (const variant of [\"A\",\"B\"] as const) {\n     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n     const stats=totals[variant]; stats.calls++;\n@@ -31,8 +40,8 @@ for (const scenario of qualityScenarios) {\n         headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n         signal:AbortSignal.timeout(30000),\n         body:JSON.stringify({\n-          systemInstruction:{parts:[{text:variants[variant]}]},\n-          contents:[...scenario.history.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n+          systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n+          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n           generationConfig:{responseMimeType:\"application/json\",temperature:0},\n         }),\n       });\n@@ -45,6 +54,7 @@ for (const scenario of qualityScenarios) {\n       const valid=parsed!==null && typeof parsed===\"object\";\n       if(valid)stats.jsonValid++;\n       const reply=valid && typeof (parsed as {reply?:unknown}).reply===\"string\" ? (parsed as {reply:string}).reply : \"\";\n+      if (exportReview && response.ok) captured[variant]=reply;\n       const result=assessQualityReply(scenario,reply);\n       metrics[variant+\"ReplyFieldPresent\"]=valid && typeof (parsed as {reply?:unknown}).reply===\"string\";\n       metrics[variant+\"Nonempty\"]=result.nonempty;\n@@ -60,5 +70,17 @@ for (const scenario of qualityScenarios) {\n     }\n   }\n   scenarioCounts[scenario.id]=metrics;\n+  if (exportReview && captured.A && captured.B) {\n+    const swap=randomInt(2)===1;\n+    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});\n+    reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n+  }\n+}\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+\n+if (exportReview) {\n+  mkdirSync(\"ab-review-output\",{recursive:true});\n+  writeFileSync(\"ab-review-output/blind-review.json\",JSON.stringify({notice:\"Synthetic scenarios only. Human ratings are not automatic quality proof.\",items:reviewItems},null,2),{mode:0o600});\n+  writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n+  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n }\n-console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));"
+        },
+        {
+          "path": "tests/context-ab-quality-long-history.test.ts",
+          "sha": "23de4570c1d98a906a68624d5048a0904914e266",
+          "status": "added",
+          "patch": "@@ -0,0 +1,15 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import {qualityScenarios} from \"../lib/context-ab-quality.ts\";\n+import {makeLongQualityHistory,recentModelReplies} from \"../lib/context-ab-quality-long-history.ts\";\n+\n+test(\"extended quality scenarios have exactly 60 synthetic messages and eight recent replies\",()=>{\n+ for(const scenario of qualityScenarios){\n+   const history=makeLongQualityHistory(scenario);\n+   assert.equal(history.length,60);\n+   assert.deepEqual(history.slice(0,scenario.history.length),scenario.history);\n+   assert.equal(recentModelReplies(history).length,8);\n+   assert.ok(history.every((turn,i)=>turn.role===(i%2===0?\"user\":\"model\")));\n+   assert.equal(recentModelReplies(history)[7],history[59].text);\n+ }\n+});"
+        }
+      ]
+    },
+    {
+      "base": "f18b5ea58cc34f148d5bc08fc710f7a4606766a5",
+      "head": "9a40d98c4ecec2f17eef1489a687acc1e24f338e",
+      "status": "ahead",
+      "ahead": 4,
+      "behind": 0,
+      "merge_base": "f18b5ea58cc34f148d5bc08fc710f7a4606766a5",
+      "files": [
+        {
+          "path": "lib/context-ab-quality-long-history.ts",
+          "sha": "7af62404361f41309fb539745e25ed0e690b9632",
+          "status": "added",
+          "patch": "@@ -0,0 +1,28 @@\n+import type { QualityScenario } from \"./context-ab-quality.ts\";\n+\n+/** Expand synthetic scenarios to 60 messages without real user data.\n+ * The first two turns preserve the scenario's original evidence.\n+ * Neutral filler is intentionally generic; this is NOT production-equivalent.\n+ */\n+export function makeLongQualityHistory(scenario: QualityScenario) {\n+  const history = [...scenario.history];\n+  const topics = [\n+    [\"最近は散歩の途中で季節の変化に気づくことがあるよ\",\"季節が少しずつ変わるのって面白いね。\"],\n+    [\"今日は新しい音楽を聴いてみたよ\",\"どんな曲が印象に残った？\"],\n+    [\"夕方の空の色がきれいだった\",\"夕方の空って表情が豊かだよね。\"],\n+    [\"週末に読みたい本を探してる\",\"気になるジャンルはある？\"],\n+    [\"近所の公園に花が咲いていたよ\",\"花が咲いているとちょっと嬉しくなるね。\"],\n+    [\"最近は朝の時間を大切にしたいな\",\"朝をどう過ごすかで気分も変わるよね。\"],\n+    [\"たまにはゆっくり映画を見たい\",\"どんな雰囲気の映画が見たい？\"],\n+    [\"今日は小さな発見があったよ\",\"それは気になるな。聞かせて？\"],\n+  ] as const;\n+  let i=0;\n+  while (history.length < 60) {\n+    const pair=topics[i++%topics.length];\n+    history.push({role:\"user\",text:pair[0]},{role:\"model\",text:pair[1]});\n+  }\n+  return history.slice(0,60);\n+}\n+export function recentModelReplies(history:readonly {role:\"user\"|\"model\";text:string}[]) {\n+  return history.filter(h=>h.role===\"model\").slice(-8).map(h=>h.text);\n+}"
+        },
+        {
+          "path": "scripts/context-ab-quality-live.ts",
+          "sha": "198e58d82c40f0a7466f8fc1d9842a670a99056c",
+          "status": "modified",
+          "patch": "@@ -3,9 +3,12 @@\n  * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.\n  * Only aggregate numeric pass/fail counts are logged; no model text.\n  */\n+import { writeFileSync, mkdirSync } from \"node:fs\";\n+import { randomInt } from \"node:crypto\";\n import { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\n import { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\n import { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\n+import { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n \n if (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\n const apiKey = process.env.GEMINI_API_KEY;\n@@ -15,13 +18,19 @@ if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n const fixture = makeSyntheticLongContext();\n+const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n+const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\n+const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\n+const reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\n let count=0;\n for (const scenario of qualityScenarios) {\n-  const replies=scenario.history.filter(h=>h.role===\"model\").map(h=>h.text);\n+  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n+  const replies=recentModelReplies(scenarioHistory);\n   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n   const metrics:Record<string,boolean | number>={};\n+  const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n   for (const variant of [\"A\",\"B\"] as const) {\n     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n     const stats=totals[variant]; stats.calls++;\n@@ -32,7 +41,7 @@ for (const scenario of qualityScenarios) {\n         signal:AbortSignal.timeout(30000),\n         body:JSON.stringify({\n           systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n-          contents:[...scenario.history.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n+          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n           generationConfig:{responseMimeType:\"application/json\",temperature:0},\n         }),\n       });\n@@ -45,6 +54,7 @@ for (const scenario of qualityScenarios) {\n       const valid=parsed!==null && typeof parsed===\"object\";\n       if(valid)stats.jsonValid++;\n       const reply=valid && typeof (parsed as {reply?:unknown}).reply===\"string\" ? (parsed as {reply:string}).reply : \"\";\n+      if (exportReview && response.ok) captured[variant]=reply;\n       const result=assessQualityReply(scenario,reply);\n       metrics[variant+\"ReplyFieldPresent\"]=valid && typeof (parsed as {reply?:unknown}).reply===\"string\";\n       metrics[variant+\"Nonempty\"]=result.nonempty;\n@@ -60,5 +70,17 @@ for (const scenario of qualityScenarios) {\n     }\n   }\n   scenarioCounts[scenario.id]=metrics;\n+  if (exportReview && captured.A && captured.B) {\n+    const swap=randomInt(2)===1;\n+    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});\n+    reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n+  }\n+}\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+\n+if (exportReview) {\n+  mkdirSync(\"ab-review-output\",{recursive:true});\n+  writeFileSync(\"ab-review-output/blind-review.json\",JSON.stringify({notice:\"Synthetic scenarios only. Human ratings are not automatic quality proof.\",items:reviewItems},null,2),{mode:0o600});\n+  writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n+  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n }\n-console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));"
+        },
+        {
+          "path": "tests/context-ab-quality-long-history.test.ts",
+          "sha": "23de4570c1d98a906a68624d5048a0904914e266",
+          "status": "added",
+          "patch": "@@ -0,0 +1,15 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import {qualityScenarios} from \"../lib/context-ab-quality.ts\";\n+import {makeLongQualityHistory,recentModelReplies} from \"../lib/context-ab-quality-long-history.ts\";\n+\n+test(\"extended quality scenarios have exactly 60 synthetic messages and eight recent replies\",()=>{\n+ for(const scenario of qualityScenarios){\n+   const history=makeLongQualityHistory(scenario);\n+   assert.equal(history.length,60);\n+   assert.deepEqual(history.slice(0,scenario.history.length),scenario.history);\n+   assert.equal(recentModelReplies(history).length,8);\n+   assert.ok(history.every((turn,i)=>turn.role===(i%2===0?\"user\":\"model\")));\n+   assert.equal(recentModelReplies(history)[7],history[59].text);\n+ }\n+});"
+        }
+      ]
+    },
+    {
+      "base": "c62cd88b72c81d4d85a40596f35d7dfe3db18091",
+      "head": "9a40d98c4ecec2f17eef1489a687acc1e24f338e",
+      "status": "ahead",
+      "ahead": 3,
+      "behind": 0,
+      "merge_base": "c62cd88b72c81d4d85a40596f35d7dfe3db18091",
+      "files": [
+        {
+          "path": "lib/context-ab-quality-long-history.ts",
+          "sha": "7af62404361f41309fb539745e25ed0e690b9632",
+          "status": "added",
+          "patch": "@@ -0,0 +1,28 @@\n+import type { QualityScenario } from \"./context-ab-quality.ts\";\n+\n+/** Expand synthetic scenarios to 60 messages without real user data.\n+ * The first two turns preserve the scenario's original evidence.\n+ * Neutral filler is intentionally generic; this is NOT production-equivalent.\n+ */\n+export function makeLongQualityHistory(scenario: QualityScenario) {\n+  const history = [...scenario.history];\n+  const topics = [\n+    [\"最近は散歩の途中で季節の変化に気づくことがあるよ\",\"季節が少しずつ変わるのって面白いね。\"],\n+    [\"今日は新しい音楽を聴いてみたよ\",\"どんな曲が印象に残った？\"],\n+    [\"夕方の空の色がきれいだった\",\"夕方の空って表情が豊かだよね。\"],\n+    [\"週末に読みたい本を探してる\",\"気になるジャンルはある？\"],\n+    [\"近所の公園に花が咲いていたよ\",\"花が咲いているとちょっと嬉しくなるね。\"],\n+    [\"最近は朝の時間を大切にしたいな\",\"朝をどう過ごすかで気分も変わるよね。\"],\n+    [\"たまにはゆっくり映画を見たい\",\"どんな雰囲気の映画が見たい？\"],\n+    [\"今日は小さな発見があったよ\",\"それは気になるな。聞かせて？\"],\n+  ] as const;\n+  let i=0;\n+  while (history.length < 60) {\n+    const pair=topics[i++%topics.length];\n+    history.push({role:\"user\",text:pair[0]},{role:\"model\",text:pair[1]});\n+  }\n+  return history.slice(0,60);\n+}\n+export function recentModelReplies(history:readonly {role:\"user\"|\"model\";text:string}[]) {\n+  return history.filter(h=>h.role===\"model\").slice(-8).map(h=>h.text);\n+}"
+        },
+        {
+          "path": "scripts/context-ab-quality-live.ts",
+          "sha": "198e58d82c40f0a7466f8fc1d9842a670a99056c",
+          "status": "modified",
+          "patch": "@@ -8,6 +8,7 @@ import { randomInt } from \"node:crypto\";\n import { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\n import { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\n import { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\n+import { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n \n if (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\n const apiKey = process.env.GEMINI_API_KEY;\n@@ -17,14 +18,16 @@ if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n const fixture = makeSyntheticLongContext();\n+const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\n const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\n const reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\n let count=0;\n for (const scenario of qualityScenarios) {\n-  const replies=scenario.history.filter(h=>h.role===\"model\").map(h=>h.text);\n+  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n+  const replies=recentModelReplies(scenarioHistory);\n   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n   const metrics:Record<string,boolean | number>={};\n   const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n@@ -38,7 +41,7 @@ for (const scenario of qualityScenarios) {\n         signal:AbortSignal.timeout(30000),\n         body:JSON.stringify({\n           systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n-          contents:[...scenario.history.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n+          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n           generationConfig:{responseMimeType:\"application/json\",temperature:0},\n         }),\n       });\n@@ -73,7 +76,7 @@ for (const scenario of qualityScenarios) {\n     reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n   }\n }\n-console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n \n if (exportReview) {\n   mkdirSync(\"ab-review-output\",{recursive:true});"
+        },
+        {
+          "path": "tests/context-ab-quality-long-history.test.ts",
+          "sha": "23de4570c1d98a906a68624d5048a0904914e266",
+          "status": "added",
+          "patch": "@@ -0,0 +1,15 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import {qualityScenarios} from \"../lib/context-ab-quality.ts\";\n+import {makeLongQualityHistory,recentModelReplies} from \"../lib/context-ab-quality-long-history.ts\";\n+\n+test(\"extended quality scenarios have exactly 60 synthetic messages and eight recent replies\",()=>{\n+ for(const scenario of qualityScenarios){\n+   const history=makeLongQualityHistory(scenario);\n+   assert.equal(history.length,60);\n+   assert.deepEqual(history.slice(0,scenario.history.length),scenario.history);\n+   assert.equal(recentModelReplies(history).length,8);\n+   assert.ok(history.every((turn,i)=>turn.role===(i%2===0?\"user\":\"model\")));\n+   assert.equal(recentModelReplies(history)[7],history[59].text);\n+ }\n+});"
+        }
+      ]
+    }
+  ],
+  "runtime_executed": false,
+  "database_accessed": false,
+  "paid_model_called": false
+}
