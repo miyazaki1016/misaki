@@ -50,14 +50,14 @@
 | `fix/safari-load-failed-message` | 記載あり | 2026-09-17 12:31 UTC | 要照合 | 要完了判定 |
 | `fix/safari-load-failed-ui` | 記載あり | 2026-09-17 09:19 UTC | 要照合 | 要完了判定 |
 | `fix/use-chat-proxy` | 記載あり | 2026-09-17 08:16 UTC | 要照合 | 要完了判定 |
-| `fix/workday-grounding` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `main` | 基準ブランチ | 未取得 | 要照合 | 対象外または要確認 |
-| `perf/chat-stage-timing` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `refine/proactive-action-tags` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `refine/sleepy-tag` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/anonymous-history-get-noop` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/canonical-relationship-integration` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/cutover-cleanup` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `fix/workday-grounding` | 記載あり | 2026-09-17 23:21 UTC | 要照合 | 要完了判定 |
+| `main` | 基準ブランチ | 2026-10-14 11:57 UTC | 要照合 | 対象外または要確認 |
+| `perf/chat-stage-timing` | 記載あり | 2026-09-18 02:31 UTC | 要照合 | 要完了判定 |
+| `refine/proactive-action-tags` | 記載あり | 2026-09-17 14:05 UTC | 要照合 | 要完了判定 |
+| `refine/sleepy-tag` | 記載あり | 2026-09-17 14:15 UTC | 要照合 | 要完了判定 |
+| `sora/anonymous-history-get-noop` | 記載あり | 2026-10-02 08:34 UTC | 要照合 | 要完了判定 |
+| `sora/canonical-relationship-integration` | 記載あり | 2026-10-02 13:09 UTC | 要照合 | 要完了判定 |
+| `sora/cutover-cleanup` | 記載あり | 2026-10-02 09:08 UTC | 要照合 | 要完了判定 |
 | `sora/drop-ungrounded-relationship-evidence` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `sora/fix-relationship-polarity-transport` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `sora/fix-waiting-reply-layout` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,7 +111,7 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り52枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り44枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
 
 2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
 
@@ -120,3 +120,5 @@
 2026-10-21: `fix/chat-network-reliability`〜`fix/grow-relationship-from-first-meeting` の8枝のcommitter.dateを取得。累計32/92、未取得60。チャット信頼性/重複防止/Gemini timeout・JSON retryの枝は9/17〜18、期限切れ一時関係のimportは10/05最終更新。日時だけではmain反映・テスト通過・本番安全性を判定しない。UTC表記。
 
 2026-10-21: 8枝のcommitter.dateを取得し反映。累計40/92、未取得52。Safari表示・cache、会話履歴維持・recall、chat proxyは9/17、relationship analyzerのbounded retryは10/05最終更新。時系列のみではmain反映や実装の安全性を判定しない。UTC表記。
+
+2026-10-21: 8枝のcommitter.dateを取得。累計48/92、未取得44。`main`は10/14 11:57 UTC時点のHEAD日時であり本表を更新するたび最新確認が必要。canonical relationship、anonymous history、cutover関連は10/02、proactive action/sleepy tagsは9/17。`main`の日時は本番デプロイ日時ではない。UTC表記。
