@@ -804,3 +804,20 @@ GitHub `main...branch` compare（ahead/behindとfile status）：
 main現行ファイルの存在とblob SHAを直接確認：`app/chat/anonymous-session-guard.tsx`=`b8756ce6...`、`app/chat/conversation-history-sync.tsx`=`3f39da15...`、`app/api/chat-proxy/route.ts`=`d1e9749f...`（わずか294 bytes）、`tests/account-conversation.test.cjs`=`c5f80596...`。古い枝の `chat-proxy` 修正が現在の正本 `app/api/chat/route.ts` に適用されるとは限らず、**旧proxy経路と現行canonical routeを区別**する。匿名のセッション終了/履歴保全/一時rootの有効期限・一回限りimportの安全境界は重要で、旧枝を丸ごとmergeせずテスト資産/再現ケース/思想を照合する。
 
 **状態**：6枝にmain差分あり（ただし古いベース338–365 behind）、2枝は差分なし。今回確認したのは差分の所在とmainファイルの存在であり、修正の機能的等価性・CI・本番適用は未検証。次の精査では匿名アカウントのログイン/ログアウト/履歴保存、期限切れtemporary receipt、想起の根拠保持を現行テストと比較する。main/production/Supabase変更なし。
+
+
+## 2026-10-21 チャット障害・重複防止・Gemini再試行の8枝（開発経緯の復元）
+
+`main...branch` compare：
+- `fix/chat-failure-recovery` ahead3/behind343、`app/api/chat/route.ts`・`app/chat/page.tsx` modified、`20260918081000_refund_failed_chat_usage.sql` added（比較上）。**当該SQLはmainにも存在**（blob `b79b9606...`）。失敗した会話の利用枠返金という意図と、現行正本処理を照合すべき。
+- `fix/chat-network-reliability` ahead1/behind356、旧 `app/api/chat-proxy/route.ts` modified。
+- `fix/chat-reliability-cleanup` ahead1/behind357、同旧proxy modified。
+- `fix/chat-request-diagnostics` ahead1/behind359、同旧proxy modified。
+- `fix/chat-turn-dedupe` ahead1/behind344、`20260918014700_prevent_duplicate_chat_turn_sync.sql` added（比較上）。**当該SQLはmainにも存在**（blob `8b3b3aad...`）。重複ターン同期防止という歴史的修正。
+- `fix/gemini-chat-timeout` ahead2/behind337、現行 `app/api/chat/route.ts` modified。
+- `fix/gemini-json-retry` ahead1/behind363、旧proxy modified。
+- `fix/use-chat-proxy` ahead1/behind360、旧proxy modified。
+
+**現行main正本の直接確認**：`app/api/chat/route.ts` は55,132 bytes（blob `5600ad37...`）、`app/api/chat-proxy/route.ts` は294 bytes（blob `d1e9749f...`）で、現在のproxyは `POST` をcanonical `../chat/route` に一度だけ委譲し、コメントで『認証・正本読取・利用枠消費/返金・成功ターン原子的確定はbase側、wrapperで再試行禁止』と明記。旧proxyのネットワーク/JSON retry/診断コードをそのまま戻すと**二重実行や重複課金・二重保存**の危険がある。retryは生成層と副作用の境界を分けて検討。
+
+**開発史としての読み取り（推論、確定事実ではない）**：ネットワーク失敗→診断/再試行→二重同期防止/返金→canonical単一路線、という問題群が見える。個々の枝の作成順・因果はcommit時刻/PR/issueで追加確認が必要。古い枝を『未反映だから戻す』ではなく、**障害再現ケース、返金・冪等性の不変条件、再試行境界**を抽出する。今回の確認は静的ソース/差分で、実稼働の障害再現・CI・production DB適用は未確認。main/production/Supabase変更なし。
