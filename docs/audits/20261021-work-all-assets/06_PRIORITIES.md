@@ -4,7 +4,7 @@
 
 | ID / 分類 | 課題・根拠 | 依存・リスク | 次に必要な検証・完了条件 |
 |---|---|---|---|
-| A01 最優先 | legacy #30のBLOCKED文書と現在HEAD成功CIの矛盾。`17449c7ec4e8ff50605ef931b04ae76584c6304f`、`LEGACY_MAINTENANCE_DRAIN.md`、`WRITE_SURFACE_INVENTORY.md`、DB試験Blob `68fea5e23b611ee13a2415b4d0addbe4fbbe1d15`、run 35470658292 | 成功表示で停止集合/安全性が証明されたと扱う危険。既知surface漏れ・pre-gate・旧処理引継ぎは別問題。 | 実行checkoutのSHA/tree、Node/PG版、実ログの各反例、現SQLと文書の反例条件を同じ証拠束で比較。保護要件を弱めず隔離環境で再現。BLOCKED解除は監査後の別判断。 |
+| A01 最優先 | legacy #30のBLOCKED文書と現在HEAD成功CIの矛盾。`17449c7ec4e8ff50605ef931b04ae76584c6304f`、`LEGACY_MAINTENANCE_DRAIN.md`、`WRITE_SURFACE_INVENTORY.md`、DB試験Blob `68fea5e23b611ee13a2415b4d0addbe4fbbe1d15`、run 35470658292 | 成功表示で停止集合/安全性が証明されたと扱う危険。既知surface漏れ・pre-gate・旧処理引継ぎは別問題。 | 最新HEADに3か所FOR SHARE追加が入ったことを特定（08追補）。実行checkoutのSHA/tree、Node/PG版、実ログの各反例、現SQLと文書の反例条件を同じ証拠束で比較。保護要件を弱めず隔離環境で再現。BLOCKED解除は監査後の別判断。 |
 | A02 最優先 | Forget v1未統合、#66 `84d147ba5b46698d3b46fb727a9859f87f79f3d2`、`lib/canonical-state.ts`/chat/Body Clock/専用SQL | 参照・保存・forget成立後のrollbackが一体。追加意味判定callでコストも増える。 | 現mainにrebase相当の差分設計のみを先に作る。古いhistory復活、明示削除、再学習同意、匿名checkpoint、別端末、出力検査、失敗時原子性の隔離試験計画。 |
 | A03 最優先 | Body Clock関係性変更race、#85 @ `ef5bd23246a75b02a0df60302263f971de061843` のrace/RPC/version文書 | conversation updated_atだけではrelationship-only更新の検知を証明しない。全writerのversion更新と配送確定が依存。 | 実効SQLのCREATE/REPLACE順序と引数をソース上で解決し、status双方更新・旧emotion/action・匿名revision・二重Pushの競合試験を設計。未証明を即本番不具合と断定しない。 |
 | A04 最優先 | IdentityのDB/main/gate三者、#67 @ `9cbe2146d4a9ad09edd16100c27d950e95a8bcc4` | PRは本番DB適用済みと主張、mainアプリ未収録。再適用・gate ONで既存状態を壊す恐れ。 | 既存4本SQLの署名/依存/台帳の記録とアプリconsumer契約を静的比較。現在DB照合は別範囲として未確認維持。 |

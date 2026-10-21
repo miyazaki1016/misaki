@@ -11,6 +11,9 @@
 5. [基本構想との整合性](05_VISION_ALIGNMENT.md)
 6. [開発優先順位案](06_PRIORITIES.md)
 7. [監査進捗・未完了報告](07_AUDIT_STATUS.md)
+8. [追補：legacy未記載SQL修正](08_LEGACY_UNDOCUMENTED_CHANGE.md)
+
+**最新追補を優先:** legacyのCI/文書の時点差は、BLOCKED記録後の `17449c7` にある3か所の行ロック修正で一部説明できた。安全性全体の解除ではない。
 
 [照合データ一式 evidence.zip](evidence.zip) の中に、本文書が参照する `branches.json`、`documents.json`、`all-files.json`、`code-differences.json`、`pull-requests.json`、`pr-discussions.json`、`previews.json`、`checks.json`、`coverage.json`、`legacy-ci-excerpts.json` を保存しています。ZIPを展開して参照してください。固定HEAD、全path/Blob、同名文書の版・所属、merge-base差分とHEAD差分、PR状態・merge SHA、Preview URL/状態/target/SHA、CIの観測を追跡できます。raw/には補助API記録・legacy実CIログを保存しています。
 

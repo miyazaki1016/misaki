@@ -27,7 +27,7 @@
 
 ## 安全上のBLOCKED
 
-`codex/legacy-maintenance-drain` @ `17449c7ec4e8ff50605ef931b04ae76584c6304f` / #30 open Draft。文書は未保護write surface、停止前MVCC snapshot、受付集合、barrier寿命等の反例とBLOCKEDを保存している。現在HEADのCIはsuccessで、実ログにもPG17.6/18.4各56 pass/0 fail/0 skipがある。この相違の原因は未確定。**成功CIでBLOCKEDを解除しない。文書だけを根拠に最新CI失敗とも書かない。**
+`codex/legacy-maintenance-drain` @ `17449c7ec4e8ff50605ef931b04ae76584c6304f` / #30 open Draft。文書は未保護write surface、停止前MVCC snapshot、受付集合、barrier寿命等の反例とBLOCKEDを保存している。現在HEADのCIはsuccessで、実ログにもPG17.6/18.4各56 pass/0 fail/0 skipがある。後続精査で最新コミットが3か所のcontrol読取りにFOR SHAREを追加したことを確認。最後の文書化以後の未記載変更で、相違の原因の一部を特定した。詳細は08_LEGACY_UNDOCUMENTED_CHANGE.md。**成功CIでBLOCKEDを解除しない。文書だけを根拠に最新CI失敗とも書かない。**
 
 ## 書込み禁止・権限制限による未反映
 
