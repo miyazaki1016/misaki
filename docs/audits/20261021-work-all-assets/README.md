@@ -15,6 +15,15 @@
 
 **最新追補を優先:** legacyのCI/文書の時点差は、BLOCKED記録後の `17449c7` にある3か所の行ロック修正で一部説明できた。安全性全体の解除ではない。
 
+## 9e3f787以降の精査
+
+- [09 全265資産の分類台帳](09_ASSET_CLASSIFICATIONS.md) — 92枝・85文書版・88 PRの確認/保留を追跡。
+- [10 legacy安全性対応表](10_LEGACY_SAFETY_MATRIX.md) — 修正、4反例回帰、CI範囲、未guard/pre-gate残件。
+- [11 回収計画・設計思想の保全](11_RECOVERY_AND_IDEAS.md) — IDEA01〜07と採用前の競合/試験/順序。
+- [12 最新進捗・残件](12_REVIEW_PROGRESS.md) — 最新の確認範囲。初期の07より優先して読む。
+
+分類JSON: [branches](09_BRANCH_CLASSIFICATIONS.json)、[documents](09_DOCUMENT_CLASSIFICATIONS.json)、[PRs](09_PR_CLASSIFICATIONS.json)、[coverage](09_CLASSIFICATION_COVERAGE.json)。文書16版は意味内容・確認範囲を記載、69版は意味精査保留。履歴上のmain収録を現在機能の完成に読み替えない。
+
 [照合データ一式 evidence.zip](evidence.zip) の中に、本文書が参照する `branches.json`、`documents.json`、`all-files.json`、`code-differences.json`、`pull-requests.json`、`pr-discussions.json`、`previews.json`、`checks.json`、`coverage.json`、`legacy-ci-excerpts.json` を保存しています。ZIPを展開して参照してください。固定HEAD、全path/Blob、同名文書の版・所属、merge-base差分とHEAD差分、PR状態・merge SHA、Preview URL/状態/target/SHA、CIの観測を追跡できます。raw/には補助API記録・legacy実CIログを保存しています。
 
 全92枝・全Treeを再取得し、文書85版の本文SHA一致を確認しました。**本文を取得したことは、全版を精読し実装との関係を確定したことを意味しません。** 全意味精査、旧巨大枝の全機能同等性、未保存・拒否作業の復元、Preview実機受入、DB/gateの現在実体は未完了・未確認です。

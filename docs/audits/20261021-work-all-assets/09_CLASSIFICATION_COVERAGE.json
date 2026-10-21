@@ -1,0 +1,33 @@
+{
+  "reference_commit": "9e3f7873a3ad5aca3638a7d7d6b76f6ac0835fe0",
+  "source_main": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "counts": {
+    "branches": 92,
+    "document_versions": 85,
+    "prs": 88
+  },
+  "branches_by_classification": {
+    "mainに同等機能が存在": 2,
+    "判断に必要な証拠が不足": 44,
+    "安全性の問題でBLOCKED": 1,
+    "main反映済み": 34,
+    "未反映で今後の実装候補": 5,
+    "未完成・要修正": 6
+  },
+  "documents_by_classification": {
+    "判断に必要な証拠が不足": 69,
+    "未完成・要修正": 2,
+    "安全性の問題でBLOCKED": 2,
+    "未反映で今後の実装候補": 12
+  },
+  "prs_by_classification": {
+    "未完成・要修正": 6,
+    "未反映で今後の実装候補": 4,
+    "判断に必要な証拠が不足": 4,
+    "main反映済み": 73,
+    "安全性の問題でBLOCKED": 1
+  },
+  "document_semantic_pending": 69,
+  "all_semantic_review_complete": false,
+  "all_assets_have_tracking_rows": true
+}

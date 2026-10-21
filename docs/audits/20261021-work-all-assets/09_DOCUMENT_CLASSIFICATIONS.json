@@ -1,0 +1,2121 @@
+[
+  {
+    "id": "DOC-001",
+    "path": "docs/ALL_BRANCH_DOCUMENT_INVENTORY_20261021.md",
+    "blob": "82ea5d4d8f4f8ae7d803e543cc6684758dfa3657",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "22a22826569fe06aa294b95afaac5e38cdc92642",
+      "date": "2026-10-21T02:50:23Z",
+      "message": "docs: inventory branch document trees 17-24 of 92"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-002",
+    "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+    "blob": "fcfab902743c4918813de44ad2d797bd466eda7a",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/shared-conversation-history-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "9ca4f4d0bef5c2a46142d3feec3d45aa20a380c0",
+      "date": "2026-10-16T00:11:28Z",
+      "message": "docs: cross-link Amahuru/Misaki shared weather integration contract"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-003",
+    "path": "docs/BRANCH_AUDIT_TRACKER_20261021.md",
+    "blob": "a69704982f4676ae7e1ca66712b32e924b8ecb99",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "cfe922f050d2ee36f4d14dccabdb19921afb0d9e",
+      "date": "2026-10-21T02:28:41Z",
+      "message": "docs: sort all 92 branch timestamps newest first"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-004",
+    "path": "docs/CONTEXT_AB_EXPERIMENT.md",
+    "blob": "8dc57e97acfdf931d875cecbb7ac39ad35fa72cb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "ad86a8d565aa502f872b4a867584e2fa576659a4",
+      "date": "2026-10-12T22:09:52Z",
+      "message": "docs: define context A/B quality and release gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-005",
+    "path": "docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md",
+    "blob": "54c033dcf3549ed789175f59d966d34efcf2af0f",
+    "classification": "未完成・要修正",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。layered builderに欠ける生成/状態/プラン境界をIDEA06へ。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/shared-conversation-history-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "45872c0fc4c335723be6579acc22ad64bacb47de",
+      "date": "2026-10-15T23:51:16Z",
+      "message": "docs: audit production-to-layered prompt gaps and multi-character migration gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-006",
+    "path": "docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md",
+    "blob": "3232ab4753618f217efd1e78ed34ac1418dca4f9",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/shared-conversation-history-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "07dce6253d090770f4ee77c690269848ded101c5",
+      "date": "2026-10-15T09:54:33Z",
+      "message": "docs: establish exact prompt extraction parity gates and source order"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-007",
+    "path": "docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md",
+    "blob": "eac5633f006e86792864a672483afeca5b70c8fb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/shared-conversation-history-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "918abffbe341d9264ee161c28d5d2e3b8b1ceb41",
+      "date": "2026-10-15T23:59:21Z",
+      "message": "docs: add explicit JSON schema key checklist for prompt drift gate"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-008",
+    "path": "docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md",
+    "blob": "2c0398dd17ee58c8b01e52b55abea195eee33dc0",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "2d5d2eddb5cabca44f50f3c498f64d7aa98160db",
+      "date": "2026-10-15T08:00:09Z",
+      "message": "docs: audit production chat versus isolated conversation lab and safety gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-009",
+    "path": "docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md",
+    "blob": "49122fdbd4436efbd9283387602c2a514077534e",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "f9f24a2f383855b2b4ec1437f929b5de4920579b",
+      "date": "2026-10-15T08:02:12Z",
+      "message": "docs: freeze production prompt parity contract before any extraction"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-010",
+    "path": "docs/CONVERSATION_LONG_TERM_PROBES_20261019.md",
+    "blob": "040a75d2e0e5b11a2bf2f447af67907533dff7ed",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "817349b518e884012c6c7ee99dd3c56751a597ac",
+      "date": "2026-10-19T02:05:54Z",
+      "message": "docs: outline long-term relationship conversation probes"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-011",
+    "path": "docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md",
+    "blob": "24c0c214054c0ea5e9a3c9c99aa7b5e21ca77133",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "cb9e01cd3bed34f0e2ae8627a50993b8cabc963b",
+      "date": "2026-10-19T02:34:00Z",
+      "message": "docs: link real-model readiness audit from quality gate"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-012",
+    "path": "docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md",
+    "blob": "3b387da4876452a90eda5dca82c791be602de6c5",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "cf2ebe76d060a56422a33e70ba0a4b9019dd1933",
+      "date": "2026-10-19T12:40:44Z",
+      "message": "docs: record branch-pinned, readiness-gated iPhone Gemini test and outstanding GitHub setup"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-013",
+    "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+    "blob": "804407c3dcbb0ca3e6a0d1e765be2d8a9a3cca4a",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "a901723a9573a1f6d7842c67f56d703ae782ca4a",
+      "date": "2026-10-19T04:10:16Z",
+      "message": "docs: give one-shot operator steps without extracting Vercel secrets"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-014",
+    "path": "docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md",
+    "blob": "5ee661407d2da6d1bd50007bb6393d4d213fa86c",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "b471cf2e3f9f18a6a4d0b8657ab373605273d498",
+      "date": "2026-10-15T07:31:46Z",
+      "message": "docs: audit existing acting lab and establish conversation tuning plan"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-015",
+    "path": "docs/DEVELOPMENT_REGISTRY.md",
+    "blob": "ef27ea36622c0a3d40fad7e0b8c2391594184410",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "399f93472de181c5da254748767b6a97f7b2fed6",
+      "date": "2026-10-21T01:23:11Z",
+      "message": "docs: audit conversation lab and Free Premium memory design"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-016",
+    "path": "docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md",
+    "blob": "ce90e641d80b74eb852df5f317cb7837c9cc2ab8",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/relationship-v1-2-stage-growth-principles"
+    ],
+    "latest_path_change": {
+      "sha": "ed8359319181f20cf73aec87ab75c7a1405264f2",
+      "date": "2026-10-04T04:41:44Z",
+      "message": "Add Gemini unit cost telemetry Work handoff"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-017",
+    "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+    "blob": "4e48f72678499ba1de0158e089c9e0a21e327cb7",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-identity-v1",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "5422d450b843bc44137ce3938b419984e765acba",
+      "date": "2026-10-04T05:22:51Z",
+      "message": "Observe Gemini physical-call usage with server-only cost telemetry (#61)\n\n* Observe Gemini physical attempt usage without changing product behavior\n\n* Clarify Gemini telemetry auth identity and future cohort semantics"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-018",
+    "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+    "blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/production-source-of-truth-reconciliation"
+    ],
+    "latest_path_change": {
+      "sha": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+      "date": "2026-10-14T00:30:10Z",
+      "message": "docs: add next Sora handoff for Oct 14"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-019",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "0715dd8a2e80829584525c639c79060eda89369c",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/forget-control-v1"
+    ],
+    "latest_path_change": {
+      "sha": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+      "date": "2026-10-06T21:20:42Z",
+      "message": "Document Forget Control Preview acceptance gate"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-020",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "083dd5663fb7d3dc3961f302d290cc490eb33ac0",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/update-overview-relationship-growth"
+    ],
+    "latest_path_change": {
+      "sha": "1d9db32ea15fbea950ac46090cb6e1a8bc750001",
+      "date": "2026-09-18T03:15:09Z",
+      "message": "Update overview for relationship growth and chat diagnostics"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-021",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "23c3a183fb9092f71d4ae762e2c4f8ea6e8478eb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/conversation-context-compression-spike"
+    ],
+    "latest_path_change": {
+      "sha": "ece799c20d685f00c007cb2f897bdd6b2443a2d3",
+      "date": "2026-10-07T23:23:35Z",
+      "message": "docs: record Acting Guide lover acceptance"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-022",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "29c5f78792cbab0803df52dd50e63ec2bb5900cb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/relationship-five-axis-design-review-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "8a7f467761f9c5b42be4bb375d616eec67d47c7c",
+      "date": "2026-10-14T20:22:04Z",
+      "message": "docs: define incremental relationship interpreter design and acceptance gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-023",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "343aca20f18654273bc54860d95cbcd2ca1cd0d9",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/lp-relationship-story",
+      "sora/update-overview-relationship-v1-production",
+      "work/gemini-unit-cost-telemetry"
+    ],
+    "latest_path_change": {
+      "sha": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2",
+      "date": "2026-10-03T15:36:07Z",
+      "message": "Document Relationship Engine v1.1 behavior and backend contracts"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-024",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "3da8bad0e216589a006cb9862278e012c72f2dc3",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/relationship-time-v2-design"
+    ],
+    "latest_path_change": {
+      "sha": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64",
+      "date": "2026-09-25T10:01:28Z",
+      "message": "Document relationship story consistency and proactive safety gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-025",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "3e5c58a25344e9042c9245b4873158a97237ffb5",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "fix/gemini-chat-timeout",
+      "fix/grow-relationship-from-first-meeting",
+      "perf/chat-stage-timing",
+      "fix/anonymous-chat-session-drop",
+      "cleanup/remove-legacy-proactive-path"
+    ],
+    "latest_path_change": {
+      "sha": "15cb968736c6c4b2442f9363b7c55f5b299ae5cb",
+      "date": "2026-09-18T00:15:46Z",
+      "message": "旧ブラウザ自発メッセージ経路を削除する\n\nSupabase Edge Function Body Clockへ一本化済みのため、旧ブラウザ自発送信、旧proactive API、旧Vercel Body Clock route、旧互換写真selectorを削除し、実装総覧を更新する。"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-026",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "3eb6a94143ebd5c3dadf4a82a230c18f934be1bc",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/canonical-relationship-integration"
+    ],
+    "latest_path_change": {
+      "sha": "0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359",
+      "date": "2026-10-02T13:09:00Z",
+      "message": "docs: record completed production canonical cutover"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-027",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "55984ee1349d457ddccaddd50cdf50e1620c4e6c",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/conversation-lab-offline-v1-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "4efa62b017ca80fe79403a55c172f22a754f2d29",
+      "date": "2026-10-20T11:17:21Z",
+      "message": "docs: hand off October 20 conversation lab progress and unresolved smoke-test blockers"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-028",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "6a2f72ccbf3daf957885f830977f47ec4d973c85",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/lp-pwa-mobile-layout"
+    ],
+    "latest_path_change": {
+      "sha": "3c679a30952287371645cb3186f31aa9a0026e8b",
+      "date": "2026-10-04T06:53:09Z",
+      "message": "docs: record PR 62 landing page completion"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-029",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "711b7674d9fa8547f73137016030c2a10195d859",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "test/relationship-acting-state-comparison",
+      "main",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "experiment/shared-conversation-history-v1-20261015",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "b45d083785bcb456c72c65e00a61af1b7c7a9b34",
+      "date": "2026-10-13T07:19:11Z",
+      "message": "docs: consolidate long-term Misaki product and architecture vision"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-030",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "779bcd2bbedbfb4fbfb512278e3b8706ee91a14d",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "b98733f159760560b8ababa80fcc35dc9f92fa76",
+      "date": "2026-10-12T01:20:18Z",
+      "message": "docs: clarify memory certainty handoff status"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-031",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "79708d00e96fbcbc68b115fa5a2be0c81d75e4c1",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/misaki-acting-lab"
+    ],
+    "latest_path_change": {
+      "sha": "1a8852b9fc42c7a337855156bd43ae1af4a683db",
+      "date": "2026-10-02T23:00:44Z",
+      "message": "docs: checkpoint multi-browser quota sync and Work handoff"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-032",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "936f61c6363da27b384e37b00f08aec6b999cd75",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/audit-overview-against-source"
+    ],
+    "latest_path_change": {
+      "sha": "f6d8baf94d037057ec94deb87b156a713445d37f",
+      "date": "2026-09-17T23:35:49Z",
+      "message": "Audit implementation overview against latest source"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-033",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "98551eeb0693a352aaf2c639babec34c95ff6484",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "fix/expired-temporary-relationship-import",
+      "fix/relationship-analyzer-bounded-retry"
+    ],
+    "latest_path_change": {
+      "sha": "3b06b33582c6651240f59acd5a4108c5cf39b34d",
+      "date": "2026-10-05T15:43:05Z",
+      "message": "docs: add hidden persona progressive self-disclosure plan"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-034",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "9c36f6cee3565d81c46cea4aa9d8c8894f5705ea",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/quality-long-history-workflow"
+    ],
+    "latest_path_change": {
+      "sha": "18e2c0bdfa007c980858f85341eb8c78e0e5301a",
+      "date": "2026-10-07T06:02:14Z",
+      "message": "docs: freeze relationship identity persistence boundary"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-035",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "aa91a9c9c7148a6b4fe8d219075ee711a873eff7",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/production-source-of-truth-reconciliation"
+    ],
+    "latest_path_change": {
+      "sha": "11b0e771d81cb034fbc6595b3ae18de0856aea38",
+      "date": "2026-10-14T00:30:00Z",
+      "message": "docs: add Oct 14 handoff and work inventory"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-036",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "b017757c16aa0435c8d39973da0f7f944247bfb5",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/update-implementation-overview"
+    ],
+    "latest_path_change": {
+      "sha": "621dea871afc4dca517071cc79666d81cb69e29c",
+      "date": "2026-09-17T23:29:33Z",
+      "message": "Update Misaki implementation overview"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-037",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "b48887633360762cb4821e0027893d30a92cde52",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/fix-waiting-reply-layout",
+      "sora/gemini-timeout-retry",
+      "sora/gemini-transient-retry",
+      "sora/history-edge-trace",
+      "sora/history-get-trace",
+      "sora/history-sync-source-proof",
+      "sora/anonymous-history-get-noop",
+      "sora/cutover-cleanup",
+      "sora/profile-aware-life-events",
+      "sora/remove-false-busy-wait",
+      "sora/remove-timestamp-history-poll",
+      "sora/sync-free-usage-with-history",
+      "codex/server-canonical-foundation"
+    ],
+    "latest_path_change": {
+      "sha": "db5b6e17c77f94f54bb4764da3fcf01b764d313e",
+      "date": "2026-10-02T08:07:11Z",
+      "message": "Document production DB and Body Clock cutover audit"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-038",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "b6a73e406cc067e4a91f1de5e882dbc626b882bb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/relationship-identity-v1"
+    ],
+    "latest_path_change": {
+      "sha": "6266cf8c367da4e822d33c92fae89a0588718962",
+      "date": "2026-10-11T08:48:01Z",
+      "message": "docs: distinguish preview deployment from acceptance"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-039",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "c3c24b7429d89331f31d2abcbdf6f1a69710432c",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "170f4d76d39c3521ff62a1bf032c066007a632d3",
+      "date": "2026-10-15T14:42:17Z",
+      "message": "docs: establish multi-character persona and state isolation as shared engine design gate"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-040",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "f551c2e456743fd9681c9c3db40b349699a5ea0b",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/relationship-v1-2-stage-growth-principles"
+    ],
+    "latest_path_change": {
+      "sha": "bc35eb6231ee93b9843f0bfbf967fde71fc97561",
+      "date": "2026-10-04T04:39:37Z",
+      "message": "Define Gemini unit cost telemetry contract"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-041",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "f80f3fe0f505a07e8f2874381f2d9b6b16fc91f3",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-polarity-integer",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "work/relationship-analyzer-diagnostics"
+    ],
+    "latest_path_change": {
+      "sha": "112b158a947b71d693c28c50597f63278b11b84d",
+      "date": "2026-10-03T08:25:32Z",
+      "message": "Close Relationship Engine v1 DB work area and hand off to Work"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-042",
+    "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+    "blob": "fc76ff0d9ecb076de4d01a005236f524c92c84d8",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "codex/legacy-maintenance-drain"
+    ],
+    "latest_path_change": {
+      "sha": "aa8a1cc4dedc0574f225faa0994efeaea0937cff",
+      "date": "2026-09-19T16:19:36Z",
+      "message": "test: retain Gate 1 barrier lifetime counterexamples and PG17 coverage"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-043",
+    "path": "docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md",
+    "blob": "ca2b53562d061f8fa01cf803b940173b783da8bb",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "51e4eb157068bd26b05571f8222fc1e5003fbf96",
+      "date": "2026-10-14T20:25:53Z",
+      "message": "docs: compare baseline and gradual interpreter and record regression risks"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-044",
+    "path": "docs/LEGACY_MAINTENANCE_DRAIN.md",
+    "blob": "f64a79e0fe4760641edcac636f1a4e06d3c4d261",
+    "classification": "安全性の問題でBLOCKED",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "反例/停止境界を精査。後続row-lock修正の時点差は08/10で補完。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "codex/legacy-maintenance-drain"
+    ],
+    "latest_path_change": {
+      "sha": "aa8a1cc4dedc0574f225faa0994efeaea0937cff",
+      "date": "2026-09-19T16:19:36Z",
+      "message": "test: retain Gate 1 barrier lifetime counterexamples and PG17 coverage"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-045",
+    "path": "docs/MISAKI_CHAT_HANDOFF_20261021.md",
+    "blob": "5d3b44267c489de0b225020b37b50959f2cfe75e",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "前回監査開始時に読了。監査枝への文書収録でありmain機能の完成判定ではない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "b7ef7eb44bcf9d33bf4b091bf17ae8b409062a11",
+      "date": "2026-10-21T02:34:55Z",
+      "message": "docs: require Misaki system vision in new-chat handoff"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-046",
+    "path": "docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md",
+    "blob": "be34a96cd15fb1a819f6415c9895726afe8a1cfe",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "ef5bd23246a75b02a0df60302263f971de061843",
+      "date": "2026-10-19T01:46:09Z",
+      "message": "docs: record agreed Free/Premium proactive memory and shared-memories product baseline"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-047",
+    "path": "docs/MISAKI_SYSTEM_VISION_20261021.md",
+    "blob": "572f96e6a291133b4ca246825b262d0ebfbf9c93",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文再読。今回の設計基準。構想の所在と実装完成を分離。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "48fc3af46d3624f73a8169cab4975f8ef4d1d2c7",
+      "date": "2026-10-21T02:34:40Z",
+      "message": "docs: capture Misaki system vision and design principles"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-048",
+    "path": "docs/MULTI_CHARACTER_DATA_SCOPE_INVENTORY.md",
+    "blob": "949bd01677f83cd3bc88194697f30bb8dbc2a9fd",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit"
+    ],
+    "latest_path_change": {
+      "sha": "ad51dfe248fdf9a6903f4ff193f437bf04b2d80c",
+      "date": "2026-10-13T07:40:56Z",
+      "message": "docs: add multi-character data scope inventory"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-049",
+    "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+    "blob": "0baf4f28d863f6e075f745afd5c903145887274f",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "different-version",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/production-source-of-truth-reconciliation"
+    ],
+    "latest_path_change": {
+      "sha": "a0c7e3d05fb386c1f4178e9db5fc2128dd9483bc",
+      "date": "2026-10-13T09:28:09Z",
+      "message": "docs: record live Relationship Engine v2 RPC catalog"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-050",
+    "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+    "blob": "4de727956e52cc8eeccd772631671af69a13536f",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "test/relationship-acting-state-comparison",
+      "main",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/relationship-five-axis-design-review-20261015",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "1fb508c224cb85a492973078ea2f27c5dc5042e6",
+      "date": "2026-10-13T07:32:51Z",
+      "message": "docs: audit relationship RPC and proactive delivery boundaries"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-051",
+    "path": "docs/MULTI_CHARACTER_RPC_CALLER_AUDIT.md",
+    "blob": "143f329c7ef4e5d17fee63c06978c658f2f70c80",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/multi-character-rpc-caller-audit"
+    ],
+    "latest_path_change": {
+      "sha": "83476dd2d347687c253a471557d9c27b82e1caf7",
+      "date": "2026-10-13T08:53:36Z",
+      "message": "docs: refine migration ledger name and version comparison"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-052",
+    "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+    "blob": "97fc43d139a2ce4b55b74d0613dffb8375a0e9af",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/production-source-of-truth-reconciliation"
+    ],
+    "latest_path_change": {
+      "sha": "9e2b951defacad24a2cdb5aa3770b7022a908cee",
+      "date": "2026-10-14T00:30:05Z",
+      "message": "docs: correct migration version mismatch count"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-053",
+    "path": "docs/RELATIONSHIP_ACTING_DTO_CANONICAL_CONTRACT_20261015.md",
+    "blob": "73807f2cc4c73663212fa5382e32ad7ccf00c706",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。verified root/5軸/status/pendingと配送race保護をIDEA04へ。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "73189d53dff0bc4a26025a2b39c7beb03e94ded2",
+      "date": "2026-10-14T22:49:56Z",
+      "message": "docs: define canonical relationship acting DTO for permanent and anonymous Body Clock"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-054",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_PARITY_AUDIT_20261015.md",
+    "blob": "465f21fa358d21c6050212ecf622fa23b8e8fa41",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "5e2f30c0070754e890c24a2c8734cea97e7068b9",
+      "date": "2026-10-14T22:46:32Z",
+      "message": "docs: verify Body Clock relationship acting prompt gap against main"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-055",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_WIRING_PLAN_20261015.md",
+    "blob": "c91e7e695fa69c2094412810ba881800f6bcd43a",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "730208b04a95bf59dc47771fbabcf309b4eb824f",
+      "date": "2026-10-15T03:32:23Z",
+      "message": "docs: map Body Clock acting wiring and identify romantic tag consistency risk"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-056",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_CANONICAL_READ_CONTRACT_20261015.md",
+    "blob": "e27d88203966faf0d0a102c43a208db5ef784541",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。恒久select不足と匿名verified rootの優先を区別。新table不要の可能性と実配線未完了を保持。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "013f7609cab089ca933cf6c5c4c599cfdb571ccf",
+      "date": "2026-10-14T22:48:14Z",
+      "message": "docs: map permanent and anonymous canonical inputs for Body Clock acting parity"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-057",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_DTO_PREWIRING_REVIEW_20261015.md",
+    "blob": "91f0026a618d5bd9a0b4d07357baa45dfb2318f9",
+    "classification": "未完成・要修正",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査とDTO契約test本文照合。test内のローカル関数でありruntime export・Edge配線ではない。欠損statusをnone断定しない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "552267b9413cd26aa063a1870f9db2e0ee26f401",
+      "date": "2026-10-15T05:58:24Z",
+      "message": "docs: review Body Clock acting DTO pre-wiring consistency and concurrency risks"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-058",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_EXISTING_VERSION_AUDIT_20261015.md",
+    "blob": "3a8ea222b258a04f949b10e74f6da3f5db680a1e",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。既存relationship_state_versionを再利用する設計。新列が必要との古い推測を確定仕様にしない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "98aa340084943ee33fa51dc35a431c9338f6a2e6",
+      "date": "2026-10-15T06:19:42Z",
+      "message": "docs: identify existing relationship state version and atomic delivery guard design"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-059",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_IMPORT_VERSION_AUDIT_20261015.md",
+    "blob": "19110ec8cfa85091296f49b7d35385c384a7ecb2",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。主要3writeのversion増分を記録。全writer/配送確定の原子的保護は別。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "dc8071e59a905ef6fae439ac33d8d7f06f4602ed",
+      "date": "2026-10-15T06:22:20Z",
+      "message": "docs: verify temporary import increments relationship version for Body Clock race design"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-060",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_PROMPT_PRECEDENCE_20261015.md",
+    "blob": "76adad02da0903d20bd88a7ea4da74c261e74c7d",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。事実境界→Action→5軸/Stage→Emotion/Tag。独立試験とEdge配線を区別。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "b31c74c9b721000adfa0eb2cc6338d9f5544523d",
+      "date": "2026-10-15T04:56:34Z",
+      "message": "docs: define relationship status and emotion-tag prompt precedence after green tests"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-061",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md",
+    "blob": "bdc5a9b9ace3866149a0a536d1f64577dcc621bc",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "4e76a8e70f21acb69e30a81791d1a6ae8831cbc1",
+      "date": "2026-10-15T06:11:36Z",
+      "message": "docs: audit Body Clock relationship state race and atomic delivery guards"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-062",
+    "path": "docs/RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md",
+    "blob": "4e9d2d2286073b20df480f021f1b85de932f8dbc",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "3f8278a4bf7627013fc2b2fc2bb05ca13d4189a7",
+      "date": "2026-10-15T06:15:30Z",
+      "message": "docs: record RPC migration verification gap without assuming relationship concurrency guard"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-063",
+    "path": "docs/RELATIONSHIP_ENGINE_V1.md",
+    "blob": "f9f763eca7713424a3d15b15fe547a16e44cb5e5",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/update-overview-relationship-v1-production",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "1937c316e9d3d4edcc11f1e447ee582ffc45357a",
+      "date": "2026-10-03T08:05:12Z",
+      "message": "Add Relationship Engine v1 design freeze"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-064",
+    "path": "docs/RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md",
+    "blob": "fd723767780d0e293c6dd71c1ac9ea929e856aa1",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。Stageと恋愛事実の分離、established履歴、floor1、5-heartをIDEA02へ。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "docs/relationship-v1-2-stage-growth-principles"
+    ],
+    "latest_path_change": {
+      "sha": "dcbabc6636dc0575e9bb1c56fc55c4a780cb82f3",
+      "date": "2026-10-04T04:13:40Z",
+      "message": "Add Relationship Engine v1.2 Work handoff"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-065",
+    "path": "docs/RELATIONSHIP_ENGINE_V1_APPLICATION.md",
+    "blob": "917837f70a6fe241ae8c3dc2a2268725d71a15c2",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/update-overview-relationship-v1-production",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a",
+      "date": "2026-10-03T10:13:57Z",
+      "message": "Verify legacy Relationship mutation revocations against hardened DB contract"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-066",
+    "path": "docs/RELATIONSHIP_ENGINE_V1_DB_PROCESSING_DESIGN.md",
+    "blob": "44aa021ec97d691e590354d7934851ad0de49e2a",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/update-overview-relationship-v1-production",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "50585d71760b7ded6a75012f3f39e19bda1032c7",
+      "date": "2026-10-03T08:12:24Z",
+      "message": "Add Relationship Engine v1 DB processing design"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-067",
+    "path": "docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md",
+    "blob": "d54729fc1ba0c7462f74bf4baebc33124ea38641",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/update-overview-relationship-v1-production",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "32a9dfc4dd7afc0890f4997fe50a21eaf68fafad",
+      "date": "2026-10-03T08:25:21Z",
+      "message": "Add Relationship Engine v1 Work implementation handoff"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-068",
+    "path": "docs/RELATIONSHIP_FIVE_AXIS_GROWTH_PACE_20261015.md",
+    "blob": "e24294eea86a52c1b95796fa75c4fef0dd68aa73",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。日数表の限定とMomentum調査をIDEA03へ。絶対的最短日数としない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "569f2259971674d7fffcb954700635b51c7868f6",
+      "date": "2026-10-14T22:40:22Z",
+      "message": "docs: quantify conditional five-axis growth pace against actual pattern rules"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-069",
+    "path": "docs/RELATIONSHIP_MOMENTUM_SOURCE_AUDIT_20261015.md",
+    "blob": "9c66e4d76943e1678ce55e71adc3f38b91b7fb9e",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。episodes/patterns/critical events取得とact guide単体入力の違いを確認。main全体でMomentum相当の不存在とは断定しない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "ebf1715abbbe22c65559636559ac44cbe88e8803",
+      "date": "2026-10-14T22:42:45Z",
+      "message": "docs: audit canonical inputs and missing contracts for momentum derivation"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-070",
+    "path": "docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md",
+    "blob": "bc11962d6fd31751f5c8f101a57a331d9844cc4d",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "e44ae6456b6cf01be7a898c11a742d843bd4c1af",
+      "date": "2026-10-14T22:44:44Z",
+      "message": "docs: verify chat prompt relationship wiring and identify remaining proactive audit"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-071",
+    "path": "docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md",
+    "blob": "0e6fd6be79d882b29055f3faabb3801b3009e7d6",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "experiment/interpreter-gradual-acting-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "140b1b417bfc65bfa87cc35832fa27234f80486d",
+      "date": "2026-10-15T06:25:58Z",
+      "message": "docs: audit legacy relationship writers and distinguish five-axis version scope"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-072",
+    "path": "docs/SERVER_CANONICAL_STATE.md",
+    "blob": "d786df430526a4fe12abab61d0053c0af2f9f6fe",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "sora/fix-waiting-reply-layout",
+      "sora/gemini-timeout-retry",
+      "sora/gemini-transient-retry",
+      "sora/history-edge-trace",
+      "sora/history-get-trace",
+      "sora/history-sync-source-proof",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/expired-temporary-relationship-import",
+      "main",
+      "sora/anonymous-history-get-noop",
+      "sora/canonical-relationship-integration",
+      "sora/cutover-cleanup",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/misaki-acting-lab",
+      "sora/profile-aware-life-events",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/remove-false-busy-wait",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/remove-timestamp-history-poll",
+      "sora/sync-free-usage-with-history",
+      "sora/update-overview-relationship-v1-production",
+      "fix/relationship-analyzer-bounded-retry",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "codex/server-canonical-foundation",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "fd4b6e78e0a79dc05ebed46f82baf205f53cca23",
+      "date": "2026-09-18T12:14:58Z",
+      "message": "Add maintenance gate and manual cutover recovery equipment"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-073",
+    "path": "docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+    "blob": "7aed7ef22ef3025fa18e8b00561ebc2d77498bf1",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "全文精査。pure engine/immutable snapshot/physical attempts/import graphの設計をIDEA05へ。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "design/shared-conversation-engine-contract-20261015"
+    ],
+    "latest_path_change": {
+      "sha": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+      "date": "2026-10-15T08:13:52Z",
+      "message": "design: define shared conversation engine contract and parity rollout gates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-074",
+    "path": "docs/WRITE_SURFACE_INVENTORY.md",
+    "blob": "a33806992107b31ddcacfd7c570a59f1b453d5e7",
+    "classification": "安全性の問題でBLOCKED",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "本文精査。旧table/RPC/auth-trigger反例とpre-gate要件を保全。最新3行修正は全surfaceを保護しない。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "codex/legacy-maintenance-drain"
+    ],
+    "latest_path_change": {
+      "sha": "1867caed8dcd67f4d1f8bac275acd4f1834aef0c",
+      "date": "2026-09-19T15:49:58Z",
+      "message": "test: expose stale snapshot admission after freeze"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-075",
+    "path": "docs/context-ab-blind-review.md",
+    "blob": "66e283a33430cb7bc07dfd035122f60ba7482fd2",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "f1f48bd463643850561369ae31c6a95c4946a940",
+      "date": "2026-10-12T23:42:12Z",
+      "message": "Link blinded review scoring template"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-076",
+    "path": "docs/context-ab-execution-gate.md",
+    "blob": "bb9da685cd80ca66db8e0771121304eda7d84949",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "84ceaf6cf42311b9d3db3d7fa0eeb6c79e9bd73b",
+      "date": "2026-10-12T23:41:22Z",
+      "message": "Link blinded quality review protocol from execution gate"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-077",
+    "path": "docs/context-ab-real-history-quality-review.md",
+    "blob": "effb8c7139303de6c92523439612b56b67aed160",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "d42d82515c04d2711d12afaa8bf9d4a14d2c1761",
+      "date": "2026-10-09T02:09:57Z",
+      "message": "docs: capture four weekly Misaki research findings as unimplemented design candidates"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-078",
+    "path": "docs/context-ab-validation-protocol.md",
+    "blob": "fc5f3fdd4a68f244015b666f826093ea30522d11",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "1c38296e8f8c5387333edb8e09934cf8877645bd",
+      "date": "2026-10-08T01:46:09Z",
+      "message": "docs: define controlled non-committing A/B benchmark and measured baseline"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-079",
+    "path": "docs/conversation-context-compression-spike.md",
+    "blob": "b5a6296987c955879d540226f14c60d2ae8df9b2",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike"
+    ],
+    "latest_path_change": {
+      "sha": "49fc3567f2171320236c1af739bf9367adc06852",
+      "date": "2026-10-08T01:12:49Z",
+      "message": "docs: establish measurement-first conversation context compression experiment"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-080",
+    "path": "docs/memory-certainty-design.md",
+    "blob": "bdb68e25bd6791208dd9a762e682c39fb1bb8b6a",
+    "classification": "未反映で今後の実装候補",
+    "asset_nature": "document-version",
+    "review_state": "reviewed-scope-noted",
+    "reason": "中心仕様と後続監査を精査。未確定/訂正/完了/人物/期間とForget分離をIDEA01へ。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "94a117e072e765041217daaa1519640b8cd53c69",
+      "date": "2026-10-10T23:34:59Z",
+      "message": "docs: trace checkpoint and proactive memory paths"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-081",
+    "path": "docs/misaki-blind-quality-evaluation-fixtures.md",
+    "blob": "9ac57367ca4c4bf9c6a50f90658e8799ec0c23d7",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "b833c8d5741362f1de3aa88613026f40ae5bd48e",
+      "date": "2026-10-13T04:50:37Z",
+      "message": "Document local synthetic quality regression runner"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-082",
+    "path": "docs/misaki-synthetic-live-evaluation-runbook.md",
+    "blob": "395b5a68e712404520d6ce03b8e5052f8c330207",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "fe81aa5f541f7b2d4ff7516d326fc07c811872fe",
+      "date": "2026-10-13T05:01:19Z",
+      "message": "Document isolated synthetic quality evaluation runbook"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-083",
+    "path": "docs/misaki-synthetic-reference-replies-and-self-scores.md",
+    "blob": "fb14a7a5422fb4b15a6478fa1cfad3625bd76d3f",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/context-no-duplicate-replies-ab"
+    ],
+    "latest_path_change": {
+      "sha": "d59a1ec8ba0c9cb4ea45bbad7479f6c5a0dd930a",
+      "date": "2026-10-13T04:54:12Z",
+      "message": "Add initial self-scored synthetic reference replies"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-084",
+    "path": "supabase/BODY_CLOCK.md",
+    "blob": "085e5eb74c62641e972ee4c4c547bf60e9fd62fc",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "same-blob",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "sora/drop-ungrounded-relationship-evidence",
+      "sora/fix-relationship-polarity-transport",
+      "sora/fix-waiting-reply-layout",
+      "sora/gemini-timeout-retry",
+      "sora/gemini-transient-retry",
+      "sora/history-edge-trace",
+      "sora/history-get-trace",
+      "sora/history-sync-source-proof",
+      "test/relationship-acting-state-comparison",
+      "work/ab-20-pair-dispatch",
+      "work/ab-blind-review-artifact-workflow",
+      "work/ab-http-diagnostics-dispatch",
+      "work/ab-long-fixture-dispatch",
+      "work/ab-manual-workflow-only",
+      "work/ab-paced-dispatch",
+      "work/ab-quality-diagnostics-workflow",
+      "work/relationship-engine-v1",
+      "work/relationship-error-diagnostics",
+      "work/relationship-identity-v1",
+      "work/relationship-polarity-integer",
+      "fix/chat-network-reliability",
+      "fix/chat-reliability-cleanup",
+      "fix/chat-request-diagnostics",
+      "fix/chat-turn-dedupe",
+      "fix/expired-temporary-relationship-import",
+      "fix/gemini-chat-timeout",
+      "fix/gemini-json-retry",
+      "fix/grow-relationship-from-first-meeting",
+      "fix/workday-grounding",
+      "main",
+      "perf/chat-stage-timing",
+      "refine/proactive-action-tags",
+      "refine/sleepy-tag",
+      "sora/anonymous-history-get-noop",
+      "sora/canonical-relationship-integration",
+      "sora/cutover-cleanup",
+      "sora/lp-pwa-mobile-layout",
+      "sora/lp-relationship-story",
+      "sora/misaki-acting-lab",
+      "sora/profile-aware-life-events",
+      "sora/relationship-analyzer-stage-diagnostics",
+      "sora/relationship-analyzer-structured-output-hotfix",
+      "sora/relationship-control-rpcs-v1",
+      "sora/relationship-evidence-validation-diagnostics",
+      "sora/relationship-processing-error-diagnostics",
+      "sora/relationship-time-v2-design",
+      "sora/remove-false-busy-wait",
+      "sora/remove-relationship-stage-diagnostics",
+      "sora/remove-relationship-temporary-diagnostics",
+      "sora/remove-timestamp-history-poll",
+      "sora/sync-free-usage-with-history",
+      "sora/update-overview-relationship-v1-production",
+      "fix/legacy-safari-cache",
+      "fix/preserve-active-chat-history",
+      "fix/recall-history-grounding",
+      "fix/recall-keep-recent-history",
+      "fix/relationship-analyzer-bounded-retry",
+      "fix/safari-load-failed-message",
+      "fix/safari-load-failed-ui",
+      "fix/use-chat-proxy",
+      "docs/multi-character-data-scope-inventory",
+      "docs/multi-character-rpc-caller-audit",
+      "docs/production-source-of-truth-reconciliation",
+      "docs/relationship-five-axis-design-review-20261015",
+      "docs/relationship-v1-2-stage-growth-principles",
+      "docs/update-implementation-overview",
+      "docs/update-overview-relationship-growth",
+      "experiment/conversation-lab-offline-v1-20261015",
+      "experiment/interpreter-gradual-acting-20261015",
+      "experiment/shared-conversation-history-v1-20261015",
+      "feature/proactive-derived-tags",
+      "fix/anonymous-chat-session-drop",
+      "fix/anonymous-email-history",
+      "fix/anonymous-session-cache-reset",
+      "fix/body-clock-claim-rpc",
+      "fix/chat-failure-recovery",
+      "work/ab-quality-manual-workflow",
+      "work/ab-quality-reply-schema-dispatch",
+      "work/context-no-duplicate-replies-ab",
+      "work/conversation-context-compression-spike",
+      "work/forget-control-v1",
+      "work/gemini-unit-cost-telemetry",
+      "work/quality-long-history-workflow",
+      "work/relationship-analyzer-diagnostics",
+      "chore/restore-relationship-rpc-migration",
+      "cleanup/legacy-proactive-tags",
+      "cleanup/remove-legacy-proactive-path",
+      "codex/legacy-maintenance-drain",
+      "codex/server-canonical-foundation",
+      "design/shared-conversation-engine-contract-20261015",
+      "docs/audit-overview-against-source",
+      "docs/development-registry-audit-20261020"
+    ],
+    "latest_path_change": {
+      "sha": "778f06088ffbc33d11618462c2c91487f052c18e",
+      "date": "2026-09-16T01:33:03Z",
+      "message": "Stop client proactive timer after successful server delivery test"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  },
+  {
+    "id": "DOC-085",
+    "path": "tests/reports/forget-batch-evaluation.md",
+    "blob": "fa3b7bcb6ea654f1777adff83c6481ca48af4fc9",
+    "classification": "判断に必要な証拠が不足",
+    "asset_nature": "document-version",
+    "review_state": "pending-semantic-review",
+    "reason": "本文取得/SHA/版/所属は確認。全内容の意味精査・現在の実装との対応は保留。",
+    "main_placement": "no-same-path",
+    "main_placement_is_feature_completion": false,
+    "branches": [
+      "work/forget-control-v1"
+    ],
+    "latest_path_change": {
+      "sha": "fb5768089494c62b35d11442d309bf3fe6df57fd",
+      "date": "2026-10-06T21:04:07Z",
+      "message": "Add verification-only Forget batch comparison and measurement harness"
+    },
+    "next_review": "既読範囲を再取得扱いに戻さず、本文段落/コード/PRの未確認対応を追加する。"
+  }
+]
