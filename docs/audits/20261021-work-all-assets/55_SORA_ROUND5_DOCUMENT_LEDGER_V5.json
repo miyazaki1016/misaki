@@ -1,0 +1,48 @@
+{
+  "schema": "misaki-round5-sora-document-overlay-v5",
+  "date": "2026-10-21",
+  "base_document_ledger": "53_SORA_ROUND5_DOCUMENT_LEDGER_V4.json",
+  "evidence": "54_SORA_HANDOFF_MEMORY_CERTAINTY_QUALITY_DOCS.md",
+  "rule": "Only original document ID+blob count as version reviewed, not generated audit docs.",
+  "new_reviewed": [
+    {
+      "id": "DOC-018",
+      "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+      "blob": "7e694b6a2fcc4b97c60612974109ae53abdd6511",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-077",
+      "path": "docs/context-ab-real-history-quality-review.md",
+      "blob": "effb8c7139303de6c92523439612b56b67aed160",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-081",
+      "path": "docs/misaki-blind-quality-evaluation-fixtures.md",
+      "blob": "9ac57367ca4c4bf9c6a50f90658e8799ec0c23d7",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    }
+  ],
+  "progress": {
+    "previous_documents_total": 51,
+    "new_reviewed_count": 3,
+    "documents_total": 54,
+    "documents_denominator": 85,
+    "documents_pending": 31,
+    "branches_insufficient": 30,
+    "branch_resolutions_new": 0,
+    "ideas_total": 13,
+    "legacy_blocked": true
+  },
+  "executed_tests": false,
+  "paid_model_called": false,
+  "production_access": false,
+  "audit_complete": false
+}
