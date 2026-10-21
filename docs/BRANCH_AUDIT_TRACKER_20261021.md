@@ -26,14 +26,14 @@
 | `docs/update-implementation-overview` | 記載あり | 2026-09-17 23:29 UTC | 要照合 | 要完了判定 |
 | `docs/update-overview-relationship-growth` | 記載あり | 2026-09-18 03:15 UTC | 要照合 | 要完了判定 |
 | `experiment/conversation-lab-offline-v1-20261015` | 記載あり | 2026-10-20 11:36 UTC | 要照合 | 要完了判定 |
-| `experiment/interpreter-gradual-acting-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `experiment/shared-conversation-history-v1-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `feature/proactive-derived-tags` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/anonymous-chat-session-drop` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/anonymous-email-history` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/anonymous-session-cache-reset` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/body-clock-claim-rpc` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/chat-failure-recovery` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `experiment/interpreter-gradual-acting-20261015` | 記載あり | 2026-10-19 01:46 UTC | 要照合 | 要完了判定 |
+| `experiment/shared-conversation-history-v1-20261015` | 記載あり | 2026-10-16 21:02 UTC | 要照合 | 要完了判定 |
+| `feature/proactive-derived-tags` | 記載あり | 2026-09-17 13:47 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-chat-session-drop` | 記載あり | 2026-09-18 00:49 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-email-history` | 記載あり | 2026-09-17 05:22 UTC | 要照合 | 要完了判定 |
+| `fix/anonymous-session-cache-reset` | 記載あり | 2026-09-17 07:44 UTC | 要照合 | 要完了判定 |
+| `fix/body-clock-claim-rpc` | 記載あり | 2026-09-17 14:35 UTC | 要照合 | 要完了判定 |
+| `fix/chat-failure-recovery` | 記載あり | 2026-09-17 23:09 UTC | 要照合 | 要完了判定 |
 | `fix/chat-network-reliability` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `fix/chat-reliability-cleanup` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `fix/chat-request-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,6 +111,8 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り76枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り68枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
 
 2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
+
+2026-10-21: 8枝の最終コミット日時を追加。累計24/92、未取得68。`experiment/interpreter-gradual-acting-20261015` は10/19、`experiment/shared-conversation-history-v1-20261015` は10/16に更新。`fix/*`の日時は9/17〜18に集中するが、古さだけでmain反映済みとは判定しない。UTC表記。
