@@ -66,14 +66,14 @@
 | `sora/history-edge-trace` | 記載あり | 2026-10-02 09:28 UTC | 要照合 | 要完了判定 |
 | `sora/history-get-trace` | 記載あり | 2026-10-02 09:24 UTC | 要照合 | 要完了判定 |
 | `sora/history-sync-source-proof` | 記載あり | 2026-10-02 09:18 UTC | 要照合 | 要完了判定 |
-| `sora/lp-pwa-mobile-layout` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/lp-relationship-story` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/misaki-acting-lab` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/profile-aware-life-events` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/relationship-analyzer-stage-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/relationship-analyzer-structured-output-hotfix` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/relationship-control-rpcs-v1` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `sora/relationship-evidence-validation-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `sora/lp-pwa-mobile-layout` | 記載あり | 2026-10-04 06:57 UTC | 要照合 | 要完了判定 |
+| `sora/lp-relationship-story` | 記載あり | 2026-10-04 06:36 UTC | 要照合 | 要完了判定 |
+| `sora/misaki-acting-lab` | 記載あり | 2026-10-03 06:18 UTC | 要照合 | 要完了判定 |
+| `sora/profile-aware-life-events` | 記載あり | 2026-10-02 08:59 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-analyzer-stage-diagnostics` | 記載あり | 2026-10-03 13:17 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-analyzer-structured-output-hotfix` | 記載あり | 2026-10-03 10:55 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-control-rpcs-v1` | 記載あり | 2026-10-03 10:07 UTC | 要照合 | 要完了判定 |
+| `sora/relationship-evidence-validation-diagnostics` | 記載あり | 2026-10-03 13:58 UTC | 要照合 | 要完了判定 |
 | `sora/relationship-processing-error-diagnostics` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `sora/relationship-time-v2-design` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `sora/remove-false-busy-wait` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,7 +111,7 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り36枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り28枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
 
 2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
 
@@ -124,3 +124,5 @@
 2026-10-21: 8枝のcommitter.dateを取得。累計48/92、未取得44。`main`は10/14 11:57 UTC時点のHEAD日時であり本表を更新するたび最新確認が必要。canonical relationship、anonymous history、cutover関連は10/02、proactive action/sleepy tagsは9/17。`main`の日時は本番デプロイ日時ではない。UTC表記。
 
 2026-10-21: 8枝のcommitter.dateを取得。累計56/92、未取得36。Gemini timeout/transient retryとhistory edge/get/sync source proofは10/02、relationship polarity/ungrounded evidenceは10/03最終更新。Gemini費用評価時はリトライ回数と履歴整合の回帰を別途調べる。UTC表記。
+
+2026-10-21: 8枝のcommitter.dateを取得。累計64/92、未取得28。PWA/mobile layout・LP関係性ストーリーは10/04、acting lab・relationship analyzer diagnostics/RPCは10/03、profile-aware life eventsは10/02最終更新。main反映・本番反映・実品質の判断は別途証拠が必要。UTC表記。
