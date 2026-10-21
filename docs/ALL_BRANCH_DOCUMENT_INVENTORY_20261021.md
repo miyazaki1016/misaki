@@ -4,9 +4,9 @@
 
 ## 実測状況
 - GitHub branches API: 92枝取得（per_page=100）。
-- Trees APIによる個別検証：**16/92枝**。いずれも `truncated=false`。
+- Trees APIによる個別検証：**24/92枝**。いずれも `truncated=false`。
 - 監査基準HEAD: `b7ef7eb44bcf9d33bf4b091bf17ae8b409062a11`（調査開始時）。
-- 残り76枝：未列挙。文書本文の精査・mainとの差分照合は未完了。
+- 残り68枝：未列挙。文書本文の精査・mainとの差分照合は未完了。
 
 | ブランチ | 文書数 | 特記 |
 |---|---:|---|
@@ -43,3 +43,21 @@ GitHub Trees APIで次の8枝を列挙。いずれも `truncated=false`。**累�
 | experiment/conversation-lab-offline-v1-20261015 | 15 | CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md、CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md、CONVERSATION_LONG_TERM_PROBES_20261019.md、CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md、CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md、CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md |
 
 この段階で判明したのは**監査ブランチHEADに存在しない文書パス**であり、台帳本文への転記済みか、内容が同等か、mainに統合済みかは未判定。特にPR #86関連の実験文書6件は全文精査対象。既存文書を勝手に上書きしない。
+
+## 追加調査：17〜24枝（2026-10-21）
+Trees APIで8枝を確認。全件 `truncated=false`。**累計24/92枝**、残り68枝。
+
+| ブランチ | 文書数 | 特記事項 |
+|---|---:|---|
+| experiment/interpreter-gradual-acting-20261015 | 26 | Relationship / Body Clock / Actingのrace・RPC・prompt・version監査群、Free/Premium記憶基準、長期会話調整計画など固有文書多数 |
+| experiment/shared-conversation-history-v1-20261015 | 13 | CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT、PROMPT_EXTRACTION_GATE、PROMPT_INSTRUCTION_INVENTORYなど |
+| feature/proactive-derived-tags | 1 | BODY_CLOCK.mdのみ |
+| fix/anonymous-chat-session-drop | 2 | overview旧版とBODY_CLOCK.md |
+| fix/anonymous-email-history | 1 | BODY_CLOCK.mdのみ |
+| fix/anonymous-session-cache-reset | 1 | BODY_CLOCK.mdのみ |
+| fix/body-clock-claim-rpc | 1 | BODY_CLOCK.mdのみ |
+| fix/chat-failure-recovery | 1 | BODY_CLOCK.mdのみ |
+
+**注意：** `experiment/shared-conversation-history-v1-20261015` 内に `AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md` が存在する。これはMisakiリポジトリ内の文書として存在確認のみ行った。別プロジェクト「アメふる」の調査・変更はしない。
+
+新たな精査対象：`RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md`、`RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md`、`RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md`、`MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md`。安全性とデータ境界に関わる可能性があるため、main統合の判断前に全文と実コードの照合が必要。
