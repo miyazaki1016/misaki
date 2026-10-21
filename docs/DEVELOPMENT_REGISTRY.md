@@ -729,3 +729,12 @@ mainのmigration tree（全35件）を列挙。claim RPCの既知の同名再定
 この最終SQLは `neutral`/`lonely` から、無交流3日以上で `primary='lonely'` を作る分岐を含む。`tests/body-clock-silence-contract.test.cjs` はそれより古い `20260917031500_phase5_relationship_aware_proactive_claim.sql` のみを検査するため、**mainの静的な安全契約テストとmigration最終定義の検証対象がずれていることは確定**。なお実DBの効果はSQLのCTE評価/条件/対象行を含め隔離DBで実行検証が必要であり、現時点でproductionの誤作動を断定しない。
 
 次の安全な検証：最新SQLのneutral→lonely分岐を対象にテストを追加する設計（古いテストは履歴として維持）、SQLの `evolved` 更新CTEが実行される条件と後続claimの送信判定を隔離DBで検証、DB適用履歴/関係v2ポリシーとの整合を確認。PR31の移植やproduction変更は先送り。分類：**コード上の整合性不一致は確認済み／本番への影響は未確認**。
+
+
+## 2026-10-21 沈黙による感情更新の厳密な適用条件とv2移行上の衝突
+
+main最終claim RPC `20260917143500_fix_body_clock_claim_rpc.sql` の本文1–110行を再確認。`evolved` は**送信期限到来かつJST当日送信4回未満**の `background_push_state` ユーザーを対象に `misaki_relationship_state` を更新。`last_interaction_at` があり24時間以上経過した行に対し、(1) happy/affectionateは強度減衰、(2) **intimacy_level が familiar/intimate/very_intimate で、3日以上無交流、primaryがneutral/lonelyならlonelyを生成**（3日28、5日38、7日48の最低強度、上限72）、(3) 同条件のneutral/lonely/sulkyは7日でPULL、neutral/lonelyは3日でWAITに変更。`state_updated_at=now()` も更新する。**全ユーザーに一律3日で寂しさが発生するわけではない**。
+
+main `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql` 本文は『Relationship v2 owns post-chat emotion/action decisions』と記載する一方、**`Lazy silence/proactive RPCs remain intact` と明記**し、旧chat/emotion triggersのみdropする。つまり後続v2 migrationはclaim RPCの沈黙変化を意図的に残している（少なくともSQLコメントとDDL上）。「v2が全沈黙更新を無効化した」とは解釈しない。
+
+**設計上の論点を分離：** (A) 初期テストの『neutral→lonelyを沈黙だけで生成しない』と最終claim SQLの**静的矛盾**、(B) v2のpost-chat reducerとproactiveのlazy silence変化が**別責務として併存する設計の是非**、(C) DBの実際の更新/送信確率/CTE同時評価と本番適用状況は**未実証**。現時点で(A)を確認済み、(B)は設計再評価対象、(C)は隔離DBで検証待ち。対処案は削除決め打ちでなく『時間による強度減衰』『関係上の出来事を根拠とした寂しさ』『送信頻度の制御』を分離して比較。Production変更なし。
