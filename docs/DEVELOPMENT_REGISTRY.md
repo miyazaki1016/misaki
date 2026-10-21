@@ -932,3 +932,14 @@ GitHub `main...branch` compare：
 mainと旧2枝のworkflow本文を直接確認。main `.github/workflows/isolated-gemini-ab-manual.yml`（blob `edffcd3d...`）は `workflow_dispatch` 専用、`confirm_billable_requests == 'YES'` をジョブ条件にし、明示入力に実験種別（latency/quality）、短長fixture、リクエスト間隔、実行数等がある。`work/ab-20-pair-dispatch`（blob `22f0d48c...`）は1組/20組（2/40 requests）の入力、`work/ab-blind-review-artifact-workflow`（blob `bd20ddcd...`）は品質レビュー出力を追加する流れ。いずれもproductionでなく特定の実験commitをcheckoutする設計。
 
 **重要**：workflowが存在することと、実Gemini実行・結果の有効性・人間のブラインド評価完了は別。現行workflowの手動課金承認ゲートを維持し、無断dispatchを行わない。これらの歴史は、品質比較を安全かつ再現可能にする試行錯誤の証拠だが、実験結果や優劣は今回の静的調査だけでは断定しない。ユーザーの新構想（複数人格、キャラごとの知識と成長）では、将来の人格一貫性・知識漏洩・長期会話の評価にも応用できる可能性がある。main/production/Supabase/有料Gemini呼び出しなし。
+
+
+## 2026-10-21 Gemini利用量テレメトリ・残存診断枝（新規2＋再確認4）
+
+`main...branch` compare：`work/gemini-unit-cost-telemetry` ahead2/behind52、workflow、chat route、Gemini generator、relationship analyzer/runtime、usage telemetryライブラリ・文書・migration・テストなど15ファイルに差分。`work/relationship-error-diagnostics` ahead0/behind77/files0。`sora/gemini-transient-retry` ahead0/behind144/files0。加えて `sora/relationship-analyzer-structured-output-hotfix`、`sora/remove-relationship-temporary-diagnostics`、`sora/relationship-processing-error-diagnostics` は前回記録済みの差分ゼロ枝として再確認のみ。
+
+**直接精読**：旧枝 `docs/GEMINI_USAGE_TELEMETRY.md`（blob `4e48f726...`）と `20261004045307_gemini_usage_telemetry.sql`（blob `28fd96fb...`）。物理的なGemini API試行ごとに記録し、retryや解析コールを含む。HTTP成功は会話の成功/請求確定と同義ではなく、トークン不明値はNULLのまま、価格・為替・課金台帳と混同しない。本文・prompt・記憶・生レスポンス・秘密鍵は記録対象外。DB設計はservice_role限定SELECT/INSERTとRLS、ユーザーUUIDを恒久アカウントや課金プランと決めつけない。
+
+**main現行ソース確認**：`lib/gemini-usage-telemetry.ts` は存在（blob `a1ef3477...`）。token数の正規化、記録列のallowlist、エラー詳細を出さない観測関数を実装。したがってbranch compareでahead2であっても『テレメトリ全体がmainに未実装』とは言えない。mainのmigration/実際の配線/DB適用/本番記録の網羅性は別途照合が必要。
+
+**今後の評価観点**：将来のキャラ単位コストとuser×characterの費用を分ける際、既存 `user_id/request_id/call_kind` のみで正しいキャラ帰属を推定できない。人格成長・知識検証・会話・Body Clock等の各コストをどう分類するか、後のDB設計段階で検討する。無断の有料Gemini呼び出し、main/production/Supabase変更なし。
