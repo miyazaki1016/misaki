@@ -982,3 +982,14 @@ GitHub branches APIを再取得し92枝の実在を確認。前回404だった `
 `codex/legacy-maintenance-drain` の `docs/LEGACY_MAINTENANCE_DRAIN.md` と `docs/WRITE_SURFACE_INVENTORY.md` を精読。**最終判定BLOCKED**。2026-09-20の隔離DB監査では、freeze完了後に古いMVCC snapshotから新規operationを受付・COMMITできる反例、旧業務writeの反例の計2件が残り、既存52テストPASSでもsnapshot回帰2件FAIL。publicテーブル22に対しguard対象12の差分10、auth.users trigger経由の書込漏れも記録。これは隔離環境での検証であり、本番事故を示すものではない。**maintenance/drain機能を本番に導入・流用しない**。古いコードをそのまま移植せず、DB isolation/transaction・書込経路・認証triggerを含む再設計が必要。
 
 Proactive/Body Clock関連枝は現行mainの仕様と差分精読するまで採否保留。通知の原子性・重複防止・ユーザー/キャラのスコープは将来設計の要点。main/本番/Supabase変更なし。
+
+
+## 2026-10-21 Conversation Lab・5軸・Free/Premiumの8枝
+
+`main...branch` compare：`docs/relationship-five-axis-design-review-20261015` ahead4/behind0 (overviewと感度テスト)、`experiment/conversation-lab-offline-v1-20261015` ahead112/behind0 (評価UI、smoke、品質評価、監査文書等)、`experiment/interpreter-gradual-acting-20261015` ahead36/behind0 (演技比較、Body Clockと関係性の整合、Free/Premiumの記憶/自発通知方針)、`sora/misaki-acting-lab` ahead0/behind106/files0、`work/relationship-analyzer-diagnostics` ahead0/behind75/files0、`work/relationship-polarity-integer` ahead0/behind73/files0、`sora/relationship-analyzer-stage-diagnostics` ahead0/behind64/files0、`sora/relationship-evidence-validation-diagnostics` ahead0/behind62/files0。差分数はmain未実装の件数ではない。
+
+`experiment/conversation-lab-offline-v1-20261015` の `docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md` を精読。旧 `/api/acting-lab` はproduction以外でAPIキーがあれば認証・予算上限なしに最大5プロフィールの並列生成を許し得て、本番の記憶・関係・Body Clockを使わない単発演技試験。**本番品質の代用として呼ばない**。PR86の研究用smokeは固定合成fixture、2回上限・retryなし、事前承認/保護/隔離DBのgateを備えるが、当該文書の時点で実Geminiは0回、隔離DB SQL未適用。CIやPreview READYは実モデル品質や実費の証明ではない。軽量化評価ではオフライン品質ゲートを再利用し、実課金実験は別途明示承認・総額上限・環境保護を必要とする。
+
+`experiment/interpreter-gradual-acting-20261015` の `docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md` を精読。Freeも美咲自身の日常からの自発メッセージを構想し、ユーザー過去会話/共有想い出を自発話題の材料にしない。Premiumは同意済みUser Memory/Shared Memoryを少数参照可能。ただし記憶保存・通常会話での参照・価格/回数/頻度は未決。課金による親密度上昇や解約による関係性低下は禁止。User Memory/Shared Memory/Relationship Memoryを分離し、user×characterに閉じる。**設計上の合意であり実装・採算の実証ではない**。
+
+Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと。通常会話の文脈短縮と自発通知の記憶利用許可は別問題。main/本番/Supabase/有料Gemini変更なし。
