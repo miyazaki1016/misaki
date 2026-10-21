@@ -1,0 +1,48 @@
+{
+  "schema": "misaki-round5-sora-document-overlay-v2",
+  "date": "2026-10-21",
+  "base_document_ledger": "47_SORA_ROUND5_DOCUMENT_LEDGER.json",
+  "evidence": "48_SORA_CONTEXT_AB_DOCUMENT_REVIEW.md",
+  "rule": "Original (ID,blob) version counted once; audit-added docs are excluded.",
+  "new_reviewed": [
+    {
+      "id": "DOC-075",
+      "blob": "66e283a33430cb7bc07dfd035122f60ba7482fd2",
+      "path": "docs/context-ab-blind-review.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-076",
+      "blob": "bb9da685cd80ca66db8e0771121304eda7d84949",
+      "path": "docs/context-ab-execution-gate.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    },
+    {
+      "id": "DOC-078",
+      "blob": "fc5f3fdd4a68f244015b666f826093ea30522d11",
+      "path": "docs/context-ab-validation-protocol.md",
+      "full_text": true,
+      "static_source_checked": true,
+      "runtime_acceptance": false
+    }
+  ],
+  "progress": {
+    "previous_documents_total": 43,
+    "new_reviewed_count": 3,
+    "documents_total": 46,
+    "documents_denominator": 85,
+    "documents_pending": 39,
+    "branches_insufficient": 30,
+    "branch_resolutions_new": 0,
+    "ideas_total": 13,
+    "legacy_blocked": true
+  },
+  "executed_tests": false,
+  "paid_model_called": false,
+  "production_access": false,
+  "audit_complete": false
+}
