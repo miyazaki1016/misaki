@@ -10,14 +10,14 @@
 
 | ブランチ | 台帳での言及 | 最終コミット日時 | main差分・PR・Preview | 追加精査 |
 |---|---|---|---|---|
-| `chore/restore-relationship-rpc-migration` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `cleanup/legacy-proactive-tags` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `cleanup/remove-legacy-proactive-path` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `codex/legacy-maintenance-drain` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `codex/server-canonical-foundation` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `design/shared-conversation-engine-contract-20261015` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/audit-overview-against-source` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `docs/development-registry-audit-20261020` | 監査作業ブランチ | 未取得 | 要照合 | 対象外または要確認 |
+| `chore/restore-relationship-rpc-migration` | 記載あり | 2026-10-14 11:49 UTC | 要照合 | 要完了判定 |
+| `cleanup/legacy-proactive-tags` | 記載あり | 2026-09-17 13:59 UTC | 要照合 | 要完了判定 |
+| `cleanup/remove-legacy-proactive-path` | 記載あり | 2026-09-18 00:13 UTC | 要照合 | 要完了判定 |
+| `codex/legacy-maintenance-drain` | 記載あり | 2026-09-19 21:30 UTC | 要照合 | 要完了判定 |
+| `codex/server-canonical-foundation` | 記載あり | 2026-10-02 08:11 UTC | 要照合 | 要完了判定 |
+| `design/shared-conversation-engine-contract-20261015` | 記載あり | 2026-10-15 08:13 UTC | 要照合 | 要完了判定 |
+| `docs/audit-overview-against-source` | 記載あり | 2026-09-17 23:35 UTC | 要照合 | 要完了判定 |
+| `docs/development-registry-audit-20261020` | 監査作業ブランチ | 2026-10-21 01:26 UTC | 要照合 | 対象外または要確認 |
 | `docs/multi-character-data-scope-inventory` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `docs/multi-character-rpc-caller-audit` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `docs/production-source-of-truth-reconciliation` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -108,3 +108,7 @@
 2. mainとの差分、対応PR、Previewの有無、既存mainの同等機能、未反映作業、危険な移植条件を根拠とともに記入する。
 3. 実装済み・テスト済み・本番反映済みはそれぞれ別の証拠で判断する。
 4. 全92枝の棚卸し後、`docs/DEVELOPMENT_REGISTRY.md`を冒頭から再読し、Gemini軽量化の計測へ進む。
+
+## 最終コミット日時取得ログ
+
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り84枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
