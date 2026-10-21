@@ -774,3 +774,16 @@ GitHub compare `main...branch`：
 - `docs/multi-character-rpc-caller-audit` **ahead9/behind1**、上記inventoryに加え `docs/MULTI_CHARACTER_RPC_CALLER_AUDIT.md`。RPC caller/GRANT/lease fencing/Relationship Engine v1・Persona Evolution・Body Clockの書込経路をソース監査。Persona Evolutionのcandidate RPC本体と候補テーブル定義は追跡migration35件で見つからず、実DBのGRANT/RLS/適用状況は未確認。**監査・安全条件の知見を保存**。User共有事実と美咲との私的関係事実の分離は、感情の根拠/記憶の捏造防止にも直結。
 
 **横断的判断：** これらは一律『main未反映のコード』ではなく、仕様/監査/再開ゲートの資産。複数キャラ化を直ちに進める指示ではない。5軸Stageは関係成立事実と別、感情・一時Momentumとも別。Shared Engineは現在のcanonical source-of-truthとPR #88の純粋関数を照合してから採否判断。production/main/Supabase変更なし。
+
+
+## 2026-10-21 Body Clock旧経路/タグ調整・migration復元の6枝
+
+`main...branch` GitHub compare：
+- `cleanup/legacy-proactive-tags` ahead2/behind349、`lib/proactive-photo.ts` 差分。旧proactive写真経路の整理候補、mainのcanonical Body Clock経路と照合前に移植しない。
+- `cleanup/remove-legacy-proactive-path` ahead7/behind339、`app/api/body-clock/route.ts`、`app/api/proactive/route.ts`、`app/chat/page.tsx`、`lib/proactive-photo.ts`、overview差分。枝側の両API routeを `fetch_file` すると404（**枝から削除された可能性が高いが、compareのstatus未確認なので断定しない**）。既存APIを削除してよいかはmainの呼出元・移行状況・後方互換性を確認してから。**削除をmainへ機械的に反映しない**。
+- `feature/proactive-derived-tags` ahead2/behind350、Body Clock Edge `proactive-decision.ts`/`proactive-photo.ts` 差分。枝のdecision blob `9ae1d8f7...`、main `b75fc031...` で不一致。枝のtags/方向/感情の思想を現行設計と比較する候補。mainの最終仕様より古い可能性。
+- `refine/proactive-action-tags` ahead1/behind348、Edge `proactive-decision.ts` 差分。動作差・採否は未検証。
+- `refine/sleepy-tag` ahead3/behind347、Edge `index.ts`/`proactive-decision.ts`/`proactive-photo.ts` 差分。眠気表現は身体状態の自然さと過剰な定型文を避ける思想として比較、旧index丸ごと移植しない。
+- `chore/restore-relationship-rpc-migration` ahead1/behind1、`20260930131930_relationship_server_rpc_user_context.sql` がcompareに現れるが、**枝とmainの当該ファイルblob SHAがともに `8c2c8383...` で完全一致**。branch compareのファイル一覧だけを根拠に未反映実装と断定しない。SQL冒頭はproduction履歴からの再構築・既適用・既存本番への再適用禁止・rollback記録なしと明記。これは文書上の由来であり現在の本番適用を今回独立確認したわけではない。
+
+6枝とも**大幅に古いベース（behind339–350、復元枝はbehind1）**で、単純mergeは避ける。未反映差分の有無だけで価値を判断せず、タグの意味/旧経路廃止の安全性/SQL provenanceを分類。次に `compare_commits` のfile status・main routeの存在・Edge decisionの差分を精査する。main/production/Supabase変更なし。
