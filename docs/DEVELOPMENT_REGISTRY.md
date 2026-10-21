@@ -763,3 +763,14 @@ GitHub compare `main...branch` を実施：
 5軸感度テストを全文確認：`createRelationshipActingGuide` に対し5軸それぞれ0/1/29/30/44/45/54/55/79/80/100を入力、Intimacy stage2・Status noneを固定し、guide文面の変化点をassert。**friendship/trust/affection は80、playfulnessは30/80、romanceは45/80**。恋人Statusのガイドはromance 0と100で同一、Status noneとは異なることも検査。0→1でguideが変わらないことも確認する。これは**現行実装の振る舞いを記録するテストであって、閾値が最適という証拠ではない**。CI実行成否は今回未検証。実Geminiの返信品質/段階的成長の実感も未検証。
 
 設計追記の重要な未解決点：『80まで成長が返事に現れない軸がある』『0→1で人格が激変しても困る』。5軸長期状態と短期Momentum/会話文脈/Statusを分け、**感情をスコアの単純合算で表現しない**思想を再評価時に参照。分類：前三枝は**mainへの未反映差分なし**、最後の枝は**有用なテスト/設計知見がmain外に残存（②思想・③検証資産の継承候補）**。main/production/Supabase変更なし。
+
+
+## 2026-10-21 未整理設計・監査ブランチ4件（複数キャラ境界とStage設計）
+
+GitHub compare `main...branch`：
+- `docs/relationship-v1-2-stage-growth-principles` **ahead10/behind52**、3 docs（`RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md`、`GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md`、`IMPLEMENTATION_OVERVIEW.md`）。v1.2 Stage/5-heartのWork引継ぎ仕様。**v1.1の本番3日Pattern→State→acting実測が終わるまでDB/runtime cutover禁止**。Stageは恋愛Statusとは別、課金/経過日数/メッセージ数で加速しない。Evidence→Episode→Pattern→5軸を保ち、Stage Resolverを純粋関数で先行検証。**実装済みではなく設計・再開条件の資産**。mainとの差分をそのまま取り込む判断はしない。
+- `design/shared-conversation-engine-contract-20261015` **ahead1/behind0**、`docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md` のみ。production chatとoffline labが同じpure reply pipelineを使い、runtimeだけが認証・quota・canonical DB commit・通知/外部情報を担当する設計契約。**設計提案であり未承認・未実装**。PR #88の実装枝との対応/契約差分は要比較。実装コードの存在を意味しない。
+- `docs/multi-character-data-scope-inventory` **ahead1/behind1**、`docs/MULTI_CHARACTER_DATA_SCOPE_INVENTORY.md`。将来の複数キャラ化に向け、User Shared Profile/Character Definition/User×Character Pair/Pair Conversation/通知などの所有境界を提案。単にUIにcharacter_idを足すだけでは記憶・関係・通知が分離されない。**設計監査であり本番実装ではない**。
+- `docs/multi-character-rpc-caller-audit` **ahead9/behind1**、上記inventoryに加え `docs/MULTI_CHARACTER_RPC_CALLER_AUDIT.md`。RPC caller/GRANT/lease fencing/Relationship Engine v1・Persona Evolution・Body Clockの書込経路をソース監査。Persona Evolutionのcandidate RPC本体と候補テーブル定義は追跡migration35件で見つからず、実DBのGRANT/RLS/適用状況は未確認。**監査・安全条件の知見を保存**。User共有事実と美咲との私的関係事実の分離は、感情の根拠/記憶の捏造防止にも直結。
+
+**横断的判断：** これらは一律『main未反映のコード』ではなく、仕様/監査/再開ゲートの資産。複数キャラ化を直ちに進める指示ではない。5軸Stageは関係成立事実と別、感情・一時Momentumとも別。Shared Engineは現在のcanonical source-of-truthとPR #88の純粋関数を照合してから採否判断。production/main/Supabase変更なし。
