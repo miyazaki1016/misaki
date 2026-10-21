@@ -958,3 +958,18 @@ mainと旧2枝のworkflow本文を直接確認。main `.github/workflows/isolate
 **ユーザーが明示した次工程の順番**：①全ブランチ/PR/実装の棚卸し完了、②台帳を冒頭から読み直し・現在の構想と突合、③**現状のGemini軽量化を最優先**（品質・記憶・関係性を保ち、実測で1会話あたり総コストを削減）、④複数キャラを見据えたDB/権限/所有権等の基盤設計、⑤美咲一人の知識・記憶・人格成長の作り込み。軽量化は無駄な重複呼び出し、再試行、長大prompt、履歴、キャッシュ、モデル単価だけでなく成功会話単位の総費用を比較。無承認の有料Gemini実験は行わない。
 
 本節は静的比較・設計方針の記録のみ。main/本番/Supabase変更なし。
+
+
+## 2026-10-21 全92枝再取得・軽量化の先行資産・RPC復元候補
+
+GitHub branches APIを再取得し92枝の実在を確認。前回404だった `sora/relationship-memory-integrity` / `sora/relationship-persona-evolution` / `sora/relationship-life-context` は今回の92枝一覧に**存在しない**。名称違いか削除等の理由は未確定。
+
+重点8枝のmain差分：`work/conversation-context-compression-spike` ahead85/behind24、`work/context-no-duplicate-replies-ab` ahead211/behind24、`design/shared-conversation-engine-contract-20261015` ahead1/behind0、`docs/multi-character-data-scope-inventory` ahead1/behind1、`docs/multi-character-rpc-caller-audit` ahead9/behind1、`work/forget-control-v1` ahead5/behind28、`work/relationship-identity-v1` ahead81/behind24、`chore/restore-relationship-rpc-migration` ahead1/behind1。大型枝のaheadは未統合機能の件数ではない。
+
+`work/conversation-context-compression-spike` の `docs/conversation-context-compression-spike.md` を精読。研究時点のbaselineは直近60発言＋別途最大8件の美咲発言の重複、persona/relationship/memory/time/weather等をGeminiへ送る構造。2026-10-08の単一例では初回30秒timeout、再試行で入力8378 tokens/出力316 tokens。**単一例はベンチマークではない**。提案候補は直近20件、古い文脈の非正本要約、重複8件削減等。要約で否定・訂正・約束・話者・関係状態を壊さず、まず内容を保存しない数値計測、品質の非劣化確認、同期Gemini追加なしを条件にする。**Gemini軽量化の第一候補資料**。
+
+`docs/multi-character-data-scope-inventory` の `docs/MULTI_CHARACTER_DATA_SCOPE_INVENTORY.md` を精読。user共有プロフィール、character定義/知識、user×character関係/会話/記憶、外部文脈、通知を分ける提案。現行のuser_id中心テーブル・RPC・Body Clock・Evolution・一時ユーザー移行はcharacter_idをUIだけに足しても隔離できない。権限・書込・非同期・削除まで一貫した境界が必要。**設計資料であって本番DB確認や移行承認ではない**。
+
+`chore/restore-relationship-rpc-migration` の `20260930131930_relationship_server_rpc_user_context.sql` を精読。冒頭に『本番Supabase migration/logから復元したSQLで、すでに本番に適用済み。既存本番DBへ再適用しない』と明記。UUID引数付き `get_relationship_time_context` / `record_relationship_chat_turn` を定義、SECURITY DEFINER、空search_path、本人/永続アカウント照合、service_roleのみ実行許可。**前回のUUID overload出所不明問題に対する有力な復元資料を発見**。ただし復元SQLと現行本番関数の完全一致、migration台帳との一致、mainへの採用状況は未検証。DBへ実行せず、GitHub main/実DBの読取照合を優先。
+
+今後の順番は棚卸し完了→台帳全文再読→Gemini軽量化の計測・オフライン比較→複数キャラ基盤→美咲一人の成長実装。main/本番/Supabase/有料Gemini実行なし。
