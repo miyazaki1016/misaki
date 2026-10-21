@@ -1,6 +1,11 @@
 # 美咲・新チャット引継ぎ（2026-10-21）
 
-> **新しいソラへ：最初に必ずこの文書、`docs/IMPLEMENTATION_OVERVIEW.md`、`docs/DEVELOPMENT_REGISTRY.md`、`docs/BRANCH_AUDIT_TRACKER_20261021.md` をGitHubから実際に読んで、現在地を確認すること。会話の記憶だけで判断しない。**
+> **新しいソラへ：最初に必ずこの文書、`docs/MISAKI_SYSTEM_VISION_20261021.md`、`docs/IMPLEMENTATION_OVERVIEW.md`、`docs/DEVELOPMENT_REGISTRY.md`、`docs/BRANCH_AUDIT_TRACKER_20261021.md` をGitHubから実際に読んで、現在地を確認すること。会話の記憶だけで判断しない。**
+
+## 0. 最重要：Misakiシステム基本構想
+- **設計思想の独立した正本：`docs/MISAKI_SYSTEM_VISION_20261021.md`**（本監査ブランチ上）。
+- 人格の一貫性と成長、Character共通とUser×Character専用データの境界、恋愛・結婚・離婚、Free/Premiumの公平性、Gemini費用と会話品質の両立、開発順序、未決事項を整理した文書。
+- **新しいソラは実装・設計判断の前に必ず全文を読む。** 本書は構想であり、実装済みを意味しない。変更するときは理由と根拠を記録する。
 
 ## 1. 対象・禁止事項
 - GitHub: `miyazaki1016/misaki`。
@@ -16,7 +21,7 @@
 - **重要：日時の取得・並び替えはmain反映、PR、Preview、未反映タスク、実装安全性の検証完了ではない。**
 
 ## 3. 新チャットでの最初の作業
-1. 上記4文書を**GitHubの実データで確認**。最新HEADと表の整合性を確認。
+1. 冒頭で指定した5文書を**GitHubの実データで確認**。最新HEADと表の整合性を確認。
 2. 全92枝のmain比較、PRの開閉/マージ履歴、Vercel Previewの所在、仕掛かりの有無を**証拠つきで**照合し、表の`main差分・PR・Preview`、`追加精査`列を更新。
 3. 「main反映済み」「別経路で同等実装済み」「未反映」「安全上ブロック」「不明・要追加調査」を区別する。ahead/behindやコミット日時だけでマージ済みとは判定しない。
 4. 過去の書き込み禁止・反映ブロックで未適用の作業が残っていないか、作業ブランチ・Preview・PRを横断して確認。
