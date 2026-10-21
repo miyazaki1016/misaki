@@ -685,3 +685,12 @@ main `supabase/functions/body-clock/proactive-decision.ts` は `misaki_relations
 - **評価**：現行と候補で同じ入力を使い、送信率、誤った心配、関係の傷の扱い、連投、誤った記憶参照を隔離テストで比較。実Gemini送信は承認なしに実施しない。
 
 **分類決定：** PR31のBody Clockの価値は主に②『思想を現行設計に適合させて再実装』と③『境界テスト資産の継承』。旧index.ts/旧SQLを直接移植する判断はしない。今後の再開条件はDB claimとEdge判断の責務分割、no-action RPC整合性、offline A/B、段階的rollout/rollback計画の確認。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 Body Clock現行テストとmigrationの整合性リスク（新規発見）
+
+main `tests/body-clock-canonical.test.cjs` を確認：恒久ユーザーのcanonical history/memory/points、匿名の暗号化temporary root、期限切れ・改ざんreceiptの生成/送信前skipを検証。PR31の旧rowベース `index.ts` 移植を避ける具体的な根拠。`supabase/functions/body-clock/conversation-root.ts` は匿名の `misaki_temporary_roots` と恒久の `misaki_user_conversation_state` を分けて読む。候補の動機判断はこのrootを優先しなければならない。
+
+**重要なmigration整合性疑義：** main `tests/body-clock-silence-contract.test.cjs` は `20260917031500_phase5_relationship_aware_proactive_claim.sql` を参照し、時間経過だけでneutralからlonelyを作らないとassert。同SQLは実際にneutral→lonelyを作らない。一方、mainに存在する**より後の日付** `20260917143500_fix_body_clock_claim_rpc.sql` は同じ `claim_misaki_body_clock_due_users` を `CREATE OR REPLACE` し、3日以上の無交流で `neutral` または `lonely` から `primary='lonely'` を作る分岐を含む。さらに親密度と経過日数によりneutralからWAIT/PULLへ変更する。**後続migrationがDBへ順序どおり適用された場合、テストが検査する古いSQLの安全契約と実効claim RPCの動作が矛盾する可能性が高い**。ファイル順序とSQL文面からの静的判断であり、production DBに適用済みか/後続の別定義があるかは未検証。
+
+この問題は『沈黙だけで傷/寂しさを捏造しない』という既存方針に関わるため、PR31動機移植より先に**最新実効SQLとテスト対象の一致**を確認すべき。テストが古いmigrationを読むだけでgreenでも、現行SQLの安全性証明にならない。**優先度：高、状態：要検証、現時点でProduction修正はしない**。次の作業：全migrationの同RPC再定義を横断検索し最終定義を確定、最新SQLに対する回帰テスト案を作成、隔離環境で検証。main/Production/Supabase変更なし。
