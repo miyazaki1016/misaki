@@ -42,14 +42,14 @@
 | `fix/gemini-chat-timeout` | 記載あり | 2026-09-18 01:23 UTC | 要照合 | 要完了判定 |
 | `fix/gemini-json-retry` | 記載あり | 2026-09-17 06:38 UTC | 要照合 | 要完了判定 |
 | `fix/grow-relationship-from-first-meeting` | 記載あり | 2026-09-18 03:01 UTC | 要照合 | 要完了判定 |
-| `fix/legacy-safari-cache` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/preserve-active-chat-history` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/recall-history-grounding` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/recall-keep-recent-history` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/relationship-analyzer-bounded-retry` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/safari-load-failed-message` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/safari-load-failed-ui` | 記載あり | 未取得 | 要照合 | 要完了判定 |
-| `fix/use-chat-proxy` | 記載あり | 未取得 | 要照合 | 要完了判定 |
+| `fix/legacy-safari-cache` | 記載あり | 2026-09-17 05:42 UTC | 要照合 | 要完了判定 |
+| `fix/preserve-active-chat-history` | 記載あり | 2026-09-17 15:56 UTC | 要照合 | 要完了判定 |
+| `fix/recall-history-grounding` | 記載あり | 2026-09-17 08:44 UTC | 要照合 | 要完了判定 |
+| `fix/recall-keep-recent-history` | 記載あり | 2026-09-17 07:58 UTC | 要照合 | 要完了判定 |
+| `fix/relationship-analyzer-bounded-retry` | 記載あり | 2026-10-05 23:50 UTC | 要照合 | 要完了判定 |
+| `fix/safari-load-failed-message` | 記載あり | 2026-09-17 12:31 UTC | 要照合 | 要完了判定 |
+| `fix/safari-load-failed-ui` | 記載あり | 2026-09-17 09:19 UTC | 要照合 | 要完了判定 |
+| `fix/use-chat-proxy` | 記載あり | 2026-09-17 08:16 UTC | 要照合 | 要完了判定 |
 | `fix/workday-grounding` | 記載あり | 未取得 | 要照合 | 要完了判定 |
 | `main` | 基準ブランチ | 未取得 | 要照合 | 対象外または要確認 |
 | `perf/chat-stage-timing` | 記載あり | 未取得 | 要照合 | 要完了判定 |
@@ -111,10 +111,12 @@
 
 ## 最終コミット日時取得ログ
 
-2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り60枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
+2026-10-21: 先頭8枝についてGitHub commits APIの`commit.committer.date`を取得し、上表にUTCで記入。**作成日時ではない**。残り52枝は未取得。監査ブランチ自身は記録後に更新されるため日時は取得時点のスナップショット。
 
 2026-10-21: 次の8枝（docs/multi-character-data-scope-inventory から experiment/conversation-lab-offline-v1-20261015）についてcommitter.dateを確認・反映。累計16/92枝、未取得76枝。時刻はUTC。`experiment/conversation-lab-offline-v1-20261015` は2026-10-20 11:36 UTCに更新されており、古い実験扱いせずPR86の現況を再確認する。
 
 2026-10-21: 8枝の最終コミット日時を追加。累計24/92、未取得68。`experiment/interpreter-gradual-acting-20261015` は10/19、`experiment/shared-conversation-history-v1-20261015` は10/16に更新。`fix/*`の日時は9/17〜18に集中するが、古さだけでmain反映済みとは判定しない。UTC表記。
 
 2026-10-21: `fix/chat-network-reliability`〜`fix/grow-relationship-from-first-meeting` の8枝のcommitter.dateを取得。累計32/92、未取得60。チャット信頼性/重複防止/Gemini timeout・JSON retryの枝は9/17〜18、期限切れ一時関係のimportは10/05最終更新。日時だけではmain反映・テスト通過・本番安全性を判定しない。UTC表記。
+
+2026-10-21: 8枝のcommitter.dateを取得し反映。累計40/92、未取得52。Safari表示・cache、会話履歴維持・recall、chat proxyは9/17、relationship analyzerのbounded retryは10/05最終更新。時系列のみではmain反映や実装の安全性を判定しない。UTC表記。
