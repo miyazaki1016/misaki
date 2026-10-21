@@ -750,3 +750,16 @@ main `20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql` 本文
 - 理由が言語化できない感情を排除する必要はないが、存在しない出来事や相手の事情を**理由として捏造しない**。
 - 将来の横断再評価では『好きとは何か』『心配とは何か』『仲直りが成立したとは何か』も検討。過度に数値・時間閾値だけで人格を決定しない。
 - 以上は**検討すべき設計仮説と問い**。既存実装を即時変更・削除する指示ではない。全件棚卸し完了後、冒頭からの再評価時にも必ず参照する。main/production/Supabase変更なし。
+
+
+## 2026-10-21 未整理ブランチ4件のmain差分・5軸演技感度テスト
+
+GitHub compare `main...branch` を実施：
+- `work/relationship-engine-v1` **ahead 0 / behind 88 / files 0**：現行mainから見て未取り込み差分なし。mainに実装済みの歴史的作業枝候補。mainとの意味的整合/本番稼働は別途確認。
+- `work/relationship-polarity-integer` **ahead 0 / behind 73 / files 0**：同じく未取り込み差分なし。過去の検証知見の有無は別途。
+- `sora/misaki-acting-lab` **ahead 0 / behind 106 / files 0**：同じく未取り込み差分なし。実モデル品質実証とはみなさない。
+- `docs/relationship-five-axis-design-review-20261015` **ahead 4 / behind 0 / files 2**：`docs/IMPLEMENTATION_OVERVIEW.md` への設計検討追記と、**mainに未反映**の `tests/relationship-acting-guide-sensitivity.test.ts` を含む。単なるdocs枝ではなく実行可能なcharacterization testを保有。
+
+5軸感度テストを全文確認：`createRelationshipActingGuide` に対し5軸それぞれ0/1/29/30/44/45/54/55/79/80/100を入力、Intimacy stage2・Status noneを固定し、guide文面の変化点をassert。**friendship/trust/affection は80、playfulnessは30/80、romanceは45/80**。恋人Statusのガイドはromance 0と100で同一、Status noneとは異なることも検査。0→1でguideが変わらないことも確認する。これは**現行実装の振る舞いを記録するテストであって、閾値が最適という証拠ではない**。CI実行成否は今回未検証。実Geminiの返信品質/段階的成長の実感も未検証。
+
+設計追記の重要な未解決点：『80まで成長が返事に現れない軸がある』『0→1で人格が激変しても困る』。5軸長期状態と短期Momentum/会話文脈/Statusを分け、**感情をスコアの単純合算で表現しない**思想を再評価時に参照。分類：前三枝は**mainへの未反映差分なし**、最後の枝は**有用なテスト/設計知見がmain外に残存（②思想・③検証資産の継承候補）**。main/production/Supabase変更なし。
