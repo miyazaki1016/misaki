@@ -694,3 +694,20 @@ main `tests/body-clock-canonical.test.cjs` を確認：恒久ユーザーのcano
 **重要なmigration整合性疑義：** main `tests/body-clock-silence-contract.test.cjs` は `20260917031500_phase5_relationship_aware_proactive_claim.sql` を参照し、時間経過だけでneutralからlonelyを作らないとassert。同SQLは実際にneutral→lonelyを作らない。一方、mainに存在する**より後の日付** `20260917143500_fix_body_clock_claim_rpc.sql` は同じ `claim_misaki_body_clock_due_users` を `CREATE OR REPLACE` し、3日以上の無交流で `neutral` または `lonely` から `primary='lonely'` を作る分岐を含む。さらに親密度と経過日数によりneutralからWAIT/PULLへ変更する。**後続migrationがDBへ順序どおり適用された場合、テストが検査する古いSQLの安全契約と実効claim RPCの動作が矛盾する可能性が高い**。ファイル順序とSQL文面からの静的判断であり、production DBに適用済みか/後続の別定義があるかは未検証。
 
 この問題は『沈黙だけで傷/寂しさを捏造しない』という既存方針に関わるため、PR31動機移植より先に**最新実効SQLとテスト対象の一致**を確認すべき。テストが古いmigrationを読むだけでgreenでも、現行SQLの安全性証明にならない。**優先度：高、状態：要検証、現時点でProduction修正はしない**。次の作業：全migrationの同RPC再定義を横断検索し最終定義を確定、最新SQLに対する回帰テスト案を作成、隔離環境で検証。main/Production/Supabase変更なし。
+
+
+## 2026-10-21 全体俯瞰での設計原則とBody Clock回帰調査の次の境界
+
+ユーザーの明示方針：『全体を見渡しているいまだから見えてくることがある。こういうときだからこそ、考えられることがある』。以後の棚卸しでは機能の存在確認だけでなく、**機能間の意味的整合性・設計原則の衝突・本来の目的・より良い再設計の可能性**を各項目に記録する。コードの無条件回収を目標にしない。
+
+### Body Clock沈黙ルールの追跡
+
+mainのmigration tree（全35件）を列挙。claim RPCの既知の同名再定義は `20260917031500_phase5_relationship_aware_proactive_claim.sql` と、後日付の `20260917143500_fix_body_clock_claim_rpc.sql`。後者はneutral→lonely分岐を持ち、既存の `tests/body-clock-silence-contract.test.cjs` は前者を読み込む。これら3ファイルの現行main blob SHAを取得して検証対象を固定（前者 `e290363d...`、後者 `a7bb0636...`、test `6d3bc7bd...`）。**全35件のSQL本文を横断して他の同名再定義がないことまではまだ確証していない**ため、最新実効定義の最終確定と本番適用状況は未確認。過去のテストのgreenを本番の安全性証明としない。
+
+### 横断設計レビューの暫定原則（提案、未承認）
+
+- 感情は単なる無会話経過時間だけで確定しない。関係の出来事、記憶、文脈と区別する。時間は強度減衰や再評価のきっかけになり得るが、感情の理由の捏造は避ける。
+- 『連絡できる機会』『連絡したい理由』『連絡する行動』『伝える内容』を別責務として追跡し、同じ見送りロジックの二重適用を避ける。
+- 感情・行動・会話・記憶・Body Clock・写真・通知で同じ関係storyとsource-of-truthを使う。実装の同名/旧新比較だけで採用を決めない。
+- テストは**最終的に有効な実装・migration**を対象にする。過去のファイル単体テストを、後続の上書き定義の検証と混同しない。
+- 思想の採否、根拠、未確認点、テスト/rollback条件を台帳に残す。現在のmain・production・Supabaseは変更しない。
