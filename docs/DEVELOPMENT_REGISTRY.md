@@ -887,3 +887,20 @@ GitHub `main...branch` compare：
 - `fix/chat-reliability-cleanup` ahead1/behind357、旧chat-proxy modified。**前回のchat reliability 8枝ですでに記録済み**、重複再確認としてのみ記載。新規棚卸しは7枝。
 
 **区別**：ahead0/files0は『mainに未反映のファイル差分なし』であり、過去の実装が現在も有効・UX問題が解消済みという意味ではない。Safari/PWAでは端末実機・キャッシュ更新・匿名履歴の持続・エラー表示を分けて検証する必要がある。`lp-relationship-story`はユーザーに見せる物語、`grow_relationship_from_first_meeting`は内部人格原則であり、両者の表現一致を将来照合。Body Clockの機械的なlonely化は『寂しさの意味を文脈から考える』方針と要再検討。main/production/Supabase変更なし。
+
+
+## 2026-10-21 正本照合・会話エンジン共通化・比較テストの7新規枝＋1再確認
+
+`main...branch` compare：
+- `docs/audit-overview-against-source` ahead1/behind340：`docs/IMPLEMENTATION_OVERVIEW.md` modified。
+- `docs/production-source-of-truth-reconciliation` ahead17/behind1：`docs/HANDOFF_NEXT_SORA_2026-10-14.md` added、`docs/IMPLEMENTATION_OVERVIEW.md` modified、`docs/MULTI_CHARACTER_PHASE0_AUDIT.md` modified、`docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md` added。**重要な未統合の正本照合資料**。このブランチを直接精読し、現在のmain/台帳と矛盾する記述を再確認すること。資料を自動で正本と見なさない。
+- `docs/update-implementation-overview` ahead1/behind341：`docs/IMPLEMENTATION_OVERVIEW.md` added（compare上）。
+- `docs/update-overview-relationship-growth` ahead1/behind334：同overview modified。
+- `experiment/shared-conversation-history-v1-20261015` ahead35/behind0：`lib/conversation-engine/` にattempt/base-prompt/character-context/character-prompt/context-format/history/layered-context/layered-prompt/memory/relationship-context/retry-guides等、会話エンジン分離に関わる多数の新規ファイル。`docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md`等も追加。**将来の複数キャラクター設計と美咲一人の先行実装をつなぐ重点検証候補**。compareにアメふる連携資料・`amahuru-rain-context.ts` もあるが、別プロジェクトのアメふる本体は調査・変更しない。35 commits aheadという数値は品質・採用可否を意味しない。
+- `test/relationship-acting-state-comparison` ahead2/behind0：`tests/relationship-acting-state-comparison.test.ts`、`tests/relationship-chat-wiring.test.ts` added。main外の関係性acting比較/配線テスト候補。テストがあるだけでは実行成功や実会話品質は未確認。
+- `perf/chat-stage-timing` ahead1/behind336：`app/api/chat/route.ts` modified。旧計測案、現行正本APIへの直接移植は要注意。
+- `sora/remove-timestamp-history-poll` ahead0/behind149/files0。前回調査済みのため**重複再確認のみ**。新規7枝。
+
+**設計思想との接続**：ユーザーの最新方針は、Misakiを複数キャラクター基盤とし、まず美咲一人を作り込むこと。ユーザー×キャラの秘密/関係記憶と、キャラ固有の知識・人格成長を分離し、婚姻の同時一人制約をDBで担保する。将来の大改修を防ぐため、識別子・所有権・データ分離・整合性は先に設計する一方、成長ロジックは検証可能に保つ。**これはユーザーとの設計議論であり、既存実装済みの主張ではない**。棚卸し完了後に台帳全体を冒頭から再読して適合性を評価する。
+
+本節は差分の存在と対象ファイルの確認まで。各branch内容・CI・preview・DB適用・本番稼働は未検証。main/production/Supabase/アメふる変更なし。
