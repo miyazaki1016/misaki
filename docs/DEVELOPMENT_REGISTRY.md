@@ -720,3 +720,12 @@ mainのmigration tree（全35件）を列挙。claim RPCの既知の同名再定
 再評価では、(a) mainへの実装/未実装と本番適用の区別、(b) 本来の目的・設計思想、(c) 他機能との整合性/重複/矛盾、(d) そのまま再利用・思想を再実装・検証知見のみ継承・不採用の分類、(e) 停止理由と再開条件、(f) テストが現行実効コード/最新migrationを対象にしているか、(g) 安全な導入順・ロールバック条件を見直す。
 
 **履歴を消さない：** 初期の記録はその時点の調査事実として保存し、後の判断は『再評価』と日付/根拠を追記する。古い結論を黙って上書きしない。台帳を『開発史の保存』と『これからの美咲の設計・優先順位』の両方に使えるようにする。再評価終了までは『棚卸し完了＝最終方針確定』と扱わない。main/production/Supabaseは無断変更しない。
+
+
+## 2026-10-21 Body Clock claim RPC 最終定義：main全後続migration本文検査
+
+`20260917143500_fix_body_clock_claim_rpc.sql` より後のmain migration **20件すべて**をGitHubから取得し、本文を `claim_misaki_body_clock_due_users`、`relationship_silence`、同名drop/redefinition、無交流時間条件で検査。**20/20件で同claim RPCの再定義/削除・`relationship_silence`の記述なし**。したがって**mainリポジトリに含まれるmigrationをファイル名順で適用した場合の最後のclaim RPC定義は `20260917143500_fix_body_clock_claim_rpc.sql`** と確定（ただし本番適用状況、DB上の手動変更、別管理SQLは未検証）。
+
+この最終SQLは `neutral`/`lonely` から、無交流3日以上で `primary='lonely'` を作る分岐を含む。`tests/body-clock-silence-contract.test.cjs` はそれより古い `20260917031500_phase5_relationship_aware_proactive_claim.sql` のみを検査するため、**mainの静的な安全契約テストとmigration最終定義の検証対象がずれていることは確定**。なお実DBの効果はSQLのCTE評価/条件/対象行を含め隔離DBで実行検証が必要であり、現時点でproductionの誤作動を断定しない。
+
+次の安全な検証：最新SQLのneutral→lonely分岐を対象にテストを追加する設計（古いテストは履歴として維持）、SQLの `evolved` 更新CTEが実行される条件と後続claimの送信判定を隔離DBで検証、DB適用履歴/関係v2ポリシーとの整合を確認。PR31の移植やproduction変更は先送り。分類：**コード上の整合性不一致は確認済み／本番への影響は未確認**。
