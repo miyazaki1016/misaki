@@ -913,3 +913,22 @@ GitHub `main...branch` compare：
 `experiment/shared-conversation-history-v1-20261015` の `docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md` と `lib/conversation-engine/character-context.ts`、`history.ts` を精読。前者は実験コードが本番と同等ではないと明記。後者はuserId/characterIdの一致を調べる純粋関数と履歴のフィルタ・直近60件変換であり、DBのアクセス制御や本番ルートの配線を実現したものではない。persona版管理、関係性、記憶の分離、外部情報の鮮度、JSON出力、再試行、課金・保存・冪等性などは移行ゲートとして残る。
 
 **今後の設計判断**：ユーザー×キャラの個別記憶、キャラ単位の知識・成長、婚姻の一意性を分ける。まず美咲一人を作り込むが、将来の複数キャラを前提にID・所有権・権限境界を設計する。以上は方針であり実装済みの認定ではない。main・本番・DB変更なし。
+
+
+## 2026-10-21 A/B実験ワークフローの歴史10枝（費用ゲートと比較品質）
+
+`main...branch` compareで次の10枝を新規確認。**すべてahead1で、変更ファイルは `.github/workflows/isolated-gemini-ab-manual.yml` のみ**（`work/ab-manual-workflow-only` はadded、他はmodified）：
+- `work/ab-20-pair-dispatch` behind23
+- `work/ab-blind-review-artifact-workflow` behind16
+- `work/ab-http-diagnostics-dispatch` behind21
+- `work/ab-long-fixture-dispatch` behind22
+- `work/ab-manual-workflow-only` behind24
+- `work/ab-paced-dispatch` behind20
+- `work/ab-quality-diagnostics-workflow` behind18
+- `work/ab-quality-manual-workflow` behind19
+- `work/ab-quality-reply-schema-dispatch` behind17
+- `work/quality-long-history-workflow` behind15
+
+mainと旧2枝のworkflow本文を直接確認。main `.github/workflows/isolated-gemini-ab-manual.yml`（blob `edffcd3d...`）は `workflow_dispatch` 専用、`confirm_billable_requests == 'YES'` をジョブ条件にし、明示入力に実験種別（latency/quality）、短長fixture、リクエスト間隔、実行数等がある。`work/ab-20-pair-dispatch`（blob `22f0d48c...`）は1組/20組（2/40 requests）の入力、`work/ab-blind-review-artifact-workflow`（blob `bd20ddcd...`）は品質レビュー出力を追加する流れ。いずれもproductionでなく特定の実験commitをcheckoutする設計。
+
+**重要**：workflowが存在することと、実Gemini実行・結果の有効性・人間のブラインド評価完了は別。現行workflowの手動課金承認ゲートを維持し、無断dispatchを行わない。これらの歴史は、品質比較を安全かつ再現可能にする試行錯誤の証拠だが、実験結果や優劣は今回の静的調査だけでは断定しない。ユーザーの新構想（複数人格、キャラごとの知識と成長）では、将来の人格一貫性・知識漏洩・長期会話の評価にも応用できる可能性がある。main/production/Supabase/有料Gemini呼び出しなし。
