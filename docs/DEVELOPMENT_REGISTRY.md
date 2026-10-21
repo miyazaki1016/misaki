@@ -855,3 +855,20 @@ GitHub `main...branch` compareで**8件すべてahead0/files0**、未反映フ�
 mainの現行対象を取得：`app/chat/conversation-history-sync.tsx` blob `3f39da15...`、`app/chat/page.tsx` `2221fcac...`、`app/api/chat/route.ts` `5600ad37...`。履歴取得・同期の証跡確認、timestamp poll除去、無料枠と履歴の整合、偽の待機表示、応答待機レイアウト、Gemini timeoutという問題群を示す**ブランチ名と現行ソースの存在**を確認。ただし個別の不具合の再現・修正内容・mainに残る機能的保証・本番状態は未検証。
 
 **開発史の仮説**：『履歴の出所を追う→同期を正す→無駄なpollを減らす→待機表示と再試行の誤解を減らす』という一連のユーザー体験課題が存在した可能性。実際の順序・因果はcommit履歴で確認するまで断定しない。履歴と利用枠の二重正本化、再試行による二重保存、画面上の偽busy状態を避ける観点で最終再評価。main/production/Supabase変更なし。
+
+
+## 2026-10-21 初対面からの関係成長・生活事実の根拠づけ8枝
+
+`main...branch` compare：
+- `fix/workday-grounding` ahead1/behind342：`app/api/chat/route.ts` modified。仕事日/休み等の事実に基づく発話の修正候補、現在のlife contextと照合前に旧routeを移植しない。
+- `fix/grow-relationship-from-first-meeting` ahead4/behind335：chat route、chat/Body Clock fallback persona、`20260918030000_grow_relationship_from_first_meeting.sql`。**SQLはmainにも存在**（blob `aa61e3b1...`）。main `lib/persona/fallback-persona.ts`（blob `f7f68d98...`）を直接読み、**『最初から恋人ではない』『初対面から会話・記憶を重ねる』『交際や昔からの恋愛を根拠なく捏造しない』**という同じ原則が現行fallbackにも明記されていることを確認。これは現行人格設計に受け継がれた重要な意図。DB適用済みかは未確認。
+- `sora/profile-aware-life-events` ahead0/behind166、差分なし。
+- `sora/drop-ungrounded-relationship-evidence` ahead0/behind59、差分なし。
+- `sora/fix-relationship-polarity-transport` ahead0/behind66、差分なし。
+- `sora/relationship-control-rpcs-v1` ahead0/behind87、差分なし。
+- `sora/canonical-relationship-integration` ahead3/behind175、`docs/IMPLEMENTATION_OVERVIEW.md` modifiedのみ。**main外に設計/引継ぎの文章差分**、実装未反映と同一視しない。
+- `sora/cutover-cleanup` ahead0/behind161、差分なし。
+
+main `lib/relationship-life-context.ts`（blob `d20d4f69...`）は `LifeFactKind=profile/schedule/routine/situation/preference/concern`、`source=user|memory`、`observedAt`、`validUntil`、`confidence` などの明示的な型を持つ。**生活の事実を文脈に応じて参照する設計資産**として、仕事日groundingや『寂しさを日数だけで決めない』方針との接続点。現行ルートでの実際の採用・品質は別途要検証。
+
+**開発史の観点**：恋人前提の発話を避ける原則、実在の生活事実に根拠を求める原則、関係性Evidenceの極性と出所を守る原則が、別々の枝から現在の一貫性に収束した可能性。因果・完成度はcommit履歴/テスト照合まで断定しない。main/production/Supabase変更なし。
