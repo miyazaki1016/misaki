@@ -54,3 +54,47 @@ export function selectChatExternalFacts(
     };
   });
 }
+
+/**
+ * More precise transport selection for a known user request.
+ * The original selector remains available for baseline comparisons only.
+ * A production caller must use this strict query contract before including
+ * transport facts; topic="transport" alone is too broad.
+ */
+export type ChatExternalQuery = Readonly<{
+  topic: ChatTopic;
+  transportKind?: "rail" | "airport";
+  targetId?: string; // canonical, provider-validated airport/line ID, not user-entered free text
+}>;
+
+export type TargetedExternalItem = ExternalItem & Readonly<{
+  targetId?: string; // canonical ID, checked before this call
+}>;
+
+export type TargetedChoice = Readonly<{
+  id: string;
+  included: boolean;
+  reason: Choice["reason"] | "missing_target" | "wrong_target" | "wrong_transport_kind";
+}>;
+
+export function selectChatExternalFactsForQuery(
+  query: ChatExternalQuery,
+  items: readonly TargetedExternalItem[],
+): readonly TargetedChoice[] {
+  const base = selectChatExternalFacts(query.topic, items);
+  return base.map((decision, index): TargetedChoice => {
+    const item = items[index];
+    if (!decision.included || query.topic !== "transport") return decision;
+    // This strict selector must not include rail facts for an airport question.
+    if (!query.transportKind || !query.targetId?.trim()) {
+      return { id: item.id, included: false, reason: "missing_target" };
+    }
+    if (item.kind !== query.transportKind) {
+      return { id: item.id, included: false, reason: "wrong_transport_kind" };
+    }
+    if (!item.targetId || item.targetId !== query.targetId) {
+      return { id: item.id, included: false, reason: "wrong_target" };
+    }
+    return decision;
+  });
+}
