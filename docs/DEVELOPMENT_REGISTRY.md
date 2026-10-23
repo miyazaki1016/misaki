@@ -1056,3 +1056,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 取得状態を `not_checked / empty / unavailable / partial / available` に区分し、取得失敗を確認済み0件と混同しない純粋関数を試作。合成fixtureの7テストを定義。
 - **未実行**：Nodeテスト、CI、型検査、実取得関数との結線、実Gemini品質比較。状態分類は入力された `failures` を信頼するだけで、現行fetch経路が失敗を返せるようになったわけではない。Production、main、DB、Gemini API不変更。
 - 次：実checkoutで `node --test tests/tokyo-event-result-state-offline.test.mjs`、エラー伝搬と部分成功の仕様レビュー。V1短縮候補は採用保留。
+
+## 2026-10-24：東京イベント状態試作の矛盾入力修正と実コード評価
+
+- 実験枝の `lib/conversation-engine/tokyo-event-result-state.mjs` を修正（`15579e7`）、テストを増補（`bf1d247`）。`attempted=0` にイベントや失敗情報があると、従来は黙ってイベントを破棄していたため、TypeErrorで拒否するよう変更。
+- GitHubから読んだ**実際のモジュール内容**を隔離JavaScript評価環境で実行し、5状態の分類・ガイド状態と矛盾入力4ケースについて14個のassertionが成功。**Node test runnerの実行ではない**。GitHubのテストファイルには合計9つのテストケース定義（5 fixture＋4 test）があるが、Node/CIでのPASSは未確認。
+- 実イベント取得関数への接続、本番会話品質、課金削減率は未確認。main/Production/DBは変更なし。次は実checkoutでNodeテスト実行、partial状態とエラー伝搬の仕様レビュー。
