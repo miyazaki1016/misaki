@@ -23,3 +23,10 @@ test('never claims verified no-events after a fetch failure', () => {
   const result = classifyTokyoEventResult({ events: [], attempted: 5, failures: ['offline fixture'] });
   assert.notEqual(emptyTokyoEventGuideState(result), 'no_confirmed_events');
 });
+
+test('reject unattempted result carrying verified events', () => {
+  assert.throws(() => classifyTokyoEventResult({ events: [event], attempted: 0 }), TypeError);
+});
+test('reject unattempted result carrying failure', () => {
+  assert.throws(() => classifyTokyoEventResult({ events: [], failures: ['timeout'], attempted: 0 }), TypeError);
+});
