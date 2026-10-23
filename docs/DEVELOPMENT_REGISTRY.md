@@ -1036,3 +1036,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` の `docs/TOKYO_EMPTY_EVENT_SOURCE_TEST_LOCAL_RUN_20261023.md`（コミット `07864fb`）に記録。
 - GitHub上の実テストファイルと実ソース0件分岐を読み、ローカル一時領域に転記・再構成してNode v22.16.0の `node --test` を実行：**8/8 PASS**。V0 760 UTF-8 bytes、未採用V1 339 bytes、差421 bytes。
 - **実checkoutではない**。CI、リポジトリ全体のテスト、品質・安全同等性、Gemini実token/実費は未検証。V1採用保留。次は実checkoutと失敗系fixture。
+
+## 2026-10-23：イベント0件の失敗系・災害系テスト契約を追加
+
+- 実験ブランチ `experiment/chat-input-metrics-offline-20261022` に `tests/tokyo-empty-event-guard-scenarios-offline.test.mjs` を追加（コミット `10bd8a1`）。7つの合成シナリオ（雑談、明示質問、取得失敗、地域不明、災害質問、検証済み災害、情報入手経路）と、V1候補に取得失敗の明示区別がないことを検出する1テスト。
+- **重要：このファイルは要件契約の雛形**。固定真偽値をassertするため、実際の生成文やイベント取得コードの安全性を検証するテストではない。Node実行、CI、実ソース接続、応答品質、Gemini実費は未確認。PASSしたとしても安全性を証明しない。
+- 新しい発見：`getTokyoLifeEvents()` は取得エラー時に空配列を返す経路があり、0件と取得失敗の区別がガイドに渡らない可能性がある。安全なV1採用前に結果状態の区別を設計・テストする必要あり。
+- main/Production/DBは不変更。次は実ソース連動の失敗系fixtureに置き換え、実checkoutでテストする。
