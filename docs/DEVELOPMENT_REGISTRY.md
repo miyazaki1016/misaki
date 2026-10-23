@@ -1007,3 +1007,12 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 **関連ルール**：`docs/MISAKI_DEVELOPMENT_WORK_RULES.md`（既存正式版）、`docs/development-ledger-continuous-update-rule-20261023.md`（今回の追加原則）。既存の本番・課金API・DB変更の承認要件を緩めない。
 
 **今回の検証範囲**：台帳本体と既存運用ルールのGitHub取得を確認。全ブランチHEADの総点検、実験枝の最新コード評価、CI・実機・本番試験はこの追記作業では未実施。次の工程は両作業ブランチの最新状態と台帳の差分照合。
+
+## 2026-10-23：Gemini軽量化実験ブランチの引継ぎ照合（読み取り）
+
+- **照合対象**：`experiment/chat-input-metrics-offline-20261022` の `docs/PROMPT_SECTION_SHARES_SYNTHETIC_20261023.md`、`docs/CHAT_PROMPT_V0_WIRING_AND_SOURCE_GUARD_20261023.md`、`docs/CHAT_INPUT_METRICS_LOCAL_TEST_REPORT_20261022.md`、`docs/CHAT_REAL_PROMPT_READONLY_AUDIT_20261022.md` をGitHubから取得して確認。
+- **確認できた成果**：合成fixtureでの節別byte計測と重複検出、実routeのV0ソース配線監査、外部情報・履歴・recentTopicText・recallの重複可能性の整理。記録上、再構成したローカル計測器6/6 PASS。ただし実験ブランチのcheckout/CI PASSを意味しない。
+- **現在の状態**：**C/D（実験・調査）**。合成UTF-8 byteの比率はGemini実token、課金額、実会話品質を証明しない。現行promptへのbyte parity、実装接続、CI、iPhone実機、本番確認は未完了。
+- **次の安全な工程**：`createTokyoLifeEventsGuide` のイベント0件の固定ガードと、既存の天気・捏造防止ガードの意味上の重複を、合成fixtureで検証する。次にrecentTopicText再掲8件とrecall追加20件を比較。**ガードを無条件削除しない**。実Gemini課金呼出し、main、本番、DB変更は行わない。
+- **Transformers.js**：別実験として候補整理のみ。iPhone Safari対応、サイズ、遅延、電池、精度、Geminiフォールバックを未検証。Gemini入力軽量化の削減率と混同しない。
+- **今回の実行・未実行**：GitHub資料の読み取りは実施。checkout、Node test、CI、実機、課金API、本番確認は未実施。全ブランチHEADと台帳の完全照合も未完了。
