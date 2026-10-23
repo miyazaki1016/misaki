@@ -1068,3 +1068,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝の `docs/TOKYO_EVENT_STATE_NODE_TEST_RUN_20261024.md`（`bd2b5a0`）に記録。GitHubから取得したモジュールとテストをローカル再構成し、Node v22.16.0で `node --test` 実行：**9/9 PASS**。GitHub checkoutではない。CI/実環境未検証。
 - 既存の `getTokyoLifeEvents()` は5取得元を `Promise.all` で呼び、各fetch helperはエラーをnullにする経路があるため、外側catchだけでは失敗状態を復元できない。状態試作への本番接続は**未実施**。
 - main/Production/DB/Gemini API変更なし。次は取得元別の成功/失敗を観測する契約設計と、オフラインfixture検証。
+
+## 2026-10-24：東京イベント5取得元の状態集約オフライン試作
+
+- 実験枝に `lib/conversation-engine/tokyo-source-health-offline.mjs`（`ffc57ff`）と `tests/tokyo-source-health-offline.test.mjs`（`df2e5ae`）を追加。
+- 5取得元（地震、警報、天気、鉄道、羽田）の `fulfilled/rejected` を区別し、結果を既存 `classifyTokyoEventResult` に渡す純粋関数と7テストを定義。空の成功と取得失敗、部分成功、重複/欠損/不正入力を対象にする。
+- **重要な未解決事項**：実fetch helperは内部でエラーをnullに変換するため、現行コードからこのoutcomeを正しく生成できない。取得元別エラーを明示する変更が必要だが、現時点では本番結線なし。テスト未実行、CI未確認、Gemini品質/費用未測定。
+- main、Production、DB、課金APIは変更なし。次は実checkoutでテストし、fetch helperの失敗観測方法を精査する。
