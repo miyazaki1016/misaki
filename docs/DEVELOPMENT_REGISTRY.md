@@ -1023,3 +1023,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実際の `createTokyoLifeEventsGuide` 0件分岐を読み取り、ローカル一時Nodeテストへ手動転記したV0 760 UTF-8 bytesと未採用V1 339 bytesを比較。差421 bytes（当該節で約55.4%）。**手動転記した文字列に対する8/8 PASS**であり、GitHub checkout、CI、実Gemini token、費用、品質、V0 prompt parityの証明ではない。
 - 明示的な「ニュースを見ていない」自己説明の禁止と自然な回答例がV1候補から消える点を検出。**安全同等性未確認のため採用保留**。次は実ソース抽出テスト、取得失敗/災害/質問分岐のfixtureとガードの維持検証。
 - main、Production、Supabase、Gemini API、ユーザーデータには触れていない。
+
+## 2026-10-23：東京イベント0件ガードのソース抽出テスト追加
+
+- 実験ブランチ `experiment/chat-input-metrics-offline-20261022` に `tests/tokyo-empty-event-guide-source-offline.test.mjs` を追加（コミット `687658da7ff518020a57fdc58c40f66814f427ec`）。GitHub読戻しで8件のNode標準テスト定義を確認。
+- テストはcheckout上の `lib/tokyo-life-events.ts` から0件時のV0テンプレートを抽出し、V1候補とのbyte差、意味上の共通点と明示的に失われる例示をチェックする。実GeminiやDBを呼ばない。
+- **未実施**：この新規テストのNode実行、CI、型検査、実際のV0 byte値の再計測。過去の手動転記760→339 bytesは暫定値のまま。新規テストはPASS未確認。安全・品質同等性も未確認、V1は採用保留。
+- 次：実験ブランチをcheckoutして `node --test tests/tokyo-empty-event-guide-source-offline.test.mjs` を実行、出力と失敗箇所を記録。main/Production/Supabaseは変更しない。
