@@ -993,3 +993,17 @@ Proactive/Body Clock関連枝は現行mainの仕様と差分精読するまで�
 `experiment/interpreter-gradual-acting-20261015` の `docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md` を精読。Freeも美咲自身の日常からの自発メッセージを構想し、ユーザー過去会話/共有想い出を自発話題の材料にしない。Premiumは同意済みUser Memory/Shared Memoryを少数参照可能。ただし記憶保存・通常会話での参照・価格/回数/頻度は未決。課金による親密度上昇や解約による関係性低下は禁止。User Memory/Shared Memory/Relationship Memoryを分離し、user×characterに閉じる。**設計上の合意であり実装・採算の実証ではない**。
 
 Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと。通常会話の文脈短縮と自発通知の記憶利用許可は別問題。main/本番/Supabase/有料Gemini変更なし。
+
+## 2026-10-23：開発台帳の継続更新を必須化（運用ルール）
+
+**決定：この台帳を開発進捗の追跡正本として、実装・調査・検証の作業単位ごとに更新する。** 単発の監査資料で終わらせない。設計・全体仕様の正本は引き続き `docs/IMPLEMENTATION_OVERVIEW.md` とし、双方の役割を混同しない。
+
+1. **開始時の照合**：関連する全ブランチの最新HEAD・コミット・実ファイルと、この台帳・総覧・引継ぎを照合する。`main` が最新とも、最新ブランチが完成版とも仮定しない。差異は未解決として明記する。
+2. **変更ごとの更新**：各作業の目的、対象ブランチと基点SHA、変更ファイル、実行した検証、結果、残課題、次の一手、保存コミットSHAをGitHubに残し、この台帳の該当項目へ反映する。
+3. **状態を分ける**：設計のみ／実験中／実装済み／オフライン検証済み／CI検証済み／実機確認済み／本番確認済みを区別する。推定値・合成fixture・過去の成功を実測や本番証明に昇格させない。
+4. **終了・チャット移行時**：台帳と対象ブランチHEADのずれを再確認し、最後の確定成果と次に行う工程を記録する。GitHub保存後は同じブランチから読戻して確認する。
+5. **実験の分離**：Gemini通常会話入力軽量化（`experiment/chat-input-metrics-offline-20261022`）とTransformers.jsのブラウザ内AI検討は別の追跡項目とし、検証前にmain／本番へ反映しない。
+
+**関連ルール**：`docs/MISAKI_DEVELOPMENT_WORK_RULES.md`（既存正式版）、`docs/development-ledger-continuous-update-rule-20261023.md`（今回の追加原則）。既存の本番・課金API・DB変更の承認要件を緩めない。
+
+**今回の検証範囲**：台帳本体と既存運用ルールのGitHub取得を確認。全ブランチHEADの総点検、実験枝の最新コード評価、CI・実機・本番試験はこの追記作業では未実施。次の工程は両作業ブランチの最新状態と台帳の差分照合。
