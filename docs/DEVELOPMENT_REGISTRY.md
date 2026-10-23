@@ -1062,3 +1062,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝の `lib/conversation-engine/tokyo-event-result-state.mjs` を修正（`15579e7`）、テストを増補（`bf1d247`）。`attempted=0` にイベントや失敗情報があると、従来は黙ってイベントを破棄していたため、TypeErrorで拒否するよう変更。
 - GitHubから読んだ**実際のモジュール内容**を隔離JavaScript評価環境で実行し、5状態の分類・ガイド状態と矛盾入力4ケースについて14個のassertionが成功。**Node test runnerの実行ではない**。GitHubのテストファイルには合計9つのテストケース定義（5 fixture＋4 test）があるが、Node/CIでのPASSは未確認。
 - 実イベント取得関数への接続、本番会話品質、課金削減率は未確認。main/Production/DBは変更なし。次は実checkoutでNodeテスト実行、partial状態とエラー伝搬の仕様レビュー。
+
+## 2026-10-24：東京イベント状態テスト Node実行・取得元結線の阻害要因
+
+- 実験枝の `docs/TOKYO_EVENT_STATE_NODE_TEST_RUN_20261024.md`（`bd2b5a0`）に記録。GitHubから取得したモジュールとテストをローカル再構成し、Node v22.16.0で `node --test` 実行：**9/9 PASS**。GitHub checkoutではない。CI/実環境未検証。
+- 既存の `getTokyoLifeEvents()` は5取得元を `Promise.all` で呼び、各fetch helperはエラーをnullにする経路があるため、外側catchだけでは失敗状態を復元できない。状態試作への本番接続は**未実施**。
+- main/Production/DB/Gemini API変更なし。次は取得元別の成功/失敗を観測する契約設計と、オフラインfixture検証。
