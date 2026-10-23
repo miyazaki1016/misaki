@@ -1030,3 +1030,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - テストはcheckout上の `lib/tokyo-life-events.ts` から0件時のV0テンプレートを抽出し、V1候補とのbyte差、意味上の共通点と明示的に失われる例示をチェックする。実GeminiやDBを呼ばない。
 - **未実施**：この新規テストのNode実行、CI、型検査、実際のV0 byte値の再計測。過去の手動転記760→339 bytesは暫定値のまま。新規テストはPASS未確認。安全・品質同等性も未確認、V1は採用保留。
 - 次：実験ブランチをcheckoutして `node --test tests/tokyo-empty-event-guide-source-offline.test.mjs` を実行、出力と失敗箇所を記録。main/Production/Supabaseは変更しない。
+
+## 2026-10-23：0件イベント抽出テストのローカル再構成実行
+
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` の `docs/TOKYO_EMPTY_EVENT_SOURCE_TEST_LOCAL_RUN_20261023.md`（コミット `07864fb`）に記録。
+- GitHub上の実テストファイルと実ソース0件分岐を読み、ローカル一時領域に転記・再構成してNode v22.16.0の `node --test` を実行：**8/8 PASS**。V0 760 UTF-8 bytes、未採用V1 339 bytes、差421 bytes。
+- **実checkoutではない**。CI、リポジトリ全体のテスト、品質・安全同等性、Gemini実token/実費は未検証。V1採用保留。次は実checkoutと失敗系fixture。
