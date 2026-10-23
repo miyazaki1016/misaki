@@ -1016,3 +1016,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - **次の安全な工程**：`createTokyoLifeEventsGuide` のイベント0件の固定ガードと、既存の天気・捏造防止ガードの意味上の重複を、合成fixtureで検証する。次にrecentTopicText再掲8件とrecall追加20件を比較。**ガードを無条件削除しない**。実Gemini課金呼出し、main、本番、DB変更は行わない。
 - **Transformers.js**：別実験として候補整理のみ。iPhone Safari対応、サイズ、遅延、電池、精度、Geminiフォールバックを未検証。Gemini入力軽量化の削減率と混同しない。
 - **今回の実行・未実行**：GitHub資料の読み取りは実施。checkout、Node test、CI、実機、課金API、本番確認は未実施。全ブランチHEADと台帳の完全照合も未完了。
+
+## 2026-10-23：東京生活イベント0件ガードの静的byte比較（実験継続）
+
+- 実験ブランチ `experiment/chat-input-metrics-offline-20261022` に `docs/TOKYO_EMPTY_EVENT_GUARD_OFFLINE_AUDIT_20261023.md`（コミット `67399c0`）と `docs/TOKYO_EMPTY_EVENT_GUARD_BYTE_COMPARISON_20261023.md`（コミット `455ab43`）を保存。
+- 実際の `createTokyoLifeEventsGuide` 0件分岐を読み取り、ローカル一時Nodeテストへ手動転記したV0 760 UTF-8 bytesと未採用V1 339 bytesを比較。差421 bytes（当該節で約55.4%）。**手動転記した文字列に対する8/8 PASS**であり、GitHub checkout、CI、実Gemini token、費用、品質、V0 prompt parityの証明ではない。
+- 明示的な「ニュースを見ていない」自己説明の禁止と自然な回答例がV1候補から消える点を検出。**安全同等性未確認のため採用保留**。次は実ソース抽出テスト、取得失敗/災害/質問分岐のfixtureとガードの維持検証。
+- main、Production、Supabase、Gemini API、ユーザーデータには触れていない。
