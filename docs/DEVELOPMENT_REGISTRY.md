@@ -1049,3 +1049,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` に `tests/tokyo-events-fetch-state-source-offline.test.mjs` を追加（コミット `d125222`）。実ソースの `getTokyoLifeEvents()` と `createTokyoLifeEventsGuide()` をcheckout時に読み、5つのテストで現行設計の「取得エラー時も[]、0件ガイドに状態引数なし」を検出する。
 - **このテストは現状の欠陥を特徴づけるだけで修正ではない。** 取得エラーが発生したことを会話ガイドに渡せない可能性が残る。実行・CI・型検査は未確認。次は実checkoutで実行し、取得結果の状態契約を別実験として設計する。
 - main、本番、DB、課金APIは変更なし。軽量化V1は安全同等性未検証につき採用保留。
+
+## 2026-10-24：東京イベント取得状態のオフライン試作
+
+- 実験ブランチ `experiment/chat-input-metrics-offline-20261022` に `lib/conversation-engine/tokyo-event-result-state.mjs`（コミット `89bf87d`）と `tests/tokyo-event-result-state-offline.test.mjs`（コミット `66dee24`）を追加。
+- 取得状態を `not_checked / empty / unavailable / partial / available` に区分し、取得失敗を確認済み0件と混同しない純粋関数を試作。合成fixtureの7テストを定義。
+- **未実行**：Nodeテスト、CI、型検査、実取得関数との結線、実Gemini品質比較。状態分類は入力された `failures` を信頼するだけで、現行fetch経路が失敗を返せるようになったわけではない。Production、main、DB、Gemini API不変更。
+- 次：実checkoutで `node --test tests/tokyo-event-result-state-offline.test.mjs`、エラー伝搬と部分成功の仕様レビュー。V1短縮候補は採用保留。
