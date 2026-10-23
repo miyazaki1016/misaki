@@ -1043,3 +1043,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - **重要：このファイルは要件契約の雛形**。固定真偽値をassertするため、実際の生成文やイベント取得コードの安全性を検証するテストではない。Node実行、CI、実ソース接続、応答品質、Gemini実費は未確認。PASSしたとしても安全性を証明しない。
 - 新しい発見：`getTokyoLifeEvents()` は取得エラー時に空配列を返す経路があり、0件と取得失敗の区別がガイドに渡らない可能性がある。安全なV1採用前に結果状態の区別を設計・テストする必要あり。
 - main/Production/DBは不変更。次は実ソース連動の失敗系fixtureに置き換え、実checkoutでテストする。
+
+## 2026-10-24：東京イベント取得失敗の実ソース連動キャラクタリゼーション
+
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` に `tests/tokyo-events-fetch-state-source-offline.test.mjs` を追加（コミット `d125222`）。実ソースの `getTokyoLifeEvents()` と `createTokyoLifeEventsGuide()` をcheckout時に読み、5つのテストで現行設計の「取得エラー時も[]、0件ガイドに状態引数なし」を検出する。
+- **このテストは現状の欠陥を特徴づけるだけで修正ではない。** 取得エラーが発生したことを会話ガイドに渡せない可能性が残る。実行・CI・型検査は未確認。次は実checkoutで実行し、取得結果の状態契約を別実験として設計する。
+- main、本番、DB、課金APIは変更なし。軽量化V1は安全同等性未検証につき採用保留。
