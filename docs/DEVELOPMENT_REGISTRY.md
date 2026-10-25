@@ -1081,3 +1081,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝に `tests/tokyo-fetch-health-source-contract-offline.test.mjs` を追加（`10d60b6`）。`lib/tokyo-life-events.ts` の実ソースを読む7つのキャラクタリゼーションテスト。**Node実行/CIは未確認**。現状の欠落を検知する目的であり、取得状態の修正ではない。
 - `fetchText` / `fetchJson` はHTTP失敗と例外を `null` に潰す。地震・予報はその結果を `[]` に変換する。羽田は国内・国際の一方が取得できなくても `false` として扱う。鉄道はVercel環境で意図的に取得をスキップし `[]` を返す。したがって5ソース単位の成功/失敗だけでなく、**スキップ状態**および**羽田などの部分取得**を表す必要がある。
 - `getTokyoLifeEvents` の外側 `Promise.all` / `catch` を変えるだけでは内側で消えた失敗は復元できない。取得補助関数の観測契約を設計してから接続する。main/本番/DB/Gemini API変更なし。
+
+## 2026-10-25：東京イベントのスキップ・部分取得状態モデルV2（実験）
+
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` に `lib/conversation-engine/tokyo-source-health-v2-offline.mjs`（`fcf8622`）、`tests/tokyo-source-health-v2-offline.test.mjs`（`4522e25`）を追加。5ソースの各サブリクエストについて `success/failure/skipped` を入力し、ソース別状態と全体の `completenessVerified` を集約。鉄道スキップと羽田国内・国際の片側失敗を明示的に扱う。
+- GitHubから再取得した実モジュールを隔離JavaScript評価器で評価し、**13 assertions成功**。**Node test runner/CIは未実行**、9テスト定義は実験fixtureのみ。取得処理への結線なし。
+- 制限：これは入力済みの状態を分類する純粋関数であり、現行fetch helperの `null` へのエラー吸収を修正しない。実データ/本番/課金API未接続。次はNodeテストと実fetch観測契約を検討。main/Production/DB不変更。
