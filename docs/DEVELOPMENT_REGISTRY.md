@@ -1087,3 +1087,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` に `lib/conversation-engine/tokyo-source-health-v2-offline.mjs`（`fcf8622`）、`tests/tokyo-source-health-v2-offline.test.mjs`（`4522e25`）を追加。5ソースの各サブリクエストについて `success/failure/skipped` を入力し、ソース別状態と全体の `completenessVerified` を集約。鉄道スキップと羽田国内・国際の片側失敗を明示的に扱う。
 - GitHubから再取得した実モジュールを隔離JavaScript評価器で評価し、**13 assertions成功**。**Node test runner/CIは未実行**、9テスト定義は実験fixtureのみ。取得処理への結線なし。
 - 制限：これは入力済みの状態を分類する純粋関数であり、現行fetch helperの `null` へのエラー吸収を修正しない。実データ/本番/課金API未接続。次はNodeテストと実fetch観測契約を検討。main/Production/DB不変更。
+
+## 2026-10-25：東京イベント状態V2 Node実行と本番接続前レビュー
+
+- 実験枝に `docs/TOKYO_SOURCE_HEALTH_V2_NODE_AND_INTEGRATION_REVIEW_20261025.md` を追加（`f4e159b`）。GitHubから取得したV2モジュールとテストをローカル再構成し、**Node v22.16.0で実際に9/9 PASS**。GitHub checkout/CI/型検査は未実施。
+- 現行fetch helperは通信失敗をnull→空配列へ変換するため、外側Promise.allSettledだけでは状態復元できない。鉄道のVercelスキップ、羽田2リクエスト、地震・警報の詳細取得を考慮する必要あり。
+- **新規発見**：V2は必須サブリクエストの個数・識別子を検査しない。羽田の国際線リクエストが欠落していても国内線successだけでavailableになりうる。必須取得対象の網羅性検証を次の優先課題とする。
+- 本番結線なし。main/Production/DB/Gemini API変更なし。ガイド短縮V1は採用保留。
