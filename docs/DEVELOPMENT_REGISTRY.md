@@ -1125,3 +1125,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝に `lib/conversation-engine/tokyo-three-stage-health-offline.mjs`（`fb4160b`）と `tests/tokyo-three-stage-health-offline.test.mjs`（`77780a3`）を追加。固定取得元→JMA候補判断→詳細取得を統合し、選択された候補IDと詳細取得対象IDの集合一致を要求。上限到達・候補判断漏れ・詳細失敗・鉄道スキップでは全体完全性をtrueにしない。
 - GitHubから再取得した実コードを隔離JavaScript評価器で検証し**12 assertions成功**。テストファイル10件、Node test runner/CIは未実行。
 - 制限：候補抽出自体の正しさや実fetch成功は検証していない。実データ、プロンプト、main、本番、DB、Gemini APIには未接続。次は候補抽出・フィード解析の検証と実行環境での正式テスト。
+
+## 2026-10-26：気象庁Atom一覧のパース形状監査（オフライン）
+
+- 実験枝に `lib/conversation-engine/tokyo-feed-parse-audit-offline.mjs`（`30717bf`）と `tests/tokyo-feed-parse-audit-offline.test.mjs`（`68fb44a`）を追加。実コード `lib/tokyo-life-events.ts` の正規表現ベース `getEntries/getLink` に合わせ、feed wrapper欠損、entry開閉不整合、名前空間付きentry、認識不能なリンクを保守的に検出。
+- GitHub再取得の実モジュールを隔離JavaScript評価器で実行し、**8チェック成功**。テスト定義7件、Node test runner/CI未実行。
+- 限界：XMLスキーマ検証器ではなく、実feedの網羅性・候補抽出条件・ネットワーク取得成功は証明しない。feedが空でも構造上は正常になりうるため、取得成功の独立観測が必要。実fetch、本番、main、DB、Gemini API未変更。
