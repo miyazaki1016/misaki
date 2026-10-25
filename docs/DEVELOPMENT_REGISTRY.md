@@ -1119,3 +1119,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝に `lib/conversation-engine/tokyo-candidate-coverage-offline.mjs`（`e1f02a8`）と `tests/tokyo-candidate-coverage-offline.test.mjs`（`7226258`）を追加。地震・警報のfeedから候補として抽出されたIDに対して `selected/filtered/no_link/cap_reached` の判断を1件ずつ照合し、記録漏れ・重複・未知IDを検出。
 - GitHubから再取得した実モジュールを隔離JavaScript環境で検証し**10チェック成功**。Node test runner/CIは未実行。テストファイルには10テスト定義。
 - **境界**：これは候補抽出後の決定網羅性であり、feedのパース漏れ、候補抽出条件の誤り、実際のfetch成功や詳細取得成功を保証しない。イベント数上限到達を明示するが、上限後の全詳細取得を要求する設計ではない。実fetch未接続、本番・main・DB・Gemini API変更なし。
+
+## 2026-10-25：東京イベント3段階の相互照合（オフライン実験）
+
+- 実験枝に `lib/conversation-engine/tokyo-three-stage-health-offline.mjs`（`fb4160b`）と `tests/tokyo-three-stage-health-offline.test.mjs`（`77780a3`）を追加。固定取得元→JMA候補判断→詳細取得を統合し、選択された候補IDと詳細取得対象IDの集合一致を要求。上限到達・候補判断漏れ・詳細失敗・鉄道スキップでは全体完全性をtrueにしない。
+- GitHubから再取得した実コードを隔離JavaScript評価器で検証し**12 assertions成功**。テストファイル10件、Node test runner/CIは未実行。
+- 制限：候補抽出自体の正しさや実fetch成功は検証していない。実データ、プロンプト、main、本番、DB、Gemini APIには未接続。次は候補抽出・フィード解析の検証と実行環境での正式テスト。
