@@ -1101,3 +1101,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - GitHubから再取得した実コードを隔離JavaScript評価環境で評価し、**14 assertions成功**。**Node test runner/CIは未実行**。テストファイルには10テストを定義。
 - V3はあくまで静的な最小リクエスト目録。地震・警報の詳細XMLは候補数で変動するため未収録。今後は動的詳細取得の状態をどう観測するか検討が必要。
 - 実fetch経路、本番、main、DB、Gemini API未変更。ガイド短縮V1は採用保留。
+
+## 2026-10-25：地震・警報の動的詳細取得を追跡するオフライン試作
+
+- 実験枝に `lib/conversation-engine/tokyo-dynamic-detail-health-offline.mjs`（`982e3c5`）と `tests/tokyo-dynamic-detail-health-offline.test.mjs`（`a0a1412`）を追加。地震・警報の一覧から発見した詳細IDと各詳細の `success/failure/skipped` を1対1で照合し、未記録・重複・未知IDを拒否する。
+- GitHub再取得した実コードを隔離JavaScript評価器で実行し、**11チェック成功**。Node test runner/CIは未実行。テストファイルは10テスト定義。
+- **制限**：一覧自体が取得できたか、候補選別前の情報が完全かは判定しない。詳細IDはURLを直接ログ保存せず呼び出し元が安全な識別子に変換する必要あり。実fetch関数とは未接続。main/本番/DB/Gemini API変更なし。
