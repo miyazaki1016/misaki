@@ -1094,3 +1094,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 現行fetch helperは通信失敗をnull→空配列へ変換するため、外側Promise.allSettledだけでは状態復元できない。鉄道のVercelスキップ、羽田2リクエスト、地震・警報の詳細取得を考慮する必要あり。
 - **新規発見**：V2は必須サブリクエストの個数・識別子を検査しない。羽田の国際線リクエストが欠落していても国内線successだけでavailableになりうる。必須取得対象の網羅性検証を次の優先課題とする。
 - 本番結線なし。main/Production/DB/Gemini API変更なし。ガイド短縮V1は採用保留。
+
+## 2026-10-25：東京イベント取得先の網羅性検査V3（実験）
+
+- 実験枝に `lib/conversation-engine/tokyo-source-health-v3-offline.mjs`（`8808f4e`）、`tests/tokyo-source-health-v3-offline.test.mjs`（`31828f8`）を追加。地震feed・警報feed・予報hourly・鉄道rail_page・羽田domestic/internationalの必須リクエストIDを固定し、欠損・重複・未知IDを拒否する。
+- GitHubから再取得した実コードを隔離JavaScript評価環境で評価し、**14 assertions成功**。**Node test runner/CIは未実行**。テストファイルには10テストを定義。
+- V3はあくまで静的な最小リクエスト目録。地震・警報の詳細XMLは候補数で変動するため未収録。今後は動的詳細取得の状態をどう観測するか検討が必要。
+- 実fetch経路、本番、main、DB、Gemini API未変更。ガイド短縮V1は採用保留。
