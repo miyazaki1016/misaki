@@ -1191,3 +1191,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `lib/conversation-engine/misaki-memory-transition-offline.mjs`（`3d47038`、曖昧ID隔離修正 `47b6d3f`）、`tests/misaki-memory-transition-offline.test.mjs`（`6a513c4`）を追加。検証済み・明示的なイベント列から予定状態 planned/confirmed/cancelled/completed を解決し、confirmed 以外を確定予定として提示しない。
 - 古い予定で取り消しを上書きしない、未検証の訂正を採用しない、同順序で矛盾する記録は隔離するなど5ケースをGitHub読戻しの隔離JSでPASS。正式Nodeテスト未実行。
 - **制約**：自然言語から予定や訂正を抽出する仕組みはない。記録のverifiedやsequenceは呼出元の信頼できる管理が前提。実会話のニュアンスや感情を評価したものではない。main・本番・DB・Gemini API変更なし。
+
+## 2026-10-26：日本語会話から予定候補を抽出する安全側のオフライン試作
+
+- 実験枝 `lib/conversation-engine/misaki-plan-candidate-offline.mjs`（`a659cdc`）、`tests/misaki-plan-candidate-offline.test.mjs`（`e3df84b`）を追加。予定検討・確定・中止・完了の表現を**未検証の候補**として分類。否定、引用・伝聞、疑問、複数状態の混在、無関係文は確定せず要確認に回す。
+- GitHub読み戻しの隔離JSで10合成例すべて期待どおり。正式Nodeテスト未実行。日本語の全表現・皮肉・省略・主語や時刻の同定は未対応。**候補はverifiedではなく、永続記憶や実予定への自動反映は禁止**。前段の明示イベント遷移器へ直接渡さない。
+- 次は主語・時制・話題の継続・確認を含む対話上の候補解決の仕様化と誤検知評価。main・本番・Supabase・有料Gemini API変更なし。
