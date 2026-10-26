@@ -1215,3 +1215,8 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` に `prototypes/multi-character-opening/index.html` を追加（`a12298b`）。スマホ幅の夜景・光・キャラのシルエット・4幕の字幕・3種類の仮キャラ切替・進捗バー・スキップ・場面送り・再試行相当のリスタート・reduced-motionを含む静的HTML試作。
 - **実際のAIダウンロードは未接続**。表示進捗は450msごとに5%増える疑似進捗。『会話へ』もデモ文言のみ。既存キャラの確定設定・画像ではなく仮表示。`lib/conversation-engine/multi-character-opening-offline.mjs` と画面は未接続。
 - 本番、main、Supabase、課金APIは変更していない。次は実モデルの進捗・ready/failure状態との接続、キャラの正式データ取得、iPhoneでの確認を行う前にレビューが必要。
+
+## 2026-10-26：初回ラウンジ→キャラ選択→オープニング接続（静的試作）
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` に `prototypes/character-lounge/index.html`（`86aeb11`）を作成。初回ラウンジの美咲カード、仮シルエット、選択ボタンを配置。
+- `prototypes/multi-character-opening/index.html`（`b53e6ed`）を更新し、`?character=misaki&from=lounge` を読み込んで選択キャラを引き継ぎ、ラウンジへの戻りボタンを追加。ラウンジ経由ではオープニング内キャラ選択を無効化。既存の単体オープニング試作は引き続き閲覧可能。
+- 初期版は美咲のみ。将来のランダム在室キャラ選択は構想段階で未実装。キャラ画像は仮のCSSシルエット。モデル進捗は疑似表示、実際のダウンロード、記憶保存、チャット遷移、実機ブラウザ確認、本番接続は未実施。DB・main・本番には変更なし。
