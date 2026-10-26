@@ -1185,3 +1185,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - `lib/conversation-engine/misaki-context-quality-audit-offline.mjs`（`51732dc`、重複内容の誤検知を防ぐ修正 `e085016`）と `tests/misaki-context-quality-audit-offline.test.mjs`（`38d1f0f`）を実験枝へ追加。直近原文・発話順・確認済み記憶のみ・イベント選択件数・出典／確認時刻／状態の保持を合成入力で検査。
 - GitHub読戻し後、隔離JavaScriptで5ガードすべてPASS。Nodeテストランナー、実Geminiトークン、意味的記憶の正確性・自然な会話品質、実プロンプト同等性は未検証。`noUnverifiedMemory` は入力時のverifiedフィルタを検査するだけで事実真偽を検証しない。
 - 次は既存60件履歴から16件原文＋検証済み古い記憶への安全な変換規約を定義し、話題継続・否定・訂正・約束・忘却の反例を作る。main・本番・DB・有料API変更なし。
+
+## 2026-10-26：古い会話の予定・訂正・取り消し遷移（オフライン試作）
+
+- 実験枝 `lib/conversation-engine/misaki-memory-transition-offline.mjs`（`3d47038`、曖昧ID隔離修正 `47b6d3f`）、`tests/misaki-memory-transition-offline.test.mjs`（`6a513c4`）を追加。検証済み・明示的なイベント列から予定状態 planned/confirmed/cancelled/completed を解決し、confirmed 以外を確定予定として提示しない。
+- 古い予定で取り消しを上書きしない、未検証の訂正を採用しない、同順序で矛盾する記録は隔離するなど5ケースをGitHub読戻しの隔離JSでPASS。正式Nodeテスト未実行。
+- **制約**：自然言語から予定や訂正を抽出する仕組みはない。記録のverifiedやsequenceは呼出元の信頼できる管理が前提。実会話のニュアンスや感情を評価したものではない。main・本番・DB・Gemini API変更なし。
