@@ -1203,3 +1203,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝に日本語会話の参照先選択12合成ケース `lib/conversation-engine/misaki-topic-benchmark-offline.mjs`（`e891ffa`）、外部埋め込み関数を注入する類似度評価器 `lib/conversation-engine/misaki-embedding-evaluation-offline.mjs`（`92bfd22`）、テスト `tests/misaki-embedding-evaluation-offline.test.mjs`（`9c03410`）を追加。
 - 評価器はcosine類似度と1位2位の差による保留を備える。GitHub読戻し隔離JSで明確な類似・同点保留の2ケースPASS。12件の実モデル評価は未実施。
 - 現在のpackage.jsonにTransformers.js依存はない。追加依存、モデルDL、実機速度、Gemini token、自然会話品質は未検証。埋め込みは主語・否定・予定確定の根拠に使わず、候補検索に限定する。main・本番・DB・有料API変更なし。
+
+## 2026-10-26：マルチキャラ共通AI初回オープニング試作
+
+- `docs/MULTI_CHARACTER_PHASE0_AUDIT.md` と `app/chat/page.tsx` を読戻し。現行は美咲単一キャラ前提であり、キャラ選択・ペア別記憶・人格は本番実装済みではない。画面の追加前にキャラID/関係状態の分離が必要。
+- 実験枝 `lib/conversation-engine/multi-character-opening-offline.mjs`（`14aed72`）に、共通モデルキーとキャラIDを分ける起動状態機械、4幕の文言、進捗、スキップ、完了、失敗、再試行を追加。`tests/multi-character-opening-offline.test.mjs`（`6979dbc`）も追加。
+- GitHub読戻しの隔離JSでスキップしてもAI準備を飛ばさない、準備完了でチャット移行可、同じモデルキーを別キャラに使える3条件PASS。正式Nodeテスト未実行。
+- **未実装**：実際のオープニングUI・画像/動画・キャラ選択・Transformers.jsの実モデルDLとprogress callback接続・ブラウザキャッシュ検証・iPhone実機・本番導入。現在の状態機械は準備完了までチャット遷移を待つ仕様だが、既存チャットがAIモデルに依存しない場合のフォールバック導線は別途設計が必要。main/本番/DB/有料API変更なし。
