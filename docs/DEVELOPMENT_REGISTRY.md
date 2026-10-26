@@ -1248,3 +1248,6 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 
 ## 2026-10-26：初回／再訪演出・モデル取得選択のUI試作
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` の `public/lab/multi-character-opening/index.html` に初回20秒／再訪2.5秒のローカルストレージ判定、Wi-Fiで準備／モバイル通信も許可／あとで決めるの選択UI、演出後の仮会話パネルを実装（`f635989`）。試作原本へ同期（`a55284c`）。再訪判定は会話へ（デモ）ボタンで仮会話画面に進んだ時に保存。モデル選択は同一オリジンのlocalStorageに保存するが、**実ダウンロードは一切開始しない**。Gemini・本番会話・記憶・セッションへの接続もなし。実験プレビューでの実機確認待ち。main・本番変更なし。
+
+## 2026-10-26：オープニングからローカル試作会話への動線
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` の `public/lab/multi-character-opening/index.html` を更新（`5f3f572`）、`prototypes/multi-character-opening/index.html` に同期（`26fba53`）。スキップで演出終了・仮会話画面へ直接移行。20秒完了後の会話へボタンでも移行。仮会話画面に入力欄・送信・3種類の定型返答を追加し、HTML textContentで安全に表示。実際のGemini呼び出し、Transformers.jsモデルロード、Supabase保存、実チャット履歴は未接続。main・本番変更なし。iPhoneプレビュー検証待ち。
