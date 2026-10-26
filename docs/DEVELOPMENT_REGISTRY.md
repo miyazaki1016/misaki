@@ -1197,3 +1197,9 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `lib/conversation-engine/misaki-plan-candidate-offline.mjs`（`a659cdc`）、`tests/misaki-plan-candidate-offline.test.mjs`（`e3df84b`）を追加。予定検討・確定・中止・完了の表現を**未検証の候補**として分類。否定、引用・伝聞、疑問、複数状態の混在、無関係文は確定せず要確認に回す。
 - GitHub読み戻しの隔離JSで10合成例すべて期待どおり。正式Nodeテスト未実行。日本語の全表現・皮肉・省略・主語や時刻の同定は未対応。**候補はverifiedではなく、永続記憶や実予定への自動反映は禁止**。前段の明示イベント遷移器へ直接渡さない。
 - 次は主語・時制・話題の継続・確認を含む対話上の候補解決の仕様化と誤検知評価。main・本番・Supabase・有料Gemini API変更なし。
+
+## 2026-10-26：Transformers.js導入前の意味検索ベンチマーク準備
+
+- 実験枝に日本語会話の参照先選択12合成ケース `lib/conversation-engine/misaki-topic-benchmark-offline.mjs`（`e891ffa`）、外部埋め込み関数を注入する類似度評価器 `lib/conversation-engine/misaki-embedding-evaluation-offline.mjs`（`92bfd22`）、テスト `tests/misaki-embedding-evaluation-offline.test.mjs`（`9c03410`）を追加。
+- 評価器はcosine類似度と1位2位の差による保留を備える。GitHub読戻し隔離JSで明確な類似・同点保留の2ケースPASS。12件の実モデル評価は未実施。
+- 現在のpackage.jsonにTransformers.js依存はない。追加依存、モデルDL、実機速度、Gemini token、自然会話品質は未検証。埋め込みは主語・否定・予定確定の根拠に使わず、候補検索に限定する。main・本番・DB・有料API変更なし。
