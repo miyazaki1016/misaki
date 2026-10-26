@@ -1178,3 +1178,10 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝の `app/api/chat/route.ts` と既存監査 `docs/CHAT_REAL_PROMPT_READONLY_AUDIT_20261022.md` を読戻し。チャット経路は最大60履歴、直近美咲8発言の別掲、東京情報取得関数の呼出しとガイドのsystem prompt挿入がある。実ネットワークアクセスはキャッシュで変化。既存ガード・人格・関係・長期記憶は削除禁止。
 - 実験枝に `lib/conversation-engine/misaki-context-comparison-offline.mjs`（`af4d3ae`）とテスト `tests/misaki-context-comparison-offline.test.mjs`（`ab1acfb`）を追加。合成の履歴・記憶・イベントについて文字数差分を計算し、トークン数ではないことと要約品質未検証を明示。
 - 現行の本番プロンプトとのbyte parity、Gemini実token、自然さ・記憶再現のA/B、Nodeテストは未確認。古い履歴を単純削除してよいという承認ではない。main・本番・DB・有料API変更なし。
+
+## 2026-10-26：圧縮後の会話品質ガード（合成監査）
+
+- 実験枝 `app/api/chat/route.ts` を再読し、`MAX_HISTORY=60`、直近美咲8発言の別掲、`getTokyoLifeEvents()` を会話経路で呼ぶ構造を確認。実際の入力節の削除や並べ替えは未実施。
+- `lib/conversation-engine/misaki-context-quality-audit-offline.mjs`（`51732dc`、重複内容の誤検知を防ぐ修正 `e085016`）と `tests/misaki-context-quality-audit-offline.test.mjs`（`38d1f0f`）を実験枝へ追加。直近原文・発話順・確認済み記憶のみ・イベント選択件数・出典／確認時刻／状態の保持を合成入力で検査。
+- GitHub読戻し後、隔離JavaScriptで5ガードすべてPASS。Nodeテストランナー、実Geminiトークン、意味的記憶の正確性・自然な会話品質、実プロンプト同等性は未検証。`noUnverifiedMemory` は入力時のverifiedフィルタを検査するだけで事実真偽を検証しない。
+- 次は既存60件履歴から16件原文＋検証済み古い記憶への安全な変換規約を定義し、話題継続・否定・訂正・約束・忘却の反例を作る。main・本番・DB・有料API変更なし。
