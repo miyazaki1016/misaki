@@ -1210,3 +1210,8 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `lib/conversation-engine/multi-character-opening-offline.mjs`（`14aed72`）に、共通モデルキーとキャラIDを分ける起動状態機械、4幕の文言、進捗、スキップ、完了、失敗、再試行を追加。`tests/multi-character-opening-offline.test.mjs`（`6979dbc`）も追加。
 - GitHub読戻しの隔離JSでスキップしてもAI準備を飛ばさない、準備完了でチャット移行可、同じモデルキーを別キャラに使える3条件PASS。正式Nodeテスト未実行。
 - **未実装**：実際のオープニングUI・画像/動画・キャラ選択・Transformers.jsの実モデルDLとprogress callback接続・ブラウザキャッシュ検証・iPhone実機・本番導入。現在の状態機械は準備完了までチャット遷移を待つ仕様だが、既存チャットがAIモデルに依存しない場合のフォールバック導線は別途設計が必要。main/本番/DB/有料API変更なし。
+
+## 2026-10-26：マルチキャラ起動オープニング画面（視覚試作）
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` に `prototypes/multi-character-opening/index.html` を追加（`a12298b`）。スマホ幅の夜景・光・キャラのシルエット・4幕の字幕・3種類の仮キャラ切替・進捗バー・スキップ・場面送り・再試行相当のリスタート・reduced-motionを含む静的HTML試作。
+- **実際のAIダウンロードは未接続**。表示進捗は450msごとに5%増える疑似進捗。『会話へ』もデモ文言のみ。既存キャラの確定設定・画像ではなく仮表示。`lib/conversation-engine/multi-character-opening-offline.mjs` と画面は未接続。
+- 本番、main、Supabase、課金APIは変更していない。次は実モデルの進捗・ready/failure状態との接続、キャラの正式データ取得、iPhoneでの確認を行う前にレビューが必要。
