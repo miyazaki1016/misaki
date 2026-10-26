@@ -1220,3 +1220,8 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` に `prototypes/character-lounge/index.html`（`86aeb11`）を作成。初回ラウンジの美咲カード、仮シルエット、選択ボタンを配置。
 - `prototypes/multi-character-opening/index.html`（`b53e6ed`）を更新し、`?character=misaki&from=lounge` を読み込んで選択キャラを引き継ぎ、ラウンジへの戻りボタンを追加。ラウンジ経由ではオープニング内キャラ選択を無効化。既存の単体オープニング試作は引き続き閲覧可能。
 - 初期版は美咲のみ。将来のランダム在室キャラ選択は構想段階で未実装。キャラ画像は仮のCSSシルエット。モデル進捗は疑似表示、実際のダウンロード、記憶保存、チャット遷移、実機ブラウザ確認、本番接続は未実施。DB・main・本番には変更なし。
+
+## 2026-10-26：既存Vercelプロジェクトのプレビュー公開準備
+- Vercel `KISHIBOJIM` チーム既存 `misaki` プロジェクト `prj_71NgSxGkNXkKECXc9jJRrJHdAkDS` がGitHub `miyazaki1016/misaki` と連携していることを確認。別プロジェクト作成は行わない。
+- 実験枝の静的試作をNext.jsの配信可能な `public/lab/character-lounge/index.html` (`49d48d5`) と `public/lab/multi-character-opening/index.html` (`288456e`) に複写。ラウンジ選択からオープニングへの相対遷移を維持。Vercel Git連携で当該実験枝のpreviewデプロイが自動生成された。確認時は新しいデプロイがQUEUEDで、動作確認は未完了。
+- 本番ターゲットやmainには反映しない。静的デモ進捗は疑似表示であり実際のTransformers.jsダウンロードではない。仮キャラシルエットのみ。
