@@ -1229,3 +1229,7 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 ## 2026-10-26：夜景ラウンジの視覚・接触演出を追加
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` の `public/lab/character-lounge/index.html` を更新（`33f083b`）。夜景・窓・フロアランプ・ソファ・座った美咲のCSS仮イラストを追加。美咲タップで挨拶の吹き出し、開始ボタンで既存オープニングへ遷移。縮小画面・reduced motion対応。
 - 原型 `prototypes/character-lounge/index.html` にも同期（`ebde644`）。キャラ実画像、表情アニメーション、実AIロードは未実装。実機表示検証待ち。main・本番には変更なし。
+
+## 2026-10-26：Transformers.js実機計測ページ
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` に `public/lab/transformers-benchmark/index.html` を追加（`16187b6`、ESM修正 `f7d900d`）。既存Vercel `misaki` のPreview限定。ユーザーの明示タップで `@huggingface/transformers@3.8.1` をCDN読み込みし、日本語対応 `Xenova/paraphrase-multilingual-MiniLM-L12-v2` のq8/WASM feature-extractionを読み込む。ライブラリ、モデルロード、初回日本語推論、合計をperformance.now()で計測し、結果をクリップボードにコピー可能。キャッシュあり再計測可能。モデルは会話生成用途ではなく暫定ベンチマーク。ネットワーク転送量・Safari/PWA差は未検証、端末実測待ち。実験ページはユーザー操作なしではダウンロードしない。本番・main変更なし。
+- オープニング長は初回・キャッシュ時の端末実測を見て決定。演出は固定20秒前後を仮説とし、読み込み完了前でもスキップ・Gemini会話へのフォールバックを検討。実測前の確定はしない。
