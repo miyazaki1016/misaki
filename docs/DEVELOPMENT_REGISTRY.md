@@ -1225,3 +1225,7 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 - Vercel `KISHIBOJIM` チーム既存 `misaki` プロジェクト `prj_71NgSxGkNXkKECXc9jJRrJHdAkDS` がGitHub `miyazaki1016/misaki` と連携していることを確認。別プロジェクト作成は行わない。
 - 実験枝の静的試作をNext.jsの配信可能な `public/lab/character-lounge/index.html` (`49d48d5`) と `public/lab/multi-character-opening/index.html` (`288456e`) に複写。ラウンジ選択からオープニングへの相対遷移を維持。Vercel Git連携で当該実験枝のpreviewデプロイが自動生成された。確認時は新しいデプロイがQUEUEDで、動作確認は未完了。
 - 本番ターゲットやmainには反映しない。静的デモ進捗は疑似表示であり実際のTransformers.jsダウンロードではない。仮キャラシルエットのみ。
+
+## 2026-10-26：夜景ラウンジの視覚・接触演出を追加
+- 実験枝 `experiment/chat-input-metrics-offline-20261022` の `public/lab/character-lounge/index.html` を更新（`33f083b`）。夜景・窓・フロアランプ・ソファ・座った美咲のCSS仮イラストを追加。美咲タップで挨拶の吹き出し、開始ボタンで既存オープニングへ遷移。縮小画面・reduced motion対応。
+- 原型 `prototypes/character-lounge/index.html` にも同期（`ebde644`）。キャラ実画像、表情アニメーション、実AIロードは未実装。実機表示検証待ち。main・本番には変更なし。
