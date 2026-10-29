@@ -156,10 +156,10 @@ test('existing anonymous user survives a new browser session with history and id
   assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);
   assert.equal(h.sessionStorage.getItem('misaki-browser-session'), '1');
 });
-test('ordinary expired anonymous browser session still clears all misaki caches', async () => {
+test('missing anonymous auth session clears old caches and signs in anew', async () => {
   const h = harness(undefined, { 'misaki-today-memory': 'old', unrelated: 'keep' });
   await h.mount('app/chat/anonymous-session-guard.tsx');
-  assert.deepEqual(h.calls, ['signOut', 'signIn']);
+  assert.deepEqual(h.calls, ['signIn']);
   assert.equal(h.localStorage.getItem('misaki-chat-history'), null);
   assert.equal(h.localStorage.getItem('misaki-today-memory'), null);
   assert.equal(h.localStorage.getItem('unrelated'), 'keep'); assert.equal(h.localStorage.getItem(ownerKey), 'new');
