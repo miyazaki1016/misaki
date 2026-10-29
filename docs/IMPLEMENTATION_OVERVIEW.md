@@ -3962,3 +3962,13 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 - **外部レビューとの関係**：21秒版と約8秒短縮版のA/B、初回ラウンジを再訪に回す案はレビュー提案であり未採用。まず動画素材・ループ品質・iPhone再生、SKIPとチャット遷移を分離検証する。
 
 詳細・残件・レビューとの対応は[開発台帳](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/DEVELOPMENT_REGISTRY.md)と[外部AIレビュー記録の2026-10-29追補](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/EXTERNAL_AI_REVIEW_20261028.md)を参照。**この節は履歴の補完であり、動画・本番機能の完成宣言ではない。**
+
+
+## 2026-10-29 ラウンジ動画自動読み込み（未公開・リリースゲートあり）
+
+- 専用作業ブランチ: `feat/lounges-autoload-assets-20261029`（main起点）。旧実験ブランチの分岐コミットを丸ごとマージしない。
+- ラウンジHTMLでは手動WebP選択を廃止し、iPhoneでループ確認済みの24fps透過WebPに自動参照変更。
+- 旧横型オープニング動画の参照を、縦型21秒H.264/AAC MP4へ変更。既存スキップ・終了後の確認画面は維持。
+- **MP4/WebP実ファイルはGitHubに未配置**。本番反映、HTTP配信、iPhone実機確認は未完了。バイナリ2本を作業ブランチの `public/lab/transparent-lounge/` に追加するまでマージ禁止。
+- 詳細・素材名・受入条件・残作業: `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md`。
+- 既存チャット、DB、Relationship Engineは変更していない。チャット画面への接続は次工程。
