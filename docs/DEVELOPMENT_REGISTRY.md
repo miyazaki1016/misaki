@@ -1276,3 +1276,11 @@ Gemini軽量化でFree/Premiumの機能境界を誤って混同しないこと�
 ## 2026-10-26：ラウンジ座席・視線演出の実験UI
 - 実験枝 `experiment/chat-input-metrics-offline-20261022` の `public/lab/lounger-presence/index.html` に夜景・座席のCSS演出、キャラごとの仮の過ごし方、控えめなアイドル動作、声かけ時に選択キャラを強調し他キャラを暗くする演出を追加（`0c4e98d`）。reduced-motion設定に対応。
 - **正式な美咲画像の組み込みは未実施**。現段階は絵文字の仮素材。AI画像をアプリ素材として保存・参照する工程は残る。入退室ロジック、ローカル保存、仮会話導線は従来どおり。main・本番変更なし。実機プレビュー確認待ち。
+
+
+## 2026-10-28〜29：外部AIレビュー用総覧・Vercel Preview・レビュー受領（記録のみ）
+- 外部共有用の美咲総覧を作成し、専用ブランチ `preview/external-ai-review-20261028` に `public/lab/external-ai-review/index.html` を追加（commit `4a0b371f`）。main/Production未変更。Vercel Preview `dpl_5cpfeFfms249UyUon9Yqm7hJZK8d`、`https://misaki-n3o9cq2dc-kishibojim.vercel.app/lab/external-ai-review/`。確認時BUILDINGで公開到達確認は別途必要。
+- 2026-10-28付の外部AIレビューPDF（全8ページ）を受領。7領域（初回体験、関係性、記憶、自発性、複数キャラ、優先順位、事業性）の評価・改善案・未回答質問を `docs/EXTERNAL_AI_REVIEW_20261028.md` に記録。**外部AIの提案は採用決定ではない。**
+- レビュー提案の順序：会話品質→Forget Control→映像SKIP/遷移統合→生活情報→複数キャラ。Premium価値の具体化も公開拡大前の検討事項。忘却の全経路検証、21秒対8秒の初回導線A/B、課金差分・原価試算等は未実施・未確認。
+- main総覧から本台帳（棚卸しブランチ）とレビュー記録への参照を設ける。台帳は**main未統合の作業記録**であり、リンクがあることはmain実装や本番適用を意味しない。
+- 本作業は文書更新のみ。mainのアプリコード、Production、DB、Push、Gemini実呼出し、課金は変更しない。
