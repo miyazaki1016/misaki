@@ -3925,3 +3925,28 @@ Reply生成時はcanonical relationship stateとcanonical Identityを読み、`s
 PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-character、marriage/world-stateは混ぜない。
 
 **施工開始前にfreezeすべき残件は、post-breakup / rejection constraintの解除条件と、Identity entry/maintenanceの数値classifierだけ。DB境界と実行順序は本節をv1施工基準とする。**
+
+
+---
+
+## 2026-10-29：開発台帳・外部AIレビュー・共有ページへの追跡入口（資料更新）
+
+> **文書の追跡入口。** この追記は設計・作業履歴の参照整備であり、外部レビューの提案を採用・実装したものではない。上部の「最終更新: 2026-10-13」は旧本文の基準日であり、この節のみ2026-10-29に追記した。
+
+### 最新の作業記録とレビュー
+
+- [開発管理台帳（棚卸しブランチ、main未統合）](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/DEVELOPMENT_REGISTRY.md) — A=main実装、B=作業ブランチ、C=実験、D=設計、U=未判定の証拠区分で追跡。**台帳へのリンクは台帳のmain統合を意味しない。**
+- [外部AIレビュー受領記録・7領域の改善案・未回答質問](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/EXTERNAL_AI_REVIEW_20261028.md) — 2026-10-28付8ページPDFの要点を記録。原本PDFはユーザーがチャットに添付（リポジトリには未配置）。
+- [外部AIレビュー用総覧Webページのソース（実験ブランチ）](https://github.com/miyazaki1016/misaki/blob/preview/external-ai-review-20261028/public/lab/external-ai-review/index.html) — 2026-10-28共有版、機密情報を除いた外部向け説明。
+- [Vercel Previewの共有ページ](https://misaki-n3o9cq2dc-kishibojim.vercel.app/lab/external-ai-review/) — 確認時のデプロイ状態はBUILDING。アクセス・公開完了は別途確認が必要。URLを知る人に閲覧される可能性があるため共有先を限定。
+
+### 外部AIレビューで提起された優先事項（**提案・未決定**）
+
+1. **会話品質**を中核として継続検証。
+2. **Forget Control**の本番完成条件を明確化し、要約・長期記憶・検索・関係パラメータ等からの再出現を防ぐ全経路検証を検討。
+3. **初回導線**の全画面再生・SKIP・チャット遷移を完成させ、21秒版と短縮8秒版のA/B検証を検討。
+4. **生活情報・自発通知**は取得失敗と不在を区別し、過干渉や誤報を避ける評価指標を先に設計。
+5. **複数キャラ**は記憶・関係・認可の分離基盤を先行検証し、公開時期は美咲単体の継続指標を見て判断。
+6. **Premium**は「親密さを売らない」方針と両立する会話量・音声等の体験価値、無料との差分、運用原価を明確化する提案。
+
+レビューの提案は未採否。計測値、残工数、Forget Controlの本番完成範囲、Premium内容と価格、災害情報の正確性経路などは未確認・未決定であり、断定しない。**今回の更新対象はmainの総覧本文と棚卸しブランチ上の台帳・レビュー記録のみ。アプリ機能、Production、DB、Push、課金は変更していない。**
