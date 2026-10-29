@@ -3950,3 +3950,15 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-
 6. **Premium**は「親密さを売らない」方針と両立する会話量・音声等の体験価値、無料との差分、運用原価を明確化する提案。
 
 レビューの提案は未採否。計測値、残工数、Forget Controlの本番完成範囲、Premium内容と価格、災害情報の正確性経路などは未確認・未決定であり、断定しない。**今回の更新対象はmainの総覧本文と棚卸しブランチ上の台帳・レビュー記録のみ。アプリ機能、Production、DB、Push、課金は変更していない。**
+
+
+### 2026-10-29 追補：ラウンジ用動画とオープニングムービーの作業履歴（前節の記載漏れ補正）
+
+**2種類の動画を混同しない。**
+
+- **ラウンジ用キャラクター動画**：夜景・ソファ背景上に美咲の短尺ループ動画を独立レイヤーで重ね、自然な瞬き、ループの開始/終了ポーズ一致、クロスフェード、背景透過WebM等を試作・検討。中央を大きく左右を小さくした3人表示とスワイプを `experiment/transparent-lounge-20261027` の `public/lab/transparent-lounge/index.html` で実験。左右2人は仮キャラであり、実人格・記憶・本番会話には未接続。各動画素材の現存・最終再生品質は別途検証。
+- **Muse制作オープニングムービー**：縦型9:16、**8秒＋8秒＋5秒＝約21秒**の3パート。来訪→話しかけ→静かな笑顔でチャットへ、Ver.2採用の制作判断。ラウンジのループ素材とは別。ラウンジ実験HTMLには動画dialog、手動再生、SKIP、終了処理があるが、**終了先は仮dialogであり本番チャットへの遷移は未完成**。参照MP4の実ファイル配信とiPhone再生も未確認。
+- **別枝の仮会話導線**：`experiment/chat-input-metrics-offline-20261022` ではSKIP/終了後のローカル仮会話画面（定型返答）を試作。実Gemini・Supabase・本番会話は未接続。
+- **外部レビューとの関係**：21秒版と約8秒短縮版のA/B、初回ラウンジを再訪に回す案はレビュー提案であり未採用。まず動画素材・ループ品質・iPhone再生、SKIPとチャット遷移を分離検証する。
+
+詳細・残件・レビューとの対応は[開発台帳](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/DEVELOPMENT_REGISTRY.md)と[外部AIレビュー記録の2026-10-29追補](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/EXTERNAL_AI_REVIEW_20261028.md)を参照。**この節は履歴の補完であり、動画・本番機能の完成宣言ではない。**
