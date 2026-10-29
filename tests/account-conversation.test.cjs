@@ -148,6 +148,14 @@ test('pending email save keeps the anonymous user when a fresh tab opens', async
   await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });
   assert.deepEqual(h.calls, []); assert.equal(h.localStorage.getItem(ownerKey), 'a');
 });
+test('existing anonymous user survives a new browser session with history and identity', async () => {
+  const h = harness({ id: 'a', is_anonymous: true });
+  await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });
+  assert.deepEqual(h.calls, []);
+  assert.equal(h.localStorage.getItem(ownerKey), 'a');
+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);
+  assert.equal(h.sessionStorage.getItem('misaki-browser-session'), '1');
+});
 test('ordinary expired anonymous browser session still clears all misaki caches', async () => {
   const h = harness(undefined, { 'misaki-today-memory': 'old', unrelated: 'keep' });
   await h.mount('app/chat/anonymous-session-guard.tsx');
