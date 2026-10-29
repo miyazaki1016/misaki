@@ -34,3 +34,9 @@
 - HTMLのWebP参照を実在する `misaki_lounge_24fps.webp` に修正済み。旧手動選択は不要。
 - `misaki-opening-vertical-21s.mp4` は**依然として未配置**（リポジトリツリー確認）。縦21秒オープニング再生はまだ検証不可。
 - 21秒MP4が同一フォルダにアップロードされるまでマージ・本番公開しない。
+
+## 2026-10-29 追記：21秒MP4到着・HTML参照修正
+- GitHubの同フォルダに `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）を確認。以前アップロード済みのユーザー素材とファイルサイズが一致する。
+- HTMLのMP4参照を実際のアップロード名 `misaki-opening-vertical-21s-iphone.mp4` に修正。WebP参照も実在する `misaki_lounge_24fps.webp`。
+- 以前の文書内の「動画2本未配置」「MP4未配置」は当時の記録。現時点では2本とも配置済み。
+- 次のゲート: GitHub CI成功、PR取り込み、本番HTTP/再生/iPhone実機確認。
