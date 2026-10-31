@@ -52,3 +52,17 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 - 既存の詳細台帳 `docs/DEVELOPMENT_REGISTRY.md` は専用ブランチのまま保持し、上記の新規候補との重複と証拠を確認してから索引へ正式登録する。
 - 管理用PR #103 のオフライン回帰テストは2026-11-01確認時点で成功。これはGitHub実データ棚卸しの実行成功を意味しない。
 - 次の一手：詳細台帳の記載済み作業IDと現在の109ブランチを照合し、追加・更新・所在不明を分類。ラウンジ系の詳細資料とPRを確認し、未確認項目を勝手に完了扱いしない。
+
+## 2026-11-01 証拠付き作業索引（初回・暫定）
+
+以下は作業単位の入口。2026-11-01のGitHub読み取り結果であり、状態の最終認定ではない。詳細は `docs/audits/DEVELOPMENT_INVENTORY_DIFF_20261101.md`。main・本番・DB・実機は個別の確認がない限り**未確認**。
+
+| ID | 作業 | 状態 | 所在・証拠 | main / 本番 / 実機 | 次の一手 |
+| --- | --- | --- | --- | --- | --- |
+| M-LNG-01 | ラウンジ・オープニング・チャット遷移（関連ブランチを1作業群として管理） | C暫定 | `feat/lounge-chat-handoff-20261030`, `feat/lounge-opening-fullscreen-20261029`, `feat/lounge-muse-v3-official-20261030`, `fix/lounge-transition-flash-20261030`; `docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md`, `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md` | 未確認 / 未確認 / 未確認 | mainとの差分と素材・遷移を統合的に確認。既存チャットや本番を変更しない |
+| M-MEM-01 | 匿名情報単位24時間記憶 | D | `design/anonymous-per-item-24h-memory-20261030`; `docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md` | 未確認 / 未確認 / 未確認 | 実装着手時は時刻境界と既存記憶の互換を検証 |
+| M-MEM-02 | 記憶の公開方針・台帳補足 | D暫定 | `docs/misaki-memory-public-final-20261030` | 未確認 / 未確認 / 未確認 | 既存詳細台帳との記載差分のみ照合 |
+| M-CONV-01 | Conversation Lab | C暫定 | Draft PR #86（open、未マージ、2026-11-01確認） | 未確認 / 未確認 / 未確認 | 実験と本番採用を区別して検証 |
+| M-CONV-02 | 共通会話エンジンの接続基盤 | C暫定 | Draft PR #88（open、未マージ、2026-11-01確認） | 未確認 / 未確認 / 未確認 | 現行mainの依存経路を検証 |
+
+※ PR #103は管理用Draft PRであり、機能実装の採用とは別。未確認を未実施と読み替えない。
