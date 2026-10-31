@@ -46,3 +46,11 @@
 - **証拠の保存先**：台帳は短い索引。アメふるの既存台帳・総覧・個別資料、美咲の詳細台帳（専用ブランチ）・監査資料を削除、短縮、無断移動しない。既存履歴と索引のリンクを保つ。
 - **棚卸しの突合順**：①既存台帳の作業IDを保持、②全ブランチ・open/closed/merged PR・open Issueを取得、③既存記録との対応表を作成、④新規・状態不一致・要証拠を抽出、⑤対象のみ再調査。open PRなし／長期更新なしを未完了と断定しない。
 - **安全ゲート**：管理ブランチとDraft PRで差分を検証。mainマージ・週次schedule有効化・アプリ本体/DB/Push/本番変更は別途承認を要する。
+
+## 2026-11-01 自動棚卸し実行ゲート・最終確認
+
+- 両リポジトリの `scripts/development_inventory.py`、`tests/test_development_inventory.py`、`.github/workflows/development-inventory.yml` は同一内容を確認。GitHub APIのbranches / **state=allのPR** / open issuesを読み、open PRなしブランチを**調査候補**として分類する。閉鎖・統合済みPRの存在フラグは保持する。
+- PRトリガーでは `Read-only inventory` ステップを**意図的にskip**し、オフライン回帰テストのみ実行する。過去のPR CI成功は実GitHub APIを用いた棚卸し成功を意味しない。
+- `workflow_dispatch` と週次scheduleはYAMLに定義済み。ただしworkflowがmainにない現状、**週次自動実行は未有効**。実データのActionsレポートは未検証。
+- 次の安全な受入条件：①独立した読み取り専用実データ実行でbranch数・PR履歴・Issue数を照合、②候補を既存台帳・mainに突合し誤検出をレビュー、③管理用Draft PRのレビュー。mainへのマージ／週次schedule開始は別途明示承認が必要。
+- **変更境界**：この記録はドキュメントのみ。Actions手動起動・main変更・本番/DB/Push変更は行わない。
