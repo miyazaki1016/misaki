@@ -1,6 +1,6 @@
 # Misaki 実装・修正 総覧
 
-> **開発台帳への入口（2026-10-31、Draft PR #103・未統合）**：[開発台帳索引](DEVELOPMENT_LEDGER.md)／[共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)。管理ブランチ `chore/development-inventory-automation-20261031` に提案中。詳細棚卸しの正本は `docs/development-registry-audit-20261020` ブランチの `docs/DEVELOPMENT_REGISTRY.md`（mainには未統合）。ブランチを丸ごとmainへマージしない。週次棚卸しは未稼働、次は検証・最新照合・承認後の統合。
+> **開発管理の現況（2026-11-01確認）**：[開発台帳・棚卸し監査索引](DEVELOPMENT_LEDGER.md)／[共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)。読み取り専用の自動棚卸しはPR #103でmainへ統合済み、PR #112で**毎日10:17 JST**に変更済み（`.github/workflows/development-inventory.yml`）。実行ごとの `report.json` と `summary.md` はGitHub Actionsの `development-inventory` artifactに30日間保存し、**mainの台帳へ日次自動追記はしない**。週次の詳細照合は別途行う管理作業で、自動実装済みとは扱わない。詳細棚卸しの歴史的正本は `docs/development-registry-audit-20261020` ブランチの `docs/DEVELOPMENT_REGISTRY.md`（main未統合）。当該ブランチ全体をmainへマージしない。
 
 > **未来のソラへ——**  
 > この総覧を読め。  
