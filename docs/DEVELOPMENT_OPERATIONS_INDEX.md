@@ -1,0 +1,18 @@
+# 開発案件・運用索引（2026-11-01時点）
+
+> この表は棚卸しの**交通整理用**。担当は作業の引継ぎ先を示し、本人の受諾や完了を意味しない。過去の監査記録を現在の本番状態と混同しない。main・本番・実機の判定は証拠がない限り未確認。
+
+| ID | 作業 | 現在の管理状態 | 引継ぎ先 | 証拠・所在 | 次の一手 |
+|---|---|---|---|---|---|
+| M-01 | ラウンジ→オープニング→チャット | 進行中・統合未判定 | 美咲担当ソラ | `docs/DEVELOPMENT_LEDGER.md` / `experiment/transparent-lounge-20261027` | 独立HTTPS実機検証の結果を受領し状態更新 |
+| M-02 | 旧会話入力・性能計測 | 照合・採否未決 | 美咲担当ソラ | `docs/audits/CHAT_METRICS_PATH_20261101.md` | 既存telemetryと旧計測の重複有無を担当へ引継ぎ |
+| M-03 | 会話コンテキスト圧縮・旧migration | 高リスク・保全 | 美咲担当ソラ | `docs/audits/LEGACY_CODE_DIFF_20261101.md` | 旧migrationを取り込まず互換性判断待ち |
+| M-04 | 外部AIレビュー用Preview | 保全・公開不可判断待ち | 美咲担当ソラ | `docs/audits/FEATURE_RECONCILIATION_20261101.md` | 公開範囲の確認待ち |
+| M-05 | 旧監査証拠 | 保全 | 棚卸し担当ソラ | `docs/audits/LEGACY_AUDIT_FOLLOWUP_20261101.md` | 必要な証拠のみ索引化 |
+| M-06 | 旧Safari・関係性診断ブランチ2件 | 整理候補・未削除 | 棚卸し担当ソラ | `docs/audits/BRANCH_TRIAGE_20261101.md` | 参照先確認後に削除可否を相談 |
+
+## 運用
+- 毎日10:17 JSTにread-onlyのGitHub Actions棚卸し。`development-inventory` artifactに `report.json` / `summary.md` を30日保持。**台帳へ自動反映はされない**。
+- 週次は新規・消滅・状態変化の候補を確認し、この索引に**変更があった案件だけ**追記・更新する。週次詳細照合は自動化済みではない。
+- 未整理ブランチの原資料: [一次分類](audits/BRANCH_TRIAGE_20261101.md) / [初回調査](audits/INVENTORY_RECONCILIATION_20261101.md)。全件の履歴はGitHub Actions成果物を参照。
+- 実装、予測精度の検証、DB、Push、デプロイ、ブランチ削除は担当ソラの領域。ここでは発見事項・所在・引継ぎ先だけを記録する。

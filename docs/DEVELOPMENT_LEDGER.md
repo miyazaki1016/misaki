@@ -1,5 +1,7 @@
 # 美咲 開発台帳（mainから辿るための索引）
 
+> **最新の交通整理表**：[開発案件・担当・次の一手の運用索引](DEVELOPMENT_OPERATIONS_INDEX.md)（2026-11-01時点。実装・本番の完了認定ではない）。
+
 > **このファイルは詳細台帳の代替ではない。** 2026-10-31時点の管理入口を追加するためのもの。実装・統合・本番反映を新たに認定しない。
 
 [実装・修正総覧](IMPLEMENTATION_OVERVIEW.md) · [共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)
