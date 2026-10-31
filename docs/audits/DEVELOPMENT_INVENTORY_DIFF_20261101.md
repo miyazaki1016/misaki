@@ -33,3 +33,11 @@
 | 記憶・公開方針資料 | `docs/misaki-memory-public-final-20261030` ahead 1 / behind 0 | 記憶方針文書と `docs/DEVELOPMENT_REGISTRY.md` を含む4ファイル | **D暫定**。既存詳細台帳を置き換えない。 |
 
 ※ ahead/behindはGit ancestryであり、未統合機能数・完成度を表さない。2026-11-01の読み取り結果。既存台帳の評価を上書きしない。
+
+## 2026-11-01 管理PRの差分・CI最終レビュー
+
+- 管理Draft PRの変更ファイルは計7件。内訳は棚卸し用workflow 1、読み取り専用スクリプト1、回帰テスト1、管理・監査ドキュメント4。アプリ本体、DBマイグレーション、Push、本番設定ファイルの変更は差分に含まれない。
+- 最新コミットのPR起動CIは成功。`Offline regression tests` 成功、`Read-only inventory` と `Save report artifact` はPRでは両方skip。実データ棚卸しの成功と取り違えない。
+- 両リポジトリのworkflowに週次cron（UTC月曜01:17、日本時間月曜10:17）と手動実行の定義がある。main未統合のため定期実行は未開始。**main統合すると週次実行が有効になるため別途承認が必要**。
+- GitHubのブランチ検索による独立した読み取り確認では、アメふる112、美咲109（各main含む）。PR・Issueの実データを棚卸しスクリプト自身が集計するE2E検証は未完了。
+- 受入残件：読み取り専用の実データ収集、PR/Issue集計の既存台帳との突合、誤検出レビュー、main統合とschedule開始の承認。
