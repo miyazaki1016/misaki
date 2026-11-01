@@ -54,7 +54,6 @@ class DeltaTests(unittest.TestCase):
     def test_triage_does_not_assign_completion(self):
         changes = [{"type": "branches", "id": "feature/new-thing", "change": "added"}]
         with patch.object(delta, "api", return_value=[]):
-            with patch.object(delta, "api", return_value=[]):
             suggestions = delta.classify_candidates(changes, "| M-01 | ラウンジ | 進行中 |")
         self.assertEqual(suggestions[0]["classification"], "needs_review")
         self.assertIsNone(suggestions[0]["proposed_status"])
