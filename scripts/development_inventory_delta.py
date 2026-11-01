@@ -88,6 +88,7 @@ def classify_candidates(changes, index_text):
     for change in changes:
         identifier = str(change["id"])
         tokens = set(re.findall(r"[a-z0-9]{4,}", identifier.lower().replace("_", "-")))
+        tokens.update(re.findall(r"[\u3040-\u30ff\u4e00-\u9fff]{2,}", identifier))
         matches = []
         for case_id, title in rows:
             title_tokens = set(re.findall(r"[a-z0-9]{4,}", title.lower()))
