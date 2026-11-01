@@ -91,7 +91,7 @@ def classify_candidates(changes, index_text):
         evidence_text = " ".join(str(details.get(key, "")) for key in ("title", "body", "head_ref"))
         identifier_text = (identifier + " " + evidence_text).lower()
         tokens = set(re.findall(r"[a-z0-9]{4,}", identifier_text.replace("_", "-")))
-        tokens.update(re.findall(r"[\u3040-\u30ff\u4e00-\u9fff]{2,}", identifier))
+        tokens.update(re.findall(r"[\u3040-\u30ff\u4e00-\u9fff]{2,}", identifier_text))
         matches = []
         for case_id, title in rows:
             title_tokens = set(re.findall(r"[a-z0-9]{4,}", title.lower()))
