@@ -1,3 +1,4 @@
+import { USER_REPLY_CONTEXT } from "../../../lib/conversation-turn-context";
 import { after } from "next/server";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
 import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
@@ -2260,6 +2261,8 @@ export async function POST(
 
     const baseSystemPrompt = `
 ${personaPrompt}
+
+${USER_REPLY_CONTEXT}
 
 ${relationshipGuide}
 

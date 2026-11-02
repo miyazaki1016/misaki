@@ -19,3 +19,10 @@ test('back/pageshow resets navigation and closes restored dialog',()=>{const b=b
 test('cancel returns to lounge without entering chat',()=>{const b=boot();b.click();b.elements['#opening'].emit('cancel');assert.equal(b.elements['#opening'].open,false);assert.deepEqual(b.visits,[])});
 test('video error leaves skip route available',()=>{const b=boot();b.click();b.elements['#opening-video'].emit('error');assert.match(b.elements['#opening-status'].textContent,/スキップ/);b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat'])});
 test('LP uses lounge and assets are local, single character only',()=>{const html=fs.readFileSync('public/lounge/index.html','utf8'),lp=fs.readFileSync('app/page.tsx','utf8');assert.equal((lp.match(/href="\/lounge\/"/g)||[]).length,6);assert.ok(!lp.includes('href="/chat"'));assert.ok(!html.includes('女の子A'));assert.ok(!html.includes('https://'));for(const x of html.matchAll(/(?:src|href)="(\/[^"#]+)"/g)){if(x[1]==='/chat')continue;assert.ok(fs.existsSync('public'+x[1]),x[1])}});
+test('official portrait lounge uses original background and Safari viewport without prototype chrome',()=>{
+ const html=fs.readFileSync('public/lounge/index.html','utf8');
+ assert.match(html,/viewport-fit=cover/);assert.match(html,/height:100vh;height:100dvh/);
+ assert.match(html,/safe-area-inset-bottom/);assert.match(html,/lounge-bg.png/);
+ assert.ok(!html.includes('<h1>'));assert.ok(!html.includes('<svg'));assert.ok(!html.includes('ショートカット比較'));
+ assert.match(html,/playsinline/);assert.match(html,/misaki-opening-vertical-21s-iphone.mp4/);
+});
