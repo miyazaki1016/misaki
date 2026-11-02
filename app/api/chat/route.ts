@@ -239,7 +239,7 @@ async function consumeDailyMessageWithRetry(
 
     console.error(
       `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,
-      error
+      "OPERATION_FAILED"
     );
 
     const text =
@@ -304,7 +304,7 @@ async function refundDailyMessage(
   if (error) {
     console.error(
       "USAGE REFUND ERROR:",
-      error
+      "OPERATION_FAILED"
     );
     return null;
   }
@@ -495,7 +495,7 @@ async function getTokyoWeather():
   } catch (error) {
     console.error(
       "WEATHER FETCH ERROR:",
-      error
+      "OPERATION_FAILED"
     );
 
     return null;
@@ -1649,9 +1649,7 @@ export async function POST(
             startedAt,
           ok: false,
           error:
-            error instanceof Error
-              ? error.message
-              : String(error),
+            "STAGE_FAILED",
         }
       );
 
@@ -1800,6 +1798,9 @@ export async function POST(
     const isAnonymous = userData.user.is_anonymous === true;
     const relationshipSupabase = isAnonymous ? null : createServerSupabase();
     const userMessageAt = new Date().toISOString();
+    // Validate the canonical anonymous root before serving any old replay token/receipt.
+    // Expired or unverifiable roots must never revive through a replay fast path.
+    const anonymousRoot = isAnonymous ? await loadTemporaryRoot(userData.user.id, temporaryState) : null;
     const temporary = isAnonymous ? openTemporaryState(temporaryState) : null;
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
@@ -1821,7 +1822,7 @@ export async function POST(
       }
     }
     const rootState = isAnonymous
-      ? await loadTemporaryRoot(userData.user.id, temporaryState)
+      ? anonymousRoot!
       : await loadCanonicalState(userData.user.id);
     memory = rootState.memory;
     misakiTodayMemory = rootState.todayMemory;
@@ -2491,7 +2492,7 @@ ${retryProblems
             attempt,
             status: result.status,
             elapsedMs,
-            data: result.data,
+            code: "MODEL_RESPONSE_FAILED",
           });
           return null;
         }
@@ -2519,7 +2520,7 @@ ${retryProblems
           traceId,
           attempt,
           elapsedMs,
-          error,
+          code: "MODEL_TRANSPORT_FAILED",
         });
         throw error;
       }
@@ -2603,7 +2604,7 @@ ${retryProblems
     ) {
       console.log(
         "MISAKI REPLY RETRY:",
-        firstProblems
+        { count: firstProblems.length }
       );
 
       const retryParsed =
@@ -2685,8 +2686,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     ) {
       console.warn(
         "MISAKI FINAL REPLY PROBLEMS:",
-        finalProblems,
-        reply
+        { count: finalProblems.length }
       );
     }
 
@@ -2884,7 +2884,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
         elapsedMs:
           Date.now() -
           requestStartedAt,
-        error,
+        code: "CHAT_FAILED",
       }
     );
 

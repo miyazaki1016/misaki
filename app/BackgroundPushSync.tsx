@@ -1,10 +1,12 @@
 "use client";
+import { recoveryScope } from "../lib/recovery-session";
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
 import { registerPushSubscription } from "../lib/push-notifications";
 
 export default function BackgroundPushSync() {
   useEffect(() => {
+    if (recoveryScope) return;
     let stopped = false, syncing = false, pushOwner: string | null = null;
     async function sync() {
       if (stopped || syncing) return;

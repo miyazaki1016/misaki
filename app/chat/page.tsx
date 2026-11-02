@@ -1,4 +1,8 @@
 "use client";
+import { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from "../../lib/recovery-session";
+
+import { startIndependentRecovery } from "../../lib/recovery-session";
+import { temporaryStateMessage } from "../../lib/temporary-state-error";
 
 import { maintenanceMessage } from "../../lib/maintenance-result";
 
@@ -201,6 +205,23 @@ function getFirstRpcRow<T>(
 }
 
 export default function ChatPage() {
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
+  const [recoveryStarting, setRecoveryStarting] = useState(false);
+  async function beginIndependentConversation() {
+    if (recoveryStarting || !recoveryCode) return;
+    if (!window.confirm("古い状態を保全したまま、このタブで独立した新しい会話を始めます。古い会話や記憶は引き継ぎません。よろしいですか？")) return;
+    setRecoveryStarting(true);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      startIndependentRecovery(data.session?.user ?? null, recoveryCode, crypto.randomUUID());
+      window.location.assign('/chat'); // Full navigation creates the isolated client.
+    } catch {
+      setRecoveryStarting(false);
+      setSendError("新しい会話を開始できませんでした。既存データは変更していません。");
+    }
+  }
+
   const [
     message,
     setMessage,
@@ -728,9 +749,7 @@ export default function ChatPage() {
       try {
         // A full remount ends the previous page's in-flight UI send marker.
         sessionStorage.removeItem("misaki-chat-sending");
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const cached = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(cached)) setMessages(cached.slice(-MAX_MESSAGES));
+        // Do not display unverified caches or persist an empty error-state over them.
         const accessToken = await getAccessToken();
         const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);
         const response = await fetch("/api/persona/history", {
@@ -741,7 +760,8 @@ export default function ChatPage() {
         });
         if (!response.ok) {
           const result = await response.json().catch(() => null);
-          throw new Error(maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
+          if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);
+          throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
         }
         const state = await response.json();
         const { data: latest } = await supabase.auth.getSession();
@@ -753,11 +773,12 @@ export default function ChatPage() {
         }
         if (typeof state.temporaryState === "string") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);
         // Permanent history is canonical. Anonymous history remains a display cache.
-        if (active && Array.isArray(state.history) && (!state.ephemeral || state.recoveredTurn || cached.length === 0)) setMessages(state.history);
+        if (active && Array.isArray(state.history)) setMessages(state.history);
         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
+        if (active) { setRecoveryCode(null); setLoaded(true); }
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
-      } finally { if (active) setLoaded(true); }
+      }
     }
     void load();
     return () => {
@@ -1028,7 +1049,7 @@ export default function ChatPage() {
     });
     if (!response.ok) {
       const result = await response.json().catch(() => null);
-      throw new Error(maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
+      throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
     }
     const state = await response.json();
     const { data: latest } = await supabase.auth.getSession();
@@ -2003,6 +2024,9 @@ export default function ChatPage() {
             {sendError}
           </div>
         )}
+        {recoveryCode && <button type="button" disabled={recoveryStarting} onClick={beginIndependentConversation}>
+          古い状態を残して、独立した新しい会話を始める
+        </button>}
       </section>
 
       {/* =========================

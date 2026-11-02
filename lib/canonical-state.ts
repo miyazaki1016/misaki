@@ -1,3 +1,4 @@
+import { TemporaryStateUnavailableError } from "./temporary-state-error";
 import { createClient } from "@supabase/supabase-js";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
@@ -55,18 +56,23 @@ export function sealTemporaryState(state: RootState, requestId: string, result?:
 // It is not a permanent account state and clients cannot choose its points/memory.
 // Do not bind to the anonymous auth ID: Safari's transient auth recovery replaces
 // that ID while preserving this live browser session. Permanent accounts ignore it.
-export function openTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown> } | null {
+function inspectTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown>; expires: number } | null {
   if (typeof token !== "string" || token.length > 512_000) return null;
   try {
     const buffer = Buffer.from(token, "base64url");
     const decipher = createDecipheriv("aes-256-gcm", encryptionKey(), buffer.subarray(0, 12));
     decipher.setAuthTag(buffer.subarray(12, 28));
     const parsed = JSON.parse(Buffer.concat([decipher.update(buffer.subarray(28)), decipher.final()]).toString());
-    if (!Number.isFinite(parsed.expires) || parsed.expires <= Date.now()) return null;
+    if (!Number.isFinite(parsed.expires)) return null;
     return parsed;
   } catch {
     return null;
   }
+}
+
+export function openTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown> } | null {
+  const parsed = inspectTemporaryState(token);
+  return parsed && parsed.expires > Date.now() ? parsed : null;
 }
 
 export async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {
@@ -112,13 +118,18 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
 
 export async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {
   const temporary = openTemporaryState(token);
-  if (token && !temporary) throw new Error("Temporary state token is invalid or expired");
+  if (token && !temporary) {
+    const inspected = inspectTemporaryState(token);
+    throw new TemporaryStateUnavailableError(inspected ? "expired" : "unverifiable");
+  }
   const { data: root, error: rootError } = await createServerSupabase().from("misaki_temporary_roots")
     .select("token,revision,expires_at").eq("user_id", userId).maybeSingle();
   if (rootError) throw new Error("Temporary root read failed");
   if (root) {
-    const verified = openTemporaryState(root.token);
-    if (!verified || Date.parse(root.expires_at) <= Date.now()) throw new Error("Temporary root expired");
+    const verified = inspectTemporaryState(root.token);
+    const expires = Date.parse(root.expires_at);
+    if (!verified || !Number.isFinite(expires)) throw new TemporaryStateUnavailableError("unverifiable");
+    if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError("expired");
     return { ...verified.state, temporaryRevision: root.revision };
   }
   // A valid bearer state can seed a replacement Safari anonymous auth ID.
@@ -184,12 +195,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
   });
   if (error || typeof data !== "string") {
     if (error) {
-      console.error("TEMPORARY RECEIPT COMMIT ERROR", {
-        code: error.code,
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-      });
+      console.error("TEMPORARY RECEIPT COMMIT ERROR", { code: "STATE_COMMIT_FAILED" });
     }
     throw new Error("Temporary receipt commit failed");
   }
