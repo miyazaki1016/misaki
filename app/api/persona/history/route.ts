@@ -1,3 +1,4 @@
+import { TemporaryStateUnavailableError, temporaryStateMessage } from "../../../../lib/temporary-state-error";
 import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from "../../../../lib/canonical-state";
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
     if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { "Cache-Control": "no-store" } });
     return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("CONVERSATION STATE READ FAILED", error);
+    console.error("CONVERSATION STATE READ FAILED", { code: "STATE_READ_FAILED" });
     return Response.json({ error: "Conversation state could not be loaded." }, { status: 500 });
   }
 }
@@ -57,12 +58,7 @@ export async function POST(request: Request) {
         p_expected_revision: state.temporaryRevision ?? null,
       });
       if (error) {
-        console.error("EMAIL CHECKPOINT ERROR", {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
+        console.error("EMAIL CHECKPOINT ERROR", { code: "STATE_COMMIT_FAILED" });
         throw new Error("Email checkpoint failed");
       }
       return Response.json({ synced: true, result: data });
@@ -99,7 +95,15 @@ export async function POST(request: Request) {
     if (error) throw new Error("Conversation edit failed");
     return Response.json(responseState(await loadCanonicalState(user.id)));
   } catch (error) {
-    console.error("CONVERSATION STATE WRITE FAILED", error);
+    if (error instanceof TemporaryStateUnavailableError) {
+      const status = error.reason === "expired" ? 410 : 409;
+      const code = error.reason === "expired" ? "TEMPORARY_STATE_EXPIRED" : "TEMPORARY_STATE_UNVERIFIABLE";
+      console.error("CONVERSATION STATE UNAVAILABLE", { code, status });
+      return Response.json({ code, error: temporaryStateMessage(status, { code }) },
+        { status, headers: { "Cache-Control": "no-store" } });
+    }
+    // Never log arbitrary exception payloads (may contain private data).
+    console.error("CONVERSATION STATE WRITE FAILED", { code: "STATE_OPERATION_FAILED" });
     return Response.json({ error: "Conversation state could not be saved." }, { status: 500 });
   }
 }
