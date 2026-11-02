@@ -35,7 +35,7 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
     updateUser: async () => { calls.push('email'); return { error: null }; },
     onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },
   }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };
-  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON, navigator: {}, crypto: require("node:crypto").webcrypto,
+  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON, navigator: {}, crypto: require("node:crypto").webcrypto, AbortSignal,
     CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init?.detail; } },
     console: { error() {} }, fetch: (...args) => h.fetch(...args),
     window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },
@@ -264,7 +264,7 @@ function allElements(tree, predicate) {
 }
 for (const [status, code, text] of [[410,'TEMPORARY_STATE_EXPIRED','有効期限'],[409,'TEMPORARY_STATE_UNVERIFIABLE','検証できません']]) {
  test(`actual chat UI ${status}: shows reason, requires confirmation, preserves old cache and disables send`, async () => {
-  const h=harness();h.fetch=async()=>Response.json({code},{status});
+  const h=harness();h.fetch=async url=>String(url).endsWith('/admission') ? Response.json({accepting:true}) : Response.json({code},{status});
   h.window.location.assign=url=>h.calls.push({navigate:url});h.window.confirm=()=>false;
   const before=h.localStorage.getItem('misaki-chat-history');
   await h.mount('app/chat/page.tsx');let tree=h.render('app/chat/page.tsx');
@@ -288,4 +288,23 @@ test('actual chat UI: valid state enables chat without recovery button',async()=
  const h=harness();h.fetch=async()=>Response.json({history, memory:[],relationshipPoints:0});await h.mount('app/chat/page.tsx');
  const tree=h.render('app/chat/page.tsx');assert.equal(find(tree,'古い状態を残して、独立した新しい会話を始める'),null);
  const input=allElements(tree,x=>x.type==='input'&&x.props.placeholder?.includes('美咲に'))[0];assert.equal(input.props.disabled,false);h.unmount();
+});
+
+for (const accepting of [false, null, 'network-failure']) test(`actual chat UI admission ${accepting}: keeps old data and does not navigate`,async()=>{
+ const h=harness();h.window.confirm=()=>true;h.window.location.assign=url=>h.calls.push({navigate:url});
+ h.fetch=async url=>{
+  if(!String(url).endsWith('/admission'))return Response.json({code:'TEMPORARY_STATE_UNVERIFIABLE'},{status:409});
+  if(accepting==='network-failure')throw Error('synthetic network failure');
+  return Response.json({accepting});
+ };
+ const oldLocal=h.localStorage.getItem('misaki-chat-history');
+ await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
+ assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.equal(h.localStorage.getItem('misaki-chat-history'),oldLocal);
+ assert.equal(h.calls.filter(x=>x.navigate).length,0);assert.ok(h.states.some(x=>typeof x==='string'&&x.includes('復旧受付を一時停止')));h.unmount();
+});
+test('account switch while waiting for admission cannot start an independent recovery',async()=>{
+ const h=harness();h.window.confirm=()=>true;
+ h.fetch=async url=>{if(String(url).endsWith('/admission')){h.setUser({id:'registered-other',is_anonymous:false});return Response.json({accepting:true})}return Response.json({code:'TEMPORARY_STATE_EXPIRED'},{status:410})};
+ await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
+ assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.ok(!h.calls.includes('signOut'));h.unmount();
 });

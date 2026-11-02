@@ -1,7 +1,7 @@
 "use client";
 import { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from "../../lib/recovery-session";
 
-import { startIndependentRecovery } from "../../lib/recovery-session";
+import { startIndependentRecovery, checkRecoveryAdmission } from "../../lib/recovery-session";
 import { temporaryStateMessage } from "../../lib/temporary-state-error";
 
 import { maintenanceMessage } from "../../lib/maintenance-result";
@@ -214,7 +214,17 @@ export default function ChatPage() {
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
-      startIndependentRecovery(data.session?.user ?? null, recoveryCode, crypto.randomUUID());
+      if (!await checkRecoveryAdmission(fetch)) {
+        setRecoveryStarting(false);
+        setSendError("新しい会話の復旧受付を一時停止しています。既存の会話や保存情報は変更していません。");
+        return;
+      }
+      // Admission check is asynchronous; never carry an old user's decision across an account switch.
+      const { data: current, error: currentError } = await supabase.auth.getSession();
+      if (currentError || !current.session?.user.is_anonymous || current.session.user.id !== data.session?.user.id) {
+        throw new Error("Account changed during recovery admission");
+      }
+      startIndependentRecovery(current.session.user, recoveryCode, crypto.randomUUID());
       window.location.assign('/chat'); // Full navigation creates the isolated client.
     } catch {
       setRecoveryStarting(false);

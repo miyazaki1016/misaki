@@ -36,3 +36,15 @@ export function startIndependentRecovery(user: { is_anonymous?: boolean } | null
   // No signOut, cache copy, root update, token import or old-key deletion.
   sessionStorage.setItem(POINTER, id);
 }
+
+// Operational admission, not an authorization token or a global auth kill switch.
+// No storage mutation; any transport/shape/status failure denies new recovery only.
+export async function checkRecoveryAdmission(fetcher: typeof fetch): Promise<boolean> {
+  try {
+    const response = await fetcher('/api/anonymous-recovery/admission', {
+      cache: 'no-store', signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) return false;
+    return (await response.json())?.accepting === true;
+  } catch { return false; }
+}
