@@ -70,13 +70,13 @@ def render_shared_paths(overlaps, evidence):
     for path, names in overlaps.items():
         coverage = "partial/unknown" if any(
             not evidence[name].get("files_complete", False) for name in names) else "API-reported"
-        safe_path = path.replace("|", "&#124;").replace("\\n", " ")
-        safe_names = ", ".join(name.replace("|", "&#124;").replace("\\n", " ") for name in names)
+        safe_path = path.replace("|", "&#124;").replace("\n", " ")
+        safe_names = ", ".join(name.replace("|", "&#124;").replace("\n", " ") for name in names)
         lines.append(f"| {safe_path} | {safe_names} | {coverage} |")
     if not overlaps:
         lines.extend(["", "No shared changed paths found in the available API evidence; "
                       "this does not prove absence of duplicated work."])
-    return "\\n".join(lines) + "\\n"
+    return "\n".join(lines) + "\n"
 
 
 def render(rows):
@@ -107,7 +107,7 @@ def main():
     Path("inventory-output/branch-comparison.md").write_text(render(rows), encoding="utf-8")
     overlaps = find_shared_paths(evidence)
     Path("inventory-output/branch-file-evidence.json").write_text(
-        json.dumps({"branches": evidence, "shared_paths": overlaps}, ensure_ascii=False, indent=2) + "\\n",
+        json.dumps({"branches": evidence, "shared_paths": overlaps}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8")
     Path("inventory-output/shared-file-review.md").write_text(
         render_shared_paths(overlaps, evidence), encoding="utf-8")
