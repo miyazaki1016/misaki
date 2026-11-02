@@ -263,4 +263,5 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #139 | Define full inventory, ledger and main index completion gates | merged | `5ddc61276a14fbedfa158b33c5c81d534a80bfc5` | 2026-11-02T15:54:37Z |
 | #140 | iPhone全画面ラウンジの正式化と通常返信の発話状況を修正 | merged | `0ba21aabc7c0abb0fd1e629400a3e2376577db8d` | 2026-11-02T15:23:31Z |
 | #141 | Complete reviewed ledger and main operations-index fact proposals | merged | `6e3df7b41bdce757191c0650a66fad977a8a198e` | 2026-11-02T16:04:56Z |
+| #143 | fix: avoid proposal branch collisions on GitHub Actions reruns | merged | `4dfd89e9cf0f333b948e1f9eeba7112b94e73b65` | 2026-11-02T16:21:24Z |
 <!-- INVENTORY_FACTS_END -->
