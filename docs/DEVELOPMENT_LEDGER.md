@@ -265,4 +265,10 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #141 | Complete reviewed ledger and main operations-index fact proposals | merged | `6e3df7b41bdce757191c0650a66fad977a8a198e` | 2026-11-02T16:04:56Z |
 | #143 | fix: avoid proposal branch collisions on GitHub Actions reruns | merged | `4dfd89e9cf0f333b948e1f9eeba7112b94e73b65` | 2026-11-02T16:21:24Z |
 | #145 | Inventory: report shared changed-file paths across work branches | merged | `16a3c9b95ff7559ef66aa4be942a20203cfe8dea` | 2026-11-02T16:37:09Z |
+| #147 | Inventory: cross-reference branches, PR history and existing case IDs | merged | `9758a5c6f496eb6614f08485262f9c735bdc350c` | 2026-11-02T16:40:50Z |
+| #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
+| #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
+| #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `157b7788de57af5205822bf91804d9af6a053912` | 2026-11-03T23:34:39Z |
+| #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
 <!-- INVENTORY_FACTS_END -->
