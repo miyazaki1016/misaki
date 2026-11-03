@@ -26,6 +26,7 @@ export default function InitialChatScroll() {
     let initialized = false;
     let following = true;
     let userScrolling = false;
+    let touchStartY: number | null = null;
     let frame = 0;
     let pending = false;
     let previousHeight = scrollingElement().scrollHeight;
@@ -46,12 +47,20 @@ export default function InitialChatScroll() {
     // scrolls from images, font loading and Safari viewport resizing do not.
     const userIntent = () => {
       userScrolling = true;
-      if (!initialized) {
-        initialized = true;
-        following = false;
-      } else {
-        following = distanceFromBottom() <= BOTTOM_THRESHOLD;
-      }
+      if (initialized) following = distanceFromBottom() <= BOTTOM_THRESHOLD;
+    };
+
+    const onTouchStart = (event: TouchEvent) => {
+      touchStartY = event.touches[0]?.clientY ?? null;
+    };
+    const onTouchMove = (event: TouchEvent) => {
+      const currentY = event.touches[0]?.clientY;
+      if (touchStartY === null || currentY === undefined) return;
+      if (Math.abs(currentY - touchStartY) < 8) return;
+      userIntent();
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) userIntent();
     };
 
     const onScroll = () => {
@@ -92,9 +101,9 @@ export default function InitialChatScroll() {
     window.addEventListener("resize", onViewportResize);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("wheel", userIntent, { passive: true });
-    window.addEventListener("touchstart", userIntent, { passive: true });
-    window.addEventListener("pointerdown", userIntent, { passive: true });
-    window.addEventListener("keydown", userIntent);
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("keydown", onKeyDown);
     document.fonts?.ready.then(() => {
       if (!disposed && initialized && following) schedule();
     });
@@ -108,9 +117,9 @@ export default function InitialChatScroll() {
       window.removeEventListener("resize", onViewportResize);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("wheel", userIntent);
-      window.removeEventListener("touchstart", userIntent);
-      window.removeEventListener("pointerdown", userIntent);
-      window.removeEventListener("keydown", userIntent);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, []);
   return null;
