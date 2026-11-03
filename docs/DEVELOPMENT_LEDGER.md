@@ -272,4 +272,5 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `9e1208199656131fdf263d3f6e12f758f1b27c9f` | 2026-11-03T23:43:30Z |
 | #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
 | #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
+| #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
 <!-- INVENTORY_FACTS_END -->
