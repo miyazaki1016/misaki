@@ -269,6 +269,7 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
 | #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
 | #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
-| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `157b7788de57af5205822bf91804d9af6a053912` | 2026-11-03T23:34:39Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `9e1208199656131fdf263d3f6e12f758f1b27c9f` | 2026-11-03T23:43:30Z |
 | #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
+| #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
 <!-- INVENTORY_FACTS_END -->
