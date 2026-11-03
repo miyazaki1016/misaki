@@ -25,6 +25,7 @@ export default function InitialChatScroll() {
     let disposed = false;
     let initialized = false;
     let following = true;
+    let userScrolling = false;
     let frame = 0;
     let pending = false;
     let previousHeight = scrollingElement().scrollHeight;
@@ -44,6 +45,7 @@ export default function InitialChatScroll() {
     // Only a real user gesture cancels initial positioning. Programmatic
     // scrolls from images, font loading and Safari viewport resizing do not.
     const userIntent = () => {
+      userScrolling = true;
       if (!initialized) {
         initialized = true;
         following = false;
@@ -53,9 +55,8 @@ export default function InitialChatScroll() {
     };
 
     const onScroll = () => {
-      if (!initialized) return;
-      // Follow again when the reader explicitly returns to the bottom.
-      if (!following && distanceFromBottom() <= BOTTOM_THRESHOLD) following = true;
+      if (!initialized || !userScrolling) return;
+      following = distanceFromBottom() <= BOTTOM_THRESHOLD;
     };
 
     const onMutation = () => {
