@@ -759,12 +759,13 @@ export default function ChatPage() {
       // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
       // Timings only: never log tokens, history, user IDs or temporary state.
       const timingEnabled = sessionStorage.getItem("misaki-history-timing") === "1";
-      const startedAt = performance.now();
+      const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+      const startedAt = timingEnabled ? nowMs() : 0;
       let previousAt = startedAt;
       const timings: Record<string, number> = {};
       const checkpoint = (name: string) => {
         if (!timingEnabled) return;
-        const now = performance.now();
+        const now = nowMs();
         timings[name] = Math.round(now - previousAt);
         previousAt = now;
       };
@@ -803,7 +804,7 @@ export default function ChatPage() {
         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
         if (active) { setRecoveryCode(null); setLoaded(true); }
         checkpoint("stateEnqueueMs");
-        if (timingEnabled) console.info("[misaki-history-timing]", { ...timings, totalUntilStateEnqueueMs: Math.round(performance.now() - startedAt) });
+        if (timingEnabled) console.info("[misaki-history-timing]", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
       }
