@@ -25,6 +25,8 @@ html = Path("docs/approval-dashboard/index.html").read_text(encoding="utf-8")
 parser = Scripts()
 parser.feed(html)
 assert len(parser.scripts) == 1, "Exactly one inline script expected"
+assert html.count("<script>") == 1 and html.count("</script>") == 1, "Script tags must be balanced and unique"
+assert html.rstrip().endswith("</script></body></html>"), "No content may leak after the closing HTML"
 assert "https://api.github.com/" in html
 assert "noopener noreferrer" in html
 assert "localStorage" not in html and "access_token" not in html
