@@ -29,6 +29,12 @@ assert "https://api.github.com/" in html
 assert "noopener noreferrer" in html
 assert "localStorage" not in html and "access_token" not in html
 assert "fetchRepo" in parser.scripts[0]
+assert "owner-decision" in html and "needs-owner-decision" in html
+assert 'data-view="untriaged"' in html
+assert "判断してほしいこと" in html and "推奨と理由" in html
+assert "needsDecision(p)" in parser.scripts[0]
+assert "p.body||''" in parser.scripts[0]
+assert "eval(" not in parser.scripts[0]
 with tempfile.TemporaryDirectory() as directory:
     path = Path(directory) / "dashboard.js"
     path.write_text(parser.scripts[0], encoding="utf-8")
