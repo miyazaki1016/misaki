@@ -43,9 +43,28 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
   const byId=id=>document.getElementById(id); let rows=[],view='pending';
   const decisionLabels=['owner-decision','needs-owner-decision','user-approval-required'];
   function needsDecision(p){return p.labels.some(x=>decisionLabels.includes(x.toLowerCase()))}
-  function section(body, heading){
+  function section(body, names){
     const lines=String(body||'').split(/\r?\n/);
-    const begin=lines.findIndex(line=>new RegExp('^#{2,4}\\s*'+heading+'\\s*
+    const headings=names.split('|');
+    const begin=lines.findIndex(line=>{
+      const title=line.trim().replace(/^#{2,4}\s*/, '').trim();
+      return /^#{2,4}\s+/.test(line.trim()) && headings.includes(title);
+    });
+    if(begin<0)return '';
+    const out=[];
+    for(let i=begin+1;i<lines.length;i++){
+      if(/^#{1,4}\s+/.test(lines[i]))break;
+      out.push(lines[i]);
+    }
+    return out.join('\n').trim().slice(0,1000);
+  }
+  function decisionFacts(p){
+    return {
+      summary:section(p.body,'変更概要|What changes|Summary'),
+      question:section(p.body,'判断してほしいこと|あなたに判断してほしいこと|Decision required'),
+      recommendation:section(p.body,'推奨と理由|推奨|Recommendation')
+    };
+  }
   const status=byId('status'),items=byId('items');
   function el(tag,cls,value){const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n}
   async function fetchRepo(repo){
