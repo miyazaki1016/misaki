@@ -14,22 +14,26 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;fl
 #items{display:grid;gap:13px}.card{background:#151f31;border:1px solid #334259;border-radius:15px;padding:17px}.card h3{font-size:1.04rem;margin:.35em 0;overflow-wrap:anywhere}.card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.card .meta{font-size:.85rem;color:#b1bed5;overflow-wrap:anywhere}
 .card .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.action{display:inline-block;text-decoration:none;color:white;padding:10px 14px;border-radius:10px;background:#315d96;font-weight:700}.action.secondary{background:#293a53}.action:hover{filter:brightness(1.18)}
 .note{border-left:4px solid #72b4ec;padding:12px 15px;background:#14283d;border-radius:7px;margin:18px 0}.warning{border-color:#e9bd77;background:#32291a}
+.decision{padding:12px 14px;margin:12px 0;border-radius:10px;background:#1f304b;border:1px solid #365078}
+.decision strong{display:block;color:#c0defc;font-size:.9rem}.decision p{white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 12px}
+.decision p:last-child{margin-bottom:0}.decision.missing{background:#2d281d;border-color:#77623c}
 .status{padding:10px 0;min-height:32px}details{margin-top:10px}summary{cursor:pointer;color:#d0ddf8}.ci{font-size:.87rem;white-space:pre-wrap}.empty{border:1px dashed #465a76;border-radius:14px;padding:32px;text-align:center;color:#bed0e8}
 footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
 @media(min-width:650px){.card{padding:20px}.card h3{font-size:1.12rem}}
 </style>
 </head><body><main>
-<header><div><span class="badge">開発管理 / GitHub連携</span><h1>❤️ 美咲 × ☔ アメふる<br>承認ボード</h1><p class="muted">あなたが確認するPRを、ひとつの画面に。</p></div><button id="reload" class="action" type="button">↻ 更新</button></header>
-<section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>承認候補（Draft以外）</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>準備中（Draft）</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
+<header><div><span class="badge">開発管理 / GitHub連携</span><h1>❤️ 美咲 × ☔ アメふる<br>承認ボード</h1><p class="muted">あなたの判断が必要な案件だけを、理由と推奨付きで。</p></div><button id="reload" class="action" type="button">↻ 更新</button></header>
+<section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>あなたの判断待ち</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>未整理・準備中</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
 <div class="note"><strong>安全な承認：</strong>この画面は読み取り専用。ボタンでGitHubの該当PRを開き、変更差分とCIを確認したうえでGitHub上でマージします。承認やマージを勝手に実行しません。</div>
 <div class="controls" aria-label="表示を切り替え">
-<button class="active" data-view="pending" type="button">承認候補</button>
+<button class="active" data-view="pending" type="button">あなたの判断待ち</button>
+<button data-view="untriaged" type="button">未整理</button>
 <button data-view="draft" type="button">準備中</button>
 <button data-view="all" type="button">すべて</button>
 <select id="project" aria-label="プロジェクト"><option value="all">両プロジェクト</option><option value="misaki">❤️ 美咲</option><option value="emergencyalert">☔ アメふる</option></select>
 </div>
 <p role="status" id="status" class="status"></p><section id="items" aria-live="polite"></section>
-<div class="note warning"><strong>注意：</strong>PRが開いているだけでは承認可能とは限りません。「承認候補」は人が確認する対象という意味です。CI失敗、マージ競合、本番・DB・通知への影響などはGitHub上で再確認してください。台帳更新PRも、自動マージの安全審査が完成するまでは候補として表示します。</div>
+<div class="note warning"><strong>注意：</strong>「あなたの判断待ち」は、PRに専用ラベルを付けて明示された案件だけです。PRが開いているだけでは承認可能とは限りません。CI失敗、マージ競合、本番・DB・通知への影響などはGitHub上で再確認してください。台帳更新PRも、自動マージの安全審査が完成するまでは候補として表示します。</div>
 <footer>公開リポジトリのGitHub APIから取得。トークン・パスワード不要／保存なし。GitHub Pagesは一般公開なので秘密情報を置かないでください。API制限やネットワークにより表示できない場合があります。</footer>
 </main>
 <script>
@@ -37,6 +41,97 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
 (function(){
   const repos=[{id:'misaki',label:'❤️ 美咲',name:'miyazaki1016/misaki'},{id:'emergencyalert',label:'☔ アメふる',name:'miyazaki1016/emergencyalert'}];
   const byId=id=>document.getElementById(id); let rows=[],view='pending';
+  const decisionLabels=['owner-decision','needs-owner-decision','user-approval-required'];
+  function needsDecision(p){return p.labels.some(x=>decisionLabels.includes(x.toLowerCase()))}
+  function section(body, heading){
+    const lines=String(body||'').split(/\r?\n/);
+    const begin=lines.findIndex(line=>new RegExp('^#{2,4}\\s*'+heading+'\\s*
+  const status=byId('status'),items=byId('items');
+  function el(tag,cls,value){const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n}
+  async function fetchRepo(repo){
+    const url='https://api.github.com/repos/'+repo.name+'/pulls?state=open&per_page=100';
+    const response=await fetch(url,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+    if(!response.ok)throw Error(repo.label+' の取得失敗（HTTP '+response.status+'）');
+    const data=await response.json();
+    if(!Array.isArray(data))throw Error(repo.label+' の形式が不正');
+    if(data.length===100)throw Error(repo.label+' は100件を超える可能性があるため全件表示を保証できません');
+    return data.map(p=>({project:repo.id,projectLabel:repo.label,number:p.number,title:p.title,url:p.html_url,draft:!!p.draft,updated:p.updated_at,head:p.head&&p.head.sha,labels:(p.labels||[]).map(x=>x.name||''),body:p.body||'',base:p.base&&p.base.ref}));
+  }
+  function render(){
+    items.replaceChildren();
+    const project=byId('project').value;
+    const relevant=rows.filter(p=>project==='all'||p.project===project);
+    const actionable=relevant.filter(needsDecision);
+    const untriaged=relevant.filter(p=>!p.draft&&!needsDecision(p));
+    const drafts=relevant.filter(p=>p.draft&&!needsDecision(p));
+    const filtered=view==='pending'?actionable:view==='untriaged'?untriaged:view==='draft'?drafts:relevant;
+    byId('pendingCount').textContent=actionable.length;
+    byId('draftCount').textContent=untriaged.length+drafts.length;
+    if(!filtered.length){
+      const message=view==='pending'?'今、判断依頼が明示された案件はありません。未整理タブには従来のPRが残っています。':'該当するPRはありません。';
+      items.append(el('div','empty',message));return;
+    }
+    for(const p of filtered){
+      const decision=needsDecision(p),facts=decisionFacts(p),card=el('article','card'),top=el('div','top');
+      top.append(el('span','badge',p.projectLabel),el('span','badge',decision?'あなたの判断待ち':p.draft?'準備中（Draft）':'未整理（判断依頼なし）'));
+      const auto=p.title.toLowerCase().includes('ledger')||p.title.includes('台帳');
+      if(auto)top.append(el('span','badge','台帳・管理'));
+      card.append(top,el('h3','',p.title),el('div','meta','#'+p.number+' · '+p.project+' · '+(p.base||'対象不明')+' 向け · 更新 '+(p.updated?new Date(p.updated).toLocaleString('ja-JP'):'不明')));
+      if(p.labels.length)card.append(el('p','meta','ラベル: '+p.labels.join(' / ')));
+      const info=el('div','decision'+(decision&&(!facts.question||!facts.recommendation)?' missing':''));
+      const fields=[
+        ['何が変わる？',facts.summary||'変更概要の記載がありません。PR本文・差分を確認してください。'],
+        ['何を判断する？',facts.question||(decision?'判断内容が未記入です。担当者に具体的な質問の追記を依頼してください。':'判断依頼が明示されていません。owner-decisionラベルを付け、PR本文に判断内容を記載してください。')],
+        ['推奨と理由',facts.recommendation||'根拠付き推奨が未記入のため、自動的な承認推奨はしません。']
+      ];
+      for(const [label,value] of fields){info.append(el('strong','',label),el('p','',value))}
+      card.append(info);
+      const actions=el('div','actions'),go=el('a','action',p.draft?'GitHubで内容を確認 →':'GitHubで確認・マージ →'),diff=el('a','action secondary','変更差分を見る');
+      for(const a of [go,diff]){a.target='_blank';a.rel='noopener noreferrer'}
+      go.href=p.url;diff.href=p.url+'/files';actions.append(go,diff);card.append(actions);
+      const details=el('details'),summary=el('summary','', 'CIの状態を取得する（開いた時だけ）'),ci=el('p','ci','未取得');details.append(summary,ci);
+      details.addEventListener('toggle',async function(){
+        if(!details.open||details.dataset.loaded)return;details.dataset.loaded='1';ci.textContent='GitHubのチェックを確認中…';
+        try{
+          const u='https://api.github.com/repos/miyazaki1016/'+p.project+'/commits/'+encodeURIComponent(p.head)+'/check-runs?per_page=100';
+          const res=await fetch(u,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+          if(!res.ok)throw Error('HTTP '+res.status);
+          const body=await res.json(),checks=body.check_runs||[];
+          ci.textContent=checks.length?checks.map(c=>String(c.conclusion||c.status)+' · '+c.name).join('\n'):'チェック情報なし。GitHubのPR画面で確認してください。';
+        }catch(err){ci.textContent='取得できませんでした（'+err.message+'）。GitHubで確認してください。'}
+      });
+      card.append(details);items.append(card);
+    }
+  }
+  async function load(){
+    byId('reload').disabled=true;status.textContent='最新のPRを確認しています…';
+    const results=await Promise.allSettled(repos.map(fetchRepo));
+    rows=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value).sort((a,b)=>b.updated.localeCompare(a.updated));
+    const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason.message);
+    status.textContent=errors.length?'一部取得に失敗: '+errors.join(' / '):'取得成功 · '+rows.length+'件のオープンPR（判断依頼は専用ラベルで抽出）';
+    byId('updated').textContent='取得日時: '+new Date().toLocaleString('ja-JP')+'（リアルタイム表示、非保存）';
+    render();byId('reload').disabled=false;
+  }
+  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',function(){view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));render()}));
+  byId('project').addEventListener('change',render);byId('reload').addEventListener('click',load);load();
+})();
+</script></body></html>
+,'i').test(line.trim()));
+    if(begin<0)return '';
+    const out=[];
+    for(let i=begin+1;i<lines.length;i++){
+      if(/^#{1,4}\s+/.test(lines[i]))break;
+      out.push(lines[i]);
+    }
+    return out.join('\n').trim().replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').slice(0,1000);
+  }
+  function decisionFacts(p){
+    return {
+      summary:section(p.body,'(変更概要|What changes|Summary)'),
+      question:section(p.body,'(判断してほしいこと|あなたに判断してほしいこと|Decision required)'),
+      recommendation:section(p.body,'(推奨と理由|推奨|Recommendation)')
+    };
+  }
   const status=byId('status'),items=byId('items');
   function el(tag,cls,value){const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n}
   async function fetchRepo(repo){
