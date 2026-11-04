@@ -56,6 +56,6 @@ assert.equal(facts.question, "AかB");
 assert.equal(facts.recommendation, "Aが安全");
 assert.equal(decisionFacts({body:""}).question, "");
 """
-    path.write_text(helpers + "\\n" + smoke, encoding="utf-8")
+    path.write_text(helpers + chr(10) + smoke, encoding="utf-8")
     subprocess.run(["node", str(path)], check=True)
 print("Dashboard structure and JavaScript syntax OK")
