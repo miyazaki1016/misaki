@@ -44,7 +44,7 @@ with tempfile.TemporaryDirectory() as directory:
     start = js.index("  const decisionLabels=")
     end = js.index("  const status=byId(", start)
     helpers = js[start:end]
-    smoke = """
+    smoke = r"""
 const assert = require("node:assert/strict");
 assert.equal(needsDecision({labels:["owner-decision"]}), true);
 assert.equal(needsDecision({labels:["routine-maintenance"]}), false);
