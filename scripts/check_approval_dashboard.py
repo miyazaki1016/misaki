@@ -49,7 +49,7 @@ const assert = require("node:assert/strict");
 assert.equal(needsDecision({labels:["owner-decision"]}), true);
 assert.equal(needsDecision({labels:["routine-maintenance"]}), false);
 assert.equal(needsDecision({labels:[]}), false);
-const body = "### 変更概要\\n会話の表示を変更\\n### 判断してほしいこと\\nAかB\\n### 推奨と理由\\nAが安全";
+const body = ["### 変更概要","会話の表示を変更","### 判断してほしいこと","AかB","### 推奨と理由","Aが安全"].join(String.fromCharCode(10));
 const facts = decisionFacts({body});
 assert.equal(facts.summary, "会話の表示を変更");
 assert.equal(facts.question, "AかB");
