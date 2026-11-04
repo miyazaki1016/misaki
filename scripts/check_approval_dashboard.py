@@ -39,4 +39,23 @@ with tempfile.TemporaryDirectory() as directory:
     path = Path(directory) / "dashboard.js"
     path.write_text(parser.scripts[0], encoding="utf-8")
     subprocess.run(["node", "--check", str(path)], check=True)
+    # Run pure decision helpers against representative owner-approval PRs.
+    js = parser.scripts[0]
+    start = js.index("  const decisionLabels=")
+    end = js.index("  const status=byId(", start)
+    helpers = js[start:end]
+    smoke = """
+const assert = require("node:assert/strict");
+assert.equal(needsDecision({labels:["owner-decision"]}), true);
+assert.equal(needsDecision({labels:["routine-maintenance"]}), false);
+assert.equal(needsDecision({labels:[]}), false);
+const body = "### 変更概要\\n会話の表示を変更\\n### 判断してほしいこと\\nAかB\\n### 推奨と理由\\nAが安全";
+const facts = decisionFacts({body});
+assert.equal(facts.summary, "会話の表示を変更");
+assert.equal(facts.question, "AかB");
+assert.equal(facts.recommendation, "Aが安全");
+assert.equal(decisionFacts({body:""}).question, "");
+"""
+    path.write_text(helpers + "\\n" + smoke, encoding="utf-8")
+    subprocess.run(["node", str(path)], check=True)
 print("Dashboard structure and JavaScript syntax OK")
