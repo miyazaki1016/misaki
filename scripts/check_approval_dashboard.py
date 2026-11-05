@@ -60,6 +60,37 @@ assert.equal(decisionFacts({body:""}).question, "");
 """
     path.write_text(helpers + chr(10) + smoke, encoding="utf-8")
     subprocess.run(["node", str(path)], check=True)
+# Handoff queue must contain exactly the existing 35 non-owner cases; never auto-merge.
+import json
+handoff = json.loads(Path("docs/approval-dashboard/handoff-queue.json").read_text(encoding="utf-8"))
+tasks = handoff["tasks"]
+assert len(tasks) == 35, "Expected 35 audited non-owner PRs in 2026-11-04 snapshot"
+assert len({(t["repo"], t["number"]) for t in tasks}) == len(tasks), "Duplicate handoffs"
+assert all(t["repo"] in ("misaki", "emergencyalert") for t in tasks)
+assert all(t["role"] in ("美咲担当ソラ", "アメふる担当ソラ", "棚卸し担当ソラ") for t in tasks)
+assert not any(t["repo"] == "misaki" and t["number"] == 101 for t in tasks), "Owner decision must remain separate"
+assert "handoff-queue.json" in html and 'data-view="handoff"' in html
+assert "navigator.clipboard.writeText" in html and "自動で別チャットを起動" in html
+assert "handoffInstruction(" in html and "renderHandoffs(" in html
+start = js.index("  function handoffInstruction(")
+end = js.index("  function render(){", start)
+handoff_functions = js[start:end]
+handoff_smoke = r"""
+const assert = require('node:assert/strict');
+const t = {repo:'emergencyalert',number:155,role:'アメふる担当ソラ',state:'Draft',reason:'検証が必要',next:'旧版と比較'};
+const p = {title:'JASPICメール移行',url:'https://github.com/miyazaki1016/emergencyalert/pull/155',head:'a'.repeat(40)};
+const prompt = handoffInstruction(t,p);
+assert.match(prompt,/PR #155/);
+assert.match(prompt,/実送信/);
+assert.match(prompt,/作り直さない/);
+assert.match(prompt,/owner-decision/);
+assert.match(prompt,/head SHA/);
+"""
+with tempfile.TemporaryDirectory() as directory:
+    path = Path(directory) / "handoff.js"
+    path.write_text(handoff_functions + chr(10) + handoff_smoke, encoding="utf-8")
+    subprocess.run(["node", "--check", str(path)], check=True)
+    subprocess.run(["node", str(path)], check=True)
 # The optional merge screen must also be self-contained and never leak source.
 merge_file = Path("docs/approval-dashboard/merge.html")
 if merge_file.exists():

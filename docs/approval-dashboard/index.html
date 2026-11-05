@@ -17,30 +17,36 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;fl
 .decision{padding:12px 14px;margin:12px 0;border-radius:10px;background:#1f304b;border:1px solid #365078}
 .decision strong{display:block;color:#c0defc;font-size:.9rem}.decision p{white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 12px}
 .decision p:last-child{margin-bottom:0}.decision.missing{background:#2d281d;border-color:#77623c}
+.handoff{background:#172b2a;border:1px solid #365a58;padding:14px;border-radius:11px;margin:12px 0}
+.handoff strong{display:block;color:#b9f2df;margin-top:6px}
+.handoff p{white-space:pre-wrap;overflow-wrap:anywhere}
+.handoff button{border:1px solid #75b7a1;background:#23685a;color:white;border-radius:10px;font-size:1rem;padding:11px 14px;cursor:pointer}
+.handoff button:focus-visible{outline:3px solid #8cd0fa;outline-offset:3px}
 .status{padding:10px 0;min-height:32px}details{margin-top:10px}summary{cursor:pointer;color:#d0ddf8}.ci{font-size:.87rem;white-space:pre-wrap}.empty{border:1px dashed #465a76;border-radius:14px;padding:32px;text-align:center;color:#bed0e8}
 footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
 @media(min-width:650px){.card{padding:20px}.card h3{font-size:1.12rem}}
 </style>
 </head><body><main>
 <header><div><span class="badge">開発管理 / GitHub連携</span><h1>❤️ 美咲 × ☔ アメふる<br>承認ボード</h1><p class="muted">あなたの判断が必要な案件だけを、理由と推奨付きで。</p></div><button id="reload" class="action" type="button">↻ 更新</button></header>
-<section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>あなたの判断待ち</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>未整理・準備中</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
+<section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>あなたの判断待ち</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>未整理・準備中</span></div><div class="panel"><div class="counter" id="handoffCount">—</div><span>ソラへ引き継ぐ候補</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
 <div class="note"><strong>安全な承認：</strong>この画面は読み取り専用。ボタンでGitHubの該当PRを開き、変更差分とCIを確認したうえでGitHub上でマージします。承認やマージを勝手に実行しません。</div>
 <div class="controls" aria-label="表示を切り替え">
 <button class="active" data-view="pending" type="button">あなたの判断待ち</button>
+<button data-view="handoff" type="button">ソラへの引き継ぎ</button>
 <button data-view="untriaged" type="button">未整理</button>
 <button data-view="draft" type="button">準備中</button>
 <button data-view="all" type="button">すべて</button>
 <select id="project" aria-label="プロジェクト"><option value="all">両プロジェクト</option><option value="misaki">❤️ 美咲</option><option value="emergencyalert">☔ アメふる</option></select>
 </div>
 <p role="status" id="status" class="status"></p><section id="items" aria-live="polite"></section>
-<div class="note warning"><strong>注意：</strong>「あなたの判断待ち」は、PRに専用ラベルを付けて明示された案件だけです。PRが開いているだけでは承認可能とは限りません。CI失敗、マージ競合、本番・DB・通知への影響などはGitHub上で再確認してください。台帳更新PRも、自動マージの安全審査が完成するまでは候補として表示します。</div>
+<div class="note warning"><strong>注意：</strong>「あなたの判断待ち」は、PRに専用ラベルを付けて明示された案件だけです。「ソラへの引き継ぎ」は2026年11月4日の一次仕分けから生成した候補で、自動で別チャットを起動する機能ではありません。PRが開いているだけでは承認可能とは限りません。CI失敗、マージ競合、本番・DB・通知への影響などはGitHub上で再確認してください。台帳更新PRも、自動マージの安全審査が完成するまでは候補として表示します。</div>
 <footer>公開リポジトリのGitHub APIから取得。トークン・パスワード不要／保存なし。GitHub Pagesは一般公開なので秘密情報を置かないでください。API制限やネットワークにより表示できない場合があります。</footer>
 </main>
 <script>
 'use strict';
 (function(){
   const repos=[{id:'misaki',label:'❤️ 美咲',name:'miyazaki1016/misaki'},{id:'emergencyalert',label:'☔ アメふる',name:'miyazaki1016/emergencyalert'}];
-  const byId=id=>document.getElementById(id); let rows=[],view='pending',mergeReady=false;
+  const byId=id=>document.getElementById(id); let rows=[],handoffs=[],handoffError='',view='pending',mergeReady=false;
   const decisionLabels=['owner-decision','needs-owner-decision','user-approval-required'];
   function needsDecision(p){return p.labels.some(x=>decisionLabels.includes(x.toLowerCase()))}
   function section(body, names){
@@ -76,6 +82,69 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
     if(data.length===100)throw Error(repo.label+' は100件を超える可能性があるため全件表示を保証できません');
     return data.map(p=>({project:repo.id,projectLabel:repo.label,number:p.number,title:p.title,url:p.html_url,draft:!!p.draft,updated:p.updated_at,head:p.head&&p.head.sha,labels:(p.labels||[]).map(x=>x.name||''),body:p.body||'',base:p.base&&p.base.ref}));
   }
+
+  function handoffInstruction(t,p){
+    const repository='miyazaki1016/'+t.repo;
+    const label=t.role;
+    const lines=[
+      '【'+label+'への作業引き継ぎ】',
+      '対象: '+repository+' PR #'+t.number+'（'+p.title+'）',
+      'URL: '+p.url,
+      'PR最新head SHA: '+p.head,
+      '一次仕分け日時: 2026-11-04（古い可能性あり。最新状態を必ず照合）',
+      '一次仕分け時の状態: '+t.state,
+      '判断の根拠: '+t.reason,
+      '次に調査すること: '+t.next,
+      '',
+      '【作業条件】',
+      'mainだけでなく既存ブランチ・PR・Issue・開発台帳・関連コミットを照合する。既存実装を作り直さない。',
+      'PRの最新head・変更差分・CI・依存ブランチ・mainへ既に含まれる実装の有無を確認してから着手する。',
+      'Draftや禁止記載のあるPRは無断でマージ・公開しない。認証・DB・通知・本番・送信は無断変更しない。',
+      '実機/本番で未検証のことを完了と呼ばない。差分がなければ不要なPRやコミットを増やさない。',
+      '実施結果、未解決事項、証拠URL、次の担当判断をPRまたは台帳に残す。',
+      '仕様・費用・公開範囲等で本人の選択が必要になったときだけ、具体的な質問・選択肢・推奨理由を記載し owner-decision を登録する。',
+      'まず状況を確認し、証拠に応じて必要な作業を進めてください。'
+    ];
+    if(t.repo==='emergencyalert'&&t.number===155)lines.push('JASPICメールの実送信・本番切替は明示承認まで禁止。');
+    return lines.join('\n');
+  }
+  async function copyInstruction(textValue,button){
+    try{
+      if(navigator.clipboard && window.isSecureContext)await navigator.clipboard.writeText(textValue);
+      else {
+        const textarea=document.createElement('textarea');
+        textarea.value=textValue;textarea.style.position='fixed';textarea.style.left='-9999px';
+        document.body.append(textarea);textarea.select();
+        const success=document.execCommand('copy');textarea.remove();
+        if(!success)throw Error('Copy unavailable');
+      }
+      const original=button.textContent;button.textContent='✅ コピーしました';
+      setTimeout(()=>{button.textContent=original},1800);
+    }catch(_){button.textContent='コピー不可。GitHubから内容を確認してください。'}
+  }
+  function renderHandoffs(relevant){
+    const project=byId('project').value;
+    if(handoffError){items.append(el('div','empty','引き継ぎ台帳の取得に失敗: '+handoffError));return}
+    const map=new Map(relevant.map(p=>[p.project+'#'+p.number,p]));
+    const active=handoffs.filter(t=>(project==='all'||t.repo===project)&&map.has(t.repo+'#'+t.number));
+    byId('handoffCount').textContent=active.length;
+    if(!active.length){items.append(el('div','empty','現在のopen PRと一致する引き継ぎ候補はありません。'));return}
+    for(const t of active){
+      const p=map.get(t.repo+'#'+t.number),card=el('article','card'),top=el('div','top');
+      top.append(el('span','badge',p.projectLabel),el('span','badge',t.role),el('span','badge',p.draft?'Draft・マージ禁止':'事実確認が先'));
+      card.append(top,el('h3','',p.title),el('p','meta','#'+p.number+' · PR更新 '+(p.updated?new Date(p.updated).toLocaleString('ja-JP'):'不明')+' · 一次仕分け 2026-11-04'));
+      const box=el('div','handoff');
+      box.append(el('strong','','なぜ担当へ戻す？'),el('p','',t.reason),
+                 el('strong','','次にやること'),el('p','',t.next));
+      card.append(box);
+      const actions=el('div','actions');
+      const button=el('button','','📋 引き継ぎ指示をコピー');
+      button.type='button';button.addEventListener('click',()=>copyInstruction(handoffInstruction(t,p),button));
+      const link=el('a','action secondary','元のPRを見る →');link.href=p.url;link.target='_blank';link.rel='noopener noreferrer';
+      actions.append(button,link);card.append(actions);
+      items.append(card);
+    }
+  }
   function render(){
     items.replaceChildren();
     const project=byId('project').value;
@@ -86,6 +155,8 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
     const filtered=view==='pending'?actionable:view==='untriaged'?untriaged:view==='draft'?drafts:relevant;
     byId('pendingCount').textContent=actionable.length;
     byId('draftCount').textContent=untriaged.length+drafts.length;
+    byId('handoffCount').textContent=handoffs.filter(t=>relevant.some(p=>p.project===t.repo&&p.number===t.number)).length;
+    if(view==='handoff'){renderHandoffs(relevant);return}
     if(!filtered.length){
       const message=view==='pending'?'今、判断依頼が明示された案件はありません。未整理タブには従来のPRが残っています。':'該当するPRはありません。';
       items.append(el('div','empty',message));return;
@@ -132,6 +203,14 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
     byId('reload').disabled=true;status.textContent='最新のPRを確認しています…';
     const config=await fetch('./merge-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
     mergeReady=!!(config && config.enabled===true && config.supabaseUrl==='https://tzozajnwznxqgxnjikoy.supabase.co' && typeof config.publishableKey==='string' && config.publishableKey.length>20);
+    try{
+      const q=await fetch('./handoff-queue.json',{cache:'no-store'});
+      if(!q.ok)throw Error('HTTP '+q.status);
+      const data=await q.json();
+      if(!Array.isArray(data.tasks)||data.tasks.length>100)throw Error('管理台帳の形式が不正');
+      handoffs=data.tasks.filter(t=>['misaki','emergencyalert'].includes(t.repo)&&Number.isSafeInteger(t.number)&&typeof t.next==='string'&&typeof t.role==='string');
+      handoffError='';
+    }catch(e){handoffs=[];handoffError=String(e.message||e)}
     const results=await Promise.allSettled(repos.map(fetchRepo));
     rows=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value).sort((a,b)=>b.updated.localeCompare(a.updated));
     const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason.message);
