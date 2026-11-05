@@ -55,7 +55,7 @@ Deno.serve(async req => {
     const { data, error } = await client.auth.getUser(jwt);
     if (error || !data.user || data.user.is_anonymous) return response(401, "認証を確認できません");
     const github = data.user.identities?.find(i => i.provider === "github" &&
-       String(i.identity_data?.sub || i.provider_id || "") === ownerId);
+       String(i.identity_data?.sub || "") === ownerId);
     if (!github) return response(403, "指定されたGitHubオーナーのみ操作できます");
 
     if (Number(req.headers.get("content-length") || "0") > 2048) return response(413, "リクエストが大きすぎます");
