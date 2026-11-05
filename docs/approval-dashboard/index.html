@@ -2,7 +2,7 @@
 <html lang="ja"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src https://api.github.com; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
 <title>開発承認ボード | 美咲・アメふる</title>
 <style>
 :root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#e8ebf6;background:#0c1220;font-synthesis:none}
@@ -40,7 +40,7 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
 'use strict';
 (function(){
   const repos=[{id:'misaki',label:'❤️ 美咲',name:'miyazaki1016/misaki'},{id:'emergencyalert',label:'☔ アメふる',name:'miyazaki1016/emergencyalert'}];
-  const byId=id=>document.getElementById(id); let rows=[],view='pending';
+  const byId=id=>document.getElementById(id); let rows=[],view='pending',mergeReady=false;
   const decisionLabels=['owner-decision','needs-owner-decision','user-approval-required'];
   function needsDecision(p){return p.labels.some(x=>decisionLabels.includes(x.toLowerCase()))}
   function section(body, names){
@@ -107,7 +107,13 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
       card.append(info);
       const actions=el('div','actions'),go=el('a','action',p.draft?'GitHubで内容を確認 →':'GitHubで確認・マージ →'),diff=el('a','action secondary','変更差分を見る');
       for(const a of [go,diff]){a.target='_blank';a.rel='noopener noreferrer'}
-      go.href=p.url;diff.href=p.url+'/files';actions.append(go,diff);card.append(actions);
+      go.href=p.url;diff.href=p.url+'/files';actions.append(go,diff);
+      if(mergeReady && decision && !p.draft && /^[a-f0-9]{40}$/.test(p.head||'')){
+        const direct=el('a','action','🔐 承認してマージ');
+        direct.href='./merge.html?'+new URLSearchParams({repo:p.project,number:String(p.number),sha:p.head});
+        actions.prepend(direct);
+      }
+      card.append(actions);
       const details=el('details'),summary=el('summary','', 'CIの状態を取得する（開いた時だけ）'),ci=el('p','ci','未取得');details.append(summary,ci);
       details.addEventListener('toggle',async function(){
         if(!details.open||details.dataset.loaded)return;details.dataset.loaded='1';ci.textContent='GitHubのチェックを確認中…';
@@ -124,6 +130,8 @@ footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
   }
   async function load(){
     byId('reload').disabled=true;status.textContent='最新のPRを確認しています…';
+    const config=await fetch('./merge-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+    mergeReady=!!(config && config.enabled===true && config.supabaseUrl==='https://tzozajnwznxqgxnjikoy.supabase.co' && typeof config.publishableKey==='string' && config.publishableKey.length>20);
     const results=await Promise.allSettled(repos.map(fetchRepo));
     rows=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value).sort((a,b)=>b.updated.localeCompare(a.updated));
     const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason.message);

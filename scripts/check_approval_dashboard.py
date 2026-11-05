@@ -60,4 +60,21 @@ assert.equal(decisionFacts({body:""}).question, "");
 """
     path.write_text(helpers + chr(10) + smoke, encoding="utf-8")
     subprocess.run(["node", str(path)], check=True)
+# The optional merge screen must also be self-contained and never leak source.
+merge_file = Path("docs/approval-dashboard/merge.html")
+if merge_file.exists():
+    merge_html = merge_file.read_text(encoding="utf-8")
+    assert merge_html.count("<script>") == 1 and merge_html.count("</script>") == 1
+    assert merge_html.rstrip().endswith("</script></main></body></html>")
+    assert "owner-merge-pkce-verifier" in merge_html
+    assert "APPROVAL_GITHUB_TOKEN" not in merge_html
+    assert "localStorage" not in merge_html
+    parsed = Scripts()
+    parsed.feed(merge_html)
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / "owner-merge.js"
+        path.write_text(parsed.scripts[0], encoding="utf-8")
+        subprocess.run(["node", "--check", str(path)], check=True)
+    config = Path("docs/approval-dashboard/merge-config.json").read_text(encoding="utf-8")
+    assert '"enabled": false' in config, "Direct merge must remain disabled until verified"
 print("Dashboard structure and JavaScript syntax OK")
