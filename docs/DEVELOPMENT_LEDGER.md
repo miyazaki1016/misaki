@@ -140,7 +140,7 @@
 | #98 | 緊急修正：ラウンジの全タップ無反応（JavaScript構文エラー） | merged | `213935de5e14d431fb38422a53a9ce844a8e8cc0` | 2026-10-29T22:48:14Z |
 | #99 | 美咲：初回は空枠、会話後にアイコン表示＋匿名会話を翌日も保持 | merged | `44e8ec5eb2ab636b76926777b714ff803ebe8aa5` | 2026-10-29T23:07:59Z |
 | #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | open | `1e48f266cf40b51220bf9197006d8b939fb00b9e` | 2026-10-30T01:05:37Z |
-| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | open | `a4ea7b00da0f213bb865a40044b46d6973f859dd` | 2026-10-30T14:40:24Z |
+| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | merged | `a4ea7b00da0f213bb865a40044b46d6973f859dd` | 2026-11-05T00:33:44Z |
 | #103 | chore: 読み取り専用の開発忘れ物検出（両プロジェクト共通方式） | merged | `441779f88c0196a914079f238061c39c3159859d` | 2026-10-31T20:12:59Z |
 | #104 | docs: 2026-11-01棚卸し・調査結果を台帳へ保存 | merged | `d411a319192f7b764d7bd639845f7256f7006903` | 2026-10-31T21:24:19Z |
 | #105 | docs: 旧監査ブランチの追加調査を台帳へ記録 | merged | `897bf1c7e084ba88de75440c0d0e2042ead3be00` | 2026-10-31T21:28:00Z |
@@ -181,4 +181,21 @@
 | #140 | iPhone全画面ラウンジの正式化と通常返信の発話状況を修正 | merged | `0ba21aabc7c0abb0fd1e629400a3e2376577db8d` | 2026-11-02T15:23:31Z |
 | #141 | Complete reviewed ledger and main operations-index fact proposals | merged | `6e3df7b41bdce757191c0650a66fad977a8a198e` | 2026-11-02T16:04:56Z |
 | #143 | fix: avoid proposal branch collisions on GitHub Actions reruns | merged | `4dfd89e9cf0f333b948e1f9eeba7112b94e73b65` | 2026-11-02T16:21:24Z |
+| #145 | Inventory: report shared changed-file paths across work branches | merged | `16a3c9b95ff7559ef66aa4be942a20203cfe8dea` | 2026-11-02T16:37:09Z |
+| #147 | Inventory: cross-reference branches, PR history and existing case IDs | merged | `9758a5c6f496eb6614f08485262f9c735bdc350c` | 2026-11-02T16:40:50Z |
+| #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
+| #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
+| #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `4c8b9a508bc655b272fbbff298a1daf1ddddbce5` | 2026-11-05T00:54:36Z |
+| #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
+| #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
+| #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
+| #155 | feat: show explicit owner decisions with question and recommendation | merged | `da1ea1eb9569ce1b414211dd2063c7b0187c70c4` | 2026-11-04T03:47:26Z |
+| #156 | fix: remove JavaScript source accidentally rendered below approval dashboard | merged | `5733e11fb8e95c6a15d4b939fbc7c9e5f583262e` | 2026-11-04T04:07:04Z |
+| #157 | docs: first-pass owner decision triage of 36 open PRs | merged | `aed0b7249c69eb057c2e761014cd386cc9fdea1f` | 2026-11-05T00:42:08Z |
+| #158 | feat: prepare authenticated owner-only merge broker (disabled by default) | merged | `a3fa23884039f320803f947babbacad68d433954` | 2026-11-05T00:54:20Z |
+| #160 | feat: show Solas handoff queue with copyable PR work instructions | merged | `b25d13349b005da467ca654ecb166cc70e67dbc6` | 2026-11-05T01:34:43Z |
+| #161 | docs: unify development management and Sora handoff entrypoints | merged | `bb43cc89b3451bc7d27ab85a3c30db54f91b3794` | 2026-11-05T02:12:19Z |
+| #162 | ci: stop automatic previews and skip documentation-only builds | merged | `9ef26156431126c48789016d18e501d56a37cc25` | 2026-11-05T04:42:01Z |
+| #163 | docs: 総覧を短くし、案件管理を開発台帳へ集約 | merged | `e75d2702654619ad2f003954f3453f2a76603c6d` | 2026-11-05T04:58:08Z |
 <!-- INVENTORY_FACTS_END -->
