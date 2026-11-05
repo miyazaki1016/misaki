@@ -783,6 +783,11 @@ export default function ChatPage() {
             pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null") }),
         });
         checkpoint("historyApiMs");
+        if (timingEnabled) {
+          const serverTiming = response.headers.get("Server-Timing");
+          const duration = serverTiming?.match(/(?:^|,)\s*history;dur=([\d.]+)/)?.[1];
+          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));
+        }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
           if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);
