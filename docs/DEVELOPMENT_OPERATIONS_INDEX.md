@@ -61,8 +61,8 @@
 | #87 | design: shared Misaki conversation engine for production and tuning lab | design/shared-conversation-engine-contract-20261015 |
 | #88 | refactor: pure conversation history adapter (first shared engine seam) | experiment/shared-conversation-history-v1-20261015 |
 | #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | design/anonymous-per-item-24h-memory-20261030 |
-| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | docs/misaki-memory-public-final-20261030 |
 | #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | fix/chat-scroll-and-load-diagnostics-20261104 |
+| #157 | docs: first-pass owner decision triage of 36 open PRs | docs/owner-triage-36prs-20261104 |
 
 全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。
 既存案件ID・判断欄は変更しません。

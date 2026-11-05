@@ -223,7 +223,7 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #98 | 緊急修正：ラウンジの全タップ無反応（JavaScript構文エラー） | merged | `213935de5e14d431fb38422a53a9ce844a8e8cc0` | 2026-10-29T22:48:14Z |
 | #99 | 美咲：初回は空枠、会話後にアイコン表示＋匿名会話を翌日も保持 | merged | `44e8ec5eb2ab636b76926777b714ff803ebe8aa5` | 2026-10-29T23:07:59Z |
 | #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | open | `1e48f266cf40b51220bf9197006d8b939fb00b9e` | 2026-10-30T01:05:37Z |
-| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | open | `a4ea7b00da0f213bb865a40044b46d6973f859dd` | 2026-10-30T14:40:24Z |
+| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | merged | `a4ea7b00da0f213bb865a40044b46d6973f859dd` | 2026-11-05T00:33:44Z |
 | #103 | chore: 読み取り専用の開発忘れ物検出（両プロジェクト共通方式） | merged | `441779f88c0196a914079f238061c39c3159859d` | 2026-10-31T20:12:59Z |
 | #104 | docs: 2026-11-01棚卸し・調査結果を台帳へ保存 | merged | `d411a319192f7b764d7bd639845f7256f7006903` | 2026-10-31T21:24:19Z |
 | #105 | docs: 旧監査ブランチの追加調査を台帳へ記録 | merged | `897bf1c7e084ba88de75440c0d0e2042ead3be00` | 2026-10-31T21:28:00Z |
@@ -275,4 +275,5 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
 | #155 | feat: show explicit owner decisions with question and recommendation | merged | `da1ea1eb9569ce1b414211dd2063c7b0187c70c4` | 2026-11-04T03:47:26Z |
 | #156 | fix: remove JavaScript source accidentally rendered below approval dashboard | merged | `5733e11fb8e95c6a15d4b939fbc7c9e5f583262e` | 2026-11-04T04:07:04Z |
+| #157 | docs: first-pass owner decision triage of 36 open PRs | open | `aed0b7249c69eb057c2e761014cd386cc9fdea1f` | 2026-11-04T10:43:16Z |
 <!-- INVENTORY_FACTS_END -->
