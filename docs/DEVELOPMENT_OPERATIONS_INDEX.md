@@ -14,31 +14,30 @@
 自動取得は確認候補。案件の進捗・本番状態を自動確定しない。旧運用手順と状態は[整理前の運用索引](https://github.com/miyazaki1016/misaki/blob/fc1424ec1649fd73b1c6e89d2122cd7df5c13038/docs/DEVELOPMENT_OPERATIONS_INDEX.md)で確認できる。
 
 <!-- OPERATIONS_INVENTORY_START -->
-## GitHub自動棚卸し（確認用の事実）
+## GitHub Open PR一覧（2026-11-05取得スナップショット）
 
-> これはPRの状態だけを示し、開発完了・本番反映・実装重複を意味しません。
-
-開発台帳: [DEVELOPMENT_LEDGER.md](DEVELOPMENT_LEDGER.md)
+> PRの状態のみ。開発完了・本番反映の認定ではありません。最新の状態は [GitHub Open PR](https://github.com/miyazaki1016/misaki/pulls) と Actions で再確認してください。自動棚卸しが次回更新する場合があります。
 
 | Open PR | タイトル | Head branch |
 |---|---|---|
-| #30 | 旧schema互換の先行maintenance/drain設備を独立追加 | codex/legacy-maintenance-drain |
-| #31 | 関係時間v2: 内容理解から感情・行動・自発性まで統合 | sora/relationship-time-v2-design |
-| #60 | Document Relationship Engine v1.2 Stage and growth principles | docs/relationship-v1-2-stage-growth-principles |
-| #66 | Forget Control v1: canonical忘却と確認付き再学習 | work/forget-control-v1 |
-| #67 | Relationship Identity v1: canonical persistence, continuity and migration audit | work/relationship-identity-v1 |
-| #78 | Test isolated conversation replay adapter | work/context-no-duplicate-replies-ab |
-| #79 | docs: multi-character data scope inventory | docs/multi-character-data-scope-inventory |
-| #80 | docs: audit multi-character RPC callers | docs/multi-character-rpc-caller-audit |
-| #81 | docs: reconcile production source-of-truth and management drift | docs/production-source-of-truth-reconciliation |
-| #83 | test: compare canonical relationship acting instructions | test/relationship-acting-state-comparison |
-| #84 | docs: 5軸成長速度とRelationship Engine思想の照合を総覧へ追記 | docs/relationship-five-axis-design-review-20261015 |
-| #85 | experiment: 5軸の中間成長を表現するInterpreter比較案（本番未接続） | experiment/interpreter-gradual-acting-20261015 |
-| #86 | experiment: offline multi-turn conversation lab foundation (no Gemini/DB) | experiment/conversation-lab-offline-v1-20261015 |
-| #87 | design: shared Misaki conversation engine for production and tuning lab | design/shared-conversation-engine-contract-20261015 |
-| #88 | refactor: pure conversation history adapter (first shared engine seam) | experiment/shared-conversation-history-v1-20261015 |
-| #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | design/anonymous-per-item-24h-memory-20261030 |
-| #101 | docs: 記憶・想い出・感情・自律日常の公開用計画資料を追加 | docs/misaki-memory-public-final-20261030 |
+| #30 | 旧schema互換の先行maintenance/drain設備を独立追加 | `codex/legacy-maintenance-drain` |
+| #31 | 関係時間v2: 内容理解から感情・行動・自発性まで統合 | `sora/relationship-time-v2-design` |
+| #60 | Document Relationship Engine v1.2 Stage and growth principles | `docs/relationship-v1-2-stage-growth-principles` |
+| #66 | Forget Control v1: canonical忘却と確認付き再学習 | `work/forget-control-v1` |
+| #67 | Relationship Identity v1: canonical persistence, continuity and migration audit | `work/relationship-identity-v1` |
+| #78 | Test isolated conversation replay adapter | `work/context-no-duplicate-replies-ab` |
+| #79 | docs: multi-character data scope inventory | `docs/multi-character-data-scope-inventory` |
+| #80 | docs: audit multi-character RPC callers | `docs/multi-character-rpc-caller-audit` |
+| #81 | docs: reconcile production source-of-truth and management drift | `docs/production-source-of-truth-reconciliation` |
+| #83 | test: compare canonical relationship acting instructions | `test/relationship-acting-state-comparison` |
+| #84 | docs: 5軸成長速度とRelationship Engine思想の照合を総覧へ追記 | `docs/relationship-five-axis-design-review-20261015` |
+| #85 | experiment: 5軸の中間成長を表現するInterpreter比較案（本番未接続） | `experiment/interpreter-gradual-acting-20261015` |
+| #86 | experiment: offline multi-turn conversation lab foundation (no Gemini/DB) | `experiment/conversation-lab-offline-v1-20261015` |
+| #87 | design: shared Misaki conversation engine for production and tuning lab | `design/shared-conversation-engine-contract-20261015` |
+| #88 | refactor: pure conversation history adapter (first shared engine seam) | `experiment/shared-conversation-history-v1-20261015` |
+| #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | `design/anonymous-per-item-24h-memory-20261030` |
+| #146 | docs: review GitHub facts in development ledger and operations index | `automation/ledger-facts-41483251398-1` |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | `fix/chat-scroll-and-load-diagnostics-20261104` |
 
 全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。
 既存案件ID・判断欄は変更しません。
