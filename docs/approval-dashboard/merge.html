@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://tzozajnwznxqgxnjikoy.supabase.co; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<title>承認してマージ | 開発承認ボード</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#e8ebf6;background:#0c1220;line-height:1.6}
+main{max-width:620px;margin:35px auto;padding:20px}
+.panel{background:#172239;border:1px solid #354a6c;border-radius:18px;padding:22px;margin:24px 0}
+h1{font-size:1.65rem}.muted{color:#b1bfd5}a{color:#a5d2ff}
+button{background:#33679c;color:white;font-weight:700;border-radius:11px;padding:13px 20px;border:1px solid #77a1d7;font-size:1.05rem;cursor:pointer}
+button:disabled{opacity:.4;cursor:not-allowed}
+#status{white-space:pre-wrap;overflow-wrap:anywhere;min-height:40px}
+label{display:block;margin:10px 0}
+.warning{background:#302519;border-left:4px solid #edc486;border-radius:9px;padding:14px}
+</style></head><body><main>
+<a href="./">← 承認ボードに戻る</a>
+<h1>🔐 承認してマージ</h1>
+<p class="muted">GitHubログインとサーバー側の安全チェックが揃った場合にのみ実行します。</p>
+<div class="panel">
+<h2 id="target">対象PRを確認中</h2>
+<p id="status" role="status">初期設定を確認しています…</p>
+<p><button type="button" id="login" disabled>GitHubで本人確認</button></p>
+<p><button type="button" id="check" disabled>マージ前の安全チェック</button></p>
+<p><button type="button" id="merge" disabled>承認してマージ</button></p>
+</div>
+<p class="warning">安全チェックが不合格・設定未完了・Draft・CI未完了の場合はマージできません。変更があったPRは古い承認を再利用できません。アプリコード・DB・通知等はこの画面からマージしません。</p>
+<p><a id="github" href="./">GitHubで直接確認する →</a></p>
+<script>
+'use strict';
+(async function(){
+  const $=id=>document.getElementById(id),state=$('status');
+  const params=new URLSearchParams(location.search);
+  const repo=params.get('repo'),number=Number(params.get('number')),sha=params.get('sha')||'';
+  const valid=['misaki','emergencyalert'].includes(repo)&&Number.isSafeInteger(number)&&number>0&&/^[a-f0-9]{40}$/.test(sha);
+  const suffix=valid?repo+' #'+number:'対象不明';
+  $('target').textContent=suffix;
+  const github=valid?'https://github.com/miyazaki1016/'+repo+'/pull/'+number:'https://github.com/miyazaki1016/misaki/pulls';
+  $('github').href=github;$('github').rel='noopener noreferrer';
+  if(!valid){state.textContent='不正なPR指定です。承認ボードから開いてください。';return}
+  const configuration=await fetch('./merge-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+  const trustedUrl='https://tzozajnwznxqgxnjikoy.supabase.co';
+  if(!configuration||configuration.enabled!==true||configuration.supabaseUrl!==trustedUrl||
+       typeof configuration.publishableKey!=='string'||configuration.publishableKey.length<20){
+    state.textContent='直接マージ機能はまだ準備中です。GitHubのPR画面から従来どおり確認・マージできます。';return;
+  }
+  const url=trustedUrl,key=configuration.publishableKey;
+  const callback=new URL('./merge.html',location.href).href;
+  const storageKey='owner-merge-pkce-verifier';
+  const targetKey='owner-merge-target';
+  let token=null,verified=false;
+  const requestBody=dryRun=>({repo,number,expectedHead:sha,confirm:'承認してマージ',dryRun});
+  const api=async(dryRun)=>{
+    const res=await fetch(url+'/functions/v1/approval-merge',{
+      method:'POST',headers:{'Authorization':'Bearer '+token,'apikey':key,'Content-Type':'application/json'},
+      body:JSON.stringify(requestBody(dryRun)),cache:'no-store'
+    });
+    const result=await res.json().catch(()=>({reason:'応答を解釈できません'}));
+    if(!res.ok||!result.ok)throw Error(result.reason||'HTTP '+res.status);
+    return result;
+  };
+  const verifier=bytes=>Array.from(bytes,b=>String.fromCharCode(b)).join('');
+  const b64url=bytes=>btoa(verifier(bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const error=params.get('error_description');
+  if(error){state.textContent='GitHubログインが完了しませんでした。設定を確認してください。';history.replaceState(null,'',callback);return}
+  const code=params.get('code');
+  if(code){
+    const savedVerifier=sessionStorage.getItem(storageKey),savedTarget=sessionStorage.getItem(targetKey);
+    sessionStorage.removeItem(storageKey);sessionStorage.removeItem(targetKey);
+    history.replaceState(null,'',callback+'?'+new URLSearchParams({repo,number:String(number),sha}));
+    if(!savedVerifier||savedTarget!==JSON.stringify({repo,number,sha})){
+      state.textContent='本人確認の途中状態が一致しません。最初からやり直してください。';return;
+    }
+    try{
+      const res=await fetch(url+'/auth/v1/token?grant_type=pkce',{
+        method:'POST',headers:{'apikey':key,'Content-Type':'application/json'},
+        body:JSON.stringify({auth_code:code,code_verifier:savedVerifier}),cache:'no-store'
+      });
+      if(!res.ok)throw Error('OAuth code exchange failed');
+      const session=await res.json();
+      if(typeof session.access_token!=='string')throw Error('No access token');
+      token=session.access_token;state.textContent='GitHubによる本人確認を受け付けました。安全チェックを実施してください。';
+      $('check').disabled=false;
+    }catch(_){state.textContent='本人確認に失敗しました。GitHub側の設定を確認してください。'}
+  }else{
+    state.textContent='まだログインしていません。本人確認が必要です。';
+    $('login').disabled=false;
+  }
+  $('login').addEventListener('click',async()=>{
+    const raw=crypto.getRandomValues(new Uint8Array(48));
+    const codeVerifier=b64url(raw);
+    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(codeVerifier));
+    const challenge=b64url(new Uint8Array(digest));
+    sessionStorage.setItem(storageKey,codeVerifier);
+    sessionStorage.setItem(targetKey,JSON.stringify({repo,number,sha}));
+    const query=new URLSearchParams({provider:'github',redirect_to:callback,flow_type:'pkce',code_challenge:challenge,code_challenge_method:'s256'});
+    location.assign(url+'/auth/v1/authorize?'+query.toString());
+  });
+  $('check').addEventListener('click',async()=>{
+    $('check').disabled=true;state.textContent='最新の状態・変更ファイル・CIを照合中…';
+    try{
+      const r=await api(true);
+      verified=true;state.textContent=r.reason;
+      $('merge').disabled=false;
+    }catch(e){verified=false;state.textContent='安全チェックで停止: '+e.message}
+  });
+  $('merge').addEventListener('click',async()=>{
+    if(!verified||!token)return;
+    if(!window.confirm(suffix+' をmainへマージします。この操作は元に戻せません。実行しますか？'))return;
+    $('merge').disabled=true;state.textContent='GitHub側でマージを確認中…';
+    try{
+      const r=await api(false);
+      state.textContent='✅ '+r.reason+'\nCommit: '+r.mergedSha;
+    }catch(e){state.textContent='マージできませんでした: '+e.message+'\nGitHubで最終状態を確認してください。'}
+  });
+})();
+</script></main></body></html>
