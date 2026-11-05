@@ -1,0 +1,23 @@
+name: Secure merge broker policy (offline)
+on:
+  pull_request:
+    paths:
+      - 'services/approval-merge-edge/**'
+      - '.github/workflows/approval-merge-policy-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  policy-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify merge guard without credentials
+        run: node --test services/approval-merge-edge/policy.test.mjs
+      - name: Reject pasted merge secrets or accidental browser token
+        run: |
+          if grep -REn 'gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}' services/approval-merge-edge; then
+            echo 'Possible embedded GitHub token' >&2
+            exit 1
+          fi
