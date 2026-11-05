@@ -1,5 +1,7 @@
 # Misaki 実装・修正 総覧
 
+> **2026-11-05 開発管理システムの共通入口**：[美咲 × アメふる 開発管理システム総覧](DEVELOPMENT_MANAGEMENT_OVERVIEW.md)。両リポジトリの自動棚卸し、承認ボード、担当ソラへの引き継ぎ、台帳更新提案と未対応の直接マージ設定を案内する**索引**。既存の開発台帳・詳細監査・専用ブランチは維持し、このリンクを本体機能の実装完了や本番反映の証拠とは扱わない。
+
 > **開発管理の現況（2026-11-01確認）**：[開発台帳・棚卸し監査索引](DEVELOPMENT_LEDGER.md)／[共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)。読み取り専用の自動棚卸しはPR #103でmainへ統合済み、PR #112で**毎日10:17 JST**に変更済み（`.github/workflows/development-inventory.yml`）。実行ごとの `report.json` と `summary.md` はGitHub Actionsの `development-inventory` artifactに30日間保存し、**mainの台帳へ日次自動追記はしない**。週次の詳細照合は別途行う管理作業で、自動実装済みとは扱わない。詳細棚卸しの歴史的正本は `docs/development-registry-audit-20261020` ブランチの `docs/DEVELOPMENT_REGISTRY.md`（main未統合）。当該ブランチ全体をmainへマージしない。
 
 > **未来のソラへ——**  
