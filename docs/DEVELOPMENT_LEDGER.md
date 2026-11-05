@@ -269,11 +269,12 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
 | #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
 | #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
-| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `9e1208199656131fdf263d3f6e12f758f1b27c9f` | 2026-11-03T23:43:30Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `6362654d8240721ef65467a07c825f1a9a765ec3` | 2026-11-05T00:54:30Z |
 | #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
 | #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
 | #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
 | #155 | feat: show explicit owner decisions with question and recommendation | merged | `da1ea1eb9569ce1b414211dd2063c7b0187c70c4` | 2026-11-04T03:47:26Z |
 | #156 | fix: remove JavaScript source accidentally rendered below approval dashboard | merged | `5733e11fb8e95c6a15d4b939fbc7c9e5f583262e` | 2026-11-04T04:07:04Z |
 | #157 | docs: first-pass owner decision triage of 36 open PRs | merged | `aed0b7249c69eb057c2e761014cd386cc9fdea1f` | 2026-11-05T00:42:08Z |
+| #158 | feat: prepare authenticated owner-only merge broker (disabled by default) | merged | `a3fa23884039f320803f947babbacad68d433954` | 2026-11-05T00:54:20Z |
 <!-- INVENTORY_FACTS_END -->
