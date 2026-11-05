@@ -279,4 +279,5 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #158 | feat: prepare authenticated owner-only merge broker (disabled by default) | merged | `a3fa23884039f320803f947babbacad68d433954` | 2026-11-05T00:54:20Z |
 | #160 | feat: show Solas handoff queue with copyable PR work instructions | merged | `b25d13349b005da467ca654ecb166cc70e67dbc6` | 2026-11-05T01:34:43Z |
 | #161 | docs: unify development management and Sora handoff entrypoints | merged | `bb43cc89b3451bc7d27ab85a3c30db54f91b3794` | 2026-11-05T02:12:19Z |
+| #162 | ci: stop automatic previews and skip documentation-only builds | merged | `9ef26156431126c48789016d18e501d56a37cc25` | 2026-11-05T04:42:01Z |
 <!-- INVENTORY_FACTS_END -->
