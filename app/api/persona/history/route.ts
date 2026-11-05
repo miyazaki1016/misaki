@@ -64,19 +64,23 @@ export async function POST(request: Request) {
       return Response.json({ synced: true, result: data });
     }
     if (body.action === "load") {
+      const loadStartedAt = performance.now();
+      const timedResponse = (payload: unknown) => Response.json(payload, {
+        headers: { "Cache-Control": "no-store", "Server-Timing": `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}` },
+      });
       if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
         if (replay) {
           const recovered = openTemporaryState(replay.temporaryState);
           if (recovered) {
             const latest = await loadTemporaryRoot(user.id, replay.temporaryState);
-            return Response.json({ ...responseState(latest, true),
+            return timedResponse({ ...responseState(latest, true),
               temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, "load") : sealTemporaryState(latest, "load"), recoveredTurn: true });
           }
         }
       }
       const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
-      return Response.json({ ...responseState(state, !!user.is_anonymous),
+      return timedResponse({ ...responseState(state, !!user.is_anonymous),
         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }
     if (!["deleteMemory", "clearMemory", "clearHistory"].includes(body.action) ||
