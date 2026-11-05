@@ -32,7 +32,13 @@ label{display:block;margin:10px 0}
 (async function(){
   const $=id=>document.getElementById(id),state=$('status');
   const params=new URLSearchParams(location.search);
-  const repo=params.get('repo'),number=Number(params.get('number')),sha=params.get('sha')||'';
+  let repo=params.get('repo'),number=Number(params.get('number')),sha=params.get('sha')||'';
+  if(params.has('code') && !params.has('repo')){
+    try{
+      const saved=JSON.parse(sessionStorage.getItem('owner-merge-target')||'null');
+      if(saved){repo=saved.repo;number=saved.number;sha=saved.sha}
+    }catch(_){ /* The missing state remains invalid. */ }
+  }
   const valid=['misaki','emergencyalert'].includes(repo)&&Number.isSafeInteger(number)&&number>0&&/^[a-f0-9]{40}$/.test(sha);
   const suffix=valid?repo+' #'+number:'対象不明';
   $('target').textContent=suffix;
