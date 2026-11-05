@@ -25,6 +25,13 @@
 | M-05 | 旧監査証拠 | 保全 | 棚卸し担当ソラ | [LEGACY_AUDIT_FOLLOWUP_20261101.md](audits/LEGACY_AUDIT_FOLLOWUP_20261101.md) | 必要な証拠のみ索引化 |
 | M-06 | 旧Safari・関係性診断ブランチ2件 | 整理候補・未削除 | 棚卸し担当ソラ | [BRANCH_TRIAGE_20261101.md](audits/BRANCH_TRIAGE_20261101.md) | 参照先確認後に削除可否を相談 |
 
+## 直近の追加案件（2026-11-05確認）
+
+| 案件 | 状態 | 次の一手・正本 |
+| --- | --- | --- |
+| チャット初期スクロール・履歴読み込み計測 | [Draft PR #151](https://github.com/miyazaki1016/misaki/pull/151)／未マージ・実機検証未了 | 最新CI・実機測定と所有者確認の安全性を照合。5秒遅延の改善効果は未測定 |
+| 美咲のバックアップ・安全な復元 | [Issue #159](https://github.com/miyazaki1016/misaki/issues/159)／調査中・実装完了ではない | 既存手動チェックポイントの対象不足、Supabase設定、復元試験を調査。DB変更は未実施 |
+
 ## 更新手順
 
 1. [最新の棚卸し結果](https://github.com/miyazaki1016/misaki/actions)から変化を拾う。結果が取得できないときは変化なしと扱わない。
@@ -198,4 +205,5 @@
 | #161 | docs: unify development management and Sora handoff entrypoints | merged | `bb43cc89b3451bc7d27ab85a3c30db54f91b3794` | 2026-11-05T02:12:19Z |
 | #162 | ci: stop automatic previews and skip documentation-only builds | merged | `9ef26156431126c48789016d18e501d56a37cc25` | 2026-11-05T04:42:01Z |
 | #163 | docs: 総覧を短くし、案件管理を開発台帳へ集約 | merged | `e75d2702654619ad2f003954f3453f2a76603c6d` | 2026-11-05T04:58:08Z |
+| #164 | docs: 開発総覧・運用索引を2026-11-05の最新案件へ更新 | merged | `79225eae87069f5b98dd538a1f4789c49f28005b` | 2026-11-05T05:14:36Z |
 <!-- INVENTORY_FACTS_END -->
