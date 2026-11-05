@@ -15,6 +15,11 @@ jobs:
       - uses: actions/checkout@v4
       - name: Verify merge guard without credentials
         run: node --test services/approval-merge-edge/policy.test.mjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Typecheck Deno Edge Function in isolation
+        run: deno check --no-config services/approval-merge-edge/index.ts
       - name: Reject pasted merge secrets or accidental browser token
         run: |
           if grep -REn 'gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}' services/approval-merge-edge; then
