@@ -275,5 +275,5 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
 | #155 | feat: show explicit owner decisions with question and recommendation | merged | `da1ea1eb9569ce1b414211dd2063c7b0187c70c4` | 2026-11-04T03:47:26Z |
 | #156 | fix: remove JavaScript source accidentally rendered below approval dashboard | merged | `5733e11fb8e95c6a15d4b939fbc7c9e5f583262e` | 2026-11-04T04:07:04Z |
-| #157 | docs: first-pass owner decision triage of 36 open PRs | open | `aed0b7249c69eb057c2e761014cd386cc9fdea1f` | 2026-11-04T10:43:16Z |
+| #157 | docs: first-pass owner decision triage of 36 open PRs | merged | `aed0b7249c69eb057c2e761014cd386cc9fdea1f` | 2026-11-05T00:42:08Z |
 <!-- INVENTORY_FACTS_END -->
