@@ -2,7 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "git": {
     "deploymentEnabled": {
-      "fix/anonymous-session-recovery": false
+      "**": false,
+      "main": true
     }
-  }
+  },
+  "ignoreCommand": "node scripts/vercel-build-guard.mjs"
 }
