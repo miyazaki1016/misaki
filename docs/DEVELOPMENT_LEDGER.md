@@ -265,3 +265,10 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
 | #141 | Complete reviewed ledger and main operations-index fact proposals | merged | `6e3df7b41bdce757191c0650a66fad977a8a198e` | 2026-11-02T16:04:56Z |
 | #143 | fix: avoid proposal branch collisions on GitHub Actions reruns | merged | `4dfd89e9cf0f333b948e1f9eeba7112b94e73b65` | 2026-11-02T16:21:24Z |
 <!-- INVENTORY_FACTS_END -->
+
+
+## 2026-11-04 チャット初期スクロール改善（Draft・検証待ち）
+
+- `app/chat/initial-chat-scroll.tsx` の既存コンポーネントを修正。旧実装は最大4秒間、MutationObserverと350msタイマーで無条件に最下部へ移動し、ユーザーの過去履歴閲覧を妨げ得た。
+- 初回の履歴描画時のみ最新位置へ移動し、その後はユーザー操作で最下部から離れたら追従停止。ResizeObserver、フォント読み込み、visualViewportの変化を監視する。
+- **未完了**: 約5秒の実測・原因分解、API/DB改善、iPhone Safari実機試験、ローカルのテスト・型検査・ビルド。未検証のためDraft PRとしてレビューを要する。匿名セッション・人格・記憶・DB・ラウンジは無変更。
