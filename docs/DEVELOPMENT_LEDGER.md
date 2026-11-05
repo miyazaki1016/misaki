@@ -25,6 +25,13 @@
 | M-05 | 旧監査証拠 | 保全 | 棚卸し担当ソラ | [LEGACY_AUDIT_FOLLOWUP_20261101.md](audits/LEGACY_AUDIT_FOLLOWUP_20261101.md) | 必要な証拠のみ索引化 |
 | M-06 | 旧Safari・関係性診断ブランチ2件 | 整理候補・未削除 | 棚卸し担当ソラ | [BRANCH_TRIAGE_20261101.md](audits/BRANCH_TRIAGE_20261101.md) | 参照先確認後に削除可否を相談 |
 
+## 直近の追加案件（2026-11-05確認）
+
+| 案件 | 状態 | 次の一手・正本 |
+| --- | --- | --- |
+| チャット初期スクロール・履歴読み込み計測 | [Draft PR #151](https://github.com/miyazaki1016/misaki/pull/151)／未マージ・実機検証未了 | 最新CI・実機測定と所有者確認の安全性を照合。5秒遅延の改善効果は未測定 |
+| 美咲のバックアップ・安全な復元 | [Issue #159](https://github.com/miyazaki1016/misaki/issues/159)／調査中・実装完了ではない | 既存手動チェックポイントの対象不足、Supabase設定、復元試験を調査。DB変更は未実施 |
+
 ## 更新手順
 
 1. [最新の棚卸し結果](https://github.com/miyazaki1016/misaki/actions)から変化を拾う。結果が取得できないときは変化なしと扱わない。
