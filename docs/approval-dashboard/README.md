@@ -40,3 +40,13 @@ Pagesが未設定のまま初回デプロイに失敗した後、同じworkflow 
 ```
 
 **運用上の安全境界:** このラベルは決裁が必要という印であり、合格・承認・マージ許可ではない。アプリ本体、認証、本番、DB、通知などの変更は専用PRの検証と承認を維持。ラベル・記載がないPRも「未整理」に残るため、管理から消えない。自動分類や自動マージはこの変更には含まない。
+
+## 🔐 ダッシュボード内からのマージ（将来機能・無効）
+
+`merge.html` はGitHub OAuth（Supabase Auth PKCE）を利用してオーナー本人を確認し、既存Supabaseプロジェクトの独立Edge Functionに依頼する**準備用UI**。GitHubの資格情報はブラウザーへ配布しない。
+
+`merge-config.json` の `enabled` は**false**で固定。これがfalseの限り既存ダッシュボードの「直接マージ」ボタンは表示しない。既存の「GitHubで確認・マージ」ボタンは引き続き使える。
+
+認証、本人のGithub ID、Supabase publishable key、サーバー側の最小権限GitHubトークン、Edge Functionを設定し、認証・拒否テスト・監査とOwner確認ができるまでは有効化しない。今後のコードの導入手順と防御条件は `../../services/approval-merge-edge/README.md` に記録。
+
+バックエンド側は現段階では **docs配下のMarkdownのみ** に対象を制限し、Draft・CI失敗・重要なコード変更などは従来通りGitHubのレビューが必要。
