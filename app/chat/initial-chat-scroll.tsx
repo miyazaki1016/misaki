@@ -47,7 +47,8 @@ export default function InitialChatScroll() {
     // scrolls from images, font loading and Safari viewport resizing do not.
     const userIntent = () => {
       userScrolling = true;
-      if (initialized) following = distanceFromBottom() <= BOTTOM_THRESHOLD;
+      // Respect gestures made before the first history bubble appears.
+      following = initialized ? distanceFromBottom() <= BOTTOM_THRESHOLD : false;
     };
 
     const onTouchStart = (event: TouchEvent) => {
@@ -72,7 +73,7 @@ export default function InitialChatScroll() {
       const hasConversation = Boolean(chat.querySelector(".bubble:not(.typingBubble)"));
       if (!initialized && hasConversation) {
         initialized = true;
-        following = true;
+        if (!userScrolling) following = true;
         schedule();
       } else if (initialized && following) {
         schedule();
