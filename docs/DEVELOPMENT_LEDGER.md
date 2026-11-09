@@ -193,7 +193,7 @@
 | #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
 | #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
 | #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
-| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `4c8b9a508bc655b272fbbff298a1daf1ddddbce5` | 2026-11-05T00:54:36Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `cb9c00cd1ee87d37ef57a28f6460c8a9352be161` | 2026-11-08T23:29:59Z |
 | #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
 | #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
 | #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
@@ -206,4 +206,6 @@
 | #162 | ci: stop automatic previews and skip documentation-only builds | merged | `9ef26156431126c48789016d18e501d56a37cc25` | 2026-11-05T04:42:01Z |
 | #163 | docs: 総覧を短くし、案件管理を開発台帳へ集約 | merged | `e75d2702654619ad2f003954f3453f2a76603c6d` | 2026-11-05T04:58:08Z |
 | #164 | docs: 開発総覧・運用索引を2026-11-05の最新案件へ更新 | merged | `79225eae87069f5b98dd538a1f4789c49f28005b` | 2026-11-05T05:14:36Z |
+| #165 | docs: 美咲のバックアップ対象と安全な復元試験の設計 | open | `5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1` | 2026-11-05T09:18:03Z |
+| #166 | feat(inventory): add searchable work-history index to Misaki daily audit | merged | `b3439dfc31c84e84bc6c1f294582f681d4daf28d` | 2026-11-09T08:17:50Z |
 <!-- INVENTORY_FACTS_END -->
