@@ -2,11 +2,15 @@
 
 ラウンジからキャラクターと会話し、記憶・想い出・関係が育つ体験をつくる。
 
+> [!CAUTION]
+> **開発・調査・検証・修正・再測定を始める前に、必ず[日本語開発履歴検索](https://miyazaki1016.github.io/misaki/history.html)を確認すること。** 機能名・日本語キーワード・コード名・過去の数値で検索し、未統合ブランチも含めた過去の実装、検証結果、根拠リンク、残課題を読む。**同じ作業を繰り返す前に、既存成果から再開できるか判断する。** 手順は[日本語開発履歴の運用](WORK_HISTORY_OPERATIONS.md)。検索結果がない・不十分なときは原本のPR・ソース差分・テスト・Actionsを確認し、未確認は未確認のまま扱う。main統合／CI成功／本番反映は区別する。
+
 > [!IMPORTANT]
 > **担当ソラはここから [開発台帳](DEVELOPMENT_LEDGER.md) へ。** 案件の状態・担当・次の一手は台帳を更新する。再開前に、該当PR・ブランチ・詳細資料を実際に確認する。
 
 | 知りたいこと | 開く場所 |
 | --- | --- |
+| **着手前に必ず見る：過去の日本語開発履歴** | [両プロジェクト共通の検索画面](https://miyazaki1016.github.io/misaki/history.html) · [運用手順](WORK_HISTORY_OPERATIONS.md) |
 | 案件の現在地・証拠・次の一手 | [開発台帳](DEVELOPMENT_LEDGER.md) |
 | 自分の判断待ち・担当への引き継ぎ | [美咲 × アメふる承認ボード](https://miyazaki1016.github.io/misaki/) |
 | PR・ブランチの自動棚卸し | [GitHub Actions](https://github.com/miyazaki1016/misaki/actions) → 最新成功の `development-inventory` |
