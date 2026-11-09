@@ -211,4 +211,5 @@
 | #167 | 日本語開発履歴：コード・検証根拠の検索と過去結論の継続保存 | merged | `7e25439024253daa1fccef870e9dfe946ddfa4ac` | 2026-11-09T08:56:36Z |
 | #168 | fix(history): 棚卸し中に更新されたPRのコミットを確実に取得 | merged | `1bb0eb939af96999692b28ea4e65b55dc3961b15` | 2026-11-09T09:02:29Z |
 | #169 | fix(history): main統合とPRマージを区別し、検証条件の検索を補強 | merged | `b4b46c92dc4d11093b125fd92821299929e13b4c` | 2026-11-09T09:08:53Z |
+| #170 | docs: require Japanese work-history review before any new development | merged | `afa7b9d94598bace5820034ad7a9b0c750b18520` | 2026-11-09T09:21:29Z |
 <!-- INVENTORY_FACTS_END -->
