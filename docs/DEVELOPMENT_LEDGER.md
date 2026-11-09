@@ -209,4 +209,5 @@
 | #165 | docs: 美咲のバックアップ対象と安全な復元試験の設計 | open | `5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1` | 2026-11-05T09:18:03Z |
 | #166 | feat(inventory): add searchable work-history index to Misaki daily audit | merged | `b3439dfc31c84e84bc6c1f294582f681d4daf28d` | 2026-11-09T08:17:50Z |
 | #167 | 日本語開発履歴：コード・検証根拠の検索と過去結論の継続保存 | merged | `7e25439024253daa1fccef870e9dfe946ddfa4ac` | 2026-11-09T08:56:36Z |
+| #168 | fix(history): 棚卸し中に更新されたPRのコミットを確実に取得 | merged | `1bb0eb939af96999692b28ea4e65b55dc3961b15` | 2026-11-09T09:02:29Z |
 <!-- INVENTORY_FACTS_END -->
