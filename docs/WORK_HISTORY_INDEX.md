@@ -1,5 +1,11 @@
 # 美咲：過去作業・検証の履歴索引
 
+## 日本語開発履歴（コード・検証根拠付き）
+
+[📚 両プロジェクトをスマートフォンで検索](https://miyazaki1016.github.io/misaki/history.html) ／ [全案件・根拠資料](https://github.com/miyazaki1016/misaki/blob/development-history/docs/work-history/README.md) ／ [更新・着手前検索・確度・制約](WORK_HISTORY_OPERATIONS.md)
+
+本文抜粋の既存索引を残し、実コード・差分・テスト・Actions・関連資料を案件単位に整理する履歴を追加しました。重要結論と過去版は保存し、本番反映とは分けて扱います。
+
 > 2026-11-09。「ブランチがある」だけでなく、「そのブランチで何を試したか」を探すための入口。**本番の完了状況の正本ではない**。
 
 ## 全PRと作業ブランチの内容を探す

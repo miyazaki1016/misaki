@@ -109,3 +109,14 @@ if merge_file.exists():
     config = Path("docs/approval-dashboard/merge-config.json").read_text(encoding="utf-8")
     assert '"enabled": false' in config, "Direct merge must remain disabled until verified"
 print("Dashboard structure and JavaScript syntax OK")
+
+# Read-only historical search is separate from owner decisions and merge controls.
+history_html = Path('docs/approval-dashboard/history.html').read_text(encoding='utf-8')
+parsed = Scripts(); parsed.feed(history_html)
+assert len(parsed.scripts) == 1
+assert 'innerHTML' not in history_html and 'localStorage' not in history_html
+assert 'textContent' in history_html and 'search-index.json' in history_html
+assert 'development-history' in history_html and "['misaki','emergencyalert']" in history_html
+with tempfile.TemporaryDirectory() as directory:
+    script = Path(directory) / 'history-viewer.js'; script.write_text(parsed.scripts[0])
+    subprocess.run(['node', '--check', str(script)], check=True)
