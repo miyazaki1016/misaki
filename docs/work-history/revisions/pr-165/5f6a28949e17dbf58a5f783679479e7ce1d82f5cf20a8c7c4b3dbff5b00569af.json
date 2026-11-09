@@ -1,0 +1,131 @@
+{
+  "id": "pr-165",
+  "number": 165,
+  "title": "docs: 美咲のバックアップ対象と安全な復元試験の設計",
+  "topics": [
+    "開発管理",
+    "認証・安全性"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更／認証・アクセス制御に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Issue #159 の続き。現行手動チェックポイントの対象不足、会話・関係性の参照関係、匿名24時間と削除済み情報の復活防止、隔離環境での復元試験ゲートを文書化。\n\n- 変更は `docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md` の新規追加のみ。\n- 本番DB・アプリコード・既存バックアップスクリプトは変更しない。\n- バックアップ実行・復元成功・PITR有効化は未確認であり、完了扱いしない。\n\nCloses #159 ではありません。設計を継続するDraft PRです。",
+  "head": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1",
+  "base": "56593e211fed2c5d2dcb44dcb1e19a086a7e207a",
+  "base_ref": "main",
+  "head_ref": "docs/backup-restore-inventory-20261105",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-05T09:18:03Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md",
+      "status": "modified",
+      "additions": 53,
+      "deletions": 0,
+      "patch": "diff --git a/docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md b/docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md\nnew file mode 100644\nindex 0000000..910f630\n--- /dev/null\n+++ b/docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md\n@@ -0,0 +1,53 @@\n+# 美咲バックアップ対象・復元試験計画（設計段階）\n+\n+更新日: 2026-11-05 / 正本: Issue #159\n+\n+## 現状と適用範囲\n+\n+この資料は読み取り監査に基づく**設計**であり、バックアップ取得・復元試験・PITR有効化の完了を示さない。既存の `supabase/canonical-backup.ps1` は移行用の手動チェックポイントで、全サービスの復旧手段ではない。スクリプトはスキーマと、関係性state/events、会話集約state、push state、日次利用量2種、proactive deliveriesの**7テーブル**のデータを取得する。会話原本 `conversations` は含まない。\n+\n+## データの分類と初期方針\n+\n+| 分類 | 代表的なテーブル | 復元方針 |\n+| --- | --- | --- |\n+| 会話原本 | `conversations` | 現行ダンプ対象外。ユーザー所有権と削除・匿名期限を確認してから対象化 |\n+| 会話集約・記憶 | `misaki_user_conversation_state` | 現行対象。ただし原本との整合性を要検証 |\n+| 関係性の現在値 | `misaki_relationship_state` | 現行対象。イベント・履歴との整合性を要検証 |\n+| 関係性イベント | `misaki_relationship_events` | 現行対象。参照先の会話原本と配信データを併せて検証 |\n+| 根拠・エピソード | `misaki_relationship_evidence`, `misaki_relationship_episodes`, `misaki_relationship_episode_evidence` | 現行対象外。参照関係を含めて検討 |\n+| パターン | `misaki_relationship_patterns`, `misaki_relationship_pattern_consumptions` | 現行対象外。参照関係を含めて検討 |\n+| 関係性の自己認識 | `misaki_relationship_identity_state`, `misaki_relationship_identity_transitions` | 現行対象外。連続性の復元要件を確認 |\n+| 適用履歴 | `misaki_relationship_state_applications` | 現行対象外。二重適用を防止 |\n+| 処理状態 | `misaki_relationship_processing`, `misaki_relationship_worker_leases`, `misaki_relationship_critical_pending` | そのまま再開しない。リース失効・再実行安全性を確認 |\n+| 匿名の一時ルート | `misaki_temporary_roots` | 期限延長・失効済み復活禁止。生データの無条件復元禁止 |\n+| Auth / Storage | 認証ユーザー・セッション・ファイル等 | 対象範囲と提供機能が未確認。DBダンプだけで完全性を主張しない |\n+\n+※これは完全なテーブル一覧ではない。追加の関連テーブル・スキーマ、RLS、保持期間、削除経路の棚卸しが必要。\n+\n+## 確認済みの依存関係\n+\n+- `misaki_relationship_events` は `conversations` と `misaki_proactive_deliveries` を参照する。\n+- `misaki_relationship_episode_evidence` は `misaki_relationship_episodes` と `misaki_relationship_evidence` を参照する。\n+- `misaki_relationship_pattern_consumptions` は `misaki_relationship_patterns` を参照する。\n+- 多くのユーザー単位のテーブルは `auth.users` を参照する。\n+\n+復元はテーブル名の羅列順で行わず、**実際の外部キー・削除規則・整合性制約を取得した後**、隔離環境で手順を確定する。\n+\n+## 復元試験の安全ゲート\n+\n+1. 本番とは独立した検証環境を用意し、本番への書き戻しを禁止する。\n+2. バックアップ範囲・取得時点・保管先・暗号化・アクセス権・SHA256・保持期限を記録する。\n+3. 復元前に、削除確定済みユーザー・匿名期限切れの情報を**復活させない仕組み**を設計・検証する。バックアップ時点より後の削除を反映できない場合は本番復元不可とする。\n+4. 外部キー、ユーザー分離、会話と集約状態、関係性イベントと現在値、重複適用、処理中リースを検証する。\n+5. 件数・ハッシュ・サンプル整合性を比較し、個人の会話本文をログやPRに出さない。\n+6. テスト結果と残余リスクをレビューし、実際の本番復旧は別途明示承認を得る。\n+\n+## 未確認・着手前の必須事項\n+\n+- Supabaseマネージドバックアップ・PITRの設定、保存期間、復元可能な範囲。\n+- Auth・Storage・Edge Functions・環境変数等の復旧責任範囲。\n+- 匿名24時間・削除受理後24時間・バックアップ30日以内のルールを実現する削除台帳／復元フィルタの有無。\n+- 暗号鍵管理・バックアップの保管場所・権限・定期実行・復元リハーサル。\n+- 全テーブルの分類と、運用データ・一時データ・恒久データの境界。\n+\n+**禁止事項:** 本資料だけを根拠に既存ダンプのテーブルを増やすこと、期限付きデータを無条件復元すること、本番DBに試験復元すること、復元成功を宣言すること。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md",
+      "source": {
+        "path": "docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md",
+        "coverage": "全文",
+        "text": "# 美咲バックアップ対象・復元試験計画（設計段階）\n\n更新日: 2026-11-05 / 正本: Issue #159\n\n## 現状と適用範囲\n\nこの資料は読み取り監査に基づく**設計**であり、バックアップ取得・復元試験・PITR有効化の完了を示さない。既存の `supabase/canonical-backup.ps1` は移行用の手動チェックポイントで、全サービスの復旧手段ではない。スクリプトはスキーマと、関係性state/events、会話集約state、push state、日次利用量2種、proactive deliveriesの**7テーブル**のデータを取得する。会話原本 `conversations` は含まない。\n\n## データの分類と初期方針\n\n| 分類 | 代表的なテーブル | 復元方針 |\n| --- | --- | --- |\n| 会話原本 | `conversations` | 現行ダンプ対象外。ユーザー所有権と削除・匿名期限を確認してから対象化 |\n| 会話集約・記憶 | `misaki_user_conversation_state` | 現行対象。ただし原本との整合性を要検証 |\n| 関係性の現在値 | `misaki_relationship_state` | 現行対象。イベント・履歴との整合性を要検証 |\n| 関係性イベント | `misaki_relationship_events` | 現行対象。参照先の会話原本と配信データを併せて検証 |\n| 根拠・エピソード | `misaki_relationship_evidence`, `misaki_relationship_episodes`, `misaki_relationship_episode_evidence` | 現行対象外。参照関係を含めて検討 |\n| パターン | `misaki_relationship_patterns`, `misaki_relationship_pattern_consumptions` | 現行対象外。参照関係を含めて検討 |\n| 関係性の自己認識 | `misaki_relationship_identity_state`, `misaki_relationship_identity_transitions` | 現行対象外。連続性の復元要件を確認 |\n| 適用履歴 | `misaki_relationship_state_applications` | 現行対象外。二重適用を防止 |\n| 処理状態 | `misaki_relationship_processing`, `misaki_relationship_worker_leases`, `misaki_relationship_critical_pending` | そのまま再開しない。リース失効・再実行安全性を確認 |\n| 匿名の一時ルート | `misaki_temporary_roots` | 期限延長・失効済み復活禁止。生データの無条件復元禁止 |\n| Auth / Storage | 認証ユーザー・セッション・ファイル等 | 対象範囲と提供機能が未確認。DBダンプだけで完全性を主張しない |\n\n※これは完全なテーブル一覧ではない。追加の関連テーブル・スキーマ、RLS、保持期間、削除経路の棚卸しが必要。\n\n## 確認済みの依存関係\n\n- `misaki_relationship_events` は `conversations` と `misaki_proactive_deliveries` を参照する。\n- `misaki_relationship_episode_evidence` は `misaki_relationship_episodes` と `misaki_relationship_evidence` を参照する。\n- `misaki_relationship_pattern_consumptions` は `misaki_relationship_patterns` を参照する。\n- 多くのユーザー単位のテーブルは `auth.users` を参照する。\n\n復元はテーブル名の羅列順で行わず、**実際の外部キー・削除規則・整合性制約を取得した後**、隔離環境で手順を確定する。\n\n## 復元試験の安全ゲート\n\n1. 本番とは独立した検証環境を用意し、本番への書き戻しを禁止する。\n2. バックアップ範囲・取得時点・保管先・暗号化・アクセス権・SHA256・保持期限を記録する。\n3. 復元前に、削除確定済みユーザー・匿名期限切れの情報を**復活させない仕組み**を設計・検証する。バックアップ時点より後の削除を反映できない場合は本番復元不可とする。\n4. 外部キー、ユーザー分離、会話と集約状態、関係性イベントと現在値、重複適用、処理中リースを検証する。\n5. 件数・ハッシュ・サンプル整合性を比較し、個人の会話本文をログやPRに出さない。\n6. テスト結果と残余リスクをレビューし、実際の本番復旧は別途明示承認を得る。\n\n## 未確認・着手前の必須事項\n\n- Supabaseマネージドバックアップ・PITRの設定、保存期間、復元可能な範囲。\n- Auth・Storage・Edge Functions・環境変数等の復旧責任範囲。\n- 匿名24時間・削除受理後24時間・バックアップ30日以内のルールを実現する削除台帳／復元フィルタの有無。\n- 暗号鍵管理・バックアップの保管場所・権限・定期実行・復元リハーサル。\n- 全テーブルの分類と、運用データ・一時データ・恒久データの境界。\n\n**禁止事項:** 本資料だけを根拠に既存ダンプのテーブルを増やすこと、期限付きデータを無条件復元すること、本番DBに試験復元すること、復元成功を宣言すること。\n",
+        "sha256": "1260decf51c9907e8be4de1b60658b68ce1b7428e7ddde1181e48b46bbd91821"
+      }
+    },
+    {
+      "path": "docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md",
+      "status": "modified",
+      "additions": 53,
+      "deletions": 0,
+      "patch": "diff --git a/docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md b/docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md\nnew file mode 100644\nindex 0000000..325da4b\n--- /dev/null\n+++ b/docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md\n@@ -0,0 +1,53 @@\n+# 隔離環境での復元検証チェックリスト（未実行）\n+\n+Issue #159 / Draft PR #165 / 2026-11-05\n+\n+## 実行前の前提（満たさなければ停止）\n+\n+- [ ] 復元先は**本番とは別プロジェクト**であり、プロジェクトID・接続先・アクセス権を二人以上で照合する。\n+- [ ] バックアップは暗号化され、復元担当者のみがアクセス可能。秘密鍵・接続URL・個人データをIssue/PR/CIログへ出さない。\n+- [ ] データ所有者、保持期限、削除受理時刻を照合できる安全な根拠がある。削除・失効の事後情報が不足する場合は、**復元を開始しない**。\n+- [ ] Auth、Storage、会話原本、関係性テーブルを含む復元範囲が確定している。\n+- [ ] 検証環境から外部メール・プッシュ通知・課金・自発配信を送らない設定が確認できている。\n+- [ ] 実行手順・ロールバック・作業責任者・証跡保存先をレビュー済み。\n+\n+## 段階的な検証\n+\n+### A. バックアップ検証\n+- [ ] ファイル一覧・SHA256・取得時刻・対象スキーマ/テーブル・保持期限を記録。\n+- [ ] `pg_restore --list` 等でアーカイブが読めることを確認。ただし読めることは復元成功を意味しない。\n+- [ ] DBスキーマのマイグレーション世代、拡張、RLS、関数、トリガーを比較。\n+- [ ] 現行 `canonical-backup.ps1` の7テーブル限定ダンプを**完全バックアップと表示しない**。\n+\n+### B. 期限・削除の検証\n+- [ ] 匿名データは作成時刻から24時間を超えて保持・利用されない。\n+- [ ] 削除受理済みのデータは、バックアップ取得後の削除であっても復活しない。\n+- [ ] 削除・失効情報の反映に失敗した場合は**復元全体を失敗扱い**とする。\n+- [ ] バックアップの保存期限が30日以内の削除ポリシーに適合する。\n+- [ ] メール登録への移行時に失効情報が復活しない。\n+\n+### C. 整合性の検証\n+- [ ] `auth.users` と各 `user_id` の参照整合性。\n+- [ ] `misaki_relationship_events` の `source_message_id` → `conversations` と `source_delivery_id` → `misaki_proactive_deliveries`。\n+- [ ] `misaki_relationship_episode_evidence` → episodes/evidence。\n+- [ ] `misaki_relationship_pattern_consumptions` → patterns。\n+- [ ] 会話原本と集約履歴の整合性。関係性イベント・identity・現在値のバージョン整合性。\n+- [ ] 処理中リース、pending、状態適用履歴について二重処理・二重反映が起きない。\n+- [ ] 別ユーザー・別キャラクターの情報が混入しない。RLSの実ユーザー権限で検証する。\n+\n+### D. 動作・終了判定\n+- [ ] 検証用の匿名/メールユーザーでログイン・履歴・関係性の読み込みを確認。\n+- [ ] 通知・メール・外部API送信が無効のまま維持されている。\n+- [ ] 件数、整合性エラー、テスト結果、残余リスクを個人データなしで記録。\n+- [ ] 検証環境を停止・消去し、証跡の保持期限を設定。\n+- [ ] **本番復元は別途明示承認が必要**。本チェックリスト完了だけで自動実行しない。\n+\n+## 判定\n+\n+**PASS:** 上記必須項目を満たし、再現可能な証跡がある場合のみ。\n+\n+**FAIL:** データ欠落、参照不整合、期限延長、削除済み情報の復活、ユーザー混線、外部送信、権限逸脱のいずれかが発生。\n+\n+**BLOCKED:** バックアップ/PITRの有無、Auth/Storageの対象、削除台帳、検証先、暗号鍵管理など必要条件が未確認。\n+\n+現在の判定は **BLOCKED / 未実行**。この文書は手順書であり、実データの取得・復元・試験実施を意味しない。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md",
+      "source": {
+        "path": "docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md",
+        "coverage": "全文",
+        "text": "# 隔離環境での復元検証チェックリスト（未実行）\n\nIssue #159 / Draft PR #165 / 2026-11-05\n\n## 実行前の前提（満たさなければ停止）\n\n- [ ] 復元先は**本番とは別プロジェクト**であり、プロジェクトID・接続先・アクセス権を二人以上で照合する。\n- [ ] バックアップは暗号化され、復元担当者のみがアクセス可能。秘密鍵・接続URL・個人データをIssue/PR/CIログへ出さない。\n- [ ] データ所有者、保持期限、削除受理時刻を照合できる安全な根拠がある。削除・失効の事後情報が不足する場合は、**復元を開始しない**。\n- [ ] Auth、Storage、会話原本、関係性テーブルを含む復元範囲が確定している。\n- [ ] 検証環境から外部メール・プッシュ通知・課金・自発配信を送らない設定が確認できている。\n- [ ] 実行手順・ロールバック・作業責任者・証跡保存先をレビュー済み。\n\n## 段階的な検証\n\n### A. バックアップ検証\n- [ ] ファイル一覧・SHA256・取得時刻・対象スキーマ/テーブル・保持期限を記録。\n- [ ] `pg_restore --list` 等でアーカイブが読めることを確認。ただし読めることは復元成功を意味しない。\n- [ ] DBスキーマのマイグレーション世代、拡張、RLS、関数、トリガーを比較。\n- [ ] 現行 `canonical-backup.ps1` の7テーブル限定ダンプを**完全バックアップと表示しない**。\n\n### B. 期限・削除の検証\n- [ ] 匿名データは作成時刻から24時間を超えて保持・利用されない。\n- [ ] 削除受理済みのデータは、バックアップ取得後の削除であっても復活しない。\n- [ ] 削除・失効情報の反映に失敗した場合は**復元全体を失敗扱い**とする。\n- [ ] バックアップの保存期限が30日以内の削除ポリシーに適合する。\n- [ ] メール登録への移行時に失効情報が復活しない。\n\n### C. 整合性の検証\n- [ ] `auth.users` と各 `user_id` の参照整合性。\n- [ ] `misaki_relationship_events` の `source_message_id` → `conversations` と `source_delivery_id` → `misaki_proactive_deliveries`。\n- [ ] `misaki_relationship_episode_evidence` → episodes/evidence。\n- [ ] `misaki_relationship_pattern_consumptions` → patterns。\n- [ ] 会話原本と集約履歴の整合性。関係性イベント・identity・現在値のバージョン整合性。\n- [ ] 処理中リース、pending、状態適用履歴について二重処理・二重反映が起きない。\n- [ ] 別ユーザー・別キャラクターの情報が混入しない。RLSの実ユーザー権限で検証する。\n\n### D. 動作・終了判定\n- [ ] 検証用の匿名/メールユーザーでログイン・履歴・関係性の読み込みを確認。\n- [ ] 通知・メール・外部API送信が無効のまま維持されている。\n- [ ] 件数、整合性エラー、テスト結果、残余リスクを個人データなしで記録。\n- [ ] 検証環境を停止・消去し、証跡の保持期限を設定。\n- [ ] **本番復元は別途明示承認が必要**。本チェックリスト完了だけで自動実行しない。\n\n## 判定\n\n**PASS:** 上記必須項目を満たし、再現可能な証跡がある場合のみ。\n\n**FAIL:** データ欠落、参照不整合、期限延長、削除済み情報の復活、ユーザー混線、外部送信、権限逸脱のいずれかが発生。\n\n**BLOCKED:** バックアップ/PITRの有無、Auth/Storageの対象、削除台帳、検証先、暗号鍵管理など必要条件が未確認。\n\n現在の判定は **BLOCKED / 未実行**。この文書は手順書であり、実データの取得・復元・試験実施を意味しない。\n",
+        "sha256": "db1b1fecd6c6359fecb62b4a21147d9ca90c40a1fa18ac89669a0774fcc2e058"
+      }
+    },
+    {
+      "path": "docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md",
+      "status": "modified",
+      "additions": 32,
+      "deletions": 0,
+      "patch": "diff --git a/docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md b/docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md\nnew file mode 100644\nindex 0000000..5880e22\n--- /dev/null\n+++ b/docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md\n@@ -0,0 +1,32 @@\n+# Supabaseバックアップ機能の確認結果（2026-11-05）\n+\n+対象: misaki / project ref `tzozajnwznxqgxnjikoy`。本資料は読み取り確認のみ。\n+\n+## 接続確認\n+\n+Supabase管理APIのプロジェクト情報から、プロジェクト `misaki` は `ACTIVE_HEALTHY`、リージョン `ap-northeast-1`、Postgres 17.6系であることを確認した。これは**バックアップが有効である証拠ではない**。\n+\n+## 公式ドキュメントで確認した仕様\n+\n+- SupabaseのPro/Team/Enterpriseプランには日次バックアップがあり、FreeプランではCLIによる定期的なオフサイトエクスポートが推奨されている。\n+- Proは日次バックアップの直近7日、Teamは14日、Enterpriseは最大30日へのアクセスが案内されている。PITRは別途確認が必要。\n+- DBバックアップにはStorage APIの**オブジェクト本体は含まれない**。DBのメタデータだけではファイルを復元できない。\n+- 公式案内: https://supabase.com/docs/guides/platform/backups\n+\n+## プロジェクト固有の未確認事項\n+\n+- 契約プランと日次バックアップの実行状況。\n+- PITRの有効・無効、復元可能な期間。\n+- 実際のバックアップ一覧と直近成功時刻。\n+- Storageオブジェクトの別系統バックアップと復旧手段。\n+- Authの対象範囲、環境変数・外部サービス設定の再構築手順。\n+- 30日以内のバックアップ削除方針と、匿名24時間・削除済みデータ非復活の整合性。\n+\n+## 次の確認手順（読み取り専用）\n+\n+1. Supabase Dashboard → 対象プロジェクト → Database → Backups を開き、Scheduled / PITRの表示と直近バックアップ時刻を確認する。\n+2. 契約プランと保持期間を確認する。管理APIを使う場合はバックアップ一覧の**GETのみ**。復元用POSTを呼ばない。\n+3. Storageに実ファイルがあるか、別途保全が必要かを調査する。個人データをログ・Issue・PRへ載せない。\n+4. 検証環境と復元手順を承認するまでは、バックアップ実行や本番復元を行わない。\n+\n+**判定: BLOCKED / 未確認。** プロジェクトの稼働状態は確認済みだが、バックアップ利用可否とPITRの有無は未確認。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md",
+      "source": {
+        "path": "docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md",
+        "coverage": "全文",
+        "text": "# Supabaseバックアップ機能の確認結果（2026-11-05）\n\n対象: misaki / project ref `tzozajnwznxqgxnjikoy`。本資料は読み取り確認のみ。\n\n## 接続確認\n\nSupabase管理APIのプロジェクト情報から、プロジェクト `misaki` は `ACTIVE_HEALTHY`、リージョン `ap-northeast-1`、Postgres 17.6系であることを確認した。これは**バックアップが有効である証拠ではない**。\n\n## 公式ドキュメントで確認した仕様\n\n- SupabaseのPro/Team/Enterpriseプランには日次バックアップがあり、FreeプランではCLIによる定期的なオフサイトエクスポートが推奨されている。\n- Proは日次バックアップの直近7日、Teamは14日、Enterpriseは最大30日へのアクセスが案内されている。PITRは別途確認が必要。\n- DBバックアップにはStorage APIの**オブジェクト本体は含まれない**。DBのメタデータだけではファイルを復元できない。\n- 公式案内: https://supabase.com/docs/guides/platform/backups\n\n## プロジェクト固有の未確認事項\n\n- 契約プランと日次バックアップの実行状況。\n- PITRの有効・無効、復元可能な期間。\n- 実際のバックアップ一覧と直近成功時刻。\n- Storageオブジェクトの別系統バックアップと復旧手段。\n- Authの対象範囲、環境変数・外部サービス設定の再構築手順。\n- 30日以内のバックアップ削除方針と、匿名24時間・削除済みデータ非復活の整合性。\n\n## 次の確認手順（読み取り専用）\n\n1. Supabase Dashboard → 対象プロジェクト → Database → Backups を開き、Scheduled / PITRの表示と直近バックアップ時刻を確認する。\n2. 契約プランと保持期間を確認する。管理APIを使う場合はバックアップ一覧の**GETのみ**。復元用POSTを呼ばない。\n3. Storageに実ファイルがあるか、別途保全が必要かを調査する。個人データをログ・Issue・PRへ載せない。\n4. 検証環境と復元手順を承認するまでは、バックアップ実行や本番復元を行わない。\n\n**判定: BLOCKED / 未確認。** プロジェクトの稼働状態は確認済みだが、バックアップ利用可否とPITRの有無は未確認。\n",
+        "sha256": "1a59fab7ff236ada32413af1385f8639fd0a2bc833c2173cf920428c5903f1b2"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "d164cd46bb59d0d4b92f4cef176aa2072070842b",
+      "message": "docs: inventory backup coverage and safe restore rehearsal gates\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d164cd46bb59d0d4b92f4cef176aa2072070842b"
+    },
+    {
+      "sha": "d77aeb4b5e387af084b282c5a73e601f23f9a37a",
+      "message": "docs: define isolated restore rehearsal safety and acceptance checks\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d77aeb4b5e387af084b282c5a73e601f23f9a37a"
+    },
+    {
+      "sha": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1",
+      "message": "docs: record verified Supabase backup capability and outstanding checks\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42001246996",
+      "id": 42001246996,
+      "updated_at": "2026-11-05T09:18:27Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42001244659",
+      "id": 42001244659,
+      "updated_at": "2026-11-05T09:19:13Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "バックアップ対象と安全な復元試験を設計。",
+    "conclusion": "設計案件。実バックアップ作成・本番復元・復旧試験の成功を示すものではない。実際の対象データ、保存先、保持、隔離復元、本人確認の受入条件を資料から引き継ぐ。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/165",
+      "https://github.com/miyazaki1016/misaki/pull/165"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "226577c84ed9b28c37ca5902316753bba0f8e424d98b464f6386dd6a3ef91755",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

@@ -1,0 +1,89 @@
+{
+  "id": "pr-133",
+  "number": 133,
+  "title": "docs: 競合AIコンパニオン研究とWork利用節約方針を総覧に反映",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "2026-11-02の2項目を `docs/IMPLEMENTATION_OVERVIEW.md` に追加します。\n\n- 競合6サービスの開発思想とMisakiへの適用・保留事項\n- ChatGPT Workの使用回数節約（読み取り確認は可能な限りソラが対応し、実装・検証・承認済み操作をまとめる）\n\n総覧1ファイル、追記のみ。実装・DB・環境変数・PR #101/#131は変更しません。ユーザー承認済み。",
+  "head": "7c02c3cf349db24f6e41e63acbd50c821c195754",
+  "base": "3098074ce0f4b9d32e3d24a71a79f59182712e6a",
+  "base_ref": "main",
+  "head_ref": "docs/misaki-companion-research-20261102",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-02T02:57:45Z",
+  "merge_commit_sha": "19bdd5776e81bf2063bfbccf24e6179b09c76516",
+  "updated_at": "2026-11-02T02:57:45Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "status": "modified",
+      "additions": 54,
+      "deletions": 0,
+      "patch": "diff --git a/docs/IMPLEMENTATION_OVERVIEW.md b/docs/IMPLEMENTATION_OVERVIEW.md\nindex 9d2e848..b4b4b67 100644\n--- a/docs/IMPLEMENTATION_OVERVIEW.md\n+++ b/docs/IMPLEMENTATION_OVERVIEW.md\n@@ -3974,3 +3974,57 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-\n - **MP4/WebP実ファイルはGitHubに未配置**。本番反映、HTTP配信、iPhone実機確認は未完了。バイナリ2本を作業ブランチの `public/lab/transparent-lounge/` に追加するまでマージ禁止。\n - 詳細・素材名・受入条件・残作業: `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md`。\n - 既存チャット、DB、Relationship Engineは変更していない。チャット画面への接続は次工程。\n+\n+\n+---\n+\n+## 2026-11-02 競合AIコンパニオンの開発思想比較（設計参考・実装指示ではない）\n+\n+> **位置づけ**：2026-11-02の会話で共有・検討した競合研究の要点。下記の他社機能・日付は調査メモとして記録し、外部公開・仕様確定時には公式一次情報を再確認すること。**Misakiの実装完了を示さず、競合の内部実装を推定で断定しない。**\n+>\n+> **最優先方針**：当面は**美咲一人の会話・人格・感情・記憶・ラウンジ体験を完成**させる。二人目以降の実装は後回し。将来のマルチキャラ化で破壊的移行が必要にならない識別子・所有境界・拡張点のみ維持する。\n+\n+### 今回の参考事例\n+\n+| サービス | 公開情報・議論の要点 | Misakiへの示唆 | 採用判断 |\n+|---|---|---|---|\n+| Kindroid | 2026-10-28頃のグループ専用ジャーナル：参加者で共有し、他の会話空間へ無条件に持ち出さない設計思想 | 同じ世界の**出来事の事実**と、キャラ別の**解釈・感情・関係性**を分離。会話空間・参加/目撃・明示共有・ユーザー所有者でアクセス判定する | **既存設計の維持・確認**。他キャラの実装は後回し |\n+| Nomi | Mind Map等、人物・場所・出来事の関連付け、会話の場による共有境界、重要情報の補助入力 | 「保存した」ことと「適切に思い出す」ことを区別。関連度・重要度・頻度・出典・秘密の境界を使う | **美咲単独の自然な想起**を将来評価。既存実装を先に棚卸し |\n+| Replika | 人格・好み・ユーザーとの関係を継続的に個別化する方向性 | **人格の核**と、ユーザーごとに成長する関係・感情・話し方を分ける | **既存方針を維持** |\n+| Character.AI | Facts と重要な物語・固定したい記憶を区別する方向性 | ユーザーに関する事実と、**美咲と一緒に経験した想い出**を区別。ユーザーが「覚えていて」と指定できる余地を残す | **将来検討**。匿名の24時間上限・同意/削除を優先 |\n+| Nemini | 2026-10-30〜31頃、他サービスの会話履歴から記憶を引き継ぐ機能、会話内の小さな共同ツール | 他サービスの履歴は「美咲との共通体験」と誤認しない。出典・発言者・本人確認と選択的同意に基づくインポートが望ましい | **後回し**。自動全件移行は採用しない |\n+| Shubiduba | 2026-10-28頃、音楽という共通体験に特化した複数AIフレンド | モードの多機能化より、仕事・旅行・天気など**一緒に経験した時間に沿った会話**を磨く。関係の深さを課金で売ることとは分ける | **今は追加モード不要**。美咲の会話品質優先 |\n+\n+### Misakiの設計原則（再確認）\n+\n+1. **事実は共有できても、想い出の解釈はそれぞれ違う。** 事実の記録とキャラクター別の感情・評価を独立させる。感情が薄れたり変化しても、出来事を捏造・改変しない。\n+2. **「誰が知っているか」に加えて「誰との関係・どの場で知ったか」を保持する。** 所有者、character ID、参加/目撃、明示共有、会話/グループの出典、権限、期限を別々に検証する。異なるユーザーの個人情報は完全に分離。\n+3. **記憶保存 ≠ 記憶想起。** 美咲が以前の話を毎回持ち出すのではなく、関連性・重要度・自然さ・頻度制限・秘密性を考慮して想起する。事実と推測を混同しない。\n+4. **人格の核 ≠ 関係の成長。** 美咲自身の価値観を維持しつつ、相手との経験で距離感・感情・気遣いが変化する。\n+5. **外部取り込み情報 ≠ 美咲と共有した想い出。** 将来移行機能を検討する場合、出典・話者・本人同意・取り込み候補の確認を必須とする。\n+6. **「忘れる」は全参照経路で守る。** 匿名の情報別24時間上限、削除抑止、派生データ、再送、通知、復旧経路を迂回させない。競合動向を理由に安全条件を緩めない。\n+\n+### 開発への反映範囲（2026-11-02時点）\n+\n+- **直近**：PR #131の匿名セッション復旧を、復旧後の会話・認証を保持できる互換復旧手段とともに安全に仕上げ、実機で送信→返信→再読込を確認。その後、既存の**新しい全画面ラウンジ**へ導線を統一し、美咲単独の会話品質・想起を評価する。\n+- **今確保する拡張点**：キャラクターID、ユーザー所有境界、イベント出典、参加/目撃/共有権限、事実と解釈の分離、版・期限・削除の契約。**既存フェーズ1ローカル基盤を再利用し、未検証の本番DB統合を既成事実にしない。**\n+- **当面しない**：他4人の人格の仮作成・マルチキャラ相互会話・グループ記憶の本番導入・外部会話一括移行・専門モード追加・競合の機能模倣。\n+- **継続的な比較研究**：Kindroid、Nomi、Replika、Character.AI、Nemini、Shubiduba等の公式更新・開発者発言・利用者評価を定期的に調査。**事実・開発思想の解釈・Misakiへの提案を区別**し、既報の重複を避ける。報告は設計の判断材料であり、コード変更を自動承認するものではない。\n+\n+**担当区分**：Misaki/アメふるの自動棚卸し・台帳更新・イベント駆動の実装保守は**別の開発管理自動化プロジェクト**が担当。Misaki本体は重複修正せず、本体のマージ/デプロイに影響する場合のみ連携する。\n+\n+\n+---\n+\n+## 2026-11-02 ChatGPT Work利用回数の節約（運用方針）\n+\n+> **目的**：Workの利用制限を踏まえ、**報告・再確認だけのWorkをできるだけ発生させず、実装が前進する単位でまとめて依頼する**。安全確認を省略する趣旨ではなく、確認を実作業へ組み込む運用変更である。\n+\n+1. **単純なReadOnly確認は原則として専用Workを起こさない。** GitHubのPR・CI・SHA・既知の差分・Vercelの状態など、ソラ側の接続ツールで取得できる範囲はソラが直接確認し、職人さんのWorkを消費しない。\n+2. **実装→必要最小限の照合→テスト→CI→（許可範囲内の）反映→結果報告を、可能な限り一度のWorkにまとめる。** 小さな確認だけを理由とした途中停止・再依頼・重複監査を避ける。\n+3. **既に成功した検証を理由なく何度もやり直さない。** ソースや環境が変わった場合の影響範囲に絞り、必要な回帰検証は省略しない。\n+4. **重要な操作の承認境界は維持する。** mainマージ/本番デプロイ、本番DB・migration・環境変数の変更、既存データの削除、実モデル送信、検証用書込みなどは、承認された範囲内でのみ実行。承認されていない次の工程には進まない。\n+5. **問題がない場合は承認済み工程を連続実行し、最後に簡潔な結果を報告する。** ブロッカー・破壊的影響・承認範囲超過が生じた場合だけ停止して相談する。\n+6. **他プロジェクトの担当範囲を重複調査しない。** Misaki・アメふるの自動棚卸し/開発台帳更新/イベント駆動自動化は独立プロジェクトが担当。Misaki本体では本体のマージ/デプロイへの影響だけ確認する。\n+\n+**指示作成時の原則**：ソラは「確認だけのWork」より「具体的な完成条件を持ったWork」を優先し、同じ質問・同じ監査をユーザーに繰り返させない。最終判断に必要な事実と未検証項目は正確に区別する。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7c02c3cf349db24f6e41e63acbd50c821c195754/docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+        "coverage": "サイズ上限120KB・原本リンク参照"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "c7216acfb08dc00c60ea14c89c08bb68ef317746",
+      "message": "docs: record 2026-11-02 AI companion design research in implementation overview\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/c7216acfb08dc00c60ea14c89c08bb68ef317746"
+    },
+    {
+      "sha": "7c02c3cf349db24f6e41e63acbd50c821c195754",
+      "message": "docs: record Work usage efficiency policy in Misaki overview\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7c02c3cf349db24f6e41e63acbd50c821c195754"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "7c02c3cf349db24f6e41e63acbd50c821c195754",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41380424639",
+      "id": 41380424639,
+      "updated_at": "2026-11-02T02:58:30Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "coverage": "全文",
+      "text": "# 美咲ラウンジ動画自動表示・開発台帳（2026-10-29）\n\n## 確認済み基準\n- main: `0b5ab6758861e2a4916b6b82ec196ed579559d0a`（作業開始時点）\n- 対象: `public/lab/transparent-lounge/index.html`、本番確認ページ `/lab/transparent-lounge/`\n- 既存ラウンジのソファ位置・拡大率・左右仮カード・スワイプ・動画終了/スキップ動作を維持する。\n- 既存チャット、DB、RPC、Relationship Engineは変更しない。\n- 元実験ブランチ `experiment/transparent-lounge-20261027` は main と分岐（ahead 26/behind 4）。そのまま main にマージしない。\n\n## 今回実装したHTML変更（未公開）\n- 手動 WebP 選択UI/JSを削除し、`/lab/transparent-lounge/misaki-lounge-24fps.webp` を自動表示する参照に変更。\n- 古い横型プレビューMP4参照を廃止し、`/lab/transparent-lounge/misaki-opening-vertical-21s.mp4` を参照。\n- 縦型video要素を `aspect-ratio:9/16`、モバイル画面高上限で表示。\n- ソファ背景は既存実験ブランチの素材URLを維持（新ブランチ main には背景画像がないため）。\n- HTMLのみ変更。**動画ファイル2本はまだGitHubの公開フォルダに存在しない。**\n\n## 素材／検証\n- ラウンジ: `misaki-lounge-24fps.webp`（元: `misaki_lounge_24fps(1).webp`）、約4.40MB、624×352、24fps/約9秒、ユーザーiPhoneでループと透過確認済み。\n- オープニング: `misaki-opening-vertical-21s.mp4`（元: `misaki-opening-vertical-21s-iphone(1).mp4`）、2,936,765 bytes、512×910、21.000秒、30fps、H.264/AAC。\n- 配置場所（GitHub）: `public/lab/transparent-lounge/`\n- ユーザーへ提供したZIP: `misaki-lounge-deploy-assets.zip`（上記2ファイルを所定の相対パスで収録）。\n- ブラウザ配信後、WebP 200 + image/webp、MP4 200 + video/mp4、再生・スキップ・終了・画面遷移をiPhone実機で確認する。\n\n## 残作業／リリース判定\n1. ZIP内のバイナリ2本をGitHubの本ブランチへコミットする（GitHubテキストAPIではこの環境からバイナリを直接転送できず、未実施）。\n2. PRの変更ファイルがHTML + 2アセット + 文書だけであることを確認し、マージ後にVercel本番配信を検証。\n3. iPhone実機で、9秒アニメーションループ、縦21秒再生、スキップ、動画終了→既存確認画面を確認。\n4. 次の工程で既存チャット入口を調査・接続する。チャットの複製実装は禁止。\n\n**現時点では本番公開・実機検証未完了。動画ファイル未配置のままPRをマージしない。**\n\n## 2026-10-29 追記：素材アップロードの現物確認\n- 作業ブランチに `public/lab/transparent-lounge/misaki_lounge_24fps.webp`（4,402,574 bytes）および `misaki_lounge_12fps.webp`（2,375,926 bytes）を確認。\n- HTMLのWebP参照を実在する `misaki_lounge_24fps.webp` に修正済み。旧手動選択は不要。\n- `misaki-opening-vertical-21s.mp4` は**依然として未配置**（リポジトリツリー確認）。縦21秒オープニング再生はまだ検証不可。\n- 21秒MP4が同一フォルダにアップロードされるまでマージ・本番公開しない。\n\n## 2026-10-29 追記：21秒MP4到着・HTML参照修正\n- GitHubの同フォルダに `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）を確認。以前アップロード済みのユーザー素材とファイルサイズが一致する。\n- HTMLのMP4参照を実際のアップロード名 `misaki-opening-vertical-21s-iphone.mp4` に修正。WebP参照も実在する `misaki_lounge_24fps.webp`。\n- 以前の文書内の「動画2本未配置」「MP4未配置」は当時の記録。現時点では2本とも配置済み。\n- 次のゲート: GitHub CI成功、PR取り込み、本番HTTP/再生/iPhone実機確認。\n\n## 2026-10-29 縦型オープニングを画面いっぱいに表示\n- iPhoneで選択後すぐに全画面相当のWebダイアログ（`position:fixed; inset:0; 100dvh`）を開き、動画を `object-fit:contain` で画面内最大表示。\n- ネイティブ動画コントロールを廃止し、縮小／PiP／動画単体のフルスクリーン解除などの意図しない操作を抑制。端末・ブラウザの機能自体を完全禁止する保証ではない。\n- 画面下部の「再生する」（自動再生失敗時）と「スキップ」は継続。終了後の確認画面は従来どおり。\n- 再生状況の通常表示は映像の邪魔にならないよう消し、読み込み失敗・バッファ時に状態を表示。\n- iPhone実機で画面サイズ・再生・終了・スキップ・音声・回転を検証する。\n",
+      "sha256": "fec688f4aa4408857b4344b946cddb1564a798c13b005e8558e0e656b9f6f224"
+    }
+  ],
+  "curated": {
+    "summary": "docs: 競合AIコンパニオン研究とWork利用節約方針を総覧に反映",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/133"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "38681dc9a9ce66c4d2d767e53b10c8374fb27df2867891a2fa640c6d3abb3f63",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

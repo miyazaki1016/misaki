@@ -1,0 +1,42 @@
+{
+  "id": "branch-50cdcf6fed465317",
+  "title": "docs/relationship-v1-2-stage-growth-principles",
+  "head": "ed8359319181f20cf73aec87ab75c7a1405264f2",
+  "head_ref": "docs/relationship-v1-2-stage-growth-principles",
+  "linked_prs": [
+    60
+  ],
+  "files": [
+    {
+      "path": "docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ed8359319181f20cf73aec87ab75c7a1405264f2/docs/GEMINI_UNIT_COST_TELEMETRY_WORK_HANDOFF.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ed8359319181f20cf73aec87ab75c7a1405264f2/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ed8359319181f20cf73aec87ab75c7a1405264f2/docs/RELATIONSHIP_ENGINE_V1_2_WORK_HANDOFF.md"
+    }
+  ],
+  "commits": "ed8359319181f20cf73aec87ab75c7a1405264f2 Add Gemini unit cost telemetry Work handoff\nbc35eb6231ee93b9843f0bfbf967fde71fc97561 Define Gemini unit cost telemetry contract\n8afab106113daed8568a59ca89280050a3f85820 Document provisional Free Premium usage economics\nade988bc1481fcc17863c4a2ff7d542bca50dd01 Record v1.2 Work handoff readiness\ndcbabc6636dc0575e9bb1c56fc55c4a780cb82f3 Add Relationship Engine v1.2 Work handoff\nc44914daf6905d949d07198e08f99fad77e95f31 Finalize Stage Resolver predicates and implementation boundaries\n1f572af80ba2dab766c1f9f264209909a73bacf6 Define Relationship Stage Resolver v1.2 contract\ncea48bb6fae1eacf327e459f280c8c8de6f288e3 Document Misaki development decision workflow\n320279730519caab8df444a3d3ca7fce444347b8 Document final Stage 0-5 relationship gates\nba868bde6d435938fd0cbe178aa7eca0ee17bf89 Document Relationship Engine v1.2 stage and growth principles",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ab641da4d568ddfdf3f59b3e9dc86e90211f25e3ab078a71b17905048ac15e12",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

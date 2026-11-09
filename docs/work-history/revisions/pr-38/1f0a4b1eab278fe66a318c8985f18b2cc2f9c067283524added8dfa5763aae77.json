@@ -1,0 +1,92 @@
+{
+  "id": "pr-38",
+  "number": 38,
+  "title": "5秒history GETをEdge境界で捕捉する",
+  "topics": [
+    "開発管理"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Route本体の診断ログが一度も実行されない一方、Vercel Edge middleware request logにはGETが継続しているため、middleware境界で発信元を捕捉する。\n\n- GET `/api/persona/history` のみ\n- source query param + User-Agentのみ\n- token/user idは記録しない\n- 原因確定後に診断ログは撤去",
+  "head": "e3a08db0c3dc97b297130a224919e73a69974c60",
+  "base": "87ac0b6540cb3e2f141447ed60dcbfd1cdf49b2e",
+  "base_ref": "main",
+  "head_ref": "sora/history-edge-trace",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-02T09:31:00Z",
+  "merge_commit_sha": "b6c9e5609fbcde16ee2cc057fcd3a86872ef0cda",
+  "updated_at": "2026-10-02T09:31:01Z",
+  "code_facts": [
+    {
+      "file": "middleware.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (request.nextUrl.pathname === \"/api/persona/history\" && request.method === \"GET\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/e3a08db0c3dc97b297130a224919e73a69974c60/middleware.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "middleware.ts",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/middleware.ts b/middleware.ts\nindex e68c161..0e7f748 100644\n--- a/middleware.ts\n+++ b/middleware.ts\n@@ -3,6 +3,13 @@ import { NextRequest, NextResponse } from \"next/server\";\n const CANONICAL_HOST = \"misaki38-ai.com\";\n \n export function middleware(request: NextRequest) {\n+  if (request.nextUrl.pathname === \"/api/persona/history\" && request.method === \"GET\") {\n+    console.log(\"HISTORY EDGE TRACE\", {\n+      source: request.nextUrl.searchParams.get(\"source\") ?? \"untagged\",\n+      userAgent: request.headers.get(\"user-agent\")?.slice(0, 160) ?? \"unknown\",\n+    });\n+  }\n+\n   const host =\n     request.headers.get(\"host\")?.split(\":\")[0]?.toLowerCase() ?? \"\";\n \n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/e3a08db0c3dc97b297130a224919e73a69974c60/middleware.ts",
+      "source": {
+        "path": "middleware.ts",
+        "coverage": "全文",
+        "text": "import { NextRequest, NextResponse } from \"next/server\";\n\nconst CANONICAL_HOST = \"misaki38-ai.com\";\n\nexport function middleware(request: NextRequest) {\n  if (request.nextUrl.pathname === \"/api/persona/history\" && request.method === \"GET\") {\n    console.log(\"HISTORY EDGE TRACE\", {\n      source: request.nextUrl.searchParams.get(\"source\") ?? \"untagged\",\n      userAgent: request.headers.get(\"user-agent\")?.slice(0, 160) ?? \"unknown\",\n    });\n  }\n\n  const host =\n    request.headers.get(\"host\")?.split(\":\")[0]?.toLowerCase() ?? \"\";\n\n  if (host === \"misaki.vercel.app\") {\n    const url = request.nextUrl.clone();\n    url.protocol = \"https:\";\n    url.host = CANONICAL_HOST;\n    url.port = \"\";\n\n    return NextResponse.redirect(url, 308);\n  }\n\n  // /api/chat は安全ラッパーを経由させる。\n  // ラッパー側で「覚えてる？」系だけ history を空にしてから\n  // 既存の app/api/chat/route.ts の POST を呼ぶ。\n  if (request.nextUrl.pathname === \"/api/chat\") {\n    const url = request.nextUrl.clone();\n    url.pathname = \"/api/chat-proxy\";\n\n    return NextResponse.rewrite(url);\n  }\n\n  return NextResponse.next();\n}\n\nexport const config = {\n  matcher: \"/((?!_next/static|_next/image|favicon.ico).*)\",\n};\n",
+        "sha256": "0c40b0b9ac3e9a044d5368bf05e1ad7059dd6aca2abc308b1efda52c3b3f0944"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "e3a08db0c3dc97b297130a224919e73a69974c60",
+      "message": "Trace history GET at edge boundary\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/e3a08db0c3dc97b297130a224919e73a69974c60"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "e3a08db0c3dc97b297130a224919e73a69974c60",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/36990002526",
+      "id": 36990002526,
+      "updated_at": "2026-10-02T09:29:34Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "CANONICAL_HOST",
+    "config",
+    "host",
+    "middleware",
+    "url"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "5秒history GETをEdge境界で捕捉する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/38"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "78ffeb0ed1c421f6e72004d3ce188cfe73242a14bc3d4dff62fa0d4bd3f79161",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

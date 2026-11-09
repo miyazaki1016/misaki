@@ -1,0 +1,983 @@
+{
+  "app/BackgroundPushSync.tsx": [
+    "pr-131",
+    "pr-29"
+  ],
+  "app/account/page.tsx": [
+    "branch-3a1e2cf011e9082f",
+    "pr-1",
+    "pr-131",
+    "pr-29",
+    "pr-32"
+  ],
+  "app/api/body-clock/route.ts": [
+    "branch-1a583769a497875d",
+    "pr-23"
+  ],
+  "app/api/chat-proxy/route.ts": [
+    "branch-387e38e3f392a033",
+    "branch-48dee2d1fc902874",
+    "branch-70d16bafe238aa7a",
+    "branch-7ebc2377f6ae2086",
+    "branch-7f356df67d09c22d",
+    "branch-992ef09e7aa2e87b",
+    "branch-bc36378a11db8be8",
+    "branch-c9e11b1515cb305d",
+    "pr-10",
+    "pr-29",
+    "pr-3",
+    "pr-30",
+    "pr-5",
+    "pr-6",
+    "pr-7",
+    "pr-8",
+    "pr-9"
+  ],
+  "app/api/chat/route.ts": [
+    "branch-48ad449fb30cd746",
+    "branch-5b98ae5ac6b68600",
+    "branch-70e44503429abc0f",
+    "branch-7e7349e1c0857db1",
+    "branch-80302ec778694c1b",
+    "branch-8c1c252f0c53fa36",
+    "branch-a5961576a6beffe1",
+    "branch-b5de3976fb8764e4",
+    "branch-c1c09c8589ffaf5e",
+    "branch-c8b5b69bea16cfe8",
+    "branch-c9e11b1515cb305d",
+    "branch-e2b90b4f0cd4a282",
+    "branch-f2dba8e26e4c9402",
+    "pr-131",
+    "pr-140",
+    "pr-19",
+    "pr-20",
+    "pr-25",
+    "pr-26",
+    "pr-27",
+    "pr-29",
+    "pr-30",
+    "pr-31",
+    "pr-32",
+    "pr-34",
+    "pr-40",
+    "pr-43",
+    "pr-45",
+    "pr-47",
+    "pr-61",
+    "pr-66",
+    "pr-67",
+    "pr-78"
+  ],
+  "app/api/conversation-review/smoke/route.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "app/api/dev/relationship-naturalness/route.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "app/api/experiments/blind-quality/route.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "app/api/experiments/replay-ab/route.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "app/api/experiments/synthetic-quality-run/route.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "app/api/feedback/reply/route.ts": [
+    "pr-29",
+    "pr-32"
+  ],
+  "app/api/persona/evolution/analyze/route.ts": [
+    "branch-b5de3976fb8764e4",
+    "branch-c9e11b1515cb305d",
+    "pr-29",
+    "pr-30",
+    "pr-66"
+  ],
+  "app/api/persona/history/route.ts": [
+    "branch-3a1e2cf011e9082f",
+    "branch-b5de3976fb8764e4",
+    "branch-c9e11b1515cb305d",
+    "branch-d4bd494d2ca8e9db",
+    "pr-1",
+    "pr-131",
+    "pr-151",
+    "pr-29",
+    "pr-30",
+    "pr-32",
+    "pr-33",
+    "pr-66"
+  ],
+  "app/api/proactive/route.ts": [
+    "branch-1a583769a497875d",
+    "pr-23"
+  ],
+  "app/api/push/body-clock/route.ts": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "app/api/push/test/route.ts": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "app/chat/anonymous-session-guard.tsx": [
+    "branch-3a1e2cf011e9082f",
+    "branch-8876346d043651ec",
+    "branch-e06b8cf63a4b31eb",
+    "branch-e520db4a8eac7868",
+    "branch-e9ece79f0b44197b",
+    "pr-1",
+    "pr-131",
+    "pr-2",
+    "pr-24",
+    "pr-4",
+    "pr-99"
+  ],
+  "app/chat/conversation-history-sync.tsx": [
+    "branch-3a1e2cf011e9082f",
+    "branch-8317c1821e24026d",
+    "branch-c9e11b1515cb305d",
+    "pr-1",
+    "pr-131",
+    "pr-17",
+    "pr-29",
+    "pr-30",
+    "pr-32",
+    "pr-35",
+    "pr-36",
+    "pr-44"
+  ],
+  "app/chat/initial-chat-scroll.tsx": [
+    "branch-d4bd494d2ca8e9db",
+    "pr-151"
+  ],
+  "app/chat/layout.tsx": [
+    "branch-3a1e2cf011e9082f",
+    "pr-1"
+  ],
+  "app/chat/page.tsx": [
+    "branch-1a583769a497875d",
+    "branch-637f3c0ed7eca805",
+    "branch-7e7349e1c0857db1",
+    "branch-b5de3976fb8764e4",
+    "branch-c9e11b1515cb305d",
+    "branch-d4bd494d2ca8e9db",
+    "pr-11",
+    "pr-131",
+    "pr-151",
+    "pr-19",
+    "pr-23",
+    "pr-29",
+    "pr-30",
+    "pr-32",
+    "pr-40",
+    "pr-42",
+    "pr-44",
+    "pr-66"
+  ],
+  "app/conversation-review/page.tsx": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "app/experiments/blind-quality-review/page.tsx": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "app/experiments/replay-self-check/page.tsx": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "app/page.tsx": [
+    "branch-2db397ec82c28320",
+    "pr-130",
+    "pr-62",
+    "pr-63"
+  ],
+  "lib/canonical-state.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-b5de3976fb8764e4",
+    "branch-f2dba8e26e4c9402",
+    "pr-131",
+    "pr-29",
+    "pr-32",
+    "pr-47",
+    "pr-66",
+    "pr-67"
+  ],
+  "lib/chat-recall.ts": [
+    "pr-29",
+    "pr-45"
+  ],
+  "lib/context-ab-approved-replay.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-balanced.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-blind-quality.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-gemini-adapter.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-long-fixture.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-offline-harness.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-prompt.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-quality-long-history.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-quality.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-replay-boundary.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-replay-preflight.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-replay-privacy.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-results.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-ab-reviewed-snapshot.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "lib/context-overlap-analysis.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-f2dba8e26e4c9402"
+  ],
+  "lib/context-size-measurement.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-f2dba8e26e4c9402"
+  ],
+  "lib/conversation-engine/amahuru-rain-context.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/attempt.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/base-prompt.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/character-context.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/character-prompt.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/context-format.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/history.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/layered-context.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/layered-prompt.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/memory.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/relationship-context.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-engine/retry-guides.ts": [
+    "branch-fc35db20bd870b9a",
+    "pr-88"
+  ],
+  "lib/conversation-lab/evaluation.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/github-one-shot-claim.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/live-smoke-probe.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/quality-assessment.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/quality-probe-runner.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/quality-probes.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/quality-review-packet.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/quality-reviewed-comparison.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/recorded-reply-import.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/runner.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-lab/scenarios.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "lib/conversation-turn-context.ts": [
+    "branch-70e44503429abc0f",
+    "pr-140"
+  ],
+  "lib/device-conversation.ts": [
+    "branch-3a1e2cf011e9082f",
+    "pr-1",
+    "pr-131",
+    "pr-29"
+  ],
+  "lib/gemini-json-generator.ts": [
+    "branch-8c1c252f0c53fa36",
+    "pr-45",
+    "pr-48",
+    "pr-61"
+  ],
+  "lib/gemini-usage-telemetry-server.ts": [
+    "branch-8c1c252f0c53fa36",
+    "pr-61"
+  ],
+  "lib/gemini-usage-telemetry.ts": [
+    "branch-8c1c252f0c53fa36",
+    "pr-61"
+  ],
+  "lib/legacy-browser-drain.ts": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "lib/legacy-drain.ts": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "lib/persona/evolution-runner.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-66"
+  ],
+  "lib/persona/fallback-persona.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "branch-e2b90b4f0cd4a282",
+    "pr-27",
+    "pr-31"
+  ],
+  "lib/persona/persona-store.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-131",
+    "pr-29",
+    "pr-32",
+    "pr-66"
+  ],
+  "lib/proactive-photo.ts": [
+    "branch-1a583769a497875d",
+    "branch-5e09e6de95bfa770",
+    "pr-13",
+    "pr-23"
+  ],
+  "lib/relationship-acting-guide-gradual-experiment.ts": [
+    "branch-a9c94bbd54224765",
+    "pr-85"
+  ],
+  "lib/relationship-acting-guide.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-45",
+    "pr-47",
+    "pr-67"
+  ],
+  "lib/relationship-action-reducer.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-analyzer-v1.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-8c1c252f0c53fa36",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-47",
+    "pr-48",
+    "pr-50",
+    "pr-51",
+    "pr-52",
+    "pr-53",
+    "pr-54",
+    "pr-55",
+    "pr-56",
+    "pr-57",
+    "pr-61",
+    "pr-65",
+    "pr-67"
+  ],
+  "lib/relationship-conversation-generator.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "lib/relationship-conversation-preview.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "lib/relationship-conversation-prompt.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "lib/relationship-emotion-reducer.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-emotion-store.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-engine-v1.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-47",
+    "pr-67"
+  ],
+  "lib/relationship-identity-resolver.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-67"
+  ],
+  "lib/relationship-life-context.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-naturalness-scenario.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "lib/relationship-patterns.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-points.ts": [
+    "pr-29",
+    "pr-32"
+  ],
+  "lib/relationship-runtime-v1.ts": [
+    "branch-5b98ae5ac6b68600",
+    "branch-8c1c252f0c53fa36",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-47",
+    "pr-49",
+    "pr-52",
+    "pr-61",
+    "pr-64",
+    "pr-67"
+  ],
+  "lib/relationship-signal.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-time.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/relationship-turn-expression.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "lib/tokyo-life-events.ts": [
+    "pr-34",
+    "pr-35"
+  ],
+  "middleware.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32",
+    "pr-38",
+    "pr-39"
+  ],
+  "public/lab/transparent-lounge-muse-v3/index.html": [
+    "branch-00773574df2cf2d3",
+    "pr-94"
+  ],
+  "public/lab/transparent-lounge-shortcuts/index.html": [
+    "branch-0ab2785a8deb3215",
+    "branch-439dfe86fa693c0a",
+    "branch-669d4b81dbb566ba",
+    "branch-7e57fa94e13bd2cd",
+    "branch-e21cbc0c26553034",
+    "branch-e520db4a8eac7868",
+    "branch-f87ab537bd23a447",
+    "pr-92",
+    "pr-93",
+    "pr-95",
+    "pr-96",
+    "pr-97",
+    "pr-98",
+    "pr-99"
+  ],
+  "public/lab/transparent-lounge-vertical/index.html": [
+    "branch-0ab2785a8deb3215",
+    "branch-669d4b81dbb566ba",
+    "branch-7e57fa94e13bd2cd",
+    "branch-b5a4c4bf623da36c",
+    "branch-e21cbc0c26553034",
+    "pr-91",
+    "pr-95",
+    "pr-96",
+    "pr-97",
+    "pr-98"
+  ],
+  "public/lab/transparent-lounge/index.html": [
+    "branch-9489dbe22b83fa25",
+    "branch-9b297aa481cc14c1",
+    "branch-c1628f2ed519dfb9",
+    "pr-89",
+    "pr-90"
+  ],
+  "public/lab/transparent-lounge/lounge-bg.png": [
+    "branch-70e44503429abc0f",
+    "branch-9b297aa481cc14c1",
+    "pr-140"
+  ],
+  "public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp": [
+    "branch-00773574df2cf2d3",
+    "pr-94"
+  ],
+  "public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4": [
+    "branch-9489dbe22b83fa25",
+    "pr-89"
+  ],
+  "public/lab/transparent-lounge/misaki_lounge_12fps.webp": [
+    "branch-9489dbe22b83fa25",
+    "pr-89"
+  ],
+  "public/lab/transparent-lounge/misaki_lounge_24fps.webp": [
+    "branch-9489dbe22b83fa25",
+    "pr-89"
+  ],
+  "public/lounge/entry.js": [
+    "branch-2db397ec82c28320",
+    "pr-130"
+  ],
+  "public/lounge/index.html": [
+    "branch-2db397ec82c28320",
+    "branch-70e44503429abc0f",
+    "pr-130",
+    "pr-140"
+  ],
+  "scripts/check_approval_dashboard.py": [
+    "branch-02f9f023f7c9991c",
+    "branch-284e2dc6d0c96cbb",
+    "branch-602fd94b750fc7fd",
+    "branch-6a84c634aa234f1c",
+    "branch-d727762241e2e4e1",
+    "branch-ea4df54e8d029f57",
+    "pr-153",
+    "pr-155",
+    "pr-156",
+    "pr-158",
+    "pr-160",
+    "pr-167"
+  ],
+  "scripts/context-ab-live.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "scripts/context-ab-quality-live.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "scripts/context-ab-smoke.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "scripts/development_branch_case_handoff.py": [
+    "branch-38e6283b99123cd5",
+    "pr-147"
+  ],
+  "scripts/development_branch_compare.py": [
+    "branch-35677a391b35c95c",
+    "branch-b23be022a75304ba",
+    "branch-ed894c05ef854553",
+    "pr-139",
+    "pr-145",
+    "pr-148"
+  ],
+  "scripts/development_branch_review_queue.py": [
+    "branch-2f842ea0ac1d18a4",
+    "pr-149"
+  ],
+  "scripts/development_history_evidence.py": [
+    "branch-02f9f023f7c9991c",
+    "pr-167"
+  ],
+  "scripts/development_index_proposal.py": [
+    "branch-436bd6babf91e34f",
+    "pr-141"
+  ],
+  "scripts/development_index_review.py": [
+    "branch-35677a391b35c95c",
+    "pr-139"
+  ],
+  "scripts/development_inventory.py": [
+    "branch-b5b1d46a6468bd59",
+    "branch-d92ca54cbab20357",
+    "branch-f54fba9240a4e12b",
+    "pr-103",
+    "pr-116",
+    "pr-122"
+  ],
+  "scripts/development_inventory_delta.py": [
+    "branch-1601ee37d65ba186",
+    "branch-4fd3d1bdc2b892c1",
+    "branch-7ea3560ec516692d",
+    "branch-b30df8ff98a54148",
+    "branch-b34c306bc7fd0b72",
+    "branch-b5b1d46a6468bd59",
+    "branch-d5f02538fc12def5",
+    "branch-f54fba9240a4e12b",
+    "pr-116",
+    "pr-118",
+    "pr-119",
+    "pr-120",
+    "pr-121",
+    "pr-122",
+    "pr-123",
+    "pr-132"
+  ],
+  "scripts/development_ledger_proposal.py": [
+    "branch-08e76fdd73cd4686",
+    "branch-3ab6bf48d6ece55f",
+    "branch-7b4c2cf2503a3179",
+    "branch-ac4d9f4766a37ec1",
+    "pr-124",
+    "pr-125",
+    "pr-126",
+    "pr-128"
+  ],
+  "scripts/development_work_history.py": [
+    "branch-d63cd059b3aaad0f",
+    "pr-166"
+  ],
+  "scripts/pr_approval_routing.py": [
+    "branch-7ae456f5639d43f4",
+    "pr-137"
+  ],
+  "scripts/pr_promotion_policy.py": [
+    "branch-f70b38dbc740ec35",
+    "pr-134"
+  ],
+  "scripts/pr_promotion_review.py": [
+    "branch-a448d35df12eb780",
+    "pr-135"
+  ],
+  "scripts/pr_review_handoff.py": [
+    "branch-136d018fe1cd5ebc",
+    "pr-136"
+  ],
+  "scripts/run-conversation-smoke.ts": [
+    "branch-ae082efda294b17a",
+    "pr-86"
+  ],
+  "scripts/run-live-synthetic-quality-eval.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "scripts/run-synthetic-quality-checks.ts": [
+    "branch-f2dba8e26e4c9402",
+    "pr-78"
+  ],
+  "scripts/vercel-build-guard.mjs": [
+    "branch-eecb7d45ce962418",
+    "pr-162"
+  ],
+  "scripts/vercel_build_guard.py": [
+    "branch-2fcb912568edd503",
+    "pr-138"
+  ],
+  "scripts/verify_ledger_proposal.py": [
+    "branch-7b4c2cf2503a3179",
+    "pr-128"
+  ],
+  "services/approval-merge-edge/index.ts": [
+    "branch-d727762241e2e4e1",
+    "pr-158"
+  ],
+  "services/approval-merge-edge/policy.mjs": [
+    "branch-d727762241e2e4e1",
+    "pr-158"
+  ],
+  "services/approval-merge-edge/policy.test.mjs": [
+    "branch-d727762241e2e4e1",
+    "pr-158"
+  ],
+  "supabase/functions/_shared/forget-control.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-66"
+  ],
+  "supabase/functions/body-clock/contact-timing.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/functions/body-clock/conversation-root.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-29",
+    "pr-66"
+  ],
+  "supabase/functions/body-clock/fallback-persona.ts": [
+    "branch-e2b90b4f0cd4a282",
+    "pr-27"
+  ],
+  "supabase/functions/body-clock/focus-guide.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/functions/body-clock/index.ts": [
+    "branch-49565aee7bcfca71",
+    "branch-b5de3976fb8764e4",
+    "branch-c1c09c8589ffaf5e",
+    "branch-c9e11b1515cb305d",
+    "pr-15",
+    "pr-29",
+    "pr-30",
+    "pr-31",
+    "pr-66"
+  ],
+  "supabase/functions/body-clock/legacy-drain.ts": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "supabase/functions/body-clock/persona-store.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-66"
+  ],
+  "supabase/functions/body-clock/proactive-decision.ts": [
+    "branch-49565aee7bcfca71",
+    "branch-70fc9c695854889a",
+    "branch-75d1d4d76110cc04",
+    "branch-c1c09c8589ffaf5e",
+    "pr-12",
+    "pr-14",
+    "pr-15",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "supabase/functions/body-clock/proactive-life-context.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-29",
+    "pr-31",
+    "pr-32"
+  ],
+  "supabase/functions/body-clock/proactive-motive.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/functions/body-clock/proactive-photo.ts": [
+    "branch-49565aee7bcfca71",
+    "branch-70fc9c695854889a",
+    "branch-c1c09c8589ffaf5e",
+    "pr-12",
+    "pr-15",
+    "pr-31"
+  ],
+  "supabase/functions/body-clock/proactive-urge.ts": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/functions/body-clock/temporary-state.ts": [
+    "branch-b5de3976fb8764e4",
+    "pr-29",
+    "pr-66"
+  ],
+  "supabase/legacy-maintenance-drain.sql": [
+    "branch-c9e11b1515cb305d",
+    "pr-30"
+  ],
+  "supabase/migrations/20260917030000_phase4_lazy_silence_evolution_rpc.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260917031500_phase5_relationship_aware_proactive_claim.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260917051607_save_anonymous_conversation.sql": [
+    "branch-3a1e2cf011e9082f",
+    "pr-1"
+  ],
+  "supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql": [
+    "branch-c75612bc790b236d",
+    "pr-16"
+  ],
+  "supabase/migrations/20260918014700_prevent_duplicate_chat_turn_sync.sql": [
+    "branch-9c34b261ec31b7a0",
+    "pr-18"
+  ],
+  "supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql": [
+    "branch-e2b90b4f0cd4a282",
+    "pr-27"
+  ],
+  "supabase/migrations/20260918081000_refund_failed_chat_usage.sql": [
+    "branch-7e7349e1c0857db1",
+    "pr-19"
+  ],
+  "supabase/migrations/20260920070000_relationship_time_v2_no_silence_only_mutation.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920073000_apply_relationship_emotion_v2_rpc.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920073100_relationship_context_state_version.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920080000_relationship_action_v2.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920083000_body_clock_no_action_finish.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920084500_body_clock_v2_opportunity_claim.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920085000_disable_legacy_keyword_emotion_trigger.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920085500_harden_relationship_v2_rpc_inputs.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260920085600_retire_superseded_relationship_emotion_v2_rpc.sql": [
+    "branch-c1c09c8589ffaf5e",
+    "pr-31"
+  ],
+  "supabase/migrations/20260926000000_semantic_relationship_point_delta.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260926004000_preserve_temporary_relationship_on_email_save.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260926005000_relationship_v2_retires_legacy_emotion_triggers.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260927000000_reply_feedback.sql": [
+    "pr-29",
+    "pr-32"
+  ],
+  "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql": [
+    "branch-155e832b29009650",
+    "pr-82"
+  ],
+  "supabase/migrations/20261004045307_gemini_usage_telemetry.sql": [
+    "branch-8c1c252f0c53fa36",
+    "pr-61"
+  ],
+  "supabase/migrations/20261006200002_forget_control_v1.sql": [
+    "branch-b5de3976fb8764e4",
+    "pr-66"
+  ],
+  "supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-67"
+  ],
+  "supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-67"
+  ],
+  "supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-67"
+  ],
+  "supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql": [
+    "branch-5b98ae5ac6b68600",
+    "branch-a5961576a6beffe1",
+    "branch-f2dba8e26e4c9402",
+    "pr-67"
+  ]
+}

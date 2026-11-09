@@ -1,0 +1,258 @@
+{
+  "id": "pr-153",
+  "number": 153,
+  "title": "feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru",
+  "topics": [
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "First usable review dashboard without a new Vercel project. Fetches open PRs from both public repositories via read-only GitHub REST API, separates review candidates and drafts, provides links to PR files and native GitHub merge controls, and fetches CI on demand. Includes a Pages publishing workflow and offline HTML/JS syntax validation. No credentials in client, no application/DB/Push changes. GitHub Pages source must be enabled in repo Settings. **Direct in-page merge is NOT implemented**: merging occurs in authenticated GitHub PR UI; a secure backend/GitHub App is needed for a true one-tap in-page merge. Review and CI required before main merge.",
+  "head": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+  "base": "8624aededd33f1d5aa580a719a680d52aa809dbe",
+  "base_ref": "main",
+  "head_ref": "feat/development-approval-dashboard-20261104",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-03T23:53:13Z",
+  "merge_commit_sha": "f6938b9af33f9e22c3d531471ea30cd6aa31e1d5",
+  "updated_at": "2026-11-03T23:53:14Z",
+  "code_facts": [
+    {
+      "file": ".github/workflows/approval-dashboard-pages.yml",
+      "kind": "実行する検証コマンド",
+      "expression": "run: python3 scripts/check_approval_dashboard.py",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/.github/workflows/approval-dashboard-pages.yml"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "class Scripts(HTMLParser):",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "def __init__(self):",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "def handle_starttag(self, tag, attrs):",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "条件分岐・閾値",
+      "expression": "if tag == \"script\":",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "def handle_endtag(self, tag):",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "条件分岐・閾値",
+      "expression": "if tag == \"script\":",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "def handle_data(self, data):",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "条件分岐・閾値",
+      "expression": "if self.in_script:",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert len(parser.scripts) == 1, \"Exactly one inline script expected\"",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"https://api.github.com/\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"noopener noreferrer\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"localStorage\" not in html and \"access_token\" not in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/approval-dashboard-pages.yml",
+      "status": "modified",
+      "additions": 46,
+      "deletions": 0,
+      "patch": "diff --git a/.github/workflows/approval-dashboard-pages.yml b/.github/workflows/approval-dashboard-pages.yml\nnew file mode 100644\nindex 0000000..6b3a4f9\n--- /dev/null\n+++ b/.github/workflows/approval-dashboard-pages.yml\n@@ -0,0 +1,46 @@\n+name: Approval dashboard (GitHub Pages)\n+on:\n+  workflow_dispatch:\n+  push:\n+    branches: [main]\n+    paths:\n+      - 'docs/approval-dashboard/**'\n+      - '.github/workflows/approval-dashboard-pages.yml'\n+      - 'scripts/check_approval_dashboard.py'\n+  pull_request:\n+    paths:\n+      - 'docs/approval-dashboard/**'\n+      - '.github/workflows/approval-dashboard-pages.yml'\n+      - 'scripts/check_approval_dashboard.py'\n+concurrency:\n+  group: approval-dashboard-pages-${{ github.ref }}\n+  cancel-in-progress: false\n+jobs:\n+  validate:\n+    runs-on: ubuntu-latest\n+    permissions:\n+      contents: read\n+    steps:\n+      - uses: actions/checkout@v4\n+      - name: Check HTML and JavaScript without network\n+        run: python3 scripts/check_approval_dashboard.py\n+  deploy:\n+    needs: validate\n+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'\n+    runs-on: ubuntu-latest\n+    permissions:\n+      contents: read\n+      pages: write\n+      id-token: write\n+    environment:\n+      name: github-pages\n+      url: ${{ steps.deployment.outputs.page_url }}\n+    steps:\n+      - uses: actions/checkout@v4\n+      - name: Upload dashboard only (no app files)\n+        uses: actions/upload-pages-artifact@v4\n+        with:\n+          path: docs/approval-dashboard\n+      - name: Publish\n+        id: deployment\n+        uses: actions/deploy-pages@v4\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/.github/workflows/approval-dashboard-pages.yml",
+      "source": {
+        "path": ".github/workflows/approval-dashboard-pages.yml",
+        "coverage": "全文",
+        "text": "name: Approval dashboard (GitHub Pages)\non:\n  workflow_dispatch:\n  push:\n    branches: [main]\n    paths:\n      - 'docs/approval-dashboard/**'\n      - '.github/workflows/approval-dashboard-pages.yml'\n      - 'scripts/check_approval_dashboard.py'\n  pull_request:\n    paths:\n      - 'docs/approval-dashboard/**'\n      - '.github/workflows/approval-dashboard-pages.yml'\n      - 'scripts/check_approval_dashboard.py'\nconcurrency:\n  group: approval-dashboard-pages-${{ github.ref }}\n  cancel-in-progress: false\njobs:\n  validate:\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n    steps:\n      - uses: actions/checkout@v4\n      - name: Check HTML and JavaScript without network\n        run: python3 scripts/check_approval_dashboard.py\n  deploy:\n    needs: validate\n    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'\n    runs-on: ubuntu-latest\n    permissions:\n      contents: read\n      pages: write\n      id-token: write\n    environment:\n      name: github-pages\n      url: ${{ steps.deployment.outputs.page_url }}\n    steps:\n      - uses: actions/checkout@v4\n      - name: Upload dashboard only (no app files)\n        uses: actions/upload-pages-artifact@v4\n        with:\n          path: docs/approval-dashboard\n      - name: Publish\n        id: deployment\n        uses: actions/deploy-pages@v4\n",
+        "sha256": "71cb99ed721edc44ec85d951458adbc2a7798fc36fe5fd3ab5fde3580c760ebc"
+      }
+    },
+    {
+      "path": "docs/approval-dashboard/README.md",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 0,
+      "patch": "diff --git a/docs/approval-dashboard/README.md b/docs/approval-dashboard/README.md\nnew file mode 100644\nindex 0000000..be9d0db\n--- /dev/null\n+++ b/docs/approval-dashboard/README.md\n@@ -0,0 +1,20 @@\n+# 開発承認ボード（美咲 × アメふる）\n+\n+## 目的\n+Vercelの追加プロジェクトを使わず、GitHub Pages上で2つのリポジトリの**open PR**をiPhoneからまとめて確認する。既存の開発台帳や棚卸しを置き換えない。\n+\n+## 表示と操作\n+- GitHub公開APIから `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のopen PRを読み取り専用で取得。\n+- Draft以外を「承認候補」、Draftを「準備中」と表示。**承認候補＝マージ安全の判定ではない。** 台帳更新PRも、別途自動マージの安全ゲートが整うまでは表示する。\n+- 「GitHubで確認・マージ」からGitHubのPR画面へ移動し、ログイン済みのユーザーが差分・CI・承認条件を確認してマージする。**このダッシュボード内からの直接マージは未実装。**\n+- CIチェックはカードを展開した時だけ取得。GitHub APIの制限に達した場合はエラーを表示する。\n+- 個人アクセストークンは保存・要求しない。GitHub Pagesは公開サイトとなるので秘密情報は載せない。\n+\n+## GitHub Pages公開\n+`.github/workflows/approval-dashboard-pages.yml` をmainへ統合後、GitHubリポジトリの **Settings → Pages → Build and deployment → Source: GitHub Actions** を設定する。以降、ダッシュボードを変更した時またはActionsの手動実行で公開できる。\n+\n+想定URL（GitHub Pages有効化後。**現時点で公開確認したURLではない**）:\n+`https://miyazaki1016.github.io/misaki/`\n+\n+## 実際にページ上で直接マージする将来拡張\n+GitHub Pagesは静的配信でサーバー側の機密資格情報を安全に保管できない。直接マージには認証済みのバックエンド／GitHub App・最小権限・実行前のCI/branch保護再検証・監査ログが必要。これらなしにトークンをブラウザーへ埋め込まない。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/docs/approval-dashboard/README.md",
+      "source": {
+        "path": "docs/approval-dashboard/README.md",
+        "coverage": "全文",
+        "text": "# 開発承認ボード（美咲 × アメふる）\n\n## 目的\nVercelの追加プロジェクトを使わず、GitHub Pages上で2つのリポジトリの**open PR**をiPhoneからまとめて確認する。既存の開発台帳や棚卸しを置き換えない。\n\n## 表示と操作\n- GitHub公開APIから `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のopen PRを読み取り専用で取得。\n- Draft以外を「承認候補」、Draftを「準備中」と表示。**承認候補＝マージ安全の判定ではない。** 台帳更新PRも、別途自動マージの安全ゲートが整うまでは表示する。\n- 「GitHubで確認・マージ」からGitHubのPR画面へ移動し、ログイン済みのユーザーが差分・CI・承認条件を確認してマージする。**このダッシュボード内からの直接マージは未実装。**\n- CIチェックはカードを展開した時だけ取得。GitHub APIの制限に達した場合はエラーを表示する。\n- 個人アクセストークンは保存・要求しない。GitHub Pagesは公開サイトとなるので秘密情報は載せない。\n\n## GitHub Pages公開\n`.github/workflows/approval-dashboard-pages.yml` をmainへ統合後、GitHubリポジトリの **Settings → Pages → Build and deployment → Source: GitHub Actions** を設定する。以降、ダッシュボードを変更した時またはActionsの手動実行で公開できる。\n\n想定URL（GitHub Pages有効化後。**現時点で公開確認したURLではない**）:\n`https://miyazaki1016.github.io/misaki/`\n\n## 実際にページ上で直接マージする将来拡張\nGitHub Pagesは静的配信でサーバー側の機密資格情報を安全に保管できない。直接マージには認証済みのバックエンド／GitHub App・最小権限・実行前のCI/branch保護再検証・監査ログが必要。これらなしにトークンをブラウザーへ埋め込まない。\n",
+        "sha256": "9b382c4c9d2c55d9ff47f624a83e5352dc6dbd1643a88162776a803f2a8d31e5"
+      }
+    },
+    {
+      "path": "docs/approval-dashboard/index.html",
+      "status": "modified",
+      "additions": 91,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/docs/approval-dashboard/index.html",
+      "source": {
+        "path": "docs/approval-dashboard/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "scripts/check_approval_dashboard.py",
+      "status": "modified",
+      "additions": 36,
+      "deletions": 0,
+      "patch": "diff --git a/scripts/check_approval_dashboard.py b/scripts/check_approval_dashboard.py\nnew file mode 100644\nindex 0000000..41adc53\n--- /dev/null\n+++ b/scripts/check_approval_dashboard.py\n@@ -0,0 +1,36 @@\n+#!/usr/bin/env python3\n+\"\"\"Offline structural check of the static approval dashboard.\"\"\"\n+from html.parser import HTMLParser\n+from pathlib import Path\n+import subprocess\n+import tempfile\n+\n+class Scripts(HTMLParser):\n+    def __init__(self):\n+        super().__init__()\n+        self.in_script = False\n+        self.scripts = []\n+    def handle_starttag(self, tag, attrs):\n+        if tag == \"script\":\n+            self.in_script = True\n+            self.scripts.append(\"\")\n+    def handle_endtag(self, tag):\n+        if tag == \"script\":\n+            self.in_script = False\n+    def handle_data(self, data):\n+        if self.in_script:\n+            self.scripts[-1] += data\n+\n+html = Path(\"docs/approval-dashboard/index.html\").read_text(encoding=\"utf-8\")\n+parser = Scripts()\n+parser.feed(html)\n+assert len(parser.scripts) == 1, \"Exactly one inline script expected\"\n+assert \"https://api.github.com/\" in html\n+assert \"noopener noreferrer\" in html\n+assert \"localStorage\" not in html and \"access_token\" not in html\n+assert \"fetchRepo\" in parser.scripts[0]\n+with tempfile.TemporaryDirectory() as directory:\n+    path = Path(directory) / \"dashboard.js\"\n+    path.write_text(parser.scripts[0], encoding=\"utf-8\")\n+    subprocess.run([\"node\", \"--check\", str(path)], check=True)\n+print(\"Dashboard structure and JavaScript syntax OK\")\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/823e019139b3c3c66762a54e61ae938fe9c154b3/scripts/check_approval_dashboard.py",
+      "source": {
+        "path": "scripts/check_approval_dashboard.py",
+        "coverage": "全文",
+        "text": "#!/usr/bin/env python3\n\"\"\"Offline structural check of the static approval dashboard.\"\"\"\nfrom html.parser import HTMLParser\nfrom pathlib import Path\nimport subprocess\nimport tempfile\n\nclass Scripts(HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.in_script = False\n        self.scripts = []\n    def handle_starttag(self, tag, attrs):\n        if tag == \"script\":\n            self.in_script = True\n            self.scripts.append(\"\")\n    def handle_endtag(self, tag):\n        if tag == \"script\":\n            self.in_script = False\n    def handle_data(self, data):\n        if self.in_script:\n            self.scripts[-1] += data\n\nhtml = Path(\"docs/approval-dashboard/index.html\").read_text(encoding=\"utf-8\")\nparser = Scripts()\nparser.feed(html)\nassert len(parser.scripts) == 1, \"Exactly one inline script expected\"\nassert \"https://api.github.com/\" in html\nassert \"noopener noreferrer\" in html\nassert \"localStorage\" not in html and \"access_token\" not in html\nassert \"fetchRepo\" in parser.scripts[0]\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / \"dashboard.js\"\n    path.write_text(parser.scripts[0], encoding=\"utf-8\")\n    subprocess.run([\"node\", \"--check\", str(path)], check=True)\nprint(\"Dashboard structure and JavaScript syntax OK\")\n",
+        "sha256": "7e8cd330e7c58f5f663f8dfd3825697a3e032f43b7a1b3291679bf5aecdff42b"
+      }
+    }
+  ],
+  "file_count": 4,
+  "reported_file_count": 4,
+  "commits": [
+    {
+      "sha": "cb67f8011c1a876dea18003782b7e6645027fa68",
+      "message": "feat: add mobile review dashboard for Misaki and Amefuru PRs\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/cb67f8011c1a876dea18003782b7e6645027fa68"
+    },
+    {
+      "sha": "13a79ca7b39d3a6623089e3fb25ecc6146065d8e",
+      "message": "ci: publish approval dashboard via GitHub Pages\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/13a79ca7b39d3a6623089e3fb25ecc6146065d8e"
+    },
+    {
+      "sha": "a918dff3f4cc83a81eb175e3617ae41855bd64d8",
+      "message": "docs: explain dashboard safety and GitHub Pages setup\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/a918dff3f4cc83a81eb175e3617ae41855bd64d8"
+    },
+    {
+      "sha": "064e61a3e1fca0fbccd1b178a96ea36b198f34ef",
+      "message": "test: validate static dashboard without network\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/064e61a3e1fca0fbccd1b178a96ea36b198f34ef"
+    },
+    {
+      "sha": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+      "message": "ci: validate dashboard in PR before Pages deployment\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/823e019139b3c3c66762a54e61ae938fe9c154b3"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41742621602",
+      "id": 41742621602,
+      "updated_at": "2026-11-03T23:53:24Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Approval dashboard (GitHub Pages)",
+      "head_sha": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41742500878",
+      "id": 41742500878,
+      "updated_at": "2026-11-03T23:52:25Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41742500732",
+      "id": 41742500732,
+      "updated_at": "2026-11-03T23:52:26Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "823e019139b3c3c66762a54e61ae938fe9c154b3",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41742500741",
+      "id": 41742500741,
+      "updated_at": "2026-11-03T23:53:02Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "Scripts",
+    "__init__",
+    "handle_data",
+    "handle_endtag",
+    "handle_starttag"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "美咲・アメふる共通のスマートフォン向け承認ボードを追加",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/153"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "1f3b44c9d26d7f5b80c9af9ca2a8f37e757f27dc24068c138196ea259e589e60",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

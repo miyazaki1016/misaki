@@ -1,0 +1,442 @@
+{
+  "id": "branch-c1c09c8589ffaf5e",
+  "title": "sora/relationship-time-v2-design",
+  "head": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64",
+  "head_ref": "sora/relationship-time-v2-design",
+  "linked_prs": [
+    31
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/relationship-v2-tests.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/.github/workflows/relationship-v2-tests.yml"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/app/api/chat/route.ts"
+    },
+    {
+      "path": "app/api/dev/relationship-naturalness/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/app/api/dev/relationship-naturalness/route.ts"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/persona/fallback-persona.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/persona/fallback-persona.ts"
+    },
+    {
+      "path": "lib/relationship-action-reducer.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-action-reducer.ts"
+    },
+    {
+      "path": "lib/relationship-conversation-generator.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-conversation-generator.ts"
+    },
+    {
+      "path": "lib/relationship-conversation-preview.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-conversation-preview.ts"
+    },
+    {
+      "path": "lib/relationship-conversation-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-conversation-prompt.ts"
+    },
+    {
+      "path": "lib/relationship-emotion-reducer.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-emotion-reducer.ts"
+    },
+    {
+      "path": "lib/relationship-emotion-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-emotion-store.ts"
+    },
+    {
+      "path": "lib/relationship-life-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-life-context.ts"
+    },
+    {
+      "path": "lib/relationship-naturalness-scenario.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-naturalness-scenario.ts"
+    },
+    {
+      "path": "lib/relationship-patterns.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-patterns.ts"
+    },
+    {
+      "path": "lib/relationship-signal.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-signal.ts"
+    },
+    {
+      "path": "lib/relationship-time.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-time.ts"
+    },
+    {
+      "path": "lib/relationship-turn-expression.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/lib/relationship-turn-expression.ts"
+    },
+    {
+      "path": "middleware.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/middleware.ts"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/package.json"
+    },
+    {
+      "path": "supabase/functions/body-clock/contact-timing.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/contact-timing.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/focus-guide.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/focus-guide.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/index.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/index.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-life-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/proactive-life-context.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-motive.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/proactive-motive.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/proactive-photo.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-urge.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/functions/body-clock/proactive-urge.ts"
+    },
+    {
+      "path": "supabase/migrations/20260920070000_relationship_time_v2_no_silence_only_mutation.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920070000_relationship_time_v2_no_silence_only_mutation.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920073000_apply_relationship_emotion_v2_rpc.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920073000_apply_relationship_emotion_v2_rpc.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920073100_relationship_context_state_version.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920073100_relationship_context_state_version.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920080000_relationship_action_v2.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920080000_relationship_action_v2.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920083000_body_clock_no_action_finish.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920083000_body_clock_no_action_finish.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920084500_body_clock_v2_opportunity_claim.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920084500_body_clock_v2_opportunity_claim.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920085000_disable_legacy_keyword_emotion_trigger.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920085000_disable_legacy_keyword_emotion_trigger.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920085500_harden_relationship_v2_rpc_inputs.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920085500_harden_relationship_v2_rpc_inputs.sql"
+    },
+    {
+      "path": "supabase/migrations/20260920085600_retire_superseded_relationship_emotion_v2_rpc.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/supabase/migrations/20260920085600_retire_superseded_relationship_emotion_v2_rpc.sql"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/body-clock-contact-timing.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-contact-timing.test.ts"
+    },
+    {
+      "path": "tests/body-clock-emotion-v2.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-emotion-v2.test.ts"
+    },
+    {
+      "path": "tests/body-clock-focus-guide.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-focus-guide.test.ts"
+    },
+    {
+      "path": "tests/body-clock-proactive-life-context-v2.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-proactive-life-context-v2.test.ts"
+    },
+    {
+      "path": "tests/body-clock-proactive-motive.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-proactive-motive.test.ts"
+    },
+    {
+      "path": "tests/body-clock-proactive-urge.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/body-clock-proactive-urge.test.ts"
+    },
+    {
+      "path": "tests/relationship-action-reducer.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-action-reducer.test.ts"
+    },
+    {
+      "path": "tests/relationship-conversation-generator.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-conversation-generator.test.ts"
+    },
+    {
+      "path": "tests/relationship-conversation-preview.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-conversation-preview.test.ts"
+    },
+    {
+      "path": "tests/relationship-conversation-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-conversation-prompt.test.ts"
+    },
+    {
+      "path": "tests/relationship-emotion-reducer.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-emotion-reducer.test.ts"
+    },
+    {
+      "path": "tests/relationship-life-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-life-context.test.ts"
+    },
+    {
+      "path": "tests/relationship-life-extraction.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-life-extraction.test.ts"
+    },
+    {
+      "path": "tests/relationship-life-memory-roundtrip.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-life-memory-roundtrip.test.ts"
+    },
+    {
+      "path": "tests/relationship-naturalness-boundary.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-naturalness-boundary.test.ts"
+    },
+    {
+      "path": "tests/relationship-naturalness-repair.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-naturalness-repair.test.ts"
+    },
+    {
+      "path": "tests/relationship-naturalness-scenario.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-naturalness-scenario.test.ts"
+    },
+    {
+      "path": "tests/relationship-patterns.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-patterns.test.ts"
+    },
+    {
+      "path": "tests/relationship-scenario.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-scenario.test.ts"
+    },
+    {
+      "path": "tests/relationship-signal.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-signal.test.ts"
+    },
+    {
+      "path": "tests/relationship-story.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-story.test.ts"
+    },
+    {
+      "path": "tests/relationship-turn-expression.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tests/relationship-turn-expression.test.ts"
+    },
+    {
+      "path": "tsconfig.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64/tsconfig.json"
+    }
+  ],
+  "commits": "e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64 Document relationship story consistency and proactive safety gates\n67827a67bb33d962bb98d5d1bc38568bf3198323 Test repair-in-progress photo tone safety\n590f97f6c34b36593ae19b2f8acd9dd7033bb200 Keep repair-in-progress photos emotionally neutral\n4c2373ea1a7d5716b0474e7eb8da94d0bb21f7df Replace literal newline escape in proactive urge source\n2e994b1a8d3229e257a7c21481db3efe0d5de618 Fix external concern urge syntax\n569f931cca26f5d2e6cb459477d9e6ae3ceeb31b Allow grounded external safety check-ins through relationship hurt gate\n5bb547aa94db9bfffe937030e0af283373f4cf01 Define external safety concern exception during unresolved hurt\n2cd95499c2818e234fcddf4170682afd03cb4580 Test Body Clock story ordering and legacy signal compatibility\n5556b315ec1c55d4424631005ffe4e3b151fd060 Preserve Body Clock event order fallback without timestamps\n8b8e0d6baa22a8082e3d5022a3dbf85df5bad1e1 Match Body Clock story event parsing to normal chat\nc19e4e49389e9dfb1e3936e1c51605e25394accf Lock normal chat and Body Clock story meaning equivalence\n94a4401ccd5685009cf6dafb0246cabbb2cac5b6 Test relationship story gates proactive urges\n4dcb14a072494eab6ea55aaffc7cb3478b0e7244 Feed relationship story into proactive urge gate\n939a93d44ecc24d67e3b8867d50df164f0f7f8f8 Gate proactive urge on unresolved relationship story\n39f70fe11a900a04b2e855e3a5e52591567f11b6 Test unresolved story cannot drive proactive closeness motive\ne024b4c2723bccfbe5ccbefbe358ca86560a2566 Pass current relationship story into proactive motive evidence\n09995b51273fe87e171bd405d2eea18b4f4fbe1d Prevent unresolved hurt from becoming proactive relationship motive\n12f623661ee229db8b421bb8540ad1ff3541e313 Lock Body Clock repair semantics to shared relationship story\nccdab53bcc36ecc1aa912dfada70d5347319c72f Align Body Clock repair semantics with normal chat\n11c7169a5d29e3ae563e7a65bca43e2ce177c43b Refresh implementation overview source baseline\n26c864cfb0193121a31978274548019a33748385 Document Body Clock shared history and photo consistency\n00eec3b9bb9cfd81319e3e4672d8747303ef75e9 Test photos cannot contradict unresolved relationship hurt\n0eb51bb420192aa4fa5c484d488033990e4df9a8 Keep proactive photos aligned with unresolved relationship hurt\nc6797ceb9d4f47acf335e633f8330cd0d28cafb0 Fix Body Clock shared event syntax\n2fd0955f3efe097fa1e78c9b8a2ae86cfd2924c9 Share one relationship event read across Body Clock\n02c1acab6957bfdd9c3b1e522d3bc586e1b46615 Accept shared relationship events in Body Clock decision\nb8a8f4daebc55e2fb106855c9100de3aba2771ac Document Body Clock relationship story continuity\n41fae0f6fe01f81eec0d6461e83215c6b565af9a Replace literal newline escapes in relationship story\ne7c993a2f658fc4deb97d79ad3074041b5647f1d Fix relationship story repair syntax\nbbd35d57321e53813e9a5f019678c2a6c3bff4ad Test that generic warmth cannot erase serious hurt\n1f0a0ec3757aa41321c7f3a8bfa374bd5c676950 Keep Body Clock repair evidence conservative\n9be5c248f07237bc45d1e0f6d5b23d53bc199f3b Require care or trust to demonstrate relationship repair\nbdae3a33997805af9d913bd7fd1cc0c9183bce36 Test Body Clock relationship story continuity\nb81d549a65553f916b34f602eeb6bcb611c8a99f Expose Body Clock story derivation for regression tests\nd0dd18af54cd60d93b33be05338e8f77583ea9a5 Apply relationship story continuity to Body Clock\n7d0e30c0eaa423c43de62bbf38f47e391f128768 Document live relationship story integration\n1d182ec0a35d7b41e3289f3a4bd5dd1d28999379 Avoid duplicate relationship event reads in chat\n81d3717eb95da6faec0c305ddaf939a64c67b162 Share one event read for relationship history\n389233f0ef33b6f7408fd0337b680168f845f089 Feed persisted relationship story into live chat wording\n33396510efb47851081608977c7f97dc3be81655 Load relationship story from persisted events\nbc872a08a88e0fbf786415118ce3910e83beb309 Test relationship story wording continuity\n6de0896b04f1825cb96bd6210a80d55665a86626 Pass relationship story into conversation expression\nf1f8c779049abafab7e44a097031584cc65f1865 Reflect relationship story meaning in wording guidance\nc959fa4d0ab394478f6807edd15f860f42abf927 Document continuous relationship event meaning\n2b15ee73fdfd12b81e3292d59918f27549da29e5 Test relationship event meaning across turns\nbe8adc72c4c29b345e875c280a4791ab8115730e Add relationship story trajectory from persisted events\n069a57b1e8c8204fd427271d8fb1390e1e34292b 総覧に生活記憶サーバー正本化の引継ぎ地点を追記\n8273084e75223fb5fa655fe12c295d8f85b0c841 生活記憶の持越しと期限切れを回帰テスト\n9528db63971f59f41adb2f7707c47d07d1a3edd6 期限付き生活記憶をチャット入出力へ接続\n4d6e1c3b17f5bcd07501379672d9399825b479de 期限付き生活事実の記憶形式を追加\nb2f32897c768e94b640fa41ed784f8e7c5486c51 現在ターンの明示生活予定を会話判断へ接続\nfa4dea83e994b1e9fa288daefd3417d7f63c61c7 生活予定抽出で第三者と曖昧表現を除外\n65b746cfd379081719d715b220d49f13dfc47f89 期限付き生活予定の抽出を回帰テスト\nd3e4c7d6dfbba0bd4fb6d3def02fbed9d49ae544 明示された短期生活予定の抽出器を追加\n769fe6281d3a0bc3221bab6599e7c01bfb87e2df 既存長期記憶を生活理解ガイドへ安全に接続\n43b8c724266f6093bb6d0125abc4754776628dd2 生活理解層の期限と根拠を回帰テスト\ne29518f966173c94316acbd97c1f99467d3dd1b0 関係性エンジン向け生活理解層の土台を追加\ncbd051da64d5455c67fbe28a237aff09d18d3a01 総覧に実Gemini会話自然さ検証の完成線を追記\n525ecedf80375877ac5468da2fc5948c0aa0f5a6 喧嘩中の心配に未解決の距離感を残す\nb1e7f19bf77e39d6c3819b458c4c7507fedba02f 実台詞検証のGemini JSON出力形式を明示\n6b82994fab4a1a1690732f80ef71e3547f367826 Preview環境変数反映のため検証デプロイを更新\n0105fdad07bdbd5ec9845b149ce0580348f23cde Preview実台詞検証を安全なGET実行にも対応\n2c307ca32988db412832811fd105cd05c6a09fe3 Preview専用自然さ検証APIはcanonical redirectを回避\n84292d48e47b85e915eb186f085dda9dca3994a3 Preview限定の実台詞自然さ検証経路を追加\na02bb017a2dceccc13097b32b0e98150fb01e1b7 境界シナリオの検証文言を実人格プロンプトへ整合\n5c802605c9d9fd013b8d39e4b72a5e7088a157d5 沈黙と継続的な気遣いの自然さシナリオを追加\n4752c759246785055f3d860fad2adb631f7ffeb4 謝罪と喧嘩中の心配を実会話シナリオへ追加\na05469cfcb2e7639c96eb59bd28be925aa6b69dc 翌朝まで感情を持ち越す実会話シナリオを固定\n832816a7c94383238003a6ef6d562d0e2547129f 連続会話の自然さ検証シナリオ基盤を追加\ne9882367c3e3ac548df2a9336664a953c6fd75dd 実APIなしで文章生成器の接続仕様を回帰テスト\n009ea717ffc179c5de9ec64243e510633d9b9401 実会話検証の文章生成器をDB非依存で分離\n7335dd09db734ed62300682df6581a6e6d80888a 実会話文章生成プロンプトの統合を回帰テスト\nae994ef06262bca376e6330f9f0873b3495875db 実会話検証用の文章生成プロンプトを追加\ndc53207874e64f4d1ab1b49d0bc5369960f89eab 実会話検証向けに基礎人格プロンプトを再利用可能化\na173c63ebe2c4011775dc1a6869b0f4dcee46dc1 実会話プレビューテストを現行感情仕様に整合\n79ae84da4d8b1d34154ed0134f831de958f31c9e 実会話プレビュー本体のESM importを修正\n15bc91989c89cffa258b66f0e9127f96cf8d9758 実会話プレビューテストのESM importを修正\n18a8faef26ddd826c27d775fef9902569f2632ab DB非依存の実会話プレビュー経路を回帰テスト\n080052fb5774238181fa145a7aadca379ff33a08 実会話検証用の関係状態プレビューを分離\nad25d007afb3d4c452013d0bdc35ce9e1ee5ffc0 総覧に感情エンジンの論理パターンと具体例を追記\n45aa322c84696d195c5bdea7787f219bc0932748 感情エンジン完成線の最終シナリオを追加\nc306d4697cd212b5eeaef9d210c7de0a4409a006 修復と境界線の最終シナリオを追加\nadbd882a2856d06db9b05abb416f223422fe412d 警戒回復シナリオだけを段階回復仕様へ修正\n7a622a9ed71189a5fbfe760d06e82fba2cd9f0dd 静かな期間の愛情継続テストを意図どおり復元\n6ea39805e571218cf8d2f0f1de7eede715dc596a 警戒回復を段階的な強度低下として検証\n5a586ed4ea9881ed7c9a4f79cdecff464ef5fceb 感情競合と回復の終盤シナリオを追加\n59fd5c7409d22b82809a0a4ab9d9a34fe286a7df 関係履歴と時間の終盤シナリオを追加\n1838e16d7090fb6915304c355eb0dd873e10e8da 複合感情の終盤シナリオを追加\nbab6ab2816feb1b2e8eac64b3eac2c96bd8892b4 気持ち対象ガイドを独立モジュールからテスト\n71a8969922dc44a56582bf231e5c7915fe2ac172 Body Clockで独立した気持ち対象ガイドを使用\n2f1da571ef18dbffabfb1f7c1b9810e1d24a146e 気持ち対象ガイドを独立モジュール化\n97bfda059cfad25d3ab4ec2004c835d46c7a9ae9 自発メッセージの気持ち対象ガイドを回帰テスト化\n4b5d4671e96612ac0542651a1f6d82f8602f48de 自発メッセージの気持ち対象ガイドをテスト可能にする\n30e02d0ba1daf6b9e83b0d6b6c9586396516e83b 自発メッセージへ気持ちの対象ガイドを実挿入\neb2ff94977134f8690fb2141377c7b386f74e658 CHASE時の心配テストも連投防止仕様へ統一\n02f3800b8f275e214ab0a7db6065e98c8aabf26b 心配の連投防止に旧テストを整合\nadcc7404fb761dad57fdbb0a02cf5b58b56887eb 心配による連投と外部緊急性の境界を固定\ne174bef40265907d514e995d66750cee13f92d7a 通常の心配にも直近接触の間隔を適用\n586b4c85033cf2797b441e220a3d33f57258efb9 RECONNECTの連投防止を回帰テスト化\n4ed8be5da6a03eab4d7759ea3605b150baf43d8a 通常RECONNECTにも直近接触クールダウンを適用\nbe0d2bf81bd9b26c9c8befab9e5eebbd7a48a724 直近接触時間の境界を回帰テスト化\nd11040c3cb37c2ad6e813eccf19ef285d0893c92 Body Clockの接触時間算出を独立モジュールへ移行\nefc55b3d85389f8091422dc37e72ccd70f92d86b 直近接触時間の算出を独立モジュール化\n2df19143be29f4f41a36c9ee25552b9e6a400443 直近接触時間の算出をテスト可能にする\nedf65d0883cc417de3bb898fa2c11c1ce511d1af Body Clockへ実際の直近接触間隔を接続\na1e8e44bcedfd80cee344b8943faccc6eb02b1dd 話題意図ガイドを生成プロンプトへ実挿入\naf3afea41f785c82a38439d5977686803b445ecc 話題意図が文章生成へ届くことを回帰テスト化\n2b04c78e9ea343c9dc2e2084b0a9cfb0517fdff6 話題意図を自発メッセージ生成ルールへ反映\ne10108a134cbff6584547a275db6eac6245a1f85 関係話題の意図と出どころ欠落を修正\n56d143de232b4d7467bcc0c1a5fa44845f8d7f82 自発メッセージの話題意図を回帰テスト化\nece41d49326f621fc70512881765b2c01d02a370 自発メッセージに話題の意図を追加\na161086fa49f58a34f7637909bc34a4252f182e6 話題の出どころを自発動機テストで固定\n587b2f2ed6d356e162e8b7d7a81f285c89d60f31 自発メッセージに話題の出どころを明示\n908a247bc8a9714dcca2b2939c5f97f256603651 欲求対象ごとの根拠選択境界を固定\nd4afb7a0953cde479d8a6291661f17f53f2660ee 欲求対象に合わせて自発動機テストを更新\n60adb26b40219690c86e9a75ccd8461a45de878d Body Clockから動機選択へ欲求対象を渡す\n916accd87c99a70a0c5d9d98a366238f86c9d664 欲求の対象を自発行動の動機選択へ接続\n1f51a61f915355e0a51046f017ff69f045062646 自発メッセージの話題対象を回帰テスト化\n576f5bd46fc2c0518ba754ca8ede97d9808e59dc 欲求の対象を自発メッセージ生成へ接続\n48858125ae8c1e60689c75d9c65d33586483a099 自発メッセージに欲求の対象を追加\n776d8cb8e101445ed98d7126f72fb304cc46415f 自発欲求と連絡タイミングの分離を回帰テスト化\n13691cea9580b72c31b8b1a231959024b0278d2f 自発欲求と直近接触の間隔を分離\n2efeee70b74547fad064ddbdc9e42989391c72db 関係履歴で異なる沈黙時間のシナリオを固定\neb6c8f32ef4a2dbdfed7e0fc9b4ea49784c721f5 関係履歴による感情時間の差を回帰テスト化\n8c3d80c01862c5186c95ec394cc6e5bbfa263346 関係履歴を感情の時間減衰へ反映\n0464a02ddf406eee731b7e1bc62516dea87df00f 関係パターン追加テストの改行を修正\nf9062ac10ad66a73bc0d34eaf8c779d8b1c2761f 修復学習テストを実際の傷と時間窓に合わせる\n34c5236014f96662c70d418c379c203dae9e5a60 関係修復の学習を実際の傷と時間窓に限定\nf11d2a9d80de48a2dc270a8be42c8afb4c2187b9 EmergencyAlert連携の自発行動境界を回帰テスト化\n6da6f831387e2c3ba815d4095fbbfcf39f27b558 外部Alertを根拠ある心配の入力として受けられる形に拡張\nb279d33b1206e62f1ba0040f694f80903b8ab431 傷が和らいだRECONNECTの自発連絡を許可\n27246f25bd564c26e684ac4a338ea66b4e20f4ad 翌朝の関係状態を自発行動判断へ固定\na3b366e46cb11e8fe1002f6403b7a6c5cd890dce 総覧にEmergencyAlertと自発行動の統合方針を追記\n9b82c20a3744888269b31d4162f50d6f5566e8dc 翌朝の関係継続シナリオと履歴連携を回帰テスト化\n8810a15744f39c20d926075e36a42071ca6cadbd 行動理由ごとの言葉の温度ガイドを返答生成へ接続\n2c00efe4a4cd5c4ce8119cb65a22962645aa34dc 言葉の温度差を返答表現テストで固定\neec53eeaf3c4f107ec07a8f46553b095c94666ca 言葉の温度ガイドのリテラル改行を修正\n5a894220988f87d7c98dc8592369f44f6be0a990 複合感情の行動理由を具体的な言葉の温度へ変換\n501c96884fcfe49f4b6225fbaec93381a581ace2 複合感情で現在の傷を優先する回帰テスト追加\na782209a0e01732584d2f489c1e85cee3af833c3 好意が残っていても現在の傷を即再接近に変えない\nbfa23221f5e5c944334fc4159806d15d15f71432 複合感情が言葉へ滲む表現ルールを回帰テスト化\ncc3270378521d1bf28caa181886b473cf43c71d7 返答表現ガイドのリテラル改行を実改行へ修正\ne61aae8a6d10e8ee49e828c32e82cc9cdf970380 返答表現ガイドの改行構文を修正\nedd55963659605139f7e0bb85907b85ebce38df5 現在の複合感情を返答生成へ渡す\n4cdca16d873e14fdc287bf284b0d82af3fb62737 複合感情を美咲の言葉の温度へ反映\n221a3161169aacaf2a6df5957448c4a9df5fd131 複合感情から美咲の行動意図を分岐\nadec42778451f82f6acd6eb11ab3bcab50865986 安心感と警戒感の関係シナリオを固定\nf9ff849c82d97ed3513d7bf6b657eb6a734aff5f 関係史から安心感と警戒感を現在感情へ反映\n04c6709dc440bd2e8d3e3cde84541d96520c220f 同じ出来事でも関係史で反応が変わるシナリオを追加\n00dc8e8726aa5cb7335abcc89cf3d152283de04c 関係履歴が行動を変える回帰テストを追加\nd2508f2b0bed1671d16239d92973d78c7a0a499f 関係パターンを感情から行動まで一貫して伝播\ne1ed1d965428f624885d1f549d6dbcc9de7fca41 関係パターンを感情から行動まで一貫して伝播\n0b3b3100c54778fac926c33390e3e33a76c42597 関係履歴パターンを美咲の行動選択へ反映\n040a8dfb6f1ad37c8c71b612d92ec668f5fe4917 連続行動の関係学習をシナリオテストで固定\n138886d293dc4d6e645effafd04515df4d2c05a6 関係学習に連続した行動の傾向を追加\n37c66cf09b79fd56b2820d4f59d3a70b2a3d45c3 関係イベントの連続性を回帰テストで固定\n8d3399e83566b482d04c807008c2473d1fe0cf60 関係学習に出来事の連続性を追加\nc80736aab39b6ec6ad95a20f3163cff45fad5edf 修復試行後の再発重みを回帰テストに反映\n8f4969140852d294c44a664c1cc8a40fa0a69810 関係パターンテストを結果ベース修復 semantics に更新\nb31b756cd9d197d132672b8fd2fcd5171371fbf1 境界線を加害扱いせず修復実績を結果ベースで学習\n5a026fb550986764fcaebe76e78801a6c1ec325e 同一チャットターンの感情と返答で同じ関係履歴を使う\n931e411766cfd0b315e3c8733e007c159d56214e 同一ターンで関係履歴判定を共有可能にする\n3c7426691f9f73fc098541c09bf0edf966a38760 返答プレビューにも関係履歴パターンを反映\nbb8507f7829678a41feb27b96880142354558ec6 関係パターンの時間減衰と再発を回帰テストで固定\n8c4629036788aa4826c8ab6d9c8a2086044650ad 関係パターンに古さと修復後再発の重みを追加\n3e51f6430171bea2f667000a49eafb9fb71583f6 関係履歴パターン導出の回帰テストを追加\n3530ccd2668570263846fa7180592613c8beec5f 関係履歴パターンを実チャット感情更新へ接続\n2c0ab5cf7e96d906cbb6ae12f32464d4acb4d47a 保存済み関係イベントからパターンを読み込む\n39d331f1d079f109f8af7a76d5343a8fa88b6fa9 総覧に関係性エンジンの最終像を明文化\n25b8311f25f62482effb4feda76ff570e62d7218 永続イベントから関係パターンを導出\ne67cabdd9bacf146662e365664c873a2d8923590 繰り返しから学ぶ関係シナリオを統合\n777f93f3f6a9dac5b4c389b32866857a5898442d 関係パターン学習の回帰テストを追加\n29bd9f8e64ad90df7931882a7a0a1dd5e7affeb1 繰り返しの関係パターンを感情判断へ反映\nc9337c1b425532b6ab968058bcb4cca238b784f9 共有履歴が現在感情へ効くシナリオを追加\nd7232a6874f0253467898b412f0015ac2ffcf036 関係の深さで同じ出来事の受け止めが変わるシナリオを追加\n6a0147c1ed9e4fcbf98bdbc82f250313523e86c4 関係時間の途中イベントで感情軌道が変わるシナリオを追加\nf154678defb027734586730cc1fc4d11b75a4410 数週間の関係時間シナリオを追加\nede909bfa35289cb0b59ba75185d5b8b60bfecd1 恋愛表現だけで未解決の境界を解除しない\nf575c59ad866a2249b4e6df41459173cfd6ce4c2 愛情と境界が衝突するシナリオを追加\n3cbdf181ddde08e101b14fffc94a84d6aeb98c7a 旧テストを謝罪と愛情の分離仕様へ更新\n148134c9b7dc5c71f6ee42dfd9554151eee3488f 謝罪と愛情を分離する回帰テストを追加\n23fd20741120137388829f482777fd21fd70fb47 謝罪だけで愛情の副感情を生成しない\n1c6b942f70e91f6aff96931b210e7a9f74db88ef 謝罪の限界と境界優先シナリオを追加\n9c9922eade3f452c254d1bcde044d57ec70a50eb 翌朝の余韻と沈黙の信頼シナリオを追加\n231cbe930df699abd62ec467e4ce4a5d00abbf85 境界維持ロジックのリテラル改行を実改行へ修正\na92cef5df4161313d30180032a2884071813f3fa 境界維持ロジックの改行構文を修正\n89cee4cdcd1d16438a55aadfe468c4fc0eba19d6 境界からの段階的修復シナリオを追加\nd6152164cffab19fca88ff4674712c7885e36eab 優しさだけで境界線を即解除しない\ne791de680432742573771dd53b1e75ce62bb1361 関係シナリオを反復傷害と境界維持へ拡張\n312fb6d9e95a9193b26f138c573b9cfe60b12a36 関係シナリオを長期空白と複雑な修復へ拡張\n9c356ef0fabffbe1cdf21dc51d43c3b59bc8716f 関係シナリオを翌朝・安心・境界線まで拡張\nb599a9811c25b16f8804f242169b9a442e436ab7 関係時間v2の一連シナリオテストを追加\n39ae58e590d322c3c5ebc2fc84e5ec4232cecc74 複合感情テストを修復途中の条件へ合わせる\n81770784e541a95ca67500ea3b72cddeb8a1c851 複合感情の回帰テストを追加\ncaf5d91027556f5e6f89c1fc16d0ee6b3c279998 感情reducerに複合感情の副成分を追加\n6e6ada33c714c82ffc6c55e02c88f9f3f543d6e9 感情余韻の継続行動テストを追加\ne05129d72669ce46652a8f3d309c0f50680a0c67 心配と嬉しさの余韻を次行動へ継続\nb06baacae3ce42d2c739f44ec98b80e0d73e1e87 余韻から行動への遷移を回帰テストで固定\n891a0f1d16b1ee488a4de27d86f3f4cb7915628f 感情の余韻を次の行動選択へ反映\nbe2f1e57dc6dece94afb9e0e1ae38934faf8557e 余韻表現の接続を回帰テストで固定\nbd66a744be016f53aa8560bf8c019276b556ec2c 会話表現へ現在感情の余韻を接続\naa7d1463727b2d72d50f4ae7e5a76785e07fb54e 現在ターンの言葉へ感情の余韻を反映\n8d808be6ffe30045a631b845c016ed17655c85eb 感情の余韻を回帰テストで固定\nf216086501f4431933839fdc48030bbd0dcf2084 感情reducerに関係の余韻を追加\n593002f8e7215329802105b756718981904c4ac7 関係イベント動機の回帰テストを追加\n262a241e0d49fcd403bdbee8c8c389157ac0cdaf Body Clockへ関係イベント由来の動機を渡す\n1a8c1a2d72f9d44457ae6689d6319e25a69982a9 自発行動の動機を保存済み関係イベントへ接続\nf661d6c8bc5c92f82309b9f36ebeed9648ff691d 旧emotion-only v2 RPCの実行経路を閉じる\na0a6bd5728b3b1d1b6ed3767d3395739d54f1c55 Body Clock親密度変換の回帰テストを追加\n27a1be2e03cbae73b74f3d6e2ec7c3c08a28188f Body Clockの親密度段階を数値判定へ正規化\n7d72a3e759cd150f92383eccb6a9dc5c61003251 関係時間v2の実装済み範囲とCI結果を総覧へ反映\n0bc79ac9c2287e66a5e9c22d80513e5cdb0e67a4 Next buildからDeno EdgeとNodeテスト領域を明示分離\n017504d8baea92b74f4744462bde923f99b4cbf4 NodeテストとNext buildでTS import解決を統一\n79245e5dce83519b078f48a9dcbbac561e81e5c5 PR31 CIにNext production build検証を追加\nf1e93acade34c4cd13c1475b3568f9d8c71cc4f0 logoutテストを会話データ消去の契約へ合わせる\nc6bac2a028f84ca882ac38f9b6b2d8e4248bc501 Node回帰テストで解決できるTS importへ修正\n0ab1465a9f4d1c5460aa659c1bb397afa0c75cb8 PR31のrelationship v2回帰テストをCI化\n7df64bd7000198f2af113ccf6116427f9c985977 relationship v2テストを標準コマンドで実行可能にする\n5195222c9e26e653a0ec3c5d11b33d7f4e1288af relationship v2 RPCの入力境界をDB側でも制限\n300e48bb7021151d194b335a4d1f38ad6ad21f25 関係時間の会話記録を成功ターンだけに修正\n2df70ac49d1bd28a2c435e1bac17df5e9c3d1ed9 写真欲求を実際の写真候補がある時だけ許可\ne6caaac21caf1b5931933367f2f763357f38ec68 写真欲求の前に実素材の利用可能性を判定\n61b4380c2a8f7ca6d1fff03f1bb472125a4e0bfe 明日の予定を2日後に使わない回帰テストへ修正\n9ffd5fd522d5bae1e10fb91671279575e9158806 相対日付の生活情報を翌日以降へ持ち越さない\ne8b1882690a487d2404576489650d9f8a8e99821 旧キーワード感情triggerをv2経路から切り離す\nf5454ba265e9b1acd7c023da2622a0467646980d Body Clock claimから時間由来感情と旧ランダム判定を撤去\na22203a930b73bcfa2d6c88f5bb03f090aa2ead6 今回ターンの表現再生成も既存返答検証を通す\n25b0413b7243356007009b373ff6d95a56d8441d 何もしない判断の次回評価時刻を結果へ反映\n055a445c935cc10083d4c0c809126742b87b57b1 写真欲求追加後のTEASEテスト境界を明示\n376e3b8059a9dfe90f238563c9ea7de0a35109df 写真欲求が確率や素材だけで生まれないことをテスト化\n5872bfb9ee40f4870bf98c08aaffb47e0255bb49 Body Clockから写真欲求の機会を評価\n51fd5984450bb427e62565ae757a33bcb74dac13 写真を見せたい欲求を独立した自発動機として追加\ncb53d02ae230acd03228117d1f9a33accadd6e5d Body Clockの写真選択へ欲求とurge強度を接続\n2093872e241c36205dc9d784c30237fe6270147e 写真を確率添付から美咲の欲求由来へ変更\nfefefebbdfc12d5e9acb90fc90874f26fa8393b7 古い生活記憶を現在事実にしない回帰テストを追加\nbf8e5088a185ad0d0da251eda5a6eb926ceba7bc 生活文脈を新しい本人発言だけに限定\n675d57052de67534e78773ef68ba1d9bfc758654 自発動機の鮮度と記憶境界をテスト化\nbb529a463e5bb99d93094d97fa62493437329751 自発動機に根拠時刻と鮮度を持たせる\n2c00e28e7e1119bc29d4027466aab670a8a49976 何もしない自発判断でも次の評価時刻へ安全に進める\n0ff1a5b0077c2df8c6e9e9eee1d4e373a5cfcdc3 Body Clockの何もしない判断でleaseを安全に解放\nda4ca53710e966442af89165bc4a02ee75f55f4c Body Clockの自発文面へ会話由来の動機を渡す\na2d96ecfdf6f6ab40226417d499dc957e9a34a23 自発欲求を直近会話と記憶の動機へ接続\neb2caf8d34e46dd01aa3267c1c79462421ad5a2e 自発欲求を送信・非送信の監査情報へ記録\n785e979a9a0d85b48c216ad8511676040cb7c4ff 自発欲求の境界条件を回帰テストへ固定\ne0a7adb07e5d85bee3b7366c5af37cecf7735d4b 自発メッセージを美咲の欲求から生成\n050f8f08328e61cf80d5fbe30b059668ba45c4a8 自発urgeを美咲の欲求タイプへ拡張\n55bc4aef14dc7af80ddbbeb1571ff0862005ddd3 関係時間v2から自発urgeまでの現在地を総覧へ統合\nff778edc22842274ea15ef006ad1619fdb4523fb 自発行動の送る・何もしない因果をテスト化\na1cdebdab6359ed428b111c23f51de43f0d935af Body Clockに何もしない自発行動を実装\nb091682b92c6b1779829c6252369cf27abe0dd1f 自発送信を時間ではなく美咲の内的urgeで判定\n918edd425c8ff7919317cc064d14eb7d2e1ef8f0 沈黙7日だけのmiss_you生成を完全撤去\nfb9e5f044ed2a4fe954a901cab82b5af882bdf0f Body Clockと通常会話の感情原則を回帰テスト化\n03b360b6cdb145855fab9b093d628a20ff259f98 Body Clockを感情v2語彙と関係時間原則へ統一\nfbde9a4a48ac198262dcf4602d4d5a66a02f537d action direction表現境界の回帰テストを追加\nd2b574bc6ff1384a5cb5aab1637e28f7127325e5 表現再生成から関係signalの正本判定を分離\n866e284d44784f9f776dc2ea8a3c4bebeb53a911 今回ターンのaction directionを実際の返答表現へ反映\n4e09492f4403e482c8a6e237867b85c135fd7422 今回ターンのaction directionを返答表現へ渡す境界を追加\nedff426fefe0e584bac934374f903f6d7b279c73 通常会話でaction direction決定を観測可能にする\n3541f243a12dc82a6eb1a40a287c46b14ecee1e0 感情とaction directionを同じターンで永続化\nb7f8b0d7eb1c6efd6f5430ccee81ba2e50062de2 旧action triggerを外し感情と行動を同一因果で永続化\n1699f973f02ca30f2bf0dfe65f9c83d1a903976f action direction v2の因果テストを追加\n5980d037adfa1c245f5f676be822063c0354f61b 感情と会話根拠からaction directionを決めるreducerを追加\n425e6f907cc28ade6327d2993e69f20ffb575a6c 感情v2接続時の認証ブロック配置を修正\n7e7fdb7fc28c9a716bfb024b96e9de5c5cf09c74 通常会話から感情v2を永続化して次ターンへ継承\na995c123fbef8ebc4305fa04becb0045b3c79188 感情reducerを永続化RPCへ接続するstoreを追加\na0e89ff01ad7676f85ac361e48983bdd40081529 関係contextへ状態versionを公開\n4a756dafbed589d23fb9ba3d5ace4ca6dd3730fc 関係状態の競合検知用version時刻を読む\n48af2e1fade75e263d83e3e1fe9110282e53aa1b 感情v2の永続化境界と競合防止を追加\n3b360d457f5695cd8263356fcd67717be50a68fe 時間だけで感情を変えない互換RPCへ移行\n9555f88930d9213588a188111e7432e840328f60 関係時間context読込を副作用なしにする\n9ad31caedd85e5a9c399d7c328a3da5ccb52ef74 感情reducerの本筋受け入れ例をテスト化\ndf002844f12eafa99f568d3371e2d1447ad6187a 関係シグナルと関係時間から感情を遷移する純粋reducerを追加\n5a2feb1ae2f6bbe5fb93784264209a4c00590aa2 通常会話で関係シグナルを意味判定する\n2781b8eff98feaa11ad439f6f005f8e031ae5bd9 関係シグナル境界の回帰テストを追加\nbed5b0f56c45903a1ce6b1d7c0fd48f56da29bd3 内容理解型の関係シグナル境界を追加\n8a2f8a24f95e09b11f8fa5d4712825febcdd24be 関係状態と関係時間v2の再開設計を総覧へ記録",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "4bccaf84f80d9a240d1683a6d7fb3b2d559c1ee1209253dc432b87e497c1164b",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "branch-155e832b29009650",
+  "title": "chore/restore-relationship-rpc-migration",
+  "head": "4dd716a2c04c6864445cb8720a1921813bb50933",
+  "head_ref": "chore/restore-relationship-rpc-migration",
+  "linked_prs": [
+    82
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    }
+  ],
+  "commits": "4dd716a2c04c6864445cb8720a1921813bb50933 chore: restore applied relationship RPC migration",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "071b98f4c6ffb90bd5ba1c239df24581476f00d390570fbf3111bd6104971a6e",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

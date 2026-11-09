@@ -1,0 +1,207 @@
+{
+  "id": "pr-33",
+  "number": 33,
+  "title": "匿名history GETのauth raceを安全なno-opにする",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "認証・安全性"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／認証・アクセス制御に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Production smokeで匿名セッション中に /api/persona/history GET が400を繰り返すケースを確認。サーバー正本・匿名POST loadは正常。GETが匿名に当たった場合は恒久状態を返さず `{ exists:false, ephemeral:true }` の200 no-opとし、raceで400を連打しない。回帰テストを追加。",
+  "head": "368afb0dfbf9ea66837c83834d8fc24837813554",
+  "base": "fe9df9585f092b88055b96f0c727106fd1c81d25",
+  "base_ref": "main",
+  "head_ref": "sora/anonymous-history-get-noop",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-02T08:35:46Z",
+  "merge_commit_sha": "477ed3bd21dd2dc2c8a615b7287b3439953372de",
+  "updated_at": "2026-10-02T08:35:46Z",
+  "code_facts": [
+    {
+      "file": "app/api/persona/history/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/app/api/persona/history/route.ts"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('anonymous history GET is a safe no-op during auth transition', async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(response.status, 200);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(await response.json(), { exists: false, ephemeral: true });",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/tests/server-canonical.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "patch": "diff --git a/.github/workflows/canonical-relationship-integration-tests.yml b/.github/workflows/canonical-relationship-integration-tests.yml\nindex f6af02e..ae44dd4 100644\n--- a/.github/workflows/canonical-relationship-integration-tests.yml\n+++ b/.github/workflows/canonical-relationship-integration-tests.yml\n@@ -1,7 +1,7 @@\n name: Canonical relationship integration tests\n on:\n   pull_request:\n-    branches: [codex/server-canonical-foundation]\n+    branches: [main, codex/server-canonical-foundation]\n   push:\n     branches: [sora/canonical-relationship-integration]\n permissions:\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/.github/workflows/canonical-relationship-integration-tests.yml",
+      "source": {
+        "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+        "coverage": "全文",
+        "text": "name: Canonical relationship integration tests\non:\n  pull_request:\n    branches: [main, codex/server-canonical-foundation]\n  push:\n    branches: [sora/canonical-relationship-integration]\npermissions:\n  contents: read\njobs:\n  test:\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n          cache: npm\n      - run: npm ci\n      - run: npm test\n      - run: npm run build\n",
+        "sha256": "82a854d17b0667bf5b6efab5ac1a54abc60f7c4196a41f5b4316729aac4c9ed8"
+      }
+    },
+    {
+      "path": "app/api/persona/history/route.ts",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "patch": "diff --git a/app/api/persona/history/route.ts b/app/api/persona/history/route.ts\nindex 8b845bb..4f8fccd 100644\n--- a/app/api/persona/history/route.ts\n+++ b/app/api/persona/history/route.ts\n@@ -22,7 +22,7 @@ export async function GET(request: Request) {\n   try {\n     const user = await authenticate(request);\n     if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n-    if (user.is_anonymous) return Response.json({ error: \"Temporary state required.\" }, { status: 400 });\n+    if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });\n     return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { \"Cache-Control\": \"no-store\" } });\n   } catch (error) {\n     console.error(\"CONVERSATION STATE READ FAILED\", error);\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/app/api/persona/history/route.ts",
+      "source": {
+        "path": "app/api/persona/history/route.ts",
+        "coverage": "全文",
+        "text": "import { maintenanceResponse } from \"../../../../lib/maintenance\";\nimport { createClient } from \"@supabase/supabase-js\";\nimport { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from \"../../../../lib/canonical-state\";\n\nasync function authenticate(request: Request) {\n  const token = request.headers.get(\"authorization\")?.match(/^Bearer (.+)$/)?.[1];\n  if (!token) return null;\n  const db = createClient(\"https://tzozajnwznxqgxnjikoy.supabase.co\", \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\", {\n    global: { headers: { Authorization: `Bearer ${token}` } },\n    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },\n  });\n  const { data, error } = await db.auth.getUser(token);\n  return error ? null : data.user;\n}\nfunction responseState(state: RootState, ephemeral = false) {\n  const history = state.history ?? [];\n  return { exists: true, history, memory: state.memory, relationshipPoints: state.relationshipPoints,\n    misakiTodayMemory: state.todayMemory, ephemeral, messageCount: history.length,\n    userMessageCount: history.filter((item: any) => item?.role === \"user\").length, memoryCount: state.memory.length, updatedAt: state.updatedAt ?? null };\n}\nexport async function GET(request: Request) {\n  try {\n    const user = await authenticate(request);\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });\n    return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { \"Cache-Control\": \"no-store\" } });\n  } catch (error) {\n    console.error(\"CONVERSATION STATE READ FAILED\", error);\n    return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });\n  }\n}\nexport async function POST(request: Request) {\n  // Anonymous \"load\" renews the root, so it is a write too.\n  const maintenance = await maintenanceResponse();\n  if (maintenance) return maintenance;\n  try {\n    const user = await authenticate(request);\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    const body = await request.json();\n    if (body.saveAnonymous === true) {\n      if (!user.is_anonymous || body.expectedUserId !== user.id) {\n        return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 });\n      }\n      let state = await loadTemporaryRoot(user.id, body.temporaryState);\n      // A reply can have committed even if its transport response was lost.\n      if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);\n        }\n      }\n      const { data, error } = await createServerSupabase().rpc(\"save_misaki_temporary_state\", {\n        p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,\n        p_today_memory: state.todayMemory, p_points: state.relationshipPoints,\n        p_relationship: state.temporaryRelationship ?? null,\n        p_expected_revision: state.temporaryRevision ?? null,\n      });\n      if (error) {\n        console.error(\"EMAIL CHECKPOINT ERROR\", {\n          code: error.code,\n          message: error.message,\n          details: error.details,\n          hint: error.hint,\n        });\n        throw new Error(\"Email checkpoint failed\");\n      }\n      return Response.json({ synced: true, result: data });\n    }\n    if (body.action === \"load\") {\n      if (user.is_anonymous && typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) {\n            const latest = await loadTemporaryRoot(user.id, replay.temporaryState);\n            return Response.json({ ...responseState(latest, true),\n              temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, \"load\") : sealTemporaryState(latest, \"load\"), recoveredTurn: true });\n          }\n        }\n      }\n      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);\n      return Response.json({ ...responseState(state, !!user.is_anonymous),\n        ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, \"load\") : sealTemporaryState(state, \"load\") } : {}) });\n    }\n    if (![\"deleteMemory\", \"clearMemory\", \"clearHistory\"].includes(body.action) ||\n      (body.action === \"deleteMemory\" && typeof body.value !== \"string\")) {\n      return Response.json({ error: \"Explicit state operation required.\" }, { status: 400 });\n    }\n    if (user.is_anonymous) {\n      const state = await loadTemporaryRoot(user.id, body.temporaryState);\n      if (body.action === \"clearHistory\") state.history = [];\n      else state.memory = body.action === \"clearMemory\" ? [] : state.memory.filter(item => item !== body.value);\n      return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });\n    }\n    const { error } = await createServerSupabase().rpc(\"edit_misaki_conversation_state\", {\n      p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,\n    });\n    if (error) throw new Error(\"Conversation edit failed\");\n    return Response.json(responseState(await loadCanonicalState(user.id)));\n  } catch (error) {\n    console.error(\"CONVERSATION STATE WRITE FAILED\", error);\n    return Response.json({ error: \"Conversation state could not be saved.\" }, { status: 500 });\n  }\n}\n",
+        "sha256": "93753271b0202bd37e2b02bcb6a04140c6a4bf7ddfaf39f0f73c1f00f7337f67"
+      }
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 0,
+      "patch": "diff --git a/tests/server-canonical.test.cjs b/tests/server-canonical.test.cjs\nindex 19d3626..16d182a 100644\n--- a/tests/server-canonical.test.cjs\n+++ b/tests/server-canonical.test.cjs\n@@ -232,6 +232,12 @@ test('email checkpoint ignores forged browser snapshot and uses verified tempora\n   const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;\n   assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');\n });\n+test('anonymous history GET is a safe no-op during auth transition', async () => {\n+  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');\n+  const response = await api.GET(h.request());\n+  assert.equal(response.status, 200);\n+  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });\n+});\n test('both permanent devices restore same server points and memory without browser caches', async () => {\n   const h = harness(), api = h.load('app/api/persona/history/route.ts');\n   const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/368afb0dfbf9ea66837c83834d8fc24837813554/tests/server-canonical.test.cjs",
+      "source": {
+        "path": "tests/server-canonical.test.cjs",
+        "coverage": "全文",
+        "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst root = path.join(__dirname, '..');\n\nfunction harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {\n  const user = { id: 'account-a', is_anonymous: anonymous };\n  const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };\n  let points = initialPoints, consumed = 0, refunded = 0, generated = 0;\n  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];\n  let checkpoint = false, revision = 0;\n  let openaiPayload = null;\n  let maintenance = false;\n  const client = {\n    auth: { getUser: async () => ({ data: { user }, error: null }) },\n    from(table) {\n      const filters = {};\n      const query = { select() { return query; }, not() { return query; }, in(k, v) { filters[k] = v; return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },\n        async maybeSingle() {\n          if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };\n          if (stateFailure) return { error: { message: 'unavailable' }, data: null };\n          if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };\n          if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };\n          if (table === 'misaki_user_conversation_state') return { data: rootState, error: null };\n          if (table === 'misaki_relationship_events') {\n            if (filters.event_type === 'email_save_checkpoint') return { data: checkpoint ? { id: 1 } : null, error: null };\n            const result = completed.get(filters.request_id);\n            return { data: result ? { metadata: result } : null, error: null };\n          }\n          if (table === 'daily_message_requests') return { data: filters.request_id ? temporaryReceipts.get(filters.request_id) ?? null : [...temporaryReceipts.values()].at(-1) ?? null, error: null };\n          return { data: null, error: null };\n        } };\n      query.single = async () => ({ data: { next_push_at: 'lease' }, error: null });\n      query.insert = async () => ({ error: null });\n      query.then = resolve => resolve({ data: [], error: null });\n      return query;\n    },\n    async rpc(name, args) {\n      calls.push({ name, args });\n      if (name === 'consume_daily_message') {\n        consumed++; return { data: [{ allowed: true, message_count: 1, remaining: 19, is_premium: premium }], error: null };\n      }\n      if (name === 'refund_daily_message') {\n        refunded++; return { data: [{ refunded: true, message_count: 0, remaining: 20, is_premium: false }], error: null };\n      }\n      if (name === 'get_relationship_time_context') return { data: { exists: true, intimacy_points: points }, error: null };\n      if (name === 'complete_misaki_chat_turn') {\n        if (commitFailure) return { data: null, error: { message: 'commit failed' } };\n        assert.equal(args.p_user_id, user.id);\n        const found = completed.get(args.p_request_id);\n        if (found) return { data: found.result, error: null };\n        const delta = Math.max(-2, Math.min(2, Number(args.p_result.relationshipPointDelta) || 0));\n        points = Math.max(0, points + delta);\n        const result = { ...args.p_result, relationshipPoints: points, relationshipPointDelta: delta, memorySynced: true, relationshipTimeSynced: true };\n        completed.set(args.p_request_id, { message: args.p_message, result });\n        rootState.memory = result.memory;\n        rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });\n        return { data: result, error: null };\n      }\n      if (name === 'save_misaki_temporary_state') {\n        if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale checkpoint' } };\n        checkpoint = true; points = args.p_points; rootState.history = args.p_history;\n        rootState.memory = args.p_memory; rootState.today_memory = args.p_today_memory;\n        return { data: { saved: true }, error: null };\n      }\n      if (name === 'write_misaki_temporary_root' || name === 'finish_misaki_body_clock_delivery') {\n        const result = storeRoot(name === 'write_misaki_temporary_root' ? args : {\n          ...args, p_token: args.p_temporary_token, p_state: args.p_temporary_state, p_refresh_expiry: false });\n        if (result.error) return result;\n        return { data: name === 'finish_misaki_body_clock_delivery' ? { deliveryId: 'delivery', pushesToday: 1, nextPushAt: 'next' } : 'revision', error: null };\n      }\n      if (name === 'sign_misaki_body_clock_relay') return { data: 'a'.repeat(64), error: null };\n      if (name === 'complete_misaki_temporary_turn') {\n        const receipt = temporaryReceipts.get(args.p_request_id);\n        if (receipt) return { data: receipt.temporary_result, error: null };\n        const stored = storeRoot(args);\n        if (stored.error) return stored;\n        temporaryReceipts.set(args.p_request_id, { completed_at: 'now', temporary_result: args.p_token,\n          message_hash: args.p_message_hash, parent_hash: args.p_parent_hash });\n        return { data: args.p_token, error: null };\n      }\n      return { data: {}, error: null };\n    },\n  };\n  function storeRoot(args) {\n    if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale root' } };\n    temporaryRoots.set(user.id, { token: args.p_token, revision: `revision-${++revision}`, expires_at: args.p_refresh_expiry === false ? temporaryRoots.get(user.id).expires_at : new Date(clock + 86400000).toISOString() });\n    if (checkpoint) {\n      points = args.p_state.relationshipPoints; rootState.history = args.p_state.history;\n      rootState.memory = args.p_state.memory; rootState.today_memory = args.p_state.todayMemory;\n    }\n    return { error: null };\n  }\n  client.auth.admin = { getUserById: async () => ({ data: { user }, error: null }) };\n  let clock = Date.now();\n  class TestDate extends Date { static now() { return clock; } }\n  const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,\n    AbortController, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },\n    console: { log() {}, warn() {}, error() {} },\n    fetch: async (url, options) => {\n      if (String(url).includes('generativelanguage')) {\n        generated++; prompts.push(JSON.parse(options.body));\n        if (generationFailure) return new Response('', { status: 500 });\n        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(openaiPayload ?? { reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });\n      }\n      return Response.json({ current: {} });\n    },\n  });\n  const cache = new Map();\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    const code = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), { compilerOptions: {\n      module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    const module = { exports: {} };\n    const req = name => {\n      if (name === '@supabase/supabase-js') return { createClient: () => client };\n      if (name === 'node:crypto') return require(name);\n      if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };\n      if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };\n      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');\n      throw Error(name);\n    };\n    try {\n      const wrapped = \"(function(require,module,exports){\" + code + String.fromCharCode(10) + \"})\";\n      vm.runInContext(wrapped, context)(req, module, module.exports);\n    } catch (error) {\n      if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);\n      throw error;\n    }\n    cache.set(file, module.exports); return module.exports;\n  }\n  return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },\n    get refunded() { return refunded; }, get generated() { return generated; },\n    setOpenaiPayload(value) { openaiPayload = value; },\n    request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },\n      body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },\n  };\n}\n\ntest('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {\n  const h = harness();\n  const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,\n    memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));\n  assert.equal(response.status, 200);\n  const result = await response.json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);\n  const prompt = JSON.stringify(h.prompts);\n  assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));\n});\ntest('same request replay returns saved response without generation/usage/addition', async () => {\n  const h = harness(), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const second = await (await route.POST(h.request())).json();\n  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);\n  const generations = h.generated;\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);\n});\ntest('Premium chat does not get an automatic point and does not refund', async () => {\n  const h = harness({ premium: true });\n  const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);\n});\nfor (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {\n  const h = harness({ [failure]: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.points, 79); assert.equal(h.refunded, 1); assert.equal(h.consumed, 1);\n});\ntest('canonical read failure stops before consuming usage', async () => {\n  const h = harness({ stateFailure: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.consumed, 0); assert.equal(h.points, 79);\n});\ntest('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();\n  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);\n  const root = h.load('lib/canonical-state.ts');\n  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);\n  assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);\n  const before = h.consumed;\n  const lostResponseReplay = await (await route.POST(h.request())).json();\n  assert.equal(lostResponseReplay.temporaryState, first.temporaryState); assert.equal(h.consumed, before);\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);\n  assert.equal(h.consumed, before);\n  const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();\n  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);\n  const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();\n  assert.equal(second.relationshipPoints, 0);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,\n    requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);\n  h.advanceClock(24 * 60 * 60 * 1000 + 1);\n  assert.equal(root.openTemporaryState(second.temporaryState), null);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);\n  assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);\n});\ntest('anonymous relationship emotion survives into the next temporary-root turn', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const root = h.load('lib/canonical-state.ts');\n  const firstState = root.openTemporaryState(first.temporaryState).state;\n  assert.ok(firstState.temporaryRelationship);\n  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');\n  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');\n\n  const second = await (await route.POST(h.request({\n    temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',\n    message: '次の会話'\n  }))).json();\n  const secondState = root.openTemporaryState(second.temporaryState).state;\n  assert.ok(secondState.temporaryRelationship);\n  assert.ok(secondState.temporaryRelationship.lastInteractionAt);\n  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);\n  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);\n});\n\ntest('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {\n  const h = harness({ anonymous: true });\n  const crypto = h.load('lib/canonical-state.ts');\n  const token = crypto.sealTemporaryState({ memory: ['verified memory'], history: [{ role: 'user', text: 'verified' }],\n    todayMemory: { date: '', items: [] }, relationshipPoints: 7 }, 'previous');\n  const api = h.load('app/api/persona/history/route.ts');\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409);\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'account-a', temporaryState: token,\n    memory: ['forged'], history: [], relationshipPoints: 999 }))).status, 200);\n  const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;\n  assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');\n});\ntest('anonymous history GET is a safe no-op during auth transition', async () => {\n  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');\n  const response = await api.GET(h.request());\n  assert.equal(response.status, 200);\n  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });\n});\ntest('both permanent devices restore same server points and memory without browser caches', async () => {\n  const h = harness(), api = h.load('app/api/persona/history/route.ts');\n  const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();\n  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 79); assert.deepEqual(a.memory, ['server memory']);\n  assert.equal((await api.POST(h.request({ history: [], memory: ['fake'], relationshipPoints: 999 }))).status, 400);\n});\n\nmodule.exports = { harness };\n\n\ntest('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {\n  const h = harness({ initialPoints: 1 });\n  const route = await h.load('app/api/chat/route.ts');\n  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });\n  const requestId = crypto.randomUUID();\n  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  const afterFirst = h.points;\n  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  assert.equal(afterFirst, 0);\n  assert.equal(h.points, 0);\n  assert.equal(first.relationshipPointDelta, undefined);\n  assert.equal(replay.relationshipPointDelta, undefined);\n});\n",
+        "sha256": "ce7d83bf6420b250f521da846ec02cf593e8cb3b10e70d90922b5f55b3750917"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "741feebdce6abce637f62f1765d53d12fbca7523",
+      "message": "Treat anonymous history GET as safe no-op\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/741feebdce6abce637f62f1765d53d12fbca7523"
+    },
+    {
+      "sha": "53930eb37b2949a28e69a6ebb1f38a3bfbc75ca4",
+      "message": "Cover anonymous history GET auth race\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/53930eb37b2949a28e69a6ebb1f38a3bfbc75ca4"
+    },
+    {
+      "sha": "368afb0dfbf9ea66837c83834d8fc24837813554",
+      "message": "Run canonical CI for main pull requests\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/368afb0dfbf9ea66837c83834d8fc24837813554"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "368afb0dfbf9ea66837c83834d8fc24837813554",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/36984808858",
+      "id": 36984808858,
+      "updated_at": "2026-10-02T08:35:11Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "GET",
+    "POST",
+    "TestDate",
+    "a",
+    "afterFirst",
+    "api",
+    "assert",
+    "authenticate",
+    "before",
+    "body",
+    "cache",
+    "checkpoint",
+    "client",
+    "clock",
+    "code",
+    "completed",
+    "context",
+    "crypto",
+    "db",
+    "delta",
+    "failure",
+    "filters",
+    "first",
+    "firstState",
+    "found",
+    "fs",
+    "generations",
+    "h",
+    "harness",
+    "history",
+    "latest",
+    "load",
+    "lostResponseReplay",
+    "maintenance",
+    "module",
+    "openaiPayload",
+    "path",
+    "points",
+    "prompt",
+    "query",
+    "receipt",
+    "recovered",
+    "replay",
+    "req",
+    "requestId",
+    "response",
+    "responseState",
+    "result",
+    "root",
+    "rootState",
+    "route",
+    "saved",
+    "second",
+    "secondState",
+    "state",
+    "storeRoot",
+    "stored",
+    "token",
+    "ts",
+    "user"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "匿名history GETのauth raceを安全なno-opにする",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/33"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "7caaccebc9223cac2b78d7a693102eeba4cfe7cef812f3429f7947108abadfa9",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

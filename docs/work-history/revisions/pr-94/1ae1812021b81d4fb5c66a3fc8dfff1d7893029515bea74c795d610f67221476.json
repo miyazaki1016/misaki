@@ -1,0 +1,127 @@
+{
+  "id": "pr-94",
+  "number": 94,
+  "title": "WIP: Muse v3 約14秒透過アニメのラウンジ比較版",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "purpose": "ラウンジ・映像・画面演出に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "既存の9秒版は一切変更せず、Muse v3約14秒版を比較する新規ページ `/lab/transparent-lounge-muse-v3/` を追加。WebM 1248×704 VP9透過→624×352 24fps WebP（334f、13.916s、無限ループ、アルファ維持）を変換済み。素材ファイル `misaki-lounge-muse-v3-14s-24fps.webp` を当ブランチの `public/lab/transparent-lounge/` にアップロードするまで**ドラフト維持・マージ禁止**。既存ラウンジ、オープニング、チャット、認証、DBは変更なし。台帳: `docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md`。",
+  "head": "eb12d7b9d70853519784f1fe8fc4104dccb36a61",
+  "base": "d0d2446f7237d366de0a992942d94be556617d53",
+  "base_ref": "main",
+  "head_ref": "feat/lounge-muse-v3-preview-20261030",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-29T22:26:38Z",
+  "merge_commit_sha": "a1888f66666e5b72bd24f37a2061aeeecafd3024",
+  "updated_at": "2026-10-29T22:26:39Z",
+  "code_facts": [
+    {
+      "file": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "kind": "テストの期待値・条件",
+      "expression": "- GitHub Actions の test と Vercel Preview Comments ともに成功を確認。",
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "status": "modified",
+      "additions": 15,
+      "deletions": 0,
+      "patch": "diff --git a/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md b/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md\nnew file mode 100644\nindex 0000000..1c09e35\n--- /dev/null\n+++ b/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md\n@@ -0,0 +1,15 @@\n+# Muse v3 約14秒ループ差し替え比較（2026-10-30）\n+\n+- 現行の約9秒・24fps透過WebPは変更しない。ラウンジ、縦型ラウンジ、ショートカット比較版も変更なし。\n+- Museからユーザーが提供した `idle-lounge-person-transparent-loopfix-v3.zip` 内の WebM を確認。1248×704、VP9透過、24fps、約13.917秒。\n+- 透過を維持しつつ624×352に縮小し、24fps無限ループWebPに変換。\n+- 変換ファイル: `misaki-lounge-muse-v3-14s-24fps.webp`、334フレーム、RIFF WebP ANMFのフレーム時間合計13,916ms、アルファチャンネル0〜255、約6.9 MB。\n+- 新設比較ページ: `/lab/transparent-lounge-muse-v3/`。既存の `/lab/transparent-lounge-shortcuts/` のコードを複製し、**WebP参照だけ変更**。オープニング21秒MP4、左右スワイプ、ショートカット、矢印は従来どおり。\n+- **素材バイナリはGitHubに未アップロード**。素材を同じブランチの `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp` に配置するまでプレビューは404。PRはドラフトにして本番反映しない。\n+- 実機テスト: iPhoneで透過、速度、表情変化、つなぎ目、通信時間、既存9秒版との比較。採用判断後に本番の参照先を変更する。\n+\n+## 2026-10-30 素材アップロード確認\n+- GitHubブランチに `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp`（6,886,060 bytes）配置済みを確認。\n+- 上記『未アップロード』は作業開始時点の記録。現在はアップロード完了。\n+- GitHub Actions の test と Vercel Preview Comments ともに成功を確認。\n+- 次の工程は比較版のみマージしてVercelの本番配信を確認。その後iPhone実機で長尺アニメの透明度とループを確認する。現行9秒版の参照は変更しない。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "source": {
+        "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+        "coverage": "全文",
+        "text": "# Muse v3 約14秒ループ差し替え比較（2026-10-30）\n\n- 現行の約9秒・24fps透過WebPは変更しない。ラウンジ、縦型ラウンジ、ショートカット比較版も変更なし。\n- Museからユーザーが提供した `idle-lounge-person-transparent-loopfix-v3.zip` 内の WebM を確認。1248×704、VP9透過、24fps、約13.917秒。\n- 透過を維持しつつ624×352に縮小し、24fps無限ループWebPに変換。\n- 変換ファイル: `misaki-lounge-muse-v3-14s-24fps.webp`、334フレーム、RIFF WebP ANMFのフレーム時間合計13,916ms、アルファチャンネル0〜255、約6.9 MB。\n- 新設比較ページ: `/lab/transparent-lounge-muse-v3/`。既存の `/lab/transparent-lounge-shortcuts/` のコードを複製し、**WebP参照だけ変更**。オープニング21秒MP4、左右スワイプ、ショートカット、矢印は従来どおり。\n- **素材バイナリはGitHubに未アップロード**。素材を同じブランチの `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp` に配置するまでプレビューは404。PRはドラフトにして本番反映しない。\n- 実機テスト: iPhoneで透過、速度、表情変化、つなぎ目、通信時間、既存9秒版との比較。採用判断後に本番の参照先を変更する。\n\n## 2026-10-30 素材アップロード確認\n- GitHubブランチに `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp`（6,886,060 bytes）配置済みを確認。\n- 上記『未アップロード』は作業開始時点の記録。現在はアップロード完了。\n- GitHub Actions の test と Vercel Preview Comments ともに成功を確認。\n- 次の工程は比較版のみマージしてVercelの本番配信を確認。その後iPhone実機で長尺アニメの透明度とループを確認する。現行9秒版の参照は変更しない。\n",
+        "sha256": "9db1086c4816c13794c16b9300b3f7c48f75e91ae24003b3c361d10441f61bf1"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge-muse-v3/index.html",
+      "status": "modified",
+      "additions": 57,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/public/lab/transparent-lounge-muse-v3/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge-muse-v3/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp",
+      "source": {
+        "path": "public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "9f37636eed866e93726cdee1331ce6b496cf5dc9",
+      "message": "feat(lounge): isolate Muse 14-second animation comparison page\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9f37636eed866e93726cdee1331ce6b496cf5dc9"
+    },
+    {
+      "sha": "3173e66949a23a02d5b7e8405a2c52c02939a2ff",
+      "message": "docs(lounge): prepare Muse v3 14s preview and asset gate\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/3173e66949a23a02d5b7e8405a2c52c02939a2ff"
+    },
+    {
+      "sha": "d6f9b1e95ebf125c621e70c508d53e80aaf09ffb",
+      "message": "Add files via upload\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d6f9b1e95ebf125c621e70c508d53e80aaf09ffb"
+    },
+    {
+      "sha": "eb12d7b9d70853519784f1fe8fc4104dccb36a61",
+      "message": "docs(lounge): confirm Muse v3 media upload and passing CI\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/eb12d7b9d70853519784f1fe8fc4104dccb36a61"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "eb12d7b9d70853519784f1fe8fc4104dccb36a61",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40965766348",
+      "id": 40965766348,
+      "updated_at": "2026-10-29T22:26:23Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "WIP: Muse v3 約14秒透過アニメのラウンジ比較版",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/94"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "d92fe0151d1facba8adf9448a8fc5d068e6c763dca1176b7403bd6d9c0c9e9c5",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

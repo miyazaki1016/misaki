@@ -1,0 +1,200 @@
+{
+  "id": "pr-89",
+  "number": 89,
+  "title": "美咲ラウンジ：24fps透過WebP自動表示＋縦型21秒OP接続",
+  "topics": [
+    "ラウンジ・画面",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "ラウンジ・映像・画面演出に関する変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 完了\n- `misaki_lounge_24fps.webp`（4,402,574 bytes）と `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）のGitHub配置を確認\n- HTMLの参照先をアップロード実ファイル名に修正\n- WebP手動選択UI廃止、縦動画9:16表示、スキップ／終了導線を維持\n- 総覧・開発台帳を更新。既存チャット・DB・RPCは変更なし\n\n## リリースゲート\n- CI `test` 成功を確認してからマージ\n- 本番デプロイ後、URLのWebP/MP4配信と実機の再生・スキップ・終了を検証\n- チャットへの本接続は別工程\n\n詳細: `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md`",
+  "head": "fda55141d873e29190c14910725c397d7931dfae",
+  "base": "0b5ab6758861e2a4916b6b82ec196ed579559d0a",
+  "base_ref": "main",
+  "head_ref": "feat/lounges-autoload-assets-20261029",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-29T14:40:05Z",
+  "merge_commit_sha": "ee74fb7c088c4751a89c7f9e9c31535a96d699b5",
+  "updated_at": "2026-10-29T14:40:06Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 0,
+      "patch": "diff --git a/docs/IMPLEMENTATION_OVERVIEW.md b/docs/IMPLEMENTATION_OVERVIEW.md\nindex 7c27f68..161ca6a 100644\n--- a/docs/IMPLEMENTATION_OVERVIEW.md\n+++ b/docs/IMPLEMENTATION_OVERVIEW.md\n@@ -3962,3 +3962,13 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-\n - **外部レビューとの関係**：21秒版と約8秒短縮版のA/B、初回ラウンジを再訪に回す案はレビュー提案であり未採用。まず動画素材・ループ品質・iPhone再生、SKIPとチャット遷移を分離検証する。\n \n 詳細・残件・レビューとの対応は[開発台帳](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/DEVELOPMENT_REGISTRY.md)と[外部AIレビュー記録の2026-10-29追補](https://github.com/miyazaki1016/misaki/blob/docs/development-registry-audit-20261020/docs/EXTERNAL_AI_REVIEW_20261028.md)を参照。**この節は履歴の補完であり、動画・本番機能の完成宣言ではない。**\n+\n+\n+## 2026-10-29 ラウンジ動画自動読み込み（未公開・リリースゲートあり）\n+\n+- 専用作業ブランチ: `feat/lounges-autoload-assets-20261029`（main起点）。旧実験ブランチの分岐コミットを丸ごとマージしない。\n+- ラウンジHTMLでは手動WebP選択を廃止し、iPhoneでループ確認済みの24fps透過WebPに自動参照変更。\n+- 旧横型オープニング動画の参照を、縦型21秒H.264/AAC MP4へ変更。既存スキップ・終了後の確認画面は維持。\n+- **MP4/WebP実ファイルはGitHubに未配置**。本番反映、HTTP配信、iPhone実機確認は未完了。バイナリ2本を作業ブランチの `public/lab/transparent-lounge/` に追加するまでマージ禁止。\n+- 詳細・素材名・受入条件・残作業: `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md`。\n+- 既存チャット、DB、Relationship Engineは変更していない。チャット画面への接続は次工程。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+        "coverage": "サイズ上限120KB・原本リンク参照"
+      }
+    },
+    {
+      "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "status": "modified",
+      "additions": 42,
+      "deletions": 0,
+      "patch": "diff --git a/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md b/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md\nnew file mode 100644\nindex 0000000..beeed74\n--- /dev/null\n+++ b/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md\n@@ -0,0 +1,42 @@\n+# 美咲ラウンジ動画自動表示・開発台帳（2026-10-29）\n+\n+## 確認済み基準\n+- main: `0b5ab6758861e2a4916b6b82ec196ed579559d0a`（作業開始時点）\n+- 対象: `public/lab/transparent-lounge/index.html`、本番確認ページ `/lab/transparent-lounge/`\n+- 既存ラウンジのソファ位置・拡大率・左右仮カード・スワイプ・動画終了/スキップ動作を維持する。\n+- 既存チャット、DB、RPC、Relationship Engineは変更しない。\n+- 元実験ブランチ `experiment/transparent-lounge-20261027` は main と分岐（ahead 26/behind 4）。そのまま main にマージしない。\n+\n+## 今回実装したHTML変更（未公開）\n+- 手動 WebP 選択UI/JSを削除し、`/lab/transparent-lounge/misaki-lounge-24fps.webp` を自動表示する参照に変更。\n+- 古い横型プレビューMP4参照を廃止し、`/lab/transparent-lounge/misaki-opening-vertical-21s.mp4` を参照。\n+- 縦型video要素を `aspect-ratio:9/16`、モバイル画面高上限で表示。\n+- ソファ背景は既存実験ブランチの素材URLを維持（新ブランチ main には背景画像がないため）。\n+- HTMLのみ変更。**動画ファイル2本はまだGitHubの公開フォルダに存在しない。**\n+\n+## 素材／検証\n+- ラウンジ: `misaki-lounge-24fps.webp`（元: `misaki_lounge_24fps(1).webp`）、約4.40MB、624×352、24fps/約9秒、ユーザーiPhoneでループと透過確認済み。\n+- オープニング: `misaki-opening-vertical-21s.mp4`（元: `misaki-opening-vertical-21s-iphone(1).mp4`）、2,936,765 bytes、512×910、21.000秒、30fps、H.264/AAC。\n+- 配置場所（GitHub）: `public/lab/transparent-lounge/`\n+- ユーザーへ提供したZIP: `misaki-lounge-deploy-assets.zip`（上記2ファイルを所定の相対パスで収録）。\n+- ブラウザ配信後、WebP 200 + image/webp、MP4 200 + video/mp4、再生・スキップ・終了・画面遷移をiPhone実機で確認する。\n+\n+## 残作業／リリース判定\n+1. ZIP内のバイナリ2本をGitHubの本ブランチへコミットする（GitHubテキストAPIではこの環境からバイナリを直接転送できず、未実施）。\n+2. PRの変更ファイルがHTML + 2アセット + 文書だけであることを確認し、マージ後にVercel本番配信を検証。\n+3. iPhone実機で、9秒アニメーションループ、縦21秒再生、スキップ、動画終了→既存確認画面を確認。\n+4. 次の工程で既存チャット入口を調査・接続する。チャットの複製実装は禁止。\n+\n+**現時点では本番公開・実機検証未完了。動画ファイル未配置のままPRをマージしない。**\n+\n+## 2026-10-29 追記：素材アップロードの現物確認\n+- 作業ブランチに `public/lab/transparent-lounge/misaki_lounge_24fps.webp`（4,402,574 bytes）および `misaki_lounge_12fps.webp`（2,375,926 bytes）を確認。\n+- HTMLのWebP参照を実在する `misaki_lounge_24fps.webp` に修正済み。旧手動選択は不要。\n+- `misaki-opening-vertical-21s.mp4` は**依然として未配置**（リポジトリツリー確認）。縦21秒オープニング再生はまだ検証不可。\n+- 21秒MP4が同一フォルダにアップロードされるまでマージ・本番公開しない。\n+\n+## 2026-10-29 追記：21秒MP4到着・HTML参照修正\n+- GitHubの同フォルダに `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）を確認。以前アップロード済みのユーザー素材とファイルサイズが一致する。\n+- HTMLのMP4参照を実際のアップロード名 `misaki-opening-vertical-21s-iphone.mp4` に修正。WebP参照も実在する `misaki_lounge_24fps.webp`。\n+- 以前の文書内の「動画2本未配置」「MP4未配置」は当時の記録。現時点では2本とも配置済み。\n+- 次のゲート: GitHub CI成功、PR取り込み、本番HTTP/再生/iPhone実機確認。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "source": {
+        "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+        "coverage": "全文",
+        "text": "# 美咲ラウンジ動画自動表示・開発台帳（2026-10-29）\n\n## 確認済み基準\n- main: `0b5ab6758861e2a4916b6b82ec196ed579559d0a`（作業開始時点）\n- 対象: `public/lab/transparent-lounge/index.html`、本番確認ページ `/lab/transparent-lounge/`\n- 既存ラウンジのソファ位置・拡大率・左右仮カード・スワイプ・動画終了/スキップ動作を維持する。\n- 既存チャット、DB、RPC、Relationship Engineは変更しない。\n- 元実験ブランチ `experiment/transparent-lounge-20261027` は main と分岐（ahead 26/behind 4）。そのまま main にマージしない。\n\n## 今回実装したHTML変更（未公開）\n- 手動 WebP 選択UI/JSを削除し、`/lab/transparent-lounge/misaki-lounge-24fps.webp` を自動表示する参照に変更。\n- 古い横型プレビューMP4参照を廃止し、`/lab/transparent-lounge/misaki-opening-vertical-21s.mp4` を参照。\n- 縦型video要素を `aspect-ratio:9/16`、モバイル画面高上限で表示。\n- ソファ背景は既存実験ブランチの素材URLを維持（新ブランチ main には背景画像がないため）。\n- HTMLのみ変更。**動画ファイル2本はまだGitHubの公開フォルダに存在しない。**\n\n## 素材／検証\n- ラウンジ: `misaki-lounge-24fps.webp`（元: `misaki_lounge_24fps(1).webp`）、約4.40MB、624×352、24fps/約9秒、ユーザーiPhoneでループと透過確認済み。\n- オープニング: `misaki-opening-vertical-21s.mp4`（元: `misaki-opening-vertical-21s-iphone(1).mp4`）、2,936,765 bytes、512×910、21.000秒、30fps、H.264/AAC。\n- 配置場所（GitHub）: `public/lab/transparent-lounge/`\n- ユーザーへ提供したZIP: `misaki-lounge-deploy-assets.zip`（上記2ファイルを所定の相対パスで収録）。\n- ブラウザ配信後、WebP 200 + image/webp、MP4 200 + video/mp4、再生・スキップ・終了・画面遷移をiPhone実機で確認する。\n\n## 残作業／リリース判定\n1. ZIP内のバイナリ2本をGitHubの本ブランチへコミットする（GitHubテキストAPIではこの環境からバイナリを直接転送できず、未実施）。\n2. PRの変更ファイルがHTML + 2アセット + 文書だけであることを確認し、マージ後にVercel本番配信を検証。\n3. iPhone実機で、9秒アニメーションループ、縦21秒再生、スキップ、動画終了→既存確認画面を確認。\n4. 次の工程で既存チャット入口を調査・接続する。チャットの複製実装は禁止。\n\n**現時点では本番公開・実機検証未完了。動画ファイル未配置のままPRをマージしない。**\n\n## 2026-10-29 追記：素材アップロードの現物確認\n- 作業ブランチに `public/lab/transparent-lounge/misaki_lounge_24fps.webp`（4,402,574 bytes）および `misaki_lounge_12fps.webp`（2,375,926 bytes）を確認。\n- HTMLのWebP参照を実在する `misaki_lounge_24fps.webp` に修正済み。旧手動選択は不要。\n- `misaki-opening-vertical-21s.mp4` は**依然として未配置**（リポジトリツリー確認）。縦21秒オープニング再生はまだ検証不可。\n- 21秒MP4が同一フォルダにアップロードされるまでマージ・本番公開しない。\n\n## 2026-10-29 追記：21秒MP4到着・HTML参照修正\n- GitHubの同フォルダに `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）を確認。以前アップロード済みのユーザー素材とファイルサイズが一致する。\n- HTMLのMP4参照を実際のアップロード名 `misaki-opening-vertical-21s-iphone.mp4` に修正。WebP参照も実在する `misaki_lounge_24fps.webp`。\n- 以前の文書内の「動画2本未配置」「MP4未配置」は当時の記録。現時点では2本とも配置済み。\n- 次のゲート: GitHub CI成功、PR取り込み、本番HTTP/再生/iPhone実機確認。\n",
+        "sha256": "704d390b5a5c8230d1891b5821e879deefe63175eb1523814994bf416147d6f4"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/index.html",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 4,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4",
+      "source": {
+        "path": "public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki_lounge_12fps.webp",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki_lounge_12fps.webp",
+      "source": {
+        "path": "public/lab/transparent-lounge/misaki_lounge_12fps.webp",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki_lounge_24fps.webp",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki_lounge_24fps.webp",
+      "source": {
+        "path": "public/lab/transparent-lounge/misaki_lounge_24fps.webp",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    }
+  ],
+  "file_count": 6,
+  "reported_file_count": 6,
+  "commits": [
+    {
+      "sha": "7cfe82d553c610e0c9804785cb01aabab84da88f",
+      "message": "feat(lounge): auto-load verified 24fps WebP and switch to vertical opening MP4\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7cfe82d553c610e0c9804785cb01aabab84da88f"
+    },
+    {
+      "sha": "e4bd3c6cd239653006c981464704c5bb0187751a",
+      "message": "fix(lounge): preserve existing experimental sofa background asset\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/e4bd3c6cd239653006c981464704c5bb0187751a"
+    },
+    {
+      "sha": "042794ed7add1b053fbef41f159b59e1175d68ef",
+      "message": "docs(lounge): track video assets, validation and release gates\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/042794ed7add1b053fbef41f159b59e1175d68ef"
+    },
+    {
+      "sha": "8832ba7bc7d9384ffda4240ab549fd57c072d1fb",
+      "message": "docs: update implementation overview for lounge video integration\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8832ba7bc7d9384ffda4240ab549fd57c072d1fb"
+    },
+    {
+      "sha": "f5de0580d6d2f2cc87e35ae05d4680ecc40439ed",
+      "message": "Add files via upload\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f5de0580d6d2f2cc87e35ae05d4680ecc40439ed"
+    },
+    {
+      "sha": "0dea18d4d5500b61dd53705b74ea004b9da2ee31",
+      "message": "fix(lounge): reference uploaded 24fps WebP filename\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/0dea18d4d5500b61dd53705b74ea004b9da2ee31"
+    },
+    {
+      "sha": "44e0bc303adb2bea86edb6f58387282e28326f33",
+      "message": "docs(lounge): record uploaded WebP and pending opening MP4\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/44e0bc303adb2bea86edb6f58387282e28326f33"
+    },
+    {
+      "sha": "ab9bfb11161bc2353fa3b416dff19e5c2a27bfee",
+      "message": "Add files via upload\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/ab9bfb11161bc2353fa3b416dff19e5c2a27bfee"
+    },
+    {
+      "sha": "b9b93c77f3ade4c59043aee8387cf012624148f4",
+      "message": "fix(lounge): point vertical opening to uploaded verified MP4\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/b9b93c77f3ade4c59043aee8387cf012624148f4"
+    },
+    {
+      "sha": "fda55141d873e29190c14910725c397d7931dfae",
+      "message": "docs(lounge): record verified GitHub MP4 arrival and final asset paths\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/fda55141d873e29190c14910725c397d7931dfae"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "fda55141d873e29190c14910725c397d7931dfae",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40893559951",
+      "id": 40893559951,
+      "updated_at": "2026-10-29T14:39:40Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "docs/development-registry-audit-20261020/docs/DEVELOPMENT_REGISTRY.md",
+      "coverage": "削除済み／取得不能・差分参照"
+    },
+    {
+      "path": "docs/development-registry-audit-20261020/docs/EXTERNAL_AI_REVIEW_20261028.md",
+      "coverage": "削除済み／取得不能・差分参照"
+    }
+  ],
+  "curated": {
+    "summary": "美咲ラウンジ：24fps透過WebP自動表示＋縦型21秒OP接続",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/89"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "b870ed51b6a9b863cc914d8362ebabd92972ea181d9e936a21307d1f7ccc682b",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

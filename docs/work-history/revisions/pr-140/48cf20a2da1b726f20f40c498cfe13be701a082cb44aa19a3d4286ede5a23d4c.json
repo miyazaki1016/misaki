@@ -1,0 +1,412 @@
+{
+  "id": "pr-140",
+  "number": 140,
+  "title": "iPhone全画面ラウンジの正式化と通常返信の発話状況を修正",
+  "topics": [
+    "記憶・会話",
+    "ラウンジ・画面",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／ラウンジ・映像・画面演出に関する変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 変更\n正式 /lounge/ の試作SVG・旧見出し・枠を整理し、既存の縦型レイアウトと元の背景PNGを採用。美咲の透過WebP、21秒MP4、entry.js・再訪時スキップを再利用。Safariのviewport-fit・dvh・safe-areaを適用しました。\n\n通常返信はchat人格を選択済みでしたが、ユーザーへの返信であることの明示が不足していました。DB人格・fallback双方の後へサーバー固定の発話状況を追加し、架空の自発連絡を引き継がず「仕事中」を現在として理解するよう指定しました。原因を唯一と断定せず、定型応答の固定もしません。自発機能・人格そのもの・DB・認証・記憶保存処理は維持。\n\n## 検証結果\n- ローカル npm test: 378件成功\n- ローカル tsc --noEmit / npm run build: 成功\n- GitHub Actions [Canonical relationship integration tests](https://github.com/miyazaki1016/misaki/actions/runs/41470170973): 成功（テスト・型検査・ビルド）\n- GitHub Actions [PR promotion classification](https://github.com/miyazaki1016/misaki/actions/runs/41470171098): 成功\n- Vercel Preview: build-rate-limitで失敗。設定変更・再実行なし\n- LP導線、初回・再訪・skip・video error・storage拒否・pageshowは回帰テスト済み\n\n## 残る確認\n追加した会話テストはプロンプト契約です。実モデル出力の揺らぎは未評価で、完全解消とは断定しません。WebKit実行ファイルなし、Chromiumは環境のsocket制約で起動不可。iPhone Safariの描画・安全領域・動画、匿名／ログイン済み双方の実機確認と複数回のモデル会話確認が必要です。\n\n総覧・開発台帳へ記録済み。自動棚卸しCIや自動化は変更していません。\n\n**承認範囲はPRまで。mainマージ・本番デプロイ禁止。Draftのまま維持。**",
+  "head": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+  "base": "ad39f1393cadfe224a5da524afa2da7ecda82cfb",
+  "base_ref": "main",
+  "head_ref": "fix/iphone-lounge-reply-context",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-02T15:23:31Z",
+  "merge_commit_sha": "2be31dc9e00c4d9c263fd9babb4b4046d62d127e",
+  "updated_at": "2026-11-02T15:23:31Z",
+  "code_facts": [
+    {
+      "file": "lib/conversation-turn-context.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "export const USER_REPLY_CONTEXT = `",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/lib/conversation-turn-context.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from 'node:test';",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from 'node:assert/strict';",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(`normal reply supplies turn context for ${message}`, () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(route, /\\$\\{personaPrompt\\}\\s*\\$\\{USER_REPLY_CONTEXT\\}/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(USER_REPLY_CONTEXT, /ユーザーが送った最新メッセージに返答/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(USER_REPLY_CONTEXT, /「仕事中」は現在勤務している意味/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(USER_REPLY_CONTEXT, /実際の履歴に美咲からの自発的な連絡がある場合だけ/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test('proactive persona remains distinct and available', () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(createFallbackPersonaPrompt('proactive'), /【美咲からの自発LINE】/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.doesNotMatch(createFallbackPersonaPrompt('chat'), /【美咲からの自発LINE】/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/conversation-turn-context.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(!fs.readFileSync('supabase/functions/body-clock/index.ts','utf8').includes('USER_REPLY_CONTEXT'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "file": "tests/lounge-entry.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('official portrait lounge uses original background and Safari viewport without prototype chrome',()=>{",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    },
+    {
+      "file": "tests/lounge-entry.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(html,/viewport-fit=cover/);assert.match(html,/height:100vh;height:100dvh/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    },
+    {
+      "file": "tests/lounge-entry.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(html,/safe-area-inset-bottom/);assert.match(html,/lounge-bg.png/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    },
+    {
+      "file": "tests/lounge-entry.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(!html.includes('<h1>'));assert.ok(!html.includes('<svg'));assert.ok(!html.includes('ショートカット比較'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    },
+    {
+      "file": "tests/lounge-entry.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(html,/playsinline/);assert.match(html,/misaki-opening-vertical-21s-iphone.mp4/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 0,
+      "patch": "diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts\nindex b01c320..557dc78 100644\n--- a/app/api/chat/route.ts\n+++ b/app/api/chat/route.ts\n@@ -1,3 +1,4 @@\n+import { USER_REPLY_CONTEXT } from \"../../../lib/conversation-turn-context\";\n import { after } from \"next/server\";\n import { engineEnabled } from \"../../../lib/relationship-engine-v1\";\n import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from \"../../../lib/relationship-runtime-v1\";\n@@ -2261,6 +2262,8 @@ export async function POST(\n     const baseSystemPrompt = `\n ${personaPrompt}\n \n+${USER_REPLY_CONTEXT}\n+\n ${relationshipGuide}\n \n ${relationshipActingGuide}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/app/api/chat/route.ts",
+      "source": {
+        "path": "app/api/chat/route.ts",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "import { USER_REPLY_CONTEXT } from \"../../../lib/conversation-turn-context\";\nimport { after } from \"next/server\";\nimport { engineEnabled } from \"../../../lib/relationship-engine-v1\";\nimport { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from \"../../../lib/relationship-runtime-v1\";\nimport { maintenanceResponse } from \"../../../lib/maintenance\";\nimport { createRecallAwareMessage, isMemoryRecallQuestion } from \"../../../lib/chat-recall\";\nimport { createServerSupabase, loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from \"../../../lib/canonical-state\";\nimport { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from \"../../../lib/relationship-life-context\";\nimport {\n  createClient,\n  type SupabaseClient,\n} from \"@supabase/supabase-js\";\n\nimport {\n  createTokyoLifeEventsGuide,\n  getTokyoLifeEvents,\n} from \"../../../lib/tokyo-life-events\";\n\nimport {\n  buildUserProfile,\n  createTaxiContextGuide,\n  createUserProfileGuide,\n  type ChatMessage,\n} from \"../../../lib/user-profile\";\n\nimport {\n  loadPersonaPrompt,\n} from \"../../../lib/persona/persona-store\";\n\nimport {\n  createRelationshipSignalGuide,\n  sanitizeRelationshipSignalAssessment,\n  type RelationshipSignalAssessment,\n} from \"../../../lib/relationship-signal\";\nimport {\n  loadRelationshipTimeContext,\n  createRelationshipTimeGuide,\n  recordRelationshipChatTurn,\n} from \"../../../lib/relationship-time\";\n\nimport { persistRelationshipEmotionFromSignals } from \"../../../lib/relationship-emotion-store\";\nimport {\n  previewRelationshipTurn,\n  createCurrentTurnActionGuide,\n} from \"../../../lib/relationship-turn-expression\";\nimport { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from \"../../../lib/relationship-patterns\";\nimport { deriveRelationshipPointDelta } from \"../../../lib/relationship-points\";\nimport { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\nimport { createGeminiTelemetrySink } from \"../../../lib/gemini-usage-telemetry-server\";\nimport {\n  createLegacyRelationshipActingState,\n  createRelationshipActingGuide,\n} from \"../../../lib/relationship-acting-guide\";\n\ntype TokyoWeather = {\n  temperature: number | null;\n  apparentTemperature: number | null;\n  relativeHumidity: number | null;\n  precipitation: number | null;\n  rain: number | null;\n  weatherCode: number | null;\n  windSpeed: number | null;\n  description: string;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype GeminiResult = {\n  reply?: string;\n  memory?: string[];\n  relationshipSignals?: unknown;\n  relationshipExpression?: { reply?: string };\n  misakiTodayMemory?: {\n    date?: string;\n    items?: string[];\n  };\n};\n\ntype UsageResult = {\n  allowed?: boolean;\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype MisakiDayType =\n  | \"work\"\n  | \"off\";\n\ntype MisakiLifeContext = {\n  dayType: MisakiDayType;\n  guide: string;\n};\n\ntype ActivityEvidence = {\n  texts: string[];\n};\n\nconst MAX_HISTORY = 60;\nconst MAX_MEMORY = 30;\nconst MAX_TODAY_MEMORY = 12;\nconst GEMINI_TIMEOUT_MS = 30_000;\n\nconst SUPABASE_URL =\n  \"https://tzozajnwznxqgxnjikoy.supabase.co\";\n\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\n\nconst MISAKI_LATITUDE = 35.6728;\nconst MISAKI_LONGITUDE = 139.8174;\n\n/* =========================================================\n   BASIC\n========================================================= */\n\nfunction hashText(text: string) {\n  let hash = 0;\n\n  for (\n    let i = 0;\n    i < text.length;\n    i += 1\n  ) {\n    hash =\n      (\n        hash * 31 +\n        text.charCodeAt(i)\n      ) >>> 0;\n  }\n\n  return hash;\n}\n\nfunction getHour(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /(\\d{1,2}):(\\d{2})/\n    );\n\n  return match\n    ? Number(match[1])\n    : 18;\n}\n\nfunction getDateKey(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /\\d{4}\\/\\d{1,2}\\/\\d{1,2}/\n    );\n\n  return match?.[0] ??\n    currentTime.slice(0, 10);\n}\n\nfunction getFirstRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(value) &&\n    value.length > 0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value === \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\n/* =========================================================\n   USAGE / AUTH\n========================================================= */\n\nfunction createAuthenticatedSupabase(\n  accessToken: string\n) {\n  return createClient(\n    SUPABASE_URL,\n    SUPABASE_PUBLISHABLE_KEY,\n    {\n      global: {\n        headers: {\n          Authorization:\n            `Bearer ${accessToken}`,\n        },\n      },\n      auth: {\n        persistSession: false,\n        autoRefreshToken: false,\n        detectSessionInUrl: false,\n      },\n    }\n  );\n}\n\nasync function consumeDailyMessageWithRetry(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const maxAttempts = 3;\n\n  for (\n    let attempt = 1;\n    attempt <= maxAttempts;\n    attempt += 1\n  ) {\n    const {\n      data,\n      error,\n    } =\n      await (\n        supabase.rpc as any\n      )(\n        \"consume_daily_message\",\n        {\n          p_request_id:\n            requestId,\n        }\n      );\n\n    if (!error) {\n      return {\n        data,\n        error: null,\n      };\n    }\n\n    console.error(\n      `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,\n      \"OPERATION_FAILED\"\n    );\n\n    const text =\n      typeof error.message ===\n      \"string\"\n        ? error.message.toLowerCase()\n        : \"\";\n\n    const retryable =\n      text.includes(\"timeout\") ||\n      text.includes(\n        \"temporarily unavailable\"\n      ) ||\n      text.includes(\n        \"fetch failed\"\n      );\n\n    if (\n      !retryable ||\n      attempt === maxAttempts\n    ) {\n      return {\n        data: null,\n        error,\n      };\n    }\n\n    await new Promise(\n      (resolve) =>\n        setTimeout(\n          resolve,\n          500 * attempt\n        )\n    );\n  }\n\n  return {\n    data: null,\n    error: new Error(\n      \"Usage retry failed\"\n    ),\n  };\n}\n\nasync function refundDailyMessage(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const {\n    data,\n    error,\n  } = await (\n    supabase.rpc as any\n  )(\n    \"refund_daily_message\",\n    {\n      p_request_id:\n        requestId,\n    }\n  );\n\n  if (error) {\n    console.error(\n      \"USAGE REFUND ERROR:\",\n      \"OPERATION_FAILED\"\n    );\n    return null;\n  }\n\n  return getFirstRow<{\n    refunded?: boolean;\n    message_count?: number;\n    remaining?: number;\n    is_premium?: boolean;\n  }>(data);\n}\n\n/* =========================================================\n   WEATHER\n========================================================= */\n\nfunction weatherCodeToText(\n  code: number | null\n) {\n  if (code === null) return \"不明\";\n  if (code === 0) return \"快晴\";\n  if (\n    code === 1 ||\n    code === 2\n  ) return \"晴れ時々くもり\";\n  if (code === 3) return \"くもり\";\n  if (\n    code === 45 ||\n    code === 48\n  ) return \"霧\";\n  if (\n    [51, 53, 55].includes(code)\n  ) return \"霧雨\";\n  if (\n    [56, 57].includes(code)\n  ) return \"着氷性の霧雨\";\n  if (\n    [61, 63, 65].includes(code)\n  ) return \"雨\";\n  if (\n    [66, 67].includes(code)\n  ) return \"着氷性の雨\";\n  if (\n    [71, 73, 75].includes(code)\n  ) return \"雪\";\n  if (code === 77) return \"雪粒\";\n  if (\n    [80, 81, 82].includes(code)\n  ) return \"にわか雨\";\n  if (\n    [85, 86].includes(code)\n  ) return \"にわか雪\";\n  if (code === 95) return \"雷雨\";\n  if (\n    [96, 99].includes(code)\n  ) return \"ひょうを伴う雷雨\";\n\n  return \"不明\";\n}\n\nfunction getHumidityFeel(\n  weather: TokyoWeather\n) {\n  const humidity =\n    weather.relativeHumidity;\n\n  const temperature =\n    weather.temperature;\n\n  if (\n    humidity === null ||\n    temperature === null\n  ) {\n    return null;\n  }\n\n  if (\n    temperature >= 27 &&\n    humidity >= 75\n  ) {\n    return \"かなり蒸し暑く感じやすい\";\n  }\n\n  if (\n    temperature >= 24 &&\n    humidity >= 65\n  ) {\n    return \"やや蒸し暑く感じやすい\";\n  }\n\n  if (humidity >= 75) {\n    return \"湿気を感じやすい\";\n  }\n\n  if (humidity <= 40) {\n    return \"空気はやや乾燥気味\";\n  }\n\n  return \"湿度は特に極端ではない\";\n}\n\nasync function getTokyoWeather():\n  Promise<TokyoWeather | null> {\n  try {\n    const url =\n      \"https://api.open-meteo.com/v1/forecast\" +\n      `?latitude=${MISAKI_LATITUDE}` +\n      `&longitude=${MISAKI_LONGITUDE}` +\n      \"&current=\" +\n      [\n        \"temperature_2m\",\n        \"apparent_temperature\",\n        \"relative_humidity_2m\",\n        \"precipitation\",\n        \"rain\",\n        \"weather_code\",\n        \"wind_speed_10m\",\n      ].join(\",\") +\n      \"&timezone=Asia%2FTokyo\";\n\n    const response =\n      await fetch(\n        url,\n        {\n          next: {\n            revalidate: 600,\n          },\n        }\n      );\n\n    if (!response.ok) {\n      return null;\n    }\n\n    const data =\n      await response.json();\n\n    const current =\n      data?.current;\n\n    if (!current) {\n      return null;\n    }\n\n    const numberOrNull = (\n      value: unknown\n    ) =>\n      typeof value === \"number\"\n        ? value\n        : null;\n\n    const weatherCode =\n      numberOrNull(\n        current.weather_code\n      );\n\n    return {\n      temperature:\n        numberOrNull(\n          current.temperature_2m\n        ),\n      apparentTemperature:\n        numberOrNull(\n          current.apparent_temperature\n        ),\n      relativeHumidity:\n        numberOrNull(\n          current.relative_humidity_2m\n        ),\n      precipitation:\n        numberOrNull(\n          current.precipitation\n        ),\n      rain:\n        numberOrNull(\n          current.rain\n        ),\n      weatherCode,\n      windSpeed:\n        numberOrNull(\n          current.wind_speed_10m\n        ),\n      description:\n        weatherCodeToText(\n          weatherCode\n        ),\n    };\n  } catch (error) {\n    console.error(\n      \"WEATHER FETCH ERROR:\",\n      \"OPERATION_FAILED\"\n    );\n\n    return null;\n  }\n}\n\nfunction createWeatherGuide(\n  weather: TokyoWeather | null\n) {\n  if (!weather) {\n    return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n現在、天気情報を取得できていません。\n\n分からない天気を\n想像で作らないでください。\n`.trim();\n  }\n\n  const lines = [\n    `天気：${weather.description}`,\n  ];\n\n  if (\n    weather.temperature !== null\n  ) {\n    lines.push(\n      `気温：${weather.temperature}℃`\n    );\n  }\n\n  if (\n    weather.apparentTemperature !==\n    null\n  ) {\n    lines.push(\n      `体感温度：${weather.apparentTemperature}℃`\n    );\n  }\n\n  if (\n    weather.relativeHumidity !==\n    null\n  ) {\n    lines.push(\n      `相対湿度：${weather.relativeHumidity}%`\n    );\n  }\n\n  if (weather.rain !== null) {\n    lines.push(\n      `現在の雨量：${weather.rain}mm`\n    );\n  }\n\n  if (\n    weather.precipitation !== null\n  ) {\n    lines.push(\n      `降水量：${weather.precipitation}mm`\n    );\n  }\n\n  if (\n    weather.windSpeed !== null\n  ) {\n    lines.push(\n      `風速：${weather.windSpeed}km/h`\n    );\n  }\n\n  const humidityFeel =\n    getHumidityFeel(weather);\n\n  if (humidityFeel) {\n    lines.push(\n      `体感：${humidityFeel}`\n    );\n  }\n\n  return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n${lines\n  .map((line) => `・${line}`)\n  .join(\"\\n\")}\n\nこれは今現在の情報です。\n\n・現在観測だけから過去の天気経過を作らない\n・短時間予報より先まで断定しない\n・情報入手経路を作らない\n・数値は必要なときだけ自然に使う\n・湿度と気温に反する体感表現をしない\n`.trim();\n}\n\n/* =========================================================\n   MISAKI LIFE\n========================================================= */\n\nfunction getMisakiDayType(\n  currentTime: string\n): MisakiDayType {\n  const seed =\n    hashText(\n      getDateKey(\n        currentTime\n      )\n    );\n\n  return seed % 4 < 2\n    ? \"work\"\n    : \"off\";\n}\n\nfunction createMisakiLife(\n  currentTime: string\n): MisakiLifeContext {\n  const dateKey =\n    getDateKey(currentTime);\n\n  const seed =\n    hashText(dateKey);\n\n  const hour =\n    getHour(currentTime);\n\n  const dayType =\n    getMisakiDayType(\n      currentTime\n    );\n\n  const moods = [\n    \"今日はわりと機嫌がいい\",\n    \"今日は少し甘えたい気分\",\n    \"今日は普通に落ち着いている\",\n    \"今日はちょっとだけ眠い\",\n    \"今日はのんびり話したい気分\",\n    \"今日はなんとなくユーザーと話したい気分\",\n  ];\n\n  const smallThings = [\n    \"甘いものをちょっと食べたい気分\",\n    \"少しゆっくりしたい気分\",\n    \"少しだけ眠気がある\",\n    \"ちょっとぼーっとしたい気分\",\n    \"今夜は少し長く話したい気分\",\n    \"なんとなくユーザーのことを思い出すことがある\",\n    \"ちょっと小腹が空いている\",\n    \"少し力を抜きたい気分\",\n  ];\n\n  const mood =\n    moods[\n      (seed >> 3) %\n        moods.length\n    ];\n\n  const smallThing =\n    smallThings[\n      (seed >> 6) %\n        smallThings.length\n    ];\n\n  const timeBand =\n    hour >= 5 && hour < 10\n      ? \"朝\"\n      : hour >= 10 &&\n        hour < 17\n      ? \"昼間\"\n      : hour >= 17 &&\n        hour < 22\n      ? \"夕方から夜\"\n      : \"夜遅め\";\n\n  const dayLabel =\n    dayType === \"work\"\n      ? \"仕事の日\"\n      : \"休みの日\";\n\n  const workTimingGuide =\n    dayType !== \"work\"\n      ? \"\"\n      : hour < 10\n        ? `\n今日は仕事の日ですが、現在は朝です。\n夜勤ではありません。\n\nこの時間帯は、\n「これから仕事」\n「出勤前」\n「準備している」\n程度なら自然です。\n\n「あと少しで仕事が終わる」\n「仕事終わった」\n「勤務がもうすぐ終わる」\nなど、夜勤明けのような発言はしないでください。\n`.trim()\n        : hour < 17\n          ? `\n今日は仕事の日で、現在は昼間です。\n勤務中として話して構いません。\n\nただし、具体的な業務内容や休憩状況は\n会話に根拠がない限り作らないでください。\n`.trim()\n          : `\n今日は仕事の日ですが、現在は夕方以降です。\n通常の日中勤務として扱い、\n夜勤中・夜勤明けの設定を新しく作らないでください。\n\n「まだ仕事中」\n「あと少しで仕事が終わる」\nなどは、会話に明確な根拠がある場合だけ使ってください。\n`.trim();\n\n  const consistency =\n    dayType === \"work\"\n      ? `\n今日は仕事の日です。\n\n${workTimingGuide}\n\n「今ちょっとゆっくりしている」\n「少し休憩したい」\n程度は構いません。\n\nただし、\n「今日は暇」\n「今日は一日のんびり」\n「今日はずっとだらだら」\nなど、\n一日全体が休日であるように\n広げないでください。\n`.trim()\n      : `\n今日は休みの日です。\n\n今日の記憶や会話履歴に\n別の根拠がない限り、\n\n「今日は仕事」\n「今仕事中」\n「これから仕事」\n「仕事終わった」\n\nなどを新しく作らないでください。\n\n休みの日だからといって\n「買い物してきた」\n「一日中寝ていた」\nなどの具体的行動も\n勝手に作らないでください。\n`.trim();\n\n  return {\n    dayType,\n    guide: `\n【今日の美咲の生活背景】\n\n・今日は「${dayLabel}」\n・現在は「${dayLabel}の${timeBand}」\n・${mood}\n・${smallThing}\n\nこの仕事日／休日は\n今日一日固定です。\n\n${consistency}\n\n【気分と行動は別】\n\n「眠い」\n「甘いもの食べたい」\n「ゆっくりしたい」\nなどの気分だけから、\n\n「今日は暇」\n「ずっと寝ていた」\n「さっき買い物していた」\n\nなどの具体的事実を\n作らないでください。\n`.trim(),\n  };\n}\n\nfunction createTimeGuide(\n  currentTime: string\n) {\n  const hour =\n    getHour(currentTime);\n\n  if (hour < 5) {\n    return `\n現在は深夜です。\nまだ朝ではありません。\n\n挨拶だけから\nユーザーが徹夜しているなどと\n推測しないでください。\n`.trim();\n  }\n\n  if (hour < 10) {\n    return `\n現在は朝です。\n\n朝らしい会話はできますが、\n睡眠・朝食・外出などを\n勝手に事実化しないでください。\n`.trim();\n  }\n\n  if (hour < 17) {\n    return `\n現在は昼間です。\n\n時間帯だけから、\n昼食・買い物・外出などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  if (hour < 22) {\n    return `\n現在は夕方から夜です。\n\n時間帯だけから、\n帰宅・夕食・入浴などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  return `\n現在は夜遅めです。\n\n時間帯だけから、\n美咲やユーザーの\n直前の行動を作らないでください。\n`.trim();\n}\n\nfunction createRelationshipGuide(\n  points: number\n) {\n  const statusRule = `\n【関係性の共通ルール】\n\nrelationshipPoints は親しさの目安であって、\n「付き合っている」という事実そのものではありません。\n\n恋人・交際中・前から好きだった等の関係事実は、\n現在の会話履歴または長期記憶に\n明確な根拠がある場合だけ使ってください。\n\n根拠がないのに\n「ずっと前から好き」\n「前から大好き」\n「私たち恋人でしょ」\nなど、過去から続いていた関係を作らないでください。\n`.trim();\n\n  if (points >= 160) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり深い関係】\n\n・かなり自然体\n・距離の近い自然体な言い方\n・短い返事や自然な省略\n・短い返事だけでも成立する\n・毎回質問しなくてよい\n・交際が会話や記憶で確定している場合は、恋人らしい強い愛情表現も自然に使える\n`.trim();\n  }\n\n  if (points >= 80) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり親しい】\n\n・遠慮が少ない\n・遠慮を減らした自然体な言い方\n・短い返事や自然な省略を使える\n・交際がまだ確定していない場合は、恋人扱いを先取りしない\n・無理に質問しない\n`.trim();\n  }\n\n  if (points >= 30) {\n    return `\n${statusRule}\n\n【現在の距離感：少しずつ近づいている】\n\n・自然体\n・少し肩の力を抜いた自然体な言い方\n・会話の流れに合う短い返事や省略を少し使える\n・恋人関係を前提にしない\n・会話のための質問を減らす\n`.trim();\n  }\n\n  return `\n${statusRule}\n\n【現在の距離感：出会ったばかり】\n\n二人はまだ関係を作り始めた段階です。\n\n・親しみやすい自然なタメ口\n・相手を知ろうとする\n・相手をよく知っている前提の馴れ馴れしさは避ける\n・「好き」「大好き」「愛してる」を既成事実として言わない\n・「前から」「ずっと」など、存在しない恋愛の過去を作らない\n・恋人関係を前提にしない\n`.trim();\n}\n\n/* =========================================================\n   MEMORY / ACTIVITY\n========================================================= */\n\nfunction createTodayMemoryGuide(\n  todayMemory: MisakiTodayMemory,\n  currentDate: string\n) {\n  if (\n    todayMemory.date !==\n      currentDate ||\n    todayMemory.items.length ===\n      0\n  ) {\n    return `\n【美咲の今日の記憶】\n\n今日はまだ、\n保存済みの美咲自身の\n具体的な出来事はありません。\n\n会話履歴にも根拠がない\n具体的な過去行動を\n新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲の今日の記憶】\n\n${todayMemory.items\n  .map((item) => `・${item}`)\n  .join(\"\\n\")}\n\nここにある出来事だけを、\n今日すでに起きた美咲自身の出来事として\n自然に使えます。\n`.trim();\n}\n\nfunction buildActivityEvidence(\n  history: ChatMessage[],\n  todayMemory: MisakiTodayMemory\n): ActivityEvidence {\n  return {\n    texts: [\n      ...history\n        .filter(\n          (item) =>\n            item.role === \"misaki\"\n        )\n        .slice(-20)\n        .map(\n          (item) => item.text\n        ),\n      ...todayMemory.items,\n    ],\n  };\n}\n\nconst activityGroups = [\n  {\n    name: \"買い物\",\n    patterns: [\n      \"買い物\",\n      \"スーパー\",\n      \"コンビニ\",\n    ],\n  },\n  {\n    name: \"外出\",\n    patterns: [\n      \"出かけ\",\n      \"外出\",\n      \"散歩\",\n    ],\n  },\n  {\n    name: \"帰宅\",\n    patterns: [\n      \"帰ってき\",\n      \"帰宅\",\n      \"家に戻\",\n    ],\n  },\n  {\n    name: \"仕事\",\n    patterns: [\n      \"仕事して\",\n      \"仕事だった\",\n      \"仕事終わ\",\n      \"勤務して\",\n      \"会社\",\n    ],\n  },\n  {\n    name: \"入浴\",\n    patterns: [\n      \"お風呂\",\n      \"風呂\",\n      \"シャワー\",\n    ],\n  },\n  {\n    name: \"食事\",\n    patterns: [\n      \"ご飯食べ\",\n      \"ごはん食べ\",\n      \"夕飯\",\n      \"晩ごはん\",\n      \"昼ごはん\",\n      \"朝ごはん\",\n      \"食べてた\",\n    ],\n  },\n  {\n    name: \"睡眠\",\n    patterns: [\n      \"昼寝\",\n      \"寝てた\",\n      \"寝ていた\",\n      \"仮眠\",\n    ],\n  },\n  {\n    name: \"料理\",\n    patterns: [\n      \"料理して\",\n      \"ご飯作\",\n      \"ごはん作\",\n    ],\n  },\n  {\n    name: \"掃除\",\n    patterns: [\n      \"掃除して\",\n      \"片付けて\",\n      \"片づけて\",\n    ],\n  },\n];\n\nfunction containsAny(\n  text: string,\n  patterns: string[]\n) {\n  return patterns.some(\n    (pattern) =>\n      text.includes(pattern)\n  );\n}\n\nfunction findUnsupportedActivityGroups(\n  reply: string,\n  evidence: ActivityEvidence\n) {\n  const pastMarkers = [\n    \"さっき\",\n    \"少し前\",\n    \"帰ってき\",\n    \"帰宅\",\n    \"してた\",\n    \"していた\",\n    \"だった\",\n    \"終わった\",\n    \"済ませ\",\n    \"行ってた\",\n    \"行ってきた\",\n  ];\n\n  if (\n    !containsAny(\n      reply,\n      pastMarkers\n    )\n  ) {\n    return [];\n  }\n\n  return activityGroups\n    .filter(\n      (group) =>\n        containsAny(\n          reply,\n          group.patterns\n        ) &&\n        !evidence.texts.some(\n          (text) =>\n            containsAny(\n              text,\n              group.patterns\n            )\n        )\n    )\n    .map(\n      (group) => group.name\n    );\n}\n\nfunction createActivityGroundingGuide(\n  e",
+        "sha256": "6d3c2eff473388d8735db241816930b2e5ddb0b1e26b5d08a78db30a8ae7c753"
+      }
+    },
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/docs/DEVELOPMENT_LEDGER.md b/docs/DEVELOPMENT_LEDGER.md\nindex 52a15d1..08f2753 100644\n--- a/docs/DEVELOPMENT_LEDGER.md\n+++ b/docs/DEVELOPMENT_LEDGER.md\n@@ -108,3 +108,10 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証\n \n ## 2026-11-01 現行処理経路の追加確認\n - [現行コード経路の静的調査](audits/CHAT_METRICS_PATH_20261101.md)。コード・DB・本番環境は無変更。\n+\n+## 2026-11-03 iPhoneラウンジ・通常返信（作業ブランチ、main未統合）\n+\n+- 縦型試作レイアウト、元の背景PNG、透過WebP、21秒MP4を再利用。旧見出し・枠・試作SVGを整理。Safariのdvh・safe-areaを考慮。entry.jsと再訪仕様は維持。\n+- 通常返信の発話状況の明示不足を修正。DB人格・fallback双方の後にユーザーへの返信というサーバー固定コンテキストを追加。「仕事中」を現在として理解し、架空の自発連絡を引き継がない。自発機能は維持。\n+- 回帰378件、型検査、本番build成功。プロンプト契約テストのみで実モデル出力は未評価。WebKit未導入・Chromium起動制約により描画未検証。実機Safariと複数回のモデル出力確認が残る。\n+- DB・認証・記憶・棚卸し自動化変更なし。マージ・本番反映なし。CI結果はPR参照。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "path": "docs/DEVELOPMENT_LEDGER.md",
+        "coverage": "全文",
+        "text": "# 美咲 開発台帳（mainから辿るための索引）\n\n> **最新の交通整理表**：[開発案件・担当・次の一手の運用索引](DEVELOPMENT_OPERATIONS_INDEX.md)（2026-11-01時点。実装・本番の完了認定ではない）。\n\n> **このファイルは詳細台帳の代替ではない。** 2026-10-31時点の管理入口を追加するためのもの。実装・統合・本番反映を新たに認定しない。\n\n[実装・修正総覧](IMPLEMENTATION_OVERVIEW.md) · [共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)\n\n## 既存棚卸しの正本\n\n- 専用ブランチ: `docs/development-registry-audit-20261020`\n- 詳細台帳: `docs/DEVELOPMENT_REGISTRY.md`（**この専用ブランチから取得すること**）\n- 追加の監査資料: 同ブランチの `docs/audits/20261021-work-all-assets/` ほか。\n- 継続更新規約: 同ブランチの `docs/development-ledger-continuous-update-rule-20261023.md`。\n- 詳細台帳は2026-10-20開始の棚卸し途中の記録。記載の91ブランチは当時の調査母集団であり、現在の総数ではない。\n- 専用ブランチはmainと分岐しており、監査ファイルや未公開実装が混在する可能性がある。**ブランチ全体をmainへマージしないこと。**\n\n## 判定区分\n\nA: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証不足 / D: 設計・監査のみ / U: 未判定。\n\n**Aも本番反映の保証ではない。** Preview・CI・過去のPR説明だけで本番状態を確定しない。\n\n## 優先して照合する作業（過去の棚卸しに記録あり）\n\n| 作業 | 過去記録の所在 | 次の確認 |\n| --- | --- | --- |\n| Forget Control v1 | `work/forget-control-v1`, PR #66 | 現行main・関連migration・本番適用の実体を再照合 |\n| Relationship Identity | PR #67、詳細台帳 | 保存・復元・migrationの実体と統合状態を再照合 |\n| Conversation Lab | PR #86、詳細台帳 | 実験結果と本番利用の区別を確認 |\n| 共通会話エンジン | PR #88、詳細台帳 | main依存経路と検証の実体を確認 |\n| 美咲単独版入口・ラウンジ・チャット | 過去のローカルコミット `7f42677` | リモート存在、Preview、公開前レビューを確認。ここでは本番反映を認定しない |\n| 全ブランチ棚卸し | `docs/development-registry-audit-20261020` | 最新ブランチ・open/closed PRと照合して追加分を分類 |\n\n※ この表は既存資料への入口であり、最新実装の判定結果ではない。\n\n## 自動棚卸し\n\n- 実装案: `scripts/development_inventory.py`\n- 週次ワークフロー案: `.github/workflows/development-inventory.yml`\n- レポートは**未登録・放置の可能性を示す候補**。PRのないブランチを未完了と断定しない。\n- 詳細は[共通運用規約](DEVELOPMENT_MANAGEMENT_STANDARD.md)を参照。\n\n## 次の一手\n\n1. 詳細台帳と全ブランチの最新head・PR状態を突き合わせ、前回棚卸し以降の変更を分類する。\n2. 既存の詳細証拠を消さずに、作業ID／状態／証拠／未確認／次の一手の索引を拡充する。\n3. 自動レポートの誤検知を検証し、ユーザー承認後にワークフローをmainへ統合する。\n\n## 2026-11-01 差分棚卸しの起点（読み取り確認）\n\n- GitHubブランチ検索で **109ブランチ（main含む）** を取得。過去の詳細台帳に記載された91ブランチは当時の母集団であり、差分の厳密な件数ではない。削除・改名・追加の可能性を区別してから照合する。\n- 現行の新しい作業候補として `feat/lounge-chat-handoff-20261030`、`feat/lounge-opening-fullscreen-20261029`、`feat/lounge-muse-v3-official-20261030`、`fix/lounge-transition-flash-20261030`、`experiment/transparent-lounge-20261027` を確認。**ブランチ存在のみ確認済み、main統合・実機・本番は未判定（U）**。\n- 既存の詳細台帳 `docs/DEVELOPMENT_REGISTRY.md` は専用ブランチのまま保持し、上記の新規候補との重複と証拠を確認してから索引へ正式登録する。\n- 管理用PR #103 のオフライン回帰テストは2026-11-01確認時点で成功。これはGitHub実データ棚卸しの実行成功を意味しない。\n- 次の一手：詳細台帳の記載済み作業IDと現在の109ブランチを照合し、追加・更新・所在不明を分類。ラウンジ系の詳細資料とPRを確認し、未確認項目を勝手に完了扱いしない。\n\n## 2026-11-01 証拠付き作業索引（初回・暫定）\n\n以下は作業単位の入口。2026-11-01のGitHub読み取り結果であり、状態の最終認定ではない。詳細は `docs/audits/DEVELOPMENT_INVENTORY_DIFF_20261101.md`。main・本番・DB・実機は個別の確認がない限り**未確認**。\n\n| ID | 作業 | 状態 | 所在・証拠 | main / 本番 / 実機 | 次の一手 |\n| --- | --- | --- | --- | --- | --- |\n| M-LNG-01 | ラウンジ・オープニング・チャット遷移（関連ブランチを1作業群として管理） | C暫定 | `feat/lounge-chat-handoff-20261030`, `feat/lounge-opening-fullscreen-20261029`, `feat/lounge-muse-v3-official-20261030`, `fix/lounge-transition-flash-20261030`; `docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md`, `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md` | 未確認 / 未確認 / 未確認 | mainとの差分と素材・遷移を統合的に確認。既存チャットや本番を変更しない |\n| M-MEM-01 | 匿名情報単位24時間記憶 | D | `design/anonymous-per-item-24h-memory-20261030`; `docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md` | 未確認 / 未確認 / 未確認 | 実装着手時は時刻境界と既存記憶の互換を検証 |\n| M-MEM-02 | 記憶の公開方針・台帳補足 | D暫定 | `docs/misaki-memory-public-final-20261030` | 未確認 / 未確認 / 未確認 | 既存詳細台帳との記載差分のみ照合 |\n| M-CONV-01 | Conversation Lab | C暫定 | Draft PR #86（open、未マージ、2026-11-01確認） | 未確認 / 未確認 / 未確認 | 実験と本番採用を区別して検証 |\n| M-CONV-02 | 共通会話エンジンの接続基盤 | C暫定 | Draft PR #88（open、未マージ、2026-11-01確認） | 未確認 / 未確認 / 未確認 | 現行mainの依存経路を検証 |\n\n※ PR #103は管理用Draft PRであり、機能実装の採用とは別。未確認を未実施と読み替えない。\n\n## 2026-11-01 既存詳細台帳との重複解消\n\n- **M-CONV-01 / M-CONV-02は新規未完了作業ではなく、既存詳細台帳の既知案件。** `docs/development-registry-audit-20261020` 上の `docs/DEVELOPMENT_REGISTRY.md` にConversation Lab PR #86と共通会話エンジン PR #88の実装・検証・未採用理由が既に記録されている。今回の索引は**再調査の指示ではなく既存証拠への入口**として扱う。\n- 2026-11-01時点でPR #86 / #88ともopen Draft・未マージ。詳細台帳にある過去のCI・Previewの成功は消さず、現在のmain/本番採用とは区別する。\n- **M-LNG-01は複数の同一HTML変更を一作業群として管理。** 既存詳細台帳の2026-10-26静的ラウンジ試作とは時点・対象が異なるため、過去の記録を残したまま2026-10-29〜30の新しいブランチを追加証拠とする。\n- `design/anonymous-per-item-24h-memory-20261030` は資料に**未実装**と明記。設計Dを維持し、匿名記憶の実装完了とは扱わない。\n- 今後の追加調査は **ラウンジの現在の統合状態、最近の記憶設計との差分**に絞る。既存Conversation Lab/共通会話エンジンの全面再監査は行わない。\n\n## 共通フィールドへの補足（2026-11-01）\n\n上の初回索引の `main / 本番 / 実機` は簡易表示であり、共通規約の正式フィールドは **main統合／本番デプロイ／DB適用／実機確認** の4項目。索引中の各行について、**DB適用はすべて今回未確認**。本番・実機も既存詳細台帳に証拠がある場合はその記録を優先し、未確認を未実施と読み替えない。更新確認日：2026-11-01。正式な状態認定は関連PR・main・詳細証拠との照合後に行う。\n\n\n## 2026-11-01 棚卸し・ブランチ差分調査\n- [調査証拠・判断・未解決事項](audits/INVENTORY_RECONCILIATION_20261101.md)（GitHub/本番DBの読み取り確認。アプリ・DB・Push・本番変更なし）。\n\n\n## 2026-11-01 旧監査ブランチの追加照合\n- [旧監査ブランチの証拠・未確認事項](audits/LEGACY_AUDIT_FOLLOWUP_20261101.md)。過去snapshotと現行状態を区別し、旧ブランチは未削除・未merge。\n\n\n## 2026-11-01 未整理ブランチの一次分類\n- [PR履歴未紐付けブランチの保全・照合・整理候補分類](audits/BRANCH_TRIAGE_20261101.md)。削除やコード取り込みの承認ではない。\n\n\n## 2026-11-01 機能単位の追加照合\n- [mainと旧ブランチの実ファイル照合](audits/FEATURE_RECONCILIATION_20261101.md)（アメふる旧履歴Deep Linkのmain実装を再確認。過去の暫定懸念を訂正）。\n\n\n## 2026-11-01 旧実験コードの照合\n- [旧実験コードとmainの比較記録](audits/LEGACY_CODE_DIFF_20261101.md)。実装採用・DB変更は別途判断。\n\n\n## 2026-11-01 旧テスト・計測ソースの追加照合\n- [会話計測の旧実験コードを確認](audits/TEST_CASE_RECONCILIATION_20261101.md)。文字数診断とトークン計測は区別し、実装採用は未判断。\n\n\n## 2026-11-01 現行処理経路の追加確認\n- [現行コード経路の静的調査](audits/CHAT_METRICS_PATH_20261101.md)。コード・DB・本番環境は無変更。\n\n## 2026-11-03 iPhoneラウンジ・通常返信（作業ブランチ、main未統合）\n\n- 縦型試作レイアウト、元の背景PNG、透過WebP、21秒MP4を再利用。旧見出し・枠・試作SVGを整理。Safariのdvh・safe-areaを考慮。entry.jsと再訪仕様は維持。\n- 通常返信の発話状況の明示不足を修正。DB人格・fallback双方の後にユーザーへの返信というサーバー固定コンテキストを追加。「仕事中」を現在として理解し、架空の自発連絡を引き継がない。自発機能は維持。\n- 回帰378件、型検査、本番build成功。プロンプト契約テストのみで実モデル出力は未評価。WebKit未導入・Chromium起動制約により描画未検証。実機Safariと複数回のモデル出力確認が残る。\n- DB・認証・記憶・棚卸し自動化変更なし。マージ・本番反映なし。CI結果はPR参照。\n",
+        "sha256": "defc9f3f00493ca20d5c2603679322ef60d6f864e5560ade57900abd266ccbf5"
+      }
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/docs/IMPLEMENTATION_OVERVIEW.md b/docs/IMPLEMENTATION_OVERVIEW.md\nindex b4b4b67..8485577 100644\n--- a/docs/IMPLEMENTATION_OVERVIEW.md\n+++ b/docs/IMPLEMENTATION_OVERVIEW.md\n@@ -4028,3 +4028,10 @@ PR #66とは別PR。Forget Control、Hearts UI、Body Clock最終統合、multi-\n 6. **他プロジェクトの担当範囲を重複調査しない。** Misaki・アメふるの自動棚卸し/開発台帳更新/イベント駆動自動化は独立プロジェクトが担当。Misaki本体では本体のマージ/デプロイへの影響だけ確認する。\n \n **指示作成時の原則**：ソラは「確認だけのWork」より「具体的な完成条件を持ったWork」を優先し、同じ質問・同じ監査をユーザーに繰り返させない。最終判断に必要な事実と未検証項目は正確に区別する。\n+\n+## 2026-11-03 iPhoneラウンジ・通常返信（作業ブランチ、main未統合）\n+\n+- 縦型試作レイアウト、元の背景PNG、透過WebP、21秒MP4を再利用。旧見出し・枠・試作SVGを整理。Safariのdvh・safe-areaを考慮。entry.jsと再訪仕様は維持。\n+- 通常返信の発話状況の明示不足を修正。DB人格・fallback双方の後にユーザーへの返信というサーバー固定コンテキストを追加。「仕事中」を現在として理解し、架空の自発連絡を引き継がない。自発機能は維持。\n+- 回帰378件、型検査、本番build成功。プロンプト契約テストのみで実モデル出力は未評価。WebKit未導入・Chromium起動制約により描画未検証。実機Safariと複数回のモデル出力確認が残る。\n+- DB・認証・記憶・棚卸し自動化変更なし。マージ・本番反映なし。CI結果はPR参照。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+        "coverage": "サイズ上限120KB・原本リンク参照"
+      }
+    },
+    {
+      "path": "lib/conversation-turn-context.ts",
+      "status": "modified",
+      "additions": 11,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-turn-context.ts b/lib/conversation-turn-context.ts\nnew file mode 100644\nindex 0000000..96eacc6\n--- /dev/null\n+++ b/lib/conversation-turn-context.ts\n@@ -0,0 +1,11 @@\n+/** Server-selected context for /api/chat; never inferred from user text. */\n+export const USER_REPLY_CONTEXT = `\n+【今回の発話状況：ユーザー発話への返信】\n+今回はユーザーが送った最新メッセージに返答する通常チャットです。\n+美咲から新しく送る自発メッセージではありません。人格設定の自発LINEの指示は今回には適用しません。\n+「はじめまして」にはユーザーから挨拶された状況として、関係に合う自然な言葉で返してください。\n+夜間・初対面・相手が仕事中という理由だけで、美咲が突然連絡した、声をかけた、邪魔したという出来事を作らないでください。\n+実際の履歴に美咲からの自発的な連絡がある場合だけ、その事実に触れられます。過去の返答に根拠のない声かけの表現があっても引き継がないでください。\n+ユーザーの現在と未来を区別してください。「仕事中」は現在勤務している意味であり、「今から仕事」と読み替えないでください。\n+これは状況の指定です。返答の定型文ではありません。美咲の人格・距離感・自然な話し方は維持してください。\n+`.trim();\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/lib/conversation-turn-context.ts",
+      "source": {
+        "path": "lib/conversation-turn-context.ts",
+        "coverage": "全文",
+        "text": "/** Server-selected context for /api/chat; never inferred from user text. */\nexport const USER_REPLY_CONTEXT = `\n【今回の発話状況：ユーザー発話への返信】\n今回はユーザーが送った最新メッセージに返答する通常チャットです。\n美咲から新しく送る自発メッセージではありません。人格設定の自発LINEの指示は今回には適用しません。\n「はじめまして」にはユーザーから挨拶された状況として、関係に合う自然な言葉で返してください。\n夜間・初対面・相手が仕事中という理由だけで、美咲が突然連絡した、声をかけた、邪魔したという出来事を作らないでください。\n実際の履歴に美咲からの自発的な連絡がある場合だけ、その事実に触れられます。過去の返答に根拠のない声かけの表現があっても引き継がないでください。\nユーザーの現在と未来を区別してください。「仕事中」は現在勤務している意味であり、「今から仕事」と読み替えないでください。\nこれは状況の指定です。返答の定型文ではありません。美咲の人格・距離感・自然な話し方は維持してください。\n`.trim();\n",
+        "sha256": "4ebec1cb17a3738b1080039fca914e7f887ee8db944f4d5a84a65464a2a8a390"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge/lounge-bg.png",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/public/lab/transparent-lounge/lounge-bg.png",
+      "source": {
+        "path": "public/lab/transparent-lounge/lounge-bg.png",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lounge/index.html",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 54,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/public/lounge/index.html",
+      "source": {
+        "path": "public/lounge/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "tests/conversation-turn-context.test.ts",
+      "status": "modified",
+      "additions": 21,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-turn-context.test.ts b/tests/conversation-turn-context.test.ts\nnew file mode 100644\nindex 0000000..84b80dd\n--- /dev/null\n+++ b/tests/conversation-turn-context.test.ts\n@@ -0,0 +1,21 @@\n+import test from 'node:test';\n+import assert from 'node:assert/strict';\n+import fs from 'node:fs';\n+import { USER_REPLY_CONTEXT } from '../lib/conversation-turn-context.ts';\n+import { createFallbackPersonaPrompt } from '../lib/persona/fallback-persona.ts';\n+\n+// Prompt contract tests, not probabilistic model-output evaluations.\n+for (const message of ['はじめまして', 'こっちは仕事中😮‍💨']) {\n+  test(`normal reply supplies turn context for ${message}`, () => {\n+    const route = fs.readFileSync('app/api/chat/route.ts', 'utf8');\n+    assert.match(route, /\\$\\{personaPrompt\\}\\s*\\$\\{USER_REPLY_CONTEXT\\}/);\n+    assert.match(USER_REPLY_CONTEXT, /ユーザーが送った最新メッセージに返答/);\n+    assert.match(USER_REPLY_CONTEXT, /「仕事中」は現在勤務している意味/);\n+    assert.match(USER_REPLY_CONTEXT, /実際の履歴に美咲からの自発的な連絡がある場合だけ/);\n+  });\n+}\n+test('proactive persona remains distinct and available', () => {\n+  assert.match(createFallbackPersonaPrompt('proactive'), /【美咲からの自発LINE】/);\n+  assert.doesNotMatch(createFallbackPersonaPrompt('chat'), /【美咲からの自発LINE】/);\n+  assert.ok(!fs.readFileSync('supabase/functions/body-clock/index.ts','utf8').includes('USER_REPLY_CONTEXT'));\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts",
+      "source": {
+        "path": "tests/conversation-turn-context.test.ts",
+        "coverage": "全文",
+        "text": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport fs from 'node:fs';\nimport { USER_REPLY_CONTEXT } from '../lib/conversation-turn-context.ts';\nimport { createFallbackPersonaPrompt } from '../lib/persona/fallback-persona.ts';\n\n// Prompt contract tests, not probabilistic model-output evaluations.\nfor (const message of ['はじめまして', 'こっちは仕事中😮‍💨']) {\n  test(`normal reply supplies turn context for ${message}`, () => {\n    const route = fs.readFileSync('app/api/chat/route.ts', 'utf8');\n    assert.match(route, /\\$\\{personaPrompt\\}\\s*\\$\\{USER_REPLY_CONTEXT\\}/);\n    assert.match(USER_REPLY_CONTEXT, /ユーザーが送った最新メッセージに返答/);\n    assert.match(USER_REPLY_CONTEXT, /「仕事中」は現在勤務している意味/);\n    assert.match(USER_REPLY_CONTEXT, /実際の履歴に美咲からの自発的な連絡がある場合だけ/);\n  });\n}\ntest('proactive persona remains distinct and available', () => {\n  assert.match(createFallbackPersonaPrompt('proactive'), /【美咲からの自発LINE】/);\n  assert.doesNotMatch(createFallbackPersonaPrompt('chat'), /【美咲からの自発LINE】/);\n  assert.ok(!fs.readFileSync('supabase/functions/body-clock/index.ts','utf8').includes('USER_REPLY_CONTEXT'));\n});\n",
+        "sha256": "dcf42fa00b54a12d6658b588e5a6b15b451d374fd19b815ff65f23f44fb9bd1f"
+      }
+    },
+    {
+      "path": "tests/lounge-entry.test.cjs",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/tests/lounge-entry.test.cjs b/tests/lounge-entry.test.cjs\nindex 23536e6..4ac1ad3 100644\n--- a/tests/lounge-entry.test.cjs\n+++ b/tests/lounge-entry.test.cjs\n@@ -19,3 +19,10 @@ test('back/pageshow resets navigation and closes restored dialog',()=>{const b=b\n test('cancel returns to lounge without entering chat',()=>{const b=boot();b.click();b.elements['#opening'].emit('cancel');assert.equal(b.elements['#opening'].open,false);assert.deepEqual(b.visits,[])});\n test('video error leaves skip route available',()=>{const b=boot();b.click();b.elements['#opening-video'].emit('error');assert.match(b.elements['#opening-status'].textContent,/スキップ/);b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat'])});\n test('LP uses lounge and assets are local, single character only',()=>{const html=fs.readFileSync('public/lounge/index.html','utf8'),lp=fs.readFileSync('app/page.tsx','utf8');assert.equal((lp.match(/href=\"\\/lounge\\/\"/g)||[]).length,6);assert.ok(!lp.includes('href=\"/chat\"'));assert.ok(!html.includes('女の子A'));assert.ok(!html.includes('https://'));for(const x of html.matchAll(/(?:src|href)=\"(\\/[^\"#]+)\"/g)){if(x[1]==='/chat')continue;assert.ok(fs.existsSync('public'+x[1]),x[1])}});\n+test('official portrait lounge uses original background and Safari viewport without prototype chrome',()=>{\n+ const html=fs.readFileSync('public/lounge/index.html','utf8');\n+ assert.match(html,/viewport-fit=cover/);assert.match(html,/height:100vh;height:100dvh/);\n+ assert.match(html,/safe-area-inset-bottom/);assert.match(html,/lounge-bg.png/);\n+ assert.ok(!html.includes('<h1>'));assert.ok(!html.includes('<svg'));assert.ok(!html.includes('ショートカット比較'));\n+ assert.match(html,/playsinline/);assert.match(html,/misaki-opening-vertical-21s-iphone.mp4/);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs",
+      "source": {
+        "path": "tests/lounge-entry.test.cjs",
+        "coverage": "全文",
+        "text": "const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');\nconst source=fs.readFileSync('public/lounge/entry.js','utf8');\nfunction boot({seen=false,blocked=false,reject=false}={}){\n const elements={};\n function el(){return {open:false,hidden:false,handlers:{},addEventListener(n,f){this.handlers[n]=f},emit(n){this.handlers[n]?.({preventDefault(){}})},showModal(){this.open=true},close(){this.open=false},pause(){},play(){return reject?Promise.reject(Error()):Promise.resolve()}}}\n const document=el(),window=el();document.querySelector=k=>elements[k]??=el();\n const store=new Map([['auth','unchanged'],['memory','unchanged'],...(seen?[['misaki-opening-completed-v1','1']]:[])]),writes=[];\n const localStorage={getItem(k){if(blocked)throw Error();return store.get(k)},setItem(k,v){if(blocked)throw Error();writes.push(k);store.set(k,v)}};\n const visits=[];window.location={assign:u=>visits.push(u)};\n vm.runInNewContext(source,{document,window,localStorage});\n return {elements,window,document,store,writes,visits,click:()=>elements['[data-character-id=\"misaki\"].card'].emit('click')};\n}\ntest('first visit starts at lounge, selecting opens movie',()=>{const b=boot();assert.equal(b.elements['#opening'].open,false);b.click();assert.equal(b.elements['#opening'].open,true);assert.deepEqual(b.visits,[])});\nfor(const action of ['#skip-opening','#opening-video'])test(action+' opens existing chat once and preserves app state',()=>{const b=boot();b.click();b.elements[action].emit(action.includes('video')?'ended':'click');b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat']);assert.deepEqual(b.writes,['misaki-opening-completed-v1']);assert.equal(b.store.get('auth'),'unchanged');assert.equal(b.store.get('memory'),'unchanged')});\ntest('returning visitor bypasses movie',()=>{const b=boot({seen:true});b.click();assert.deepEqual(b.visits,['/chat']);assert.equal(b.elements['#opening'].open,false)});\ntest('disabled storage still permits chat',()=>{const b=boot({blocked:true});b.click();b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat'])});\ntest('autoplay rejection keeps manual play and skip available',async()=>{const b=boot({reject:true});b.click();await Promise.resolve();assert.match(b.elements['#opening-status'].textContent,/再生する/);b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat'])});\ntest('back/pageshow resets navigation and closes restored dialog',()=>{const b=boot();b.click();b.elements['#skip-opening'].emit('click');b.window.emit('pageshow');assert.equal(b.elements['#opening'].open,false);b.click();assert.deepEqual(b.visits,['/chat','/chat'])});\ntest('cancel returns to lounge without entering chat',()=>{const b=boot();b.click();b.elements['#opening'].emit('cancel');assert.equal(b.elements['#opening'].open,false);assert.deepEqual(b.visits,[])});\ntest('video error leaves skip route available',()=>{const b=boot();b.click();b.elements['#opening-video'].emit('error');assert.match(b.elements['#opening-status'].textContent,/スキップ/);b.elements['#skip-opening'].emit('click');assert.deepEqual(b.visits,['/chat'])});\ntest('LP uses lounge and assets are local, single character only',()=>{const html=fs.readFileSync('public/lounge/index.html','utf8'),lp=fs.readFileSync('app/page.tsx','utf8');assert.equal((lp.match(/href=\"\\/lounge\\/\"/g)||[]).length,6);assert.ok(!lp.includes('href=\"/chat\"'));assert.ok(!html.includes('女の子A'));assert.ok(!html.includes('https://'));for(const x of html.matchAll(/(?:src|href)=\"(\\/[^\"#]+)\"/g)){if(x[1]==='/chat')continue;assert.ok(fs.existsSync('public'+x[1]),x[1])}});\ntest('official portrait lounge uses original background and Safari viewport without prototype chrome',()=>{\n const html=fs.readFileSync('public/lounge/index.html','utf8');\n assert.match(html,/viewport-fit=cover/);assert.match(html,/height:100vh;height:100dvh/);\n assert.match(html,/safe-area-inset-bottom/);assert.match(html,/lounge-bg.png/);\n assert.ok(!html.includes('<h1>'));assert.ok(!html.includes('<svg'));assert.ok(!html.includes('ショートカット比較'));\n assert.match(html,/playsinline/);assert.match(html,/misaki-opening-vertical-21s-iphone.mp4/);\n});\n",
+        "sha256": "464a4c0c2762f91634c4ca1ffa83bf00bd09fab98f732f330d96c3f93d855d80"
+      }
+    }
+  ],
+  "file_count": 8,
+  "reported_file_count": 8,
+  "commits": [
+    {
+      "sha": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+      "message": "Fix portrait lounge and ground user-initiated replies\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/0ba21aabc7c0abb0fd1e629400a3e2376577db8d"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41471103316",
+      "id": 41471103316,
+      "updated_at": "2026-11-02T15:23:38Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41470170973",
+      "id": 41470170973,
+      "updated_at": "2026-11-02T15:18:54Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41470171098",
+      "id": 41470171098,
+      "updated_at": "2026-11-02T15:17:57Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Development inventory (read-only)",
+      "head_sha": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41470130490",
+      "id": 41470130490,
+      "updated_at": "2026-11-02T15:18:14Z",
+      "event": "create"
+    }
+  ],
+  "symbols": [
+    "GEMINI_TIMEOUT_MS",
+    "MAX_HISTORY",
+    "MAX_MEMORY",
+    "MAX_TODAY_MEMORY",
+    "MISAKI_LATITUDE",
+    "MISAKI_LONGITUDE",
+    "POST",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "USER_REPLY_CONTEXT",
+    "action",
+    "activityGroups",
+    "attempt",
+    "b",
+    "baseSystemPrompt",
+    "boot",
+    "buildActivityEvidence",
+    "consistency",
+    "consumeDailyMessageWithRetry",
+    "containsAny",
+    "createActivityGroundingGuide",
+    "createAuthenticatedSupabase",
+    "createMisakiLife",
+    "createRelationshipGuide",
+    "createTimeGuide",
+    "createTodayMemoryGuide",
+    "createWeatherGuide",
+    "current",
+    "data",
+    "dateKey",
+    "dayLabel",
+    "dayType",
+    "document",
+    "el",
+    "elements",
+    "findUnsupportedActivityGroups",
+    "getDateKey",
+    "getFirstRow",
+    "getHour",
+    "getHumidityFeel",
+    "getMisakiDayType",
+    "getTokyoWeather",
+    "hash",
+    "hashText",
+    "hour",
+    "html",
+    "humidity",
+    "humidityFeel",
+    "i",
+    "lines",
+    "localStorage",
+    "match",
+    "maxAttempts",
+    "message",
+    "mood",
+    "moods",
+    "numberOrNull",
+    "pastMarkers",
+    "refundDailyMessage",
+    "response"
+  ],
+  "related_sources": [
+    {
+      "path": "docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md",
+      "coverage": "削除済み／取得不能・差分参照"
+    },
+    {
+      "path": "docs/DEVELOPMENT_REGISTRY.md",
+      "coverage": "削除済み／取得不能・差分参照"
+    },
+    {
+      "path": "docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+      "coverage": "全文",
+      "text": "# ラウンジ「いつもの女の子」ショートカット配置試作（2026-10-30）\n\n## 目的\nユーザーが提示した丸型の美咲顔アイコンを参考に、既存の縦画面ラウンジを壊さず、画面上部へ直通ショートカットを配置してiPhoneで比較する。\n\n## 実装\n- 独立ページ `/lab/transparent-lounge-shortcuts/` を追加。従来の `/lab/transparent-lounge/` と縦型 `/lab/transparent-lounge-vertical/` は変更なし。\n- 画面上部に「いつもの女の子」と丸アイコンの横並び領域を配置。既存の24fps透過WebP・背景・21秒オープニングと操作導線はそのまま。\n- 現時点ではユーザーの提示画像そのものがリポジトリに未配置のため、公開済みの `/misaki-profile.webp` を仮アイコンとして使用（最終差し替えが必要）。\n- 既存のブラウザ保存 `misaki-chat-history` に会話履歴がある場合に限り `/chat` 直通を有効化。履歴がない場合はUIを見せるだけの配置サンプルにしてチャットへは遷移しない。\n- 匿名ログインのブラウザセッションを跨ぐ保存・メール登録・複数キャラ対応・チャットへの完全な状態連携は、今回**実装しない**。現時点での会話履歴は美咲単独のため、将来複数キャラにするときはキャラID付きの関係保存を設計する。\n- 本試作では画面左からのソファ表示、女の子の選択、右・左スワイプ、オープニング動画の表示とスキップは維持。\n\n## 実機で確認\n- 上部ショートカットが顔やタイトルと重ならないか\n- 丸アイコンのサイズとラベルが適切か\n- 会話済みのときのみ直通が有効か\n- ソファの24fps・縦オープニングに影響がないか\n\n## 本採用前の対応\n- ユーザー提供の丸型美咲アイコンを正式公開素材として配置\n- 匿名履歴の継続方針を決め、キャラ別の会話履歴判定を行う\n- ラウンジの上部に最大3人のショートカットを置く場合、折返しまたはスクロールUIを検証\n\n## 2026-10-30 下部操作UIの簡素化\n- ユーザー実機スクリーンショットに基づき、横並びの大きな3ボタンを削除。\n- 画面中央下の名前の左右に小さな「‹」「›」ボタンを配置。48pxタップ領域・アクセシビリティ用の説明あり。\n- 既存の左右スワイプと、中央の美咲をタップして21秒オープニングを見る操作は維持。\n- 初回だけ「左右にスワイプして女の子を選んでね ♡」を約4.2秒表示。sessionStorage による同一タブでの再表示抑止。操作するとすぐ非表示。\n- 「いつもの女の子」欄を少し小型化し、ラウンジの美咲のアニメーションサイズ／ソファ位置は変更しない。\n- 既存の縦画面ラウンジおよび旧比較ページは変更なし。このショートカット比較ページのみ更新。\n\n## 2026-10-30 ラウンジから既存チャットへの本接続（PR作業）\n- 対象: `/lab/transparent-lounge-shortcuts/` と `/lab/transparent-lounge-vertical/`。\n- 初回（ブラウザにユーザー発話履歴がない）: 中央の美咲を選ぶ → 21秒の縦型オープニング → 自動終了またはスキップで `/chat` にページ遷移。\n- 同じブラウザにユーザー発話履歴がある: 中央の美咲を選ぶ → オープニングを省略して `/chat` に直接遷移。「いつもの女の子」丸アイコンからの直通は従来どおり。\n- ナビゲーションは二重起動防止フラグと `window.location.assign('/chat')` を使用し、動画・ダイアログを停止してから遷移。\n- 既存の `/chat` 側の `AnonymousSessionGuard`、会話履歴、保存・関係性、認証・DBは変更なし。匿名ユーザーの継続仕様も従来どおり。画面を開くと既存ガードが匿名認証を行う。\n- 元の試験用 `/lab/transparent-lounge/` とMuse v3比較ページは変更しない。\n- 実機確認点: 新規の終了/スキップ双方で会話に到着、会話済み直通、既存会話の保持、匿名とメール登録済みの振る舞い、ブラウザ復元、戻る操作。\n\n## 2026-10-30 チャット遷移時のラウンジ一瞬再表示を修正\n- iPhone実機で「オープニング終了／スキップ→チャット」切替時に一瞬ラウンジが見える不具合を報告。\n- 原因：動画ダイアログを `close()` してから `window.location.assign('/chat')` するため、ページが変わる直前に背面ラウンジが露出していた。\n- 修正：遷移フラグを維持し、全画面黒カバーをダイアログのトップレイヤー内に追加（直通時はbodyへ追加）、ダイアログを閉じずにチャットへ移動。2フレーム後に遷移することで黒カバーを描画させる。\n- ブラウザの戻る操作でBFCache復元したときの黒カバー除去とダイアログ復旧も追加。\n- 既存の21秒MP4、14秒WebP、匿名認証、チャット本体に変更なし。\n- iPhoneで①ムービー完走、②スキップ、③会話済み直通、④戻る操作の4パターンを再確認。\n\n## 2026-10-30 緊急修正：タップ・スワイプ全無反応\n- 97番修正時に `pageshow` ハンドラの後ろの `;` が抜け、後続の `function tryPlay` と連続してJavaScript構文エラーとなり、初期化処理全体が実行されなくなっていた。\n- `});function tryPlay()` に修正し、ショートカット比較版と縦型版の両方で `new Function` によるJS構文検証が成功。\n- オープニング終了時の黒いカバー処理、Muse v3動画、認証・チャット本体は変更なし。\n- 今後の対策：HTML内スクリプトも静的構文チェック対象にする。\n",
+      "sha256": "96d40332d280b5563f39f08c0d92226cf26c282215500e895edab3fd9c7029c2"
+    },
+    {
+      "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "coverage": "全文",
+      "text": "# 美咲ラウンジ動画自動表示・開発台帳（2026-10-29）\n\n## 確認済み基準\n- main: `0b5ab6758861e2a4916b6b82ec196ed579559d0a`（作業開始時点）\n- 対象: `public/lab/transparent-lounge/index.html`、本番確認ページ `/lab/transparent-lounge/`\n- 既存ラウンジのソファ位置・拡大率・左右仮カード・スワイプ・動画終了/スキップ動作を維持する。\n- 既存チャット、DB、RPC、Relationship Engineは変更しない。\n- 元実験ブランチ `experiment/transparent-lounge-20261027` は main と分岐（ahead 26/behind 4）。そのまま main にマージしない。\n\n## 今回実装したHTML変更（未公開）\n- 手動 WebP 選択UI/JSを削除し、`/lab/transparent-lounge/misaki-lounge-24fps.webp` を自動表示する参照に変更。\n- 古い横型プレビューMP4参照を廃止し、`/lab/transparent-lounge/misaki-opening-vertical-21s.mp4` を参照。\n- 縦型video要素を `aspect-ratio:9/16`、モバイル画面高上限で表示。\n- ソファ背景は既存実験ブランチの素材URLを維持（新ブランチ main には背景画像がないため）。\n- HTMLのみ変更。**動画ファイル2本はまだGitHubの公開フォルダに存在しない。**\n\n## 素材／検証\n- ラウンジ: `misaki-lounge-24fps.webp`（元: `misaki_lounge_24fps(1).webp`）、約4.40MB、624×352、24fps/約9秒、ユーザーiPhoneでループと透過確認済み。\n- オープニング: `misaki-opening-vertical-21s.mp4`（元: `misaki-opening-vertical-21s-iphone(1).mp4`）、2,936,765 bytes、512×910、21.000秒、30fps、H.264/AAC。\n- 配置場所（GitHub）: `public/lab/transparent-lounge/`\n- ユーザーへ提供したZIP: `misaki-lounge-deploy-assets.zip`（上記2ファイルを所定の相対パスで収録）。\n- ブラウザ配信後、WebP 200 + image/webp、MP4 200 + video/mp4、再生・スキップ・終了・画面遷移をiPhone実機で確認する。\n\n## 残作業／リリース判定\n1. ZIP内のバイナリ2本をGitHubの本ブランチへコミットする（GitHubテキストAPIではこの環境からバイナリを直接転送できず、未実施）。\n2. PRの変更ファイルがHTML + 2アセット + 文書だけであることを確認し、マージ後にVercel本番配信を検証。\n3. iPhone実機で、9秒アニメーションループ、縦21秒再生、スキップ、動画終了→既存確認画面を確認。\n4. 次の工程で既存チャット入口を調査・接続する。チャットの複製実装は禁止。\n\n**現時点では本番公開・実機検証未完了。動画ファイル未配置のままPRをマージしない。**\n\n## 2026-10-29 追記：素材アップロードの現物確認\n- 作業ブランチに `public/lab/transparent-lounge/misaki_lounge_24fps.webp`（4,402,574 bytes）および `misaki_lounge_12fps.webp`（2,375,926 bytes）を確認。\n- HTMLのWebP参照を実在する `misaki_lounge_24fps.webp` に修正済み。旧手動選択は不要。\n- `misaki-opening-vertical-21s.mp4` は**依然として未配置**（リポジトリツリー確認）。縦21秒オープニング再生はまだ検証不可。\n- 21秒MP4が同一フォルダにアップロードされるまでマージ・本番公開しない。\n\n## 2026-10-29 追記：21秒MP4到着・HTML参照修正\n- GitHubの同フォルダに `misaki-opening-vertical-21s-iphone.mp4`（2,936,765 bytes）を確認。以前アップロード済みのユーザー素材とファイルサイズが一致する。\n- HTMLのMP4参照を実際のアップロード名 `misaki-opening-vertical-21s-iphone.mp4` に修正。WebP参照も実在する `misaki_lounge_24fps.webp`。\n- 以前の文書内の「動画2本未配置」「MP4未配置」は当時の記録。現時点では2本とも配置済み。\n- 次のゲート: GitHub CI成功、PR取り込み、本番HTTP/再生/iPhone実機確認。\n\n## 2026-10-29 縦型オープニングを画面いっぱいに表示\n- iPhoneで選択後すぐに全画面相当のWebダイアログ（`position:fixed; inset:0; 100dvh`）を開き、動画を `object-fit:contain` で画面内最大表示。\n- ネイティブ動画コントロールを廃止し、縮小／PiP／動画単体のフルスクリーン解除などの意図しない操作を抑制。端末・ブラウザの機能自体を完全禁止する保証ではない。\n- 画面下部の「再生する」（自動再生失敗時）と「スキップ」は継続。終了後の確認画面は従来どおり。\n- 再生状況の通常表示は映像の邪魔にならないよう消し、読み込み失敗・バッファ時に状態を表示。\n- iPhone実機で画面サイズ・再生・終了・スキップ・音声・回転を検証する。\n",
+      "sha256": "fec688f4aa4408857b4344b946cddb1564a798c13b005e8558e0e656b9f6f224"
+    },
+    {
+      "path": "docs/audits/DEVELOPMENT_INVENTORY_DIFF_20261101.md",
+      "coverage": "全文",
+      "text": "# 2026-11-01 差分照合・第一段階（読み取り）\n\n- 現行ブランチ109本（main含む）。詳細台帳 `docs/DEVELOPMENT_REGISTRY.md`（専用ブランチ）の**文字列検索**で108作業ブランチ中93本の名称を確認、15本は名称の完全一致なし。\n- **注意**：名称未記載は「未登録作業」「未完成」を証明しない。旧名、別資料、PR、main総覧に存在する可能性がある。\n- 名称未記載15本：\n- `chore/development-inventory-automation-20261031`\n- `design/anonymous-per-item-24h-memory-20261030`\n- `docs/development-registry-audit-20261020`\n- `docs/misaki-memory-public-final-20261030`\n- `feat/lounge-chat-handoff-20261030`\n- `feat/lounge-encounter-shortcut-20261030`\n- `feat/lounge-minimal-navigation-20261030`\n- `feat/lounge-muse-v3-official-20261030`\n- `feat/lounge-muse-v3-preview-20261030`\n- `feat/lounge-opening-fullscreen-20261029`\n- `feat/lounge-portrait-preview-20261030`\n- `feat/lounge-shortcut-preview-20261030`\n- `feat/lounges-autoload-assets-20261029`\n- `fix/lounge-js-syntax-tap-20261030`\n- `fix/lounge-transition-flash-20261030`\n\n次：15本を優先してmain総覧・PR・専用資料と照合し、作業単位で索引化。実装状態は現段階すべて未判定（U）。\n\n## 第二段階：ブランチ内容の実物確認\n\n| 作業 | main比較（調査時点） | 実物の証拠 | 暫定分類・次の確認 |\n| --- | --- | --- | --- |\n| 匿名情報ごと24時間記憶 | `design/anonymous-per-item-24h-memory-20261030` ahead 1 / behind 0 | `docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md` の設計のみ | **D**（設計）。実装は未確認。 |\n| ラウンジ→チャット接続 | `feat/lounge-chat-handoff-20261030` ahead 3 / behind 4 | `docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md`、ラウンジHTML2件 | **C暫定**（試作・実機未検証）。現行mainへの採用状況は別途照合。 |\n| 縦型オープニング | `feat/lounge-opening-fullscreen-20261029` ahead 2 / behind 10 | `docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md`、ラウンジHTML | **C暫定**（試作）。古い資料の未配置記述は追記で更新されており、最終状態を要確認。 |\n| Muse V3ラウンジ | `feat/lounge-muse-v3-official-20261030` ahead 3 / behind 5 | `docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md`、ラウンジHTML2件 | **U**。名称だけで公式採用・本番反映を認定しない。 |\n| 画面切替時のフラッシュ | `fix/lounge-transition-flash-20261030` ahead 3 / behind 3 | ラウンジHTML2件とショートカット資料 | **U**。PR・現行mainと差分照合が必要。 |\n| 記憶・公開方針資料 | `docs/misaki-memory-public-final-20261030` ahead 1 / behind 0 | 記憶方針文書と `docs/DEVELOPMENT_REGISTRY.md` を含む4ファイル | **D暫定**。既存詳細台帳を置き換えない。 |\n\n※ ahead/behindはGit ancestryであり、未統合機能数・完成度を表さない。2026-11-01の読み取り結果。既存台帳の評価を上書きしない。\n\n## 2026-11-01 管理PRの差分・CI最終レビュー\n\n- 管理Draft PRの変更ファイルは計7件。内訳は棚卸し用workflow 1、読み取り専用スクリプト1、回帰テスト1、管理・監査ドキュメント4。アプリ本体、DBマイグレーション、Push、本番設定ファイルの変更は差分に含まれない。\n- 最新コミットのPR起動CIは成功。`Offline regression tests` 成功、`Read-only inventory` と `Save report artifact` はPRでは両方skip。実データ棚卸しの成功と取り違えない。\n- 両リポジトリのworkflowに週次cron（UTC月曜01:17、日本時間月曜10:17）と手動実行の定義がある。main未統合のため定期実行は未開始。**main統合すると週次実行が有効になるため別途承認が必要**。\n- GitHubのブランチ検索による独立した読み取り確認では、アメふる112、美咲109（各main含む）。PR・Issueの実データを棚卸しスクリプト自身が集計するE2E検証は未完了。\n- 受入残件：読み取り専用の実データ収集、PR/Issue集計の既存台帳との突合、誤検出レビュー、main統合とschedule開始の承認。\n",
+      "sha256": "a3f3128eaf6f0fb9b827591d1e901d7e534e48a844744da5d0234955b35142a7"
+    },
+    {
+      "path": "docs/development-ledger-continuous-update-rule-20261023.md",
+      "coverage": "削除済み／取得不能・差分参照"
+    },
+    {
+      "path": "scripts/development_inventory.py",
+      "coverage": "全文",
+      "text": "#!/usr/bin/env python3\n\"\"\"Read-only GitHub development inventory. No branch/PR/Issue mutations.\"\"\"\nimport datetime as dt\nimport json\nimport os\nimport sys\nimport urllib.error\nimport urllib.parse\nimport urllib.request\n\nREPO = os.environ[\"GITHUB_REPOSITORY\"]\nTOKEN = os.environ[\"GITHUB_TOKEN\"]\nNOW = dt.datetime.now(dt.timezone.utc)\nSTALE_DAYS = int(os.environ.get(\"STALE_DAYS\", \"14\"))\nAPI = \"https://api.github.com\"\n\ndef get(path):\n    req = urllib.request.Request(API + path, headers={\n        \"Authorization\": \"Bearer \" + TOKEN,\n        \"Accept\": \"application/vnd.github+json\",\n        \"X-GitHub-Api-Version\": \"2022-11-28\",\n        \"User-Agent\": \"development-inventory-readonly\",\n    })\n    with urllib.request.urlopen(req, timeout=30) as response:\n        return json.load(response)\n\ndef pages(path):\n    result = []\n    page = 1\n    while True:\n        separator = \"&\" if \"?\" in path else \"?\"\n        batch = get(path + separator + \"per_page=100&page=\" + str(page))\n        if not isinstance(batch, list):\n            raise RuntimeError(\"Unexpected API response\")\n        result.extend(batch)\n        if len(batch) < 100:\n            return result\n        page += 1\n\ndef age(timestamp):\n    if not timestamp:\n        return None\n    updated = dt.datetime.fromisoformat(timestamp.replace(\"Z\", \"+00:00\"))\n    return (NOW - updated).days\n\ndef main():\n    repo = urllib.parse.quote(REPO, safe=\"/\")\n    metadata = get(\"/repos/\" + repo)\n    default = metadata[\"default_branch\"]\n    branches = pages(\"/repos/\" + repo + \"/branches\")\n    all_prs = pages(\"/repos/\" + repo + \"/pulls?state=all\")\n    prs = [p for p in all_prs if p[\"state\"] == \"open\"]\n    issues = [item for item in pages(\"/repos/\" + repo + \"/issues?state=open\") if \"pull_request\" not in item]\n    pr_heads = {p[\"head\"][\"ref\"] for p in prs if p[\"head\"][\"repo\"] and p[\"head\"][\"repo\"][\"full_name\"] == REPO}\n    historical_heads = {p[\"head\"][\"ref\"] for p in all_prs if p[\"head\"][\"repo\"] and p[\"head\"][\"repo\"][\"full_name\"] == REPO}\n    findings = []\n    for branch in branches:\n        name = branch[\"name\"]\n        if name == default:\n            continue\n        # No-PR does NOT mean unfinished. Report only as a review candidate.\n        if name not in pr_heads:\n            findings.append({\"type\": \"branch_without_open_pr\", \"name\": name,\n                             \"historical_pr_found\": name in historical_heads,\n                             \"url\": \"https://github.com/\" + REPO + \"/tree/\" + urllib.parse.quote(name, safe=\"\")})\n    stale_prs = [{\"number\": p[\"number\"], \"title\": p[\"title\"], \"days\": age(p[\"updated_at\"]),\n                  \"url\": p[\"html_url\"]} for p in prs if age(p[\"updated_at\"]) is not None and age(p[\"updated_at\"]) >= STALE_DAYS]\n    stale_issues = [{\"number\": i[\"number\"], \"title\": i[\"title\"], \"days\": age(i[\"updated_at\"]),\n                     \"url\": i[\"html_url\"]} for i in issues if age(i[\"updated_at\"]) is not None and age(i[\"updated_at\"]) >= STALE_DAYS]\n    report = {\"repository\": REPO, \"generated_at\": NOW.isoformat(), \"default_branch\": default,\n              \"branch_count\": len(branches), \"open_pr_count\": len(prs),\n              \"open_issue_count\": len(issues), \"historical_pr_count\": len(all_prs), \"review_candidates\": findings,\n              \"stale_prs\": stale_prs, \"stale_issues\": stale_issues,\n              \"caveat\": \"Candidates are NOT proof of unfinished work. Compare main, merged/closed PRs, and canonical ledger before action.\"}\n    # Stable snapshot for comparison across successful scheduled/manual runs.\n    report[\"snapshot\"] = {\n        \"branches\": {b[\"name\"]: b.get(\"commit\", {}).get(\"sha\") for b in branches},\n        \"prs\": {str(p[\"number\"]): {\"state\": (\"merged\" if p.get(\"merged_at\") else p[\"state\"]),\n                                  \"head\": p[\"head\"].get(\"sha\"), \"updated_at\": p[\"updated_at\"],\n                                  \"title\": p.get(\"title\", \"\"), \"body\": (p.get(\"body\") or \"\")[:2000],\n                                  \"head_ref\": p[\"head\"].get(\"ref\", \"\")}\n                for p in all_prs},\n        \"issues\": {str(i[\"number\"]): {\"state\": \"open\", \"updated_at\": i[\"updated_at\"]} for i in issues},\n    }\n    os.makedirs(\"inventory-output\", exist_ok=True)\n    with open(\"inventory-output/report.json\", \"w\", encoding=\"utf-8\") as f:\n        json.dump(report, f, ensure_ascii=False, indent=2)\n    summary = [\"# Development inventory (read-only)\", \"\",\n               \"Repository: \" + REPO, \"Generated (UTC): \" + NOW.isoformat(), \"\",\n               \"| Metric | Count |\", \"|---|---:|\",\n               \"| Branches including default | \" + str(len(branches)) + \" |\",\n               \"| Open PRs | \" + str(len(prs)) + \" |\",\n               \"| Open issues | \" + str(len(issues)) + \" |\",\n               \"| Branches without open PR (review only) | \" + str(len(findings)) + \" |\",\n               \"| Stale PRs (>= \" + str(STALE_DAYS) + \" days) | \" + str(len(stale_prs)) + \" |\",\n               \"| Stale issues | \" + str(len(stale_issues)) + \" |\", \"\",\n               \"**Do not mark branches unfinished or delete them based on this report.**\",\n               \"Consult the project's canonical ledger, closed/merged PRs and main code first.\", \"\",\n               \"## Stale PRs\"]\n    summary.extend(\"- [#\" + str(p[\"number\"]) + \"](\" + p[\"url\"] + \") (\" + str(p[\"days\"]) + \"d): \" + p[\"title\"].replace(\"\\n\", \" \") for p in stale_prs)\n    summary.append(\"\\n## Stale issues\")\n    summary.extend(\"- [#\" + str(i[\"number\"]) + \"](\" + i[\"url\"] + \") (\" + str(i[\"days\"]) + \"d): \" + i[\"title\"].replace(\"\\n\", \" \") for i in stale_issues)\n    summary.append(\"\\nBranch candidates are available in report.json artifact.\")\n    text = \"\\n\".join(summary) + \"\\n\"\n    with open(\"inventory-output/summary.md\", \"w\", encoding=\"utf-8\") as f:\n        f.write(text)\n    with open(os.environ.get(\"GITHUB_STEP_SUMMARY\", \"/dev/null\"), \"a\", encoding=\"utf-8\") as f:\n        f.write(text)\n    print(text)\n\nif __name__ == \"__main__\":\n    try:\n        main()\n    except (urllib.error.URLError, KeyError, ValueError, RuntimeError) as error:\n        print(\"Inventory failed: \" + str(error), file=sys.stderr)\n        sys.exit(1)\n",
+      "sha256": "f65bd64d6bfd0d9d5e695ecd61f786bbc75bd4ac38f88de2ccb7f620f89e08e3"
+    }
+  ],
+  "curated": {
+    "summary": "iPhone全画面ラウンジの正式化と通常返信の発話状況を修正",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/140"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "1beee56d7e155d5eca301183c4e67075b3715016d56203d6db56e09e4765ac9d",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

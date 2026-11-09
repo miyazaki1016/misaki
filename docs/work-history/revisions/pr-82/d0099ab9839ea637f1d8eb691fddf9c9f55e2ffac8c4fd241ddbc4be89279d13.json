@@ -1,0 +1,136 @@
+{
+  "id": "pr-82",
+  "number": 82,
+  "title": "chore: restore applied relationship RPC migration",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## Purpose\nRestore the canonical Git-managed SQL source for the Relationship Server RPC change that was already applied to production on 2026-09-30 13:19:30.016 UTC.\n\n## Scope\n- Adds `supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql`.\n- The function definitions and grants are reconstructed from the production migration/log record.\n- No production database change is performed by this PR.\n- This is a source-of-truth restoration, not a new production migration to execute against the existing database.\n\n## Audit note\nThe production migration record did not contain rollback SQL. The original GitHub migration file could not be found on `main`; the production log remains the evidence for the applied SQL.",
+  "head": "4dd716a2c04c6864445cb8720a1921813bb50933",
+  "base": "1fb508c224cb85a492973078ea2f27c5dc5042e6",
+  "base_ref": "main",
+  "head_ref": "chore/restore-relationship-rpc-migration",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-14T11:57:22Z",
+  "merge_commit_sha": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "updated_at": "2026-10-14T11:57:22Z",
+  "code_facts": [
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "関数・クラス定義",
+      "expression": "create or replace function public.get_relationship_time_context(p_user_id uuid default null)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "条件分岐・閾値",
+      "expression": "if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "関数・クラス定義",
+      "expression": "revoke all on function public.get_relationship_time_context(uuid) from public,anon,authenticated;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant execute on function public.get_relationship_time_context(uuid) to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "関数・クラス定義",
+      "expression": "create or replace function public.record_relationship_chat_turn(p_user_message_at timestamptz,p_misaki_message_at timestamptz,p_user_id uuid default null)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "条件分岐・閾値",
+      "expression": "if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "条件分岐・閾値",
+      "expression": "if found and v_before.last_interaction_at is not null then v_elapsed_seconds:=greatest(floor(extract(epoch from(v_user_at-v_before.last_interaction_at)))::bigint,0); end if;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "関数・クラス定義",
+      "expression": "revoke all on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) from public,anon,authenticated;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    },
+    {
+      "file": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant execute on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql"
+    }
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "status": "modified",
+      "additions": 58,
+      "deletions": 0,
+      "patch": "diff --git a/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql b/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql\nnew file mode 100644\nindex 0000000..8c2c838\n--- /dev/null\n+++ b/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql\n@@ -0,0 +1,58 @@\n+-- Reconstructed from the production Supabase migration/log record for\n+-- 2026-09-30 13:19:30.016 UTC.\n+--\n+-- This migration records SQL that was already applied to production.\n+-- It is restored here as the canonical Git-managed schema source.\n+-- Do not re-apply this migration to the existing production database.\n+-- Rollback SQL was not present in the production migration record.\n+\n+create or replace function public.get_relationship_time_context(p_user_id uuid default null)\n+returns jsonb\n+language plpgsql\n+security definer\n+set search_path = ''\n+as $$\n+declare\n+  v_user_id uuid := coalesce(auth.uid(), p_user_id);\n+  v_state public.misaki_relationship_state%rowtype;\n+  v_now timestamptz := now();\n+  v_elapsed_seconds bigint := 0;\n+  v_elapsed_hours numeric := 0;\n+  v_band text := 'new';\n+begin\n+  if v_user_id is null then raise exception 'authentication required'; end if;\n+  if auth.uid() is not null and auth.uid() <> v_user_id then raise exception 'user mismatch'; end if;\n+  if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;\n+  if not exists(select 1 from auth.users where id=v_user_id and not is_anonymous) then raise exception 'permanent account required'; end if;\n+  select * into v_state from public.misaki_relationship_state where user_id=v_user_id;\n+  if not found then return jsonb_build_object('exists',false,'now',v_now,'elapsed_seconds',0,'elapsed_hours',0,'time_band','new','intimacy_level','initial','intimacy_points',0,'emotion_state',jsonb_build_object('primary','neutral','intensity',0),'action_state','NORMAL','last_user_message_at',null,'last_misaki_message_at',null,'last_interaction_at',null,'silence_started_at',null); end if;\n+  if v_state.last_interaction_at is not null then\n+    v_elapsed_seconds:=greatest(floor(extract(epoch from(v_now-v_state.last_interaction_at)))::bigint,0);\n+    v_elapsed_hours:=round(v_elapsed_seconds::numeric/3600,2);\n+    v_band:=case when v_elapsed_seconds<21600 then 'recent' when v_elapsed_seconds<86400 then 'same_day' when v_elapsed_seconds<259200 then 'one_to_three_days' when v_elapsed_seconds<604800 then 'three_to_seven_days' else 'seven_plus_days' end;\n+  end if;\n+  return jsonb_build_object('exists',true,'now',v_now,'elapsed_seconds',v_elapsed_seconds,'elapsed_hours',v_elapsed_hours,'time_band',v_band,'intimacy_level',v_state.intimacy_level,'intimacy_points',v_state.intimacy_points,'emotion_state',v_state.emotion_state,'action_state',v_state.action_state,'last_user_message_at',v_state.last_user_message_at,'last_misaki_message_at',v_state.last_misaki_message_at,'last_interaction_at',v_state.last_interaction_at,'silence_started_at',v_state.silence_started_at,'state_updated_at',v_state.state_updated_at);\n+end $$;\n+revoke all on function public.get_relationship_time_context(uuid) from public,anon,authenticated;\n+grant execute on function public.get_relationship_time_context(uuid) to service_role;\n+\n+create or replace function public.record_relationship_chat_turn(p_user_message_at timestamptz,p_misaki_message_at timestamptz,p_user_id uuid default null)\n+returns jsonb language plpgsql security definer set search_path='' as $$\n+declare\n+ v_user_id uuid:=coalesce(auth.uid(),p_user_id); v_before public.misaki_relationship_state%rowtype; v_after public.misaki_relationship_state%rowtype; v_user_at timestamptz:=coalesce(p_user_message_at,now()); v_misaki_at timestamptz:=coalesce(p_misaki_message_at,now()); v_last_at timestamptz:=greatest(v_user_at,v_misaki_at); v_elapsed_seconds bigint:=null;\n+begin\n+ if v_user_id is null then raise exception 'authentication required'; end if;\n+ if auth.uid() is not null and auth.uid()<>v_user_id then raise exception 'user mismatch'; end if;\n+ if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;\n+ if not exists(select 1 from auth.users where id=v_user_id and not is_anonymous) then raise exception 'permanent account required'; end if;\n+ if v_user_at>now()+interval '5 minutes' or v_misaki_at>now()+interval '5 minutes' then raise exception 'future timestamp not allowed'; end if;\n+ select * into v_before from public.misaki_relationship_state where user_id=v_user_id for update;\n+ if found and v_before.last_interaction_at is not null then v_elapsed_seconds:=greatest(floor(extract(epoch from(v_user_at-v_before.last_interaction_at)))::bigint,0); end if;\n+ insert into public.misaki_relationship_state(user_id,last_user_message_at,last_misaki_message_at,last_interaction_at,silence_started_at,state_updated_at)\n+ values(v_user_id,v_user_at,v_misaki_at,v_last_at,v_last_at,now())\n+ on conflict(user_id) do update set last_user_message_at=greatest(coalesce(misaki_relationship_state.last_user_message_at,excluded.last_user_message_at),excluded.last_user_message_at),last_misaki_message_at=greatest(coalesce(misaki_relationship_state.last_misaki_message_at,excluded.last_misaki_message_at),excluded.last_misaki_message_at),last_interaction_at=greatest(coalesce(misaki_relationship_state.last_interaction_at,excluded.last_interaction_at),excluded.last_interaction_at),silence_started_at=greatest(coalesce(misaki_relationship_state.silence_started_at,excluded.silence_started_at),excluded.silence_started_at),state_updated_at=now() returning * into v_after;\n+ insert into public.misaki_relationship_events(user_id,event_type,before_state,after_state,reason,metadata) values(v_user_id,'chat_turn',case when v_before.user_id is null then null else to_jsonb(v_before) end,to_jsonb(v_after),'normal chat turn completed',jsonb_build_object('user_message_at',v_user_at,'misaki_message_at',v_misaki_at,'silence_before_seconds',v_elapsed_seconds));\n+ return jsonb_build_object('ok',true,'silence_before_seconds',v_elapsed_seconds,'state',to_jsonb(v_after));\n+end $$;\n+revoke all on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) from public,anon,authenticated;\n+grant execute on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) to service_role;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/4dd716a2c04c6864445cb8720a1921813bb50933/supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+      "source": {
+        "path": "supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql",
+        "coverage": "全文",
+        "text": "-- Reconstructed from the production Supabase migration/log record for\n-- 2026-09-30 13:19:30.016 UTC.\n--\n-- This migration records SQL that was already applied to production.\n-- It is restored here as the canonical Git-managed schema source.\n-- Do not re-apply this migration to the existing production database.\n-- Rollback SQL was not present in the production migration record.\n\ncreate or replace function public.get_relationship_time_context(p_user_id uuid default null)\nreturns jsonb\nlanguage plpgsql\nsecurity definer\nset search_path = ''\nas $$\ndeclare\n  v_user_id uuid := coalesce(auth.uid(), p_user_id);\n  v_state public.misaki_relationship_state%rowtype;\n  v_now timestamptz := now();\n  v_elapsed_seconds bigint := 0;\n  v_elapsed_hours numeric := 0;\n  v_band text := 'new';\nbegin\n  if v_user_id is null then raise exception 'authentication required'; end if;\n  if auth.uid() is not null and auth.uid() <> v_user_id then raise exception 'user mismatch'; end if;\n  if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;\n  if not exists(select 1 from auth.users where id=v_user_id and not is_anonymous) then raise exception 'permanent account required'; end if;\n  select * into v_state from public.misaki_relationship_state where user_id=v_user_id;\n  if not found then return jsonb_build_object('exists',false,'now',v_now,'elapsed_seconds',0,'elapsed_hours',0,'time_band','new','intimacy_level','initial','intimacy_points',0,'emotion_state',jsonb_build_object('primary','neutral','intensity',0),'action_state','NORMAL','last_user_message_at',null,'last_misaki_message_at',null,'last_interaction_at',null,'silence_started_at',null); end if;\n  if v_state.last_interaction_at is not null then\n    v_elapsed_seconds:=greatest(floor(extract(epoch from(v_now-v_state.last_interaction_at)))::bigint,0);\n    v_elapsed_hours:=round(v_elapsed_seconds::numeric/3600,2);\n    v_band:=case when v_elapsed_seconds<21600 then 'recent' when v_elapsed_seconds<86400 then 'same_day' when v_elapsed_seconds<259200 then 'one_to_three_days' when v_elapsed_seconds<604800 then 'three_to_seven_days' else 'seven_plus_days' end;\n  end if;\n  return jsonb_build_object('exists',true,'now',v_now,'elapsed_seconds',v_elapsed_seconds,'elapsed_hours',v_elapsed_hours,'time_band',v_band,'intimacy_level',v_state.intimacy_level,'intimacy_points',v_state.intimacy_points,'emotion_state',v_state.emotion_state,'action_state',v_state.action_state,'last_user_message_at',v_state.last_user_message_at,'last_misaki_message_at',v_state.last_misaki_message_at,'last_interaction_at',v_state.last_interaction_at,'silence_started_at',v_state.silence_started_at,'state_updated_at',v_state.state_updated_at);\nend $$;\nrevoke all on function public.get_relationship_time_context(uuid) from public,anon,authenticated;\ngrant execute on function public.get_relationship_time_context(uuid) to service_role;\n\ncreate or replace function public.record_relationship_chat_turn(p_user_message_at timestamptz,p_misaki_message_at timestamptz,p_user_id uuid default null)\nreturns jsonb language plpgsql security definer set search_path='' as $$\ndeclare\n v_user_id uuid:=coalesce(auth.uid(),p_user_id); v_before public.misaki_relationship_state%rowtype; v_after public.misaki_relationship_state%rowtype; v_user_at timestamptz:=coalesce(p_user_message_at,now()); v_misaki_at timestamptz:=coalesce(p_misaki_message_at,now()); v_last_at timestamptz:=greatest(v_user_at,v_misaki_at); v_elapsed_seconds bigint:=null;\nbegin\n if v_user_id is null then raise exception 'authentication required'; end if;\n if auth.uid() is not null and auth.uid()<>v_user_id then raise exception 'user mismatch'; end if;\n if auth.uid() is not null and coalesce((auth.jwt()->>'is_anonymous')::boolean,false) then raise exception 'permanent account required'; end if;\n if not exists(select 1 from auth.users where id=v_user_id and not is_anonymous) then raise exception 'permanent account required'; end if;\n if v_user_at>now()+interval '5 minutes' or v_misaki_at>now()+interval '5 minutes' then raise exception 'future timestamp not allowed'; end if;\n select * into v_before from public.misaki_relationship_state where user_id=v_user_id for update;\n if found and v_before.last_interaction_at is not null then v_elapsed_seconds:=greatest(floor(extract(epoch from(v_user_at-v_before.last_interaction_at)))::bigint,0); end if;\n insert into public.misaki_relationship_state(user_id,last_user_message_at,last_misaki_message_at,last_interaction_at,silence_started_at,state_updated_at)\n values(v_user_id,v_user_at,v_misaki_at,v_last_at,v_last_at,now())\n on conflict(user_id) do update set last_user_message_at=greatest(coalesce(misaki_relationship_state.last_user_message_at,excluded.last_user_message_at),excluded.last_user_message_at),last_misaki_message_at=greatest(coalesce(misaki_relationship_state.last_misaki_message_at,excluded.last_misaki_message_at),excluded.last_misaki_message_at),last_interaction_at=greatest(coalesce(misaki_relationship_state.last_interaction_at,excluded.last_interaction_at),excluded.last_interaction_at),silence_started_at=greatest(coalesce(misaki_relationship_state.silence_started_at,excluded.silence_started_at),excluded.silence_started_at),state_updated_at=now() returning * into v_after;\n insert into public.misaki_relationship_events(user_id,event_type,before_state,after_state,reason,metadata) values(v_user_id,'chat_turn',case when v_before.user_id is null then null else to_jsonb(v_before) end,to_jsonb(v_after),'normal chat turn completed',jsonb_build_object('user_message_at',v_user_at,'misaki_message_at',v_misaki_at,'silence_before_seconds',v_elapsed_seconds));\n return jsonb_build_object('ok',true,'silence_before_seconds',v_elapsed_seconds,'state',to_jsonb(v_after));\nend $$;\nrevoke all on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) from public,anon,authenticated;\ngrant execute on function public.record_relationship_chat_turn(timestamptz,timestamptz,uuid) to service_role;\n",
+        "sha256": "cabff272569f72a227b014b890064beaa7c25bed121ab6fca550f1988e5fe81b"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "4dd716a2c04c6864445cb8720a1921813bb50933",
+      "message": "chore: restore applied relationship RPC migration\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4dd716a2c04c6864445cb8720a1921813bb50933"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "4dd716a2c04c6864445cb8720a1921813bb50933",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/38559354153",
+      "id": 38559354153,
+      "updated_at": "2026-10-14T11:51:08Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "public"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "適用済み関係性RPCの移行SQLを復元",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/82"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "95c9b9a5e9351d0db8b81dafb16b8a3bfbfec788e059f2e30beff0a8e158b410",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

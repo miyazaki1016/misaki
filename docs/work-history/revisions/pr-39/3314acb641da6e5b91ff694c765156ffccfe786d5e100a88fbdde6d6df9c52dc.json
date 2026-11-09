@@ -1,0 +1,206 @@
+{
+  "id": "pr-39",
+  "number": 39,
+  "title": "時刻表示の5秒history pollingを撤去する",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Edge診断でiPhone Chromeからの untagged GET を確認し、実装全走査で `app/chat/chat-timestamp-display.tsx` の `POLL_MS = 5_000` → `setInterval(refresh)` → `/api/persona/history` を発信元として特定。\n\n- 5秒pollingを撤去\n- 初回・DOM mutation・focus/visibility時の時刻装飾更新は維持\n- #37/#38で追加したroute/middleware診断ログを撤去\n- 5秒polling再混入防止テスト追加",
+  "head": "829ee4671443140386043396ffb70c0a8a8daaae",
+  "base": "b6c9e5609fbcde16ee2cc057fcd3a86872ef0cda",
+  "base_ref": "main",
+  "head_ref": "sora/remove-timestamp-history-poll",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-02T10:01:33Z",
+  "merge_commit_sha": "a4bf950a0e7a4b1f2b67b8491417194357e8f95d",
+  "updated_at": "2026-10-02T10:01:33Z",
+  "code_facts": [
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('chat timestamp display does not poll permanent history', () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(!source.includes('POLL_MS'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(!source.includes('setInterval'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/tests/server-canonical.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/chat/chat-timestamp-display.tsx",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 6,
+      "patch": "diff --git a/app/chat/chat-timestamp-display.tsx b/app/chat/chat-timestamp-display.tsx\nindex d9b47b7..8e95cfd 100644\n--- a/app/chat/chat-timestamp-display.tsx\n+++ b/app/chat/chat-timestamp-display.tsx\n@@ -9,7 +9,6 @@ type ServerMessage = {\n   sentAt?: string | null;\n };\n \n-const POLL_MS = 5_000;\n const TOKYO_TZ = \"Asia/Tokyo\";\n \n function sanitizeHistory(value: unknown): ServerMessage[] {\n@@ -243,10 +242,6 @@ export default function ChatTimestampDisplay() {\n       });\n     }\n \n-    const interval = window.setInterval(() => {\n-      void refresh();\n-    }, POLL_MS);\n-\n     const onFocus = () => void refresh();\n     const onVisibility = () => {\n       if (document.visibilityState === \"visible\") void refresh();\n@@ -258,7 +253,6 @@ export default function ChatTimestampDisplay() {\n     return () => {\n       active = false;\n       observer.disconnect();\n-      window.clearInterval(interval);\n       window.clearTimeout(renderTimer);\n       window.removeEventListener(\"focus\", onFocus);\n       document.removeEventListener(\"visibilitychange\", onVisibility);\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/app/chat/chat-timestamp-display.tsx",
+      "source": {
+        "path": "app/chat/chat-timestamp-display.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useEffect } from \"react\";\nimport { supabase } from \"../../lib/supabase\";\n\ntype ServerMessage = {\n  role: \"user\" | \"misaki\";\n  text: string;\n  sentAt?: string | null;\n};\n\nconst TOKYO_TZ = \"Asia/Tokyo\";\n\nfunction sanitizeHistory(value: unknown): ServerMessage[] {\n  if (!Array.isArray(value)) return [];\n\n  return value\n    .filter(\n      (item): item is ServerMessage =>\n        Boolean(\n          item &&\n            typeof item === \"object\" &&\n            (((item as ServerMessage).role === \"user\") ||\n              ((item as ServerMessage).role === \"misaki\")) &&\n            typeof (item as ServerMessage).text === \"string\"\n        )\n    )\n    .map((item) => ({\n      role: item.role,\n      text: item.text.trim(),\n      sentAt:\n        typeof item.sentAt === \"string\" && item.sentAt.trim()\n          ? item.sentAt\n          : null,\n    }))\n    .slice(-60);\n}\n\nfunction formatTime(value: string) {\n  const date = new Date(value);\n  if (!Number.isFinite(date.getTime())) return \"\";\n\n  return new Intl.DateTimeFormat(\"ja-JP\", {\n    timeZone: TOKYO_TZ,\n    hour: \"2-digit\",\n    minute: \"2-digit\",\n    hour12: false,\n  }).format(date);\n}\n\nfunction dateKey(value: string) {\n  const date = new Date(value);\n  if (!Number.isFinite(date.getTime())) return \"\";\n\n  return new Intl.DateTimeFormat(\"ja-JP\", {\n    timeZone: TOKYO_TZ,\n    year: \"numeric\",\n    month: \"2-digit\",\n    day: \"2-digit\",\n  }).format(date);\n}\n\nfunction formatDate(value: string) {\n  const date = new Date(value);\n  if (!Number.isFinite(date.getTime())) return \"\";\n\n  return new Intl.DateTimeFormat(\"ja-JP\", {\n    timeZone: TOKYO_TZ,\n    month: \"numeric\",\n    day: \"numeric\",\n    weekday: \"short\",\n  }).format(date);\n}\n\nfunction getBubbles() {\n  return Array.from(\n    document.querySelectorAll<HTMLElement>(\n      \".chat .bubble:not(.typingBubble)\"\n    )\n  ).filter(\n    (bubble) =>\n      bubble.getAttribute(\"data-misaki-timestamp-helper\") !== \"true\"\n  );\n}\n\nfunction clearDecorations() {\n  document\n    .querySelectorAll('[data-misaki-message-time=\"true\"]')\n    .forEach((node) => node.remove());\n\n  document\n    .querySelectorAll('[data-misaki-date-divider=\"true\"]')\n    .forEach((node) => node.remove());\n}\n\nfunction createTimeLabel(time: string, isUser: boolean) {\n  const label = document.createElement(\"span\");\n  label.setAttribute(\"data-misaki-message-time\", \"true\");\n  label.textContent = time;\n\n  Object.assign(label.style, {\n    display: \"block\",\n    marginTop: \"4px\",\n    color: \"#a99ca1\",\n    fontSize: \"9px\",\n    lineHeight: \"1\",\n    textAlign: isUser ? \"right\" : \"left\",\n    opacity: \"0.9\",\n  });\n\n  return label;\n}\n\nfunction createDateDivider(text: string) {\n  const divider = document.createElement(\"div\");\n  divider.setAttribute(\"data-misaki-date-divider\", \"true\");\n  divider.textContent = text;\n\n  Object.assign(divider.style, {\n    alignSelf: \"center\",\n    margin: \"14px auto 10px\",\n    padding: \"4px 10px\",\n    borderRadius: \"999px\",\n    background: \"rgba(108, 92, 98, 0.07)\",\n    color: \"#9a8b90\",\n    fontSize: \"9px\",\n    lineHeight: \"1.3\",\n    textAlign: \"center\",\n  });\n\n  return divider;\n}\n\nfunction decorate(history: ServerMessage[]) {\n  clearDecorations();\n\n  const bubbles = getBubbles();\n  if (bubbles.length === 0 || history.length === 0) return;\n\n  let historyCursor = 0;\n  let previousDate = \"\";\n\n  for (const bubble of bubbles) {\n    const role: ServerMessage[\"role\"] = bubble.classList.contains(\"user\")\n      ? \"user\"\n      : \"misaki\";\n    const text = (bubble.textContent ?? \"\").trim();\n\n    let matchedIndex = -1;\n\n    for (let i = historyCursor; i < history.length; i += 1) {\n      if (history[i].role === role && history[i].text === text) {\n        matchedIndex = i;\n        break;\n      }\n    }\n\n    if (matchedIndex < 0) continue;\n\n    const item = history[matchedIndex];\n    historyCursor = matchedIndex + 1;\n\n    if (!item.sentAt) continue;\n\n    const time = formatTime(item.sentAt);\n    const currentDate = dateKey(item.sentAt);\n\n    if (currentDate && currentDate !== previousDate) {\n      const dateText = formatDate(item.sentAt);\n      if (dateText) {\n        bubble.insertAdjacentElement(\n          \"beforebegin\",\n          createDateDivider(dateText)\n        );\n      }\n      previousDate = currentDate;\n    }\n\n    if (time) {\n      bubble.appendChild(createTimeLabel(time, role === \"user\"));\n    }\n  }\n}\n\nasync function loadHistory() {\n  const { data: sessionData } = await supabase.auth.getSession();\n  const token = sessionData.session?.access_token;\n\n  if (!token) return [];\n\n  const response = await fetch(\"/api/persona/history\", {\n    headers: {\n      Authorization: `Bearer ${token}`,\n    },\n    cache: \"no-store\",\n  });\n\n  if (!response.ok) return [];\n\n  const data = await response.json().catch(() => null);\n  return sanitizeHistory(data?.history);\n}\n\nexport default function ChatTimestampDisplay() {\n  useEffect(() => {\n    let active = true;\n    let renderTimer = 0;\n\n    const refresh = async () => {\n      const history = await loadHistory();\n      if (!active) return;\n      decorate(history);\n    };\n\n    const schedule = () => {\n      window.clearTimeout(renderTimer);\n      renderTimer = window.setTimeout(() => {\n        void refresh();\n      }, 180);\n    };\n\n    void refresh();\n\n    const observer = new MutationObserver((mutations) => {\n      const onlyOurDecorations = mutations.every((mutation) =>\n        Array.from(mutation.addedNodes).every(\n          (node) =>\n            !(node instanceof HTMLElement) ||\n            node.getAttribute(\"data-misaki-message-time\") === \"true\" ||\n            node.getAttribute(\"data-misaki-date-divider\") === \"true\"\n        )\n      );\n\n      if (!onlyOurDecorations) schedule();\n    });\n\n    const chat = document.querySelector(\".chat\");\n    if (chat) {\n      observer.observe(chat, {\n        childList: true,\n        subtree: true,\n      });\n    }\n\n    const onFocus = () => void refresh();\n    const onVisibility = () => {\n      if (document.visibilityState === \"visible\") void refresh();\n    };\n\n    window.addEventListener(\"focus\", onFocus);\n    document.addEventListener(\"visibilitychange\", onVisibility);\n\n    return () => {\n      active = false;\n      observer.disconnect();\n      window.clearTimeout(renderTimer);\n      window.removeEventListener(\"focus\", onFocus);\n      document.removeEventListener(\"visibilitychange\", onVisibility);\n      clearDecorations();\n    };\n  }, []);\n\n  return null;\n}\n",
+        "sha256": "620f85b8af53d4504a0c9f03d82dc22554c26c9511b9e036af627cb43dc8f0b3"
+      }
+    },
+    {
+      "path": "middleware.ts",
+      "status": "modified",
+      "additions": 0,
+      "deletions": 7,
+      "patch": "diff --git a/middleware.ts b/middleware.ts\nindex 0e7f748..e68c161 100644\n--- a/middleware.ts\n+++ b/middleware.ts\n@@ -3,13 +3,6 @@ import { NextRequest, NextResponse } from \"next/server\";\n const CANONICAL_HOST = \"misaki38-ai.com\";\n \n export function middleware(request: NextRequest) {\n-  if (request.nextUrl.pathname === \"/api/persona/history\" && request.method === \"GET\") {\n-    console.log(\"HISTORY EDGE TRACE\", {\n-      source: request.nextUrl.searchParams.get(\"source\") ?? \"untagged\",\n-      userAgent: request.headers.get(\"user-agent\")?.slice(0, 160) ?? \"unknown\",\n-    });\n-  }\n-\n   const host =\n     request.headers.get(\"host\")?.split(\":\")[0]?.toLowerCase() ?? \"\";\n \n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/middleware.ts",
+      "source": {
+        "path": "middleware.ts",
+        "coverage": "全文",
+        "text": "import { NextRequest, NextResponse } from \"next/server\";\n\nconst CANONICAL_HOST = \"misaki38-ai.com\";\n\nexport function middleware(request: NextRequest) {\n  const host =\n    request.headers.get(\"host\")?.split(\":\")[0]?.toLowerCase() ?? \"\";\n\n  if (host === \"misaki.vercel.app\") {\n    const url = request.nextUrl.clone();\n    url.protocol = \"https:\";\n    url.host = CANONICAL_HOST;\n    url.port = \"\";\n\n    return NextResponse.redirect(url, 308);\n  }\n\n  // /api/chat は安全ラッパーを経由させる。\n  // ラッパー側で「覚えてる？」系だけ history を空にしてから\n  // 既存の app/api/chat/route.ts の POST を呼ぶ。\n  if (request.nextUrl.pathname === \"/api/chat\") {\n    const url = request.nextUrl.clone();\n    url.pathname = \"/api/chat-proxy\";\n\n    return NextResponse.rewrite(url);\n  }\n\n  return NextResponse.next();\n}\n\nexport const config = {\n  matcher: \"/((?!_next/static|_next/image|favicon.ico).*)\",\n};\n",
+        "sha256": "45ab6098c7856e8dda71ec2920a1de2ae894a528b79fb46ef557643ac0e293fa"
+      }
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/tests/server-canonical.test.cjs b/tests/server-canonical.test.cjs\nindex 17c0338..26a88ef 100644\n--- a/tests/server-canonical.test.cjs\n+++ b/tests/server-canonical.test.cjs\n@@ -292,3 +292,10 @@ test('history sync self-disables when server confirms anonymous state', () => {\n   assert.ok(source.includes('state?.ephemeral === true'));\n   assert.ok(source.includes('permanentlyDisabled = true'));\n });\n+\n+\n+test('chat timestamp display does not poll permanent history', () => {\n+  const source = fs.readFileSync(path.join(root, 'app/chat/chat-timestamp-display.tsx'), 'utf8');\n+  assert.ok(!source.includes('POLL_MS'));\n+  assert.ok(!source.includes('setInterval'));\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/829ee4671443140386043396ffb70c0a8a8daaae/tests/server-canonical.test.cjs",
+      "source": {
+        "path": "tests/server-canonical.test.cjs",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst root = path.join(__dirname, '..');\n\nfunction harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {\n  const user = { id: 'account-a', is_anonymous: anonymous };\n  const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };\n  let points = initialPoints, consumed = 0, refunded = 0, generated = 0;\n  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];\n  let checkpoint = false, revision = 0;\n  let openaiPayload = null;\n  let maintenance = false;\n  const client = {\n    auth: { getUser: async () => ({ data: { user }, error: null }) },\n    from(table) {\n      const filters = {};\n      const query = { select() { return query; }, not() { return query; }, in(k, v) { filters[k] = v; return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },\n        async maybeSingle() {\n          if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };\n          if (stateFailure) return { error: { message: 'unavailable' }, data: null };\n          if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };\n          if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };\n          if (table === 'misaki_user_conversation_state') return { data: rootState, error: null };\n          if (table === 'misaki_relationship_events') {\n            if (filters.event_type === 'email_save_checkpoint') return { data: checkpoint ? { id: 1 } : null, error: null };\n            const result = completed.get(filters.request_id);\n            return { data: result ? { metadata: result } : null, error: null };\n          }\n          if (table === 'daily_message_requests') return { data: filters.request_id ? temporaryReceipts.get(filters.request_id) ?? null : [...temporaryReceipts.values()].at(-1) ?? null, error: null };\n          return { data: null, error: null };\n        } };\n      query.single = async () => ({ data: { next_push_at: 'lease' }, error: null });\n      query.insert = async () => ({ error: null });\n      query.then = resolve => resolve({ data: [], error: null });\n      return query;\n    },\n    async rpc(name, args) {\n      calls.push({ name, args });\n      if (name === 'consume_daily_message') {\n        consumed++; return { data: [{ allowed: true, message_count: 1, remaining: 19, is_premium: premium }], error: null };\n      }\n      if (name === 'refund_daily_message') {\n        refunded++; return { data: [{ refunded: true, message_count: 0, remaining: 20, is_premium: false }], error: null };\n      }\n      if (name === 'get_relationship_time_context') return { data: { exists: true, intimacy_points: points }, error: null };\n      if (name === 'complete_misaki_chat_turn') {\n        if (commitFailure) return { data: null, error: { message: 'commit failed' } };\n        assert.equal(args.p_user_id, user.id);\n        const found = completed.get(args.p_request_id);\n        if (found) return { data: found.result, error: null };\n        const delta = Math.max(-2, Math.min(2, Number(args.p_result.relationshipPointDelta) || 0));\n        points = Math.max(0, points + delta);\n        const result = { ...args.p_result, relationshipPoints: points, relationshipPointDelta: delta, memorySynced: true, relationshipTimeSynced: true };\n        completed.set(args.p_request_id, { message: args.p_message, result });\n        rootState.memory = result.memory;\n        rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });\n        return { data: result, error: null };\n      }\n      if (name === 'save_misaki_temporary_state') {\n        if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale checkpoint' } };\n        checkpoint = true; points = args.p_points; rootState.history = args.p_history;\n        rootState.memory = args.p_memory; rootState.today_memory = args.p_today_memory;\n        return { data: { saved: true }, error: null };\n      }\n      if (name === 'write_misaki_temporary_root' || name === 'finish_misaki_body_clock_delivery') {\n        const result = storeRoot(name === 'write_misaki_temporary_root' ? args : {\n          ...args, p_token: args.p_temporary_token, p_state: args.p_temporary_state, p_refresh_expiry: false });\n        if (result.error) return result;\n        return { data: name === 'finish_misaki_body_clock_delivery' ? { deliveryId: 'delivery', pushesToday: 1, nextPushAt: 'next' } : 'revision', error: null };\n      }\n      if (name === 'sign_misaki_body_clock_relay') return { data: 'a'.repeat(64), error: null };\n      if (name === 'complete_misaki_temporary_turn') {\n        const receipt = temporaryReceipts.get(args.p_request_id);\n        if (receipt) return { data: receipt.temporary_result, error: null };\n        const stored = storeRoot(args);\n        if (stored.error) return stored;\n        temporaryReceipts.set(args.p_request_id, { completed_at: 'now', temporary_result: args.p_token,\n          message_hash: args.p_message_hash, parent_hash: args.p_parent_hash });\n        return { data: args.p_token, error: null };\n      }\n      return { data: {}, error: null };\n    },\n  };\n  function storeRoot(args) {\n    if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale root' } };\n    temporaryRoots.set(user.id, { token: args.p_token, revision: `revision-${++revision}`, expires_at: args.p_refresh_expiry === false ? temporaryRoots.get(user.id).expires_at : new Date(clock + 86400000).toISOString() });\n    if (checkpoint) {\n      points = args.p_state.relationshipPoints; rootState.history = args.p_state.history;\n      rootState.memory = args.p_state.memory; rootState.today_memory = args.p_state.todayMemory;\n    }\n    return { error: null };\n  }\n  client.auth.admin = { getUserById: async () => ({ data: { user }, error: null }) };\n  let clock = Date.now();\n  class TestDate extends Date { static now() { return clock; } }\n  const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,\n    AbortController, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },\n    console: { log() {}, warn() {}, error() {} },\n    fetch: async (url, options) => {\n      if (String(url).includes('generativelanguage')) {\n        generated++; prompts.push(JSON.parse(options.body));\n        if (generationFailure) return new Response('', { status: 500 });\n        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(openaiPayload ?? { reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });\n      }\n      return Response.json({ current: {} });\n    },\n  });\n  const cache = new Map();\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    const code = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), { compilerOptions: {\n      module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    const module = { exports: {} };\n    const req = name => {\n      if (name === '@supabase/supabase-js') return { createClient: () => client };\n      if (name === 'node:crypto') return require(name);\n      if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };\n      if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };\n      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');\n      throw Error(name);\n    };\n    try {\n      const wrapped = \"(function(require,module,exports){\" + code + String.fromCharCode(10) + \"})\";\n      vm.runInContext(wrapped, context)(req, module, module.exports);\n    } catch (error) {\n      if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);\n      throw error;\n    }\n    cache.set(file, module.exports); return module.exports;\n  }\n  return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },\n    get refunded() { return refunded; }, get generated() { return generated; },\n    setOpenaiPayload(value) { openaiPayload = value; },\n    request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },\n      body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },\n  };\n}\n\ntest('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {\n  const h = harness();\n  const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,\n    memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));\n  assert.equal(response.status, 200);\n  const result = await response.json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);\n  const prompt = JSON.stringify(h.prompts);\n  assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));\n});\ntest('same request replay returns saved response without generation/usage/addition', async () => {\n  const h = harness(), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const second = await (await route.POST(h.request())).json();\n  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);\n  const generations = h.generated;\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);\n});\ntest('Premium chat does not get an automatic point and does not refund', async () => {\n  const h = harness({ premium: true });\n  const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);\n});\nfor (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {\n  const h = harness({ [failure]: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.points, 79); assert.equal(h.refunded, 1); assert.equal(h.consumed, 1);\n});\ntest('canonical read failure stops before consuming usage', async () => {\n  const h = harness({ stateFailure: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.consumed, 0); assert.equal(h.points, 79);\n});\ntest('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();\n  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);\n  const root = h.load('lib/canonical-state.ts');\n  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);\n  assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);\n  const before = h.consumed;\n  const lostResponseReplay = await (await route.POST(h.request())).json();\n  assert.equal(lostResponseReplay.temporaryState, first.temporaryState); assert.equal(h.consumed, before);\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);\n  assert.equal(h.consumed, before);\n  const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();\n  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);\n  const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();\n  assert.equal(second.relationshipPoints, 0);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,\n    requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);\n  h.advanceClock(24 * 60 * 60 * 1000 + 1);\n  assert.equal(root.openTemporaryState(second.temporaryState), null);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);\n  assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);\n});\ntest('anonymous relationship emotion survives into the next temporary-root turn', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const root = h.load('lib/canonical-state.ts');\n  const firstState = root.openTemporaryState(first.temporaryState).state;\n  assert.ok(firstState.temporaryRelationship);\n  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');\n  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');\n\n  const second = await (await route.POST(h.request({\n    temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',\n    message: '次の会話'\n  }))).json();\n  const secondState = root.openTemporaryState(second.temporaryState).state;\n  assert.ok(secondState.temporaryRelationship);\n  assert.ok(secondState.temporaryRelationship.lastInteractionAt);\n  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);\n  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);\n});\n\ntest('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {\n  const h = harness({ anonymous: true });\n  const crypto = h.load('lib/canonical-state.ts');\n  const token = crypto.sealTemporaryState({ memory: ['verified memory'], history: [{ role: 'user', text: 'verified' }],\n    todayMemory: { date: '', items: [] }, relationshipPoints: 7 }, 'previous');\n  const api = h.load('app/api/persona/history/route.ts');\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409);\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'account-a', temporaryState: token,\n    memory: ['forged'], history: [], relationshipPoints: 999 }))).status, 200);\n  const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;\n  assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');\n});\ntest('anonymous history GET is a safe no-op during auth transition', async () => {\n  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');\n  const response = await api.GET(h.request());\n  assert.equal(response.status, 200);\n  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });\n});\ntest('both permanent devices restore same server points and memory without browser caches', async () => {\n  const h = harness(), api = h.load('app/api/persona/history/route.ts');\n  const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();\n  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 79); assert.deepEqual(a.memory, ['server memory']);\n  assert.equal((await api.POST(h.request({ history: [], memory: ['fake'], relationshipPoints: 999 }))).status, 400);\n});\n\nmodule.exports = { harness };\n\n\ntest('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {\n  const h = harness({ initialPoints: 1 });\n  const route = await h.load('app/api/chat/route.ts');\n  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });\n  const requestId = crypto.randomUUID();\n  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  const afterFirst = h.points;\n  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  assert.equal(afterFirst, 0);\n  assert.equal(h.points, 0);\n  assert.equal(first.relationshipPointDelta, undefined);\n  assert.equal(replay.relationshipPointDelta, undefined);\n});\n\n\ntest('anonymous browser never enters permanent history GET sync', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');\n  assert.ok(source.includes('localStorage.getItem(AUTH_KIND_KEY) === \"anonymous\"'));\n  assert.ok(source.includes('session.user.is_anonymous'));\n  assert.ok(source.includes('if (!session?.user || session.user.is_anonymous) return;'));\n});\n\ntest('Vercel runtime does not call the JR East endpoint that returns 403', ",
+        "sha256": "8561e42360ca6de884902eae8c5b3ac822192223cc3196ad2e6b61c47e99b2cd"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "f983bd3473346ae87b7a420eaf319f17d23fded3",
+      "message": "Stop timestamp history polling\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f983bd3473346ae87b7a420eaf319f17d23fded3"
+    },
+    {
+      "sha": "7331164fd04a93fc9991378677b0619175be4894",
+      "message": "Remove history route diagnostic\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7331164fd04a93fc9991378677b0619175be4894"
+    },
+    {
+      "sha": "486d08748d2ebb8897a00cc198d336403b018a3e",
+      "message": "Remove history edge diagnostic\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/486d08748d2ebb8897a00cc198d336403b018a3e"
+    },
+    {
+      "sha": "829ee4671443140386043396ffb70c0a8a8daaae",
+      "message": "Cover timestamp polling regression\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/829ee4671443140386043396ffb70c0a8a8daaae"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "829ee4671443140386043396ffb70c0a8a8daaae",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/36990717244",
+      "id": 36990717244,
+      "updated_at": "2026-10-02T09:36:57Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "CANONICAL_HOST",
+    "ChatTimestampDisplay",
+    "POLL_MS",
+    "TOKYO_TZ",
+    "TestDate",
+    "a",
+    "active",
+    "afterFirst",
+    "api",
+    "assert",
+    "before",
+    "bubble",
+    "bubbles",
+    "cache",
+    "chat",
+    "checkpoint",
+    "clearDecorations",
+    "client",
+    "clock",
+    "code",
+    "completed",
+    "config",
+    "context",
+    "createDateDivider",
+    "createTimeLabel",
+    "crypto",
+    "currentDate",
+    "data",
+    "date",
+    "dateKey",
+    "dateText",
+    "decorate",
+    "delta",
+    "divider",
+    "failure",
+    "filters",
+    "first",
+    "firstState",
+    "formatDate",
+    "formatTime",
+    "found",
+    "fs",
+    "generations",
+    "getBubbles",
+    "h",
+    "harness",
+    "history",
+    "historyCursor",
+    "host",
+    "i",
+    "interval",
+    "item",
+    "label",
+    "load",
+    "loadHistory",
+    "lostResponseReplay",
+    "maintenance",
+    "matchedIndex",
+    "middleware",
+    "module"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "時刻表示の5秒history pollingを撤去する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/39"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "2d56b357c581160be6d7495e89534a9b30b49b5167090582a9d05741a23ba089",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

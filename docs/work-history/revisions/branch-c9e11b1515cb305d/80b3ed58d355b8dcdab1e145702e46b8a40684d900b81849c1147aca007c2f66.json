@@ -1,0 +1,200 @@
+{
+  "id": "branch-c9e11b1515cb305d",
+  "title": "codex/legacy-maintenance-drain",
+  "head": "17449c7ec4e8ff50605ef931b04ae76584c6304f",
+  "head_ref": "codex/legacy-maintenance-drain",
+  "linked_prs": [
+    30
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/legacy-drain.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/.github/workflows/legacy-drain.yml"
+    },
+    {
+      "path": "app/api/chat-proxy/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/chat-proxy/route.ts"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/chat/route.ts"
+    },
+    {
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/persona/evolution/analyze/route.ts"
+    },
+    {
+      "path": "app/api/persona/history/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/persona/history/route.ts"
+    },
+    {
+      "path": "app/api/push/body-clock/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/push/body-clock/route.ts"
+    },
+    {
+      "path": "app/api/push/test/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/api/push/test/route.ts"
+    },
+    {
+      "path": "app/chat/conversation-history-sync.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/app/chat/page.tsx"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/LEGACY_MAINTENANCE_DRAIN.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/docs/LEGACY_MAINTENANCE_DRAIN.md"
+    },
+    {
+      "path": "docs/WRITE_SURFACE_INVENTORY.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/docs/WRITE_SURFACE_INVENTORY.md"
+    },
+    {
+      "path": "lib/legacy-browser-drain.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/lib/legacy-browser-drain.ts"
+    },
+    {
+      "path": "lib/legacy-drain.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/lib/legacy-drain.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/package.json"
+    },
+    {
+      "path": "supabase/functions/body-clock/index.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/supabase/functions/body-clock/index.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/legacy-drain.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/supabase/functions/body-clock/legacy-drain.ts"
+    },
+    {
+      "path": "supabase/legacy-maintenance-drain.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/supabase/legacy-maintenance-drain.sql"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/legacy-drain.browser.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/legacy-drain.browser.test.cjs"
+    },
+    {
+      "path": "tests/legacy-drain.db.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/legacy-drain.db.test.cjs"
+    },
+    {
+      "path": "tests/legacy-drain.edge.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/legacy-drain.edge.test.cjs"
+    },
+    {
+      "path": "tests/legacy-drain.routes.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/legacy-drain.routes.test.cjs"
+    },
+    {
+      "path": "tests/legacy-schema.fixture.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/17449c7ec4e8ff50605ef931b04ae76584c6304f/tests/legacy-schema.fixture.sql"
+    }
+  ],
+  "commits": "17449c7ec4e8ff50605ef931b04ae76584c6304f Make freeze control reads MVCC-safe with row locks\naa8a1cc4dedc0574f225faa0994efeaea0937cff test: retain Gate 1 barrier lifetime counterexamples and PG17 coverage\n1867caed8dcd67f4d1f8bac275acd4f1834aef0c test: expose stale snapshot admission after freeze\n375088c0ef14d5e9dd98ae3495d03f41da1eeaf5 test: expose stale snapshot freeze bypass and record blocker\nfb25649e836a3fa9681fa0bbe168cbae42018abf Document catalog inventory and reproduced auth-trigger freeze bypass\nf09a6b5746274ab6e863515897d17cdd5ba50474 Document reproduced legacy freeze bypasses and blocked handover audit\n69e7d5c679548f9fd4d29ff90e73850f2d643930 Add independent legacy maintenance admission and drain equipment",
+  "topics": [
+    "雨量・全国検知",
+    "記憶・会話",
+    "通知・配信",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a2484198a82d7af9742d20dc8fc940ab814abdfc8375527af8c259127a2ce14f",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

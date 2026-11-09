@@ -1,0 +1,256 @@
+{
+  "id": "pr-155",
+  "number": 155,
+  "title": "feat: show explicit owner decisions with question and recommendation",
+  "topics": [
+    "開発管理"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Dashboard improvement based on owner's request: initial view includes only PRs explicitly labeled owner-decision / needs-owner-decision / user-approval-required; separate untriaged and draft views preserve visibility of everything else. Cards surface PR-authored 変更概要 / 判断してほしいこと / 推奨と理由, and say 未記入 if evidence is lacking (never invent recommendation). Draft decision requests may be shown but are not merge-ready. No automatic labeling/approvals/merges, no secrets. README documents cross-repo decision handoff; offline regression assertions added. Verify CI and Pages deployment before main merge.",
+  "head": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+  "base": "f839665ff5fa0c9ae35a2aa8e7b85122eebb7494",
+  "base_ref": "main",
+  "head_ref": "feat/owner-decision-queue-20261104",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-04T03:47:26Z",
+  "merge_commit_sha": "f9720cf21dccdc46e1a89ecc7917a790e20594f4",
+  "updated_at": "2026-11-04T03:47:26Z",
+  "code_facts": [
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"owner-decision\" in html and \"needs-owner-decision\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert 'data-view=\"untriaged\"' in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"判断してほしいこと\" in html and \"推奨と理由\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"needsDecision(p)\" in parser.scripts[0]",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"p.body||''\" in parser.scripts[0]",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"eval(\" not in parser.scripts[0]",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "const assert = require(\"node:assert/strict\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(needsDecision({labels:[\"owner-decision\"]}), true);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(needsDecision({labels:[\"routine-maintenance\"]}), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(needsDecision({labels:[]}), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(facts.summary, \"会話の表示を変更\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(facts.question, \"AかB\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/approval-dashboard/README.md",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 1,
+      "patch": "diff --git a/docs/approval-dashboard/README.md b/docs/approval-dashboard/README.md\nindex 85059b2..306827c 100644\n--- a/docs/approval-dashboard/README.md\n+++ b/docs/approval-dashboard/README.md\n@@ -5,7 +5,9 @@ Vercelの追加プロジェクトを使わず、GitHub Pages上で2つのリポ\n \n ## 表示と操作\n - GitHub公開APIから `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のopen PRを読み取り専用で取得。\n-- Draft以外を「承認候補」、Draftを「準備中」と表示。**承認候補＝マージ安全の判定ではない。** 台帳更新PRも、別途自動マージの安全ゲートが整うまでは表示する。\n+- 初期画面は**「あなたの判断待ち」**。open PRのラベル `owner-decision`、`needs-owner-decision` または `user-approval-required` が明示されたものだけを表示。Draftの仕様判断依頼も表示するが、マージ可能とは扱わない。\n+- その他の非Draft PRは「未整理」、Draft PRは「準備中」、全件は「すべて」に分ける。未整理を自動的に承認済み・不要とは判定しない。\n+- 判断待ちのカードはPR本文の `### 変更概要` / `### 判断してほしいこと` / `### 推奨と理由` を抽出する。情報不足は「未記入」と明示し、AIによる推測で埋めない。\n - 「GitHubで確認・マージ」からGitHubのPR画面へ移動し、ログイン済みのユーザーが差分・CI・承認条件を確認してマージする。**このダッシュボード内からの直接マージは未実装。**\n - CIチェックはカードを展開した時だけ取得。GitHub APIの制限に達した場合はエラーを表示する。\n - 個人アクセストークンは保存・要求しない。GitHub Pagesは公開サイトとなるので秘密情報は載せない。\n@@ -21,3 +23,20 @@ GitHub Pagesは静的配信でサーバー側の機密資格情報を安全に\n \n ## 再実行時の注意\n Pagesが未設定のまま初回デプロイに失敗した後、同じworkflow run内のdeployジョブだけを再実行すると、同名の `github-pages` アーティファクトが2つできて配信に失敗することがある。その場合は**同じジョブの再実行を繰り返さず、Actionsの「Run workflow」で新しいworkflow runを作る**。新しいrunの公開結果を確認してから利用者へURLを案内する。\n+\n+## 判断依頼の登録規約（両リポジトリ共通）\n+\n+オーナーに決定してほしい具体的な項目がある場合だけ、対象PRに `owner-decision` ラベルを付与し、PR本文に以下を記載する。ラベルがなければ初期画面には表示されない。\n+\n+```markdown\n+### 変更概要\n+誰に何の影響があるか、専門用語を避けて説明する。\n+\n+### 判断してほしいこと\n+選択肢AとB、各案の結果。何を決めればよいかを一問に絞る。\n+\n+### 推奨と理由\n+推奨する選択肢、根拠、確認済みテストと残る懸念。\n+```\n+\n+**運用上の安全境界:** このラベルは決裁が必要という印であり、合格・承認・マージ許可ではない。アプリ本体、認証、本番、DB、通知などの変更は専用PRの検証と承認を維持。ラベル・記載がないPRも「未整理」に残るため、管理から消えない。自動分類や自動マージはこの変更には含まない。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/docs/approval-dashboard/README.md",
+      "source": {
+        "path": "docs/approval-dashboard/README.md",
+        "coverage": "全文",
+        "text": "# 開発承認ボード（美咲 × アメふる）\n\n## 目的\nVercelの追加プロジェクトを使わず、GitHub Pages上で2つのリポジトリの**open PR**をiPhoneからまとめて確認する。既存の開発台帳や棚卸しを置き換えない。\n\n## 表示と操作\n- GitHub公開APIから `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のopen PRを読み取り専用で取得。\n- 初期画面は**「あなたの判断待ち」**。open PRのラベル `owner-decision`、`needs-owner-decision` または `user-approval-required` が明示されたものだけを表示。Draftの仕様判断依頼も表示するが、マージ可能とは扱わない。\n- その他の非Draft PRは「未整理」、Draft PRは「準備中」、全件は「すべて」に分ける。未整理を自動的に承認済み・不要とは判定しない。\n- 判断待ちのカードはPR本文の `### 変更概要` / `### 判断してほしいこと` / `### 推奨と理由` を抽出する。情報不足は「未記入」と明示し、AIによる推測で埋めない。\n- 「GitHubで確認・マージ」からGitHubのPR画面へ移動し、ログイン済みのユーザーが差分・CI・承認条件を確認してマージする。**このダッシュボード内からの直接マージは未実装。**\n- CIチェックはカードを展開した時だけ取得。GitHub APIの制限に達した場合はエラーを表示する。\n- 個人アクセストークンは保存・要求しない。GitHub Pagesは公開サイトとなるので秘密情報は載せない。\n\n## GitHub Pages公開\n`.github/workflows/approval-dashboard-pages.yml` をmainへ統合後、GitHubリポジトリの **Settings → Pages → Build and deployment → Source: GitHub Actions** を設定する。以降、ダッシュボードを変更した時またはActionsの手動実行で公開できる。\n\n想定URL（GitHub Pages有効化後。**現時点で公開確認したURLではない**）:\n`https://miyazaki1016.github.io/misaki/`\n\n## 実際にページ上で直接マージする将来拡張\nGitHub Pagesは静的配信でサーバー側の機密資格情報を安全に保管できない。直接マージには認証済みのバックエンド／GitHub App・最小権限・実行前のCI/branch保護再検証・監査ログが必要。これらなしにトークンをブラウザーへ埋め込まない。\n\n## 再実行時の注意\nPagesが未設定のまま初回デプロイに失敗した後、同じworkflow run内のdeployジョブだけを再実行すると、同名の `github-pages` アーティファクトが2つできて配信に失敗することがある。その場合は**同じジョブの再実行を繰り返さず、Actionsの「Run workflow」で新しいworkflow runを作る**。新しいrunの公開結果を確認してから利用者へURLを案内する。\n\n## 判断依頼の登録規約（両リポジトリ共通）\n\nオーナーに決定してほしい具体的な項目がある場合だけ、対象PRに `owner-decision` ラベルを付与し、PR本文に以下を記載する。ラベルがなければ初期画面には表示されない。\n\n```markdown\n### 変更概要\n誰に何の影響があるか、専門用語を避けて説明する。\n\n### 判断してほしいこと\n選択肢AとB、各案の結果。何を決めればよいかを一問に絞る。\n\n### 推奨と理由\n推奨する選択肢、根拠、確認済みテストと残る懸念。\n```\n\n**運用上の安全境界:** このラベルは決裁が必要という印であり、合格・承認・マージ許可ではない。アプリ本体、認証、本番、DB、通知などの変更は専用PRの検証と承認を維持。ラベル・記載がないPRも「未整理」に残るため、管理から消えない。自動分類や自動マージはこの変更には含まない。\n",
+        "sha256": "97ed20b0417842d2d9190b8fcf4e4a8766172f774937e3b80ead9a5c701d4990"
+      }
+    },
+    {
+      "path": "docs/approval-dashboard/index.html",
+      "status": "modified",
+      "additions": 118,
+      "deletions": 4,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/docs/approval-dashboard/index.html",
+      "source": {
+        "path": "docs/approval-dashboard/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "scripts/check_approval_dashboard.py",
+      "status": "modified",
+      "additions": 25,
+      "deletions": 0,
+      "patch": "diff --git a/scripts/check_approval_dashboard.py b/scripts/check_approval_dashboard.py\nindex 41adc53..28274ec 100644\n--- a/scripts/check_approval_dashboard.py\n+++ b/scripts/check_approval_dashboard.py\n@@ -29,8 +29,33 @@ assert \"https://api.github.com/\" in html\n assert \"noopener noreferrer\" in html\n assert \"localStorage\" not in html and \"access_token\" not in html\n assert \"fetchRepo\" in parser.scripts[0]\n+assert \"owner-decision\" in html and \"needs-owner-decision\" in html\n+assert 'data-view=\"untriaged\"' in html\n+assert \"判断してほしいこと\" in html and \"推奨と理由\" in html\n+assert \"needsDecision(p)\" in parser.scripts[0]\n+assert \"p.body||''\" in parser.scripts[0]\n+assert \"eval(\" not in parser.scripts[0]\n with tempfile.TemporaryDirectory() as directory:\n     path = Path(directory) / \"dashboard.js\"\n     path.write_text(parser.scripts[0], encoding=\"utf-8\")\n     subprocess.run([\"node\", \"--check\", str(path)], check=True)\n+    # Run pure decision helpers against representative owner-approval PRs.\n+    js = parser.scripts[0]\n+    start = js.index(\"  const decisionLabels=\")\n+    end = js.index(\"  const status=byId(\", start)\n+    helpers = js[start:end]\n+    smoke = r\"\"\"\n+const assert = require(\"node:assert/strict\");\n+assert.equal(needsDecision({labels:[\"owner-decision\"]}), true);\n+assert.equal(needsDecision({labels:[\"routine-maintenance\"]}), false);\n+assert.equal(needsDecision({labels:[]}), false);\n+const body = [\"### 変更概要\",\"会話の表示を変更\",\"### 判断してほしいこと\",\"AかB\",\"### 推奨と理由\",\"Aが安全\"].join(String.fromCharCode(10));\n+const facts = decisionFacts({body});\n+assert.equal(facts.summary, \"会話の表示を変更\");\n+assert.equal(facts.question, \"AかB\");\n+assert.equal(facts.recommendation, \"Aが安全\");\n+assert.equal(decisionFacts({body:\"\"}).question, \"\");\n+\"\"\"\n+    path.write_text(helpers + chr(10) + smoke, encoding=\"utf-8\")\n+    subprocess.run([\"node\", str(path)], check=True)\n print(\"Dashboard structure and JavaScript syntax OK\")\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/da1ea1eb9569ce1b414211dd2063c7b0187c70c4/scripts/check_approval_dashboard.py",
+      "source": {
+        "path": "scripts/check_approval_dashboard.py",
+        "coverage": "全文",
+        "text": "#!/usr/bin/env python3\n\"\"\"Offline structural check of the static approval dashboard.\"\"\"\nfrom html.parser import HTMLParser\nfrom pathlib import Path\nimport subprocess\nimport tempfile\n\nclass Scripts(HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.in_script = False\n        self.scripts = []\n    def handle_starttag(self, tag, attrs):\n        if tag == \"script\":\n            self.in_script = True\n            self.scripts.append(\"\")\n    def handle_endtag(self, tag):\n        if tag == \"script\":\n            self.in_script = False\n    def handle_data(self, data):\n        if self.in_script:\n            self.scripts[-1] += data\n\nhtml = Path(\"docs/approval-dashboard/index.html\").read_text(encoding=\"utf-8\")\nparser = Scripts()\nparser.feed(html)\nassert len(parser.scripts) == 1, \"Exactly one inline script expected\"\nassert \"https://api.github.com/\" in html\nassert \"noopener noreferrer\" in html\nassert \"localStorage\" not in html and \"access_token\" not in html\nassert \"fetchRepo\" in parser.scripts[0]\nassert \"owner-decision\" in html and \"needs-owner-decision\" in html\nassert 'data-view=\"untriaged\"' in html\nassert \"判断してほしいこと\" in html and \"推奨と理由\" in html\nassert \"needsDecision(p)\" in parser.scripts[0]\nassert \"p.body||''\" in parser.scripts[0]\nassert \"eval(\" not in parser.scripts[0]\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / \"dashboard.js\"\n    path.write_text(parser.scripts[0], encoding=\"utf-8\")\n    subprocess.run([\"node\", \"--check\", str(path)], check=True)\n    # Run pure decision helpers against representative owner-approval PRs.\n    js = parser.scripts[0]\n    start = js.index(\"  const decisionLabels=\")\n    end = js.index(\"  const status=byId(\", start)\n    helpers = js[start:end]\n    smoke = r\"\"\"\nconst assert = require(\"node:assert/strict\");\nassert.equal(needsDecision({labels:[\"owner-decision\"]}), true);\nassert.equal(needsDecision({labels:[\"routine-maintenance\"]}), false);\nassert.equal(needsDecision({labels:[]}), false);\nconst body = [\"### 変更概要\",\"会話の表示を変更\",\"### 判断してほしいこと\",\"AかB\",\"### 推奨と理由\",\"Aが安全\"].join(String.fromCharCode(10));\nconst facts = decisionFacts({body});\nassert.equal(facts.summary, \"会話の表示を変更\");\nassert.equal(facts.question, \"AかB\");\nassert.equal(facts.recommendation, \"Aが安全\");\nassert.equal(decisionFacts({body:\"\"}).question, \"\");\n\"\"\"\n    path.write_text(helpers + chr(10) + smoke, encoding=\"utf-8\")\n    subprocess.run([\"node\", str(path)], check=True)\nprint(\"Dashboard structure and JavaScript syntax OK\")\n",
+        "sha256": "52baec33979de69cdbc11009b13cee15abfc8ff69dac86fbbbd2e6475ee5d618"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "c4595267a3b37590d17f1b42b84ae7e1ca7db023",
+      "message": "feat: show owner decision questions, evidence and recommendations on dashboard\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/c4595267a3b37590d17f1b42b84ae7e1ca7db023"
+    },
+    {
+      "sha": "c53af67513879d6bd62edb482f8db1167c8a3186",
+      "message": "docs: define explicit owner decision handoff contract\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/c53af67513879d6bd62edb482f8db1167c8a3186"
+    },
+    {
+      "sha": "5fcdec0929532ea9e6c1cd0ee277c30234c5e36d",
+      "message": "test: require explicit owner decision queue and actionable card fields\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/5fcdec0929532ea9e6c1cd0ee277c30234c5e36d"
+    },
+    {
+      "sha": "f79f35a710c73cf483877adcfe76ad4bb4fce76b",
+      "message": "fix: restore decision section parser syntax\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f79f35a710c73cf483877adcfe76ad4bb4fce76b"
+    },
+    {
+      "sha": "1bb68f77d4f2b7793c71a2b0bafd82b6d520d56e",
+      "message": "test: exercise explicit owner decision and PR body section parsing\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1bb68f77d4f2b7793c71a2b0bafd82b6d520d56e"
+    },
+    {
+      "sha": "666ad8b6a9f0e333d06fb75115a0467feb734403",
+      "message": "test: preserve literal JS newline escapes in decision smoke cases\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/666ad8b6a9f0e333d06fb75115a0467feb734403"
+    },
+    {
+      "sha": "a96e96bedaf68e98f2ba5f853604c10583a87065",
+      "message": "test: join helper and smoke JS with real newline\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/a96e96bedaf68e98f2ba5f853604c10583a87065"
+    },
+    {
+      "sha": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+      "message": "test: supply actual multiline PR body in parser regression\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/da1ea1eb9569ce1b414211dd2063c7b0187c70c4"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41769259424",
+      "id": 41769259424,
+      "updated_at": "2026-11-04T03:47:36Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41769144114",
+      "id": 41769144114,
+      "updated_at": "2026-11-04T03:46:25Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Approval dashboard (GitHub Pages)",
+      "head_sha": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41769144054",
+      "id": 41769144054,
+      "updated_at": "2026-11-04T03:46:24Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "da1ea1eb9569ce1b414211dd2063c7b0187c70c4",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41769144105",
+      "id": 41769144105,
+      "updated_at": "2026-11-04T03:47:14Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "Scripts",
+    "__init__",
+    "assert",
+    "body",
+    "decisionLabels",
+    "facts",
+    "handle_data",
+    "handle_endtag",
+    "handle_starttag",
+    "status"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "本人判断の質問と推奨案を承認ボードに表示",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/155"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "028400414b1664d81829218a68678aebf375a109b7591f59849fb21e95817080",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

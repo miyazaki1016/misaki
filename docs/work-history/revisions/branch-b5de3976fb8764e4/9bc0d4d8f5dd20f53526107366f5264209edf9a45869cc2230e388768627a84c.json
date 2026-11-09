@@ -1,0 +1,261 @@
+{
+  "id": "branch-b5de3976fb8764e4",
+  "title": "work/forget-control-v1",
+  "head": "84d147ba5b46698d3b46fb727a9859f87f79f3d2",
+  "head_ref": "work/forget-control-v1",
+  "linked_prs": [
+    66
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/app/api/chat/route.ts"
+    },
+    {
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/app/api/persona/evolution/analyze/route.ts"
+    },
+    {
+      "path": "app/api/persona/history/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/app/api/persona/history/route.ts"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/app/chat/page.tsx"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/canonical-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/lib/canonical-state.ts"
+    },
+    {
+      "path": "lib/persona/evolution-runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/lib/persona/evolution-runner.ts"
+    },
+    {
+      "path": "lib/persona/persona-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/lib/persona/persona-store.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/package.json"
+    },
+    {
+      "path": "supabase/functions/_shared/forget-control.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/functions/_shared/forget-control.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/functions/body-clock/conversation-root.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/index.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/functions/body-clock/index.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/functions/body-clock/persona-store.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/functions/body-clock/temporary-state.ts"
+    },
+    {
+      "path": "supabase/migrations/20261006200002_forget_control_v1.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/supabase/migrations/20261006200002_forget_control_v1.sql"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/body-clock-canonical.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/body-clock-canonical.test.cjs"
+    },
+    {
+      "path": "tests/forget-batch-evaluate.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-batch-evaluate.ts"
+    },
+    {
+      "path": "tests/forget-batch.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-batch.test.ts"
+    },
+    {
+      "path": "tests/forget-call-count.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-call-count.test.cjs"
+    },
+    {
+      "path": "tests/forget-control.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-control.test.ts"
+    },
+    {
+      "path": "tests/forget-database.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-database.test.cjs"
+    },
+    {
+      "path": "tests/forget-fixture.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-fixture.cjs"
+    },
+    {
+      "path": "tests/forget-integration.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/forget-integration.test.cjs"
+    },
+    {
+      "path": "tests/helpers/canonical-harness.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/helpers/canonical-harness.cjs"
+    },
+    {
+      "path": "tests/helpers/forget-batch-evaluation.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/helpers/forget-batch-evaluation.ts"
+    },
+    {
+      "path": "tests/helpers/forget-batch-fixtures.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/helpers/forget-batch-fixtures.ts"
+    },
+    {
+      "path": "tests/helpers/forget-batch-runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/helpers/forget-batch-runner.ts"
+    },
+    {
+      "path": "tests/maintenance.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/maintenance.test.cjs"
+    },
+    {
+      "path": "tests/reports/forget-batch-evaluation.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/reports/forget-batch-evaluation.md"
+    },
+    {
+      "path": "tests/reports/forget-batch-scripted.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/reports/forget-batch-scripted.json"
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/server-canonical.test.cjs"
+    },
+    {
+      "path": "tests/temporary-continuity.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/84d147ba5b46698d3b46fb727a9859f87f79f3d2/tests/temporary-continuity.test.cjs"
+    }
+  ],
+  "commits": "84d147ba5b46698d3b46fb727a9859f87f79f3d2 Document Forget Control Preview acceptance gate\na13fb439d1a78f76f5607b8bb6465287fa95b3a3 Document Gemini Shadow blockers and separate batch optimization\nfb5768089494c62b35d11442d309bf3fe6df57fd Add verification-only Forget batch comparison and measurement harness\n3cb98b7e70b601602c0c473136b75fce02db6ff0 Prove canonical Soft Forget removal and measure resolver call counts\nbb6c98d635a6016a6e1d8b7fa1a39eacffb6cb3c Implement canonical Forget Control v1 with confirmed relearning",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "9b0a92aa3a3ee59f78e3f3c93d593a433c97d455cb4834bba59869127a4c54b0",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

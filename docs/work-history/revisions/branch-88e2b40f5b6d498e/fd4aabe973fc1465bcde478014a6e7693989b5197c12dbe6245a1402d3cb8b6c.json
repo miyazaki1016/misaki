@@ -1,0 +1,20 @@
+{
+  "id": "branch-88e2b40f5b6d498e",
+  "title": "sora/drop-ungrounded-relationship-evidence",
+  "head": "ae0df66929f62bb804b37c35eebabb7e8c66b696",
+  "head_ref": "sora/drop-ungrounded-relationship-evidence",
+  "linked_prs": [
+    56
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ae951031b47af0f4fb1c9515f2dd2786ceccf3add04395fcda27a778cc953c9e",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

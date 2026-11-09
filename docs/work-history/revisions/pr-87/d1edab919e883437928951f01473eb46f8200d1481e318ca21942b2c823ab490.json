@@ -1,0 +1,92 @@
+{
+  "id": "pr-87",
+  "number": 87,
+  "title": "design: shared Misaki conversation engine for production and tuning lab",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Design-only Draft PR. Proposes a single pure conversation pipeline shared by production and offline lab, with strict separation of canonical state, auth, quota and writes. Includes parity invariants, phased extraction and rollout gates. No runtime edits, no model calls, no production deployment. Coordinate with PR #85 (draft overview) and PR #86 (offline harness). Owner approval required before any paid Gemini calls or production rollout.",
+  "head": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+  "base": "c88cf7f79d4c7ae35765d8ba4664f5e8a358dcfa",
+  "base_ref": "main",
+  "head_ref": "design/shared-conversation-engine-contract-20261015",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-10-15T08:14:27Z",
+  "code_facts": [
+    {
+      "file": "docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+      "kind": "テストの期待値・条件",
+      "expression": "**Inside shared engine**: prompt assembly, Gemini message mapping, generation orchestration via an injected model port, parsing, reply problem detection, retry decision, expression rewrite and final cleanup. Relationship/emotion calculation must be pure and take snapshot input; if not yet pure, keep it outside and supply resolved guides.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/daded504b1d2834ed4d7b4a6d0758e89841aed74/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md"
+    },
+    {
+      "file": "docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+      "kind": "テストの期待値・条件",
+      "expression": "**Phase 2 — injected generation pipeline**: model port and deterministic test double; replicate initial generation, rejection/retry, cleanup and conditional emotion/expression generation. Count logical calls and physical retries separately.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/daded504b1d2834ed4d7b4a6d0758e89841aed74/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+      "status": "modified",
+      "additions": 111,
+      "deletions": 0,
+      "patch": "diff --git a/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md b/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md\nnew file mode 100644\nindex 0000000..7aed7ef\n--- /dev/null\n+++ b/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md\n@@ -0,0 +1,111 @@\n+# Shared Conversation Engine — design contract v0 (2026-10-15)\n+\n+**Status: proposed design, not implemented or approved for production.** Isolated branch from `main`. No API calls, database access, runtime edits, or deployment.\n+\n+## Goal\n+\n+Both production chat and an offline conversation tuning lab invoke the **same pure reply pipeline**. The runtime supplies state; the engine decides how to render and validate language; the runtime alone controls persistence, quota, authentication and state transitions.\n+\n+```text\n+Production authenticated runtime ──┐\n+                                  ├── resolve immutable ConversationSnapshot\n+Offline synthetic lab adapter ─────┘                │\n+                                                    ▼\n+                                  shared ConversationEngine\n+                               prompt → model → validate → expression\n+                                                    │\n+                                                    ▼\n+                                      ReplyCandidate + diagnostics\n+                                                    │\n+                       ┌────────────────────────────┴─────────────────┐\n+                       ▼                                              ▼\n+               Production commit adapter                       Lab record only\n+```\n+\n+## Boundaries\n+\n+**Outside shared engine**: auth, quota, canonical DB reads/writes, relationship event commits, clock/weather/network retrieval, scheduling, telemetry with user IDs. Only production adapter can commit canonical state.\n+\n+**Inside shared engine**: prompt assembly, Gemini message mapping, generation orchestration via an injected model port, parsing, reply problem detection, retry decision, expression rewrite and final cleanup. Relationship/emotion calculation must be pure and take snapshot input; if not yet pure, keep it outside and supply resolved guides.\n+\n+## Proposed typed interface\n+\n+```ts\n+type ConversationSnapshot = Readonly<{\n+  persona: { text: string; source: string; version: string | null };\n+  userText: string;\n+  modelUserText: string;\n+  history: readonly { role: \"user\" | \"misaki\"; text: string }[];\n+  memory: readonly string[];\n+  todayMemory: { date: string; items: readonly string[] };\n+  relationship: {\n+    points: number;\n+    actingGuide: string;\n+    legacyGuide: string;\n+    pendingGuide: string;\n+    emotionGuide: string;\n+  };\n+  resolvedGuides: {\n+    profile: string; life: string; time: string; signals: string;\n+    taxi: string; misakiLife: string; activity: string;\n+    weather: string; weatherHistory: string; tokyoEvents: string;\n+    todayMemory: string; recentTopics: string;\n+  };\n+  currentTime: string;\n+  currentDate: string;\n+  dayType: \"work\" | \"off\";\n+}>;\n+type ModelPort = (input: {\n+  systemInstruction: string;\n+  contents: readonly { role: \"user\" | \"model\"; parts: readonly { text: string }[] }[];\n+  userText: string;\n+  attempt: number;\n+}) => Promise<{ ok: boolean; text: string | null; status: number }>;\n+type ReplyCandidate = {\n+  reply: string;\n+  proposedMemory: readonly string[];\n+  proposedTodayMemory: readonly string[];\n+  proposedSignals: unknown;\n+  diagnostics: readonly string[];\n+  modelCalls: number;\n+};\n+```\n+\n+This is an architectural sketch, **not a claim that the current production route already satisfies these types**. Preserve the exact existing JSON schema, parsing, retries and conditional expression stage during extraction. The engine never persists `proposed*` fields.\n+\n+## Safety and parity invariants\n+\n+1. Identical snapshot + deterministic model fixture must produce identical prompt bytes, history order, retry decisions, cleanup and reply in production and lab adapters.\n+2. Preserve production's 60-message history cap, recall-aware user text, persona source/version and all dynamic guide ordering.\n+3. Never manufacture five-axis relationship values from legacy intimacy points; neutral fallback is explicit.\n+4. No lab adapter imports canonical writers or production chat API. A type-level boundary alone is insufficient; add import graph checks.\n+5. Explicit `modelCalls` and physical attempt budget; retries inside model transport count too. Hard-stop before exceeding owner-approved cap.\n+6. `ReplyCandidate` is a proposal only; production commits after its existing authorization, quota and idempotency checks.\n+7. Synthetic records have provenance `offline-synthetic`. Real Gemini records require separate consent, redaction and access controls.\n+8. No prompt content or user memories in logs by default. Never auto-merge or auto-deploy tuned prompts.\n+\n+## Phased implementation and acceptance\n+\n+**Phase 0 — design review**: document dependencies and choose safe extraction seam. No runtime modifications.\n+\n+**Phase 1 — pure prompt builder** (separate Draft PR): capture exact old prompt with fixtures; move template verbatim; compare byte-for-byte in tests, including work/off day, memory, relationship, recall, weather and empty state. No change to production code path until tests pass.\n+\n+**Phase 2 — injected generation pipeline**: model port and deterministic test double; replicate initial generation, rejection/retry, cleanup and conditional emotion/expression generation. Count logical calls and physical retries separately.\n+\n+**Phase 3 — adapter parity**: production adapter and offline synthetic adapter use same pure engine. Test that lab adapter cannot import Supabase, production route, quota or canonical writer. Production feature flag remains off pending review.\n+\n+**Phase 4 — controlled real model**: authenticated nonproduction runner, no canonical writes, max attempts/turns, no hidden retries, preapproved cost, manually scored comparisons. No real Gemini calls until owner approval.\n+\n+**Phase 5 — release gate**: review against PR #85's newer draft overview, staged rollout, monitor regressions, rollback plan, explicit owner go/no-go.\n+\n+## Open design questions\n+\n+- Which relationship/emotion expression functions are pure today, and which require DB or external state?\n+- What is the exact current Gemini transport retry ceiling, and how is each physical attempt observed?\n+- Which parts of reply validation/cleanup are safe to extract without changing semantics?\n+- How to handle evolving stored persona versions while keeping baseline comparisons reproducible?\n+- Should experiment quality reports be stored as private CI artifacts or in a separate protected data store? Neither is implemented.\n+\n+## Coordination\n+\n+PR #86 is an **offline fixture harness**. PR #85 is a separate **draft relationship/interpreter overview**. This design must not overwrite either or silently change the canonical implementation overview. Before implementation, reconcile these contracts in the latest canonical overview.\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/daded504b1d2834ed4d7b4a6d0758e89841aed74/docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+      "source": {
+        "path": "docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md",
+        "coverage": "全文",
+        "text": "# Shared Conversation Engine — design contract v0 (2026-10-15)\n\n**Status: proposed design, not implemented or approved for production.** Isolated branch from `main`. No API calls, database access, runtime edits, or deployment.\n\n## Goal\n\nBoth production chat and an offline conversation tuning lab invoke the **same pure reply pipeline**. The runtime supplies state; the engine decides how to render and validate language; the runtime alone controls persistence, quota, authentication and state transitions.\n\n```text\nProduction authenticated runtime ──┐\n                                  ├── resolve immutable ConversationSnapshot\nOffline synthetic lab adapter ─────┘                │\n                                                    ▼\n                                  shared ConversationEngine\n                               prompt → model → validate → expression\n                                                    │\n                                                    ▼\n                                      ReplyCandidate + diagnostics\n                                                    │\n                       ┌────────────────────────────┴─────────────────┐\n                       ▼                                              ▼\n               Production commit adapter                       Lab record only\n```\n\n## Boundaries\n\n**Outside shared engine**: auth, quota, canonical DB reads/writes, relationship event commits, clock/weather/network retrieval, scheduling, telemetry with user IDs. Only production adapter can commit canonical state.\n\n**Inside shared engine**: prompt assembly, Gemini message mapping, generation orchestration via an injected model port, parsing, reply problem detection, retry decision, expression rewrite and final cleanup. Relationship/emotion calculation must be pure and take snapshot input; if not yet pure, keep it outside and supply resolved guides.\n\n## Proposed typed interface\n\n```ts\ntype ConversationSnapshot = Readonly<{\n  persona: { text: string; source: string; version: string | null };\n  userText: string;\n  modelUserText: string;\n  history: readonly { role: \"user\" | \"misaki\"; text: string }[];\n  memory: readonly string[];\n  todayMemory: { date: string; items: readonly string[] };\n  relationship: {\n    points: number;\n    actingGuide: string;\n    legacyGuide: string;\n    pendingGuide: string;\n    emotionGuide: string;\n  };\n  resolvedGuides: {\n    profile: string; life: string; time: string; signals: string;\n    taxi: string; misakiLife: string; activity: string;\n    weather: string; weatherHistory: string; tokyoEvents: string;\n    todayMemory: string; recentTopics: string;\n  };\n  currentTime: string;\n  currentDate: string;\n  dayType: \"work\" | \"off\";\n}>;\ntype ModelPort = (input: {\n  systemInstruction: string;\n  contents: readonly { role: \"user\" | \"model\"; parts: readonly { text: string }[] }[];\n  userText: string;\n  attempt: number;\n}) => Promise<{ ok: boolean; text: string | null; status: number }>;\ntype ReplyCandidate = {\n  reply: string;\n  proposedMemory: readonly string[];\n  proposedTodayMemory: readonly string[];\n  proposedSignals: unknown;\n  diagnostics: readonly string[];\n  modelCalls: number;\n};\n```\n\nThis is an architectural sketch, **not a claim that the current production route already satisfies these types**. Preserve the exact existing JSON schema, parsing, retries and conditional expression stage during extraction. The engine never persists `proposed*` fields.\n\n## Safety and parity invariants\n\n1. Identical snapshot + deterministic model fixture must produce identical prompt bytes, history order, retry decisions, cleanup and reply in production and lab adapters.\n2. Preserve production's 60-message history cap, recall-aware user text, persona source/version and all dynamic guide ordering.\n3. Never manufacture five-axis relationship values from legacy intimacy points; neutral fallback is explicit.\n4. No lab adapter imports canonical writers or production chat API. A type-level boundary alone is insufficient; add import graph checks.\n5. Explicit `modelCalls` and physical attempt budget; retries inside model transport count too. Hard-stop before exceeding owner-approved cap.\n6. `ReplyCandidate` is a proposal only; production commits after its existing authorization, quota and idempotency checks.\n7. Synthetic records have provenance `offline-synthetic`. Real Gemini records require separate consent, redaction and access controls.\n8. No prompt content or user memories in logs by default. Never auto-merge or auto-deploy tuned prompts.\n\n## Phased implementation and acceptance\n\n**Phase 0 — design review**: document dependencies and choose safe extraction seam. No runtime modifications.\n\n**Phase 1 — pure prompt builder** (separate Draft PR): capture exact old prompt with fixtures; move template verbatim; compare byte-for-byte in tests, including work/off day, memory, relationship, recall, weather and empty state. No change to production code path until tests pass.\n\n**Phase 2 — injected generation pipeline**: model port and deterministic test double; replicate initial generation, rejection/retry, cleanup and conditional emotion/expression generation. Count logical calls and physical retries separately.\n\n**Phase 3 — adapter parity**: production adapter and offline synthetic adapter use same pure engine. Test that lab adapter cannot import Supabase, production route, quota or canonical writer. Production feature flag remains off pending review.\n\n**Phase 4 — controlled real model**: authenticated nonproduction runner, no canonical writes, max attempts/turns, no hidden retries, preapproved cost, manually scored comparisons. No real Gemini calls until owner approval.\n\n**Phase 5 — release gate**: review against PR #85's newer draft overview, staged rollout, monitor regressions, rollback plan, explicit owner go/no-go.\n\n## Open design questions\n\n- Which relationship/emotion expression functions are pure today, and which require DB or external state?\n- What is the exact current Gemini transport retry ceiling, and how is each physical attempt observed?\n- Which parts of reply validation/cleanup are safe to extract without changing semantics?\n- How to handle evolving stored persona versions while keeping baseline comparisons reproducible?\n- Should experiment quality reports be stored as private CI artifacts or in a separate protected data store? Neither is implemented.\n\n## Coordination\n\nPR #86 is an **offline fixture harness**. PR #85 is a separate **draft relationship/interpreter overview**. This design must not overwrite either or silently change the canonical implementation overview. Before implementation, reconcile these contracts in the latest canonical overview.\n",
+        "sha256": "5866d805a2c0572609b3570162a1954942179f3d15f4319a99cc297c3919d379"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+      "message": "design: define shared conversation engine contract and parity rollout gates\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/daded504b1d2834ed4d7b4a6d0758e89841aed74"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "daded504b1d2834ed4d7b4a6d0758e89841aed74",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/38704198432",
+      "id": 38704198432,
+      "updated_at": "2026-10-15T08:14:43Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "本番と調整ラボで会話エンジンを共有する設計案",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/87"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "71a02b7978a18332e18e075afb54a92f17e89c351968badcf14ae25d34c6a8d7",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

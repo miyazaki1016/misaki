@@ -1,0 +1,115 @@
+{
+  "id": "pr-95",
+  "number": 95,
+  "title": "美咲ラウンジ：iPhone確認済みのMuse 14秒透過アニメを正式採用",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "purpose": "ラウンジ・映像・画面演出に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "iPhone実機でユーザーが約14秒のMuse v3透過WebPの表示・動きを確認して問題なしと評価。現行ショートカット付き縦型ラウンジと縦型単独ラウンジの参照先を14秒版に切り替えます。\n\n- `/lab/transparent-lounge-shortcuts/`・`/lab/transparent-lounge-vertical/` のみ更新\n- 旧9秒WebPファイルと元の `/lab/transparent-lounge/` を比較・ロールバック用に残す\n- 21秒オープニング、チャット、認証、DBは変更なし\n- 開発台帳更新\n\nCI成功後本番反映し、Vercel production commitを確認します。",
+  "head": "1206082bafe848ff7b2261857c66de6708ef344e",
+  "base": "a1888f66666e5b72bd24f37a2061aeeecafd3024",
+  "base_ref": "main",
+  "head_ref": "feat/lounge-muse-v3-official-20261030",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-29T22:32:09Z",
+  "merge_commit_sha": "9751cdca3c012d1f1b981bcad37b24c37ef26f66",
+  "updated_at": "2026-10-29T22:32:09Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 0,
+      "patch": "diff --git a/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md b/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md\nindex 1c09e35..34aa20d 100644\n--- a/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md\n+++ b/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md\n@@ -13,3 +13,10 @@\n - 上記『未アップロード』は作業開始時点の記録。現在はアップロード完了。\n - GitHub Actions の test と Vercel Preview Comments ともに成功を確認。\n - 次の工程は比較版のみマージしてVercelの本番配信を確認。その後iPhone実機で長尺アニメの透明度とループを確認する。現行9秒版の参照は変更しない。\n+\n+## 2026-10-30 実機合格・正式採用\n+- ユーザーがiPhoneで14秒版を実際に確認し「バッチリ、問題ない」と評価。Muse v3透過WebPを正式採用。\n+- 現行UIのショートカット付き縦型ラウンジ `/lab/transparent-lounge-shortcuts/` と独立した縦画面版 `/lab/transparent-lounge-vertical/` の参照先を14秒版へ切り替え。\n+- 9秒版のファイル `/lab/transparent-lounge/misaki_lounge_24fps.webp` と元の検証用ページ `/lab/transparent-lounge/` はロールバック・比較用に維持。Muse v3比較ページも維持。\n+- 新しい素材は6,886,060 bytes（約6.9 MB）なので、初回読み込みは旧9秒版4.4 MBより増加。通信上限・表示速度は引き続き実機で評価する。\n+- チャットへの本接続／ログイン方式の変更はこのPRの対象外。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "source": {
+        "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+        "coverage": "全文",
+        "text": "# Muse v3 約14秒ループ差し替え比較（2026-10-30）\n\n- 現行の約9秒・24fps透過WebPは変更しない。ラウンジ、縦型ラウンジ、ショートカット比較版も変更なし。\n- Museからユーザーが提供した `idle-lounge-person-transparent-loopfix-v3.zip` 内の WebM を確認。1248×704、VP9透過、24fps、約13.917秒。\n- 透過を維持しつつ624×352に縮小し、24fps無限ループWebPに変換。\n- 変換ファイル: `misaki-lounge-muse-v3-14s-24fps.webp`、334フレーム、RIFF WebP ANMFのフレーム時間合計13,916ms、アルファチャンネル0〜255、約6.9 MB。\n- 新設比較ページ: `/lab/transparent-lounge-muse-v3/`。既存の `/lab/transparent-lounge-shortcuts/` のコードを複製し、**WebP参照だけ変更**。オープニング21秒MP4、左右スワイプ、ショートカット、矢印は従来どおり。\n- **素材バイナリはGitHubに未アップロード**。素材を同じブランチの `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp` に配置するまでプレビューは404。PRはドラフトにして本番反映しない。\n- 実機テスト: iPhoneで透過、速度、表情変化、つなぎ目、通信時間、既存9秒版との比較。採用判断後に本番の参照先を変更する。\n\n## 2026-10-30 素材アップロード確認\n- GitHubブランチに `public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp`（6,886,060 bytes）配置済みを確認。\n- 上記『未アップロード』は作業開始時点の記録。現在はアップロード完了。\n- GitHub Actions の test と Vercel Preview Comments ともに成功を確認。\n- 次の工程は比較版のみマージしてVercelの本番配信を確認。その後iPhone実機で長尺アニメの透明度とループを確認する。現行9秒版の参照は変更しない。\n\n## 2026-10-30 実機合格・正式採用\n- ユーザーがiPhoneで14秒版を実際に確認し「バッチリ、問題ない」と評価。Muse v3透過WebPを正式採用。\n- 現行UIのショートカット付き縦型ラウンジ `/lab/transparent-lounge-shortcuts/` と独立した縦画面版 `/lab/transparent-lounge-vertical/` の参照先を14秒版へ切り替え。\n- 9秒版のファイル `/lab/transparent-lounge/misaki_lounge_24fps.webp` と元の検証用ページ `/lab/transparent-lounge/` はロールバック・比較用に維持。Muse v3比較ページも維持。\n- 新しい素材は6,886,060 bytes（約6.9 MB）なので、初回読み込みは旧9秒版4.4 MBより増加。通信上限・表示速度は引き続き実機で評価する。\n- チャットへの本接続／ログイン方式の変更はこのPRの対象外。\n",
+        "sha256": "40be5a63976dc7988fdb4a54d6f074cfb975710e27059b7dad7896b97b9fba23"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge-shortcuts/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge-vertical/index.html",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 1,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/public/lab/transparent-lounge-vertical/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge-vertical/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "47b8fc4996b908722a72cebae7ae749f02347883",
+      "message": "feat(lounge): adopt iPhone-approved Muse v3 14s animation on transparent-lounge-shortcuts\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/47b8fc4996b908722a72cebae7ae749f02347883"
+    },
+    {
+      "sha": "7f3bb910348a6f120845c280b01951d623e0840a",
+      "message": "feat(lounge): adopt iPhone-approved Muse v3 14s animation on transparent-lounge-vertical\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7f3bb910348a6f120845c280b01951d623e0840a"
+    },
+    {
+      "sha": "1206082bafe848ff7b2261857c66de6708ef344e",
+      "message": "docs(lounge): record iPhone acceptance and Muse v3 official adoption\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1206082bafe848ff7b2261857c66de6708ef344e"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "1206082bafe848ff7b2261857c66de6708ef344e",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40966456151",
+      "id": 40966456151,
+      "updated_at": "2026-10-29T22:31:54Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "美咲ラウンジ：iPhone確認済みのMuse 14秒透過アニメを正式採用",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/95"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "4a8aae4ff1264df74297414c3a7f039697f25c023ce55a1b6cd83b212515efd2",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

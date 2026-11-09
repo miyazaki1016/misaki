@@ -1,0 +1,84 @@
+{
+  "id": "pr-72",
+  "number": 72,
+  "title": "ci: optional pacing for isolated Gemini A/B calls",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Workflow-only: manual delay choice 0 or 10000ms between billable isolated Gemini calls; pinned experimental runner d159ac7. Existing manual confirmation YES remains. This does not guarantee avoiding 429 quota limits. No application/Production changes. Owner approval required before merge.",
+  "head": "266c6a1ce74bc6ba0889e41590004854386fab31",
+  "base": "16c414f1932927d6be2224aa2edd450cd4413b29",
+  "base_ref": "main",
+  "head_ref": "work/ab-paced-dispatch",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-08T03:45:29Z",
+  "merge_commit_sha": "8e47892840d97576d817f385eacef6bb8100ea57",
+  "updated_at": "2026-10-08T03:45:30Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 1,
+      "patch": "diff --git a/.github/workflows/isolated-gemini-ab-manual.yml b/.github/workflows/isolated-gemini-ab-manual.yml\nindex b3ba117..889638d 100644\n--- a/.github/workflows/isolated-gemini-ab-manual.yml\n+++ b/.github/workflows/isolated-gemini-ab-manual.yml\n@@ -14,6 +14,14 @@ on:\n         options:\n           - 'short'\n           - 'long'\n+      delay_ms:\n+        description: 'Delay between Gemini requests in milliseconds (0 or 10000)'\n+        required: true\n+        type: choice\n+        default: '10000'\n+        options:\n+          - '0'\n+          - '10000'\n       runs_per_variant:\n         description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n         required: true\n@@ -33,7 +41,7 @@ jobs:\n       - name: Checkout pinned experiment commit (not Production)\n         uses: actions/checkout@v4\n         with:\n-          ref: c1a66ecc3d6e1c913311873e0f0096f23d1ecd02\n+          ref: d159ac70fb95be23204e04c4d91b453f1f7894f3\n           persist-credentials: false\n       - uses: actions/setup-node@v4\n         with:\n@@ -48,6 +56,7 @@ jobs:\n           MISAKI_AB_MODEL: gemini-3.1-flash-lite\n           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n           MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n+          MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}\n         run: |\n           if [ -z \"$GEMINI_API_KEY\" ]; then\n             echo 'Secret missing; refusing live calls.'\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/266c6a1ce74bc6ba0889e41590004854386fab31/.github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+        "coverage": "全文",
+        "text": "name: Isolated Gemini A/B (manual only)\non:\n  workflow_dispatch:\n    inputs:\n      confirm_billable_requests:\n        description: 'Type YES to authorize 2 or 40 billable Gemini requests with synthetic data'\n        required: true\n        type: string\n      fixture:\n        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'\n        required: true\n        type: choice\n        default: 'short'\n        options:\n          - 'short'\n          - 'long'\n      delay_ms:\n        description: 'Delay between Gemini requests in milliseconds (0 or 10000)'\n        required: true\n        type: choice\n        default: '10000'\n        options:\n          - '0'\n          - '10000'\n      runs_per_variant:\n        description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n        required: true\n        type: choice\n        default: '1'\n        options:\n          - '1'\n          - '20'\npermissions:\n  contents: read\njobs:\n  isolated-ab:\n    if: ${{ github.event.inputs.confirm_billable_requests == 'YES' }}\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - name: Checkout pinned experiment commit (not Production)\n        uses: actions/checkout@v4\n        with:\n          ref: d159ac70fb95be23204e04c4d91b453f1f7894f3\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts\n      - name: Run explicitly approved synthetic Gemini A/B requests\n        env:\n          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}\n          MISAKI_AB_LIVE: 'YES'\n          MISAKI_AB_MODEL: gemini-3.1-flash-lite\n          MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n          MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}\n        run: |\n          if [ -z \"$GEMINI_API_KEY\" ]; then\n            echo 'Secret missing; refusing live calls.'\n            exit 1\n          fi\n          node --experimental-strip-types scripts/context-ab-live.ts\n",
+        "sha256": "dfabff94585a763119350d6f4f92d8238cae092855fd65db19506922887cf513"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "266c6a1ce74bc6ba0889e41590004854386fab31",
+      "message": "ci: add manual Gemini A/B request pacing option\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/266c6a1ce74bc6ba0889e41590004854386fab31"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "266c6a1ce74bc6ba0889e41590004854386fab31",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37724189947",
+      "id": 37724189947,
+      "updated_at": "2026-10-08T03:46:38Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "scripts/context-ab-live.ts",
+      "coverage": "削除済み／取得不能・差分参照"
+    }
+  ],
+  "curated": {
+    "summary": "隔離A/Bの呼出し間隔を任意に調整",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/72"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "346b0fb5687a5040b0a3314c79bd7574378beb06efd68e0b127ebf10d62fe5f5",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

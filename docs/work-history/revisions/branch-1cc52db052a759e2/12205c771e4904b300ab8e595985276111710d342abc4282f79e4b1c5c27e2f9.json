@@ -1,0 +1,42 @@
+{
+  "id": "branch-1cc52db052a759e2",
+  "title": "docs/backup-restore-inventory-20261105",
+  "head": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1",
+  "head_ref": "docs/backup-restore-inventory-20261105",
+  "linked_prs": [
+    165
+  ],
+  "files": [
+    {
+      "path": "docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md"
+    },
+    {
+      "path": "docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md"
+    },
+    {
+      "path": "docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1/docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md"
+    }
+  ],
+  "commits": "5ad808ba0f6bc51de1b4ed66bdf1922ae184e6b1 docs: record verified Supabase backup capability and outstanding checks\nd77aeb4b5e387af084b282c5a73e601f23f9a37a docs: define isolated restore rehearsal safety and acceptance checks\nd164cd46bb59d0d4b92f4cef176aa2072070842b docs: inventory backup coverage and safe restore rehearsal gates",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a44d4f4b33b713957e764faee98961f7c1268de10d87c09c0cfe7ae910ecb3d8",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

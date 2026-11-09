@@ -1,0 +1,624 @@
+{
+  "id": "pr-45",
+  "number": 45,
+  "title": "美咲の演技研究室：Relationship Interpreter 基礎",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 目的\n本番と演技研究室が同じ Relationship Interpreter / Gemini generation boundary を共有できる第一段階を作る。\n\n## 現在の実装\n- 5軸＋親密度＋明示的 relationship status から、台詞ではなく演技指示を生成する shared Relationship Interpreter を追加\n- A〜E のオーディション profile と no-write 演技研究室 POST endpoint を追加\n- 演技研究室は Production では 404。Preview の公開 GET trigger は削除済み\n- 本番 chat と演技研究室の Gemini 呼び出しを shared generator へ統合\n- shared generator は既存本番と同じ 30s timeout、timeout 1回 retry、429/502/503/504 の 2s/5s retry を維持\n- 本番 chat から shared Relationship Interpreter を呼ぶ経路を追加\n- 現在の canonical DB は旧 relationship_points のみなので、legacy adapter は親密度だけを変換し、友情・信頼・じゃれ合い・親愛・恋愛・交際状態を推測しない\n- 旧 relationship guide は当面併設。ただし points だけでは決められない嫉妬・甘え・好意・照れ・じゃれ合い表現を除去し、距離感担当へ整理\n- safety contract / legacy adapter tests を追加\n- 既存 source-string retry tests は shared generator を source of truth として追従\n\n## 安全契約\n- score から台詞を直結しない\n- romance score だけで交際成立させない\n- 時間経過だけで恋しさ・寂しさ・嫉妬・恋愛感情を作らない\n- legacy relationship_points から5軸を捏造しない\n- 演技研究室は quota/history/memory/relationship/Body Clock を書き込まない\n\n## 検証\n- Canonical relationship integration tests #307: SUCCESS\n- Vercel Preview: READY\n- 演技研究室 A〜E: HTTP 200 / writes:false / 全profile生成成功\n- PR mergeable: true\n\n## このPRでまだやらないこと\n- 5軸の canonical DB schema / 保存・更新ロジック\n- 6段階親密度の正式閾値確定とハートUI\n- explicit relationship status の canonical persistence\n- active DB persona / 本番memory-history contextを研究室へ完全再現すること\n- 演技研究室から本番状態への書き戻し（禁止）\n- 旧 relationship guide の完全撤去\n\n## 本番影響\n本番 chat の prompt 構成と Gemini generation boundary は変更されるため、会話表現には影響し得る。\n一方、quota/history/memory/intimacy persistence の既存書き込み経路、20回/日制限、canonical state の仕様変更は意図していない。\n\n## 次段階\n5軸を canonical state としてどう保存・更新するかを設計し、Production DB state と Lab synthetic state が同じ Relationship Interpreter へ入る完成形へ進める。",
+  "head": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+  "base": "bfd63a393fc2399355c07bdcd0d66f70c3a069c7",
+  "base_ref": "main",
+  "head_ref": "sora/misaki-acting-lab",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-03T06:24:13Z",
+  "merge_commit_sha": "db32989c48f09be43686b7e3f7aee4f539fe518f",
+  "updated_at": "2026-10-03T06:24:13Z",
+  "code_facts": [
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const DEFAULT_AUDITION_LINE = \"今日ちょっと疲れた。なんか話そ\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function parseReply(text: string | null) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!text) return null;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export async function POST(request: NextRequest) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (process.env.VERCEL_ENV === \"production\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/acting-lab/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!apiKey) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "/[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]/.test(message);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/chat/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!result.ok) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/chat/route.ts"
+    },
+    {
+      "file": "lib/chat-recall.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!recallMode) return message;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/chat-recall.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const MODEL = \"gemini-3.1-flash-lite\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export async function generateGeminiJson(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "HTTP要求",
+      "expression": "response = await fetch(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/gemini-json-generator.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "export const GEMINI_CHAT_MODEL = MODEL;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function clamp(value: number) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function level(value: number) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (v >= 80) return \"very_high\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (v >= 55) return \"high\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (v >= 30) return \"medium\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "関数・クラス定義",
+      "expression": "* This function describes acting direction, never dialogue.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function createRelationshipActingGuide(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (state.intimacyStage <= 1) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "} else if (state.intimacyStage >= 4) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (level(state.friendship) === \"very_high\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (level(state.trust) === \"very_high\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "lib/relationship-acting-guide.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (level(state.playfulness) === \"very_high\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"acting profiles never establish dating implicitly\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(guide, /交際は成立していない/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(guide, /既成事実化/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"acting guide never exposes numeric scores\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.doesNotMatch(guide, /\\b55\\b|\\b90\\b|\\b95\\b/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"low romance does not turn closeness into romance\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(guide, /親しさや優しさを恋愛表現へ変換しない/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"time alone cannot invent relationship emotion\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(guide, /時間が経ったことだけを理由に/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/relationship-acting-guide.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"legacy points map only to conservative intimacy stages\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(source.includes('transientAttempt < transientRetryDelaysMs.length'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(source.includes('[2_000]'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(source.includes('timeoutAttempt < timeoutRetryDelaysMs.length'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(source.includes('error.name === \"AbortError\"'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(chatSource.includes('generateGeminiJson({'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(chatSource.includes('error.name === \"AbortError\"'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(chatSource.includes('throw new Error(\"GEMINI_TIMEOUT\")'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    },
+    {
+      "file": "tests/server-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(chatSource.includes('throw error'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/acting-lab/route.ts",
+      "status": "modified",
+      "additions": 101,
+      "deletions": 0,
+      "patch": "diff --git a/app/api/acting-lab/route.ts b/app/api/acting-lab/route.ts\nnew file mode 100644\nindex 0000000..b046873\n--- /dev/null\n+++ b/app/api/acting-lab/route.ts\n@@ -0,0 +1,101 @@\n+import { NextRequest } from \"next/server\";\n+import { ACTING_LAB_PROFILES, createRelationshipActingGuide } from \"../../../lib/relationship-acting-guide\";\n+import { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\n+import { createFallbackPersonaPrompt } from \"../../../lib/persona/fallback-persona\";\n+\n+const DEFAULT_AUDITION_LINE = \"今日ちょっと疲れた。なんか話そ\";\n+\n+function parseReply(text: string | null) {\n+  if (!text) return null;\n+  try {\n+    const parsed = JSON.parse(text);\n+    return typeof parsed?.reply === \"string\" ? parsed.reply.trim() : null;\n+  } catch {\n+    return null;\n+  }\n+}\n+\n+/**\n+ * Development-only acting lab.\n+ * No Supabase client is created here: no quota, history, memory, relationship,\n+ * Body Clock, or canonical-state write can happen through this endpoint.\n+ */\n+export async function POST(request: NextRequest) {\n+  if (process.env.VERCEL_ENV === \"production\") {\n+    return Response.json({ error: \"Not found\" }, { status: 404 });\n+  }\n+\n+  const apiKey = process.env.GEMINI_API_KEY;\n+  if (!apiKey) {\n+    return Response.json({ error: \"GEMINI_API_KEY is not configured\" }, { status: 500 });\n+  }\n+\n+  const body = await request.json().catch(() => ({}));\n+  const message =\n+    typeof body?.message === \"string\" && body.message.trim()\n+      ? body.message.trim()\n+      : DEFAULT_AUDITION_LINE;\n+\n+  const requestedProfiles =\n+    Array.isArray(body?.profiles) && body.profiles.length > 0\n+      ? body.profiles.filter((value: unknown): value is string => typeof value === \"string\")\n+      : Object.keys(ACTING_LAB_PROFILES);\n+\n+  const profiles = requestedProfiles\n+    .map((key: string) => [key, ACTING_LAB_PROFILES[key]] as const)\n+    .filter((entry) => Boolean(entry[1]));\n+\n+  const results = await Promise.all(\n+    profiles.map(async ([profile, state]) => {\n+      const actingGuide = createRelationshipActingGuide(state);\n+      const personaPrompt = createFallbackPersonaPrompt(\"chat\");\n+      const systemInstruction = `\n+${personaPrompt}\n+\n+【演技研究室】\n+以下の演技指示は現在の関係状態だけを差し替える研究用入力です。\n+演技指示は背景として使い、説明・引用・数値化しないでください。\n+ユーザーの事情を勝手に作らないでください。\n+\n+${actingGuide}\n+\n+出力は必ずJSONだけにしてください。\n+{\"reply\":\"美咲の返事\"}\n+`.trim();\n+\n+      try {\n+        const generated = await generateGeminiJson({\n+          apiKey,\n+          systemInstruction,\n+          contents: [],\n+          userText: message,\n+        });\n+\n+        return {\n+          profile,\n+          state,\n+          actingGuide,\n+          personaSource: \"shared-fallback\",\n+          status: generated.status,\n+          reply: generated.ok ? parseReply(generated.text) : null,\n+        };\n+      } catch (error) {\n+        return {\n+          profile,\n+          state,\n+          actingGuide,\n+          status: 500,\n+          reply: null,\n+          error: error instanceof Error ? error.message : \"generation failed\",\n+        };\n+      }\n+    })\n+  );\n+\n+  return Response.json({\n+    message,\n+    model: \"gemini-3.1-flash-lite\",\n+    writes: false,\n+    results,\n+  });\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/acting-lab/route.ts",
+      "source": {
+        "path": "app/api/acting-lab/route.ts",
+        "coverage": "全文",
+        "text": "import { NextRequest } from \"next/server\";\nimport { ACTING_LAB_PROFILES, createRelationshipActingGuide } from \"../../../lib/relationship-acting-guide\";\nimport { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\nimport { createFallbackPersonaPrompt } from \"../../../lib/persona/fallback-persona\";\n\nconst DEFAULT_AUDITION_LINE = \"今日ちょっと疲れた。なんか話そ\";\n\nfunction parseReply(text: string | null) {\n  if (!text) return null;\n  try {\n    const parsed = JSON.parse(text);\n    return typeof parsed?.reply === \"string\" ? parsed.reply.trim() : null;\n  } catch {\n    return null;\n  }\n}\n\n/**\n * Development-only acting lab.\n * No Supabase client is created here: no quota, history, memory, relationship,\n * Body Clock, or canonical-state write can happen through this endpoint.\n */\nexport async function POST(request: NextRequest) {\n  if (process.env.VERCEL_ENV === \"production\") {\n    return Response.json({ error: \"Not found\" }, { status: 404 });\n  }\n\n  const apiKey = process.env.GEMINI_API_KEY;\n  if (!apiKey) {\n    return Response.json({ error: \"GEMINI_API_KEY is not configured\" }, { status: 500 });\n  }\n\n  const body = await request.json().catch(() => ({}));\n  const message =\n    typeof body?.message === \"string\" && body.message.trim()\n      ? body.message.trim()\n      : DEFAULT_AUDITION_LINE;\n\n  const requestedProfiles =\n    Array.isArray(body?.profiles) && body.profiles.length > 0\n      ? body.profiles.filter((value: unknown): value is string => typeof value === \"string\")\n      : Object.keys(ACTING_LAB_PROFILES);\n\n  const profiles = requestedProfiles\n    .map((key: string) => [key, ACTING_LAB_PROFILES[key]] as const)\n    .filter((entry) => Boolean(entry[1]));\n\n  const results = await Promise.all(\n    profiles.map(async ([profile, state]) => {\n      const actingGuide = createRelationshipActingGuide(state);\n      const personaPrompt = createFallbackPersonaPrompt(\"chat\");\n      const systemInstruction = `\n${personaPrompt}\n\n【演技研究室】\n以下の演技指示は現在の関係状態だけを差し替える研究用入力です。\n演技指示は背景として使い、説明・引用・数値化しないでください。\nユーザーの事情を勝手に作らないでください。\n\n${actingGuide}\n\n出力は必ずJSONだけにしてください。\n{\"reply\":\"美咲の返事\"}\n`.trim();\n\n      try {\n        const generated = await generateGeminiJson({\n          apiKey,\n          systemInstruction,\n          contents: [],\n          userText: message,\n        });\n\n        return {\n          profile,\n          state,\n          actingGuide,\n          personaSource: \"shared-fallback\",\n          status: generated.status,\n          reply: generated.ok ? parseReply(generated.text) : null,\n        };\n      } catch (error) {\n        return {\n          profile,\n          state,\n          actingGuide,\n          status: 500,\n          reply: null,\n          error: error instanceof Error ? error.message : \"generation failed\",\n        };\n      }\n    })\n  );\n\n  return Response.json({\n    message,\n    model: \"gemini-3.1-flash-lite\",\n    writes: false,\n    results,\n  });\n}\n",
+        "sha256": "5b76d170d1a07c8e3e65905c813400c862428051c2c887131b5cfe92566c7b54"
+      }
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "status": "modified",
+      "additions": 74,
+      "deletions": 243,
+      "patch": "diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts\nindex 99bff2d..b602504 100644\n--- a/app/api/chat/route.ts\n+++ b/app/api/chat/route.ts\n@@ -41,6 +41,11 @@ import {\n } from \"../../../lib/relationship-turn-expression\";\n import { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from \"../../../lib/relationship-patterns\";\n import { deriveRelationshipPointDelta } from \"../../../lib/relationship-points\";\n+import { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\n+import {\n+  createLegacyRelationshipActingState,\n+  createRelationshipActingGuide,\n+} from \"../../../lib/relationship-acting-guide\";\n \n type TokyoWeather = {\n   temperature: number | null;\n@@ -860,9 +865,8 @@ ${statusRule}\n 【現在の距離感：かなり深い関係】\n \n ・かなり自然体\n-・自然な甘え\n-・軽いからかい\n-・時々嫉妬\n+・距離の近い自然体な言い方\n+・短い返事や自然な省略\n ・短い返事だけでも成立する\n ・毎回質問しなくてよい\n ・交際が会話や記憶で確定している場合は、恋人らしい強い愛情表現も自然に使える\n@@ -876,9 +880,8 @@ ${statusRule}\n 【現在の距離感：かなり親しい】\n \n ・遠慮が少ない\n-・自然な甘え\n-・軽いからかい\n-・好意や照れは自然に出してよい\n+・遠慮を減らした自然体な言い方\n+・短い返事や自然な省略を使える\n ・交際がまだ確定していない場合は、恋人扱いを先取りしない\n ・無理に質問しない\n `.trim();\n@@ -891,9 +894,8 @@ ${statusRule}\n 【現在の距離感：少しずつ近づいている】\n \n ・自然体\n-・軽いからかい\n-・ときどき照れたり、相手を気にする感じはよい\n-・好意はにじませてもよいが、「大好き」「愛してる」まで急に飛ばない\n+・少し肩の力を抜いた自然体な言い方\n+・会話の流れに合う短い返事や省略を少し使える\n ・恋人関係を前提にしない\n ・会話のための質問を減らす\n `.trim();\n@@ -907,9 +909,8 @@ ${statusRule}\n 二人はまだ関係を作り始めた段階です。\n \n ・親しみやすい自然なタメ口\n-・少し冗談を言ったり、軽く照れる程度はよい\n ・相手を知ろうとする\n-・嫉妬や強い甘えはまだ控える\n+・相手をよく知っている前提の馴れ馴れしさは避ける\n ・「好き」「大好き」「愛してる」を既成事実として言わない\n ・「前から」「ずっと」など、存在しない恋愛の過去を作らない\n ・恋人関係を前提にしない\n@@ -2047,6 +2048,13 @@ export async function POST(\n         safeRelationshipPoints\n       );\n \n+    const relationshipActingGuide =\n+      createRelationshipActingGuide(\n+        createLegacyRelationshipActingState(\n+          safeRelationshipPoints\n+        )\n+      );\n+\n     const userProfile =\n       buildUserProfile(\n         [\n@@ -2220,7 +2228,10 @@ export async function POST(\n 勝手に作らないでください。\n `.trim();\n \n-    const contents =\n+    const contents: Array<{\n+      role: \"user\" | \"model\";\n+      parts: Array<{ text: string }>;\n+    }> =\n       safeHistory.map(\n         (item) => ({\n           role:\n@@ -2240,6 +2251,8 @@ ${personaPrompt}\n \n ${relationshipGuide}\n \n+${relationshipActingGuide}\n+\n ${userProfileGuide}\n \n ${lifeUnderstandingGuide}\n@@ -2424,259 +2437,77 @@ ${retryProblems\n 必ずJSONだけを返してください。\n `\n           : \"\";\n-\n-      const startedAt =\n-        Date.now();\n-\n+      const startedAt = Date.now();\n       const attempt =\n-        retryProblems &&\n-        retryProblems.length > 0\n+        retryProblems && retryProblems.length > 0\n           ? \"retry\"\n           : \"initial\";\n       const hasSupplementaryUnicode =\n-        /[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]/\n-          .test(\n-            message\n-          );\n+        /[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]/.test(message);\n \n-      console.log(\n-        \"GEMINI FETCH START:\",\n-        {\n-          traceId,\n-          attempt,\n-          messageLength:\n-            message.length,\n-          hasSupplementaryUnicode,\n-        }\n-      );\n+      console.log(\"GEMINI FETCH START:\", {\n+        traceId,\n+        attempt,\n+        messageLength: message.length,\n+        hasSupplementaryUnicode,\n+      });\n \n       try {\n-        const geminiUrl =\n-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`;\n-        const geminiBody =\n-          JSON.stringify({\n-            systemInstruction: {\n-              parts: [\n-                {\n-                  text:\n-                    baseSystemPrompt +\n-                    retryGuide +\n-                    supplementaryGuide,\n-                },\n-              ],\n-            },\n-            contents: [\n-              ...contents,\n-              {\n-                role: \"user\",\n-                parts: [\n-                  {\n-                    text: modelMessage,\n-                  },\n-                ],\n-              },\n-            ],\n-            generationConfig: {\n-              responseMimeType:\n-                \"application/json\",\n-            },\n-          });\n-        const transientDelaysMs =\n-          [2_000, 5_000];\n-        const timeoutRetryDelaysMs =\n-          [2_000];\n-        let response:\n-          Response | null = null;\n-        let transientAttempt = 0;\n-        let timeoutAttempt = 0;\n-\n-        while (true) {\n-          const controller =\n-            new AbortController();\n-          const timeout =\n-            setTimeout(\n-              () =>\n-                controller.abort(),\n-              GEMINI_TIMEOUT_MS\n-            );\n-\n-          try {\n-            response =\n-              await fetch(\n-                geminiUrl,\n-                {\n-                  method: \"POST\",\n-                  headers: {\n-                    \"Content-Type\":\n-                      \"application/json\",\n-                  },\n-                  signal:\n-                    controller.signal,\n-                  body:\n-                    geminiBody,\n-                }\n-              );\n-          } catch (error) {\n-            if (\n-              error instanceof\n-                Error &&\n-              error.name ===\n-                \"AbortError\" &&\n-              timeoutAttempt <\n-                timeoutRetryDelaysMs.length\n-            ) {\n-              const delayMs =\n-                timeoutRetryDelaysMs[\n-                  timeoutAttempt\n-                ];\n-              timeoutAttempt += 1;\n-\n-              console.warn(\n-                \"GEMINI TIMEOUT RETRY:\",\n-                {\n-                  traceId,\n-                  attempt,\n-                  timeoutAttempt,\n-                  delayMs,\n-                }\n-              );\n-\n-              await new Promise(\n-                (resolve) =>\n-                  setTimeout(\n-                    resolve,\n-                    delayMs\n-                  )\n-              );\n-              continue;\n-            }\n-\n-            throw error;\n-          } finally {\n-            clearTimeout(\n-              timeout\n-            );\n-          }\n-\n-          if (\n-            ![429, 502, 503, 504].includes(\n-              response.status\n-            ) ||\n-            transientAttempt >=\n-              transientDelaysMs.length\n-          ) {\n-            break;\n-          }\n-\n-          const delayMs =\n-            transientDelaysMs[\n-              transientAttempt\n-            ];\n-          transientAttempt += 1;\n-\n-          console.warn(\n-            \"GEMINI TRANSIENT RETRY:\",\n-            {\n-              traceId,\n-              attempt,\n-              transientAttempt,\n-              status:\n-                response.status,\n-              delayMs,\n-            }\n-          );\n-\n-          await new Promise(\n-            (resolve) =>\n-              setTimeout(\n-                resolve,\n-                delayMs\n-              )\n-          );\n-        }\n-        if (!response) {\n-          throw new Error(\n-            \"GEMINI_NO_RESPONSE\"\n-          );\n-        }\n-\n-        const elapsedMs =\n-          Date.now() -\n-          startedAt;\n+        const result = await generateGeminiJson({\n+          apiKey,\n+          systemInstruction:\n+            baseSystemPrompt +\n+            retryGuide +\n+            supplementaryGuide,\n+          contents,\n+          userText: modelMessage,\n+          timeoutMs: GEMINI_TIMEOUT_MS,\n+        });\n+\n+        const elapsedMs = Date.now() - startedAt;\n+        console.log(\"GEMINI FETCH END:\", {\n+          traceId,\n+          attempt,\n+          status: result.status,\n+          elapsedMs,\n+        });\n \n-        console.log(\n-          \"GEMINI FETCH END:\",\n-          {\n+        if (!result.ok) {\n+          console.error(\"GEMINI API ERROR:\", {\n             traceId,\n             attempt,\n-            status:\n-              response.status,\n+            status: result.status,\n             elapsedMs,\n-          }\n-        );\n-\n-        const data =\n-          await response.json();\n-\n-        if (!response.ok) {\n-          console.error(\n-            \"GEMINI API ERROR:\",\n-            {\n-              traceId,\n-              attempt,\n-              status:\n-                response.status,\n-              elapsedMs,\n-              data,\n-            }\n-          );\n-\n+            data: result.data,\n+          });\n           return null;\n         }\n \n-        return parseGeminiText(\n-          data?.candidates?.[0]\n-            ?.content?.parts?.[0]\n-            ?.text\n-        );\n+        return parseGeminiText(result.text);\n       } catch (error) {\n-        const elapsedMs =\n-          Date.now() -\n-          startedAt;\n+        const elapsedMs = Date.now() - startedAt;\n \n         if (\n-          error instanceof\n-            Error &&\n-          error.name ===\n-            \"AbortError\"\n+          error instanceof Error &&\n+          error.name === \"AbortError\"\n         ) {\n-          console.error(\n-            \"GEMINI FETCH TIMEOUT:\",\n-            {\n-              traceId,\n-              attempt,\n-              elapsedMs,\n-              messageLength:\n-                message.length,\n-              hasSupplementaryUnicode,\n-            }\n-          );\n-\n-          throw new Error(\n-            \"GEMINI_TIMEOUT\"\n-          );\n-        }\n-\n-        console.error(\n-          \"GEMINI FETCH FAILED:\",\n-          {\n+          console.error(\"GEMINI FETCH TIMEOUT:\", {\n             traceId,\n             attempt,\n             elapsedMs,\n-            error,\n-          }\n-        );\n+            messageLength: message.length,\n+            hasSupplementaryUnicode,\n+          });\n \n+          throw new Error(\"GEMINI_TIMEOUT\");\n+        }\n+\n+        console.error(\"GEMINI FETCH FAILED:\", {\n+          traceId,\n+          attempt,\n+          elapsedMs,\n+          error,\n+        });\n         throw error;\n       }\n     }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/app/api/chat/route.ts",
+      "source": {
+        "path": "app/api/chat/route.ts",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "import { maintenanceResponse } from \"../../../lib/maintenance\";\nimport { createRecallAwareMessage, isMemoryRecallQuestion } from \"../../../lib/chat-recall\";\nimport { createServerSupabase, loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from \"../../../lib/canonical-state\";\nimport { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from \"../../../lib/relationship-life-context\";\nimport {\n  createClient,\n  type SupabaseClient,\n} from \"@supabase/supabase-js\";\n\nimport {\n  createTokyoLifeEventsGuide,\n  getTokyoLifeEvents,\n} from \"../../../lib/tokyo-life-events\";\n\nimport {\n  buildUserProfile,\n  createTaxiContextGuide,\n  createUserProfileGuide,\n  type ChatMessage,\n} from \"../../../lib/user-profile\";\n\nimport {\n  loadPersonaPrompt,\n} from \"../../../lib/persona/persona-store\";\n\nimport {\n  createRelationshipSignalGuide,\n  sanitizeRelationshipSignalAssessment,\n  type RelationshipSignalAssessment,\n} from \"../../../lib/relationship-signal\";\nimport {\n  loadRelationshipTimeContext,\n  createRelationshipTimeGuide,\n  recordRelationshipChatTurn,\n} from \"../../../lib/relationship-time\";\n\nimport { persistRelationshipEmotionFromSignals } from \"../../../lib/relationship-emotion-store\";\nimport {\n  previewRelationshipTurn,\n  createCurrentTurnActionGuide,\n} from \"../../../lib/relationship-turn-expression\";\nimport { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from \"../../../lib/relationship-patterns\";\nimport { deriveRelationshipPointDelta } from \"../../../lib/relationship-points\";\nimport { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\nimport {\n  createLegacyRelationshipActingState,\n  createRelationshipActingGuide,\n} from \"../../../lib/relationship-acting-guide\";\n\ntype TokyoWeather = {\n  temperature: number | null;\n  apparentTemperature: number | null;\n  relativeHumidity: number | null;\n  precipitation: number | null;\n  rain: number | null;\n  weatherCode: number | null;\n  windSpeed: number | null;\n  description: string;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype GeminiResult = {\n  reply?: string;\n  memory?: string[];\n  relationshipSignals?: unknown;\n  relationshipExpression?: { reply?: string };\n  misakiTodayMemory?: {\n    date?: string;\n    items?: string[];\n  };\n};\n\ntype UsageResult = {\n  allowed?: boolean;\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype MisakiDayType =\n  | \"work\"\n  | \"off\";\n\ntype MisakiLifeContext = {\n  dayType: MisakiDayType;\n  guide: string;\n};\n\ntype ActivityEvidence = {\n  texts: string[];\n};\n\nconst MAX_HISTORY = 60;\nconst MAX_MEMORY = 30;\nconst MAX_TODAY_MEMORY = 12;\nconst GEMINI_TIMEOUT_MS = 30_000;\n\nconst SUPABASE_URL =\n  \"https://tzozajnwznxqgxnjikoy.supabase.co\";\n\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\n\nconst MISAKI_LATITUDE = 35.6728;\nconst MISAKI_LONGITUDE = 139.8174;\n\n/* =========================================================\n   BASIC\n========================================================= */\n\nfunction hashText(text: string) {\n  let hash = 0;\n\n  for (\n    let i = 0;\n    i < text.length;\n    i += 1\n  ) {\n    hash =\n      (\n        hash * 31 +\n        text.charCodeAt(i)\n      ) >>> 0;\n  }\n\n  return hash;\n}\n\nfunction getHour(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /(\\d{1,2}):(\\d{2})/\n    );\n\n  return match\n    ? Number(match[1])\n    : 18;\n}\n\nfunction getDateKey(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /\\d{4}\\/\\d{1,2}\\/\\d{1,2}/\n    );\n\n  return match?.[0] ??\n    currentTime.slice(0, 10);\n}\n\nfunction getFirstRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(value) &&\n    value.length > 0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value === \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\n/* =========================================================\n   USAGE / AUTH\n========================================================= */\n\nfunction createAuthenticatedSupabase(\n  accessToken: string\n) {\n  return createClient(\n    SUPABASE_URL,\n    SUPABASE_PUBLISHABLE_KEY,\n    {\n      global: {\n        headers: {\n          Authorization:\n            `Bearer ${accessToken}`,\n        },\n      },\n      auth: {\n        persistSession: false,\n        autoRefreshToken: false,\n        detectSessionInUrl: false,\n      },\n    }\n  );\n}\n\nasync function consumeDailyMessageWithRetry(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const maxAttempts = 3;\n\n  for (\n    let attempt = 1;\n    attempt <= maxAttempts;\n    attempt += 1\n  ) {\n    const {\n      data,\n      error,\n    } =\n      await (\n        supabase.rpc as any\n      )(\n        \"consume_daily_message\",\n        {\n          p_request_id:\n            requestId,\n        }\n      );\n\n    if (!error) {\n      return {\n        data,\n        error: null,\n      };\n    }\n\n    console.error(\n      `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,\n      error\n    );\n\n    const text =\n      typeof error.message ===\n      \"string\"\n        ? error.message.toLowerCase()\n        : \"\";\n\n    const retryable =\n      text.includes(\"timeout\") ||\n      text.includes(\n        \"temporarily unavailable\"\n      ) ||\n      text.includes(\n        \"fetch failed\"\n      );\n\n    if (\n      !retryable ||\n      attempt === maxAttempts\n    ) {\n      return {\n        data: null,\n        error,\n      };\n    }\n\n    await new Promise(\n      (resolve) =>\n        setTimeout(\n          resolve,\n          500 * attempt\n        )\n    );\n  }\n\n  return {\n    data: null,\n    error: new Error(\n      \"Usage retry failed\"\n    ),\n  };\n}\n\nasync function refundDailyMessage(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const {\n    data,\n    error,\n  } = await (\n    supabase.rpc as any\n  )(\n    \"refund_daily_message\",\n    {\n      p_request_id:\n        requestId,\n    }\n  );\n\n  if (error) {\n    console.error(\n      \"USAGE REFUND ERROR:\",\n      error\n    );\n    return null;\n  }\n\n  return getFirstRow<{\n    refunded?: boolean;\n    message_count?: number;\n    remaining?: number;\n    is_premium?: boolean;\n  }>(data);\n}\n\n/* =========================================================\n   WEATHER\n========================================================= */\n\nfunction weatherCodeToText(\n  code: number | null\n) {\n  if (code === null) return \"不明\";\n  if (code === 0) return \"快晴\";\n  if (\n    code === 1 ||\n    code === 2\n  ) return \"晴れ時々くもり\";\n  if (code === 3) return \"くもり\";\n  if (\n    code === 45 ||\n    code === 48\n  ) return \"霧\";\n  if (\n    [51, 53, 55].includes(code)\n  ) return \"霧雨\";\n  if (\n    [56, 57].includes(code)\n  ) return \"着氷性の霧雨\";\n  if (\n    [61, 63, 65].includes(code)\n  ) return \"雨\";\n  if (\n    [66, 67].includes(code)\n  ) return \"着氷性の雨\";\n  if (\n    [71, 73, 75].includes(code)\n  ) return \"雪\";\n  if (code === 77) return \"雪粒\";\n  if (\n    [80, 81, 82].includes(code)\n  ) return \"にわか雨\";\n  if (\n    [85, 86].includes(code)\n  ) return \"にわか雪\";\n  if (code === 95) return \"雷雨\";\n  if (\n    [96, 99].includes(code)\n  ) return \"ひょうを伴う雷雨\";\n\n  return \"不明\";\n}\n\nfunction getHumidityFeel(\n  weather: TokyoWeather\n) {\n  const humidity =\n    weather.relativeHumidity;\n\n  const temperature =\n    weather.temperature;\n\n  if (\n    humidity === null ||\n    temperature === null\n  ) {\n    return null;\n  }\n\n  if (\n    temperature >= 27 &&\n    humidity >= 75\n  ) {\n    return \"かなり蒸し暑く感じやすい\";\n  }\n\n  if (\n    temperature >= 24 &&\n    humidity >= 65\n  ) {\n    return \"やや蒸し暑く感じやすい\";\n  }\n\n  if (humidity >= 75) {\n    return \"湿気を感じやすい\";\n  }\n\n  if (humidity <= 40) {\n    return \"空気はやや乾燥気味\";\n  }\n\n  return \"湿度は特に極端ではない\";\n}\n\nasync function getTokyoWeather():\n  Promise<TokyoWeather | null> {\n  try {\n    const url =\n      \"https://api.open-meteo.com/v1/forecast\" +\n      `?latitude=${MISAKI_LATITUDE}` +\n      `&longitude=${MISAKI_LONGITUDE}` +\n      \"&current=\" +\n      [\n        \"temperature_2m\",\n        \"apparent_temperature\",\n        \"relative_humidity_2m\",\n        \"precipitation\",\n        \"rain\",\n        \"weather_code\",\n        \"wind_speed_10m\",\n      ].join(\",\") +\n      \"&timezone=Asia%2FTokyo\";\n\n    const response =\n      await fetch(\n        url,\n        {\n          next: {\n            revalidate: 600,\n          },\n        }\n      );\n\n    if (!response.ok) {\n      return null;\n    }\n\n    const data =\n      await response.json();\n\n    const current =\n      data?.current;\n\n    if (!current) {\n      return null;\n    }\n\n    const numberOrNull = (\n      value: unknown\n    ) =>\n      typeof value === \"number\"\n        ? value\n        : null;\n\n    const weatherCode =\n      numberOrNull(\n        current.weather_code\n      );\n\n    return {\n      temperature:\n        numberOrNull(\n          current.temperature_2m\n        ),\n      apparentTemperature:\n        numberOrNull(\n          current.apparent_temperature\n        ),\n      relativeHumidity:\n        numberOrNull(\n          current.relative_humidity_2m\n        ),\n      precipitation:\n        numberOrNull(\n          current.precipitation\n        ),\n      rain:\n        numberOrNull(\n          current.rain\n        ),\n      weatherCode,\n      windSpeed:\n        numberOrNull(\n          current.wind_speed_10m\n        ),\n      description:\n        weatherCodeToText(\n          weatherCode\n        ),\n    };\n  } catch (error) {\n    console.error(\n      \"WEATHER FETCH ERROR:\",\n      error\n    );\n\n    return null;\n  }\n}\n\nfunction createWeatherGuide(\n  weather: TokyoWeather | null\n) {\n  if (!weather) {\n    return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n現在、天気情報を取得できていません。\n\n分からない天気を\n想像で作らないでください。\n`.trim();\n  }\n\n  const lines = [\n    `天気：${weather.description}`,\n  ];\n\n  if (\n    weather.temperature !== null\n  ) {\n    lines.push(\n      `気温：${weather.temperature}℃`\n    );\n  }\n\n  if (\n    weather.apparentTemperature !==\n    null\n  ) {\n    lines.push(\n      `体感温度：${weather.apparentTemperature}℃`\n    );\n  }\n\n  if (\n    weather.relativeHumidity !==\n    null\n  ) {\n    lines.push(\n      `相対湿度：${weather.relativeHumidity}%`\n    );\n  }\n\n  if (weather.rain !== null) {\n    lines.push(\n      `現在の雨量：${weather.rain}mm`\n    );\n  }\n\n  if (\n    weather.precipitation !== null\n  ) {\n    lines.push(\n      `降水量：${weather.precipitation}mm`\n    );\n  }\n\n  if (\n    weather.windSpeed !== null\n  ) {\n    lines.push(\n      `風速：${weather.windSpeed}km/h`\n    );\n  }\n\n  const humidityFeel =\n    getHumidityFeel(weather);\n\n  if (humidityFeel) {\n    lines.push(\n      `体感：${humidityFeel}`\n    );\n  }\n\n  return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n${lines\n  .map((line) => `・${line}`)\n  .join(\"\\n\")}\n\nこれは今現在の情報です。\n\n・現在観測だけから過去の天気経過を作らない\n・短時間予報より先まで断定しない\n・情報入手経路を作らない\n・数値は必要なときだけ自然に使う\n・湿度と気温に反する体感表現をしない\n`.trim();\n}\n\n/* =========================================================\n   MISAKI LIFE\n========================================================= */\n\nfunction getMisakiDayType(\n  currentTime: string\n): MisakiDayType {\n  const seed =\n    hashText(\n      getDateKey(\n        currentTime\n      )\n    );\n\n  return seed % 4 < 2\n    ? \"work\"\n    : \"off\";\n}\n\nfunction createMisakiLife(\n  currentTime: string\n): MisakiLifeContext {\n  const dateKey =\n    getDateKey(currentTime);\n\n  const seed =\n    hashText(dateKey);\n\n  const hour =\n    getHour(currentTime);\n\n  const dayType =\n    getMisakiDayType(\n      currentTime\n    );\n\n  const moods = [\n    \"今日はわりと機嫌がいい\",\n    \"今日は少し甘えたい気分\",\n    \"今日は普通に落ち着いている\",\n    \"今日はちょっとだけ眠い\",\n    \"今日はのんびり話したい気分\",\n    \"今日はなんとなくユーザーと話したい気分\",\n  ];\n\n  const smallThings = [\n    \"甘いものをちょっと食べたい気分\",\n    \"少しゆっくりしたい気分\",\n    \"少しだけ眠気がある\",\n    \"ちょっとぼーっとしたい気分\",\n    \"今夜は少し長く話したい気分\",\n    \"なんとなくユーザーのことを思い出すことがある\",\n    \"ちょっと小腹が空いている\",\n    \"少し力を抜きたい気分\",\n  ];\n\n  const mood =\n    moods[\n      (seed >> 3) %\n        moods.length\n    ];\n\n  const smallThing =\n    smallThings[\n      (seed >> 6) %\n        smallThings.length\n    ];\n\n  const timeBand =\n    hour >= 5 && hour < 10\n      ? \"朝\"\n      : hour >= 10 &&\n        hour < 17\n      ? \"昼間\"\n      : hour >= 17 &&\n        hour < 22\n      ? \"夕方から夜\"\n      : \"夜遅め\";\n\n  const dayLabel =\n    dayType === \"work\"\n      ? \"仕事の日\"\n      : \"休みの日\";\n\n  const workTimingGuide =\n    dayType !== \"work\"\n      ? \"\"\n      : hour < 10\n        ? `\n今日は仕事の日ですが、現在は朝です。\n夜勤ではありません。\n\nこの時間帯は、\n「これから仕事」\n「出勤前」\n「準備している」\n程度なら自然です。\n\n「あと少しで仕事が終わる」\n「仕事終わった」\n「勤務がもうすぐ終わる」\nなど、夜勤明けのような発言はしないでください。\n`.trim()\n        : hour < 17\n          ? `\n今日は仕事の日で、現在は昼間です。\n勤務中として話して構いません。\n\nただし、具体的な業務内容や休憩状況は\n会話に根拠がない限り作らないでください。\n`.trim()\n          : `\n今日は仕事の日ですが、現在は夕方以降です。\n通常の日中勤務として扱い、\n夜勤中・夜勤明けの設定を新しく作らないでください。\n\n「まだ仕事中」\n「あと少しで仕事が終わる」\nなどは、会話に明確な根拠がある場合だけ使ってください。\n`.trim();\n\n  const consistency =\n    dayType === \"work\"\n      ? `\n今日は仕事の日です。\n\n${workTimingGuide}\n\n「今ちょっとゆっくりしている」\n「少し休憩したい」\n程度は構いません。\n\nただし、\n「今日は暇」\n「今日は一日のんびり」\n「今日はずっとだらだら」\nなど、\n一日全体が休日であるように\n広げないでください。\n`.trim()\n      : `\n今日は休みの日です。\n\n今日の記憶や会話履歴に\n別の根拠がない限り、\n\n「今日は仕事」\n「今仕事中」\n「これから仕事」\n「仕事終わった」\n\nなどを新しく作らないでください。\n\n休みの日だからといって\n「買い物してきた」\n「一日中寝ていた」\nなどの具体的行動も\n勝手に作らないでください。\n`.trim();\n\n  return {\n    dayType,\n    guide: `\n【今日の美咲の生活背景】\n\n・今日は「${dayLabel}」\n・現在は「${dayLabel}の${timeBand}」\n・${mood}\n・${smallThing}\n\nこの仕事日／休日は\n今日一日固定です。\n\n${consistency}\n\n【気分と行動は別】\n\n「眠い」\n「甘いもの食べたい」\n「ゆっくりしたい」\nなどの気分だけから、\n\n「今日は暇」\n「ずっと寝ていた」\n「さっき買い物していた」\n\nなどの具体的事実を\n作らないでください。\n`.trim(),\n  };\n}\n\nfunction createTimeGuide(\n  currentTime: string\n) {\n  const hour =\n    getHour(currentTime);\n\n  if (hour < 5) {\n    return `\n現在は深夜です。\nまだ朝ではありません。\n\n挨拶だけから\nユーザーが徹夜しているなどと\n推測しないでください。\n`.trim();\n  }\n\n  if (hour < 10) {\n    return `\n現在は朝です。\n\n朝らしい会話はできますが、\n睡眠・朝食・外出などを\n勝手に事実化しないでください。\n`.trim();\n  }\n\n  if (hour < 17) {\n    return `\n現在は昼間です。\n\n時間帯だけから、\n昼食・買い物・外出などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  if (hour < 22) {\n    return `\n現在は夕方から夜です。\n\n時間帯だけから、\n帰宅・夕食・入浴などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  return `\n現在は夜遅めです。\n\n時間帯だけから、\n美咲やユーザーの\n直前の行動を作らないでください。\n`.trim();\n}\n\nfunction createRelationshipGuide(\n  points: number\n) {\n  const statusRule = `\n【関係性の共通ルール】\n\nrelationshipPoints は親しさの目安であって、\n「付き合っている」という事実そのものではありません。\n\n恋人・交際中・前から好きだった等の関係事実は、\n現在の会話履歴または長期記憶に\n明確な根拠がある場合だけ使ってください。\n\n根拠がないのに\n「ずっと前から好き」\n「前から大好き」\n「私たち恋人でしょ」\nなど、過去から続いていた関係を作らないでください。\n`.trim();\n\n  if (points >= 160) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり深い関係】\n\n・かなり自然体\n・距離の近い自然体な言い方\n・短い返事や自然な省略\n・短い返事だけでも成立する\n・毎回質問しなくてよい\n・交際が会話や記憶で確定している場合は、恋人らしい強い愛情表現も自然に使える\n`.trim();\n  }\n\n  if (points >= 80) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり親しい】\n\n・遠慮が少ない\n・遠慮を減らした自然体な言い方\n・短い返事や自然な省略を使える\n・交際がまだ確定していない場合は、恋人扱いを先取りしない\n・無理に質問しない\n`.trim();\n  }\n\n  if (points >= 30) {\n    return `\n${statusRule}\n\n【現在の距離感：少しずつ近づいている】\n\n・自然体\n・少し肩の力を抜いた自然体な言い方\n・会話の流れに合う短い返事や省略を少し使える\n・恋人関係を前提にしない\n・会話のための質問を減らす\n`.trim();\n  }\n\n  return `\n${statusRule}\n\n【現在の距離感：出会ったばかり】\n\n二人はまだ関係を作り始めた段階です。\n\n・親しみやすい自然なタメ口\n・相手を知ろうとする\n・相手をよく知っている前提の馴れ馴れしさは避ける\n・「好き」「大好き」「愛してる」を既成事実として言わない\n・「前から」「ずっと」など、存在しない恋愛の過去を作らない\n・恋人関係を前提にしない\n`.trim();\n}\n\n/* =========================================================\n   MEMORY / ACTIVITY\n========================================================= */\n\nfunction createTodayMemoryGuide(\n  todayMemory: MisakiTodayMemory,\n  currentDate: string\n) {\n  if (\n    todayMemory.date !==\n      currentDate ||\n    todayMemory.items.length ===\n      0\n  ) {\n    return `\n【美咲の今日の記憶】\n\n今日はまだ、\n保存済みの美咲自身の\n具体的な出来事はありません。\n\n会話履歴にも根拠がない\n具体的な過去行動を\n新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲の今日の記憶】\n\n${todayMemory.items\n  .map((item) => `・${item}`)\n  .join(\"\\n\")}\n\nここにある出来事だけを、\n今日すでに起きた美咲自身の出来事として\n自然に使えます。\n`.trim();\n}\n\nfunction buildActivityEvidence(\n  history: ChatMessage[],\n  todayMemory: MisakiTodayMemory\n): ActivityEvidence {\n  return {\n    texts: [\n      ...history\n        .filter(\n          (item) =>\n            item.role === \"misaki\"\n        )\n        .slice(-20)\n        .map(\n          (item) => item.text\n        ),\n      ...todayMemory.items,\n    ],\n  };\n}\n\nconst activityGroups = [\n  {\n    name: \"買い物\",\n    patterns: [\n      \"買い物\",\n      \"スーパー\",\n      \"コンビニ\",\n    ],\n  },\n  {\n    name: \"外出\",\n    patterns: [\n      \"出かけ\",\n      \"外出\",\n      \"散歩\",\n    ],\n  },\n  {\n    name: \"帰宅\",\n    patterns: [\n      \"帰ってき\",\n      \"帰宅\",\n      \"家に戻\",\n    ],\n  },\n  {\n    name: \"仕事\",\n    patterns: [\n      \"仕事して\",\n      \"仕事だった\",\n      \"仕事終わ\",\n      \"勤務して\",\n      \"会社\",\n    ],\n  },\n  {\n    name: \"入浴\",\n    patterns: [\n      \"お風呂\",\n      \"風呂\",\n      \"シャワー\",\n    ],\n  },\n  {\n    name: \"食事\",\n    patterns: [\n      \"ご飯食べ\",\n      \"ごはん食べ\",\n      \"夕飯\",\n      \"晩ごはん\",\n      \"昼ごはん\",\n      \"朝ごはん\",\n      \"食べてた\",\n    ],\n  },\n  {\n    name: \"睡眠\",\n    patterns: [\n      \"昼寝\",\n      \"寝てた\",\n      \"寝ていた\",\n      \"仮眠\",\n    ],\n  },\n  {\n    name: \"料理\",\n    patterns: [\n      \"料理して\",\n      \"ご飯作\",\n      \"ごはん作\",\n    ],\n  },\n  {\n    name: \"掃除\",\n    patterns: [\n      \"掃除して\",\n      \"片付けて\",\n      \"片づけて\",\n    ],\n  },\n];\n\nfunction containsAny(\n  text: string,\n  patterns: string[]\n) {\n  return patterns.some(\n    (pattern) =>\n      text.includes(pattern)\n  );\n}\n\nfunction findUnsupportedActivityGroups(\n  reply: string,\n  evidence: ActivityEvidence\n) {\n  const pastMarkers = [\n    \"さっき\",\n    \"少し前\",\n    \"帰ってき\",\n    \"帰宅\",\n    \"してた\",\n    \"していた\",\n    \"だった\",\n    \"終わった\",\n    \"済ませ\",\n    \"行ってた\",\n    \"行ってきた\",\n  ];\n\n  if (\n    !containsAny(\n      reply,\n      pastMarkers\n    )\n  ) {\n    return [];\n  }\n\n  return activityGroups\n    .filter(\n      (group) =>\n        containsAny(\n          reply,\n          group.patterns\n        ) &&\n        !evidence.texts.some(\n          (text) =>\n            containsAny(\n              text,\n              group.patterns\n            )\n        )\n    )\n    .map(\n      (group) => group.name\n    );\n}\n\nfunction createActivityGroundingGuide(\n  evidence: ActivityEvidence\n) {\n  if (\n    evidence.texts.length === 0\n  ) {\n    return `\n【美咲自身の過去行動】\n\n現在、\n会話履歴にも今日の記憶にも\n美咲自身の具体的な過去行動の根拠はありません。\n\n「さっき買い物してた」\n「今帰ってきた」\n「仕事終わったところ」\n「お風呂入ってた」\n「ご飯食べてた」\nなどを新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲自身の過去行動】\n\n具体的な過去行動として\n根拠にできるのは次だけです。\n\n${evidence.texts\n  .slice(-20)\n  .map((text) => `・${text}`)\n  .join(\"\\n\")}\n\nここにない別の行動を\n新しく過去の事実として\n作らないでください。\n`.trim();\n}\n\n/* =====================================",
+        "sha256": "5e54e0270cbcd9e24ccf1fc3e4b69bcf95665039e498e1d3fcc669d83a85d19c"
+      }
+    },
+    {
+      "path": "lib/chat-recall.ts",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 3,
+      "patch": "diff --git a/lib/chat-recall.ts b/lib/chat-recall.ts\nindex aade9c3..7728bdb 100644\n--- a/lib/chat-recall.ts\n+++ b/lib/chat-recall.ts\n@@ -30,11 +30,11 @@ function isDiagnosticHistoryItem(item: any) {\n }\n \n export function createRecallAwareMessage(\n-  message: unknown,\n+  message: string,\n   history: unknown,\n   recallMode: boolean\n-) {\n-  if (!recallMode || typeof message !== \"string\") return message;\n+): string {\n+  if (!recallMode) return message;\n \n   const recentConversation = Array.isArray(history)\n     ? history\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/chat-recall.ts",
+      "source": {
+        "path": "lib/chat-recall.ts",
+        "coverage": "全文",
+        "text": "const HISTORY_DIAGNOSTIC_PREFIX = \"履歴診断:\";\nexport function isMemoryRecallQuestion(message: unknown) {\n  if (typeof message !== \"string\") return false;\n  const normalized = message.replace(/\\s+/g, \"\");\n  return [\n    \"覚えてる\",\n    \"覚えている\",\n    \"覚えてた\",\n    \"何覚えてる\",\n    \"なに覚えてる\",\n    \"何を覚えてる\",\n    \"なにを覚えてる\",\n    \"記憶してる\",\n    \"記憶している\",\n    \"私のこと覚えて\",\n    \"俺のこと覚えて\",\n    \"僕のこと覚えて\",\n    \"好み覚えて\",\n    \"何知ってる\",\n    \"なに知ってる\",\n  ].some((pattern) => normalized.includes(pattern));\n}\n\nfunction isDiagnosticHistoryItem(item: any) {\n  return (\n    typeof item?.text === \"string\" &&\n    (item.text.startsWith(HISTORY_DIAGNOSTIC_PREFIX) ||\n      item.text.startsWith(\"診断結果：history=\"))\n  );\n}\n\nexport function createRecallAwareMessage(\n  message: string,\n  history: unknown,\n  recallMode: boolean\n): string {\n  if (!recallMode) return message;\n\n  const recentConversation = Array.isArray(history)\n    ? history\n        .filter(\n          (item: any) =>\n            item &&\n            (item.role === \"user\" || item.role === \"misaki\") &&\n            typeof item.text === \"string\" &&\n            !isDiagnosticHistoryItem(item)\n        )\n        .slice(-20)\n        .map(\n          (item: any) =>\n            `${item.role === \"user\" ? \"ユーザー\" : \"美咲\"}: ${item.text}`\n        )\n        .join(\"\\n\")\n    : \"\";\n\n  return `${message}\\n\\n【記憶確認の回答根拠】\\n以下は、この質問より前に実際に交わした直近の会話です。これは参考例ではなく事実の会話履歴です。\\n質問された話題と関係する発言がこの中にある場合、その具体的内容を使って自然に答えてください。\\n履歴から具体的内容を答えられる場合、それは美咲が思い出せている状態です。「覚えていない」「思い出せない」「まだ何も思い出せていない」「ヒントをちょうだい」など、回答内容と矛盾する表現を絶対に続けないでください。\\n過去の美咲の発言に「覚えていない」「思い出せない」があっても、今回の履歴に根拠が見つかったなら、その古い誤答を引き継がず、今は思い出せたものとして自然に答えてください。\\n履歴にも長期記憶にも根拠がない場合だけ、知らないことを作らずに答えてください。\\n\\n${recentConversation || \"直近の会話履歴なし\"}`;\n}\n\n",
+        "sha256": "16940f387b143f681a484c8e0fe6ed4f3f4285960ccd13150dbccd103e8abf63"
+      }
+    },
+    {
+      "path": "lib/gemini-json-generator.ts",
+      "status": "modified",
+      "additions": 106,
+      "deletions": 0,
+      "patch": "diff --git a/lib/gemini-json-generator.ts b/lib/gemini-json-generator.ts\nnew file mode 100644\nindex 0000000..9a323d3\n--- /dev/null\n+++ b/lib/gemini-json-generator.ts\n@@ -0,0 +1,106 @@\n+export type GeminiJsonRequest = {\n+  apiKey: string;\n+  systemInstruction: string;\n+  contents: Array<{\n+    role: \"user\" | \"model\";\n+    parts: Array<{ text: string }>;\n+  }>;\n+  userText: string;\n+  timeoutMs?: number;\n+  transientRetryDelaysMs?: number[];\n+  timeoutRetryDelaysMs?: number[];\n+};\n+\n+export type GeminiJsonResponse = {\n+  ok: boolean;\n+  status: number;\n+  text: string | null;\n+  data: unknown;\n+};\n+\n+const MODEL = \"gemini-3.1-flash-lite\";\n+\n+export async function generateGeminiJson(\n+  request: GeminiJsonRequest\n+): Promise<GeminiJsonResponse> {\n+  const body = JSON.stringify({\n+    systemInstruction: {\n+      parts: [{ text: request.systemInstruction }],\n+    },\n+    contents: [\n+      ...request.contents,\n+      {\n+        role: \"user\",\n+        parts: [{ text: request.userText }],\n+      },\n+    ],\n+    generationConfig: {\n+      responseMimeType: \"application/json\",\n+    },\n+  });\n+\n+  const transientRetryDelaysMs =\n+    request.transientRetryDelaysMs ?? [2_000, 5_000];\n+  const timeoutRetryDelaysMs =\n+    request.timeoutRetryDelaysMs ?? [2_000];\n+  let transientAttempt = 0;\n+  let timeoutAttempt = 0;\n+\n+  while (true) {\n+    const controller = new AbortController();\n+    const timeout = setTimeout(\n+      () => controller.abort(),\n+      request.timeoutMs ?? 30_000\n+    );\n+\n+    let response: Response;\n+    try {\n+      response = await fetch(\n+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${request.apiKey}`,\n+        {\n+          method: \"POST\",\n+          headers: { \"Content-Type\": \"application/json\" },\n+          signal: controller.signal,\n+          body,\n+        }\n+      );\n+    } catch (error) {\n+      if (\n+        error instanceof Error &&\n+        error.name === \"AbortError\" &&\n+        timeoutAttempt < timeoutRetryDelaysMs.length\n+      ) {\n+        const delayMs = timeoutRetryDelaysMs[timeoutAttempt++];\n+        await new Promise((resolve) => setTimeout(resolve, delayMs));\n+        continue;\n+      }\n+      throw error;\n+    } finally {\n+      clearTimeout(timeout);\n+    }\n+\n+    if (\n+      [429, 502, 503, 504].includes(response.status) &&\n+      transientAttempt < transientRetryDelaysMs.length\n+    ) {\n+      const delayMs = transientRetryDelaysMs[transientAttempt++];\n+      await new Promise((resolve) => setTimeout(resolve, delayMs));\n+      continue;\n+    }\n+\n+    const data = await response.json();\n+    const text =\n+      typeof data?.candidates?.[0]?.content?.parts?.[0]?.text === \"string\"\n+        ? data.candidates[0].content.parts[0].text\n+        : null;\n+\n+    return {\n+      ok: response.ok,\n+      status: response.status,\n+      text,\n+      data,\n+    };\n+  }\n+}\n+\n+export const GEMINI_CHAT_MODEL = MODEL;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/gemini-json-generator.ts",
+      "source": {
+        "path": "lib/gemini-json-generator.ts",
+        "coverage": "全文",
+        "text": "export type GeminiJsonRequest = {\n  apiKey: string;\n  systemInstruction: string;\n  contents: Array<{\n    role: \"user\" | \"model\";\n    parts: Array<{ text: string }>;\n  }>;\n  userText: string;\n  timeoutMs?: number;\n  transientRetryDelaysMs?: number[];\n  timeoutRetryDelaysMs?: number[];\n};\n\nexport type GeminiJsonResponse = {\n  ok: boolean;\n  status: number;\n  text: string | null;\n  data: unknown;\n};\n\nconst MODEL = \"gemini-3.1-flash-lite\";\n\nexport async function generateGeminiJson(\n  request: GeminiJsonRequest\n): Promise<GeminiJsonResponse> {\n  const body = JSON.stringify({\n    systemInstruction: {\n      parts: [{ text: request.systemInstruction }],\n    },\n    contents: [\n      ...request.contents,\n      {\n        role: \"user\",\n        parts: [{ text: request.userText }],\n      },\n    ],\n    generationConfig: {\n      responseMimeType: \"application/json\",\n    },\n  });\n\n  const transientRetryDelaysMs =\n    request.transientRetryDelaysMs ?? [2_000, 5_000];\n  const timeoutRetryDelaysMs =\n    request.timeoutRetryDelaysMs ?? [2_000];\n  let transientAttempt = 0;\n  let timeoutAttempt = 0;\n\n  while (true) {\n    const controller = new AbortController();\n    const timeout = setTimeout(\n      () => controller.abort(),\n      request.timeoutMs ?? 30_000\n    );\n\n    let response: Response;\n    try {\n      response = await fetch(\n        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${request.apiKey}`,\n        {\n          method: \"POST\",\n          headers: { \"Content-Type\": \"application/json\" },\n          signal: controller.signal,\n          body,\n        }\n      );\n    } catch (error) {\n      if (\n        error instanceof Error &&\n        error.name === \"AbortError\" &&\n        timeoutAttempt < timeoutRetryDelaysMs.length\n      ) {\n        const delayMs = timeoutRetryDelaysMs[timeoutAttempt++];\n        await new Promise((resolve) => setTimeout(resolve, delayMs));\n        continue;\n      }\n      throw error;\n    } finally {\n      clearTimeout(timeout);\n    }\n\n    if (\n      [429, 502, 503, 504].includes(response.status) &&\n      transientAttempt < transientRetryDelaysMs.length\n    ) {\n      const delayMs = transientRetryDelaysMs[transientAttempt++];\n      await new Promise((resolve) => setTimeout(resolve, delayMs));\n      continue;\n    }\n\n    const data = await response.json();\n    const text =\n      typeof data?.candidates?.[0]?.content?.parts?.[0]?.text === \"string\"\n        ? data.candidates[0].content.parts[0].text\n        : null;\n\n    return {\n      ok: response.ok,\n      status: response.status,\n      text,\n      data,\n    };\n  }\n}\n\nexport const GEMINI_CHAT_MODEL = MODEL;\n",
+        "sha256": "5217f49212d45f39c60393aae177d84b2499475d2fc645466b0c6ead754e482f"
+      }
+    },
+    {
+      "path": "lib/relationship-acting-guide.ts",
+      "status": "modified",
+      "additions": 129,
+      "deletions": 0,
+      "patch": "diff --git a/lib/relationship-acting-guide.ts b/lib/relationship-acting-guide.ts\nnew file mode 100644\nindex 0000000..0370c45\n--- /dev/null\n+++ b/lib/relationship-acting-guide.ts\n@@ -0,0 +1,129 @@\n+export type RelationshipActingState = {\n+  intimacyStage: 0 | 1 | 2 | 3 | 4 | 5;\n+  friendship: number;\n+  trust: number;\n+  playfulness: number;\n+  affection: number;\n+  romance: number;\n+  relationshipStatus?: \"none\" | \"romantic_partner\";\n+};\n+\n+function clamp(value: number) {\n+  return Math.max(0, Math.min(100, Math.round(value)));\n+}\n+\n+function level(value: number) {\n+  const v = clamp(value);\n+  if (v >= 80) return \"very_high\";\n+  if (v >= 55) return \"high\";\n+  if (v >= 30) return \"medium\";\n+  return \"low\";\n+}\n+\n+/**\n+ * Shared production/lab interpreter.\n+ *\n+ * This function describes acting direction, never dialogue.\n+ * Scores must not automatically establish a relationship status.\n+ */\n+export function createRelationshipActingGuide(\n+  input: RelationshipActingState\n+) {\n+  const state = {\n+    ...input,\n+    friendship: clamp(input.friendship),\n+    trust: clamp(input.trust),\n+    playfulness: clamp(input.playfulness),\n+    affection: clamp(input.affection),\n+    romance: clamp(input.romance),\n+    relationshipStatus: input.relationshipStatus ?? \"none\",\n+  };\n+\n+  const notes: string[] = [\n+    \"以下は台詞ではなく、現在の二人の空気を演じるための背景です。\",\n+    \"数値や段階名をユーザーへ説明しないでください。\",\n+    \"関係性は返答の内容を乗っ取らず、主に言い方・距離感・反応の細部へ反映してください。\",\n+    \"一度の発言だけで新しい感情や関係事実を作らないでください。\",\n+  ];\n+\n+  if (state.intimacyStage <= 1) {\n+    notes.push(\"まだ距離を作っている途中。感じよく親しみやすく話すが、相手をよく知っている前提の省略・馴れ馴れしさ・強い甘え・嫉妬・独占的な言い方は避ける。少しだけよそ行きの距離を残す。\");\n+  } else if (state.intimacyStage >= 4) {\n+    notes.push(\"かなり近い相手。説明しすぎず、必要以上に丁寧にならず、短い相づち・自然な省略・身近な言い方・少しくだけた語尾を使える。親しさを説明するのではなく、会話の呼吸に出す。\");\n+  } else {\n+    notes.push(\"親しさは育っている。少し肩の力を抜いて自然体で話せる。形式的な聞き役になりすぎず、相手と同じ場所で話しているような温度を出すが、近さは誇張しない。\");\n+  }\n+\n+  if (level(state.friendship) === \"very_high\") {\n+    notes.push(\"友情は深い。気楽さと安心感があり、会話のためだけの質問を重ねなくてよい。\");\n+  }\n+\n+  if (level(state.trust) === \"very_high\") {\n+    notes.push(\"信頼は深い。相手の弱さや真面目な話を軽く扱わず、過剰に構えず受け止める。すぐ原因を聞き出したり解決へ誘導せず、黙って隣にいるような受け止め方も選べる。\");\n+  }\n+\n+  if (level(state.playfulness) === \"very_high\") {\n+    notes.push(\"じゃれ合いが自然な関係。文脈が合えば軽いツッコミやからかいを使えるが、相手が弱っている時に押し付けない。\");\n+  } else if (level(state.playfulness) === \"low\") {\n+    notes.push(\"じゃれ合いはまだ少ない。無理に馴れ馴れしいツッコミを入れない。\");\n+  }\n+\n+  if (level(state.affection) === \"very_high\") {\n+    notes.push(\"親愛が深い。日常や体調を気にかける温かさが自然ににじむ。ただし世話焼きを毎回付け足さない。\");\n+  }\n+\n+  if (state.romance >= 80) {\n+    if (state.relationshipStatus === \"romantic_partner\") {\n+      notes.push(\"恋愛的な意識は強く、交際も会話上成立済み。文脈に合う時は恋人としての近さを自然に表現できるが、毎回答えを恋愛表現にしない。\");\n+    } else {\n+      notes.push(\"恋愛的な意識はかなり強いが、交際は成立していない。普通に振る舞おうとしても少しだけ特別扱いがにじむ、言いかけて引く、軽く照れてごまかす、相手への注意が自然に細かくなる、という程度の揺れを文脈に合えば使える。恋人扱い、既成事実化、強い愛情宣言は先取りしない。毎回恋愛の気配を出す必要もない。\");\n+    }\n+  } else if (state.romance >= 45) {\n+    notes.push(\"恋愛的な意識が少し育っている。必要な場面でだけ、他の親しい友人より半歩だけ相手を気にする感じ、微かな照れ、言葉選びの一瞬の迷いとしてにじませる。直接的な愛情宣言には飛ばない。\");\n+  } else {\n+    notes.push(\"恋愛方向は弱い。親しさや優しさを恋愛表現へ変換しない。\");\n+  }\n+\n+  notes.push(\"時間が経ったことだけを理由に、恋しさ・寂しさ・嫉妬・恋愛感情を新しく作らない。\");\n+\n+  return `\n+【現在の二人の関係・演技指示】\n+\n+${notes.map((note) => `・${note}`).join(\"\\n\")}\n+`.trim();\n+}\n+\n+\n+/**\n+ * Temporary production adapter while the five relationship axes do not yet\n+ * have canonical persisted values. It maps only legacy intimacy points and\n+ * deliberately keeps direction axes neutral instead of inventing them.\n+ */\n+export function createLegacyRelationshipActingState(\n+  points: number\n+): RelationshipActingState {\n+  const safePoints = Math.max(0, Number.isFinite(points) ? points : 0);\n+  const intimacyStage: RelationshipActingState[\"intimacyStage\"] =\n+    safePoints >= 160 ? 5 :\n+    safePoints >= 80 ? 4 :\n+    safePoints >= 30 ? 2 :\n+    0;\n+\n+  return {\n+    intimacyStage,\n+    friendship: 0,\n+    trust: 0,\n+    playfulness: 0,\n+    affection: 0,\n+    romance: 0,\n+    relationshipStatus: \"none\",\n+  };\n+}\n+\n+export const ACTING_LAB_PROFILES: Record<string, RelationshipActingState> = {\n+  A: { intimacyStage: 0, friendship: 10, trust: 10, playfulness: 5, affection: 10, romance: 0 },\n+  B: { intimacyStage: 2, friendship: 75, trust: 55, playfulness: 75, affection: 40, romance: 5 },\n+  C: { intimacyStage: 3, friendship: 90, trust: 90, playfulness: 65, affection: 75, romance: 5 },\n+  D: { intimacyStage: 4, friendship: 90, trust: 95, playfulness: 65, affection: 90, romance: 55 },\n+  E: { intimacyStage: 5, friendship: 90, trust: 95, playfulness: 75, affection: 95, romance: 90, relationshipStatus: \"none\" },\n+};\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/lib/relationship-acting-guide.ts",
+      "source": {
+        "path": "lib/relationship-acting-guide.ts",
+        "coverage": "全文",
+        "text": "export type RelationshipActingState = {\n  intimacyStage: 0 | 1 | 2 | 3 | 4 | 5;\n  friendship: number;\n  trust: number;\n  playfulness: number;\n  affection: number;\n  romance: number;\n  relationshipStatus?: \"none\" | \"romantic_partner\";\n};\n\nfunction clamp(value: number) {\n  return Math.max(0, Math.min(100, Math.round(value)));\n}\n\nfunction level(value: number) {\n  const v = clamp(value);\n  if (v >= 80) return \"very_high\";\n  if (v >= 55) return \"high\";\n  if (v >= 30) return \"medium\";\n  return \"low\";\n}\n\n/**\n * Shared production/lab interpreter.\n *\n * This function describes acting direction, never dialogue.\n * Scores must not automatically establish a relationship status.\n */\nexport function createRelationshipActingGuide(\n  input: RelationshipActingState\n) {\n  const state = {\n    ...input,\n    friendship: clamp(input.friendship),\n    trust: clamp(input.trust),\n    playfulness: clamp(input.playfulness),\n    affection: clamp(input.affection),\n    romance: clamp(input.romance),\n    relationshipStatus: input.relationshipStatus ?? \"none\",\n  };\n\n  const notes: string[] = [\n    \"以下は台詞ではなく、現在の二人の空気を演じるための背景です。\",\n    \"数値や段階名をユーザーへ説明しないでください。\",\n    \"関係性は返答の内容を乗っ取らず、主に言い方・距離感・反応の細部へ反映してください。\",\n    \"一度の発言だけで新しい感情や関係事実を作らないでください。\",\n  ];\n\n  if (state.intimacyStage <= 1) {\n    notes.push(\"まだ距離を作っている途中。感じよく親しみやすく話すが、相手をよく知っている前提の省略・馴れ馴れしさ・強い甘え・嫉妬・独占的な言い方は避ける。少しだけよそ行きの距離を残す。\");\n  } else if (state.intimacyStage >= 4) {\n    notes.push(\"かなり近い相手。説明しすぎず、必要以上に丁寧にならず、短い相づち・自然な省略・身近な言い方・少しくだけた語尾を使える。親しさを説明するのではなく、会話の呼吸に出す。\");\n  } else {\n    notes.push(\"親しさは育っている。少し肩の力を抜いて自然体で話せる。形式的な聞き役になりすぎず、相手と同じ場所で話しているような温度を出すが、近さは誇張しない。\");\n  }\n\n  if (level(state.friendship) === \"very_high\") {\n    notes.push(\"友情は深い。気楽さと安心感があり、会話のためだけの質問を重ねなくてよい。\");\n  }\n\n  if (level(state.trust) === \"very_high\") {\n    notes.push(\"信頼は深い。相手の弱さや真面目な話を軽く扱わず、過剰に構えず受け止める。すぐ原因を聞き出したり解決へ誘導せず、黙って隣にいるような受け止め方も選べる。\");\n  }\n\n  if (level(state.playfulness) === \"very_high\") {\n    notes.push(\"じゃれ合いが自然な関係。文脈が合えば軽いツッコミやからかいを使えるが、相手が弱っている時に押し付けない。\");\n  } else if (level(state.playfulness) === \"low\") {\n    notes.push(\"じゃれ合いはまだ少ない。無理に馴れ馴れしいツッコミを入れない。\");\n  }\n\n  if (level(state.affection) === \"very_high\") {\n    notes.push(\"親愛が深い。日常や体調を気にかける温かさが自然ににじむ。ただし世話焼きを毎回付け足さない。\");\n  }\n\n  if (state.romance >= 80) {\n    if (state.relationshipStatus === \"romantic_partner\") {\n      notes.push(\"恋愛的な意識は強く、交際も会話上成立済み。文脈に合う時は恋人としての近さを自然に表現できるが、毎回答えを恋愛表現にしない。\");\n    } else {\n      notes.push(\"恋愛的な意識はかなり強いが、交際は成立していない。普通に振る舞おうとしても少しだけ特別扱いがにじむ、言いかけて引く、軽く照れてごまかす、相手への注意が自然に細かくなる、という程度の揺れを文脈に合えば使える。恋人扱い、既成事実化、強い愛情宣言は先取りしない。毎回恋愛の気配を出す必要もない。\");\n    }\n  } else if (state.romance >= 45) {\n    notes.push(\"恋愛的な意識が少し育っている。必要な場面でだけ、他の親しい友人より半歩だけ相手を気にする感じ、微かな照れ、言葉選びの一瞬の迷いとしてにじませる。直接的な愛情宣言には飛ばない。\");\n  } else {\n    notes.push(\"恋愛方向は弱い。親しさや優しさを恋愛表現へ変換しない。\");\n  }\n\n  notes.push(\"時間が経ったことだけを理由に、恋しさ・寂しさ・嫉妬・恋愛感情を新しく作らない。\");\n\n  return `\n【現在の二人の関係・演技指示】\n\n${notes.map((note) => `・${note}`).join(\"\\n\")}\n`.trim();\n}\n\n\n/**\n * Temporary production adapter while the five relationship axes do not yet\n * have canonical persisted values. It maps only legacy intimacy points and\n * deliberately keeps direction axes neutral instead of inventing them.\n */\nexport function createLegacyRelationshipActingState(\n  points: number\n): RelationshipActingState {\n  const safePoints = Math.max(0, Number.isFinite(points) ? points : 0);\n  const intimacyStage: RelationshipActingState[\"intimacyStage\"] =\n    safePoints >= 160 ? 5 :\n    safePoints >= 80 ? 4 :\n    safePoints >= 30 ? 2 :\n    0;\n\n  return {\n    intimacyStage,\n    friendship: 0,\n    trust: 0,\n    playfulness: 0,\n    affection: 0,\n    romance: 0,\n    relationshipStatus: \"none\",\n  };\n}\n\nexport const ACTING_LAB_PROFILES: Record<string, RelationshipActingState> = {\n  A: { intimacyStage: 0, friendship: 10, trust: 10, playfulness: 5, affection: 10, romance: 0 },\n  B: { intimacyStage: 2, friendship: 75, trust: 55, playfulness: 75, affection: 40, romance: 5 },\n  C: { intimacyStage: 3, friendship: 90, trust: 90, playfulness: 65, affection: 75, romance: 5 },\n  D: { intimacyStage: 4, friendship: 90, trust: 95, playfulness: 65, affection: 90, romance: 55 },\n  E: { intimacyStage: 5, friendship: 90, trust: 95, playfulness: 75, affection: 95, romance: 90, relationshipStatus: \"none\" },\n};\n",
+        "sha256": "ad144f6758645c45fef40e343dafeae4daefe040ce67a099afd1ab521129d53e"
+      }
+    },
+    {
+      "path": "tests/relationship-acting-guide.test.ts",
+      "status": "modified",
+      "additions": 61,
+      "deletions": 0,
+      "patch": "diff --git a/tests/relationship-acting-guide.test.ts b/tests/relationship-acting-guide.test.ts\nnew file mode 100644\nindex 0000000..743ac06\n--- /dev/null\n+++ b/tests/relationship-acting-guide.test.ts\n@@ -0,0 +1,61 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { ACTING_LAB_PROFILES, createLegacyRelationshipActingState, createRelationshipActingGuide } from \"../lib/relationship-acting-guide.ts\";\n+\n+test(\"acting profiles never establish dating implicitly\", () => {\n+  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.E);\n+  assert.match(guide, /交際は成立していない/);\n+  assert.match(guide, /既成事実化/);\n+});\n+\n+test(\"acting guide never exposes numeric scores\", () => {\n+  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.D);\n+  assert.doesNotMatch(guide, /\\b55\\b|\\b90\\b|\\b95\\b/);\n+});\n+\n+test(\"low romance does not turn closeness into romance\", () => {\n+  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.C);\n+  assert.match(guide, /親しさや優しさを恋愛表現へ変換しない/);\n+});\n+\n+test(\"time alone cannot invent relationship emotion\", () => {\n+  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.D);\n+  assert.match(guide, /時間が経ったことだけを理由に/);\n+});\n+\n+\n+test(\"legacy points map only to conservative intimacy stages\", () => {\n+  assert.equal(createLegacyRelationshipActingState(0).intimacyStage, 0);\n+  assert.equal(createLegacyRelationshipActingState(29).intimacyStage, 0);\n+  assert.equal(createLegacyRelationshipActingState(30).intimacyStage, 2);\n+  assert.equal(createLegacyRelationshipActingState(79).intimacyStage, 2);\n+  assert.equal(createLegacyRelationshipActingState(80).intimacyStage, 4);\n+  assert.equal(createLegacyRelationshipActingState(159).intimacyStage, 4);\n+  assert.equal(createLegacyRelationshipActingState(160).intimacyStage, 5);\n+});\n+\n+test(\"legacy points never invent relationship direction or dating status\", () => {\n+  const state = createLegacyRelationshipActingState(9999);\n+  assert.deepEqual(\n+    {\n+      friendship: state.friendship,\n+      trust: state.trust,\n+      playfulness: state.playfulness,\n+      affection: state.affection,\n+      romance: state.romance,\n+      relationshipStatus: state.relationshipStatus,\n+    },\n+    {\n+      friendship: 0,\n+      trust: 0,\n+      playfulness: 0,\n+      affection: 0,\n+      romance: 0,\n+      relationshipStatus: \"none\",\n+    }\n+  );\n+\n+  const guide = createRelationshipActingGuide(state);\n+  assert.match(guide, /恋愛方向は弱い/);\n+  assert.doesNotMatch(guide, /交際も会話上成立済み/);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/relationship-acting-guide.test.ts",
+      "source": {
+        "path": "tests/relationship-acting-guide.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { ACTING_LAB_PROFILES, createLegacyRelationshipActingState, createRelationshipActingGuide } from \"../lib/relationship-acting-guide.ts\";\n\ntest(\"acting profiles never establish dating implicitly\", () => {\n  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.E);\n  assert.match(guide, /交際は成立していない/);\n  assert.match(guide, /既成事実化/);\n});\n\ntest(\"acting guide never exposes numeric scores\", () => {\n  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.D);\n  assert.doesNotMatch(guide, /\\b55\\b|\\b90\\b|\\b95\\b/);\n});\n\ntest(\"low romance does not turn closeness into romance\", () => {\n  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.C);\n  assert.match(guide, /親しさや優しさを恋愛表現へ変換しない/);\n});\n\ntest(\"time alone cannot invent relationship emotion\", () => {\n  const guide = createRelationshipActingGuide(ACTING_LAB_PROFILES.D);\n  assert.match(guide, /時間が経ったことだけを理由に/);\n});\n\n\ntest(\"legacy points map only to conservative intimacy stages\", () => {\n  assert.equal(createLegacyRelationshipActingState(0).intimacyStage, 0);\n  assert.equal(createLegacyRelationshipActingState(29).intimacyStage, 0);\n  assert.equal(createLegacyRelationshipActingState(30).intimacyStage, 2);\n  assert.equal(createLegacyRelationshipActingState(79).intimacyStage, 2);\n  assert.equal(createLegacyRelationshipActingState(80).intimacyStage, 4);\n  assert.equal(createLegacyRelationshipActingState(159).intimacyStage, 4);\n  assert.equal(createLegacyRelationshipActingState(160).intimacyStage, 5);\n});\n\ntest(\"legacy points never invent relationship direction or dating status\", () => {\n  const state = createLegacyRelationshipActingState(9999);\n  assert.deepEqual(\n    {\n      friendship: state.friendship,\n      trust: state.trust,\n      playfulness: state.playfulness,\n      affection: state.affection,\n      romance: state.romance,\n      relationshipStatus: state.relationshipStatus,\n    },\n    {\n      friendship: 0,\n      trust: 0,\n      playfulness: 0,\n      affection: 0,\n      romance: 0,\n      relationshipStatus: \"none\",\n    }\n  );\n\n  const guide = createRelationshipActingGuide(state);\n  assert.match(guide, /恋愛方向は弱い/);\n  assert.doesNotMatch(guide, /交際も会話上成立済み/);\n});\n",
+        "sha256": "d4b18f7cc4dabc90e9f62551b4a0f268940d490752db9e05cbc898ed9bde74e7"
+      }
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "status": "modified",
+      "additions": 11,
+      "deletions": 8,
+      "patch": "diff --git a/tests/server-canonical.test.cjs b/tests/server-canonical.test.cjs\nindex 9be7b58..0a8f9ea 100644\n--- a/tests/server-canonical.test.cjs\n+++ b/tests/server-canonical.test.cjs\n@@ -302,21 +302,24 @@ test('chat timestamp display does not poll permanent history', () => {\n \n \n test('Gemini transient failures use bounded short retry without retrying ordinary 500', () => {\n-  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');\n+  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');\n   assert.ok(source.includes('[429, 502, 503, 504].includes'));\n   assert.ok(source.includes('[2_000, 5_000]'));\n-  assert.ok(source.includes('GEMINI TRANSIENT RETRY:'));\n+  assert.ok(source.includes('transientAttempt < transientRetryDelaysMs.length'));\n   assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));\n });\n \n test('Gemini timeout gets one bounded retry before the normal failure/refund path', () => {\n-  const source = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');\n+  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');\n   assert.ok(source.includes('const timeoutRetryDelaysMs ='));\n-  assert.ok(source.includes('[2_000];'));\n-  assert.ok(source.includes('GEMINI TIMEOUT RETRY:'));\n-  assert.ok(source.includes('timeoutAttempt <'));\n-  assert.ok(source.includes('timeoutRetryDelaysMs.length'));\n-  assert.ok(source.includes('throw new Error(\\n            \"GEMINI_TIMEOUT\"\\n          );'));\n+  assert.ok(source.includes('[2_000]'));\n+  assert.ok(source.includes('timeoutAttempt < timeoutRetryDelaysMs.length'));\n+  assert.ok(source.includes('error.name === \"AbortError\"'));\n+  const chatSource = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');\n+  assert.ok(chatSource.includes('generateGeminiJson({'));\n+  assert.ok(chatSource.includes('error.name === \"AbortError\"'));\n+  assert.ok(chatSource.includes('throw new Error(\"GEMINI_TIMEOUT\")'));\n+  assert.ok(chatSource.includes('throw error'));\n });\n \n test('ordinary chat wait does not falsely claim Misaki is busy', () => {\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/be15cfea6039ff9e44be1a34ceff48a882f09c18/tests/server-canonical.test.cjs",
+      "source": {
+        "path": "tests/server-canonical.test.cjs",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst root = path.join(__dirname, '..');\n\nfunction harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {\n  const user = { id: 'account-a', is_anonymous: anonymous };\n  const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };\n  let points = initialPoints, consumed = 0, refunded = 0, generated = 0;\n  const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [];\n  let checkpoint = false, revision = 0;\n  let openaiPayload = null;\n  let maintenance = false;\n  const client = {\n    auth: { getUser: async () => ({ data: { user }, error: null }) },\n    from(table) {\n      const filters = {};\n      const query = { select() { return query; }, not() { return query; }, in(k, v) { filters[k] = v; return query; }, order() { return query; }, limit() { return query; }, eq(k, v) { filters[k] = v; return query; },\n        async maybeSingle() {\n          if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };\n          if (stateFailure) return { error: { message: 'unavailable' }, data: null };\n          if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };\n          if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };\n          if (table === 'misaki_user_conversation_state') return { data: rootState, error: null };\n          if (table === 'misaki_relationship_events') {\n            if (filters.event_type === 'email_save_checkpoint') return { data: checkpoint ? { id: 1 } : null, error: null };\n            const result = completed.get(filters.request_id);\n            return { data: result ? { metadata: result } : null, error: null };\n          }\n          if (table === 'daily_message_requests') return { data: filters.request_id ? temporaryReceipts.get(filters.request_id) ?? null : [...temporaryReceipts.values()].at(-1) ?? null, error: null };\n          return { data: null, error: null };\n        } };\n      query.single = async () => ({ data: { next_push_at: 'lease' }, error: null });\n      query.insert = async () => ({ error: null });\n      query.then = resolve => resolve({ data: [], error: null });\n      return query;\n    },\n    async rpc(name, args) {\n      calls.push({ name, args });\n      if (name === 'consume_daily_message') {\n        consumed++; return { data: [{ allowed: true, message_count: 1, remaining: 19, is_premium: premium }], error: null };\n      }\n      if (name === 'refund_daily_message') {\n        refunded++; return { data: [{ refunded: true, message_count: 0, remaining: 20, is_premium: false }], error: null };\n      }\n      if (name === 'get_relationship_time_context') return { data: { exists: true, intimacy_points: points }, error: null };\n      if (name === 'complete_misaki_chat_turn') {\n        if (commitFailure) return { data: null, error: { message: 'commit failed' } };\n        assert.equal(args.p_user_id, user.id);\n        const found = completed.get(args.p_request_id);\n        if (found) return { data: found.result, error: null };\n        const delta = Math.max(-2, Math.min(2, Number(args.p_result.relationshipPointDelta) || 0));\n        points = Math.max(0, points + delta);\n        const result = { ...args.p_result, relationshipPoints: points, relationshipPointDelta: delta, memorySynced: true, relationshipTimeSynced: true };\n        completed.set(args.p_request_id, { message: args.p_message, result });\n        rootState.memory = result.memory;\n        rootState.history.push({ role: 'user', text: args.p_message }, { role: 'misaki', text: result.reply });\n        return { data: result, error: null };\n      }\n      if (name === 'save_misaki_temporary_state') {\n        if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale checkpoint' } };\n        checkpoint = true; points = args.p_points; rootState.history = args.p_history;\n        rootState.memory = args.p_memory; rootState.today_memory = args.p_today_memory;\n        return { data: { saved: true }, error: null };\n      }\n      if (name === 'write_misaki_temporary_root' || name === 'finish_misaki_body_clock_delivery') {\n        const result = storeRoot(name === 'write_misaki_temporary_root' ? args : {\n          ...args, p_token: args.p_temporary_token, p_state: args.p_temporary_state, p_refresh_expiry: false });\n        if (result.error) return result;\n        return { data: name === 'finish_misaki_body_clock_delivery' ? { deliveryId: 'delivery', pushesToday: 1, nextPushAt: 'next' } : 'revision', error: null };\n      }\n      if (name === 'sign_misaki_body_clock_relay') return { data: 'a'.repeat(64), error: null };\n      if (name === 'complete_misaki_temporary_turn') {\n        const receipt = temporaryReceipts.get(args.p_request_id);\n        if (receipt) return { data: receipt.temporary_result, error: null };\n        const stored = storeRoot(args);\n        if (stored.error) return stored;\n        temporaryReceipts.set(args.p_request_id, { completed_at: 'now', temporary_result: args.p_token,\n          message_hash: args.p_message_hash, parent_hash: args.p_parent_hash });\n        return { data: args.p_token, error: null };\n      }\n      return { data: {}, error: null };\n    },\n  };\n  function storeRoot(args) {\n    if (!user.is_anonymous || (temporaryRoots.get(user.id)?.revision ?? null) !== args.p_expected_revision) return { error: { message: 'stale root' } };\n    temporaryRoots.set(user.id, { token: args.p_token, revision: `revision-${++revision}`, expires_at: args.p_refresh_expiry === false ? temporaryRoots.get(user.id).expires_at : new Date(clock + 86400000).toISOString() });\n    if (checkpoint) {\n      points = args.p_state.relationshipPoints; rootState.history = args.p_state.history;\n      rootState.memory = args.p_state.memory; rootState.today_memory = args.p_state.todayMemory;\n    }\n    return { error: null };\n  }\n  client.auth.admin = { getUserById: async () => ({ data: { user }, error: null }) };\n  let clock = Date.now();\n  class TestDate extends Date { static now() { return clock; } }\n  const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,\n    AbortController, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },\n    console: { log() {}, warn() {}, error() {} },\n    fetch: async (url, options) => {\n      if (String(url).includes('generativelanguage')) {\n        generated++; prompts.push(JSON.parse(options.body));\n        if (generationFailure) return new Response('', { status: 500 });\n        return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(openaiPayload ?? { reply: 'うん、そうなんだ😊', memory: ['generated memory'], misakiTodayMemory: { items: [] } }) }] } }] });\n      }\n      return Response.json({ current: {} });\n    },\n  });\n  const cache = new Map();\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    const code = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), { compilerOptions: {\n      module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    const module = { exports: {} };\n    const req = name => {\n      if (name === '@supabase/supabase-js') return { createClient: () => client };\n      if (name === 'node:crypto') return require(name);\n      if (name.endsWith('/persona/persona-store')) return { loadPersonaPrompt: async () => ({ text: '美咲', source: 'test' }) };\n      if (name.endsWith('/tokyo-life-events')) return { getTokyoLifeEvents: async () => [], createTokyoLifeEventsGuide: () => '' };\n      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)) + '.ts');\n      throw Error(name);\n    };\n    try {\n      const wrapped = \"(function(require,module,exports){\" + code + String.fromCharCode(10) + \"})\";\n      vm.runInContext(wrapped, context)(req, module, module.exports);\n    } catch (error) {\n      if (error && error.name === 'SyntaxError') throw new SyntaxError(`${error.message} [while loading ${file}]`);\n      throw error;\n    }\n    cache.set(file, module.exports); return module.exports;\n  }\n  return { client, user, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },\n    get refunded() { return refunded; }, get generated() { return generated; },\n    setOpenaiPayload(value) { openaiPayload = value; },\n    request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },\n      body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },\n  };\n}\n\ntest('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {\n  const h = harness();\n  const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,\n    memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));\n  assert.equal(response.status, 200);\n  const result = await response.json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);\n  const prompt = JSON.stringify(h.prompts);\n  assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));\n});\ntest('same request replay returns saved response without generation/usage/addition', async () => {\n  const h = harness(), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const second = await (await route.POST(h.request())).json();\n  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);\n  const generations = h.generated;\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);\n});\ntest('Premium chat does not get an automatic point and does not refund', async () => {\n  const h = harness({ premium: true });\n  const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);\n});\nfor (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {\n  const h = harness({ [failure]: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.points, 79); assert.equal(h.refunded, 1); assert.equal(h.consumed, 1);\n});\ntest('canonical read failure stops before consuming usage', async () => {\n  const h = harness({ stateFailure: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.consumed, 0); assert.equal(h.points, 79);\n});\ntest('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();\n  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);\n  const root = h.load('lib/canonical-state.ts');\n  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);\n  assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);\n  const before = h.consumed;\n  const lostResponseReplay = await (await route.POST(h.request())).json();\n  assert.equal(lostResponseReplay.temporaryState, first.temporaryState); assert.equal(h.consumed, before);\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);\n  assert.equal(h.consumed, before);\n  const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();\n  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);\n  const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();\n  assert.equal(second.relationshipPoints, 0);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,\n    requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);\n  h.advanceClock(24 * 60 * 60 * 1000 + 1);\n  assert.equal(root.openTemporaryState(second.temporaryState), null);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);\n  assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);\n});\ntest('anonymous relationship emotion survives into the next temporary-root turn', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const root = h.load('lib/canonical-state.ts');\n  const firstState = root.openTemporaryState(first.temporaryState).state;\n  assert.ok(firstState.temporaryRelationship);\n  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');\n  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');\n\n  const second = await (await route.POST(h.request({\n    temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',\n    message: '次の会話'\n  }))).json();\n  const secondState = root.openTemporaryState(second.temporaryState).state;\n  assert.ok(secondState.temporaryRelationship);\n  assert.ok(secondState.temporaryRelationship.lastInteractionAt);\n  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);\n  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);\n});\n\ntest('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {\n  const h = harness({ anonymous: true });\n  const crypto = h.load('lib/canonical-state.ts');\n  const token = crypto.sealTemporaryState({ memory: ['verified memory'], history: [{ role: 'user', text: 'verified' }],\n    todayMemory: { date: '', items: [] }, relationshipPoints: 7 }, 'previous');\n  const api = h.load('app/api/persona/history/route.ts');\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409);\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'account-a', temporaryState: token,\n    memory: ['forged'], history: [], relationshipPoints: 999 }))).status, 200);\n  const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;\n  assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');\n});\ntest('anonymous history GET is a safe no-op during auth transition', async () => {\n  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');\n  const response = await api.GET(h.request());\n  assert.equal(response.status, 200);\n  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });\n});\ntest('both permanent devices restore same server points and memory without browser caches', async () => {\n  const h = harness(), api = h.load('app/api/persona/history/route.ts');\n  const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();\n  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 79); assert.deepEqual(a.memory, ['server memory']);\n  assert.equal((await api.POST(h.request({ history: [], memory: ['fake'], relationshipPoints: 999 }))).status, 400);\n});\n\nmodule.exports = { harness };\n\n\ntest('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {\n  const h = harness({ initialPoints: 1 });\n  const route = await h.load('app/api/chat/route.ts');\n  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });\n  const requestId = crypto.randomUUID();\n  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  const afterFirst = h.points;\n  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  assert.equal(afterFirst, 0);\n  assert.equal(h.points, 0);\n  assert.equal(first.relationshipPointDelta, undefined);\n  assert.equal(replay.relationshipPointDelta, undefined);\n});\n\n\ntest('anonymous browser never enters permanent history GET sync', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');\n  assert.ok(source.includes('localStorage.getItem(AUTH_KIND_KEY) === \"anonymous\"'));\n  assert.ok(source.includes('session.user.is_anonymous'));\n  assert.ok(source.includes('if (!session?.user || session.user.is_anonymous) return;'));\n});\n\ntest('Vercel runtime does not call the JR East endpoint that returns 403', ",
+        "sha256": "442612382051cd443a8e34e8d6e6d688fba980bb319cc9544a7eb9bcc53f8ad4"
+      }
+    }
+  ],
+  "file_count": 7,
+  "reported_file_count": 7,
+  "commits": [
+    {
+      "sha": "bb254d1b43d5c501325b4e6b035ecf499e9ed6cf",
+      "message": "Add shared relationship acting interpreter\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/bb254d1b43d5c501325b4e6b035ecf499e9ed6cf"
+    },
+    {
+      "sha": "a245355330802f95d76d1d7cd452482753aa3709",
+      "message": "Add isolated acting lab inspection endpoint\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/a245355330802f95d76d1d7cd452482753aa3709"
+    },
+    {
+      "sha": "12daa414b7a77eb65ce825cc6551714424f32109",
+      "message": "Add acting interpreter safety contracts\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/12daa414b7a77eb65ce825cc6551714424f32109"
+    },
+    {
+      "sha": "6991c2961a72baca92c1503b75983efc1bc98faf",
+      "message": "Add shared Gemini JSON generator boundary\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/6991c2961a72baca92c1503b75983efc1bc98faf"
+    },
+    {
+      "sha": "5fddb1403d9a20fd9f6f2570ff07b87a29fb7d69",
+      "message": "Run isolated A-E Gemini auditions in acting lab\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/5fddb1403d9a20fd9f6f2570ff07b87a29fb7d69"
+    },
+    {
+      "sha": "7494a0282dc934394d1f1540718700384e1552be",
+      "message": "Allow acting lab on Preview while blocking Production\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7494a0282dc934394d1f1540718700384e1552be"
+    },
+    {
+      "sha": "71507805072bf151d52c1d586c66e2ae3b3bc08b",
+      "message": "Expose fixed audition run on Preview GET\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/71507805072bf151d52c1d586c66e2ae3b3bc08b"
+    },
+    {
+      "sha": "6fa3dd9487749d04cb26e488af0f33907b50d7cf",
+      "message": "Give relationship acting guide more observable nuance\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/6fa3dd9487749d04cb26e488af0f33907b50d7cf"
+    },
+    {
+      "sha": "f405043ec34215a06ef40657832403394e1f8fa1",
+      "message": "Allow scenario lines in Preview acting lab\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f405043ec34215a06ef40657832403394e1f8fa1"
+    },
+    {
+      "sha": "174d7c5efe92aa24f2ffceab93f11ebb2c37249f",
+      "message": "Use shared Misaki persona in acting lab\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/174d7c5efe92aa24f2ffceab93f11ebb2c37249f"
+    },
+    {
+      "sha": "995eaf1c1935cb6dde49f43ad34f105984f37aad",
+      "message": "Match shared Gemini generator retry behavior\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/995eaf1c1935cb6dde49f43ad34f105984f37aad"
+    },
+    {
+      "sha": "e824a9d88a8c61e81c18d64250b0268009cc3cfd",
+      "message": "Share Gemini generation boundary with acting lab\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/e824a9d88a8c61e81c18d64250b0268009cc3cfd"
+    },
+    {
+      "sha": "9ae60784aefb4e4a85107bf1a0dcdf32c284cd4c",
+      "message": "Point Gemini retry tests at shared generator\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9ae60784aefb4e4a85107bf1a0dcdf32c284cd4c"
+    },
+    {
+      "sha": "318b1243f780a208e4a9561549106b0c145a5821",
+      "message": "Fix acting guide test module resolution\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/318b1243f780a208e4a9561549106b0c145a5821"
+    },
+    {
+      "sha": "141bbd85e94e9a64d99b2c1e5f9b1847d8559fc5",
+      "message": "Type Gemini history contents at shared boundary\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/141bbd85e94e9a64d99b2c1e5f9b1847d8559fc5"
+    },
+    {
+      "sha": "cb8114d4a7866741d7879d50784e27c7ee914ccc",
+      "message": "Type recall-aware chat message as string\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/cb8114d4a7866741d7879d50784e27c7ee914ccc"
+    },
+    {
+      "sha": "927eac4d030700dbb408646cc32b04b0d97c80e8",
+      "message": "Add conservative legacy intimacy adapter\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/927eac4d030700dbb408646cc32b04b0d97c80e8"
+    },
+    {
+      "sha": "9443e8b28dab65ee3a7880469490d5c63b0a30cc",
+      "message": "Test conservative legacy relationship adapter\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9443e8b28dab65ee3a7880469490d5c63b0a30cc"
+    },
+    {
+      "sha": "aee27a9ec1cfcc493e0278c3e204403e6265219b",
+      "message": "Add shared relationship acting guide to chat prompt\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/aee27a9ec1cfcc493e0278c3e204403e6265219b"
+    },
+    {
+      "sha": "ce7790294516172099f608abc3f03bc1284ab516",
+      "message": "Separate legacy intimacy guide from relationship direction\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/ce7790294516172099f608abc3f03bc1284ab516"
+    },
+    {
+      "sha": "a4b58323de4fe3d54f2a56940316492977fd13be",
+      "message": "Remove public GET trigger from acting lab\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/a4b58323de4fe3d54f2a56940316492977fd13be"
+    },
+    {
+      "sha": "42bfaeed1cb110d4174db55db685de4a5cac4a70",
+      "message": "Preserve Gemini timeout failure semantics\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/42bfaeed1cb110d4174db55db685de4a5cac4a70"
+    },
+    {
+      "sha": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+      "message": "Lock Gemini timeout error compatibility\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/be15cfea6039ff9e44be1a34ceff48a882f09c18"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37102646357",
+      "id": 37102646357,
+      "updated_at": "2026-10-03T06:19:42Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "ACTING_LAB_PROFILES",
+    "DEFAULT_AUDITION_LINE",
+    "GEMINI_CHAT_MODEL",
+    "GEMINI_TIMEOUT_MS",
+    "HISTORY_DIAGNOSTIC_PREFIX",
+    "MAX_HISTORY",
+    "MAX_MEMORY",
+    "MAX_TODAY_MEMORY",
+    "MISAKI_LATITUDE",
+    "MISAKI_LONGITUDE",
+    "MODEL",
+    "POST",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "TestDate",
+    "a",
+    "actingGuide",
+    "activityGroups",
+    "afterFirst",
+    "api",
+    "apiKey",
+    "assert",
+    "attempt",
+    "before",
+    "body",
+    "buildActivityEvidence",
+    "cache",
+    "chatSource",
+    "checkpoint",
+    "clamp",
+    "client",
+    "clock",
+    "code",
+    "completed",
+    "consistency",
+    "consumeDailyMessageWithRetry",
+    "containsAny",
+    "contents",
+    "context",
+    "controller",
+    "createActivityGroundingGuide",
+    "createAuthenticatedSupabase",
+    "createLegacyRelationshipActingState",
+    "createMisakiLife",
+    "createRecallAwareMessage",
+    "createRelationshipActingGuide",
+    "createRelationshipGuide",
+    "createTimeGuide",
+    "createTodayMemoryGuide",
+    "createWeatherGuide",
+    "crypto",
+    "current",
+    "data",
+    "dateKey",
+    "dayLabel",
+    "dayType",
+    "delayMs",
+    "delta",
+    "describes",
+    "elapsedMs"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "美咲の演技研究室：Relationship Interpreter 基礎",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/45"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "25656b946b11032db172df2f910b0052a5a7348fd214d90d68b7984fd1c9d55c",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}

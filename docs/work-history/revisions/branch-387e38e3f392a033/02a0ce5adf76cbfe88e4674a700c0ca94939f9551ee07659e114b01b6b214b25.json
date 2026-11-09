@@ -1,0 +1,28 @@
+{
+  "id": "branch-387e38e3f392a033",
+  "title": "fix/chat-reliability-cleanup",
+  "head": "a06baac8110ded425c07e2122117e89460868405",
+  "head_ref": "fix/chat-reliability-cleanup",
+  "linked_prs": [
+    9
+  ],
+  "files": [
+    {
+      "path": "app/api/chat-proxy/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a06baac8110ded425c07e2122117e89460868405/app/api/chat-proxy/route.ts"
+    }
+  ],
+  "commits": "a06baac8110ded425c07e2122117e89460868405 記憶回答の矛盾防止と履歴診断を整理する",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "9114a5b305f40675eed484e7e1a0cdfc78622c3257a420a76e1b3a18b15f613b",
+  "collected_at": "2026-11-09T08:56:52.743400+00:00"
+}
