@@ -7,6 +7,9 @@ import os
 import subprocess
 
 MANAGEMENT_FILES = {
+    ".github/workflows/development-preflight.yml",
+    "scripts/development_preflight.py",
+    "tests/test_development_preflight.py",
     ".github/workflows/development-inventory.yml",
     ".github/workflows/pr-promotion-review.yml",
     ".github/workflows/ledger-facts-proposal.yml",
