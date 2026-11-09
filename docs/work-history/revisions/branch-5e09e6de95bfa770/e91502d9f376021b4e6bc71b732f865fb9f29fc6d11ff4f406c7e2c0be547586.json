@@ -1,0 +1,28 @@
+{
+  "id": "branch-5e09e6de95bfa770",
+  "title": "cleanup/legacy-proactive-tags",
+  "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+  "head_ref": "cleanup/legacy-proactive-tags",
+  "linked_prs": [
+    13
+  ],
+  "files": [
+    {
+      "path": "lib/proactive-photo.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/275529187bc54a7151de3aa06ed4c6b07362d1fd/lib/proactive-photo.ts"
+    }
+  ],
+  "commits": "275529187bc54a7151de3aa06ed4c6b07362d1fd 互換APIを保ったまま旧タグ推論だけ無効化\n3d73f08b64873502878d3ce1edade307f5f28eb8 旧自発APIの独立タグ推論を廃止",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "42e5945f08f47ff6eb1825e62f7e9ca62fca9e5d94823b63e94afe73649d83fe",
+  "collected_at": "2026-11-09T09:51:44.382854+00:00"
+}

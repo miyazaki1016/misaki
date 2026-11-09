@@ -1,0 +1,98 @@
+{
+  "id": "branch-d727762241e2e4e1",
+  "title": "feat/secure-owner-merge-api-20261105",
+  "head": "a3fa23884039f320803f947babbacad68d433954",
+  "head_ref": "feat/secure-owner-merge-api-20261105",
+  "linked_prs": [
+    158
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/approval-merge-policy-tests.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/.github/workflows/approval-merge-policy-tests.yml"
+    },
+    {
+      "path": "docs/approval-dashboard/README.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/docs/approval-dashboard/README.md"
+    },
+    {
+      "path": "docs/approval-dashboard/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/docs/approval-dashboard/index.html"
+    },
+    {
+      "path": "docs/approval-dashboard/merge-config.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/docs/approval-dashboard/merge-config.json"
+    },
+    {
+      "path": "docs/approval-dashboard/merge.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/docs/approval-dashboard/merge.html"
+    },
+    {
+      "path": "scripts/check_approval_dashboard.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/scripts/check_approval_dashboard.py"
+    },
+    {
+      "path": "services/approval-merge-edge/README.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/services/approval-merge-edge/README.md"
+    },
+    {
+      "path": "services/approval-merge-edge/index.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/services/approval-merge-edge/index.ts"
+    },
+    {
+      "path": "services/approval-merge-edge/policy.mjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/services/approval-merge-edge/policy.mjs"
+    },
+    {
+      "path": "services/approval-merge-edge/policy.test.mjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/services/approval-merge-edge/policy.test.mjs"
+    },
+    {
+      "path": "tsconfig.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a3fa23884039f320803f947babbacad68d433954/tsconfig.json"
+    }
+  ],
+  "commits": "a3fa23884039f320803f947babbacad68d433954 fix: use verified GitHub identity_data.sub without nonexistent fallback\n05fb7c8bac99c8cc71887ed86963d34173432c69 ci: add standalone Deno Edge Function type check\ncacc6320a19038d966f6b08217462dc72022081f docs: document direct merge UI preview and disabled security gate\n4f472fb4d1fd8cc994dc3c9e2402e60e9b9e270c test: verify optional merge UI syntax and disabled-by-default config\n4819d125be4afb02db4c23713886776836d5529c feat: show direct-merge action only when secure auth config is enabled\nbe59d0ac40fcc18b6ebbd7ba9045fc75228af623 fix: recover PR state securely after Github OAuth callback\n78fbe2d115f7af714d7c32cc05d8833e53755b81 feat: add opt-in GitHub OAuth PKCE owner merge confirmation screen\ne953c3b21e61cab88c7d5be5bd94c192d5edebdb config: keep direct merge disabled until owner authentication is configured\n076ef4d452d348be72c53996f90682b058982ac2 build: exclude Deno-only secure approval edge from Next.js typecheck\n65659778770d80e3529b16642c8bd44e863b2ffa ci: test merge guard without credentials or production write\ne12bed9e4cd4e43ac61e3028f99103d8df8a5744 docs: outline secure one-tap merge setup and strict no-deploy boundary\nb34c460fb0eccfe54bad866a6890bfb27ae609c8 feat: implement opt-in server-only authenticated merge broker with strict owner gate\nf0c0dbd9c13dc35bf821086b76ea217b5ed322ac test: verify secure merge guard rejects unsafe PRs\n5f153d983de9439a835e5d51284714138e825360 feat: add fail-closed owner merge guard policy",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "7b1f08498013d9ee3507755fb43ccabfee052c0e94b4437916729cb4af28259e",
+  "collected_at": "2026-11-09T09:51:44.382854+00:00"
+}

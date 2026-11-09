@@ -1,0 +1,20 @@
+{
+  "id": "branch-3d254ed3e3aa160f",
+  "title": "work/relationship-engine-v1",
+  "head": "42c8eba3c92e0cbaeb0825717f122e2fb3f7364a",
+  "head_ref": "work/relationship-engine-v1",
+  "linked_prs": [
+    47
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "c1fdc6f37ab964482ec89b5b6235833e06a2064fa22bcad7523b6f3bbb75ab85",
+  "collected_at": "2026-11-09T09:51:44.382854+00:00"
+}
