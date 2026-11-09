@@ -213,4 +213,5 @@
 | #169 | fix(history): main統合とPRマージを区別し、検証条件の検索を補強 | merged | `b4b46c92dc4d11093b125fd92821299929e13b4c` | 2026-11-09T09:08:53Z |
 | #170 | docs: require Japanese work-history review before any new development | merged | `afa7b9d94598bace5820034ad7a9b0c750b18520` | 2026-11-09T09:21:29Z |
 | #171 | feat(history): 着手前に「以前の実装・検証」を自動提示して再利用判断を確認 | merged | `54e6017b56f435b28fb91a2d6932ca87b9f7bced` | 2026-11-09T09:45:45Z |
+| #172 | docs(history): 着手前自動照合の実測と再利用判断を保存 | merged | `2f8ab3ed5c1c1c9a8de55a8514d17929eb5abcd2` | 2026-11-09T09:51:29Z |
 <!-- INVENTORY_FACTS_END -->
