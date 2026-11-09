@@ -12,6 +12,7 @@
 | 案件を担当ソラに渡す | 同じ画面の「ソラへの引き継ぎ」→ 対象案件の**引き継ぎ指示をコピー** → 既存の担当ソラのチャットまたはWorkに貼り付ける |
 | ダッシュボードの仕様・運用を確認 | [承認ボード運用マニュアル](approval-dashboard/README.md) |
 | 2026-11-04時点の全36件の一次仕分けを見る | [一次仕分け結果](approval-dashboard/OWNER_TRIAGE_20261104.md) |
+| **美咲の過去の作業内容・検証結果を探す** | [美咲の履歴索引](WORK_HISTORY_INDEX.md) → 日次棚卸しの `work-history.md`（全PR・作業ブランチ） |
 | 自動棚卸し・開発案件管理を調べる | [美咲の運用索引](DEVELOPMENT_OPERATIONS_INDEX.md)、[美咲の開発台帳](DEVELOPMENT_LEDGER.md)、[アメふるの運用索引](https://github.com/miyazaki1016/emergencyalert/blob/main/docs/DEVELOPMENT_OPERATIONS_INDEX.md) |
 | マージボタンの準備状況を調べる | [安全な直接マージAPIの設計・準備状況](../services/approval-merge-edge/README.md) |
 
