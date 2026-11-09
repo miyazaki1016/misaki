@@ -1,0 +1,20 @@
+{
+  "id": "branch-1b5dc9cb22951e7b",
+  "title": "fix/anonymous-session-recovery",
+  "head": "6af9501cd6e691e85cf855d843586eba4f175559",
+  "head_ref": "fix/anonymous-session-recovery",
+  "linked_prs": [
+    131
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "82eb661a5d713fd782b4afd57b7747e984c226b1c810be87362d5085e423f816",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

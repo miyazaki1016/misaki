@@ -1,0 +1,35 @@
+{
+  "id": "branch-e9ece79f0b44197b",
+  "title": "fix/anonymous-chat-session-drop",
+  "head": "5b6c276c1da9ea85615fda11a881e2b3802f08f7",
+  "head_ref": "fix/anonymous-chat-session-drop",
+  "linked_prs": [
+    24
+  ],
+  "files": [
+    {
+      "path": "app/chat/anonymous-session-guard.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5b6c276c1da9ea85615fda11a881e2b3802f08f7/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5b6c276c1da9ea85615fda11a881e2b3802f08f7/tests/account-conversation.test.cjs"
+    }
+  ],
+  "commits": "5b6c276c1da9ea85615fda11a881e2b3802f08f7 Test anonymous auth recovery without chat loss\n174f17a8532f73cc20edf01853039f96b99f4d24 Preserve anonymous chat across transient auth drops",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "97dce3de64c3bb768ff67a8e2a927f72dbe820c098e75faef5626a4d0b427b46",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "branch-8f7424f62a838c0f",
+  "title": "sora/remove-false-busy-wait",
+  "head": "1b77372a7e385a58f127d259a99e05e60cb8deb6",
+  "head_ref": "sora/remove-false-busy-wait",
+  "linked_prs": [
+    42
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "20641391d061eb6035cda60e9f2db77f8512344636de1d20e66b49966e09f944",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

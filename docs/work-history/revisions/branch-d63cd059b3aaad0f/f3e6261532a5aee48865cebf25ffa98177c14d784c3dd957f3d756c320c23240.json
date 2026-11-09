@@ -1,0 +1,56 @@
+{
+  "id": "branch-d63cd059b3aaad0f",
+  "title": "feat/work-history-index-20261109",
+  "head": "b3439dfc31c84e84bc6c1f294582f681d4daf28d",
+  "head_ref": "feat/work-history-index-20261109",
+  "linked_prs": [
+    166
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b3439dfc31c84e84bc6c1f294582f681d4daf28d/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b3439dfc31c84e84bc6c1f294582f681d4daf28d/docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md"
+    },
+    {
+      "path": "docs/WORK_HISTORY_INDEX.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b3439dfc31c84e84bc6c1f294582f681d4daf28d/docs/WORK_HISTORY_INDEX.md"
+    },
+    {
+      "path": "scripts/development_work_history.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b3439dfc31c84e84bc6c1f294582f681d4daf28d/scripts/development_work_history.py"
+    },
+    {
+      "path": "tests/test_development_work_history.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b3439dfc31c84e84bc6c1f294582f681d4daf28d/tests/test_development_work_history.py"
+    }
+  ],
+  "commits": "b3439dfc31c84e84bc6c1f294582f681d4daf28d docs: expose Misaki work-history search from shared development overview\n4cb442d99faf7fd98d6ada2dce6ccd8e3089e74d docs(misaki): permanent discovery map for prior experiments, branches and PRs\n6948e3d4ff9855014166b0d1f56e24b2da4ca0b2 ci(inventory): include searchable work-history in existing daily artifact\na1de165135be2297623d97423eb93efffbabda00 test(inventory): verify full past PR and branch history index\n5988238f61a878dab9b643144e76e9a6cba4681c feat(inventory): carry over read-only work-history renderer from emergencyalert",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "cffacceb3bf392031e02b9d3dbefc49eb676976d4bc7b51584b87c87cad850ea",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

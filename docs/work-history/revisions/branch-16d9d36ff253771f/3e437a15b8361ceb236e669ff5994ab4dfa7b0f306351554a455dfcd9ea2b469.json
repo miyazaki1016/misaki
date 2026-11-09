@@ -1,0 +1,28 @@
+{
+  "id": "branch-16d9d36ff253771f",
+  "title": "docs/misaki-companion-research-20261102",
+  "head": "7c02c3cf349db24f6e41e63acbd50c821c195754",
+  "head_ref": "docs/misaki-companion-research-20261102",
+  "linked_prs": [
+    133
+  ],
+  "files": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/7c02c3cf349db24f6e41e63acbd50c821c195754/docs/IMPLEMENTATION_OVERVIEW.md"
+    }
+  ],
+  "commits": "7c02c3cf349db24f6e41e63acbd50c821c195754 docs: record Work usage efficiency policy in Misaki overview\nc7216acfb08dc00c60ea14c89c08bb68ef317746 docs: record 2026-11-02 AI companion design research in implementation overview",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "6a7918f3d6ae039f8e5a575557ced906df921c091cd69eaf0bf75f9b29a45802",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

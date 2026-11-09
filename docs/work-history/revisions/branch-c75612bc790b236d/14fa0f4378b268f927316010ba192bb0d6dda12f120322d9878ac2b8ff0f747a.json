@@ -1,0 +1,28 @@
+{
+  "id": "branch-c75612bc790b236d",
+  "title": "fix/body-clock-claim-rpc",
+  "head": "df2daf89f604bf80fab4e720060861862bdd2f6f",
+  "head_ref": "fix/body-clock-claim-rpc",
+  "linked_prs": [
+    16
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/df2daf89f604bf80fab4e720060861862bdd2f6f/supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql"
+    }
+  ],
+  "commits": "df2daf89f604bf80fab4e720060861862bdd2f6f Fix body clock claim RPC execution",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "f9c4b2a32c458464a1a25e20b594a0ea26dd9c8c7e8d4dceab6c0f52a2613b6e",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

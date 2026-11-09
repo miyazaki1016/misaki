@@ -1,0 +1,20 @@
+{
+  "id": "branch-affe9c1706156567",
+  "title": "sora/relationship-evidence-validation-diagnostics",
+  "head": "b8607f3e92fde63fbc37dab85a30d9945c8ad649",
+  "head_ref": "sora/relationship-evidence-validation-diagnostics",
+  "linked_prs": [
+    55
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a67b5f41cecb91a5209fe8c0fcc8a61038c7999e348a975e047d1d4d0edc52cd",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

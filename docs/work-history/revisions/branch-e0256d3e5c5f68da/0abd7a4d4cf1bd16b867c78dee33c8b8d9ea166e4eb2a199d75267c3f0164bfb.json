@@ -1,0 +1,20 @@
+{
+  "id": "branch-e0256d3e5c5f68da",
+  "title": "sora/lp-relationship-story",
+  "head": "9bfa0760f56b3d1c3bf6d07af056410afde975ec",
+  "head_ref": "sora/lp-relationship-story",
+  "linked_prs": [
+    62
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a7baeea7ceb00cd43501424be191e2564cb3652ff94ddb787cc4832d1d8cafc6",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}

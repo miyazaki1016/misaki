@@ -1,0 +1,28 @@
+{
+  "id": "branch-d1c7bd152670a9a9",
+  "title": "docs/audit-overview-against-source",
+  "head": "f6d8baf94d037057ec94deb87b156a713445d37f",
+  "head_ref": "docs/audit-overview-against-source",
+  "linked_prs": [
+    22
+  ],
+  "files": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f6d8baf94d037057ec94deb87b156a713445d37f/docs/IMPLEMENTATION_OVERVIEW.md"
+    }
+  ],
+  "commits": "f6d8baf94d037057ec94deb87b156a713445d37f Audit implementation overview against latest source",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ffd34fe9b35b193a595aaa9cc8e056ab0d6a43ba9a2a61b629d10d7f792b3521",
+  "collected_at": "2026-11-09T09:09:04.549496+00:00"
+}
