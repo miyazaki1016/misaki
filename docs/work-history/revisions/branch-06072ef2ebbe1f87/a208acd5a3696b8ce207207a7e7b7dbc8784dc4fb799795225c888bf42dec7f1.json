@@ -1,0 +1,20 @@
+{
+  "id": "branch-06072ef2ebbe1f87",
+  "title": "sora/relationship-control-rpcs-v1",
+  "head": "e6bf2bc75aa5dd87e520724e5dbf3f4a5f0f6578",
+  "head_ref": "sora/relationship-control-rpcs-v1",
+  "linked_prs": [
+    46
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "e0de3590f37212616faa30dec5c73b21ecf14295abc211df4b1a591505d57e4a",
+  "collected_at": "2026-11-09T10:10:20.576470+00:00"
+}

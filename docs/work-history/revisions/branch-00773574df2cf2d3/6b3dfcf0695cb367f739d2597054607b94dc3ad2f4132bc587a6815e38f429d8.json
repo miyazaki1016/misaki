@@ -1,0 +1,42 @@
+{
+  "id": "branch-00773574df2cf2d3",
+  "title": "feat/lounge-muse-v3-preview-20261030",
+  "head": "eb12d7b9d70853519784f1fe8fc4104dccb36a61",
+  "head_ref": "feat/lounge-muse-v3-preview-20261030",
+  "linked_prs": [
+    94
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge-muse-v3/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/public/lab/transparent-lounge-muse-v3/index.html"
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/eb12d7b9d70853519784f1fe8fc4104dccb36a61/public/lab/transparent-lounge/misaki-lounge-muse-v3-14s-24fps.webp"
+    }
+  ],
+  "commits": "eb12d7b9d70853519784f1fe8fc4104dccb36a61 docs(lounge): confirm Muse v3 media upload and passing CI\nd6f9b1e95ebf125c621e70c508d53e80aaf09ffb Add files via upload\n3173e66949a23a02d5b7e8405a2c52c02939a2ff docs(lounge): prepare Muse v3 14s preview and asset gate\n9f37636eed866e93726cdee1331ce6b496cf5dc9 feat(lounge): isolate Muse 14-second animation comparison page",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "fbdc5d96feaad33b54de95f9b6e519e0048469e83500fe29ea91364f8234c5e1",
+  "collected_at": "2026-11-09T10:10:20.576470+00:00"
+}

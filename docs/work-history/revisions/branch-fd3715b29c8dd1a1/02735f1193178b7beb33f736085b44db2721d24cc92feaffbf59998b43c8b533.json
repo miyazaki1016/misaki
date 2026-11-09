@@ -1,0 +1,18 @@
+{
+  "id": "branch-fd3715b29c8dd1a1",
+  "title": "fix/ledger-workflow-yaml-corruption-20261103",
+  "head": "49536f4784b1cff8d3fab9853f94c328a84f28f2",
+  "head_ref": "fix/ledger-workflow-yaml-corruption-20261103",
+  "linked_prs": [],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "PR未関連のブランチ差分",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "53e951bf37fd9457d6ffd55d8672386da334fa40d7f5d1c975c6f16b96f19b13",
+  "collected_at": "2026-11-09T10:10:20.576470+00:00"
+}

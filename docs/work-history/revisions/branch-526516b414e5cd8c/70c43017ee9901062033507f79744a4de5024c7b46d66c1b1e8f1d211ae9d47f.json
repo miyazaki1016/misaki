@@ -1,0 +1,20 @@
+{
+  "id": "branch-526516b414e5cd8c",
+  "title": "sora/gemini-transient-retry",
+  "head": "0c77bad036d4bef73c82983c3ae3f800943a1ee5",
+  "head_ref": "sora/gemini-transient-retry",
+  "linked_prs": [
+    40
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "33c60091ff3d913e808bd7e0ed52d7923cf4d08f839513de54e33360dc529ff8",
+  "collected_at": "2026-11-09T10:10:20.576470+00:00"
+}
