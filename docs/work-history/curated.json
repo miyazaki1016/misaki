@@ -1,0 +1,1158 @@
+{
+  "schema_version": 1,
+  "reviewed_at": "2026-11-09",
+  "prs": {
+    "1": {
+      "summary": "匿名会話と記憶をメール確認前に同じユーザーへ保存する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/1"
+      ]
+    },
+    "2": {
+      "summary": "旧Safariに残った所有者不明の会話キャッシュを破棄する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/2"
+      ]
+    },
+    "3": {
+      "summary": "GeminiのJSON解析失敗時に会話生成を自動再試行する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/3"
+      ]
+    },
+    "4": {
+      "summary": "Safariで正常な匿名会話が消える可能性を防ぐ",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/4"
+      ]
+    },
+    "5": {
+      "summary": "記憶確認の質問でも直近の会話履歴を保持する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/5"
+      ]
+    },
+    "6": {
+      "summary": "記憶確認では直近の会話履歴を明示的に参照する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/6"
+      ]
+    },
+    "7": {
+      "summary": "実機から会話履歴の受信状況を診断できるようにする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/7"
+      ]
+    },
+    "8": {
+      "summary": "記憶確認時に直近会話を回答根拠として再提示する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/8"
+      ]
+    },
+    "9": {
+      "summary": "記憶回答の矛盾防止と診断コードを整理する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/9"
+      ]
+    },
+    "10": {
+      "summary": "proxy再試行による利用回数の二重消費を防ぐ",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/10"
+      ]
+    },
+    "11": {
+      "summary": "Safariで通信例外を美咲の発言として表示しない",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/11"
+      ]
+    },
+    "12": {
+      "summary": "自発メッセージの表現タグを感情・行動判断から派生させる",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/12"
+      ]
+    },
+    "13": {
+      "summary": "旧自発APIの独立タグ推論を廃止する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/13"
+      ]
+    },
+    "14": {
+      "summary": "自発メッセージの行動状態と表現タグの優先関係を調整する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/14"
+      ]
+    },
+    "15": {
+      "summary": "sleepyを深夜の身体状態タグとして正式化する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/15"
+      ]
+    },
+    "16": {
+      "summary": "Body Clock claim RPCの実行エラーを修正する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/16"
+      ]
+    },
+    "17": {
+      "summary": "iPhoneで直前のチャットが消える同期競合を修正する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/17"
+      ]
+    },
+    "18": {
+      "summary": "会話同期で同じチャットターンが二重保存されるのを防ぐ",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/18"
+      ]
+    },
+    "19": {
+      "summary": "チャット返答失敗時に回数を戻してエラーを表示する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/19"
+      ]
+    },
+    "20": {
+      "summary": "ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/20"
+      ]
+    },
+    "21": {
+      "summary": "直近の実装・修正総覧を更新する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/21"
+      ]
+    },
+    "22": {
+      "summary": "総覧を最新mainソースと再照合する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/22"
+      ]
+    },
+    "23": {
+      "summary": "旧ブラウザ自発メッセージ経路を削除する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/23"
+      ]
+    },
+    "24": {
+      "summary": "匿名セッションの一時切断で会話を消さない",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/24"
+      ]
+    },
+    "25": {
+      "summary": "Gemini返答待ちにタイムアウトと診断ログを追加する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/25"
+      ]
+    },
+    "26": {
+      "summary": "チャット応答の工程別タイミングを計測する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/26"
+      ]
+    },
+    "27": {
+      "summary": "初対面から関係を育てる設定に切り替える",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/27"
+      ]
+    },
+    "28": {
+      "summary": "総覧を関係成長・応答診断の最新状態へ更新する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/28"
+      ]
+    },
+    "29": {
+      "summary": "美咲の根本状態をサーバー正本化する基礎工事",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/29"
+      ]
+    },
+    "30": {
+      "summary": "旧schema互換の先行maintenance/drain設備を独立追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/30"
+      ]
+    },
+    "31": {
+      "summary": "関係時間v2: 内容理解から感情・行動・自発性まで統合",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/31"
+      ]
+    },
+    "32": {
+      "summary": "統合検証: canonical memory × relationship life context",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/32"
+      ]
+    },
+    "33": {
+      "summary": "匿名history GETのauth raceを安全なno-opにする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/33"
+      ]
+    },
+    "34": {
+      "summary": "生活イベントを確認済みユーザープロフィール連動にする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/34"
+      ]
+    },
+    "35": {
+      "summary": "移行仕上げ: 匿名history同期とJR 403ノイズを止める",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/35"
+      ]
+    },
+    "36": {
+      "summary": "匿名history 5秒GETの発信元を実証して停止する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/36"
+      ]
+    },
+    "37": {
+      "summary": "5秒history GETの発信元をProductionで確定する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/37"
+      ]
+    },
+    "38": {
+      "summary": "5秒history GETをEdge境界で捕捉する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/38"
+      ]
+    },
+    "39": {
+      "summary": "時刻表示の5秒history pollingを撤去する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/39"
+      ]
+    },
+    "40": {
+      "summary": "Gemini一時混雑を美咲の待機体験で吸収する",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/40"
+      ]
+    },
+    "41": {
+      "summary": "待機メッセージの縦崩れを直す",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/41"
+      ]
+    },
+    "42": {
+      "summary": "通常応答で忙しそう表示を出さない",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/42"
+      ]
+    },
+    "43": {
+      "summary": "Geminiタイムアウトを一度だけ自動再試行",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/43"
+      ]
+    },
+    "44": {
+      "summary": "正本の会話履歴を再取得した際に無料回数表示も同期",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/44"
+      ]
+    },
+    "45": {
+      "summary": "美咲の演技研究室：Relationship Interpreter 基礎",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/45"
+      ]
+    },
+    "46": {
+      "summary": "Relationship Engine v1の正本DB契約を追加し、リースで重複処理や古い書込みを保護。",
+      "conclusion": "引継ぎ資料にはEvidence、Episode、Pattern、Critical Pending、5長期軸、明示的関係状態、版番号、処理台帳とRPC契約が記載されている。これは既存のDB基盤を再設計しないための根拠。過去資料の本番適用記述と、今回の本番状態確認は分離する。親密さを恋愛・恋人状態と同一視せず、経過時間だけで感情を捏造しない。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/46",
+        "https://github.com/miyazaki1016/misaki/blob/main/docs/RELATIONSHIP_ENGINE_V1_WORK_HANDOFF.md"
+      ]
+    },
+    "47": {
+      "summary": "チャット保存後に正本のRelationship Engine v1を接続",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/47"
+      ]
+    },
+    "48": {
+      "summary": "Relationship Analyzerの構造化出力を緊急修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/48"
+      ]
+    },
+    "49": {
+      "summary": "関係性処理の例外名・メッセージを記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/49"
+      ]
+    },
+    "50": {
+      "summary": "Relationship Analyzerに許可項目だけの一時Gemini診断を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/50"
+      ]
+    },
+    "51": {
+      "summary": "fix: Relationship Analyzer の polarity 整数 enum を削除",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/51"
+      ]
+    },
+    "52": {
+      "summary": "一時的な関係性診断を削除",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/52"
+      ]
+    },
+    "53": {
+      "summary": "関係性分析のpolarity受渡しを修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/53"
+      ]
+    },
+    "54": {
+      "summary": "Relationship Analyzerの工程診断を一時追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/54"
+      ]
+    },
+    "55": {
+      "summary": "関係性の根拠検証が失敗した理由を診断",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/55"
+      ]
+    },
+    "56": {
+      "summary": "根拠のない関係性の証拠候補を除外",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/56"
+      ]
+    },
+    "57": {
+      "summary": "Relationship Analyzerの一時診断を撤去",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/57"
+      ]
+    },
+    "58": {
+      "summary": "Relationship Engine v1.1の本番仕様を総覧へ反映",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/58"
+      ]
+    },
+    "59": {
+      "summary": "Relationship Engine v1.1の本番仕様で総覧を更新",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/59"
+      ]
+    },
+    "60": {
+      "summary": "Relationship Engine v1.2の段階と成長原則を記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/60"
+      ]
+    },
+    "61": {
+      "summary": "Geminiの物理呼出し回数と費用をサーバー側だけで計測",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/61"
+      ]
+    },
+    "62": {
+      "summary": "関係の成長を軸に美咲の紹介ページを更新",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/62"
+      ]
+    },
+    "63": {
+      "summary": "モバイルPWA案内の横はみ出しを修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/63"
+      ]
+    },
+    "64": {
+      "summary": "期限切れ匿名ルートで関係性処理が止まる問題を防止",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/64"
+      ]
+    },
+    "65": {
+      "summary": "関係性分析の一時障害を再試行",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/65"
+      ]
+    },
+    "66": {
+      "summary": "正本記憶の忘却と確認付き再学習を設計・実装する案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/66"
+      ]
+    },
+    "67": {
+      "summary": "関係性IDの永続性・継続性・移行を監査する案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/67"
+      ]
+    },
+    "68": {
+      "summary": "手動実行だけの隔離Gemini A/B比較を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/68"
+      ]
+    },
+    "69": {
+      "summary": "隔離Gemini A/B比較に20組の選択肢を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/69"
+      ]
+    },
+    "70": {
+      "summary": "長い文脈の合成A/Bテストデータを選択可能にする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/70"
+      ]
+    },
+    "71": {
+      "summary": "手動A/B比較のHTTP・JSON診断を固定",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/71"
+      ]
+    },
+    "72": {
+      "summary": "隔離A/Bの呼出し間隔を任意に調整",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/72"
+      ]
+    },
+    "73": {
+      "summary": "合成会話の品質A/B比較を手動実行可能にする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/73"
+      ]
+    },
+    "74": {
+      "summary": "品質比較の失敗診断を数値だけに制限",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/74"
+      ]
+    },
+    "75": {
+      "summary": "品質比較実行と返信JSON形式を明示的に固定",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/75"
+      ]
+    },
+    "76": {
+      "summary": "匿名化した合成返信の短期保存成果物を有効化",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/76"
+      ]
+    },
+    "77": {
+      "summary": "長い会話履歴の合成品質A/B比較を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/77"
+      ]
+    },
+    "78": {
+      "summary": "隔離会話再生アダプターの検証案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/78"
+      ]
+    },
+    "79": {
+      "summary": "複数キャラクターのデータ範囲を棚卸し",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/79"
+      ]
+    },
+    "80": {
+      "summary": "複数キャラクター向けRPC呼出し元を監査",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/80"
+      ]
+    },
+    "81": {
+      "summary": "本番の正本と管理資料のずれを監査",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/81"
+      ]
+    },
+    "82": {
+      "summary": "適用済み関係性RPCの移行SQLを復元",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/82"
+      ]
+    },
+    "83": {
+      "summary": "正本の関係性演技指示を比較する検証案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/83"
+      ]
+    },
+    "84": {
+      "summary": "docs: 5軸成長速度とRelationship Engine思想の照合を総覧へ追記",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/84"
+      ]
+    },
+    "85": {
+      "summary": "experiment: 5軸の中間成長を表現するInterpreter比較案（本番未接続）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/85"
+      ]
+    },
+    "86": {
+      "summary": "Gemini・DBを使わない複数ターン会話ラボの基盤案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/86"
+      ]
+    },
+    "87": {
+      "summary": "本番と調整ラボで会話エンジンを共有する設計案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/87"
+      ]
+    },
+    "88": {
+      "summary": "会話履歴を純粋処理で変換する共通エンジンの入口案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/88"
+      ]
+    },
+    "89": {
+      "summary": "美咲ラウンジ：24fps透過WebP自動表示＋縦型21秒OP接続",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/89"
+      ]
+    },
+    "90": {
+      "summary": "美咲オープニングをiPhone画面いっぱいに固定表示",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/90"
+      ]
+    },
+    "91": {
+      "summary": "美咲ラウンジ：縦画面いっぱいの比較用プレビューを追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/91"
+      ]
+    },
+    "92": {
+      "summary": "美咲：縦画面ラウンジに「いつもの女の子」ショートカット比較版を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/92"
+      ]
+    },
+    "93": {
+      "summary": "ラウンジ：大きな下部ボタンを小さな左右矢印と初回スワイプ案内に置換",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/93"
+      ]
+    },
+    "94": {
+      "summary": "WIP: Muse v3 約14秒透過アニメのラウンジ比較版",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/94"
+      ]
+    },
+    "95": {
+      "summary": "美咲ラウンジ：iPhone確認済みのMuse 14秒透過アニメを正式採用",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/95"
+      ]
+    },
+    "96": {
+      "summary": "美咲ラウンジ：オープニング終了・スキップから既存チャットへ接続",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/96"
+      ]
+    },
+    "97": {
+      "summary": "美咲ラウンジ：チャット切替時に背景が一瞬映る問題を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/97"
+      ]
+    },
+    "98": {
+      "summary": "緊急修正：ラウンジの全タップ無反応（JavaScript構文エラー）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/98"
+      ]
+    },
+    "99": {
+      "summary": "美咲：初回は空枠、会話後にアイコン表示＋匿名会話を翌日も保持",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/99"
+      ]
+    },
+    "100": {
+      "summary": "設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/100"
+      ]
+    },
+    "101": {
+      "summary": "記憶・想い出・感情・自律日常の既存実装監査と段階的拡張計画を整理。",
+      "conclusion": "資料の作業は監査・計画整理。キャラ別の想い出、約束の継続、留守中の日常、自然な想起をすべて実装済みとは扱わない。会話・長期記憶・関係性・ラウンジの既存機能を再利用する。美咲以外4人の正式設定は確認事項。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/101",
+        "https://github.com/miyazaki1016/misaki/blob/main/docs/MEMORY_AUTONOMY_PUBLIC_OVERVIEW_20261030.md"
+      ]
+    },
+    "103": {
+      "summary": "chore: 読み取り専用の開発忘れ物検出（両プロジェクト共通方式）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/103"
+      ]
+    },
+    "104": {
+      "summary": "docs: 2026-11-01棚卸し・調査結果を台帳へ保存",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/104"
+      ]
+    },
+    "105": {
+      "summary": "docs: 旧監査ブランチの追加調査を台帳へ記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/105"
+      ]
+    },
+    "106": {
+      "summary": "docs: 未整理ブランチの保全・照合・整理候補を分類",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/106"
+      ]
+    },
+    "107": {
+      "summary": "docs: 旧ブランチとmainの機能単位照合を記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/107"
+      ]
+    },
+    "108": {
+      "summary": "docs: 旧実験コードのmain照合記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/108"
+      ]
+    },
+    "109": {
+      "summary": "docs: 旧テスト・計測コードのmain照合を記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/109"
+      ]
+    },
+    "110": {
+      "summary": "docs: 開発台帳に旧テスト照合記録を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/110"
+      ]
+    },
+    "111": {
+      "summary": "docs: 現行処理経路と旧実験の追加照合",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/111"
+      ]
+    },
+    "112": {
+      "summary": "読み取り専用の開発棚卸しを毎日10:17に実行",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/112"
+      ]
+    },
+    "113": {
+      "summary": "総覧の棚卸し状態と日次実行時刻を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/113"
+      ]
+    },
+    "114": {
+      "summary": "開発台帳からたどれる簡潔な運用索引を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/114"
+      ]
+    },
+    "115": {
+      "summary": "棚卸し差分の確認と台帳更新手順を記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/115"
+      ]
+    },
+    "116": {
+      "summary": "棚卸し差分と台帳更新候補を日次で生成",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/116"
+      ]
+    },
+    "117": {
+      "summary": "前回の棚卸し成果物を読み取り専用で取得可能にする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/117"
+      ]
+    },
+    "118": {
+      "summary": "前回成果物がHTTP 401でも当日の棚卸し結果を保持",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/118"
+      ]
+    },
+    "119": {
+      "summary": "棚卸し成果物比較時のHTTP 401を診断",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/119"
+      ]
+    },
+    "120": {
+      "summary": "棚卸し第2段階：読み取り専用の仕分けと台帳レビュー提案",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/120"
+      ]
+    },
+    "121": {
+      "summary": "棚卸し仕分け成果物のJSONとMarkdownの形式を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/121"
+      ]
+    },
+    "122": {
+      "summary": "棚卸し第3段階：PR情報から案件候補を提示",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/122"
+      ]
+    },
+    "123": {
+      "summary": "棚卸し第3段階：上限付きのPRファイル根拠と保守仕分け",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/123"
+      ]
+    },
+    "124": {
+      "summary": "台帳自動更新の安全な境界を定義",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/124"
+      ]
+    },
+    "125": {
+      "summary": "台帳更新案のPRを定期生成しレビューへ回す",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/125"
+      ]
+    },
+    "126": {
+      "summary": "台帳の事実表の列を初回定期実行前に修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/126"
+      ]
+    },
+    "127": {
+      "summary": "PR・main更新を起点に台帳の事実更新案を生成",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/127"
+      ]
+    },
+    "128": {
+      "summary": "台帳自動書込み前に不明時は停止する検査を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/128"
+      ]
+    },
+    "129": {
+      "summary": "台帳自動処理の診断成果物と権限エラーを追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/129"
+      ]
+    },
+    "130": {
+      "summary": "美咲単独版：LP→ラウンジ→動画→既存チャットを接続",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/130"
+      ]
+    },
+    "131": {
+      "summary": "匿名状態を保全して会話を復旧し、新規復旧受付だけを停止可能にする",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/131"
+      ]
+    },
+    "132": {
+      "summary": "ブランチSHAが文字列の場合に棚卸しCIが落ちる不具合を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/132"
+      ]
+    },
+    "133": {
+      "summary": "docs: 競合AIコンパニオン研究とWork利用節約方針を総覧に反映",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/133"
+      ]
+    },
+    "134": {
+      "summary": "不明時は昇格を許可しないPR方針を追加（判定提案のみ）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/134"
+      ]
+    },
+    "135": {
+      "summary": "PR更新時に昇格候補を分類（レビュー専用）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/135"
+      ]
+    },
+    "136": {
+      "summary": "既存棚卸しにopen PRのレビュー引継ぎ一覧を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/136"
+      ]
+    },
+    "137": {
+      "summary": "すべてのopen PRに人が確認する経路を表示",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/137"
+      ]
+    },
+    "138": {
+      "summary": "Vercelのビルド削減を準備（このPR時点は未有効）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/138"
+      ]
+    },
+    "139": {
+      "summary": "棚卸し・台帳・main索引の完了条件を定義",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/139"
+      ]
+    },
+    "140": {
+      "summary": "iPhone全画面ラウンジの正式化と通常返信の発話状況を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/140"
+      ]
+    },
+    "141": {
+      "summary": "確認済みの台帳・main運用索引への事実更新案を完成",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/141"
+      ]
+    },
+    "142": {
+      "summary": "自動生成された台帳・運用索引の事実を確認",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/142"
+      ]
+    },
+    "143": {
+      "summary": "Actions再実行で更新提案ブランチが衝突する問題を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/143"
+      ]
+    },
+    "144": {
+      "summary": "GitHubの事実を開発台帳・運用索引で確認",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/144"
+      ]
+    },
+    "145": {
+      "summary": "複数ブランチが変更する共通ファイルを報告",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/145"
+      ]
+    },
+    "146": {
+      "summary": "GitHubの事実を開発台帳・運用索引で確認",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/146"
+      ]
+    },
+    "147": {
+      "summary": "ブランチ・PR履歴・既存案件IDを相互参照",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/147"
+      ]
+    },
+    "148": {
+      "summary": "ブランチ間のコード差分が完全一致する根拠を比較",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/148"
+      ]
+    },
+    "149": {
+      "summary": "根拠だけで人の確認順序を付けるレビュー一覧を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/149"
+      ]
+    },
+    "150": {
+      "summary": "棚卸しの繰返し時に既存の台帳更新PRを再利用",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/150"
+      ]
+    },
+    "151": {
+      "summary": "チャット初期スクロールの追従制御と、会話読込み遅延の調査。",
+      "conclusion": "PR表題で調査・検証は未完了と明示されている。変更コードの存在を動作改善の実証にしない。最新head、iPhoneの初期スクロール、会話取得時間の計測条件を確認して再開。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/151",
+        "https://github.com/miyazaki1016/misaki/pull/151"
+      ]
+    },
+    "152": {
+      "summary": "不正なYAML統合後の台帳更新ワークフローを復旧",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/152"
+      ]
+    },
+    "153": {
+      "summary": "美咲・アメふる共通のスマートフォン向け承認ボードを追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/153"
+      ]
+    },
+    "154": {
+      "summary": "Pages有効化後の再実行手順を記録",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/154"
+      ]
+    },
+    "155": {
+      "summary": "本人判断の質問と推奨案を承認ボードに表示",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/155"
+      ]
+    },
+    "156": {
+      "summary": "承認画面の下へJavaScriptソースが漏れ表示される問題を修正",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/156"
+      ]
+    },
+    "157": {
+      "summary": "open PR 36件の本人判断要否を一次仕分け",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/157"
+      ]
+    },
+    "158": {
+      "summary": "認証済み本人だけのマージ仲介基盤を準備（既定で無効）",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/158"
+      ]
+    },
+    "160": {
+      "summary": "担当AI向けにコピーできるPR作業指示一覧を表示",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/160"
+      ]
+    },
+    "161": {
+      "summary": "開発管理と担当AI引継ぎの入口を統一",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/161"
+      ]
+    },
+    "162": {
+      "summary": "自動プレビューを停止し、資料だけの更新はビルドを省略",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/162"
+      ]
+    },
+    "163": {
+      "summary": "docs: 総覧を短くし、案件管理を開発台帳へ集約",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/163"
+      ]
+    },
+    "164": {
+      "summary": "docs: 開発総覧・運用索引を2026-11-05の最新案件へ更新",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/164"
+      ]
+    },
+    "165": {
+      "summary": "バックアップ対象と安全な復元試験を設計。",
+      "conclusion": "設計案件。実バックアップ作成・本番復元・復旧試験の成功を示すものではない。実際の対象データ、保存先、保持、隔離復元、本人確認の受入条件を資料から引き継ぐ。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/165",
+        "https://github.com/miyazaki1016/misaki/pull/165"
+      ]
+    },
+    "166": {
+      "summary": "美咲の日次棚卸しに検索可能な作業履歴索引を追加",
+      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/166"
+      ]
+    }
+  }
+}

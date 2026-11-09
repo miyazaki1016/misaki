@@ -26,7 +26,9 @@ header{display:flex;justify-content:space-between;align-items:center;gap:16px;fl
 footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
 @media(min-width:650px){.card{padding:20px}.card h3{font-size:1.12rem}}
 </style>
-</head><body><main>
+</head><body>
+<p style="padding:12px;text-align:center"><a href="history.html">📚 日本語開発履歴・過去のコードと検証を検索</a></p>
+<main>
 <header><div><span class="badge">開発管理 / GitHub連携</span><h1>❤️ 美咲 × ☔ アメふる<br>承認ボード</h1><p class="muted">あなたの判断が必要な案件だけを、理由と推奨付きで。</p></div><button id="reload" class="action" type="button">↻ 更新</button></header>
 <section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>あなたの判断待ち</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>未整理・準備中</span></div><div class="panel"><div class="counter" id="handoffCount">—</div><span>ソラへ引き継ぐ候補</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
 <div class="note"><strong>安全な承認：</strong>この画面は読み取り専用。ボタンでGitHubの該当PRを開き、変更差分とCIを確認したうえでGitHub上でマージします。承認やマージを勝手に実行しません。</div>
