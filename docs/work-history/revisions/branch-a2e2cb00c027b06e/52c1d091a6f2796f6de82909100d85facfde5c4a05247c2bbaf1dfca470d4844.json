@@ -1,0 +1,20 @@
+{
+  "id": "branch-a2e2cb00c027b06e",
+  "title": "sora/lp-pwa-mobile-layout",
+  "head": "f65c3b2e56478634861e27193fbb5913ebfb84cb",
+  "head_ref": "sora/lp-pwa-mobile-layout",
+  "linked_prs": [
+    63
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "509e5d7a68d58a4334aed513343e09b4a70fc87c2f40c6aafccf7f46d3e67ced",
+  "collected_at": "2026-11-09T09:46:04.814619+00:00"
+}

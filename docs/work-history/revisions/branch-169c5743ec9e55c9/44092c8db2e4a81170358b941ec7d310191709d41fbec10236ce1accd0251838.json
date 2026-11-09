@@ -1,0 +1,28 @@
+{
+  "id": "branch-169c5743ec9e55c9",
+  "title": "chore/daily-development-inventory-20261101",
+  "head": "289325326dd8f63ff611d54e8b7de2a57c9f8af7",
+  "head_ref": "chore/daily-development-inventory-20261101",
+  "linked_prs": [
+    112
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/289325326dd8f63ff611d54e8b7de2a57c9f8af7/.github/workflows/development-inventory.yml"
+    }
+  ],
+  "commits": "289325326dd8f63ff611d54e8b7de2a57c9f8af7 Run read-only development inventory daily at 10:17 JST",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "806f6f246be12fe16c0e6412b465e4f6f5add3fc3b436926772f12c6ca1f334b",
+  "collected_at": "2026-11-09T09:46:04.814619+00:00"
+}

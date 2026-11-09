@@ -725,6 +725,10 @@
     "pr-126",
     "pr-128"
   ],
+  "scripts/development_preflight.py": [
+    "branch-01116240ec96678b",
+    "pr-171"
+  ],
   "scripts/development_work_history.py": [
     "branch-d63cd059b3aaad0f",
     "pr-166"
@@ -758,12 +762,16 @@
     "pr-78"
   ],
   "scripts/vercel-build-guard.mjs": [
+    "branch-01116240ec96678b",
     "branch-eecb7d45ce962418",
-    "pr-162"
+    "pr-162",
+    "pr-171"
   ],
   "scripts/vercel_build_guard.py": [
+    "branch-01116240ec96678b",
     "branch-2fcb912568edd503",
-    "pr-138"
+    "pr-138",
+    "pr-171"
   ],
   "scripts/verify_ledger_proposal.py": [
     "branch-7b4c2cf2503a3179",

@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-09T09:21:40.820660+00:00
+更新 (UTC): 2026-11-09T09:46:04.814619+00:00
 
 ## 全案件
 
@@ -12,6 +12,7 @@
 | --- | --- | --- | --- |
 | [work/ab-blind-review-artifact-workflow](cases/branch-0000ff4995ce3709.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/lounge-muse-v3-preview-20261030](cases/branch-00773574df2cf2d3.md) | ラウンジ・画面：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [feat/automatic-history-preflight-20261109](cases/branch-01116240ec96678b.md) | 開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/remove-timestamp-history-poll](cases/branch-02d4eb506c006982.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/japanese-development-history-20261109](cases/branch-02f9f023f7c9991c.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41385998077](cases/branch-04f9df6413016d09.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -279,6 +280,7 @@
 | [fix(history): main統合とPRマージを区別し、検証条件の検索を補強](cases/pr-169.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [iPhoneで直前のチャットが消える同期競合を修正する](cases/pr-17.md) | 記憶・会話・開発管理：iPhoneで直前のチャットが消える同期競合を修正する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs: require Japanese work-history review before any new development](cases/pr-170.md) | 開発管理・画面・表示：開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [feat(history): 着手前に「以前の実装・検証」を自動提示して再利用判断を確認](cases/pr-171.md) | 開発管理・画面・表示：開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [会話同期で同じチャットターンが二重保存されるのを防ぐ](cases/pr-18.md) | 記憶・会話：会話同期で同じチャットターンが二重保存されるのを防ぐ | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -496,6 +498,7 @@
 - scripts/development_inventory.py：[branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d92ca54cbab20357](cases/branch-d92ca54cbab20357.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-103](cases/pr-103.md), [pr-116](cases/pr-116.md), [pr-122](cases/pr-122.md)
 - scripts/development_inventory_delta.py：[branch-1601ee37d65ba186](cases/branch-1601ee37d65ba186.md), [branch-4fd3d1bdc2b892c1](cases/branch-4fd3d1bdc2b892c1.md), [branch-7ea3560ec516692d](cases/branch-7ea3560ec516692d.md), [branch-b30df8ff98a54148](cases/branch-b30df8ff98a54148.md), [branch-b34c306bc7fd0b72](cases/branch-b34c306bc7fd0b72.md), [branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d5f02538fc12def5](cases/branch-d5f02538fc12def5.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-116](cases/pr-116.md), [pr-118](cases/pr-118.md), [pr-119](cases/pr-119.md), [pr-120](cases/pr-120.md), [pr-121](cases/pr-121.md), [pr-122](cases/pr-122.md), [pr-123](cases/pr-123.md), [pr-132](cases/pr-132.md)
 - scripts/development_ledger_proposal.py：[branch-08e76fdd73cd4686](cases/branch-08e76fdd73cd4686.md), [branch-3ab6bf48d6ece55f](cases/branch-3ab6bf48d6ece55f.md), [branch-7b4c2cf2503a3179](cases/branch-7b4c2cf2503a3179.md), [branch-ac4d9f4766a37ec1](cases/branch-ac4d9f4766a37ec1.md), [pr-124](cases/pr-124.md), [pr-125](cases/pr-125.md), [pr-126](cases/pr-126.md), [pr-128](cases/pr-128.md)
+- scripts/development_preflight.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [pr-171](cases/pr-171.md)
 - scripts/development_work_history.py：[branch-d63cd059b3aaad0f](cases/branch-d63cd059b3aaad0f.md), [pr-166](cases/pr-166.md)
 - scripts/pr_approval_routing.py：[branch-7ae456f5639d43f4](cases/branch-7ae456f5639d43f4.md), [pr-137](cases/pr-137.md)
 - scripts/pr_promotion_policy.py：[branch-f70b38dbc740ec35](cases/branch-f70b38dbc740ec35.md), [pr-134](cases/pr-134.md)
@@ -504,8 +507,8 @@
 - scripts/run-conversation-smoke.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - scripts/run-live-synthetic-quality-eval.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/run-synthetic-quality-checks.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- scripts/vercel-build-guard.mjs：[branch-eecb7d45ce962418](cases/branch-eecb7d45ce962418.md), [pr-162](cases/pr-162.md)
-- scripts/vercel_build_guard.py：[branch-2fcb912568edd503](cases/branch-2fcb912568edd503.md), [pr-138](cases/pr-138.md)
+- scripts/vercel-build-guard.mjs：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-eecb7d45ce962418](cases/branch-eecb7d45ce962418.md), [pr-162](cases/pr-162.md), [pr-171](cases/pr-171.md)
+- scripts/vercel_build_guard.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-2fcb912568edd503](cases/branch-2fcb912568edd503.md), [pr-138](cases/pr-138.md), [pr-171](cases/pr-171.md)
 - scripts/verify_ledger_proposal.py：[branch-7b4c2cf2503a3179](cases/branch-7b4c2cf2503a3179.md), [pr-128](cases/pr-128.md)
 - services/approval-merge-edge/index.ts：[branch-d727762241e2e4e1](cases/branch-d727762241e2e4e1.md), [pr-158](cases/pr-158.md)
 - services/approval-merge-edge/policy.mjs：[branch-d727762241e2e4e1](cases/branch-d727762241e2e4e1.md), [pr-158](cases/pr-158.md)
