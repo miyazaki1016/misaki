@@ -1,0 +1,63 @@
+{
+  "id": "branch-35677a391b35c95c",
+  "title": "chore/inventory-index-review",
+  "head": "5ddc61276a14fbedfa158b33c5c81d534a80bfc5",
+  "head_ref": "chore/inventory-index-review",
+  "linked_prs": [
+    139
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "docs/INVENTORY_COMPLETION_CRITERIA.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/docs/INVENTORY_COMPLETION_CRITERIA.md"
+    },
+    {
+      "path": "scripts/development_branch_compare.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/scripts/development_branch_compare.py"
+    },
+    {
+      "path": "scripts/development_index_review.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/scripts/development_index_review.py"
+    },
+    {
+      "path": "tests/test_development_branch_compare.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/tests/test_development_branch_compare.py"
+    },
+    {
+      "path": "tests/test_development_index_review.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5ddc61276a14fbedfa158b33c5c81d534a80bfc5/tests/test_development_index_review.py"
+    }
+  ],
+  "commits": "5ddc61276a14fbedfa158b33c5c81d534a80bfc5 Include safe branch-to-main comparisons and tests in inventory\n77d43d2db3938222ea544fd01be35717f8ff9f5c Test branch comparison evidence and failure handling\n2e5743b16bd6453ac2a4b5acdb0502028291c088 Add read-only branch-to-main API comparison report\n3da6000d8e5a7a9acc9dcdac5599619b72b36295 Run index reconciliation regression tests in CI\nc2af64178cd997a5daa9834ccad156d97d66dd69 Test fail-closed index reconciliation\n6d914b1007d9b10ffa136d5d8e0b654f32e7798f Include index reconciliation in existing inventory artifact\ncac7af32445c4507a2b375996a896028ba2429e9 Generate safe review-only index reconciliation artifact\na5f3961bebc60b01d7f300cd442979f0f9969236 Define complete inventory to ledger to index acceptance criteria",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "cf10ae8cf3698eb44f3850e74e6a3cc4f099f4d011a20933438e546ac46de923",
+  "collected_at": "2026-11-09T09:21:40.820660+00:00"
+}

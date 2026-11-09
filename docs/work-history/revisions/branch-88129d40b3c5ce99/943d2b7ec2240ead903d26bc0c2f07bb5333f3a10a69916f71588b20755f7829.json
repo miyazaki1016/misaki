@@ -1,0 +1,28 @@
+{
+  "id": "branch-88129d40b3c5ce99",
+  "title": "work/ab-quality-diagnostics-workflow",
+  "head": "ab805d88148c6880238918e858ca5261564c1bdc",
+  "head_ref": "work/ab-quality-diagnostics-workflow",
+  "linked_prs": [
+    74
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ab805d88148c6880238918e858ca5261564c1bdc/.github/workflows/isolated-gemini-ab-manual.yml"
+    }
+  ],
+  "commits": "ab805d88148c6880238918e858ca5261564c1bdc ci: pin quality A/B with boolean-only failure diagnostics",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "235c5043fa28535696acfdc7ea3bdddcb620ec3ab5512b15e303e8df6df6d0c8",
+  "collected_at": "2026-11-09T09:21:40.820660+00:00"
+}
