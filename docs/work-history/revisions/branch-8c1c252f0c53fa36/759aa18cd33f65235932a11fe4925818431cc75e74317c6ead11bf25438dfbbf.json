@@ -1,0 +1,133 @@
+{
+  "id": "branch-8c1c252f0c53fa36",
+  "title": "work/gemini-unit-cost-telemetry",
+  "head": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035",
+  "head_ref": "work/gemini-unit-cost-telemetry",
+  "linked_prs": [
+    61
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/canonical-relationship-integration-tests.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/.github/workflows/canonical-relationship-integration-tests.yml"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/app/api/chat/route.ts"
+    },
+    {
+      "path": "docs/GEMINI_USAGE_TELEMETRY.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/docs/GEMINI_USAGE_TELEMETRY.md"
+    },
+    {
+      "path": "lib/gemini-json-generator.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/lib/gemini-json-generator.ts"
+    },
+    {
+      "path": "lib/gemini-usage-telemetry-server.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/lib/gemini-usage-telemetry-server.ts"
+    },
+    {
+      "path": "lib/gemini-usage-telemetry.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/lib/gemini-usage-telemetry.ts"
+    },
+    {
+      "path": "lib/relationship-analyzer-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/lib/relationship-analyzer-v1.ts"
+    },
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/package.json"
+    },
+    {
+      "path": "supabase/migrations/20261004045307_gemini_usage_telemetry.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/supabase/migrations/20261004045307_gemini_usage_telemetry.sql"
+    },
+    {
+      "path": "tests/gemini-usage-telemetry-server.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/tests/gemini-usage-telemetry-server.test.cjs"
+    },
+    {
+      "path": "tests/gemini-usage-telemetry.rollback.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/tests/gemini-usage-telemetry.rollback.sql"
+    },
+    {
+      "path": "tests/gemini-usage-telemetry.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/tests/gemini-usage-telemetry.test.ts"
+    },
+    {
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/tests/relationship-runtime-v1.test.cjs"
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035/tests/server-canonical.test.cjs"
+    }
+  ],
+  "commits": "e329b6c81bce3f5f54a5a6d5af14c3ebc40d2035 Clarify Gemini telemetry auth identity and future cohort semantics\nc4bc326e1d95e047a4a3a7bd072aebd4ff96669e Observe Gemini physical attempt usage without changing product behavior",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "e875745eda483f8934ff9ea522ce4bfa3ab4189eff24fe9b4d7260e8b2962e93",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

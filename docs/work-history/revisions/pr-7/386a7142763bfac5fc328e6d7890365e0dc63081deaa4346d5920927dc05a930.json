@@ -1,0 +1,143 @@
+{
+  "id": "pr-7",
+  "number": 7,
+  "title": "実機から会話履歴の受信状況を診断できるようにする",
+  "topics": [
+    "記憶・会話",
+    "開発管理"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "実機Safariで表示履歴とモデル参照履歴の食い違いを切り分けるため、通常会話をGeminiへ送らずに `履歴診断:<語句>` で受信済みhistory件数と該当語句を含む履歴件数だけを返す診断経路を追加します。会話本文はサーバーログへ出力せず、診断時は会話・記憶・関係時間をSupabaseへ同期しません。原因特定後に診断経路は撤去予定です。",
+  "snapshot_head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+  "snapshot_consistent": true,
+  "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+  "base": "1d80a67899dd54ee1d73e6dd08b96b386ae88029",
+  "base_ref": "main",
+  "head_ref": "fix/chat-request-diagnostics",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-17T08:33:19Z",
+  "merge_commit_sha": "c7eaf54f44b7e58f0fe88eee64b32f0efe841ca9",
+  "updated_at": "2026-09-17T08:33:19Z",
+  "code_facts": [
+    {
+      "file": "app/api/chat-proxy/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const HISTORY_DIAGNOSTIC_PREFIX = \"履歴診断:\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    },
+    {
+      "file": "app/api/chat-proxy/route.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function createHistoryDiagnostic(body: any) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    },
+    {
+      "file": "app/api/chat-proxy/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (typeof body?.message !== \"string\") return null;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    },
+    {
+      "file": "app/api/chat-proxy/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!body.message.startsWith(HISTORY_DIAGNOSTIC_PREFIX)) return null;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    },
+    {
+      "file": "app/api/chat-proxy/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (diagnosticResponse) return diagnosticResponse;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/chat-proxy/route.ts",
+      "status": "modified",
+      "additions": 29,
+      "deletions": 0,
+      "patch": "diff --git a/app/api/chat-proxy/route.ts b/app/api/chat-proxy/route.ts\nindex 083c551..efb7e40 100644\n--- a/app/api/chat-proxy/route.ts\n+++ b/app/api/chat-proxy/route.ts\n@@ -8,6 +8,7 @@ const SUPABASE_PUBLISHABLE_KEY =\n const MAX_MEMORY = 30;\n const PARSE_ERROR_MESSAGE =\n   \"美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。\";\n+const HISTORY_DIAGNOSTIC_PREFIX = \"履歴診断:\";\n \n function createAuthenticatedSupabase(accessToken: string) {\n   return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {\n@@ -66,6 +67,31 @@ function createForwardedRequest(request: Request, body: unknown) {\n   });\n }\n \n+function createHistoryDiagnostic(body: any) {\n+  if (typeof body?.message !== \"string\") return null;\n+  if (!body.message.startsWith(HISTORY_DIAGNOSTIC_PREFIX)) return null;\n+\n+  const term = body.message.slice(HISTORY_DIAGNOSTIC_PREFIX.length).trim();\n+  const history = Array.isArray(body?.history) ? body.history : [];\n+  const validHistory = history.filter(\n+    (item: any) =>\n+      item &&\n+      (item.role === \"user\" || item.role === \"misaki\") &&\n+      typeof item.text === \"string\"\n+  );\n+  const matches = term\n+    ? validHistory.filter((item: any) => item.text.includes(term)).length\n+    : 0;\n+\n+  return Response.json({\n+    reply: `診断結果：history=${validHistory.length}件 / 「${term || \"未指定\"}」を含む履歴=${matches}件`,\n+    memory: sanitizeMemory(body?.memory),\n+    memorySynced: false,\n+    relationshipTimeSynced: false,\n+    diagnostic: true,\n+  });\n+}\n+\n async function callBaseChatWithParseRetry(request: Request, body: unknown) {\n   const firstResponse = await baseChatPost(createForwardedRequest(request, body));\n   if (firstResponse.ok || firstResponse.status !== 500) return firstResponse;\n@@ -108,6 +134,9 @@ export async function POST(request: Request) {\n       );\n     }\n \n+    const diagnosticResponse = createHistoryDiagnostic(body);\n+    if (diagnosticResponse) return diagnosticResponse;\n+\n     const isAnonymous = userData.user.is_anonymous === true;\n     const recallMode = isMemoryRecallQuestion(body?.message);\n     const messageForModel = createRecallAwareMessage(body?.message, recallMode);\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts",
+      "source": {
+        "path": "app/api/chat-proxy/route.ts",
+        "coverage": "全文",
+        "text": "import { createClient } from \"@supabase/supabase-js\";\nimport { POST as baseChatPost } from \"../chat/route\";\nimport { recordRelationshipChatTurn } from \"../../../lib/relationship-time\";\n\nconst SUPABASE_URL = \"https://tzozajnwznxqgxnjikoy.supabase.co\";\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\nconst MAX_MEMORY = 30;\nconst PARSE_ERROR_MESSAGE =\n  \"美咲の返事をうまく読み取れなかったみたい。もう一度話しかけてね。\";\nconst HISTORY_DIAGNOSTIC_PREFIX = \"履歴診断:\";\n\nfunction createAuthenticatedSupabase(accessToken: string) {\n  return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {\n    global: { headers: { Authorization: `Bearer ${accessToken}` } },\n    auth: {\n      persistSession: false,\n      autoRefreshToken: false,\n      detectSessionInUrl: false,\n    },\n  });\n}\n\nfunction sanitizeMemory(value: unknown): string[] {\n  return Array.isArray(value)\n    ? value\n        .filter((item): item is string => typeof item === \"string\")\n        .map((item) => item.trim())\n        .filter(Boolean)\n        .slice(-MAX_MEMORY)\n    : [];\n}\n\nfunction isMemoryRecallQuestion(message: unknown) {\n  if (typeof message !== \"string\") return false;\n  const normalized = message.replace(/\\s+/g, \"\");\n  return [\n    \"覚えてる\",\n    \"覚えている\",\n    \"覚えてた\",\n    \"何覚えてる\",\n    \"なに覚えてる\",\n    \"何を覚えてる\",\n    \"なにを覚えてる\",\n    \"記憶してる\",\n    \"記憶している\",\n    \"私のこと覚えて\",\n    \"俺のこと覚えて\",\n    \"僕のこと覚えて\",\n    \"好み覚えて\",\n    \"何知ってる\",\n    \"なに知ってる\",\n  ].some((pattern) => normalized.includes(pattern));\n}\n\nfunction createRecallAwareMessage(message: unknown, recallMode: boolean) {\n  if (!recallMode || typeof message !== \"string\") return message;\n\n  return `${message}\\n\\n【会話履歴の確認】\\n回答する前に、渡されている直近の会話履歴を必ず確認してください。\\n質問の答えが直近の会話履歴にある場合は、その内容を最優先で使って自然に答えてください。\\n直近の会話履歴になければ長期記憶を確認し、どちらにも根拠がなければ知らないことを作らずに答えてください。`;\n}\n\nfunction createForwardedRequest(request: Request, body: unknown) {\n  return new Request(request.url, {\n    method: \"POST\",\n    headers: request.headers,\n    body: JSON.stringify(body),\n  });\n}\n\nfunction createHistoryDiagnostic(body: any) {\n  if (typeof body?.message !== \"string\") return null;\n  if (!body.message.startsWith(HISTORY_DIAGNOSTIC_PREFIX)) return null;\n\n  const term = body.message.slice(HISTORY_DIAGNOSTIC_PREFIX.length).trim();\n  const history = Array.isArray(body?.history) ? body.history : [];\n  const validHistory = history.filter(\n    (item: any) =>\n      item &&\n      (item.role === \"user\" || item.role === \"misaki\") &&\n      typeof item.text === \"string\"\n  );\n  const matches = term\n    ? validHistory.filter((item: any) => item.text.includes(term)).length\n    : 0;\n\n  return Response.json({\n    reply: `診断結果：history=${validHistory.length}件 / 「${term || \"未指定\"}」を含む履歴=${matches}件`,\n    memory: sanitizeMemory(body?.memory),\n    memorySynced: false,\n    relationshipTimeSynced: false,\n    diagnostic: true,\n  });\n}\n\nasync function callBaseChatWithParseRetry(request: Request, body: unknown) {\n  const firstResponse = await baseChatPost(createForwardedRequest(request, body));\n  if (firstResponse.ok || firstResponse.status !== 500) return firstResponse;\n\n  let retryParseFailure = false;\n  try {\n    const payload = await firstResponse.clone().json();\n    retryParseFailure = payload?.error === PARSE_ERROR_MESSAGE;\n  } catch {\n    return firstResponse;\n  }\n\n  if (!retryParseFailure) return firstResponse;\n\n  console.warn(\"CHAT JSON PARSE ERROR: retrying Gemini response once\");\n  return baseChatPost(createForwardedRequest(request, body));\n}\n\nexport async function POST(request: Request) {\n  try {\n    const body = await request.json();\n    const authorization = request.headers.get(\"authorization\") ?? \"\";\n\n    if (!authorization.startsWith(\"Bearer \")) {\n      return Response.json(\n        { error: \"ログイン情報を確認できませんでした。ページを再読み込みしてね。\" },\n        { status: 401 }\n      );\n    }\n\n    const accessToken = authorization.slice(\"Bearer \".length).trim();\n    const supabase = createAuthenticatedSupabase(accessToken);\n    const { data: userData, error: userError } =\n      await supabase.auth.getUser(accessToken);\n\n    if (userError || !userData.user) {\n      return Response.json(\n        { error: \"ログイン情報を確認できませんでした。ページを再読み込みしてね。\" },\n        { status: 401 }\n      );\n    }\n\n    const diagnosticResponse = createHistoryDiagnostic(body);\n    if (diagnosticResponse) return diagnosticResponse;\n\n    const isAnonymous = userData.user.is_anonymous === true;\n    const recallMode = isMemoryRecallQuestion(body?.message);\n    const messageForModel = createRecallAwareMessage(body?.message, recallMode);\n\n    // 匿名利用ではSupabaseを会話・記憶・関係時間の保存先にしない。\n    // ブラウザから届いた一時記憶と直近の会話履歴を、そのブラウザセッション中の回答に使う。\n    if (isAnonymous) {\n      const temporaryMemory = sanitizeMemory(body?.memory);\n      const safeBody = {\n        ...body,\n        message: messageForModel,\n        memory: temporaryMemory,\n      };\n\n      const baseResponse = await callBaseChatWithParseRetry(request, safeBody);\n      if (!baseResponse.ok) return baseResponse;\n\n      const result = await baseResponse.json();\n      const returnedMemory = sanitizeMemory(result?.memory);\n\n      return Response.json({\n        ...result,\n        memory: recallMode ? temporaryMemory : returnedMemory,\n        memorySynced: false,\n        relationshipTimeSynced: false,\n        ephemeral: true,\n      });\n    }\n\n    // 保存済みアカウントではSupabaseのmemoryを唯一の正本として使う。\n    // 記憶確認の質問でも、正本memoryに加えてブラウザから届く直近の会話履歴を文脈として残す。\n    const { data: state, error: stateError } = await supabase\n      .from(\"misaki_user_conversation_state\")\n      .select(\"memory\")\n      .eq(\"user_id\", userData.user.id)\n      .maybeSingle();\n\n    if (stateError) {\n      console.error(\"CANONICAL MEMORY READ ERROR:\", stateError);\n      return Response.json(\n        { error: \"美咲の記憶を確認できませんでした。少ししてからもう一度話しかけてね。\" },\n        { status: 500 }\n      );\n    }\n\n    const canonicalMemory = sanitizeMemory(state?.memory);\n    const safeBody = {\n      ...body,\n      message: messageForModel,\n      memory: canonicalMemory,\n    };\n\n    const userMessageAt = new Date();\n    const baseResponse = await callBaseChatWithParseRetry(request, safeBody);\n    if (!baseResponse.ok) return baseResponse;\n\n    const result = await baseResponse.json();\n    const misakiMessageAt = new Date();\n    const returnedMemory = sanitizeMemory(result?.memory);\n    const nextMemory = recallMode ? canonicalMemory : returnedMemory;\n    const historyForSync =\n      typeof body?.message === \"string\" && typeof result?.reply === \"string\"\n        ? [\n            { role: \"user\", text: body.message },\n            { role: \"misaki\", text: result.reply },\n          ]\n        : [];\n\n    const { error: syncError } = await (supabase.rpc as any)(\n      \"sync_user_conversation_state\",\n      { p_history: historyForSync, p_memory: nextMemory }\n    );\n\n    if (syncError) {\n      console.error(\"CANONICAL MEMORY WRITE ERROR:\", syncError);\n      return Response.json(\n        { error: \"美咲の記憶を保存できませんでした。もう一度話しかけてね。\" },\n        { status: 500 }\n      );\n    }\n\n    // 会話と記憶の保存が成功した後にだけ関係時間を進める。\n    // 関係時間の記録失敗で、すでに生成できた会話そのものは失敗扱いにしない。\n    const relationshipTimeSynced = await recordRelationshipChatTurn(\n      supabase,\n      false,\n      userMessageAt,\n      misakiMessageAt\n    );\n\n    return Response.json({\n      ...result,\n      memory: nextMemory,\n      memorySynced: true,\n      relationshipTimeSynced,\n    });\n  } catch (error) {\n    console.error(\"CHAT PROXY ERROR:\", error);\n    return Response.json(\n      { error: \"今ちょっと美咲とつながりにくいみたい。少ししてからもう一度話しかけてね。\" },\n      { status: 500 }\n    );\n  }\n}\n",
+        "sha256": "cb122cbe625e9589bb1f4121c3e8aca2746108ea526b5d71fe1bd640d8c484c6"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+      "message": "会話履歴の実受信状況を安全に診断できるようにする\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/47f39994a79e68fa47cbe5234ba75ce2a19d5965"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "HISTORY_DIAGNOSTIC_PREFIX",
+    "MAX_MEMORY",
+    "PARSE_ERROR_MESSAGE",
+    "POST",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "accessToken",
+    "authorization",
+    "baseResponse",
+    "body",
+    "callBaseChatWithParseRetry",
+    "canonicalMemory",
+    "createAuthenticatedSupabase",
+    "createForwardedRequest",
+    "createHistoryDiagnostic",
+    "createRecallAwareMessage",
+    "diagnosticResponse",
+    "firstResponse",
+    "history",
+    "historyForSync",
+    "isAnonymous",
+    "isMemoryRecallQuestion",
+    "matches",
+    "messageForModel",
+    "misakiMessageAt",
+    "nextMemory",
+    "normalized",
+    "payload",
+    "recallMode",
+    "relationshipTimeSynced",
+    "result",
+    "retryParseFailure",
+    "returnedMemory",
+    "safeBody",
+    "sanitizeMemory",
+    "supabase",
+    "temporaryMemory",
+    "term",
+    "userMessageAt",
+    "validHistory"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "実機から会話履歴の受信状況を診断できるようにする",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/7"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "c7b13c9f5c35530d7e2b4916cc073cbb33882b620088872a04778d206cebe5d9",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

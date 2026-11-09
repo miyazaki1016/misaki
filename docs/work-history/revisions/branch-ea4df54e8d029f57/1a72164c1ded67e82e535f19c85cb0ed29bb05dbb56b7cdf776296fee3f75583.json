@@ -1,0 +1,35 @@
+{
+  "id": "branch-ea4df54e8d029f57",
+  "title": "fix/approval-board-leaked-source-20261104",
+  "head": "5733e11fb8e95c6a15d4b939fbc7c9e5f583262e",
+  "head_ref": "fix/approval-board-leaked-source-20261104",
+  "linked_prs": [
+    156
+  ],
+  "files": [
+    {
+      "path": "docs/approval-dashboard/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5733e11fb8e95c6a15d4b939fbc7c9e5f583262e/docs/approval-dashboard/index.html"
+    },
+    {
+      "path": "scripts/check_approval_dashboard.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5733e11fb8e95c6a15d4b939fbc7c9e5f583262e/scripts/check_approval_dashboard.py"
+    }
+  ],
+  "commits": "5733e11fb8e95c6a15d4b939fbc7c9e5f583262e test: reject leaked source outside HTML and duplicate closing script tags\nca939177b4bb8394fb76a077846285eb7b801053 fix: remove duplicated JavaScript printed after closing HTML",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b987ac58dba8dc4fcc9132b2b6689921848f30578b15b5cc465e7b6f799d98f1",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

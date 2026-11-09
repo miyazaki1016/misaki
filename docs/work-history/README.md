@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-09T08:56:52.743400+00:00
+更新 (UTC): 2026-11-09T09:02:40.107460+00:00
 
 ## 全案件
 
@@ -65,6 +65,7 @@
 | [docs/forecast-horizon-investigation-20261101](cases/branch-3d9f51f0fd411e35.md) | 雨量・全国検知・記憶・会話・開発管理：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
 | [chore/reuse-ledger-proposal-20261103](cases/branch-3e233e87eef83ac6.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
 | [automation/ledger-facts-41386492542](cases/branch-3f5bb45aa4923cdf.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | PR未関連のブランチ差分 | 未確認 |
+| [fix/history-pr-checkout-race-20261109](cases/branch-412ffa2ddbe80074.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
 | [docs/relationship-five-axis-design-review-20261015](cases/branch-42b715df1ad8655e.md) | 記憶・会話・画面・表示：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
 | [chore/inventory-index-facts-proposal](cases/branch-436bd6babf91e34f.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
 | [feat/lounge-minimal-navigation-20261030](cases/branch-439dfe86fa693c0a.md) | ラウンジ・画面：mainとのソース差分を収録・関連PRを照合 | ブランチ差分（PR関連あり） | 未確認 |
@@ -272,6 +273,7 @@
 | [docs: 美咲のバックアップ対象と安全な復元試験の設計](cases/pr-165.md) | 開発管理・認証・安全性：バックアップ対象と安全な復元試験を設計。 | open | 未確認 |
 | [feat(inventory): add searchable work-history index to Misaki daily audit](cases/pr-166.md) | 開発管理：美咲の日次棚卸しに検索可能な作業履歴索引を追加 | merged | 未確認 |
 | [日本語開発履歴：コード・検証根拠の検索と過去結論の継続保存](cases/pr-167.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | merged | 未確認 |
+| [fix(history): 棚卸し中に更新されたPRのコミットを確実に取得](cases/pr-168.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | merged | 未確認 |
 | [iPhoneで直前のチャットが消える同期競合を修正する](cases/pr-17.md) | 記憶・会話・開発管理：iPhoneで直前のチャットが消える同期競合を修正する | merged | 未確認 |
 | [会話同期で同じチャットターンが二重保存されるのを防ぐ](cases/pr-18.md) | 記憶・会話：会話同期で同じチャットターンが二重保存されるのを防ぐ | merged | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | merged | 未確認 |
@@ -484,7 +486,7 @@
 - scripts/development_branch_case_handoff.py：[branch-38e6283b99123cd5](cases/branch-38e6283b99123cd5.md), [pr-147](cases/pr-147.md)
 - scripts/development_branch_compare.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [branch-b23be022a75304ba](cases/branch-b23be022a75304ba.md), [branch-ed894c05ef854553](cases/branch-ed894c05ef854553.md), [pr-139](cases/pr-139.md), [pr-145](cases/pr-145.md), [pr-148](cases/pr-148.md)
 - scripts/development_branch_review_queue.py：[branch-2f842ea0ac1d18a4](cases/branch-2f842ea0ac1d18a4.md), [pr-149](cases/pr-149.md)
-- scripts/development_history_evidence.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [pr-167](cases/pr-167.md)
+- scripts/development_history_evidence.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [branch-412ffa2ddbe80074](cases/branch-412ffa2ddbe80074.md), [pr-167](cases/pr-167.md), [pr-168](cases/pr-168.md)
 - scripts/development_index_proposal.py：[branch-436bd6babf91e34f](cases/branch-436bd6babf91e34f.md), [pr-141](cases/pr-141.md)
 - scripts/development_index_review.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [pr-139](cases/pr-139.md)
 - scripts/development_inventory.py：[branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d92ca54cbab20357](cases/branch-d92ca54cbab20357.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-103](cases/pr-103.md), [pr-116](cases/pr-116.md), [pr-122](cases/pr-122.md)

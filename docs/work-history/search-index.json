@@ -1,14 +1,28 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-09T08:56:52.743400+00:00",
+  "generated_at": "2026-11-09T09:02:40.107460+00:00",
   "coverage": {
-    "prs": 165,
-    "pr_cases": 165,
-    "branches": 188,
+    "prs": 166,
+    "pr_cases": 166,
+    "branches": 189,
     "errors": [],
-    "api_calls": 661
+    "api_calls": 665
   },
   "cases": [
+    {
+      "id": "pr-168",
+      "title": "fix(history): 棚卸し中に更新されたPRのコミットを確実に取得",
+      "summary": "開発資産の把握・引継ぎ・レビューを支援する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "fix(history): 棚卸し中に更新されたPRのコミットを確実に取得 開発資産の把握・引継ぎ・レビューを支援する変更 {} 実Actionsで、checkout後に台帳ボットがPR headを更新し、取得済みGit参照に新しいコミットがない競合を確認しました。PRメタデータで観測したbase/headを40桁SHAで固定し、不足するオブジェクトだけをGitから取得します。取得できない案件は未確認の収集エラーとして扱い、成功したと偽りません。\n\n新しい回帰テストで、変更されたheadだけをSHA固定で取得することと不正なrefを拒否することを確認。履歴関連12テスト成功。アプリ・通知・DB変更なし。 API FakeAPI HistoryTests Missing __init__ branch_case build clean code_facts collect_pr describe digest dump duplicate_candidates ensure_commit get git local_commits local_files md observed_runs pages render_case render_output search source symbols test_checkout_race_fetches_exact_missing_pr_head test_exact_code_fact_retains_source_link_and_assertion test_merged_into_feature_is_not_main_or_production test_missing_api_cache_never_fabricates_evidence test_redact_secrets_and_skip_sensitive_source test_revisions_survive_changed_and_deleted_branch test_search_uses_all_terms_including_numeric_conclusion test_unchanged_pr_reuses_evidence_without_requests test_viewer_escapes_untrusted_pr_html write scripts/development_history_evidence.py tests/test_development_history_evidence.py "
+    },
     {
       "id": "pr-167",
       "title": "日本語開発履歴：コード・検証根拠の検索と過去結論の継続保存",
@@ -3997,6 +4011,20 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/grow-relationship-from-first-meeting ブランチ差分を収録 {}   app/api/chat/route.ts lib/persona/fallback-persona.ts supabase/functions/body-clock/fallback-persona.ts supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql "
+    },
+    {
+      "id": "branch-412ffa2ddbe80074",
+      "title": "fix/history-pr-checkout-race-20261109",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/history-pr-checkout-race-20261109 ブランチ差分を収録 {}   scripts/development_history_evidence.py tests/test_development_history_evidence.py "
     },
     {
       "id": "branch-28fc3c410f8d2108",

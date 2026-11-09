@@ -1,0 +1,100 @@
+{
+  "id": "pr-91",
+  "number": 91,
+  "title": "美咲ラウンジ：縦画面いっぱいの比較用プレビューを追加",
+  "topics": [
+    "ラウンジ・画面",
+    "画面・表示"
+  ],
+  "purpose": "ラウンジ・映像・画面演出に関する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "既存の `/lab/transparent-lounge/` は変更せず、`/lab/transparent-lounge-vertical/` に縦画面（100dvh）版を追加。背景の横長画像は引き伸ばさず中央をクロップし、24fps透過WebPと21秒MP4は既存と共用。スワイプ・選択・スキップは維持。ユーザーのiPhoneで見比べた後に採否判断。ドキュメント `docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md` に記録。",
+  "snapshot_head": "002484b73898dfc1b312c3769801f178e6f50f64",
+  "snapshot_consistent": true,
+  "head": "002484b73898dfc1b312c3769801f178e6f50f64",
+  "base": "b1c416c85ed784e23aa9ed6cbe91a64b3f2f17d0",
+  "base_ref": "main",
+  "head_ref": "feat/lounge-portrait-preview-20261030",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-29T16:39:43Z",
+  "merge_commit_sha": "290ee7ede697e22d2afe2e69a2716e0d08de63fc",
+  "updated_at": "2026-10-29T16:39:43Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md",
+      "status": "modified",
+      "additions": 9,
+      "deletions": 0,
+      "patch": "diff --git a/docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md b/docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md\nnew file mode 100644\nindex 0000000..c6a1e2d\n--- /dev/null\n+++ b/docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md\n@@ -0,0 +1,9 @@\n+# 美咲ラウンジ縦画面プレビュー（2026-10-30）\n+\n+- **本番の既存ラウンジは変更しない。** 比較用の独立した試作ページを `public/lab/transparent-lounge-vertical/index.html` に作成。\n+- 表示パス: `/lab/transparent-lounge-vertical/`\n+- iPhoneの画面高（`100dvh`）を利用し、ソファの背景をクロップして全画面に表示。横長の元画像は引き伸ばさず縦構図にトリミングする。\n+- 24fps透過WebPは既存の `/lab/transparent-lounge/misaki_lounge_24fps.webp` を共用。21秒縦型MP4も既存パスを共用し、メディアの二重配置を避ける。\n+- 下部に左右切り替え、選択ボタンとドットを配置。スワイプ、動画再生、スキップ操作は既存から継承。\n+- 既存の会話・認証・DB・ホームルーティングには手を加えない。\n+- ユーザーのiPhoneで表示位置、ソファとの馴染み、画面上のボタン、オープニングへの切り替えを比較検証し、採否を判断する。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/002484b73898dfc1b312c3769801f178e6f50f64/docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md",
+      "source": {
+        "path": "docs/LOUNGE_PORTRAIT_PREVIEW_20261030.md",
+        "coverage": "全文",
+        "text": "# 美咲ラウンジ縦画面プレビュー（2026-10-30）\n\n- **本番の既存ラウンジは変更しない。** 比較用の独立した試作ページを `public/lab/transparent-lounge-vertical/index.html` に作成。\n- 表示パス: `/lab/transparent-lounge-vertical/`\n- iPhoneの画面高（`100dvh`）を利用し、ソファの背景をクロップして全画面に表示。横長の元画像は引き伸ばさず縦構図にトリミングする。\n- 24fps透過WebPは既存の `/lab/transparent-lounge/misaki_lounge_24fps.webp` を共用。21秒縦型MP4も既存パスを共用し、メディアの二重配置を避ける。\n- 下部に左右切り替え、選択ボタンとドットを配置。スワイプ、動画再生、スキップ操作は既存から継承。\n- 既存の会話・認証・DB・ホームルーティングには手を加えない。\n- ユーザーのiPhoneで表示位置、ソファとの馴染み、画面上のボタン、オープニングへの切り替えを比較検証し、採否を判断する。\n",
+        "sha256": "f9221d70dfd708934ae4062dd65304a0f532937768986d216c0aa6db5fc1f8bd"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge-vertical/index.html",
+      "status": "modified",
+      "additions": 30,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/002484b73898dfc1b312c3769801f178e6f50f64/public/lab/transparent-lounge-vertical/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge-vertical/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    }
+  ],
+  "file_count": 2,
+  "reported_file_count": 2,
+  "commits": [
+    {
+      "sha": "5c54d034d6b81970254304d0ebd01f1b3244712e",
+      "message": "feat(lounge): add isolated iPhone full-height portrait lounge preview\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/5c54d034d6b81970254304d0ebd01f1b3244712e"
+    },
+    {
+      "sha": "002484b73898dfc1b312c3769801f178e6f50f64",
+      "message": "docs(lounge): document isolated portrait preview and validation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/002484b73898dfc1b312c3769801f178e6f50f64"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "002484b73898dfc1b312c3769801f178e6f50f64",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40913581206",
+      "id": 40913581206,
+      "updated_at": "2026-10-29T16:39:17Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "美咲ラウンジ：縦画面いっぱいの比較用プレビューを追加",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/91"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "5e4f4478a54735cc02981adfb129b413df03fc71d53ebd88ad401e260b9b5a4f",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

@@ -1,0 +1,42 @@
+{
+  "id": "branch-136d018fe1cd5ebc",
+  "title": "feat/pr-review-handoff-queue-20261102",
+  "head": "4caa708bac259ad2293c7a33ab9442b6b41a9bbf",
+  "head_ref": "feat/pr-review-handoff-queue-20261102",
+  "linked_prs": [
+    136
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4caa708bac259ad2293c7a33ab9442b6b41a9bbf/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "scripts/pr_review_handoff.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4caa708bac259ad2293c7a33ab9442b6b41a9bbf/scripts/pr_review_handoff.py"
+    },
+    {
+      "path": "tests/test_pr_review_handoff.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4caa708bac259ad2293c7a33ab9442b6b41a9bbf/tests/test_pr_review_handoff.py"
+    }
+  ],
+  "commits": "4caa708bac259ad2293c7a33ab9442b6b41a9bbf Fail closed when inventory PR snapshot is missing\nf435a67d9e6c0a2c84feac505042be9fd5e6f08e Include open PR handoff queue in existing inventory artifact\nb3a54cc35c99c2465999a4dfd17b546ca69023d5 Add read-only open PR handoff report for project maintainer\n966b2e9bed51b1c4e5a4305c8ff6b8fb3a4bf226 Add read-only open PR handoff report for project maintainer",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "949db1002ef2dfd94d84359ecd40834ac27164dcb4ec12fa575cf5b313329cbb",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "branch-8317c1821e24026d",
+  "title": "fix/preserve-active-chat-history",
+  "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+  "head_ref": "fix/preserve-active-chat-history",
+  "linked_prs": [
+    17
+  ],
+  "files": [
+    {
+      "path": "app/chat/conversation-history-sync.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    }
+  ],
+  "commits": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08 Preserve newer local chat history during sync",
+  "topics": [
+    "記憶・会話",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "98287f2dbe861159e2ed997903a5c730c144b37ae71a769452e460c4b0bdc32e",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

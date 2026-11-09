@@ -1,0 +1,575 @@
+{
+  "id": "pr-1",
+  "number": 1,
+  "title": "匿名会話と記憶をメール確認前に同じユーザーへ保存する",
+  "topics": [
+    "記憶・会話",
+    "通知・配信",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／通知・メール配信とその運用に関する変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "匿名で会話してからメール保存し、確認リンクを新しいタブで開くと、認証確認前のセッションガードが端末履歴を消去し得ました。履歴同期もサーバー行が存在する場合は空履歴を端末へ上書きしていました。\n\n「メールで保存」の明示操作時に、確認メール送信より先に同じ匿名user_idへ会話・長期記憶をチェックポイント保存します。updateUser({email})による同一IDの正式化を維持し、端末の所有者を照合して別ユーザーのキャッシュを消去します。ガードは認証確認後にチャットをマウントし、同期中のユーザー切替や壊れたレスポンスからの上書きを防ぎます。新規RPCは認証された匿名本人だけが使え、再送でも履歴を重複追加しません。通常の匿名会話のサーバー非保存とログアウト時の両ストレージ消去は維持します。\n\n検証: クライアント/API回帰テスト11件、型チェック、コンパイル通過。Supabaseで再送・所有者分離・空履歴上書き防止・記憶のみ・空行からの保存・正式化後の同一ID復元・他ユーザーのRLS遮断を検証（テストはROLLBACK）。Migration 20260917051607_save_anonymous_conversation は対象Supabaseへ適用済みです。\n\n制約: ローカルの完全ビルドは端末の子プロセス起動制限（spawn EPERM）、workerThreadsでの回避時は静的ページ生成のDataCloneErrorで完了できませんでした。実メール送信を伴う認証E2Eは未実施です。プレビュービルドを確認してからマージしてください。",
+  "snapshot_head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+  "snapshot_consistent": true,
+  "head": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+  "base": "0ae531999ab7999ef6d8443b0001187522f4f7cb",
+  "base_ref": "main",
+  "head_ref": "fix/anonymous-email-history",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-17T05:26:43Z",
+  "merge_commit_sha": "7595c2d1d935354a1c9127bc529cb268788c8e9b",
+  "updated_at": "2026-09-17T05:26:43Z",
+  "code_facts": [
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (currentUser) bindDeviceUser(currentUser.id);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (active) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (session?.user) bindDeviceUser(session.user.id);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (sessionError) throw sessionError;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!session?.user.is_anonymous || session.user.id !== user?.id ||",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "HTTP要求",
+      "expression": "const saved = await fetch(\"/api/persona/history\", {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!saved.ok) throw new Error(\"会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/account/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx"
+    },
+    {
+      "file": "app/api/persona/history/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (body?.saveAnonymous === true) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts"
+    },
+    {
+      "file": "app/api/persona/history/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts"
+    },
+    {
+      "file": "app/api/persona/history/route.ts",
+      "kind": "DB・ストレージ操作の呼出し",
+      "expression": "const { data, error } = await auth.supabase.rpc(\"save_anonymous_conversation_state\", {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts"
+    },
+    {
+      "file": "app/api/persona/history/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (error) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "export default function AnonymousSessionGuard({ children }: { children: ReactNode }) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (error) throw error;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!user || (!hadBrowserSession && lastAuthKind === \"anonymous\" && user.is_anonymous && !pendingSave)) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (user) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (signOutError) throw signOutError;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!active) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (signInError) throw signInError;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!active) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (user) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!localStorage.getItem(DEVICE_USER_KEY) && !user.is_anonymous) clearMisakiDeviceData();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (active) setFailed(true);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/anonymous-session-guard.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!active || !initialized) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!state || typeof state.exists !== \"boolean\" || !Array.isArray(state.history) || !Array.isArray(state.memory)) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!serverState.exists && localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "export const DEVICE_USER_KEY = \"misaki-device-user-id\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "export const EMAIL_SAVE_USER_KEY = \"misaki-email-save-user-id\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function clearMisakiDeviceData() {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (key?.startsWith(\"misaki-\")) storage.removeItem(key);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function bindDeviceUser(userId: string) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (owner && owner !== userId) clearMisakiDeviceData();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function readDeviceArray(key: string): unknown[] {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!raw) return [];",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "lib/device-conversation.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!Array.isArray(value)) throw new Error(\"Invalid conversation cache.\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts"
+    },
+    {
+      "file": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "kind": "テストの期待値・条件",
+      "expression": "-- Explicit email-save checkpoint. A snapshot replaces itself; it is never a delta.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/supabase/migrations/20260917051607_save_anonymous_conversation.sql"
+    },
+    {
+      "file": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "kind": "関数・クラス定義",
+      "expression": "create or replace function public.save_anonymous_conversation_state(p_history jsonb, p_memory jsonb)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/supabase/migrations/20260917051607_save_anonymous_conversation.sql"
+    },
+    {
+      "file": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "kind": "関数・クラス定義",
+      "expression": "revoke all on function public.save_anonymous_conversation_state(jsonb,jsonb) from public, anon;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/supabase/migrations/20260917051607_save_anonymous_conversation.sql"
+    },
+    {
+      "file": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant execute on function public.save_anonymous_conversation_state(jsonb,jsonb) to authenticated;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/supabase/migrations/20260917051607_save_anonymous_conversation.sql"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "// Run: node --test tests/account-conversation.test.cjs",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "const { test } = require('node:test');",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "const assert = require('node:assert/strict');",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "関数・クラス定義",
+      "expression": "function storage(initial = {}) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "DB・ストレージ操作の呼出し",
+      "expression": "getItem: k => map.get(k) ?? null, setItem: (k, v) => map.set(k, String(v)), removeItem: k => map.delete(k) };",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "関数・クラス定義",
+      "expression": "async function flush() { for (let i = 0; i < 12; i++) await new Promise(setImmediate); }",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "関数・クラス定義",
+      "expression": "function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionInitial = {}) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!(i in states)) states[i] = value;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "条件分岐・閾値",
+      "expression": "}, useEffect: fn => { if (!mounted) effects.push(fn); }, useLayoutEffect: fn => { if (!mounted) effects.push(fn); } };",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "HTTP要求",
+      "expression": "console: { error() {} }, fetch: (...args) => h.fetch(...args),",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "関数・クラス定義",
+      "expression": "function load(file) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    },
+    {
+      "file": "tests/account-conversation.test.cjs",
+      "kind": "条件分岐・閾値",
+      "expression": "if (cache.has(file)) return cache.get(file);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/account/page.tsx",
+      "status": "modified",
+      "additions": 30,
+      "deletions": 12,
+      "patch": "diff --git a/app/account/page.tsx b/app/account/page.tsx\nindex aba9678..9082429 100644\n--- a/app/account/page.tsx\n+++ b/app/account/page.tsx\n@@ -3,6 +3,7 @@\n import { useEffect, useState, type CSSProperties } from \"react\";\n import type { User } from \"@supabase/supabase-js\";\n import { supabase } from \"../../lib/supabase\";\n+import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, readDeviceArray } from \"../../lib/device-conversation\";\n \n type Mode = \"save\" | \"login\";\n \n@@ -10,17 +11,6 @@ function normalizeEmail(value: string) {\n   return value.trim().toLowerCase();\n }\n \n-function clearMisakiDeviceData() {\n-  for (let i = localStorage.length - 1; i >= 0; i -= 1) {\n-    const key = localStorage.key(i);\n-    if (key?.startsWith(\"misaki-\")) localStorage.removeItem(key);\n-  }\n-  for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {\n-    const key = sessionStorage.key(i);\n-    if (key?.startsWith(\"misaki-\")) sessionStorage.removeItem(key);\n-  }\n-}\n-\n function isExistingAccountError(error: any) {\n   const text = `${error?.code ?? \"\"} ${error?.message ?? \"\"}`.toLowerCase();\n   return [\n@@ -79,6 +69,7 @@ export default function AccountPage() {\n         }\n \n         if (active) {\n+          if (currentUser) bindDeviceUser(currentUser.id);\n           setUser(currentUser);\n           setMode(currentUser && !currentUser.is_anonymous ? \"login\" : \"save\");\n         }\n@@ -92,7 +83,10 @@ export default function AccountPage() {\n \n     void load();\n     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {\n-      if (active) setUser(session?.user ?? null);\n+      if (active) {\n+        if (session?.user) bindDeviceUser(session.user.id);\n+        setUser(session?.user ?? null);\n+      }\n     });\n \n     return () => {\n@@ -109,6 +103,30 @@ export default function AccountPage() {\n     setWorking(true);\n     setMessage(\"\");\n     try {\n+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();\n+      if (sessionError) throw sessionError;\n+      const session = sessionData.session;\n+      if (!session?.user.is_anonymous || session.user.id !== user?.id ||\n+          localStorage.getItem(DEVICE_USER_KEY) !== session.user.id) {\n+        throw new Error(\"アカウント状態が変わりました。画面を開き直してください。\");\n+      }\n+      // Save before sending the link: confirmation may open in another tab/device.\n+      const saved = await fetch(\"/api/persona/history\", {\n+        method: \"POST\",\n+        headers: { \"Content-Type\": \"application/json\", Authorization: `Bearer ${session.access_token}` },\n+        body: JSON.stringify({\n+          saveAnonymous: true,\n+          expectedUserId: session.user.id,\n+          history: readDeviceArray(\"misaki-chat-history\"),\n+          memory: readDeviceArray(\"misaki-long-term-memory\"),\n+        }),\n+      });\n+      if (!saved.ok) throw new Error(\"会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。\");\n+      const { data: latest } = await supabase.auth.getSession();\n+      if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {\n+        throw new Error(\"アカウント状態が変わりました。画面を開き直してください。\");\n+      }\n+      localStorage.setItem(EMAIL_SAVE_USER_KEY, session.user.id);\n       const { error } = await supabase.auth.updateUser(\n         { email: nextEmail },\n         { emailRedirectTo: `${window.location.origin}/account` }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/account/page.tsx",
+      "source": {
+        "path": "app/account/page.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useEffect, useState, type CSSProperties } from \"react\";\nimport type { User } from \"@supabase/supabase-js\";\nimport { supabase } from \"../../lib/supabase\";\nimport { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY, readDeviceArray } from \"../../lib/device-conversation\";\n\ntype Mode = \"save\" | \"login\";\n\nfunction normalizeEmail(value: string) {\n  return value.trim().toLowerCase();\n}\n\nfunction isExistingAccountError(error: any) {\n  const text = `${error?.code ?? \"\"} ${error?.message ?? \"\"}`.toLowerCase();\n  return [\n    \"already registered\",\n    \"already exists\",\n    \"email exists\",\n    \"email_exists\",\n    \"email_conflict\",\n    \"identity_already_exists\",\n    \"already associated\",\n    \"already linked\",\n  ].some((value) => text.includes(value));\n}\n\nfunction authError(error: any) {\n  const text = `${error?.code ?? \"\"} ${error?.message ?? \"\"}`.toLowerCase();\n  if (text.includes(\"rate limit\") || error?.status === 429) {\n    return \"メール送信回数の上限に達しています。少し時間をおいてからもう一度お試しください。\";\n  }\n  if (text.includes(\"expired\")) return \"コードの有効期限が切れています。新しいメールを送り直してください。\";\n  if (text.includes(\"invalid otp\") || text.includes(\"invalid token\")) {\n    return \"ログインコードが正しくないか、すでに無効です。最新のメールを確認してください。\";\n  }\n  return typeof error?.message === \"string\"\n    ? error.message\n    : \"処理できませんでした。少し時間をおいてもう一度お試しください。\";\n}\n\nexport default function AccountPage() {\n  const [user, setUser] = useState<User | null>(null);\n  const [mode, setMode] = useState<Mode>(\"save\");\n  const [email, setEmail] = useState(\"\");\n  const [otp, setOtp] = useState(\"\");\n  const [otpSent, setOtpSent] = useState(false);\n  const [loading, setLoading] = useState(true);\n  const [working, setWorking] = useState(false);\n  const [message, setMessage] = useState(\"\");\n\n  const isAnonymous = user?.is_anonymous === true;\n  const isPermanent = Boolean(user && !user.is_anonymous);\n\n  useEffect(() => {\n    let active = true;\n\n    async function load() {\n      try {\n        const { data, error } = await supabase.auth.getSession();\n        if (error) throw error;\n        let currentUser = data.session?.user ?? null;\n\n        if (!currentUser) {\n          const { data: anonymous, error: anonymousError } =\n            await supabase.auth.signInAnonymously();\n          if (anonymousError) throw anonymousError;\n          currentUser = anonymous.user ?? null;\n        }\n\n        if (active) {\n          if (currentUser) bindDeviceUser(currentUser.id);\n          setUser(currentUser);\n          setMode(currentUser && !currentUser.is_anonymous ? \"login\" : \"save\");\n        }\n      } catch (error) {\n        console.error(\"ACCOUNT INIT ERROR:\", error);\n        if (active) setMessage(\"アカウント状態を確認できませんでした。\");\n      } finally {\n        if (active) setLoading(false);\n      }\n    }\n\n    void load();\n    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {\n      if (active) {\n        if (session?.user) bindDeviceUser(session.user.id);\n        setUser(session?.user ?? null);\n      }\n    });\n\n    return () => {\n      active = false;\n      listener.subscription.unsubscribe();\n    };\n  }, []);\n\n  async function saveByEmail() {\n    const nextEmail = normalizeEmail(email);\n    if (!nextEmail) return setMessage(\"メールアドレスを入力してください。\");\n    if (!isAnonymous) return setMessage(\"この美咲はすでに保存されています。\");\n\n    setWorking(true);\n    setMessage(\"\");\n    try {\n      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();\n      if (sessionError) throw sessionError;\n      const session = sessionData.session;\n      if (!session?.user.is_anonymous || session.user.id !== user?.id ||\n          localStorage.getItem(DEVICE_USER_KEY) !== session.user.id) {\n        throw new Error(\"アカウント状態が変わりました。画面を開き直してください。\");\n      }\n      // Save before sending the link: confirmation may open in another tab/device.\n      const saved = await fetch(\"/api/persona/history\", {\n        method: \"POST\",\n        headers: { \"Content-Type\": \"application/json\", Authorization: `Bearer ${session.access_token}` },\n        body: JSON.stringify({\n          saveAnonymous: true,\n          expectedUserId: session.user.id,\n          history: readDeviceArray(\"misaki-chat-history\"),\n          memory: readDeviceArray(\"misaki-long-term-memory\"),\n        }),\n      });\n      if (!saved.ok) throw new Error(\"会話・記憶を保存できませんでした。メールは送信していません。もう一度お試しください。\");\n      const { data: latest } = await supabase.auth.getSession();\n      if (latest.session?.user.id !== session.user.id || !latest.session.user.is_anonymous) {\n        throw new Error(\"アカウント状態が変わりました。画面を開き直してください。\");\n      }\n      localStorage.setItem(EMAIL_SAVE_USER_KEY, session.user.id);\n      const { error } = await supabase.auth.updateUser(\n        { email: nextEmail },\n        { emailRedirectTo: `${window.location.origin}/account` }\n      );\n      if (error) throw error;\n      setMessage(\n        \"確認メールを送りました。確認が完了すると、ここまでの会話・記憶をこのメールアドレスの美咲として保存します。\"\n      );\n    } catch (error: any) {\n      if (isExistingAccountError(error)) {\n        setMode(\"login\");\n        setMessage(\"このメールアドレスには保存済みの美咲があります。ログインしてください。\");\n      } else {\n        setMessage(authError(error));\n      }\n    } finally {\n      setWorking(false);\n    }\n  }\n\n  async function sendLoginOtp() {\n    const nextEmail = normalizeEmail(email);\n    if (!nextEmail) return setMessage(\"メールアドレスを入力してください。\");\n\n    setWorking(true);\n    setMessage(\"\");\n    setOtpSent(false);\n    try {\n      const { error } = await supabase.auth.signInWithOtp({\n        email: nextEmail,\n        options: {\n          shouldCreateUser: false,\n          emailRedirectTo: `${window.location.origin}/account`,\n        },\n      });\n      if (error) throw error;\n      setOtpSent(true);\n      setMessage(\"ログイン認証コードをメールに送りました。\");\n    } catch (error: any) {\n      setMessage(authError(error));\n    } finally {\n      setWorking(false);\n    }\n  }\n\n  async function verifyLoginOtp() {\n    const nextEmail = normalizeEmail(email);\n    const token = otp.replace(/\\D/g, \"\").slice(0, 6);\n    if (!nextEmail || token.length !== 6) {\n      return setMessage(\"メールアドレスと6桁のコードを確認してください。\");\n    }\n\n    setWorking(true);\n    setMessage(\"\");\n    try {\n      // 別の匿名美咲の一時データを、既存アカウントへ混ぜない。\n      clearMisakiDeviceData();\n      const { error } = await supabase.auth.verifyOtp({\n        email: nextEmail,\n        token,\n        type: \"email\",\n      });\n      if (error) throw error;\n      window.location.href = \"/chat\";\n    } catch (error: any) {\n      setMessage(authError(error));\n      setWorking(false);\n    }\n  }\n\n  async function signOut() {\n    setWorking(true);\n    setMessage(\"\");\n    try {\n      const { error } = await supabase.auth.signOut({ scope: \"local\" });\n      if (error) throw error;\n      clearMisakiDeviceData();\n      window.location.href = \"/chat\";\n    } catch (error: any) {\n      setMessage(authError(error));\n      setWorking(false);\n    }\n  }\n\n  if (loading) {\n    return <main style={styles.page}><section style={styles.card}>アカウントを確認しています…</section></main>;\n  }\n\n  return (\n    <main style={styles.page}>\n      <section style={styles.card}>\n        <div style={styles.eyebrow}>MISAKI ACCOUNT</div>\n        <h1 style={styles.title}>美咲を保存・ログイン</h1>\n        <p style={styles.lead}>\n          未ログイン中の美咲は一時利用です。メールで保存すると、ブラウザを閉じても会話や記憶を引き継げます。\n        </p>\n\n        <div style={styles.statusBox}>\n          <strong>現在の状態</strong>\n          <div style={{ marginTop: 6 }}>\n            {isPermanent\n              ? `${user?.email ?? \"保存済みアカウント\"} でログイン中`\n              : \"未ログイン・一時利用中\"}\n          </div>\n        </div>\n\n        {isPermanent ? (\n          <>\n            <a href=\"/chat\" style={styles.primaryLink}>美咲とのトークへ戻る</a>\n            <button type=\"button\" onClick={signOut} disabled={working} style={styles.secondaryButton}>\n              {working ? \"ログアウト中…\" : \"ログアウト\"}\n            </button>\n            <p style={styles.note}>ログアウトすると、この端末に残っている美咲の会話・記憶・キャッシュを消去します。保存済みデータは再ログインすれば戻ります。</p>\n          </>\n        ) : (\n          <>\n            <div style={styles.tabs}>\n              <button type=\"button\" onClick={() => { setMode(\"save\"); setMessage(\"\"); setOtpSent(false); }} style={{ ...styles.tabButton, ...(mode === \"save\" ? styles.tabActive : {}) }}>\n                メールで保存\n              </button>\n              <button type=\"button\" onClick={() => { setMode(\"login\"); setMessage(\"\"); setOtpSent(false); }} style={{ ...styles.tabButton, ...(mode === \"login\" ? styles.tabActive : {}) }}>\n                ログイン\n              </button>\n            </div>\n\n            <p style={styles.note}>\n              {mode === \"save\"\n                ? \"今の一時的な美咲を残したい場合は、メールアドレスで保存してください。\"\n                : \"すでに保存している美咲を呼び戻します。\"}\n            </p>\n\n            <label style={styles.label}>\n              メールアドレス\n              <input type=\"email\" inputMode=\"email\" autoComplete=\"email\" value={email} onChange={(e) => setEmail(e.target.value)} placeholder=\"you@example.com\" style={styles.input} />\n            </label>\n\n            {mode === \"save\" ? (\n              <button type=\"button\" disabled={working} onClick={saveByEmail} style={styles.primaryButton}>\n                {working ? \"送信中…\" : \"メールで保存する\"}\n              </button>\n            ) : (\n              <>\n                <button type=\"button\" disabled={working} onClick={sendLoginOtp} style={styles.primaryButton}>\n                  {working ? \"送信中…\" : \"ログインメールを送る\"}\n                </button>\n                {otpSent ? (\n                  <div style={{ marginTop: 18 }}>\n                    <label style={styles.label}>\n                      6桁のログイン認証コード\n                      <input type=\"text\" inputMode=\"numeric\" autoComplete=\"one-time-code\" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\\D/g, \"\").slice(0, 6))} placeholder=\"123456\" style={{ ...styles.input, letterSpacing: 6, fontSize: 22, textAlign: \"center\" }} />\n                    </label>\n                    <button type=\"button\" disabled={working || otp.length !== 6} onClick={verifyLoginOtp} style={styles.primaryButton}>このコードでログイン</button>\n                  </div>\n                ) : null}\n              </>\n            )}\n          </>\n        )}\n\n        {message ? <div style={styles.message}>{message}</div> : null}\n        <div style={styles.footerLinks}><a href=\"/chat\" style={styles.textLink}>トークに戻る</a></div>\n      </section>\n    </main>\n  );\n}\n\nconst styles: Record<string, CSSProperties> = {\n  page: { minHeight: \"100vh\", padding: \"32px 16px\", background: \"linear-gradient(180deg, #fff8f6 0%, #f8efec 100%)\", color: \"#392d29\", fontFamily: '-apple-system, BlinkMacSystemFont, \"Hiragino Sans\", \"Yu Gothic\", sans-serif' },\n  card: { maxWidth: 560, margin: \"0 auto\", padding: \"28px 22px\", background: \"rgba(255,255,255,0.92)\", borderRadius: 24, boxShadow: \"0 16px 50px rgba(82, 51, 42, 0.10)\" },\n  eyebrow: { fontSize: 12, fontWeight: 800, letterSpacing: 2, color: \"#a56d5f\" },\n  title: { margin: \"8px 0 10px\", fontSize: 28, lineHeight: 1.35 },\n  lead: { margin: 0, color: \"#6c5c57\", lineHeight: 1.8 },\n  statusBox: { marginTop: 22, padding: \"14px 16px\", borderRadius: 16, background: \"#f7f0ed\", lineHeight: 1.7 },\n  tabs: { display: \"grid\", gridTemplateColumns: \"1fr 1fr\", gap: 8, marginTop: 22, padding: 5, borderRadius: 16, background: \"#f3ebe8\" },\n  tabButton: { border: 0, borderRadius: 12, padding: \"11px 8px\", background: \"transparent\", color: \"#735d56\", fontWeight: 700, cursor: \"pointer\" },\n  tabActive: { background: \"#ffffff\", color: \"#4b3731\", boxShadow: \"0 4px 14px rgba(65, 43, 35, 0.08)\" },\n  note: { margin: \"18px 0\", color: \"#6c5c57\", lineHeight: 1.8, fontSize: 14 },\n  label: { display: \"block\", fontSize: 14, fontWeight: 700 },\n  input: { boxSizing: \"border-box\", width: \"100%\", marginTop: 8, padding: \"13px 14px\", border: \"1px solid #ddcfca\", borderRadius: 13, background: \"#fff\", color: \"#332824\", outline: \"none\" },\n  primaryButton: { width: \"100%\", marginTop: 14, padding: \"14px 16px\", border: 0, borderRadius: 14, background: \"#7a4d43\", color: \"#fff\", fontWeight: 800, cursor: \"pointer\" },\n  primaryLink: { display: \"block\", marginTop: 18, padding: \"14px 16px\", borderRadius: 14, background: \"#7a4d43\", color: \"#fff\", textDecoration: \"none\", textAlign: \"center\", fontWeight: 800 },\n  secondaryButton: { width: \"100%\", marginTop: 10, padding: \"12px 16px\", border: \"1px solid #ddcfca\", borderRadius: 14, background: \"#fff\", color: \"#5d4841\", fontWeight: 700, cursor: \"pointer\" },\n  message: { marginTop: 18, padding: \"13px 14px\", borderRadius: 14, background: \"#fff2df\", color: \"#6d4d22\", lineHeight: 1.7, fontSize: 14 },\n  footerLinks: { display: \"flex\", justifyContent: \"center\", marginTop: 24 },\n  textLink: { color: \"#87665d\", fontSize: 14 },\n};\n",
+        "sha256": "a8efcd54dc3ee7b9f309e048910c803aa6b1dd7cfd850c1165b6f6b7383b604c"
+      }
+    },
+    {
+      "path": "app/api/persona/history/route.ts",
+      "status": "modified",
+      "additions": 18,
+      "deletions": 2,
+      "patch": "diff --git a/app/api/persona/history/route.ts b/app/api/persona/history/route.ts\nindex 8676edb..f2b35fa 100644\n--- a/app/api/persona/history/route.ts\n+++ b/app/api/persona/history/route.ts\n@@ -80,7 +80,8 @@ async function getAuthenticatedClient(request: Request) {\n \n   return {\n     supabase,\n-    userId: data.user.id,\n+    userId: data.user.id,\n+    isAnonymous: data.user.is_anonymous === true,\n   };\n }\n \n@@ -145,7 +146,22 @@ export async function POST(request: Request) {\n       body ?? {},\n       \"memory\"\n     );\n-    const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;\n+    const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;\n+\n+    if (body?.saveAnonymous === true) {\n+      if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {\n+        return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 });\n+      }\n+      const { data, error } = await auth.supabase.rpc(\"save_anonymous_conversation_state\", {\n+        p_history: history,\n+        p_memory: memory ?? [],\n+      });\n+      if (error) {\n+        console.error(\"ANONYMOUS CONVERSATION SAVE ERROR:\", error);\n+        return Response.json({ error: \"Conversation could not be saved.\" }, { status: 500 });\n+      }\n+      return Response.json({ synced: true, result: data });\n+    }\n \n     if (history.length === 0) {\n       return Response.json(\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts",
+      "source": {
+        "path": "app/api/persona/history/route.ts",
+        "coverage": "全文",
+        "text": "import { createClient } from \"@supabase/supabase-js\";\n\nconst SUPABASE_URL = \"https://tzozajnwznxqgxnjikoy.supabase.co\";\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\n\ntype ChatMessage = {\n  role: \"user\" | \"misaki\";\n  text: string;\n  sentAt?: string;\n};\n\nfunction createAuthenticatedSupabase(accessToken: string) {\n  return createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {\n    global: {\n      headers: {\n        Authorization: `Bearer ${accessToken}`,\n      },\n    },\n    auth: {\n      persistSession: false,\n      autoRefreshToken: false,\n      detectSessionInUrl: false,\n    },\n  });\n}\n\nfunction getBearerToken(request: Request) {\n  const authorization = request.headers.get(\"authorization\") ?? \"\";\n  if (!authorization.startsWith(\"Bearer \")) return null;\n  const token = authorization.slice(\"Bearer \".length).trim();\n  return token || null;\n}\n\nfunction sanitizeHistory(value: unknown): ChatMessage[] {\n  if (!Array.isArray(value)) return [];\n\n  return value\n    .filter(\n      (item: any) =>\n        item &&\n        (item.role === \"user\" || item.role === \"misaki\") &&\n        typeof item.text === \"string\" &&\n        item.text.trim()\n    )\n    .map((item: any) => ({\n      role: item.role as \"user\" | \"misaki\",\n      text: item.text.trim().slice(0, 2000),\n      ...(typeof item.sentAt === \"string\" && Number.isFinite(Date.parse(item.sentAt))\n        ? { sentAt: new Date(item.sentAt).toISOString() }\n        : {}),\n    }))\n    .slice(-60);\n}\n\nfunction sanitizeMemory(value: unknown): string[] {\n  if (!Array.isArray(value)) return [];\n\n  return value\n    .filter(\n      (item: unknown): item is string =>\n        typeof item === \"string\" && item.trim().length > 0\n    )\n    .map((item) => item.trim().slice(0, 500))\n    .slice(-30);\n}\n\nasync function getAuthenticatedClient(request: Request) {\n  const accessToken = getBearerToken(request);\n  if (!accessToken) {\n    return { error: \"Authentication required.\" as const };\n  }\n\n  const supabase = createAuthenticatedSupabase(accessToken);\n  const { data, error } = await supabase.auth.getUser(accessToken);\n\n  if (error || !data.user) {\n    return { error: \"Authentication required.\" as const };\n  }\n\n  return {\n    supabase,\n    userId: data.user.id,\n    isAnonymous: data.user.is_anonymous === true,\n  };\n}\n\nexport async function GET(request: Request) {\n  try {\n    const auth = await getAuthenticatedClient(request);\n    if (\"error\" in auth) {\n      return Response.json({ error: auth.error }, { status: 401 });\n    }\n\n    const { data, error } = await auth.supabase\n      .from(\"misaki_user_conversation_state\")\n      .select(\"history,memory,message_count,user_message_count,updated_at\")\n      .eq(\"user_id\", auth.userId)\n      .maybeSingle();\n\n    if (error) {\n      console.error(\"CONVERSATION STATE GET ERROR:\", error);\n      return Response.json(\n        { error: \"Conversation state could not be loaded.\" },\n        { status: 500 }\n      );\n    }\n\n    const history = sanitizeHistory(data?.history);\n    const memory = sanitizeMemory(data?.memory);\n\n    return Response.json({\n      exists: Boolean(data),\n      history,\n      memory,\n      messageCount:\n        typeof data?.message_count === \"number\"\n          ? data.message_count\n          : history.length,\n      userMessageCount:\n        typeof data?.user_message_count === \"number\"\n          ? data.user_message_count\n          : history.filter((item) => item.role === \"user\").length,\n      memoryCount: memory.length,\n      updatedAt: data?.updated_at ?? null,\n    });\n  } catch (error) {\n    console.error(\"CONVERSATION STATE GET ROUTE ERROR:\", error);\n    return Response.json(\n      { error: \"Conversation state could not be loaded.\" },\n      { status: 500 }\n    );\n  }\n}\n\nexport async function POST(request: Request) {\n  try {\n    const auth = await getAuthenticatedClient(request);\n    if (\"error\" in auth) {\n      return Response.json({ error: auth.error }, { status: 401 });\n    }\n\n    const body = await request.json();\n    const history = sanitizeHistory(body?.history);\n    const memoryWasProvided = Object.prototype.hasOwnProperty.call(\n      body ?? {},\n      \"memory\"\n    );\n    const memory = memoryWasProvided ? sanitizeMemory(body?.memory) : null;\n\n    if (body?.saveAnonymous === true) {\n      if (!auth.isAnonymous || body.expectedUserId !== auth.userId) {\n        return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 });\n      }\n      const { data, error } = await auth.supabase.rpc(\"save_anonymous_conversation_state\", {\n        p_history: history,\n        p_memory: memory ?? [],\n      });\n      if (error) {\n        console.error(\"ANONYMOUS CONVERSATION SAVE ERROR:\", error);\n        return Response.json({ error: \"Conversation could not be saved.\" }, { status: 500 });\n      }\n      return Response.json({ synced: true, result: data });\n    }\n\n    if (history.length === 0) {\n      return Response.json(\n        { error: \"Conversation history is empty.\" },\n        { status: 400 }\n      );\n    }\n\n    const { data, error } = await auth.supabase.rpc(\n      \"sync_user_conversation_state\",\n      {\n        p_history: history,\n        p_memory: memory,\n      }\n    );\n\n    if (error) {\n      console.error(\"CONVERSATION STATE SYNC RPC ERROR:\", error);\n      return Response.json(\n        { error: \"Conversation history could not be synchronized.\" },\n        { status: 500 }\n      );\n    }\n\n    return Response.json({\n      synced: true,\n      result: data,\n    });\n  } catch (error) {\n    console.error(\"CONVERSATION STATE POST ROUTE ERROR:\", error);\n    return Response.json(\n      { error: \"Conversation history could not be synchronized.\" },\n      { status: 500 }\n    );\n  }\n}\n",
+        "sha256": "63f40c26027dc4b65e49a7e002a1c3451797621a4ce545c60c1655b99c7c4e23"
+      }
+    },
+    {
+      "path": "app/chat/anonymous-session-guard.tsx",
+      "status": "modified",
+      "additions": 50,
+      "deletions": 53,
+      "patch": "diff --git a/app/chat/anonymous-session-guard.tsx b/app/chat/anonymous-session-guard.tsx\nindex f3086b3..22b105a 100644\n--- a/app/chat/anonymous-session-guard.tsx\n+++ b/app/chat/anonymous-session-guard.tsx\n@@ -1,75 +1,71 @@\n \"use client\";\n \n-import { useLayoutEffect } from \"react\";\n+import { useLayoutEffect, useState, type ReactNode } from \"react\";\n import { supabase } from \"../../lib/supabase\";\n+import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from \"../../lib/device-conversation\";\n \n const AUTH_KIND_KEY = \"misaki-auth-kind\";\n const BROWSER_SESSION_KEY = \"misaki-browser-session\";\n \n-function clearMisakiLocalData() {\n-  for (let i = localStorage.length - 1; i >= 0; i -= 1) {\n-    const key = localStorage.key(i);\n-    if (key?.startsWith(\"misaki-\") && key !== AUTH_KIND_KEY) {\n-      localStorage.removeItem(key);\n-    }\n-  }\n-\n-  for (let i = sessionStorage.length - 1; i >= 0; i -= 1) {\n-    const key = sessionStorage.key(i);\n-    if (key?.startsWith(\"misaki-\")) {\n-      sessionStorage.removeItem(key);\n-    }\n-  }\n-}\n-\n-export default function AnonymousSessionGuard() {\n+export default function AnonymousSessionGuard({ children }: { children: ReactNode }) {\n+  const [ready, setReady] = useState(false);\n+  const [failed, setFailed] = useState(false);\n   useLayoutEffect(() => {\n     let active = true;\n-\n-    const hadBrowserSession = sessionStorage.getItem(BROWSER_SESSION_KEY) === \"1\";\n-    const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);\n-\n-    // 前回が匿名利用で、ブラウザセッションが終了している場合は\n-    // 匿名会話・記憶・進化キャッシュを新しいセッションへ持ち越さない。\n-    if (!hadBrowserSession && lastAuthKind === \"anonymous\") {\n-      clearMisakiLocalData();\n-      localStorage.removeItem(AUTH_KIND_KEY);\n-    }\n-\n-    sessionStorage.setItem(BROWSER_SESSION_KEY, \"1\");\n+    let initialized = false;\n \n     async function reconcileAuth() {\n-      const { data } = await supabase.auth.getSession();\n-      if (!active) return;\n-\n-      const user = data.session?.user ?? null;\n-\n-      // Supabase の匿名セッション自体は localStorage に残るため、\n-      // ブラウザを閉じた後の新規セッションでは匿名認証も作り直す。\n-      if (!hadBrowserSession && lastAuthKind === \"anonymous\" && user?.is_anonymous) {\n-        await supabase.auth.signOut({ scope: \"local\" });\n+      try {\n+        const hadBrowserSession = sessionStorage.getItem(BROWSER_SESSION_KEY) === \"1\";\n+        const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);\n+        const { data, error } = await supabase.auth.getSession();\n+        if (error) throw error;\n         if (!active) return;\n-        const { data: anonymousData } = await supabase.auth.signInAnonymously();\n-        if (!active) return;\n-        if (anonymousData.user) {\n-          localStorage.setItem(AUTH_KIND_KEY, \"anonymous\");\n+        let user = data.session?.user ?? null;\n+        const pendingSave = user && localStorage.getItem(EMAIL_SAVE_USER_KEY) === user.id;\n+\n+        // Supabase の匿名セッション自体は localStorage に残るため、\n+        // ブラウザを閉じた後の新規セッションでは匿名認証も作り直す。\n+        if (!user || (!hadBrowserSession && lastAuthKind === \"anonymous\" && user.is_anonymous && !pendingSave)) {\n+          clearMisakiDeviceData();\n+          if (user) {\n+            const { error: signOutError } = await supabase.auth.signOut({ scope: \"local\" });\n+            if (signOutError) throw signOutError;\n+          }\n+          if (!active) return;\n+          const { data: anonymousData, error: signInError } = await supabase.auth.signInAnonymously();\n+          if (signInError) throw signInError;\n+          if (!active) return;\n+          user = anonymousData.user;\n         }\n-        return;\n-      }\n \n-      if (user) {\n-        localStorage.setItem(\n-          AUTH_KIND_KEY,\n-          user.is_anonymous ? \"anonymous\" : \"permanent\"\n-        );\n+        if (user) {\n+          if (!localStorage.getItem(DEVICE_USER_KEY) && !user.is_anonymous) clearMisakiDeviceData();\n+          bindDeviceUser(user.id);\n+          localStorage.setItem(\n+            AUTH_KIND_KEY,\n+            user.is_anonymous ? \"anonymous\" : \"permanent\"\n+          );\n+          sessionStorage.setItem(BROWSER_SESSION_KEY, \"1\");\n+          initialized = true;\n+          setReady(true);\n+        }\n+      } catch (error) {\n+        console.error(\"ANONYMOUS SESSION GUARD ERROR:\", error);\n+        if (active) setFailed(true);\n       }\n     }\n \n     void reconcileAuth();\n \n-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {\n-      if (!active) return;\n+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {\n+      if (!active || !initialized) return;\n       const user = session?.user;\n+      if (event === \"SIGNED_OUT\" || (user && localStorage.getItem(DEVICE_USER_KEY) !== user.id)) {\n+        clearMisakiDeviceData();\n+        window.location.reload();\n+        return;\n+      }\n       if (user) {\n         localStorage.setItem(\n           AUTH_KIND_KEY,\n@@ -84,5 +80,6 @@ export default function AnonymousSessionGuard() {\n     };\n   }, []);\n \n-  return null;\n+  if (!ready) return <main>{failed ? \"アカウントを確認できませんでした。画面を再読み込みしてください。\" : \"アカウントを確認しています…\"}</main>;\n+  return <>{children}</>;\n }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/anonymous-session-guard.tsx",
+      "source": {
+        "path": "app/chat/anonymous-session-guard.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useLayoutEffect, useState, type ReactNode } from \"react\";\nimport { supabase } from \"../../lib/supabase\";\nimport { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from \"../../lib/device-conversation\";\n\nconst AUTH_KIND_KEY = \"misaki-auth-kind\";\nconst BROWSER_SESSION_KEY = \"misaki-browser-session\";\n\nexport default function AnonymousSessionGuard({ children }: { children: ReactNode }) {\n  const [ready, setReady] = useState(false);\n  const [failed, setFailed] = useState(false);\n  useLayoutEffect(() => {\n    let active = true;\n    let initialized = false;\n\n    async function reconcileAuth() {\n      try {\n        const hadBrowserSession = sessionStorage.getItem(BROWSER_SESSION_KEY) === \"1\";\n        const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);\n        const { data, error } = await supabase.auth.getSession();\n        if (error) throw error;\n        if (!active) return;\n        let user = data.session?.user ?? null;\n        const pendingSave = user && localStorage.getItem(EMAIL_SAVE_USER_KEY) === user.id;\n\n        // Supabase の匿名セッション自体は localStorage に残るため、\n        // ブラウザを閉じた後の新規セッションでは匿名認証も作り直す。\n        if (!user || (!hadBrowserSession && lastAuthKind === \"anonymous\" && user.is_anonymous && !pendingSave)) {\n          clearMisakiDeviceData();\n          if (user) {\n            const { error: signOutError } = await supabase.auth.signOut({ scope: \"local\" });\n            if (signOutError) throw signOutError;\n          }\n          if (!active) return;\n          const { data: anonymousData, error: signInError } = await supabase.auth.signInAnonymously();\n          if (signInError) throw signInError;\n          if (!active) return;\n          user = anonymousData.user;\n        }\n\n        if (user) {\n          if (!localStorage.getItem(DEVICE_USER_KEY) && !user.is_anonymous) clearMisakiDeviceData();\n          bindDeviceUser(user.id);\n          localStorage.setItem(\n            AUTH_KIND_KEY,\n            user.is_anonymous ? \"anonymous\" : \"permanent\"\n          );\n          sessionStorage.setItem(BROWSER_SESSION_KEY, \"1\");\n          initialized = true;\n          setReady(true);\n        }\n      } catch (error) {\n        console.error(\"ANONYMOUS SESSION GUARD ERROR:\", error);\n        if (active) setFailed(true);\n      }\n    }\n\n    void reconcileAuth();\n\n    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {\n      if (!active || !initialized) return;\n      const user = session?.user;\n      if (event === \"SIGNED_OUT\" || (user && localStorage.getItem(DEVICE_USER_KEY) !== user.id)) {\n        clearMisakiDeviceData();\n        window.location.reload();\n        return;\n      }\n      if (user) {\n        localStorage.setItem(\n          AUTH_KIND_KEY,\n          user.is_anonymous ? \"anonymous\" : \"permanent\"\n        );\n      }\n    });\n\n    return () => {\n      active = false;\n      listener.subscription.unsubscribe();\n    };\n  }, []);\n\n  if (!ready) return <main>{failed ? \"アカウントを確認できませんでした。画面を再読み込みしてください。\" : \"アカウントを確認しています…\"}</main>;\n  return <>{children}</>;\n}\n",
+        "sha256": "88c515a406bc35190f2791cb222f59ffc4f83393569e2dc5a88ee12302912eb8"
+      }
+    },
+    {
+      "path": "app/chat/conversation-history-sync.tsx",
+      "status": "modified",
+      "additions": 21,
+      "deletions": 20,
+      "patch": "diff --git a/app/chat/conversation-history-sync.tsx b/app/chat/conversation-history-sync.tsx\nindex dc69b43..879d659 100644\n--- a/app/chat/conversation-history-sync.tsx\n+++ b/app/chat/conversation-history-sync.tsx\n@@ -2,6 +2,7 @@\n \n import { useEffect } from \"react\";\n import { supabase } from \"../../lib/supabase\";\n+import { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from \"../../lib/device-conversation\";\n \n const CHAT_HISTORY_KEY = \"misaki-chat-history\";\n const LONG_MEMORY_KEY = \"misaki-long-term-memory\";\n@@ -74,7 +75,11 @@ async function fetchServerState(token: string): Promise<ServerState> {\n     cache: \"no-store\",\n   });\n   if (!response.ok) throw new Error(\"Conversation state load failed.\");\n-  return (await response.json().catch(() => null)) ?? {};\n+  const state = await response.json();\n+  if (!state || typeof state.exists !== \"boolean\" || !Array.isArray(state.history) || !Array.isArray(state.memory)) {\n+    throw new Error(\"Invalid conversation state response.\");\n+  }\n+  return state;\n }\n \n export default function ConversationHistorySync() {\n@@ -97,30 +102,25 @@ export default function ConversationHistorySync() {\n         if (!session?.access_token || !session.user || session.user.is_anonymous) {\n           return;\n         }\n+        const userId = session.user.id;\n+        if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n \n         const localHistory = sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY));\n         const localMemory = sanitizeMemory(readJsonArray(LONG_MEMORY_KEY));\n-        let serverState = await fetchServerState(session.access_token);\n-\n-        // 匿名で話していた美咲をメール保存した直後だけ、\n-        // その時点の一時会話・記憶を保存済みアカウントへ初回登録する。\n-        if (!serverState.exists && (localHistory.length > 0 || localMemory.length > 0)) {\n-          const bootstrap = await fetch(\"/api/persona/history\", {\n-            method: \"POST\",\n-            headers: {\n-              \"Content-Type\": \"application/json\",\n-              Authorization: `Bearer ${session.access_token}`,\n-            },\n-            body: JSON.stringify({\n-              history: localHistory,\n-              memory: localMemory,\n-            }),\n-          });\n-\n-          if (!bootstrap.ok) throw new Error(\"Initial conversation sync failed.\");\n-          serverState = await fetchServerState(session.access_token);\n+        const serverState = await fetchServerState(session.access_token);\n+        if (!serverState.exists && localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n+          throw new Error(\"Saved conversation state is missing.\");\n         }\n \n+        // Email save already persisted the snapshot before sending confirmation.\n+        // Never bootstrap a signed-in account from unqualified device caches.\n+        const { data: latest } = await supabase.auth.getSession();\n+        if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||\n+            localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n+        // A chat response may have arrived while the server request was in flight.\n+        if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||\n+            !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;\n+\n         const serverHistory = sanitizeHistory(serverState.history);\n         const serverMemory = sanitizeMemory(serverState.memory);\n         const historyChanged = !arraysEqual(localHistory, serverHistory);\n@@ -128,6 +128,7 @@ export default function ConversationHistorySync() {\n \n         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));\n         localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));\n+        if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n \n         if ((historyChanged || memoryChanged) && !stopped) {\n           window.location.reload();\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/conversation-history-sync.tsx",
+      "source": {
+        "path": "app/chat/conversation-history-sync.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useEffect } from \"react\";\nimport { supabase } from \"../../lib/supabase\";\nimport { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from \"../../lib/device-conversation\";\n\nconst CHAT_HISTORY_KEY = \"misaki-chat-history\";\nconst LONG_MEMORY_KEY = \"misaki-long-term-memory\";\nconst SYNC_INTERVAL_MS = 5_000;\n\ntype ChatMessage = {\n  role: \"user\" | \"misaki\";\n  text: string;\n  sentAt?: string;\n};\n\ntype ServerState = {\n  exists?: boolean;\n  history?: unknown;\n  memory?: unknown;\n};\n\nfunction readJsonArray(key: string): unknown[] {\n  try {\n    const raw = localStorage.getItem(key);\n    if (!raw) return [];\n    const parsed = JSON.parse(raw);\n    return Array.isArray(parsed) ? parsed : [];\n  } catch {\n    return [];\n  }\n}\n\nfunction sanitizeHistory(value: unknown): ChatMessage[] {\n  if (!Array.isArray(value)) return [];\n  return value\n    .filter(\n      (item): item is ChatMessage =>\n        Boolean(\n          item &&\n            typeof item === \"object\" &&\n            ((item as ChatMessage).role === \"user\" ||\n              (item as ChatMessage).role === \"misaki\") &&\n            typeof (item as ChatMessage).text === \"string\" &&\n            (item as ChatMessage).text.trim()\n        )\n    )\n    .map((item) => ({\n      role: item.role,\n      text: item.text.trim().slice(0, 2000),\n      ...(typeof item.sentAt === \"string\" &&\n      Number.isFinite(new Date(item.sentAt).getTime())\n        ? { sentAt: new Date(item.sentAt).toISOString() }\n        : {}),\n    }))\n    .slice(-60);\n}\n\nfunction sanitizeMemory(value: unknown): string[] {\n  if (!Array.isArray(value)) return [];\n  return value\n    .filter((item): item is string => typeof item === \"string\")\n    .map((item) => item.trim().slice(0, 500))\n    .filter(Boolean)\n    .slice(-30);\n}\n\nfunction arraysEqual(a: unknown[], b: unknown[]) {\n  return JSON.stringify(a) === JSON.stringify(b);\n}\n\nasync function fetchServerState(token: string): Promise<ServerState> {\n  const response = await fetch(\"/api/persona/history\", {\n    headers: { Authorization: `Bearer ${token}` },\n    cache: \"no-store\",\n  });\n  if (!response.ok) throw new Error(\"Conversation state load failed.\");\n  const state = await response.json();\n  if (!state || typeof state.exists !== \"boolean\" || !Array.isArray(state.history) || !Array.isArray(state.memory)) {\n    throw new Error(\"Invalid conversation state response.\");\n  }\n  return state;\n}\n\nexport default function ConversationHistorySync() {\n  useEffect(() => {\n    let stopped = false;\n    let syncing = false;\n\n    const sync = async () => {\n      if (stopped || syncing) return;\n      syncing = true;\n\n      try {\n        const { data, error } = await supabase.auth.getSession();\n        if (error) throw error;\n\n        const session = data.session;\n\n        // 匿名利用中は会話・記憶をSupabaseへ永続化しない。\n        // ブラウザ内の一時データだけで会話を続ける。\n        if (!session?.access_token || !session.user || session.user.is_anonymous) {\n          return;\n        }\n        const userId = session.user.id;\n        if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n\n        const localHistory = sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY));\n        const localMemory = sanitizeMemory(readJsonArray(LONG_MEMORY_KEY));\n        const serverState = await fetchServerState(session.access_token);\n        if (!serverState.exists && localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n          throw new Error(\"Saved conversation state is missing.\");\n        }\n\n        // Email save already persisted the snapshot before sending confirmation.\n        // Never bootstrap a signed-in account from unqualified device caches.\n        const { data: latest } = await supabase.auth.getSession();\n        if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||\n            localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n        // A chat response may have arrived while the server request was in flight.\n        if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||\n            !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;\n\n        const serverHistory = sanitizeHistory(serverState.history);\n        const serverMemory = sanitizeMemory(serverState.memory);\n        const historyChanged = !arraysEqual(localHistory, serverHistory);\n        const memoryChanged = !arraysEqual(localMemory, serverMemory);\n\n        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));\n        localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));\n        if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n\n        if ((historyChanged || memoryChanged) && !stopped) {\n          window.location.reload();\n        }\n      } catch (error) {\n        console.error(\"CONVERSATION HISTORY SYNC ERROR:\", error);\n      } finally {\n        syncing = false;\n      }\n    };\n\n    void sync();\n    const intervalId = window.setInterval(() => void sync(), SYNC_INTERVAL_MS);\n    const handleVisibility = () => {\n      if (document.visibilityState === \"visible\") void sync();\n    };\n\n    window.addEventListener(\"focus\", sync);\n    document.addEventListener(\"visibilitychange\", handleVisibility);\n\n    const { data: authListener } = supabase.auth.onAuthStateChange(() => {\n      window.setTimeout(() => void sync(), 100);\n    });\n\n    return () => {\n      stopped = true;\n      window.clearInterval(intervalId);\n      window.removeEventListener(\"focus\", sync);\n      document.removeEventListener(\"visibilitychange\", handleVisibility);\n      authListener.subscription.unsubscribe();\n    };\n  }, []);\n\n  return null;\n}\n",
+        "sha256": "ac6e664b89da4ee1b014d9f250e7b9e81b55e2d0de5a9154a4c0c99c75c32dc7"
+      }
+    },
+    {
+      "path": "app/chat/layout.tsx",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 3,
+      "patch": "diff --git a/app/chat/layout.tsx b/app/chat/layout.tsx\nindex 5bdf85a..36f7f42 100644\n--- a/app/chat/layout.tsx\n+++ b/app/chat/layout.tsx\n@@ -9,8 +9,7 @@ import FloatingMenuButton from \"./floating-menu-button\";\n \n export default function ChatLayout({ children }: { children: ReactNode }) {\n   return (\n-    <>\n-      <AnonymousSessionGuard />\n+    <AnonymousSessionGuard>\n       <ConversationHistorySync />\n       <AccountMenuLink />\n       <ProactivePhotoDisplay />\n@@ -113,6 +112,6 @@ export default function ChatLayout({ children }: { children: ReactNode }) {\n       `}</style>\n \n       {children}\n-    </>\n+    </AnonymousSessionGuard>\n   );\n }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/chat/layout.tsx",
+      "source": {
+        "path": "app/chat/layout.tsx",
+        "coverage": "全文",
+        "text": "import type { ReactNode } from \"react\";\nimport AnonymousSessionGuard from \"./anonymous-session-guard\";\nimport ConversationHistorySync from \"./conversation-history-sync\";\nimport AccountMenuLink from \"./account-menu-link\";\nimport ProactivePhotoDisplay from \"./proactive-photo-display\";\nimport ChatTimestampDisplay from \"./chat-timestamp-display\";\nimport InitialChatScroll from \"./initial-chat-scroll\";\nimport FloatingMenuButton from \"./floating-menu-button\";\n\nexport default function ChatLayout({ children }: { children: ReactNode }) {\n  return (\n    <AnonymousSessionGuard>\n      <ConversationHistorySync />\n      <AccountMenuLink />\n      <ProactivePhotoDisplay />\n      <ChatTimestampDisplay />\n      <InitialChatScroll />\n      <FloatingMenuButton />\n\n      <style>{`\n        .shell .chat [data-misaki-proactive-photo=\"true\"] {\n          margin-left: 45px !important;\n        }\n\n        @media (display-mode: browser) {\n          .shell .chat {\n            padding-bottom: 106px !important;\n          }\n        }\n\n        @media (display-mode: standalone) {\n          .shell .chat {\n            padding-bottom: 126px !important;\n          }\n        }\n\n        /*\n          iOS Safari/WebKit treats fixed descendants of a backdrop-filtered\n          ancestor as if they were fixed to that ancestor. The menu lives\n          inside the sticky header, so remove containing-block effects here\n          and let the menu/backdrop anchor to the viewport.\n        */\n        .shell .misakiChatHeader {\n          backdrop-filter: none !important;\n          -webkit-backdrop-filter: none !important;\n          filter: none !important;\n          transform: none !important;\n          perspective: none !important;\n          contain: none !important;\n        }\n\n        .shell .misakiMenu {\n          position: fixed !important;\n          top: calc(64px + env(safe-area-inset-top)) !important;\n          right: 12px !important;\n          z-index: 1001 !important;\n        }\n\n        .shell .menuBackdrop {\n          position: fixed !important;\n          inset: 0 !important;\n          z-index: 1000 !important;\n        }\n\n        @media (min-width: 700px) and (max-width: 1399px) {\n          .shell {\n            max-width: min(90vw, 1040px) !important;\n          }\n\n          .shell .inputArea {\n            width: min(90vw, 1040px) !important;\n          }\n\n          .shell .chat .bubble:not(.user):not(.typingBubble) {\n            width: calc(100% - 90px);\n            max-width: calc(100% - 90px);\n          }\n\n          .shell .chat [data-misaki-proactive-photo=\"true\"] {\n            width: min(460px, calc(100% - 45px)) !important;\n            max-width: calc(100% - 45px) !important;\n          }\n\n          .shell .misakiMenu {\n            right: calc((100vw - min(90vw, 1040px)) / 2 + 12px) !important;\n          }\n        }\n\n        @media (min-width: 1400px) {\n          .shell {\n            max-width: 820px !important;\n          }\n\n          .shell .inputArea {\n            width: 820px !important;\n          }\n\n          .shell .chat .bubble:not(.user):not(.typingBubble) {\n            width: calc(100% - 90px);\n            max-width: calc(100% - 90px);\n          }\n\n          .shell .chat [data-misaki-proactive-photo=\"true\"] {\n            width: min(500px, calc(100% - 45px)) !important;\n            max-width: calc(100% - 45px) !important;\n          }\n\n          .shell .misakiMenu {\n            right: calc((100vw - 820px) / 2 + 12px) !important;\n          }\n        }\n      `}</style>\n\n      {children}\n    </AnonymousSessionGuard>\n  );\n}\n",
+        "sha256": "bb31168dc84e9fbed893e82adedb8cdbf1a983594c87fbf45a74ceb0975019d5"
+      }
+    },
+    {
+      "path": "lib/device-conversation.ts",
+      "status": "modified",
+      "additions": 25,
+      "deletions": 0,
+      "patch": "diff --git a/lib/device-conversation.ts b/lib/device-conversation.ts\nnew file mode 100644\nindex 0000000..ede3498\n--- /dev/null\n+++ b/lib/device-conversation.ts\n@@ -0,0 +1,25 @@\n+export const DEVICE_USER_KEY = \"misaki-device-user-id\";\n+export const EMAIL_SAVE_USER_KEY = \"misaki-email-save-user-id\";\n+\n+export function clearMisakiDeviceData() {\n+  for (const storage of [localStorage, sessionStorage]) {\n+    for (let i = storage.length - 1; i >= 0; i -= 1) {\n+      const key = storage.key(i);\n+      if (key?.startsWith(\"misaki-\")) storage.removeItem(key);\n+    }\n+  }\n+}\n+\n+export function bindDeviceUser(userId: string) {\n+  const owner = localStorage.getItem(DEVICE_USER_KEY);\n+  if (owner && owner !== userId) clearMisakiDeviceData();\n+  localStorage.setItem(DEVICE_USER_KEY, userId);\n+}\n+\n+export function readDeviceArray(key: string): unknown[] {\n+  const raw = localStorage.getItem(key);\n+  if (!raw) return [];\n+  const value: unknown = JSON.parse(raw);\n+  if (!Array.isArray(value)) throw new Error(\"Invalid conversation cache.\");\n+  return value;\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/lib/device-conversation.ts",
+      "source": {
+        "path": "lib/device-conversation.ts",
+        "coverage": "全文",
+        "text": "export const DEVICE_USER_KEY = \"misaki-device-user-id\";\nexport const EMAIL_SAVE_USER_KEY = \"misaki-email-save-user-id\";\n\nexport function clearMisakiDeviceData() {\n  for (const storage of [localStorage, sessionStorage]) {\n    for (let i = storage.length - 1; i >= 0; i -= 1) {\n      const key = storage.key(i);\n      if (key?.startsWith(\"misaki-\")) storage.removeItem(key);\n    }\n  }\n}\n\nexport function bindDeviceUser(userId: string) {\n  const owner = localStorage.getItem(DEVICE_USER_KEY);\n  if (owner && owner !== userId) clearMisakiDeviceData();\n  localStorage.setItem(DEVICE_USER_KEY, userId);\n}\n\nexport function readDeviceArray(key: string): unknown[] {\n  const raw = localStorage.getItem(key);\n  if (!raw) return [];\n  const value: unknown = JSON.parse(raw);\n  if (!Array.isArray(value)) throw new Error(\"Invalid conversation cache.\");\n  return value;\n}\n",
+        "sha256": "1370b763ff7b0b62112e8acbe13d7bac31c1bca7b4335bc197000872c800be9b"
+      }
+    },
+    {
+      "path": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "status": "modified",
+      "additions": 49,
+      "deletions": 0,
+      "patch": "diff --git a/supabase/migrations/20260917051607_save_anonymous_conversation.sql b/supabase/migrations/20260917051607_save_anonymous_conversation.sql\nnew file mode 100644\nindex 0000000..7b0ca6f\n--- /dev/null\n+++ b/supabase/migrations/20260917051607_save_anonymous_conversation.sql\n@@ -0,0 +1,49 @@\n+-- Explicit email-save checkpoint. A snapshot replaces itself; it is never a delta.\n+-- SECURITY DEFINER is necessary because the conversation table has no direct\n+-- client insert/update policies. Ownership and anonymous status are checked here.\n+create or replace function public.save_anonymous_conversation_state(p_history jsonb, p_memory jsonb)\n+returns jsonb\n+language plpgsql\n+security definer\n+set search_path = ''\n+as $$\n+declare\n+  v_user_id uuid := auth.uid();\n+  v_history jsonb;\n+  v_memory jsonb;\n+begin\n+  if v_user_id is null then raise exception 'anonymous account required'; end if;\n+  -- Serialize snapshots and hold anonymous status stable against confirmation.\n+  perform 1 from auth.users where id = v_user_id and is_anonymous = true for update;\n+  if not found then\n+    raise exception 'anonymous account required';\n+  end if;\n+  if jsonb_typeof(p_history) is distinct from 'array' or jsonb_typeof(p_memory) is distinct from 'array' then\n+    raise exception 'invalid snapshot';\n+  end if;\n+  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb) into v_history\n+  from (\n+    select jsonb_build_object('role', elem->>'role', 'text', left(btrim(elem->>'text'), 2000),\n+      'sentAt', to_char(clock_timestamp() at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')) as item, ord\n+    from jsonb_array_elements(p_history) with ordinality a(elem, ord)\n+    where elem->>'role' in ('user', 'misaki') and jsonb_typeof(elem->'text') = 'string'\n+      and length(btrim(elem->>'text')) > 0\n+    order by ord desc limit 60\n+  ) items;\n+  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb) into v_memory\n+  from (\n+    select to_jsonb(left(btrim(elem #>> '{}'), 500)) as item, ord\n+    from jsonb_array_elements(p_memory) with ordinality a(elem, ord)\n+    where jsonb_typeof(elem) = 'string' and length(btrim(elem #>> '{}')) > 0\n+    order by ord desc limit 30\n+  ) items;\n+\n+  insert into public.misaki_user_conversation_state(user_id, history, memory, updated_at)\n+  values (v_user_id, v_history, v_memory, now())\n+  on conflict (user_id) do update set history = excluded.history, memory = excluded.memory, updated_at = now()\n+  where jsonb_array_length(misaki_user_conversation_state.history) <= jsonb_array_length(excluded.history);\n+  return jsonb_build_object('saved', true);\n+end;\n+$$;\n+revoke all on function public.save_anonymous_conversation_state(jsonb,jsonb) from public, anon;\n+grant execute on function public.save_anonymous_conversation_state(jsonb,jsonb) to authenticated;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+      "source": {
+        "path": "supabase/migrations/20260917051607_save_anonymous_conversation.sql",
+        "coverage": "全文",
+        "text": "-- Explicit email-save checkpoint. A snapshot replaces itself; it is never a delta.\n-- SECURITY DEFINER is necessary because the conversation table has no direct\n-- client insert/update policies. Ownership and anonymous status are checked here.\ncreate or replace function public.save_anonymous_conversation_state(p_history jsonb, p_memory jsonb)\nreturns jsonb\nlanguage plpgsql\nsecurity definer\nset search_path = ''\nas $$\ndeclare\n  v_user_id uuid := auth.uid();\n  v_history jsonb;\n  v_memory jsonb;\nbegin\n  if v_user_id is null then raise exception 'anonymous account required'; end if;\n  -- Serialize snapshots and hold anonymous status stable against confirmation.\n  perform 1 from auth.users where id = v_user_id and is_anonymous = true for update;\n  if not found then\n    raise exception 'anonymous account required';\n  end if;\n  if jsonb_typeof(p_history) is distinct from 'array' or jsonb_typeof(p_memory) is distinct from 'array' then\n    raise exception 'invalid snapshot';\n  end if;\n  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb) into v_history\n  from (\n    select jsonb_build_object('role', elem->>'role', 'text', left(btrim(elem->>'text'), 2000),\n      'sentAt', to_char(clock_timestamp() at time zone 'UTC', 'YYYY-MM-DD\"T\"HH24:MI:SS.MS\"Z\"')) as item, ord\n    from jsonb_array_elements(p_history) with ordinality a(elem, ord)\n    where elem->>'role' in ('user', 'misaki') and jsonb_typeof(elem->'text') = 'string'\n      and length(btrim(elem->>'text')) > 0\n    order by ord desc limit 60\n  ) items;\n  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb) into v_memory\n  from (\n    select to_jsonb(left(btrim(elem #>> '{}'), 500)) as item, ord\n    from jsonb_array_elements(p_memory) with ordinality a(elem, ord)\n    where jsonb_typeof(elem) = 'string' and length(btrim(elem #>> '{}')) > 0\n    order by ord desc limit 30\n  ) items;\n\n  insert into public.misaki_user_conversation_state(user_id, history, memory, updated_at)\n  values (v_user_id, v_history, v_memory, now())\n  on conflict (user_id) do update set history = excluded.history, memory = excluded.memory, updated_at = now()\n  where jsonb_array_length(misaki_user_conversation_state.history) <= jsonb_array_length(excluded.history);\n  return jsonb_build_object('saved', true);\nend;\n$$;\nrevoke all on function public.save_anonymous_conversation_state(jsonb,jsonb) from public, anon;\ngrant execute on function public.save_anonymous_conversation_state(jsonb,jsonb) to authenticated;\n",
+        "sha256": "04ad6417228d06c3dd2b6338f7bf3d4d600732fdfe65b9fe0756b88fa2265561"
+      }
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "status": "modified",
+      "additions": 156,
+      "deletions": 0,
+      "patch": "diff --git a/tests/account-conversation.test.cjs b/tests/account-conversation.test.cjs\nnew file mode 100644\nindex 0000000..82cda9c\n--- /dev/null\n+++ b/tests/account-conversation.test.cjs\n@@ -0,0 +1,156 @@\n+// Exercise the actual client components and API with controlled auth/storage.\n+// Run: node --test tests/account-conversation.test.cjs\n+const { test } = require('node:test');\n+const assert = require('node:assert/strict');\n+const fs = require('node:fs');\n+const path = require('node:path');\n+const vm = require('node:vm');\n+const ts = require('typescript');\n+const root = path.join(__dirname, '..');\n+const history = [{ role: 'user', text: 'hello' }, { role: 'misaki', text: 'hi' }];\n+const ownerKey = 'misaki-device-user-id';\n+const pendingKey = 'misaki-email-save-user-id';\n+function storage(initial = {}) {\n+  const map = new Map(Object.entries(initial));\n+  return { get length() { return map.size; }, key: i => [...map.keys()][i] ?? null,\n+    getItem: k => map.get(k) ?? null, setItem: (k, v) => map.set(k, String(v)), removeItem: k => map.delete(k) };\n+}\n+async function flush() { for (let i = 0; i < 12; i++) await new Promise(setImmediate); }\n+function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionInitial = {}) {\n+  const localStorage = storage({ [ownerKey]: 'a', 'misaki-chat-history': JSON.stringify(history),\n+    'misaki-long-term-memory': '[\"remember\"]', 'misaki-auth-kind': 'anonymous', ...initial });\n+  const sessionStorage = storage(sessionInitial);\n+  const states = [], effects = [], cleanups = [], calls = [], listeners = [];\n+  let cursor = 0, mounted = false, currentUser = user;\n+  const react = { useState: value => {\n+    const i = cursor++;\n+    if (!(i in states)) states[i] = value;\n+    return [states[i], next => { states[i] = typeof next === 'function' ? next(states[i]) : next; }];\n+  }, useEffect: fn => { if (!mounted) effects.push(fn); }, useLayoutEffect: fn => { if (!mounted) effects.push(fn); } };\n+  const client = { auth: {\n+    getSession: async () => ({ data: { session: currentUser ? { user: currentUser, access_token: 'token' } : null }, error: null }),\n+    getUser: async () => ({ data: { user: currentUser }, error: null }),\n+    signOut: async () => { calls.push('signOut'); currentUser = null; return { error: null }; },\n+    signInAnonymously: async () => { calls.push('signIn'); currentUser = { id: 'new', is_anonymous: true }; return { data: { user: currentUser }, error: null }; },\n+    updateUser: async () => { calls.push('email'); return { error: null }; },\n+    onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },\n+  }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };\n+  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON,\n+    console: { error() {} }, fetch: (...args) => h.fetch(...args),\n+    window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },\n+      setInterval() {}, clearInterval() {}, setTimeout: fn => fn(), addEventListener() {}, removeEventListener() {} },\n+    document: { visibilityState: 'visible', addEventListener() {}, removeEventListener() {} } });\n+  const cache = new Map();\n+  function load(file) {\n+    if (cache.has(file)) return cache.get(file);\n+    const output = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), {\n+      compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020 }\n+    }).outputText;\n+    const module = { exports: {} };\n+    const req = name => {\n+      if (name === 'react') return react;\n+      if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };\n+      if (name === '@supabase/supabase-js') return { createClient: () => client };\n+      if (name.endsWith('/supabase')) return { supabase: client };\n+      if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');\n+      throw Error(name);\n+    };\n+    vm.runInContext(`(function(require,module,exports){${output}\\n})`, context)(req, module, module.exports);\n+    cache.set(file, module.exports);\n+    return module.exports;\n+  }\n+  const h = { localStorage, sessionStorage, states, calls, client, load,\n+    fetch: async () => Response.json({ exists: true, history, memory: ['remember'] }),\n+    setUser: u => { currentUser = u; }, emit: (event, u) => listeners.forEach(fn => fn(event, u ? { user: u } : null)),\n+    render(file, props = {}) { cursor = 0; const tree = load(file).default(props); mounted = true; return tree; },\n+    async mount(file, props) { const tree = this.render(file, props); effects.splice(0).forEach(fn => { const cleanup = fn(); if (cleanup) cleanups.push(cleanup); }); await flush(); return tree; },\n+    unmount() { cleanups.forEach(fn => fn()); } };\n+  return h;\n+}\n+function find(tree, text) {\n+  if (!tree || typeof tree !== 'object') return null;\n+  if (tree.type === 'button' && tree.props.children === text) return tree;\n+  for (const child of [tree.props?.children].flat(Infinity)) { const match = find(child, text); if (match) return match; }\n+  return null;\n+}\n+test('email save checkpoints history and memory before updateUser', async () => {\n+  const h = harness();\n+  h.fetch = async (_url, options) => { h.calls.push('save');\n+    const body = JSON.parse(options.body);\n+    assert.equal(body.expectedUserId, 'a'); assert.equal(body.saveAnonymous, true);\n+    assert.deepEqual(body.history, history); assert.deepEqual(body.memory, ['remember']);\n+    return Response.json({ synced: true }); };\n+  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n+  assert.deepEqual(h.calls, ['save', 'email']); assert.equal(h.localStorage.getItem(pendingKey), 'a');\n+});\n+test('failed checkpoint never sends confirmation email', async () => {\n+  const h = harness(); h.fetch = async () => new Response('', { status: 500 });\n+  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n+  assert.ok(!h.calls.includes('email')); assert.equal(h.localStorage.getItem(pendingKey), null);\n+});\n+test('account switch during checkpoint never updates another user email', async () => {\n+  const h = harness(); h.fetch = async () => { h.setUser({ id: 'b', is_anonymous: true }); return Response.json({}); };\n+  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n+  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n+  assert.ok(!h.calls.includes('email'));\n+});\n+test('confirmation in a fresh tab preserves same-user cache and gates chat hydration', async () => {\n+  const h = harness({ id: 'a', is_anonymous: false });\n+  const tree = await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });\n+  assert.equal(tree.type, 'main'); assert.equal(h.states[0], true);\n+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);\n+  assert.deepEqual(h.calls, []);\n+});\n+test('pending email save keeps the anonymous user when a fresh tab opens', async () => {\n+  const h = harness(undefined, { [pendingKey]: 'a' });\n+  await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });\n+  assert.deepEqual(h.calls, []); assert.equal(h.localStorage.getItem(ownerKey), 'a');\n+});\n+test('ordinary expired anonymous browser session still clears all misaki caches', async () => {\n+  const h = harness(undefined, { 'misaki-today-memory': 'old', unrelated: 'keep' });\n+  await h.mount('app/chat/anonymous-session-guard.tsx');\n+  assert.deepEqual(h.calls, ['signOut', 'signIn']);\n+  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);\n+  assert.equal(h.localStorage.getItem('misaki-today-memory'), null);\n+  assert.equal(h.localStorage.getItem('unrelated'), 'keep'); assert.equal(h.localStorage.getItem(ownerKey), 'new');\n+});\n+test('different permanent user clears previous conversation and memory', async () => {\n+  const h = harness({ id: 'b', is_anonymous: false }, { [pendingKey]: 'a' });\n+  await h.mount('app/chat/anonymous-session-guard.tsx');\n+  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);\n+  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), null);\n+  assert.equal(h.localStorage.getItem(pendingKey), null); assert.equal(h.localStorage.getItem(ownerKey), 'b');\n+});\n+test('logout clears caches in both storage areas and remounts mounted chat', async () => {\n+  const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-browser-session': '1', 'misaki-test': 'secret' });\n+  await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);\n+  assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));\n+});\n+test('server response after user switch cannot write old account history', async () => {\n+  const h = harness({ id: 'a', is_anonymous: false });\n+  h.fetch = async () => { h.setUser({ id: 'b', is_anonymous: false }); return Response.json({ exists: true, history: [], memory: [] }); };\n+  await h.mount('app/chat/conversation-history-sync.tsx');\n+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history); assert.deepEqual(h.calls, []);\n+});\n+test('missing or malformed saved server state cannot erase checkpoint cache', async () => {\n+  for (const server of [{ exists: false, history: [], memory: [] }, {}]) {\n+    const h = harness({ id: 'a', is_anonymous: false }, { [pendingKey]: 'a' });\n+    h.fetch = async () => Response.json(server);\n+    await h.mount('app/chat/conversation-history-sync.tsx');\n+    assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);\n+    assert.equal(h.localStorage.getItem(pendingKey), 'a');\n+  }\n+});\n+test('API rejects foreign expected user ID and accepts memory-only explicit save', async () => {\n+  const h = harness(); const route = h.load('app/api/persona/history/route.ts');\n+  const request = body => new Request('https://example.test/api/persona/history', {\n+    method: 'POST', headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });\n+  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'b', history, memory: [] }))).status, 409);\n+  assert.equal(h.calls.length, 0);\n+  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history: [], memory: ['remember'] }))).status, 200);\n+  assert.equal(h.calls[0].name, 'save_anonymous_conversation_state');\n+  h.setUser({ id: 'a', is_anonymous: false });\n+  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs",
+      "source": {
+        "path": "tests/account-conversation.test.cjs",
+        "coverage": "全文",
+        "text": "// Exercise the actual client components and API with controlled auth/storage.\n// Run: node --test tests/account-conversation.test.cjs\nconst { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst root = path.join(__dirname, '..');\nconst history = [{ role: 'user', text: 'hello' }, { role: 'misaki', text: 'hi' }];\nconst ownerKey = 'misaki-device-user-id';\nconst pendingKey = 'misaki-email-save-user-id';\nfunction storage(initial = {}) {\n  const map = new Map(Object.entries(initial));\n  return { get length() { return map.size; }, key: i => [...map.keys()][i] ?? null,\n    getItem: k => map.get(k) ?? null, setItem: (k, v) => map.set(k, String(v)), removeItem: k => map.delete(k) };\n}\nasync function flush() { for (let i = 0; i < 12; i++) await new Promise(setImmediate); }\nfunction harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionInitial = {}) {\n  const localStorage = storage({ [ownerKey]: 'a', 'misaki-chat-history': JSON.stringify(history),\n    'misaki-long-term-memory': '[\"remember\"]', 'misaki-auth-kind': 'anonymous', ...initial });\n  const sessionStorage = storage(sessionInitial);\n  const states = [], effects = [], cleanups = [], calls = [], listeners = [];\n  let cursor = 0, mounted = false, currentUser = user;\n  const react = { useState: value => {\n    const i = cursor++;\n    if (!(i in states)) states[i] = value;\n    return [states[i], next => { states[i] = typeof next === 'function' ? next(states[i]) : next; }];\n  }, useEffect: fn => { if (!mounted) effects.push(fn); }, useLayoutEffect: fn => { if (!mounted) effects.push(fn); } };\n  const client = { auth: {\n    getSession: async () => ({ data: { session: currentUser ? { user: currentUser, access_token: 'token' } : null }, error: null }),\n    getUser: async () => ({ data: { user: currentUser }, error: null }),\n    signOut: async () => { calls.push('signOut'); currentUser = null; return { error: null }; },\n    signInAnonymously: async () => { calls.push('signIn'); currentUser = { id: 'new', is_anonymous: true }; return { data: { user: currentUser }, error: null }; },\n    updateUser: async () => { calls.push('email'); return { error: null }; },\n    onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },\n  }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };\n  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON,\n    console: { error() {} }, fetch: (...args) => h.fetch(...args),\n    window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },\n      setInterval() {}, clearInterval() {}, setTimeout: fn => fn(), addEventListener() {}, removeEventListener() {} },\n    document: { visibilityState: 'visible', addEventListener() {}, removeEventListener() {} } });\n  const cache = new Map();\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    const output = ts.transpileModule(fs.readFileSync(path.join(root, file), 'utf8'), {\n      compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2020 }\n    }).outputText;\n    const module = { exports: {} };\n    const req = name => {\n      if (name === 'react') return react;\n      if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };\n      if (name === '@supabase/supabase-js') return { createClient: () => client };\n      if (name.endsWith('/supabase')) return { supabase: client };\n      if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');\n      throw Error(name);\n    };\n    vm.runInContext(`(function(require,module,exports){${output}\\n})`, context)(req, module, module.exports);\n    cache.set(file, module.exports);\n    return module.exports;\n  }\n  const h = { localStorage, sessionStorage, states, calls, client, load,\n    fetch: async () => Response.json({ exists: true, history, memory: ['remember'] }),\n    setUser: u => { currentUser = u; }, emit: (event, u) => listeners.forEach(fn => fn(event, u ? { user: u } : null)),\n    render(file, props = {}) { cursor = 0; const tree = load(file).default(props); mounted = true; return tree; },\n    async mount(file, props) { const tree = this.render(file, props); effects.splice(0).forEach(fn => { const cleanup = fn(); if (cleanup) cleanups.push(cleanup); }); await flush(); return tree; },\n    unmount() { cleanups.forEach(fn => fn()); } };\n  return h;\n}\nfunction find(tree, text) {\n  if (!tree || typeof tree !== 'object') return null;\n  if (tree.type === 'button' && tree.props.children === text) return tree;\n  for (const child of [tree.props?.children].flat(Infinity)) { const match = find(child, text); if (match) return match; }\n  return null;\n}\ntest('email save checkpoints history and memory before updateUser', async () => {\n  const h = harness();\n  h.fetch = async (_url, options) => { h.calls.push('save');\n    const body = JSON.parse(options.body);\n    assert.equal(body.expectedUserId, 'a'); assert.equal(body.saveAnonymous, true);\n    assert.deepEqual(body.history, history); assert.deepEqual(body.memory, ['remember']);\n    return Response.json({ synced: true }); };\n  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n  assert.deepEqual(h.calls, ['save', 'email']); assert.equal(h.localStorage.getItem(pendingKey), 'a');\n});\ntest('failed checkpoint never sends confirmation email', async () => {\n  const h = harness(); h.fetch = async () => new Response('', { status: 500 });\n  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n  assert.ok(!h.calls.includes('email')); assert.equal(h.localStorage.getItem(pendingKey), null);\n});\ntest('account switch during checkpoint never updates another user email', async () => {\n  const h = harness(); h.fetch = async () => { h.setUser({ id: 'b', is_anonymous: true }); return Response.json({}); };\n  await h.mount('app/account/page.tsx'); h.states[2] = 'test@example.test';\n  await find(h.render('app/account/page.tsx'), 'メールで保存する').props.onClick();\n  assert.ok(!h.calls.includes('email'));\n});\ntest('confirmation in a fresh tab preserves same-user cache and gates chat hydration', async () => {\n  const h = harness({ id: 'a', is_anonymous: false });\n  const tree = await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });\n  assert.equal(tree.type, 'main'); assert.equal(h.states[0], true);\n  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);\n  assert.deepEqual(h.calls, []);\n});\ntest('pending email save keeps the anonymous user when a fresh tab opens', async () => {\n  const h = harness(undefined, { [pendingKey]: 'a' });\n  await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });\n  assert.deepEqual(h.calls, []); assert.equal(h.localStorage.getItem(ownerKey), 'a');\n});\ntest('ordinary expired anonymous browser session still clears all misaki caches', async () => {\n  const h = harness(undefined, { 'misaki-today-memory': 'old', unrelated: 'keep' });\n  await h.mount('app/chat/anonymous-session-guard.tsx');\n  assert.deepEqual(h.calls, ['signOut', 'signIn']);\n  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);\n  assert.equal(h.localStorage.getItem('misaki-today-memory'), null);\n  assert.equal(h.localStorage.getItem('unrelated'), 'keep'); assert.equal(h.localStorage.getItem(ownerKey), 'new');\n});\ntest('different permanent user clears previous conversation and memory', async () => {\n  const h = harness({ id: 'b', is_anonymous: false }, { [pendingKey]: 'a' });\n  await h.mount('app/chat/anonymous-session-guard.tsx');\n  assert.equal(h.localStorage.getItem('misaki-chat-history'), null);\n  assert.equal(h.localStorage.getItem('misaki-long-term-memory'), null);\n  assert.equal(h.localStorage.getItem(pendingKey), null); assert.equal(h.localStorage.getItem(ownerKey), 'b');\n});\ntest('logout clears caches in both storage areas and remounts mounted chat', async () => {\n  const h = harness({ id: 'a', is_anonymous: false }, {}, { 'misaki-browser-session': '1', 'misaki-test': 'secret' });\n  await h.mount('app/chat/anonymous-session-guard.tsx'); h.emit('SIGNED_OUT', null);\n  assert.equal(h.localStorage.length, 0); assert.equal(h.sessionStorage.length, 0); assert.ok(h.calls.includes('reload'));\n});\ntest('server response after user switch cannot write old account history', async () => {\n  const h = harness({ id: 'a', is_anonymous: false });\n  h.fetch = async () => { h.setUser({ id: 'b', is_anonymous: false }); return Response.json({ exists: true, history: [], memory: [] }); };\n  await h.mount('app/chat/conversation-history-sync.tsx');\n  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history); assert.deepEqual(h.calls, []);\n});\ntest('missing or malformed saved server state cannot erase checkpoint cache', async () => {\n  for (const server of [{ exists: false, history: [], memory: [] }, {}]) {\n    const h = harness({ id: 'a', is_anonymous: false }, { [pendingKey]: 'a' });\n    h.fetch = async () => Response.json(server);\n    await h.mount('app/chat/conversation-history-sync.tsx');\n    assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);\n    assert.equal(h.localStorage.getItem(pendingKey), 'a');\n  }\n});\ntest('API rejects foreign expected user ID and accepts memory-only explicit save', async () => {\n  const h = harness(); const route = h.load('app/api/persona/history/route.ts');\n  const request = body => new Request('https://example.test/api/persona/history', {\n    method: 'POST', headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });\n  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'b', history, memory: [] }))).status, 409);\n  assert.equal(h.calls.length, 0);\n  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history: [], memory: ['remember'] }))).status, 200);\n  assert.equal(h.calls[0].name, 'save_anonymous_conversation_state');\n  h.setUser({ id: 'a', is_anonymous: false });\n  assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);\n});\n",
+        "sha256": "1efbb88701f37f46798d07bb295ffed40db347b9301478999656f13f98a2ce66"
+      }
+    }
+  ],
+  "file_count": 8,
+  "reported_file_count": 8,
+  "commits": [
+    {
+      "sha": "2bff36f2f4723c2dbdf1f5b42db48b509a4f1831",
+      "message": "Preserve anonymous conversations before email account confirmation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/2bff36f2f4723c2dbdf1f5b42db48b509a4f1831"
+    },
+    {
+      "sha": "27e83d2366de22053a7f41d62b77cfe6d7a748a8",
+      "message": "Preserve existing API line endings to keep the fix focused\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/27e83d2366de22053a7f41d62b77cfe6d7a748a8"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "AUTH_KIND_KEY",
+    "AccountPage",
+    "AnonymousSessionGuard",
+    "BROWSER_SESSION_KEY",
+    "CHAT_HISTORY_KEY",
+    "ChatLayout",
+    "ConversationHistorySync",
+    "DEVICE_USER_KEY",
+    "EMAIL_SAVE_USER_KEY",
+    "GET",
+    "LONG_MEMORY_KEY",
+    "POST",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "SYNC_INTERVAL_MS",
+    "accessToken",
+    "active",
+    "arraysEqual",
+    "assert",
+    "auth",
+    "authError",
+    "authorization",
+    "bindDeviceUser",
+    "body",
+    "bootstrap",
+    "cache",
+    "child",
+    "cleanup",
+    "clearMisakiDeviceData",
+    "clearMisakiLocalData",
+    "client",
+    "context",
+    "createAuthenticatedSupabase",
+    "currentUser",
+    "cursor",
+    "fetchServerState",
+    "find",
+    "flush",
+    "fs",
+    "getAuthenticatedClient",
+    "getBearerToken",
+    "h",
+    "hadBrowserSession",
+    "handleVisibility",
+    "harness",
+    "history",
+    "historyChanged",
+    "i",
+    "initialized",
+    "intervalId",
+    "isAnonymous",
+    "isExistingAccountError",
+    "isPermanent",
+    "key",
+    "lastAuthKind",
+    "load",
+    "localHistory",
+    "localMemory",
+    "localStorage",
+    "map"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "匿名会話と記憶をメール確認前に同じユーザーへ保存する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/1"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "537cef27508ab78a40e3c290dbb22925e9c896fbc200045883afaca125eadbc9",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

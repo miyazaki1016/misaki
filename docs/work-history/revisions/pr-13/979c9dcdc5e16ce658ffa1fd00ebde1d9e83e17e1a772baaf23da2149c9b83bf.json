@@ -1,0 +1,105 @@
+{
+  "id": "pr-13",
+  "number": 13,
+  "title": "旧自発APIの独立タグ推論を廃止する",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 変更内容\n- `lib/proactive-photo.ts` の本文キーワードからの独立タグ推論を停止\n- 旧 `/api/proactive` 側は時刻・関係ポイント・直近写真だけで互換選定\n- 公開型と既存写真メタデータは互換性のため維持\n- 意味タグの判断元を Body Clock の `ProactiveDecisionContext` に一本化\n\n## 目的\nPR #12 で導入した\n`関係状態 → 感情・行動 → direction → 派生タグ → 文面・写真`\nを唯一の意味判断系にし、旧ルート側の独立タグ推論が将来矛盾を作らないようにします。\n\n## 非変更範囲\n- Body Clock の新しい派生タグロジック\n- チャット・記憶・認証・利用回数\n- 写真添付率 34%\n- 写真ファイル\n- 既存の公開型・写真メタデータ\n- 時間帯・関係ポイントによる旧ルートの写真候補絞り込み\n",
+  "snapshot_head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+  "snapshot_consistent": true,
+  "head": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+  "base": "47a616db7641ff3a9d30a2ffaec905349b8c6ed7",
+  "base_ref": "main",
+  "head_ref": "cleanup/legacy-proactive-tags",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-17T14:00:30Z",
+  "merge_commit_sha": "d35827487fbd1effbacc4b283aafdcf2d10b6b14",
+  "updated_at": "2026-09-17T14:00:30Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "lib/proactive-photo.ts",
+      "status": "modified",
+      "additions": 9,
+      "deletions": 101,
+      "patch": "diff --git a/lib/proactive-photo.ts b/lib/proactive-photo.ts\nindex 2d8c5f8..c5c41cd 100644\n--- a/lib/proactive-photo.ts\n+++ b/lib/proactive-photo.ts\n@@ -5,6 +5,11 @@ export type MisakiPhotoTime =\n   | \"night\"\n   | \"any\";\n \n+/**\n+ * Legacy compatibility vocabulary for the old /api/proactive path.\n+ * The active Body Clock flow derives semantic expression tags from\n+ * ProactiveDecisionContext instead of inferring them from generated text.\n+ */\n export type MisakiPhotoTag =\n   | \"soft\"\n   | \"cheerful\"\n@@ -132,90 +137,6 @@ function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, \"any\"> {\n   return \"night\";\n }\n \n-function inferTags(reply: string): MisakiPhotoTag[] {\n-  const text = reply.toLowerCase();\n-  const tags = new Set<MisakiPhotoTag>();\n-\n-  if (/眠|ねむ|おやすみ|寝/.test(text)) {\n-    tags.add(\"sleepy\");\n-    tags.add(\"calm\");\n-  }\n-\n-  if (/好き|会いた|ぎゅ|甘え|寂し|さみし/.test(text)) {\n-    tags.add(\"romantic\");\n-    tags.add(\"affectionate\");\n-  }\n-\n-  if (/会いた|顔が浮か|思い出し/.test(text)) {\n-    tags.add(\"miss_you\");\n-  }\n-\n-  if (/笑|ふふ|えへ|嬉|うれし|やった|元気/.test(text)) {\n-    tags.add(\"cheerful\");\n-  }\n-\n-  if (/落ち着|ゆっくり|のんびり|ほっと|まったり/.test(text)) {\n-    tags.add(\"calm\");\n-    tags.add(\"relax\");\n-  }\n-\n-  if (/がんば|頑張|お疲れ|おつかれ|応援/.test(text)) {\n-    tags.add(\"encouraging\");\n-  }\n-\n-  if (/どうしてる|元気\\?|大丈夫\\?|何してる|なにしてる/.test(text)) {\n-    tags.add(\"check_in\");\n-  }\n-\n-  if (/からか|冗談|笑|ふふ|いたずら/.test(text)) {\n-    tags.add(\"playful\");\n-  }\n-\n-  if (/ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)) {\n-    tags.add(\"casual\");\n-  }\n-\n-  if (tags.size === 0) {\n-    tags.add(\"soft\");\n-  }\n-\n-  return [...tags];\n-}\n-\n-function normalizeContextTags(\n-  context: MisakiProactiveContext | undefined,\n-  reply: string\n-) {\n-  const explicit = Array.isArray(context?.tags)\n-    ? context.tags.filter((tag): tag is MisakiPhotoTag =>\n-        [\n-          \"soft\",\n-          \"cheerful\",\n-          \"calm\",\n-          \"romantic\",\n-          \"sleepy\",\n-          \"casual\",\n-          \"affectionate\",\n-          \"miss_you\",\n-          \"relax\",\n-          \"playful\",\n-          \"encouraging\",\n-          \"check_in\",\n-          \"selfie\",\n-        ].includes(tag)\n-      )\n-    : [];\n-\n-  return explicit.length > 0 ? explicit : inferTags(reply);\n-}\n-\n-function scorePhoto(photo: MisakiPhoto, tags: MisakiPhotoTag[]) {\n-  return tags.reduce(\n-    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),\n-    0\n-  );\n-}\n-\n function weightedPick(\n   photos: MisakiPhoto[],\n   seed: number\n@@ -251,7 +172,6 @@ export function selectMisakiProactivePhoto(\n     currentTime,\n     relationshipPoints,\n     reply,\n-    context,\n     recentPhotoIds = [],\n   } = input;\n \n@@ -259,9 +179,10 @@ export function selectMisakiProactivePhoto(\n     return null;\n   }\n \n-  const tags = normalizeContextTags(context, reply);\n+  // Compatibility selector only: do not infer semantic tags from reply text here.\n+  // The active Body Clock path owns semantic decisions via ProactiveDecisionContext.\n   const seed = hashText(\n-    `${currentTime}|${relationshipPoints}|${reply}|${tags.join(\",\")}`\n+    `${currentTime}|${relationshipPoints}|${reply}`\n   );\n \n   const attachThreshold = Math.floor(PHOTO_ATTACH_RATE * 10000);\n@@ -282,19 +203,6 @@ export function selectMisakiProactivePhoto(\n     return null;\n   }\n \n-  const scored = candidates.map((photo) => ({\n-    photo,\n-    score: scorePhoto(photo, tags),\n-  }));\n-\n-  const bestScore = Math.max(...scored.map((item) => item.score));\n-\n-  if (bestScore > 0) {\n-    candidates = scored\n-      .filter((item) => item.score === bestScore)\n-      .map((item) => item.photo);\n-  }\n-\n   const withoutRecent = candidates.filter(\n     (photo) => !recentPhotoIds.includes(photo.id)\n   );\n@@ -305,7 +213,7 @@ export function selectMisakiProactivePhoto(\n \n   return weightedPick(\n     candidates,\n-    hashText(`${seed}|${tags.join(\"|\")}|${timeBucket}`)\n+    hashText(`${seed}|${timeBucket}`)\n   );\n }\n \n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/275529187bc54a7151de3aa06ed4c6b07362d1fd/lib/proactive-photo.ts",
+      "source": {
+        "path": "lib/proactive-photo.ts",
+        "coverage": "全文",
+        "text": "export type MisakiPhotoTime =\n  | \"morning\"\n  | \"day\"\n  | \"evening\"\n  | \"night\"\n  | \"any\";\n\n/**\n * Legacy compatibility vocabulary for the old /api/proactive path.\n * The active Body Clock flow derives semantic expression tags from\n * ProactiveDecisionContext instead of inferring them from generated text.\n */\nexport type MisakiPhotoTag =\n  | \"soft\"\n  | \"cheerful\"\n  | \"calm\"\n  | \"romantic\"\n  | \"sleepy\"\n  | \"casual\"\n  | \"affectionate\"\n  | \"miss_you\"\n  | \"relax\"\n  | \"playful\"\n  | \"encouraging\"\n  | \"check_in\"\n  | \"selfie\";\n\nexport type MisakiProactiveContext = {\n  tags: MisakiPhotoTag[];\n};\n\nexport type MisakiPhoto = {\n  id: string;\n  src: string;\n  times: MisakiPhotoTime[];\n  tags: MisakiPhotoTag[];\n  minRelationshipPoints: number;\n  weight: number;\n};\n\nexport type SelectMisakiPhotoInput = {\n  currentTime: string;\n  relationshipPoints: number;\n  reply: string;\n  context?: MisakiProactiveContext;\n  recentPhotoIds?: string[];\n};\n\nconst PHOTO_ATTACH_RATE = 0.34;\n\nconst PHOTOS: MisakiPhoto[] = [\n  {\n    id: \"morning-01\",\n    src: \"/misaki-morning.webp\",\n    times: [\"morning\"],\n    tags: [\"soft\", \"cheerful\", \"casual\", \"check_in\", \"selfie\"],\n    minRelationshipPoints: 0,\n    weight: 5,\n  },\n  {\n    id: \"day-01\",\n    src: \"/misaki-day-intro.webp\",\n    times: [\"day\"],\n    tags: [\"cheerful\", \"casual\", \"soft\", \"playful\", \"selfie\"],\n    minRelationshipPoints: 0,\n    weight: 5,\n  },\n  {\n    id: \"evening-01\",\n    src: \"/misaki-evening.webp\",\n    times: [\"evening\"],\n    tags: [\"calm\", \"soft\", \"romantic\", \"affectionate\", \"relax\", \"selfie\"],\n    minRelationshipPoints: 10,\n    weight: 5,\n  },\n  {\n    id: \"night-01\",\n    src: \"/misaki-night.webp\",\n    times: [\"night\"],\n    tags: [\n      \"calm\",\n      \"romantic\",\n      \"sleepy\",\n      \"soft\",\n      \"affectionate\",\n      \"miss_you\",\n      \"relax\",\n      \"selfie\",\n    ],\n    minRelationshipPoints: 20,\n    weight: 5,\n  },\n];\n\nfunction hashText(text: string) {\n  let hash = 2166136261;\n\n  for (let i = 0; i < text.length; i += 1) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n\n  return hash >>> 0;\n}\n\nfunction getHour(currentTime: string) {\n  const match = currentTime.match(/(\\d{1,2}):(\\d{2})/);\n\n  if (!match) {\n    return 18;\n  }\n\n  const hour = Number(match[1]);\n\n  if (!Number.isFinite(hour)) {\n    return 18;\n  }\n\n  return Math.max(0, Math.min(23, hour));\n}\n\nfunction getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, \"any\"> {\n  const hour = getHour(currentTime);\n\n  if (hour >= 5 && hour < 10) {\n    return \"morning\";\n  }\n\n  if (hour >= 10 && hour < 17) {\n    return \"day\";\n  }\n\n  if (hour >= 17 && hour < 21) {\n    return \"evening\";\n  }\n\n  return \"night\";\n}\n\nfunction weightedPick(\n  photos: MisakiPhoto[],\n  seed: number\n): MisakiPhoto | null {\n  if (photos.length === 0) {\n    return null;\n  }\n\n  const totalWeight = photos.reduce(\n    (sum, photo) => sum + Math.max(1, photo.weight),\n    0\n  );\n\n  let target = seed % totalWeight;\n\n  for (const photo of photos) {\n    const weight = Math.max(1, photo.weight);\n\n    if (target < weight) {\n      return photo;\n    }\n\n    target -= weight;\n  }\n\n  return photos[0] ?? null;\n}\n\nexport function selectMisakiProactivePhoto(\n  input: SelectMisakiPhotoInput\n): MisakiPhoto | null {\n  const {\n    currentTime,\n    relationshipPoints,\n    reply,\n    recentPhotoIds = [],\n  } = input;\n\n  if (!reply.trim()) {\n    return null;\n  }\n\n  // Compatibility selector only: do not infer semantic tags from reply text here.\n  // The active Body Clock path owns semantic decisions via ProactiveDecisionContext.\n  const seed = hashText(\n    `${currentTime}|${relationshipPoints}|${reply}`\n  );\n\n  const attachThreshold = Math.floor(PHOTO_ATTACH_RATE * 10000);\n\n  if (seed % 10000 >= attachThreshold) {\n    return null;\n  }\n\n  const timeBucket = getTimeBucket(currentTime);\n\n  let candidates = PHOTOS.filter(\n    (photo) =>\n      relationshipPoints >= photo.minRelationshipPoints &&\n      (photo.times.includes(timeBucket) || photo.times.includes(\"any\"))\n  );\n\n  if (candidates.length === 0) {\n    return null;\n  }\n\n  const withoutRecent = candidates.filter(\n    (photo) => !recentPhotoIds.includes(photo.id)\n  );\n\n  if (withoutRecent.length > 0) {\n    candidates = withoutRecent;\n  }\n\n  return weightedPick(\n    candidates,\n    hashText(`${seed}|${timeBucket}`)\n  );\n}\n\nexport function getMisakiPhotoCatalog() {\n  return PHOTOS;\n}\n",
+        "sha256": "900efb680da17a04596b8b24c4b381707c8f76fd8c94eecafea713265150d4b5"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "3d73f08b64873502878d3ce1edade307f5f28eb8",
+      "message": "旧自発APIの独立タグ推論を廃止\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/3d73f08b64873502878d3ce1edade307f5f28eb8"
+    },
+    {
+      "sha": "275529187bc54a7151de3aa06ed4c6b07362d1fd",
+      "message": "互換APIを保ったまま旧タグ推論だけ無効化\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/275529187bc54a7151de3aa06ed4c6b07362d1fd"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "PHOTOS",
+    "PHOTO_ATTACH_RATE",
+    "attachThreshold",
+    "bestScore",
+    "candidates",
+    "explicit",
+    "getHour",
+    "getMisakiPhotoCatalog",
+    "getTimeBucket",
+    "hash",
+    "hashText",
+    "hour",
+    "i",
+    "inferTags",
+    "match",
+    "normalizeContextTags",
+    "photo",
+    "scorePhoto",
+    "scored",
+    "seed",
+    "selectMisakiProactivePhoto",
+    "tags",
+    "target",
+    "text",
+    "timeBucket",
+    "totalWeight",
+    "weight",
+    "weightedPick",
+    "withoutRecent"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "旧自発APIの独立タグ推論を廃止する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/13"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "e2e6994d2e4c87c01b24e255764b3a9a79e066b15da51755d78c894d1e9e1bf3",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

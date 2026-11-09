@@ -1,0 +1,44 @@
+{
+  "id": "branch-d4bd494d2ca8e9db",
+  "title": "fix/chat-scroll-and-load-diagnostics-20261104",
+  "head": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+  "head_ref": "fix/chat-scroll-and-load-diagnostics-20261104",
+  "linked_prs": [
+    151
+  ],
+  "files": [
+    {
+      "path": "app/api/persona/history/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/api/persona/history/route.ts"
+    },
+    {
+      "path": "app/chat/initial-chat-scroll.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx"
+    }
+  ],
+  "commits": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161 Merge main into PR #151 and preserve current docs; guard early scroll gestures\n4c8b9a508bc655b272fbbff298a1daf1ddddbce5 chore: include server-side history load duration in opt-in timing diagnostics\n6362654d8240721ef65467a07c825f1a9a765ec3 chore: expose privacy-safe server timing for history load\n9e1208199656131fdf263d3f6e12f758f1b27c9f fix: make opt-in history timings safe in test runtimes without performance\n157b7788de57af5205822bf91804d9af6a053912 chore: add opt-in privacy-safe client history load timing checkpoints\n12a94e111490bb86d9636715167046989769a67d fix: distinguish scrolling gestures from taps in initial chat scroll\n1a13022649170f25caf328b83f6fbfb754c72b25 docs: record draft chat scroll change and outstanding validation\n4cf92c9453fdcc2dea02a8f261834e6d18d2f307 docs: record draft chat scroll change and outstanding validation\n79eb8a9ca84dcf712911899d59dee3fb959940fb fix: distinguish user scrolling from layout-driven scrolling\nf0651faefe43d15df91bed29f62083f2f73e5715 fix: keep chat at latest without interrupting history reading",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ae6724d976ea5ca57e0a922d8e7ff7a47d955a6359306961f07b41e4352eea40",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

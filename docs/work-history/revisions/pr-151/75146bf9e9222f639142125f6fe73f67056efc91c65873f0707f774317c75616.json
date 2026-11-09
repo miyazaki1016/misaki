@@ -1,0 +1,336 @@
+{
+  "id": "pr-151",
+  "number": 151,
+  "title": "WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了）",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 実装\n既存 InitialChatScroll を修正。旧4秒の無条件スクロールと350ms再移動を撤去し、履歴描画時の初期位置合わせ、ユーザーによる過去履歴閲覧時の追従停止、ResizeObserver・フォント・visualViewportへの追従を追加。ラウンジ、認証、DB、人格、記憶は変更しない。\n\n## 未完了・マージ禁止\n- 初期読み込み約5秒の内訳の実測、サーバー/API/DB計測、効果検証、速度改善\n- 実機iPhone Safari、匿名復旧・期限切れ、長履歴・リロード等の回帰テスト\n- テスト・型検査・ビルドの実行（この実行環境ではリポジトリのgit cloneがDNS制限で失敗）\n- スクロール制御の挙動レビュー\n\n未測定の改善値を推定していない。CIと実機検証が完了するまでDraftのまま、mainへのマージ・productionデプロイ禁止。",
+  "snapshot_head": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+  "snapshot_consistent": true,
+  "head": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+  "base": "56593e211fed2c5d2dcb44dcb1e19a086a7e207a",
+  "base_ref": "main",
+  "head_ref": "fix/chat-scroll-and-load-diagnostics-20261104",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-08T23:29:59Z",
+  "code_facts": [
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "const BOTTOM_THRESHOLD = 100;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "function scrollingElement(): Element {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "function distanceFromBottom(): number {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "function toBottom(): void {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "export default function InitialChatScroll() {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!chat) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (disposed || pending || !following) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!disposed && following) toBottom();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (touchStartY === null || currentY === undefined) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (Math.abs(currentY - touchStartY) < 8) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if ([\"ArrowUp\", \"ArrowDown\", \"PageUp\", \"PageDown\", \"Home\", \"End\", \" \"].includes(event.key)) userIntent();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/initial-chat-scroll.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!initialized || !userScrolling) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!timingEnabled) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (timingEnabled) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (duration) timings.historyServerLoadMs = Math.round(Number(duration));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (timingEnabled) console.info(\"[misaki-history-timing]\", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/persona/history/route.ts",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 2,
+      "patch": "diff --git a/app/api/persona/history/route.ts b/app/api/persona/history/route.ts\nindex 81acd7b..6e9cf49 100644\n--- a/app/api/persona/history/route.ts\n+++ b/app/api/persona/history/route.ts\n@@ -64,19 +64,23 @@ export async function POST(request: Request) {\n       return Response.json({ synced: true, result: data });\n     }\n     if (body.action === \"load\") {\n+      const loadStartedAt = performance.now();\n+      const timedResponse = (payload: unknown) => Response.json(payload, {\n+        headers: { \"Cache-Control\": \"no-store\", \"Server-Timing\": `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}` },\n+      });\n       if (user.is_anonymous && typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n         if (replay) {\n           const recovered = openTemporaryState(replay.temporaryState);\n           if (recovered) {\n             const latest = await loadTemporaryRoot(user.id, replay.temporaryState);\n-            return Response.json({ ...responseState(latest, true),\n+            return timedResponse({ ...responseState(latest, true),\n               temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, \"load\") : sealTemporaryState(latest, \"load\"), recoveredTurn: true });\n           }\n         }\n       }\n       const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);\n-      return Response.json({ ...responseState(state, !!user.is_anonymous),\n+      return timedResponse({ ...responseState(state, !!user.is_anonymous),\n         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, \"load\") : sealTemporaryState(state, \"load\") } : {}) });\n     }\n     if (![\"deleteMemory\", \"clearMemory\", \"clearHistory\"].includes(body.action) ||\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/api/persona/history/route.ts",
+      "source": {
+        "path": "app/api/persona/history/route.ts",
+        "coverage": "全文",
+        "text": "import { TemporaryStateUnavailableError, temporaryStateMessage } from \"../../../../lib/temporary-state-error\";\nimport { maintenanceResponse } from \"../../../../lib/maintenance\";\nimport { createClient } from \"@supabase/supabase-js\";\nimport { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot } from \"../../../../lib/canonical-state\";\n\nasync function authenticate(request: Request) {\n  const token = request.headers.get(\"authorization\")?.match(/^Bearer (.+)$/)?.[1];\n  if (!token) return null;\n  const db = createClient(\"https://tzozajnwznxqgxnjikoy.supabase.co\", \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\", {\n    global: { headers: { Authorization: `Bearer ${token}` } },\n    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },\n  });\n  const { data, error } = await db.auth.getUser(token);\n  return error ? null : data.user;\n}\nfunction responseState(state: RootState, ephemeral = false) {\n  const history = state.history ?? [];\n  return { exists: true, history, memory: state.memory, relationshipPoints: state.relationshipPoints,\n    misakiTodayMemory: state.todayMemory, ephemeral, messageCount: history.length,\n    userMessageCount: history.filter((item: any) => item?.role === \"user\").length, memoryCount: state.memory.length, updatedAt: state.updatedAt ?? null };\n}\nexport async function GET(request: Request) {\n  try {\n    const user = await authenticate(request);\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });\n    return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { \"Cache-Control\": \"no-store\" } });\n  } catch (error) {\n    console.error(\"CONVERSATION STATE READ FAILED\", { code: \"STATE_READ_FAILED\" });\n    return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });\n  }\n}\nexport async function POST(request: Request) {\n  // Anonymous \"load\" renews the root, so it is a write too.\n  const maintenance = await maintenanceResponse();\n  if (maintenance) return maintenance;\n  try {\n    const user = await authenticate(request);\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    const body = await request.json();\n    if (body.saveAnonymous === true) {\n      if (!user.is_anonymous || body.expectedUserId !== user.id) {\n        return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 });\n      }\n      let state = await loadTemporaryRoot(user.id, body.temporaryState);\n      // A reply can have committed even if its transport response was lost.\n      if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);\n        }\n      }\n      const { data, error } = await createServerSupabase().rpc(\"save_misaki_temporary_state\", {\n        p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,\n        p_today_memory: state.todayMemory, p_points: state.relationshipPoints,\n        p_relationship: state.temporaryRelationship ?? null,\n        p_expected_revision: state.temporaryRevision ?? null,\n      });\n      if (error) {\n        console.error(\"EMAIL CHECKPOINT ERROR\", { code: \"STATE_COMMIT_FAILED\" });\n        throw new Error(\"Email checkpoint failed\");\n      }\n      return Response.json({ synced: true, result: data });\n    }\n    if (body.action === \"load\") {\n      const loadStartedAt = performance.now();\n      const timedResponse = (payload: unknown) => Response.json(payload, {\n        headers: { \"Cache-Control\": \"no-store\", \"Server-Timing\": `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}` },\n      });\n      if (user.is_anonymous && typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) {\n            const latest = await loadTemporaryRoot(user.id, replay.temporaryState);\n            return timedResponse({ ...responseState(latest, true),\n              temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, \"load\") : sealTemporaryState(latest, \"load\"), recoveredTurn: true });\n          }\n        }\n      }\n      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);\n      return timedResponse({ ...responseState(state, !!user.is_anonymous),\n        ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, \"load\") : sealTemporaryState(state, \"load\") } : {}) });\n    }\n    if (![\"deleteMemory\", \"clearMemory\", \"clearHistory\"].includes(body.action) ||\n      (body.action === \"deleteMemory\" && typeof body.value !== \"string\")) {\n      return Response.json({ error: \"Explicit state operation required.\" }, { status: 400 });\n    }\n    if (user.is_anonymous) {\n      const state = await loadTemporaryRoot(user.id, body.temporaryState);\n      if (body.action === \"clearHistory\") state.history = [];\n      else state.memory = body.action === \"clearMemory\" ? [] : state.memory.filter(item => item !== body.value);\n      return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });\n    }\n    const { error } = await createServerSupabase().rpc(\"edit_misaki_conversation_state\", {\n      p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,\n    });\n    if (error) throw new Error(\"Conversation edit failed\");\n    return Response.json(responseState(await loadCanonicalState(user.id)));\n  } catch (error) {\n    if (error instanceof TemporaryStateUnavailableError) {\n      const status = error.reason === \"expired\" ? 410 : 409;\n      const code = error.reason === \"expired\" ? \"TEMPORARY_STATE_EXPIRED\" : \"TEMPORARY_STATE_UNVERIFIABLE\";\n      console.error(\"CONVERSATION STATE UNAVAILABLE\", { code, status });\n      return Response.json({ code, error: temporaryStateMessage(status, { code }) },\n        { status, headers: { \"Cache-Control\": \"no-store\" } });\n    }\n    // Never log arbitrary exception payloads (may contain private data).\n    console.error(\"CONVERSATION STATE WRITE FAILED\", { code: \"STATE_OPERATION_FAILED\" });\n    return Response.json({ error: \"Conversation state could not be saved.\" }, { status: 500 });\n  }\n}\n",
+        "sha256": "289ab5ab5c30e64f4b9b74d045f103021a2d76dfd2f71073623465f5e9af88fc"
+      }
+    },
+    {
+      "path": "app/chat/initial-chat-scroll.tsx",
+      "status": "modified",
+      "additions": 99,
+      "deletions": 103,
+      "patch": "diff --git a/app/chat/initial-chat-scroll.tsx b/app/chat/initial-chat-scroll.tsx\nindex 3f61d14..9061c81 100644\n--- a/app/chat/initial-chat-scroll.tsx\n+++ b/app/chat/initial-chat-scroll.tsx\n@@ -2,130 +2,126 @@\n \n import { useEffect } from \"react\";\n \n-function scrollToLatest() {\n-  const scrollingElement =\n-    document.scrollingElement ??\n-    document.documentElement;\n+// The document (not .chat) is the scroll container on this page.\n+// Never use a timer that can pull someone away from older messages.\n+const BOTTOM_THRESHOLD = 100;\n \n-  scrollingElement.scrollTop =\n-    scrollingElement.scrollHeight;\n+function scrollingElement(): Element {\n+  return document.scrollingElement ?? document.documentElement;\n }\n \n-export default function InitialChatScroll() {\n-  useEffect(() => {\n-    let active = true;\n-    let observer: MutationObserver | null = null;\n-    let settleTimer = 0;\n-    let hardStopTimer = 0;\n-    let attempts = 0;\n+function distanceFromBottom(): number {\n+  const element = scrollingElement();\n+  return element.scrollHeight - element.clientHeight - element.scrollTop;\n+}\n \n-    const imageLoadHandler = () => {\n-      if (!active) return;\n+function toBottom(): void {\n+  const element = scrollingElement();\n+  element.scrollTop = element.scrollHeight;\n+}\n \n-      window.requestAnimationFrame(() => {\n-        if (!active) return;\n-        scrollToLatest();\n+export default function InitialChatScroll() {\n+  useEffect(() => {\n+    let disposed = false;\n+    let initialized = false;\n+    let following = true;\n+    let userScrolling = false;\n+    let touchStartY: number | null = null;\n+    let frame = 0;\n+    let pending = false;\n+    let previousHeight = scrollingElement().scrollHeight;\n+\n+    const chat = document.querySelector<HTMLElement>(\".shell .chat\");\n+    if (!chat) return;\n+\n+    const schedule = () => {\n+      if (disposed || pending || !following) return;\n+      pending = true;\n+      frame = window.requestAnimationFrame(() => {\n+        pending = false;\n+        if (!disposed && following) toBottom();\n       });\n     };\n \n-    const bindPendingImages = () => {\n-      document\n-        .querySelectorAll<HTMLImageElement>(\n-          '.shell .chat img'\n-        )\n-        .forEach((image) => {\n-          if (image.complete) {\n-            return;\n-          }\n-\n-          image.addEventListener(\n-            \"load\",\n-            imageLoadHandler,\n-            { once: true }\n-          );\n-        });\n+    // Only a real user gesture cancels initial positioning. Programmatic\n+    // scrolls from images, font loading and Safari viewport resizing do not.\n+    const userIntent = () => {\n+      userScrolling = true;\n+      // Respect gestures made before the first history bubble appears.\n+      following = initialized ? distanceFromBottom() <= BOTTOM_THRESHOLD : false;\n     };\n \n-    const finish = () => {\n-      observer?.disconnect();\n-      observer = null;\n-      window.clearTimeout(settleTimer);\n-      window.clearTimeout(hardStopTimer);\n+    const onTouchStart = (event: TouchEvent) => {\n+      touchStartY = event.touches[0]?.clientY ?? null;\n+    };\n+    const onTouchMove = (event: TouchEvent) => {\n+      const currentY = event.touches[0]?.clientY;\n+      if (touchStartY === null || currentY === undefined) return;\n+      if (Math.abs(currentY - touchStartY) < 8) return;\n+      userIntent();\n+    };\n+    const onKeyDown = (event: KeyboardEvent) => {\n+      if ([\"ArrowUp\", \"ArrowDown\", \"PageUp\", \"PageDown\", \"Home\", \"End\", \" \"].includes(event.key)) userIntent();\n     };\n \n-    const run = () => {\n-      if (!active) return;\n-\n-      const chat =\n-        document.querySelector<HTMLElement>(\".shell .chat\");\n-\n-      if (!chat) return;\n-\n-      const bubbles = chat.querySelectorAll(\n-        \".bubble:not(.typingBubble)\"\n-      );\n-\n-      if (bubbles.length === 0) return;\n-\n-      attempts += 1;\n-      bindPendingImages();\n-\n-      window.requestAnimationFrame(() => {\n-        window.requestAnimationFrame(() => {\n-          if (!active) return;\n-\n-          scrollToLatest();\n-\n-          window.clearTimeout(settleTimer);\n-          settleTimer = window.setTimeout(() => {\n-            if (!active) return;\n-\n-            scrollToLatest();\n-          }, 350);\n-        });\n-      });\n+    const onScroll = () => {\n+      if (!initialized || !userScrolling) return;\n+      following = distanceFromBottom() <= BOTTOM_THRESHOLD;\n+    };\n \n-      if (attempts >= 12) {\n-        observer?.disconnect();\n-        observer = null;\n+    const onMutation = () => {\n+      const hasConversation = Boolean(chat.querySelector(\".bubble:not(.typingBubble)\"));\n+      if (!initialized && hasConversation) {\n+        initialized = true;\n+        if (!userScrolling) following = true;\n+        schedule();\n+      } else if (initialized && following) {\n+        schedule();\n       }\n     };\n \n-    run();\n-\n-    observer = new MutationObserver(() => {\n-      run();\n+    // ResizeObserver handles text reflow, images and font metrics. Only keep\n+    // following if the reader was already at the latest messages.\n+    const resize = new ResizeObserver(() => {\n+      const height = scrollingElement().scrollHeight;\n+      if (height !== previousHeight) {\n+        previousHeight = height;\n+        if (initialized && following) schedule();\n+      }\n     });\n-\n-    observer.observe(document.body, {\n-      childList: true,\n-      subtree: true,\n+    resize.observe(chat);\n+    const mutation = new MutationObserver(onMutation);\n+    mutation.observe(chat, { childList: true, subtree: true, characterData: true });\n+    onMutation();\n+\n+    const viewport = window.visualViewport;\n+    const onViewportResize = () => {\n+      if (initialized && following) schedule();\n+    };\n+    viewport?.addEventListener(\"resize\", onViewportResize);\n+    window.addEventListener(\"resize\", onViewportResize);\n+    window.addEventListener(\"scroll\", onScroll, { passive: true });\n+    window.addEventListener(\"wheel\", userIntent, { passive: true });\n+    window.addEventListener(\"touchstart\", onTouchStart, { passive: true });\n+    window.addEventListener(\"touchmove\", onTouchMove, { passive: true });\n+    window.addEventListener(\"keydown\", onKeyDown);\n+    document.fonts?.ready.then(() => {\n+      if (!disposed && initialized && following) schedule();\n     });\n \n-    hardStopTimer = window.setTimeout(() => {\n-      if (!active) return;\n-\n-      bindPendingImages();\n-      scrollToLatest();\n-      finish();\n-    }, 4000);\n-\n     return () => {\n-      active = false;\n-      finish();\n-\n-      document\n-        .querySelectorAll<HTMLImageElement>(\n-          '.shell .chat img'\n-        )\n-        .forEach((image) => {\n-          image.removeEventListener(\n-            \"load\",\n-            imageLoadHandler\n-          );\n-        });\n+      disposed = true;\n+      window.cancelAnimationFrame(frame);\n+      resize.disconnect();\n+      mutation.disconnect();\n+      viewport?.removeEventListener(\"resize\", onViewportResize);\n+      window.removeEventListener(\"resize\", onViewportResize);\n+      window.removeEventListener(\"scroll\", onScroll);\n+      window.removeEventListener(\"wheel\", userIntent);\n+      window.removeEventListener(\"touchstart\", onTouchStart);\n+      window.removeEventListener(\"touchmove\", onTouchMove);\n+      window.removeEventListener(\"keydown\", onKeyDown);\n     };\n   }, []);\n-\n   return null;\n }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/initial-chat-scroll.tsx",
+      "source": {
+        "path": "app/chat/initial-chat-scroll.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useEffect } from \"react\";\n\n// The document (not .chat) is the scroll container on this page.\n// Never use a timer that can pull someone away from older messages.\nconst BOTTOM_THRESHOLD = 100;\n\nfunction scrollingElement(): Element {\n  return document.scrollingElement ?? document.documentElement;\n}\n\nfunction distanceFromBottom(): number {\n  const element = scrollingElement();\n  return element.scrollHeight - element.clientHeight - element.scrollTop;\n}\n\nfunction toBottom(): void {\n  const element = scrollingElement();\n  element.scrollTop = element.scrollHeight;\n}\n\nexport default function InitialChatScroll() {\n  useEffect(() => {\n    let disposed = false;\n    let initialized = false;\n    let following = true;\n    let userScrolling = false;\n    let touchStartY: number | null = null;\n    let frame = 0;\n    let pending = false;\n    let previousHeight = scrollingElement().scrollHeight;\n\n    const chat = document.querySelector<HTMLElement>(\".shell .chat\");\n    if (!chat) return;\n\n    const schedule = () => {\n      if (disposed || pending || !following) return;\n      pending = true;\n      frame = window.requestAnimationFrame(() => {\n        pending = false;\n        if (!disposed && following) toBottom();\n      });\n    };\n\n    // Only a real user gesture cancels initial positioning. Programmatic\n    // scrolls from images, font loading and Safari viewport resizing do not.\n    const userIntent = () => {\n      userScrolling = true;\n      // Respect gestures made before the first history bubble appears.\n      following = initialized ? distanceFromBottom() <= BOTTOM_THRESHOLD : false;\n    };\n\n    const onTouchStart = (event: TouchEvent) => {\n      touchStartY = event.touches[0]?.clientY ?? null;\n    };\n    const onTouchMove = (event: TouchEvent) => {\n      const currentY = event.touches[0]?.clientY;\n      if (touchStartY === null || currentY === undefined) return;\n      if (Math.abs(currentY - touchStartY) < 8) return;\n      userIntent();\n    };\n    const onKeyDown = (event: KeyboardEvent) => {\n      if ([\"ArrowUp\", \"ArrowDown\", \"PageUp\", \"PageDown\", \"Home\", \"End\", \" \"].includes(event.key)) userIntent();\n    };\n\n    const onScroll = () => {\n      if (!initialized || !userScrolling) return;\n      following = distanceFromBottom() <= BOTTOM_THRESHOLD;\n    };\n\n    const onMutation = () => {\n      const hasConversation = Boolean(chat.querySelector(\".bubble:not(.typingBubble)\"));\n      if (!initialized && hasConversation) {\n        initialized = true;\n        if (!userScrolling) following = true;\n        schedule();\n      } else if (initialized && following) {\n        schedule();\n      }\n    };\n\n    // ResizeObserver handles text reflow, images and font metrics. Only keep\n    // following if the reader was already at the latest messages.\n    const resize = new ResizeObserver(() => {\n      const height = scrollingElement().scrollHeight;\n      if (height !== previousHeight) {\n        previousHeight = height;\n        if (initialized && following) schedule();\n      }\n    });\n    resize.observe(chat);\n    const mutation = new MutationObserver(onMutation);\n    mutation.observe(chat, { childList: true, subtree: true, characterData: true });\n    onMutation();\n\n    const viewport = window.visualViewport;\n    const onViewportResize = () => {\n      if (initialized && following) schedule();\n    };\n    viewport?.addEventListener(\"resize\", onViewportResize);\n    window.addEventListener(\"resize\", onViewportResize);\n    window.addEventListener(\"scroll\", onScroll, { passive: true });\n    window.addEventListener(\"wheel\", userIntent, { passive: true });\n    window.addEventListener(\"touchstart\", onTouchStart, { passive: true });\n    window.addEventListener(\"touchmove\", onTouchMove, { passive: true });\n    window.addEventListener(\"keydown\", onKeyDown);\n    document.fonts?.ready.then(() => {\n      if (!disposed && initialized && following) schedule();\n    });\n\n    return () => {\n      disposed = true;\n      window.cancelAnimationFrame(frame);\n      resize.disconnect();\n      mutation.disconnect();\n      viewport?.removeEventListener(\"resize\", onViewportResize);\n      window.removeEventListener(\"resize\", onViewportResize);\n      window.removeEventListener(\"scroll\", onScroll);\n      window.removeEventListener(\"wheel\", userIntent);\n      window.removeEventListener(\"touchstart\", onTouchStart);\n      window.removeEventListener(\"touchmove\", onTouchMove);\n      window.removeEventListener(\"keydown\", onKeyDown);\n    };\n  }, []);\n  return null;\n}\n",
+        "sha256": "50d063d29c20760f36a97e355aba7371494734a4d983432778ef272749d2609d"
+      }
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "status": "modified",
+      "additions": 24,
+      "deletions": 0,
+      "patch": "diff --git a/app/chat/page.tsx b/app/chat/page.tsx\nindex 8d93d08..dfb4117 100644\n--- a/app/chat/page.tsx\n+++ b/app/chat/page.tsx\n@@ -756,11 +756,25 @@ export default function ChatPage() {\n     window.addEventListener(\"misaki-history-state\", receiveHistory);\n     window.addEventListener(\"misaki-usage-state\", receiveUsage);\n     async function load() {\n+      // Enable locally with sessionStorage.setItem(\"misaki-history-timing\", \"1\").\n+      // Timings only: never log tokens, history, user IDs or temporary state.\n+      const timingEnabled = sessionStorage.getItem(\"misaki-history-timing\") === \"1\";\n+      const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n+      const startedAt = timingEnabled ? nowMs() : 0;\n+      let previousAt = startedAt;\n+      const timings: Record<string, number> = {};\n+      const checkpoint = (name: string) => {\n+        if (!timingEnabled) return;\n+        const now = nowMs();\n+        timings[name] = Math.round(now - previousAt);\n+        previousAt = now;\n+      };\n       try {\n         // A full remount ends the previous page's in-flight UI send marker.\n         sessionStorage.removeItem(\"misaki-chat-sending\");\n         // Do not display unverified caches or persist an empty error-state over them.\n         const accessToken = await getAccessToken();\n+        checkpoint(\"accessTokenMs\");\n         const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);\n         const response = await fetch(\"/api/persona/history\", {\n           method: \"POST\",\n@@ -768,13 +782,21 @@ export default function ChatPage() {\n           body: JSON.stringify({ action: \"load\", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),\n             pending: JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\") }),\n         });\n+        checkpoint(\"historyApiMs\");\n+        if (timingEnabled) {\n+          const serverTiming = response.headers.get(\"Server-Timing\");\n+          const duration = serverTiming?.match(/(?:^|,)\\s*history;dur=([\\d.]+)/)?.[1];\n+          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));\n+        }\n         if (!response.ok) {\n           const result = await response.json().catch(() => null);\n           if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);\n           throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || \"美咲の状態を読み込めませんでした。\");\n         }\n         const state = await response.json();\n+        checkpoint(\"jsonParseMs\");\n         const { data: latest } = await supabase.auth.getSession();\n+        checkpoint(\"sessionVerificationMs\");\n         if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;\n         applyRoot(state);\n         const pending = JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\");\n@@ -786,6 +808,8 @@ export default function ChatPage() {\n         if (active && Array.isArray(state.history)) setMessages(state.history);\n         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);\n         if (active) { setRecoveryCode(null); setLoaded(true); }\n+        checkpoint(\"stateEnqueueMs\");\n+        if (timingEnabled) console.info(\"[misaki-history-timing]\", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });\n       } catch (error) {\n         if (active) setSendError(error instanceof Error ? error.message : \"状態を読み込めませんでした。\");\n       }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/cb9c00cd1ee87d37ef57a28f6460c8a9352be161/app/chat/page.tsx",
+      "source": {
+        "path": "app/chat/page.tsx",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "\"use client\";\nimport { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from \"../../lib/recovery-session\";\n\nimport { startIndependentRecovery, checkRecoveryAdmission } from \"../../lib/recovery-session\";\nimport { temporaryStateMessage } from \"../../lib/temporary-state-error\";\n\nimport { maintenanceMessage } from \"../../lib/maintenance-result\";\n\nimport { TEMPORARY_STATE_KEY, DEVICE_USER_KEY } from \"../../lib/device-conversation\";\nimport {\n  useEffect,\n  useState,\n} from \"react\";\n\nimport {\n  supabase,\n} from \"../../lib/supabase\";\n\nimport {\n  registerPushSubscription,\n  sendTestPushNotification,\n} from \"../../lib/push-notifications\";\n\ntype ChatMessage = {\n  role: \"misaki\" | \"user\";\n  text: string;\n  requestId?: string;\n};\n\ntype DailyUsage = {\n  date: string;\n  count: number;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype Plan =\n  | \"free\"\n  | \"premium\";\n\ntype UsageRpcResult = {\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype ApiUsage = {\n  messageCount?: number;\n  remaining?: number;\n  isPremium?: boolean;\n};\n\nconst STORAGE_KEY =\n  \"misaki-chat-history\";\n\nconst MEMORY_KEY =\n  \"misaki-long-term-memory\";\n\nconst RELATIONSHIP_KEY =\n  \"misaki-relationship-points\";\n\nconst MISAKI_TODAY_MEMORY_KEY =\n  \"misaki-today-memory\";\n\nconst MAX_MESSAGES = 60;\n\n// 無料版は1日20往復まで\nconst FREE_DAILY_LIMIT = 20;\n\nconst INITIAL_MESSAGES:\n  ChatMessage[] = [];\n\n\n\nfunction getJapanDateKey() {\n  return new Date()\n    .toLocaleDateString(\n      \"ja-JP\",\n      {\n        timeZone:\n          \"Asia/Tokyo\",\n\n        year:\n          \"numeric\",\n\n        month:\n          \"2-digit\",\n\n        day:\n          \"2-digit\",\n      }\n    );\n}\n\nfunction getJapanCurrentTime() {\n  return new Date()\n    .toLocaleString(\n      \"ja-JP\",\n      {\n        timeZone:\n          \"Asia/Tokyo\",\n\n        year:\n          \"numeric\",\n\n        month:\n          \"2-digit\",\n\n        day:\n          \"2-digit\",\n\n        weekday:\n          \"short\",\n\n        hour:\n          \"2-digit\",\n\n        minute:\n          \"2-digit\",\n\n        hour12:\n          false,\n      }\n    );\n}\n\nfunction createEmptyTodayMemory():\n  MisakiTodayMemory {\n  return {\n    date:\n      getJapanDateKey(),\n\n    items: [],\n  };\n}\n\nfunction isPremiumActive(\n  plan:\n    | string\n    | null\n    | undefined,\n\n  premiumUntil:\n    | string\n    | null\n    | undefined\n) {\n  if (\n    plan !==\n    \"premium\"\n  ) {\n    return false;\n  }\n\n  if (\n    !premiumUntil\n  ) {\n    return true;\n  }\n\n  const expiresAt =\n    new Date(\n      premiumUntil\n    ).getTime();\n\n  if (\n    !Number.isFinite(\n      expiresAt\n    )\n  ) {\n    return false;\n  }\n\n  return (\n    expiresAt >\n    Date.now()\n  );\n}\n\nfunction getFirstRpcRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(\n      value\n    ) &&\n    value.length >\n      0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value ===\n      \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\nexport default function ChatPage() {\n  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);\n  const [recoveryStarting, setRecoveryStarting] = useState(false);\n  async function beginIndependentConversation() {\n    if (recoveryStarting || !recoveryCode) return;\n    if (!window.confirm(\"古い状態を保全したまま、このタブで独立した新しい会話を始めます。古い会話や記憶は引き継ぎません。よろしいですか？\")) return;\n    setRecoveryStarting(true);\n    try {\n      const { data, error } = await supabase.auth.getSession();\n      if (error) throw error;\n      if (!await checkRecoveryAdmission(fetch)) {\n        setRecoveryStarting(false);\n        setSendError(\"新しい会話の復旧受付を一時停止しています。既存の会話や保存情報は変更していません。\");\n        return;\n      }\n      // Admission check is asynchronous; never carry an old user's decision across an account switch.\n      const { data: current, error: currentError } = await supabase.auth.getSession();\n      if (currentError || !current.session?.user.is_anonymous || current.session.user.id !== data.session?.user.id) {\n        throw new Error(\"Account changed during recovery admission\");\n      }\n      startIndependentRecovery(current.session.user, recoveryCode, crypto.randomUUID());\n      window.location.assign('/chat'); // Full navigation creates the isolated client.\n    } catch {\n      setRecoveryStarting(false);\n      setSendError(\"新しい会話を開始できませんでした。既存データは変更していません。\");\n    }\n  }\n\n  const [\n    message,\n    setMessage,\n  ] =\n    useState(\"\");\n\n  const [\n    messages,\n    setMessages,\n  ] =\n    useState<\n      ChatMessage[]\n    >(\n      INITIAL_MESSAGES\n    );\n\n  const [replyFeedback, setReplyFeedback] = useState<Record<string, { rating: \"good\" | \"bad\"; reason?: string }>>({});\n\n  const [\n    memory,\n    setMemory,\n  ] =\n    useState<\n      string[]\n    >([]);\n\n  const [\n    misakiTodayMemory,\n    setMisakiTodayMemory,\n  ] =\n    useState<\n      MisakiTodayMemory\n    >(\n      createEmptyTodayMemory()\n    );\n\n  const [\n    relationshipPoints,\n    setRelationshipPoints,\n  ] =\n    useState(0);\n\n  const [\n    dailyUsage,\n    setDailyUsage,\n  ] =\n    useState<\n      DailyUsage\n    >({\n      date:\n        getJapanDateKey(),\n\n      count:\n        0,\n    });\n\n  const [\n    plan,\n    setPlan,\n  ] =\n    useState<\n      Plan\n    >(\n      \"free\"\n    );\n\n  const [\n    accountLoaded,\n    setAccountLoaded,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showPremium,\n    setShowPremium,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showMemory,\n    setShowMemory,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showMenu,\n    setShowMenu,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    loading,\n    setLoading,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    waitingOnReply,\n    setWaitingOnReply,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    sendError,\n    setSendError,\n  ] =\n    useState(\n      \"\"\n    );\n\n  const [\n    loaded,\n    setLoaded,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    notificationPermission,\n    setNotificationPermission,\n  ] =\n    useState<\n      | \"default\"\n      | \"granted\"\n      | \"denied\"\n      | \"unsupported\"\n    >(\n      \"default\"\n    );\n\n  const isPremium =\n    plan ===\n    \"premium\";\n\n  const today =\n    getJapanDateKey();\n\n  const usageCountToday =\n    dailyUsage.date ===\n    today\n      ? dailyUsage.count\n      : 0;\n\n  const freeRemaining =\n    Math.max(\n      0,\n      FREE_DAILY_LIMIT -\n        usageCountToday\n    );\n\n  const freeLimitReached =\n    accountLoaded &&\n    !isPremium &&\n    usageCountToday >=\n      FREE_DAILY_LIMIT;\n\n  useEffect(\n    () => {\n      let active =\n        true;\n\n      async function loadEntitlement(\n        userId:\n          string\n      ) {\n        for (\n          let attempt =\n            0;\n          attempt <\n            5;\n          attempt +=\n            1\n        ) {\n          const {\n            data,\n            error,\n          } =\n            await supabase\n              .from(\n                \"user_entitlements\"\n              )\n              .select(\n                \"plan,premium_until\"\n              )\n              .eq(\n                \"user_id\",\n                userId\n              )\n              .maybeSingle();\n\n          if (\n            error\n          ) {\n            throw error;\n          }\n\n          if (\n            data\n          ) {\n            return isPremiumActive(\n              data.plan,\n              data.premium_until\n            );\n          }\n\n          await new Promise(\n            (\n              resolve\n            ) =>\n              window.setTimeout(\n                resolve,\n                350\n              )\n          );\n        }\n\n        return false;\n      }\n\n      async function loadDailyUsage() {\n        const {\n          data,\n          error,\n        } =\n          await supabase.rpc(\n            \"get_daily_message_usage\"\n          );\n\n        if (\n          error\n        ) {\n          throw error;\n        }\n\n        const usage =\n          getFirstRpcRow<\n            UsageRpcResult\n          >(\n            data\n          );\n\n        return {\n          count:\n            typeof usage\n              ?.message_count ===\n              \"number\"\n              ? Math.max(\n                  0,\n                  Math.floor(\n                    usage\n                      .message_count\n                  )\n                )\n              : 0,\n\n          isPremium:\n            usage\n              ?.is_premium ===\n            true,\n        };\n      }\n\n      async function initializeAccount() {\n        try {\n          const {\n            data:\n              sessionData,\n            error:\n              sessionError,\n          } =\n            await supabase\n              .auth\n              .getSession();\n\n          if (\n            sessionError\n          ) {\n            throw sessionError;\n          }\n\n          let user =\n            sessionData\n              .session\n              ?.user ??\n            null;\n\n          if (\n            !user\n          ) {\n            const {\n              data:\n                signInData,\n              error:\n                signInError,\n            } =\n              await supabase\n                .auth\n                .signInAnonymously();\n\n            if (\n              signInError\n            ) {\n              throw signInError;\n            }\n\n            user =\n              signInData\n                .user ??\n              null;\n          }\n\n          if (\n            !user\n          ) {\n            throw new Error(\n              \"Supabase user was not created.\"\n            );\n          }\n\n          const [\n            entitlementPremium,\n            usage,\n          ] =\n            await Promise\n              .all([\n                loadEntitlement(\n                  user.id\n                ),\n\n                loadDailyUsage(),\n              ]);\n\n          if (\n            !active\n          ) {\n            return;\n          }\n\n          const premium =\n            entitlementPremium ||\n            usage\n              .isPremium;\n\n          setPlan(\n            premium\n              ? \"premium\"\n              : \"free\"\n          );\n\n          setDailyUsage({\n            date:\n              getJapanDateKey(),\n\n            count:\n              usage.count,\n          });\n        } catch (\n          error\n        ) {\n          console.error(\n            \"Supabase account initialization failed:\",\n            error\n          );\n\n          if (\n            active\n          ) {\n            setPlan(\n              \"free\"\n            );\n\n            setDailyUsage({\n              date:\n                getJapanDateKey(),\n\n              count:\n                0,\n            });\n          }\n        } finally {\n          if (\n            active\n          ) {\n            setAccountLoaded(\n              true\n            );\n          }\n        }\n      }\n\n      initializeAccount();\n\n      return () => {\n        active =\n          false;\n      };\n    },\n    []\n  );\n\n  useEffect(\n    () => {\n      if (\n        !accountLoaded\n      ) {\n        return;\n      }\n\n      if (\n        isPremium\n      ) {\n        setShowPremium(\n          false\n        );\n\n        return;\n      }\n\n      if (\n        usageCountToday >=\n        FREE_DAILY_LIMIT\n      ) {\n        setShowPremium(\n          true\n        );\n      }\n    },\n    [\n      accountLoaded,\n      isPremium,\n      usageCountToday,\n    ]\n  );\n\n  useEffect(\n    () => {\n      if (\n        \"serviceWorker\" in\n        navigator\n      ) {\n        navigator\n          .serviceWorker\n          .register(\n            \"/sw.js\"\n          )\n          .then(\n            (\n              registration\n            ) => {\n              console.log(\n                \"Service Worker registered:\",\n                registration\n              );\n            }\n          )\n          .catch(\n            (\n              error\n            ) => {\n              console.error(\n                \"Service Worker registration failed:\",\n                error\n              );\n            }\n          );\n      }\n    },\n    []\n  );\n\n  useEffect(\n    () => {\n      if (\n        !(\n          \"Notification\" in\n          window\n        )\n      ) {\n        setNotificationPermission(\n          \"unsupported\"\n        );\n\n        return;\n      }\n\n      setNotificationPermission(\n        Notification\n          .permission\n      );\n    },\n    []\n  );\n\n  useEffect(() => {\n    let active = true;\n    function applyRoot(state: any) {\n      if (!active || !state) return;\n      if (Array.isArray(state.memory)) setMemory(state.memory);\n      if (typeof state.relationshipPoints === \"number\") setRelationshipPoints(state.relationshipPoints);\n      if (state.misakiTodayMemory) applyTodayMemory(state.misakiTodayMemory);\n    }\n    const receive = (event: Event) => applyRoot((event as CustomEvent).detail);\n    const receiveHistory = (event: Event) => {\n      const history = (event as CustomEvent).detail;\n      if (active && Array.isArray(history)) setMessages(history.slice(-MAX_MESSAGES));\n    };\n    const receiveUsage = (event: Event) => applyApiUsage((event as CustomEvent).detail);\n    window.addEventListener(\"misaki-root-state\", receive);\n    window.addEventListener(\"misaki-history-state\", receiveHistory);\n    window.addEventListener(\"misaki-usage-state\", receiveUsage);\n    async function load() {\n      // Enable locally with sessionStorage.setItem(\"misaki-history-timing\", \"1\").\n      // Timings only: never log tokens, history, user IDs or temporary state.\n      const timingEnabled = sessionStorage.getItem(\"misaki-history-timing\") === \"1\";\n      const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n      const startedAt = timingEnabled ? nowMs() : 0;\n      let previousAt = startedAt;\n      const timings: Record<string, number> = {};\n      const checkpoint = (name: string) => {\n        if (!timingEnabled) return;\n        const now = nowMs();\n        timings[name] = Math.round(now - previousAt);\n        previousAt = now;\n      };\n      try {\n        // A full remount ends the previous page's in-flight UI send marker.\n        sessionStorage.removeItem(\"misaki-chat-sending\");\n        // Do not display unverified caches or persist an empty error-state over them.\n        const accessToken = await getAccessToken();\n        checkpoint(\"accessTokenMs\");\n        const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);\n        const response = await fetch(\"/api/persona/history\", {\n          method: \"POST\",\n          headers: { \"Content-Type\": \"application/json\", Authorization: `Bearer ${accessToken}` },\n          body: JSON.stringify({ action: \"load\", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),\n            pending: JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\") }),\n        });\n        checkpoint(\"historyApiMs\");\n        if (timingEnabled) {\n          const serverTiming = response.headers.get(\"Server-Timing\");\n          const duration = serverTiming?.match(/(?:^|,)\\s*history;dur=([\\d.]+)/)?.[1];\n          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));\n        }\n        if (!response.ok) {\n          const result = await response.json().catch(() => null);\n          if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);\n          throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || \"美咲の状態を読み込めませんでした。\");\n        }\n        const state = await response.json();\n        checkpoint(\"jsonParseMs\");\n        const { data: latest } = await supabase.auth.getSession();\n        checkpoint(\"sessionVerificationMs\");\n        if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;\n        applyRoot(state);\n        const pending = JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\");\n        if (state.recoveredTurn || state.history?.some((item: any) => item.requestId === pending?.requestId)) {\n          sessionStorage.removeItem(\"misaki-pending-chat-turn\");\n        }\n        if (typeof state.temporaryState === \"string\") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);\n        // Permanent history is canonical. Anonymous history remains a display cache.\n        if (active && Array.isArray(state.history)) setMessages(state.history);\n        for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);\n        if (active) { setRecoveryCode(null); setLoaded(true); }\n        checkpoint(\"stateEnqueueMs\");\n        if (timingEnabled) console.info(\"[misaki-history-timing]\", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });\n      } catch (error) {\n        if (active) setSendError(error instanceof Error ? error.message : \"状態を読み込めませんでした。\");\n      }\n    }\n    void load();\n    return () => {\n      active = false;\n      window.removeEventListener(\"misaki-root-state\", receive);\n      window.removeEventListener(\"misaki-history-state\", receiveHistory);\n      window.removeEventListener(\"misaki-usage-state\", receiveUsage);\n    };\n  }, []);\n\n  useEffect(\n    () => {\n      if (\n        !loaded\n      ) {\n        return;\n      }\n\n      try {\n        const limitedMessages =\n          messages\n            .slice(\n              -MAX_MESSAGES\n            );\n\n        localStorage\n          .setItem(\n            STORAGE_KEY,\n\n            JSON.stringify(\n              limitedMessages\n            )\n          );\n      } catch (\n        error\n      ) {\n        console.error(\n          \"Failed to save chat history:\",\n          error\n        );\n      }\n    },\n    [\n      messages,\n      loaded,\n    ]\n  );\n\n  async function getAccessToken() {\n    const {\n      data,\n      error,\n    } =\n      await supabase\n        .auth\n        .getSession();\n\n    if (\n      error\n    ) {\n      throw error;\n    }\n\n    const accessToken =\n      data\n        .session\n        ?.access_token;\n\n    if (\n      !accessToken\n    ) {\n      throw new Error(\n        \"ログイン情報を確認できま",
+        "sha256": "5a5409469314e49389c2e30fa618787e716cb0febfd2d361f46626bdf212f893"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "f0651faefe43d15df91bed29f62083f2f73e5715",
+      "message": "fix: keep chat at latest without interrupting history reading\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f0651faefe43d15df91bed29f62083f2f73e5715"
+    },
+    {
+      "sha": "79eb8a9ca84dcf712911899d59dee3fb959940fb",
+      "message": "fix: distinguish user scrolling from layout-driven scrolling\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/79eb8a9ca84dcf712911899d59dee3fb959940fb"
+    },
+    {
+      "sha": "4cf92c9453fdcc2dea02a8f261834e6d18d2f307",
+      "message": "docs: record draft chat scroll change and outstanding validation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4cf92c9453fdcc2dea02a8f261834e6d18d2f307"
+    },
+    {
+      "sha": "1a13022649170f25caf328b83f6fbfb754c72b25",
+      "message": "docs: record draft chat scroll change and outstanding validation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1a13022649170f25caf328b83f6fbfb754c72b25"
+    },
+    {
+      "sha": "12a94e111490bb86d9636715167046989769a67d",
+      "message": "fix: distinguish scrolling gestures from taps in initial chat scroll\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/12a94e111490bb86d9636715167046989769a67d"
+    },
+    {
+      "sha": "157b7788de57af5205822bf91804d9af6a053912",
+      "message": "chore: add opt-in privacy-safe client history load timing checkpoints\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/157b7788de57af5205822bf91804d9af6a053912"
+    },
+    {
+      "sha": "9e1208199656131fdf263d3f6e12f758f1b27c9f",
+      "message": "fix: make opt-in history timings safe in test runtimes without performance\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9e1208199656131fdf263d3f6e12f758f1b27c9f"
+    },
+    {
+      "sha": "6362654d8240721ef65467a07c825f1a9a765ec3",
+      "message": "chore: expose privacy-safe server timing for history load\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/6362654d8240721ef65467a07c825f1a9a765ec3"
+    },
+    {
+      "sha": "4c8b9a508bc655b272fbbff298a1daf1ddddbce5",
+      "message": "chore: include server-side history load duration in opt-in timing diagnostics\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4c8b9a508bc655b272fbbff298a1daf1ddddbce5"
+    },
+    {
+      "sha": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+      "message": "Merge main into PR #151 and preserve current docs; guard early scroll gestures\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/cb9c00cd1ee87d37ef57a28f6460c8a9352be161"
+    }
+  ],
+  "comments": [
+    {
+      "body": "### 2026-11-05 Vercelビルド停止中の静的レビュー（コード変更なし）\n\nPR head `4c8b9a5` の `app/chat/initial-chat-scroll.tsx` / `app/chat/page.tsx` / `app/api/persona/history/route.ts` を読み取り確認。**ビルド・デプロイは実行していない。**\n\n**要修正・検証候補**\n1. `userIntent()` は `initialized` 前にジェスチャーがあっても `following` を変更せず、`onMutation()` が初回の会話要素出現時に `following=true` を強制する。ユーザーが読み込み中に上へ移動した場合、意図しない最下部ジャンプの可能性。再現テストと修正が必要。\n2. `onTouchMove()` は指の移動方向を考慮せず、しきい値8px超で `userScrolling=true`。タッチ後の実際の `scroll` と `distanceFromBottom()` の組合せがiOS Safariで期待どおりか未確認。\n3. `ResizeObserver` は `.chat` を監視する一方、`previousHeight` はdocumentの `scrollHeight`。フォント/viewport/画像の変化で高さが変わる場合の追従と、閲覧中の強制スクロール防止を実機で検証すること。\n4. API `Server-Timing: history;dur=...` は `action=load` 分岐の計測で、前段の `maintenanceResponse()`、`authenticate()`、`request.json()` は含まない。クライアントの `historyApiMs` と単純比較して『DB時間』と解釈しないこと。\n5. `main` とPR headは分岐済み（main側16コミット、PR側9コミット）。CI・マージ可否・既存変更との整合を更新前に再確認すること。\n\n**今できること**: 上記の再現条件、テストケース、計測定義の整備。**解除後に必要**: main追従、CI、iPhone実機、5秒内訳実測、レビュー。これらが完了するまでDraft維持・マージ禁止。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/151#issuecomment-6654370542"
+    },
+    {
+      "body": "### Vercel停止中：スクロール回帰試験・計測の受け入れ条件（実行前チェックリスト）\n\n`main` とPR headの実装を比較。`main` は画像load時と350ms/4秒タイマーで下端へ強制移動するため、過去履歴閲覧中のジャンプが回帰リスク。PRではタイマー撤去済みだが以下の確認が必要。\n\n**スクロール試験（iPhone Safari＋長履歴を優先）**\n- [ ] 履歴なし→最初の返信を受け取る：最新メッセージが見える。\n- [ ] 履歴あり→初回表示：最新メッセージが見える。空履歴・typing bubbleだけでは初期化を完了しない。\n- [ ] 履歴取得中に指で上方向へ操作→履歴描画：ユーザー操作を優先し、強制ジャンプしない。\n- [ ] 過去履歴を読んでいる最中に新着・画像load・フォント確定・キーボード開閉：閲覧位置を維持する。\n- [ ] 自分で下端に戻る→新着：追従を再開する。\n- [ ] タッチ・ホイール・PageUp/Home/End・画面回転：意図しない追従再開や固定がない。\n- [ ] リロード・匿名ログイン・メールログイン・期限切れ復旧：所有者不一致の履歴が一瞬でも表示されない。\n- [ ] React effectの解除・再実行でイベントリスナー/Observerが重複しない。\n\n**約5秒の計測定義（匿名・メール各複数回、中央値と最大値）**\n- `getAccessToken` / API fetch（network含む） / `response.json` / `supabase.auth.getSession` / 所有者検証後state反映 / 描画完了、の順に計測。\n- サーバー側は認証、maintenance、body parse、状態取得を区別する。現行 `Server-Timing history;dur` は認証前処理を含まないため、総サーバー時間と混同しない。\n- 開発ログには時間値のみ。token、user_id、履歴本文、記憶、temporaryStateは出力しない。\n- 速度改善は実測比較ができるまで数値を主張しない。\n\n**作業境界**: これはレビュー・試験計画のみ。branch push/commit、Actionsの再実行、Vercelビルド、デプロイ、mainマージは実施していない。ビルド制限解除まではこの状態を維持する。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/151#issuecomment-6654387336"
+    }
+  ],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42535448752",
+      "id": 42535448752,
+      "updated_at": "2026-11-08T23:31:03Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "cb9c00cd1ee87d37ef57a28f6460c8a9352be161",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42535448741",
+      "id": 42535448741,
+      "updated_at": "2026-11-08T23:30:14Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "BOTTOM_THRESHOLD",
+    "ChatPage",
+    "FREE_DAILY_LIMIT",
+    "GET",
+    "INITIAL_MESSAGES",
+    "InitialChatScroll",
+    "MAX_MESSAGES",
+    "MEMORY_KEY",
+    "MISAKI_TODAY_MEMORY_KEY",
+    "POST",
+    "RELATIONSHIP_KEY",
+    "STORAGE_KEY",
+    "accessToken",
+    "active",
+    "applyRoot",
+    "attempt",
+    "attempts",
+    "authenticate",
+    "beginIndependentConversation",
+    "bindPendingImages",
+    "body",
+    "bubbles",
+    "chat",
+    "checkpoint",
+    "code",
+    "createEmptyTodayMemory",
+    "currentY",
+    "db",
+    "disposed",
+    "distanceFromBottom",
+    "duration",
+    "element",
+    "expectedOwner",
+    "expiresAt",
+    "finish",
+    "following",
+    "frame",
+    "freeLimitReached",
+    "freeRemaining",
+    "getAccessToken",
+    "getFirstRpcRow",
+    "getJapanCurrentTime",
+    "getJapanDateKey",
+    "hardStopTimer",
+    "hasConversation",
+    "height",
+    "history",
+    "imageLoadHandler",
+    "initializeAccount",
+    "initialized",
+    "isPremium",
+    "isPremiumActive",
+    "key",
+    "latest",
+    "limitedMessages",
+    "load",
+    "loadDailyUsage",
+    "loadEntitlement",
+    "loadStartedAt",
+    "maintenance"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "チャット初期スクロールの追従制御と、会話読込み遅延の調査。",
+    "conclusion": "PR表題で調査・検証は未完了と明示されている。変更コードの存在を動作改善の実証にしない。最新head、iPhoneの初期スクロール、会話取得時間の計測条件を確認して再開。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/151",
+      "https://github.com/miyazaki1016/misaki/pull/151"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "4ab51bb643797d18e70b331fb592661ba4a69aefd927c38f0554672732bb5b25",
+  "ci_digest": "98a5a28a900664797bb6457facaa50846061e7ed6cbc1f2e3ba90e3d07baccac",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "branch-75cad6b9a274a9b7",
+  "title": "sora/misaki-acting-lab",
+  "head": "be15cfea6039ff9e44be1a34ceff48a882f09c18",
+  "head_ref": "sora/misaki-acting-lab",
+  "linked_prs": [
+    45
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "27657842afb8af6f6ca540e68e8d429cf860172e9993858cc0a43b53ed4555c0",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

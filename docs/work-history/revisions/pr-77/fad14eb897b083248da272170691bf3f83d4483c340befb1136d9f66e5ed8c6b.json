@@ -1,0 +1,90 @@
+{
+  "id": "pr-77",
+  "number": 77,
+  "title": "ci: add manual long-history synthetic quality A/B option",
+  "topics": [
+    "開発管理"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Workflow-only. Add quality_history short/long selector; long runs four synthetic scenarios with 60 history messages each. Pin isolated experiment to 9a40d98. Still 8 explicitly authorized billable calls for quality, with 10s pacing; blind artifacts retained 1 day. No production app or DB change. Requires owner approval before merge.",
+  "snapshot_head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+  "snapshot_consistent": true,
+  "head": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+  "base": "921db010c0b4093c7741418a2b33ccdce5f9389b",
+  "base_ref": "main",
+  "head_ref": "work/quality-long-history-workflow",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-08T10:49:35Z",
+  "merge_commit_sha": "9dbe888726996820bb9b6a5c53eabfc6be6b6b76",
+  "updated_at": "2026-10-08T10:49:35Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 1,
+      "patch": "diff --git a/.github/workflows/isolated-gemini-ab-manual.yml b/.github/workflows/isolated-gemini-ab-manual.yml\nindex bd20ddc..edffcd3 100644\n--- a/.github/workflows/isolated-gemini-ab-manual.yml\n+++ b/.github/workflows/isolated-gemini-ab-manual.yml\n@@ -30,6 +30,14 @@ on:\n         options:\n           - '0'\n           - '10000'\n+      quality_history:\n+        description: 'Quality scenarios: short or 60-message synthetic history (quality mode only)'\n+        required: true\n+        type: choice\n+        default: 'short'\n+        options:\n+          - 'short'\n+          - 'long'\n       runs_per_variant:\n         description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n         required: true\n@@ -49,7 +57,7 @@ jobs:\n       - name: Checkout pinned experiment commit (not Production)\n         uses: actions/checkout@v4\n         with:\n-          ref: c62cd88b72c81d4d85a40596f35d7dfe3db18091\n+          ref: 9a40d98c4ecec2f17eef1489a687acc1e24f338e\n           persist-credentials: false\n       - uses: actions/setup-node@v4\n         with:\n@@ -65,6 +73,7 @@ jobs:\n           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n           MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n           MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}\n+          MISAKI_AB_QUALITY_HISTORY: ${{ inputs.quality_history }}\n           MISAKI_AB_EXPORT_REVIEW: ${{ inputs.experiment == 'quality' && 'YES' || 'NO' }}\n         run: |\n           if [ -z \"$GEMINI_API_KEY\" ]; then\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409/.github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+        "coverage": "全文",
+        "text": "name: Isolated Gemini A/B (manual only)\non:\n  workflow_dispatch:\n    inputs:\n      confirm_billable_requests:\n        description: 'Type YES to authorize billable synthetic Gemini requests (quality: 8 calls; latency: 2 or 40)'\n        required: true\n        type: string\n      experiment:\n        description: 'Latency/token or four-scenario quality A/B'\n        required: true\n        type: choice\n        default: 'latency'\n        options:\n          - 'latency'\n          - 'quality'\n      fixture:\n        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'\n        required: true\n        type: choice\n        default: 'short'\n        options:\n          - 'short'\n          - 'long'\n      delay_ms:\n        description: 'Delay between Gemini requests in milliseconds (0 or 10000)'\n        required: true\n        type: choice\n        default: '10000'\n        options:\n          - '0'\n          - '10000'\n      quality_history:\n        description: 'Quality scenarios: short or 60-message synthetic history (quality mode only)'\n        required: true\n        type: choice\n        default: 'short'\n        options:\n          - 'short'\n          - 'long'\n      runs_per_variant:\n        description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n        required: true\n        type: choice\n        default: '1'\n        options:\n          - '1'\n          - '20'\npermissions:\n  contents: read\njobs:\n  isolated-ab:\n    if: ${{ github.event.inputs.confirm_billable_requests == 'YES' }}\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - name: Checkout pinned experiment commit (not Production)\n        uses: actions/checkout@v4\n        with:\n          ref: 9a40d98c4ecec2f17eef1489a687acc1e24f338e\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts\n      - name: Run explicitly approved synthetic Gemini A/B requests\n        env:\n          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}\n          MISAKI_AB_LIVE: 'YES'\n          MISAKI_AB_MODEL: gemini-3.1-flash-lite\n          MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n          MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}\n          MISAKI_AB_QUALITY_HISTORY: ${{ inputs.quality_history }}\n          MISAKI_AB_EXPORT_REVIEW: ${{ inputs.experiment == 'quality' && 'YES' || 'NO' }}\n        run: |\n          if [ -z \"$GEMINI_API_KEY\" ]; then\n            echo 'Secret missing; refusing live calls.'\n            exit 1\n          fi\n          if [ \"${{ inputs.experiment }}\" = \"quality\" ]; then\n            node --experimental-strip-types scripts/context-ab-quality-live.ts\n          else\n            node --experimental-strip-types scripts/context-ab-live.ts\n          fi\n      - name: Upload blinded synthetic replies for human review\n        if: ${{ success() && inputs.experiment == 'quality' }}\n        uses: actions/upload-artifact@v4\n        with:\n          name: synthetic-blind-review\n          path: ab-review-output/blind-review.json\n          if-no-files-found: error\n          retention-days: 1\n      - name: Upload separate answer key\n        if: ${{ success() && inputs.experiment == 'quality' }}\n        uses: actions/upload-artifact@v4\n        with:\n          name: synthetic-review-key\n          path: ab-review-output/blind-key.json\n          if-no-files-found: error\n          retention-days: 1\n",
+        "sha256": "a52438f8de7e74f66245721215f684118456862dc3ded8f04250cd3f51ae893c"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+      "message": "ci: expose manual 60-message synthetic quality A/B option\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "efcf00c4beb7f8cc4a077a5ff0e4d455cd6f1409",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37755016144",
+      "id": 37755016144,
+      "updated_at": "2026-10-08T09:13:19Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "scripts/context-ab-live.ts",
+      "coverage": "削除済み／取得不能・差分参照"
+    },
+    {
+      "path": "scripts/context-ab-quality-live.ts",
+      "coverage": "削除済み／取得不能・差分参照"
+    }
+  ],
+  "curated": {
+    "summary": "長い会話履歴の合成品質A/B比較を追加",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/77"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "a109276d7120a00968c7db61ce00fa876793234ecef3aaf39af787ea3471c65b",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

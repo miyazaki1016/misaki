@@ -1,0 +1,20 @@
+{
+  "id": "branch-7cd7466c64076bce",
+  "title": "work/relationship-polarity-integer",
+  "head": "68a2aebb98e5f800f7a6d334c815c2a7841b2873",
+  "head_ref": "work/relationship-polarity-integer",
+  "linked_prs": [
+    51
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b25085f7026a01dd559891f869115b56fa0b92d38c6ff758b1da6a5210a935a8",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

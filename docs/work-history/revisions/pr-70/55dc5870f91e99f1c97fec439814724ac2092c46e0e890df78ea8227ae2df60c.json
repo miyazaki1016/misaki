@@ -1,0 +1,86 @@
+{
+  "id": "pr-70",
+  "number": 70,
+  "title": "ci: select synthetic long-context Gemini A/B fixture",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Workflow-only: add short/long fixture choice and pin the experimental commit with synthetic ~12k-character prompt and 60-message history. Manual YES required, 1 or 20 pairs selectable, potential billable API calls only on manual dispatch. No Production app or DB changes. Draft until owner approves merge.",
+  "snapshot_head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+  "snapshot_consistent": true,
+  "head": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+  "base": "e94fa0cf950b08183d7d15eb03d6b12fb0ef20ee",
+  "base_ref": "main",
+  "head_ref": "work/ab-long-fixture-dispatch",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-08T03:36:21Z",
+  "merge_commit_sha": "7fcb8322f7f141e5e38d5d3d37294fc5cfae7e6c",
+  "updated_at": "2026-10-08T03:36:21Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 1,
+      "patch": "diff --git a/.github/workflows/isolated-gemini-ab-manual.yml b/.github/workflows/isolated-gemini-ab-manual.yml\nindex 22f0d48..5937ffb 100644\n--- a/.github/workflows/isolated-gemini-ab-manual.yml\n+++ b/.github/workflows/isolated-gemini-ab-manual.yml\n@@ -6,6 +6,14 @@ on:\n         description: 'Type YES to authorize 2 or 40 billable Gemini requests with synthetic data'\n         required: true\n         type: string\n+      fixture:\n+        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'\n+        required: true\n+        type: choice\n+        default: 'short'\n+        options:\n+          - 'short'\n+          - 'long'\n       runs_per_variant:\n         description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n         required: true\n@@ -25,7 +33,7 @@ jobs:\n       - name: Checkout pinned experiment commit (not Production)\n         uses: actions/checkout@v4\n         with:\n-          ref: 9d7b14d42e279d249f48482209b6d130f36674d9\n+          ref: 04781ea0b3cf2ed4a0d5a7ab356712e1cacf2dbb\n           persist-credentials: false\n       - uses: actions/setup-node@v4\n         with:\n@@ -39,6 +47,7 @@ jobs:\n           MISAKI_AB_LIVE: 'YES'\n           MISAKI_AB_MODEL: gemini-3.1-flash-lite\n           MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n+          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n         run: |\n           if [ -z \"$GEMINI_API_KEY\" ]; then\n             echo 'Secret missing; refusing live calls.'\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/188502ff4b70f5c4fdfbec44cb47d86d99c055ab/.github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+        "coverage": "全文",
+        "text": "name: Isolated Gemini A/B (manual only)\non:\n  workflow_dispatch:\n    inputs:\n      confirm_billable_requests:\n        description: 'Type YES to authorize 2 or 40 billable Gemini requests with synthetic data'\n        required: true\n        type: string\n      fixture:\n        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'\n        required: true\n        type: choice\n        default: 'short'\n        options:\n          - 'short'\n          - 'long'\n      runs_per_variant:\n        description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'\n        required: true\n        type: choice\n        default: '1'\n        options:\n          - '1'\n          - '20'\npermissions:\n  contents: read\njobs:\n  isolated-ab:\n    if: ${{ github.event.inputs.confirm_billable_requests == 'YES' }}\n    runs-on: ubuntu-latest\n    timeout-minutes: 30\n    steps:\n      - name: Checkout pinned experiment commit (not Production)\n        uses: actions/checkout@v4\n        with:\n          ref: 04781ea0b3cf2ed4a0d5a7ab356712e1cacf2dbb\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts\n      - name: Run explicitly approved synthetic Gemini A/B requests\n        env:\n          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}\n          MISAKI_AB_LIVE: 'YES'\n          MISAKI_AB_MODEL: gemini-3.1-flash-lite\n          MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}\n          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}\n        run: |\n          if [ -z \"$GEMINI_API_KEY\" ]; then\n            echo 'Secret missing; refusing live calls.'\n            exit 1\n          fi\n          node --experimental-strip-types scripts/context-ab-live.ts\n",
+        "sha256": "6bf8875d531c60cd983e652462b26efe015d8abeae9977a1b22f8e8ff766eea0"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+      "message": "ci: expose short/long synthetic fixture selector for manual A/B\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/188502ff4b70f5c4fdfbec44cb47d86d99c055ab"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "188502ff4b70f5c4fdfbec44cb47d86d99c055ab",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37723486577",
+      "id": 37723486577,
+      "updated_at": "2026-10-08T03:36:54Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "scripts/context-ab-live.ts",
+      "coverage": "削除済み／取得不能・差分参照"
+    }
+  ],
+  "curated": {
+    "summary": "長い文脈の合成A/Bテストデータを選択可能にする",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/70"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "e808d96dea7a4a387a5b28ff8cac989cafd8435b8fa6a32629c70b714fd01e2b",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

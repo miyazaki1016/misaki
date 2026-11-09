@@ -1,0 +1,42 @@
+{
+  "id": "branch-669d4b81dbb566ba",
+  "title": "feat/lounge-muse-v3-official-20261030",
+  "head": "1206082bafe848ff7b2261857c66de6708ef344e",
+  "head_ref": "feat/lounge-muse-v3-official-20261030",
+  "linked_prs": [
+    95
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/docs/LOUNGE_MUSE_V3_PREVIEW_20261030.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/public/lab/transparent-lounge-shortcuts/index.html"
+    },
+    {
+      "path": "public/lab/transparent-lounge-vertical/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/1206082bafe848ff7b2261857c66de6708ef344e/public/lab/transparent-lounge-vertical/index.html"
+    }
+  ],
+  "commits": "1206082bafe848ff7b2261857c66de6708ef344e docs(lounge): record iPhone acceptance and Muse v3 official adoption\n7f3bb910348a6f120845c280b01951d623e0840a feat(lounge): adopt iPhone-approved Muse v3 14s animation on transparent-lounge-vertical\n47b8fc4996b908722a72cebae7ae749f02347883 feat(lounge): adopt iPhone-approved Muse v3 14s animation on transparent-lounge-shortcuts",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "0e6a7a59551887ce9d0540f9d5d3cfdf5b9ef6d3952f072169482fd725af930e",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

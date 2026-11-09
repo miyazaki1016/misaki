@@ -1,0 +1,20 @@
+{
+  "id": "branch-0b40fb0e2197e346",
+  "title": "work/relationship-error-diagnostics",
+  "head": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+  "head_ref": "work/relationship-error-diagnostics",
+  "linked_prs": [
+    49
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "3f5d72aa0ae3f91674f8056c3dd1d30c473735cefb0c39d199f089e89b25f6a4",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}

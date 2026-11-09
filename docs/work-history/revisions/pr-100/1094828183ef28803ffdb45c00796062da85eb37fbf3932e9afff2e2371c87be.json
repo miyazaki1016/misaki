@@ -1,0 +1,87 @@
+{
+  "id": "pr-100",
+  "number": 100,
+  "title": "設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序",
+  "topics": [
+    "記憶・会話",
+    "認証・安全性"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／認証・アクセス制御に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "匿名24時間の合意仕様と現行実装との差、履歴表示とAI想起の境界、メール保存・Body Clock・Relationship Engineの回帰条件を整理。設計のみ、実装・本番反映は未実施。",
+  "snapshot_head": "1e48f266cf40b51220bf9197006d8b939fb00b9e",
+  "snapshot_consistent": true,
+  "head": "1e48f266cf40b51220bf9197006d8b939fb00b9e",
+  "base": "51ecbfb9b90bfefcfb93a5a094dda24ab2ebe172",
+  "base_ref": "main",
+  "head_ref": "design/anonymous-per-item-24h-memory-20261030",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-10-30T01:05:37Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md",
+      "status": "modified",
+      "additions": 30,
+      "deletions": 0,
+      "patch": "diff --git a/docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md b/docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md\nnew file mode 100644\nindex 0000000..4aeace2\n--- /dev/null\n+++ b/docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md\n@@ -0,0 +1,30 @@\n+# 美咲：匿名24時間・登録後長期記憶／Gemini軽量化の実装設計（2026-10-30）\n+\n+## 決定したユーザー仕様（未実装）\n+- 匿名：**個々の情報が作成された時刻から24時間**で失効。新しい会話やトークン再発行で古い情報の期限を延長しない。\n+- 匿名：会話履歴の画面表示は端末側で継続可能。ただし美咲の推論・自発発話・関係性判断に使用できる履歴は各発言の作成から24時間以内に限定する。\n+- メール登録：長期記憶・過去履歴・関係性をアカウントに保持。登録時に失効済みの匿名記憶や履歴由来の知識を復活させない。登録後の履歴閲覧範囲と記憶への取り込みは別管理。\n+- 明示的な削除は履歴・記憶・要約・関係イベント・Body Clockからも復活させない。\n+\n+## main監査（実装前）\n+- `lib/canonical-state.ts` の `sealTemporaryState` は **トークン全体**を `Date.now()+24h` で封印する。これは情報ごとの24時間ではない。`app/api/persona/history/route.ts` の匿名 load はトークンを再封印し得る。\n+- `app/api/chat/route.ts` は `rootState.memory` / `rootState.history` を読み、最大60履歴・最大30記憶をGemini文脈に使用する。現状、匿名の各記憶・履歴について独立した24時間フィルタがない。\n+- `RootState.memory` は文字列配列。既存のライフファクトやプロフィール記憶にタイムスタンプを後付けせず、別の時刻メタデータを持つ後方互換移行が必要。\n+- `temporaryRelationship`、`relationshipEngine`、Body Clock、自発発話、メール保存の経路も時間境界の対象。チャットrouteだけをフィルタして完了とはしない。\n+- `app/chat/page.tsx` の端末キャッシュは表示用。期限切れの履歴をサーバーへ送って推論用に復活させない。\n+\n+## 実装の順序と受け入れ基準\n+1. **時刻付き記憶スキーマ**：情報ID・作成時刻・最終編集時刻・失効時刻・削除墓標を設計。既存匿名状態は無期限の記憶として扱わず、移行方針を明示。登録ユーザーの既存永続データは変更しない。\n+2. **単一の期限判定関数**：信頼できるサーバー時刻を使用。24時間ちょうどで失効。再会話・load・token refresh・Body Clockで元の失効時刻を延長しない。端末時計を信頼しない。\n+3. **全読取境界で適用**：通常チャット、記憶の想起、life facts、Relationship Engine、Body Clock、メール保存、履歴同期。履歴の画面表示とAI文脈の参照を分離。\n+4. **メール保存の原子性**：有効情報だけを永続側へ移し、期限切れ・削除済み情報を移さない。メール確認待ち中の追加会話と再試行・二重保存も検証。\n+5. **回帰テスト**：23:59:59有効／24:00:00失効、別時刻の複数情報、再会話で延命しない、端末履歴は表示できるがAIには渡らない、削除が復活しない、Safari匿名ID交換、メール保存境界、Body Clock、自発発話、登録ユーザー無変更。\n+6. **段階的リリース**：まずテストと隔離実装、CI合格、Preview、匿名/登録の実機確認後にmainへ。現時点では本番変更なし。\n+\n+## Gemini軽量化：記憶境界を先に固定\n+- `docs/IMPLEMENTATION_OVERVIEW.md` の既存A/BおよびPR #78を再利用。未マージ実験を本番実装と誤認しない。\n+- 直近美咲発言8件のsystem prompt再掲の削減が第一候補。会話履歴そのものを削除せず、人格・感情・安全ルールを維持。\n+- 正確なトークン計測、生成回数、品質回帰の検証前に本番で短縮しない。Gemini APIの有料実験を無断実行しない。\n+\n+## 状態\n+**設計・監査のみ。コード・DB・本番挙動は未変更。**\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/1e48f266cf40b51220bf9197006d8b939fb00b9e/docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md",
+      "source": {
+        "path": "docs/ANONYMOUS_MEMORY_24H_DESIGN_20261030.md",
+        "coverage": "全文",
+        "text": "# 美咲：匿名24時間・登録後長期記憶／Gemini軽量化の実装設計（2026-10-30）\n\n## 決定したユーザー仕様（未実装）\n- 匿名：**個々の情報が作成された時刻から24時間**で失効。新しい会話やトークン再発行で古い情報の期限を延長しない。\n- 匿名：会話履歴の画面表示は端末側で継続可能。ただし美咲の推論・自発発話・関係性判断に使用できる履歴は各発言の作成から24時間以内に限定する。\n- メール登録：長期記憶・過去履歴・関係性をアカウントに保持。登録時に失効済みの匿名記憶や履歴由来の知識を復活させない。登録後の履歴閲覧範囲と記憶への取り込みは別管理。\n- 明示的な削除は履歴・記憶・要約・関係イベント・Body Clockからも復活させない。\n\n## main監査（実装前）\n- `lib/canonical-state.ts` の `sealTemporaryState` は **トークン全体**を `Date.now()+24h` で封印する。これは情報ごとの24時間ではない。`app/api/persona/history/route.ts` の匿名 load はトークンを再封印し得る。\n- `app/api/chat/route.ts` は `rootState.memory` / `rootState.history` を読み、最大60履歴・最大30記憶をGemini文脈に使用する。現状、匿名の各記憶・履歴について独立した24時間フィルタがない。\n- `RootState.memory` は文字列配列。既存のライフファクトやプロフィール記憶にタイムスタンプを後付けせず、別の時刻メタデータを持つ後方互換移行が必要。\n- `temporaryRelationship`、`relationshipEngine`、Body Clock、自発発話、メール保存の経路も時間境界の対象。チャットrouteだけをフィルタして完了とはしない。\n- `app/chat/page.tsx` の端末キャッシュは表示用。期限切れの履歴をサーバーへ送って推論用に復活させない。\n\n## 実装の順序と受け入れ基準\n1. **時刻付き記憶スキーマ**：情報ID・作成時刻・最終編集時刻・失効時刻・削除墓標を設計。既存匿名状態は無期限の記憶として扱わず、移行方針を明示。登録ユーザーの既存永続データは変更しない。\n2. **単一の期限判定関数**：信頼できるサーバー時刻を使用。24時間ちょうどで失効。再会話・load・token refresh・Body Clockで元の失効時刻を延長しない。端末時計を信頼しない。\n3. **全読取境界で適用**：通常チャット、記憶の想起、life facts、Relationship Engine、Body Clock、メール保存、履歴同期。履歴の画面表示とAI文脈の参照を分離。\n4. **メール保存の原子性**：有効情報だけを永続側へ移し、期限切れ・削除済み情報を移さない。メール確認待ち中の追加会話と再試行・二重保存も検証。\n5. **回帰テスト**：23:59:59有効／24:00:00失効、別時刻の複数情報、再会話で延命しない、端末履歴は表示できるがAIには渡らない、削除が復活しない、Safari匿名ID交換、メール保存境界、Body Clock、自発発話、登録ユーザー無変更。\n6. **段階的リリース**：まずテストと隔離実装、CI合格、Preview、匿名/登録の実機確認後にmainへ。現時点では本番変更なし。\n\n## Gemini軽量化：記憶境界を先に固定\n- `docs/IMPLEMENTATION_OVERVIEW.md` の既存A/BおよびPR #78を再利用。未マージ実験を本番実装と誤認しない。\n- 直近美咲発言8件のsystem prompt再掲の削減が第一候補。会話履歴そのものを削除せず、人格・感情・安全ルールを維持。\n- 正確なトークン計測、生成回数、品質回帰の検証前に本番で短縮しない。Gemini APIの有料実験を無断実行しない。\n\n## 状態\n**設計・監査のみ。コード・DB・本番挙動は未変更。**\n",
+        "sha256": "8aa94969597b1b24a7208987230c9d0a89faad28ae8084d71212d73b4ae8ca0e"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "1e48f266cf40b51220bf9197006d8b939fb00b9e",
+      "message": "docs: define per-item anonymous 24h memory boundary and rollout plan\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1e48f266cf40b51220bf9197006d8b939fb00b9e"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "1e48f266cf40b51220bf9197006d8b939fb00b9e",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40983679786",
+      "id": 40983679786,
+      "updated_at": "2026-10-30T01:05:50Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "coverage": "サイズ上限120KB・原本リンク参照"
+    }
+  ],
+  "curated": {
+    "summary": "設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/100"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "cbaadd19122fc742d423c464b930139a73f7ca3112ae12c67209dcaa6239b7d7",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00"
+}
