@@ -18,6 +18,33 @@ class FakeAPI:
         return {'title':'Stride experiment','body':'47 regions missed','head':{'sha':'a'*40,'ref':'research'},'base':{'sha':'b'*40,'ref':'feature'},'state':'closed','merged_at':'2026-01-01','merge_commit_sha':'c'*40,'updated_at':'2026-01-02','draft':False}
 
 class HistoryTests(unittest.TestCase):
+    def test_phone_filters_main_ancestry_instead_of_pr_merged_state(self):
+        import subprocess
+        page=(Path(__file__).resolve().parents[1]/'docs/approval-dashboard/history.html').read_text()
+        function=page.split('function filtered(){',1)[1].split('function render(',1)[0]
+        script="""const fields={query:{value:''},repo:{value:''},state:{value:'unmerged'}};
+const el=id=>fields[id];
+const all=[{id:'pr-1',repo:'misaki',state:'merged',main_status:'mainに祖先コミットとして存在（機能受入・本番は別）',search_text:'会話'},
+{id:'pr-62',repo:'emergencyalert',state:'merged',main_status:'main祖先として未確認',search_text:'z4 stride 47'}];
+"""+'function filtered(){'+function+"""
+if(filtered().map(c=>c.id).join()!=='pr-62')throw Error('Feature merge mistaken for main');
+fields.query.value='z4 47';if(filtered().length!==1)throw Error('Numeric AND search');
+fields.state.value='merged';fields.query.value='';if(filtered().map(c=>c.id).join()!=='pr-1')throw Error('Main ancestry filter');
+"""
+        subprocess.run(['node','-e',script],check=True,capture_output=True,text=True)
+
+    def test_phone_search_retains_code_conditions_and_main_status(self):
+        with tempfile.TemporaryDirectory() as temp:
+            case={'id':'pr-62','title':'研究','state':'merged','main_status':'main祖先として未確認',
+                  'remaining':'受入試験が未完了','files':[],
+                  'code_facts':[{'file':'test.ts','kind':'条件','expression':'expect(missed).toBe(47)','url':'https://github.com/test/repo/blob/sha/test.ts'}]}
+            history.render_output({'generated_at':'now','cases':{'pr-62':case},'coverage':{'errors':[]}},temp,'test/repo')
+            index=json.loads(Path(temp,'search-index.json').read_text())['cases'][0]
+            self.assertIn('toBe(47)',index['search_text'])
+            self.assertEqual(index['remaining'],'受入試験が未完了')
+            row=next(line for line in Path(temp,'README.md').read_text().splitlines() if 'cases/pr-62.md' in line)
+            self.assertIn('main祖先として未確認',row)
+
     def test_checkout_race_fetches_exact_missing_pr_head(self):
         import subprocess
         sha='a'*40
