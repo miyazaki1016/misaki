@@ -135,3 +135,35 @@ test("touch movement suspends queued follow before Safari dispatches scroll", ()
   assert.equal(h.scrollingElement.scrollTop, 1600);
   h.unmount();
 });
+
+
+test("upward keyboard navigation cancels queued follow before scroll event", () => {
+  const h = setup();
+  h.showBubble();
+  h.flush();
+  h.scrollingElement.scrollHeight += 200;
+  h.mutate();
+  h.gesture("keydown", { key: "PageUp" });
+  h.flush();
+  assert.equal(h.scrollingElement.scrollTop, 1200);
+  // Returning to the bottom with a scroll event allows follow again.
+  h.scrollingElement.scrollTop = 1400;
+  h.gesture("scroll", {});
+  h.scrollingElement.scrollHeight += 200;
+  h.resize();
+  h.flush();
+  assert.equal(h.scrollingElement.scrollTop, 1600);
+  h.unmount();
+});
+
+test("shift-space keyboard navigation also cancels queued follow", () => {
+  const h = setup();
+  h.showBubble();
+  h.flush();
+  h.scrollingElement.scrollHeight += 200;
+  h.mutate();
+  h.gesture("keydown", { key: " ", shiftKey: true });
+  h.flush();
+  assert.equal(h.scrollingElement.scrollTop, 1200);
+  h.unmount();
+});
