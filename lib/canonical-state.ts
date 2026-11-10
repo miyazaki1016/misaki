@@ -75,32 +75,44 @@ export function openTemporaryState(token: unknown): { state: RootState; requestI
   return parsed && parsed.expires > Date.now() ? parsed : null;
 }
 
-export async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {
+export async function loadCanonicalState(userId: string, onStageTiming?: (stage: string, durationMs: number) => void): Promise<RootState & { history: unknown[] }> {
+  const clock = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+  const record = (stage: string, start: number) => onStageTiming?.(stage, clock() - start);
   const db = createServerSupabase();
   let relationshipImportPending = false;
   if (engineEnabled()) {
+    const stageStartedAt = clock();
     // Read path never starts permanent Relationship work without ownership.
     // The post-save worker imports the frozen anonymous trajectory under its lease.
     const [imported, temporary] = await Promise.all([
       db.from("misaki_relationship_temporary_v1_imports").select("user_id").eq("user_id", userId).maybeSingle(),
       db.from("misaki_temporary_roots").select("token").eq("user_id", userId).maybeSingle(),
     ]);
+    record("imports", stageStartedAt);
     relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);
   }
+  const canonicalStartedAt = clock();
   const [relationship, conversation] = await Promise.all([
     db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
+  record("canonical", canonicalStartedAt);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
   let relationshipCriticalPending = relationshipImportPending;
   if (engineEnabled()) {
+    const criticalStartedAt = clock();
     const { data, error } = await db.from("misaki_relationship_critical_pending").select("request_id").eq("user_id", userId).in("status", ["pending", "processing", "failed"]);
+    record("critical", criticalStartedAt);
     relationshipCriticalPending ||= !!error || !!data?.length;
     // Bridge the interval after chat commit but before the after() worker creates pending rows.
+    const eventsStartedAt = clock();
     const { data: recent, error: recentError } = await db.from("misaki_relationship_events").select("request_id,metadata")
       .eq("user_id", userId).eq("event_type", "chat_turn_completed").order("id", { ascending: false }).limit(3);
+    record("events", eventsStartedAt);
+    const processingStartedAt = clock();
     const { data: processed, error: processedError } = await db.from("misaki_relationship_processing").select("request_id")
       .eq("user_id", userId).eq("processing_version", "relationship-v1.1").eq("status", "applied");
+    record("processing", processingStartedAt);
     relationshipCriticalPending ||= !!recentError || !!processedError || !!recent?.some(t =>
       typeof t.metadata?.message === "string" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));
   }
