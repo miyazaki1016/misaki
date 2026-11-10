@@ -218,4 +218,5 @@
 | #175 | feat(history): Issueへ照合結果を返却し、引継ぎと検証・完成を分離 | merged | `ab90b75a222676fd3ede283bcf3dabcbc0532ee6` | 2026-11-10T05:03:42Z |
 | #178 | docs: 自動照合の合格確認まで案件調査を開始しない | merged | `814dd54d8352b99e1ae1e738108c8d00f68e4d33` | 2026-11-10T05:33:42Z |
 | #179 | docs: 照合待機から本題まで追加合図なしで継続する | merged | `e52257dee648a0b25104c5b8bd7fab79f4cc87ef` | 2026-11-10T08:31:49Z |
+| #180 | feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル | merged | `29f09d07a2c3b80eaa8300af6827851d127264cc` | 2026-11-10T15:36:10Z |
 <!-- INVENTORY_FACTS_END -->
