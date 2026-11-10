@@ -1,0 +1,20 @@
+{
+  "id": "branch-a8fc0e1f175ee465",
+  "title": "sora/remove-relationship-stage-diagnostics",
+  "head": "d41e673420637cd644587c5db42c38d432fd2e74",
+  "head_ref": "sora/remove-relationship-stage-diagnostics",
+  "linked_prs": [
+    57
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ec85c887ecabd6c798857c425f5ee5f0ae2fe4b061963ccba3798d64b79dde0a",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}

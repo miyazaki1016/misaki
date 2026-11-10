@@ -1,0 +1,232 @@
+{
+  "id": "pr-180",
+  "number": 180,
+  "title": "feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 目的\niPhone Safariで約5秒かかる履歴表示について、既存の計測値を画面上で確認できるようにする。\n\n## 変更\n- `/chat?historyDiagnostics=1` でのみ計測パネルを表示。\n- 既存の `misaki-history-timing` 計測値を再利用し、ミリ秒単位で表示。会話・トークン・ユーザーIDは表示しない。\n- 通常アクセスでは表示しない。閉じる操作あり。\n\n## 検証と反映条件\n- 最新HEAD `29f09d07a2c3b80eaa8300af6827851d127264cc` のテスト・TypeScript・build 成功: https://github.com/miyazaki1016/misaki/actions/runs/42840419873\n- 過去PR #151の既存計測を拡張し、PR #44の履歴同期・PR #131の既存設計を再利用。重複調査なし。\n- ユーザーは本番マージ・反映を明示許可済み。診断はURL指定時だけ表示。実機計測と5秒の根本原因解決は未完了。\n\n<!-- history-preflight {\"decisions\":[{\"id\":\"pr-151\",\"decision\":\"extend\",\"reason\":\"PR151で実装済みのクライアント履歴計測を再利用し、iPhone上の表示だけを追加する。既存計測は再実装しない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\"},{\"id\":\"pr-44\",\"decision\":\"reuse\",\"reason\":\"PR44の既存履歴同期・再取得の設計をそのまま利用し、今回の変更では履歴取得処理自体に手を加えない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/44\"},{\"id\":\"pr-131\",\"decision\":\"distinct\",\"reason\":\"PR131の関連既存実装を保持し、今回の変更は画面上の任意診断表示だけに限定して既存処理を変更しない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"}]} -->",
+  "snapshot_head": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+  "snapshot_consistent": true,
+  "head": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+  "base": "cb5b21e9f73d57d13a865d240a07565d92048737",
+  "base_ref": "main",
+  "head_ref": "feat/iphone-history-diagnostics-20261110",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-10T15:36:10Z",
+  "merge_commit_sha": "3b95259a9eeb9327980aae54baae0332dcc32601",
+  "updated_at": "2026-11-10T15:36:10Z",
+  "code_facts": [
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "テストの期待値・条件",
+      "expression": "const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? \"\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (active) setShowHistoryDiagnostics(urlDiagnostics);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (timingEnabled) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx"
+    },
+    {
+      "file": "app/chat/page.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (active && urlDiagnostics) setHistoryDiagnostics(summary);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/chat/page.tsx",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 2,
+      "patch": "diff --git a/app/chat/page.tsx b/app/chat/page.tsx\nindex 69964cc7..40de7b5b 100644\n--- a/app/chat/page.tsx\n+++ b/app/chat/page.tsx\n@@ -205,6 +205,8 @@ function getFirstRpcRow<T>(\n }\n \n export default function ChatPage() {\n+  const [historyDiagnostics, setHistoryDiagnostics] = useState<Record<string, number> | null>(null);\n+  const [showHistoryDiagnostics, setShowHistoryDiagnostics] = useState(false);\n   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);\n   const [recoveryStarting, setRecoveryStarting] = useState(false);\n   async function beginIndependentConversation() {\n@@ -758,7 +760,9 @@ export default function ChatPage() {\n     async function load() {\n       // Enable locally with sessionStorage.setItem(\"misaki-history-timing\", \"1\").\n       // Timings only: never log tokens, history, user IDs or temporary state.\n-      const timingEnabled = sessionStorage.getItem(\"misaki-history-timing\") === \"1\";\n+      const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? \"\");\n+      const timingEnabled = urlDiagnostics || sessionStorage.getItem(\"misaki-history-timing\") === \"1\";\n+      if (active) setShowHistoryDiagnostics(urlDiagnostics);\n       const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n       const startedAt = timingEnabled ? nowMs() : 0;\n       let previousAt = startedAt;\n@@ -813,7 +817,11 @@ export default function ChatPage() {\n         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);\n         if (active) { setRecoveryCode(null); setLoaded(true); }\n         checkpoint(\"stateEnqueueMs\");\n-        if (timingEnabled) console.info(\"[misaki-history-timing]\", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });\n+        if (timingEnabled) {\n+          const summary = { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) };\n+          console.info(\"[misaki-history-timing]\", summary);\n+          if (active && urlDiagnostics) setHistoryDiagnostics(summary);\n+        }\n       } catch (error) {\n         if (active) setSendError(error instanceof Error ? error.message : \"状態を読み込めませんでした。\");\n       }\n@@ -3077,6 +3085,16 @@ export default function ChatPage() {\n           }\n         }\n       `}</style>\n+      {showHistoryDiagnostics && (\n+        <aside aria-label=\"履歴読み込み診断\" style={{ position: \"fixed\", bottom: 12, left: 12, right: 12, zIndex: 9999, maxHeight: \"45vh\", overflow: \"auto\", padding: 14, borderRadius: 12, background: \"#fff\", color: \"#333\", boxShadow: \"0 2px 16px #0004\", fontSize: 12 }}>\n+          <strong>履歴読み込み診断（ミリ秒）</strong>\n+          <button type=\"button\" onClick={() => setShowHistoryDiagnostics(false)} style={{ float: \"right\" }}>閉じる</button>\n+          {historyDiagnostics ? Object.entries(historyDiagnostics).map(([name, ms]) => (\n+            <div key={name}>{name}: {ms} ms</div>\n+          )) : <div>計測中…</div>}\n+          <small>数値のみ表示。会話内容・認証情報は表示しません。</small>\n+        </aside>\n+      )}\n     </main>\n   );\n }\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx",
+      "source": {
+        "path": "app/chat/page.tsx",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "\"use client\";\nimport { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from \"../../lib/recovery-session\";\n\nimport { startIndependentRecovery, checkRecoveryAdmission } from \"../../lib/recovery-session\";\nimport { temporaryStateMessage } from \"../../lib/temporary-state-error\";\n\nimport { maintenanceMessage } from \"../../lib/maintenance-result\";\n\nimport { TEMPORARY_STATE_KEY, DEVICE_USER_KEY } from \"../../lib/device-conversation\";\nimport {\n  useEffect,\n  useState,\n} from \"react\";\n\nimport {\n  supabase,\n} from \"../../lib/supabase\";\n\nimport {\n  registerPushSubscription,\n  sendTestPushNotification,\n} from \"../../lib/push-notifications\";\n\ntype ChatMessage = {\n  role: \"misaki\" | \"user\";\n  text: string;\n  requestId?: string;\n};\n\ntype DailyUsage = {\n  date: string;\n  count: number;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype Plan =\n  | \"free\"\n  | \"premium\";\n\ntype UsageRpcResult = {\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype ApiUsage = {\n  messageCount?: number;\n  remaining?: number;\n  isPremium?: boolean;\n};\n\nconst STORAGE_KEY =\n  \"misaki-chat-history\";\n\nconst MEMORY_KEY =\n  \"misaki-long-term-memory\";\n\nconst RELATIONSHIP_KEY =\n  \"misaki-relationship-points\";\n\nconst MISAKI_TODAY_MEMORY_KEY =\n  \"misaki-today-memory\";\n\nconst MAX_MESSAGES = 60;\n\n// 無料版は1日20往復まで\nconst FREE_DAILY_LIMIT = 20;\n\nconst INITIAL_MESSAGES:\n  ChatMessage[] = [];\n\n\n\nfunction getJapanDateKey() {\n  return new Date()\n    .toLocaleDateString(\n      \"ja-JP\",\n      {\n        timeZone:\n          \"Asia/Tokyo\",\n\n        year:\n          \"numeric\",\n\n        month:\n          \"2-digit\",\n\n        day:\n          \"2-digit\",\n      }\n    );\n}\n\nfunction getJapanCurrentTime() {\n  return new Date()\n    .toLocaleString(\n      \"ja-JP\",\n      {\n        timeZone:\n          \"Asia/Tokyo\",\n\n        year:\n          \"numeric\",\n\n        month:\n          \"2-digit\",\n\n        day:\n          \"2-digit\",\n\n        weekday:\n          \"short\",\n\n        hour:\n          \"2-digit\",\n\n        minute:\n          \"2-digit\",\n\n        hour12:\n          false,\n      }\n    );\n}\n\nfunction createEmptyTodayMemory():\n  MisakiTodayMemory {\n  return {\n    date:\n      getJapanDateKey(),\n\n    items: [],\n  };\n}\n\nfunction isPremiumActive(\n  plan:\n    | string\n    | null\n    | undefined,\n\n  premiumUntil:\n    | string\n    | null\n    | undefined\n) {\n  if (\n    plan !==\n    \"premium\"\n  ) {\n    return false;\n  }\n\n  if (\n    !premiumUntil\n  ) {\n    return true;\n  }\n\n  const expiresAt =\n    new Date(\n      premiumUntil\n    ).getTime();\n\n  if (\n    !Number.isFinite(\n      expiresAt\n    )\n  ) {\n    return false;\n  }\n\n  return (\n    expiresAt >\n    Date.now()\n  );\n}\n\nfunction getFirstRpcRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(\n      value\n    ) &&\n    value.length >\n      0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value ===\n      \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\nexport default function ChatPage() {\n  const [historyDiagnostics, setHistoryDiagnostics] = useState<Record<string, number> | null>(null);\n  const [showHistoryDiagnostics, setShowHistoryDiagnostics] = useState(false);\n  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);\n  const [recoveryStarting, setRecoveryStarting] = useState(false);\n  async function beginIndependentConversation() {\n    if (recoveryStarting || !recoveryCode) return;\n    if (!window.confirm(\"古い状態を保全したまま、このタブで独立した新しい会話を始めます。古い会話や記憶は引き継ぎません。よろしいですか？\")) return;\n    setRecoveryStarting(true);\n    try {\n      const { data, error } = await supabase.auth.getSession();\n      if (error) throw error;\n      if (!await checkRecoveryAdmission(fetch)) {\n        setRecoveryStarting(false);\n        setSendError(\"新しい会話の復旧受付を一時停止しています。既存の会話や保存情報は変更していません。\");\n        return;\n      }\n      // Admission check is asynchronous; never carry an old user's decision across an account switch.\n      const { data: current, error: currentError } = await supabase.auth.getSession();\n      if (currentError || !current.session?.user.is_anonymous || current.session.user.id !== data.session?.user.id) {\n        throw new Error(\"Account changed during recovery admission\");\n      }\n      startIndependentRecovery(current.session.user, recoveryCode, crypto.randomUUID());\n      window.location.assign('/chat'); // Full navigation creates the isolated client.\n    } catch {\n      setRecoveryStarting(false);\n      setSendError(\"新しい会話を開始できませんでした。既存データは変更していません。\");\n    }\n  }\n\n  const [\n    message,\n    setMessage,\n  ] =\n    useState(\"\");\n\n  const [\n    messages,\n    setMessages,\n  ] =\n    useState<\n      ChatMessage[]\n    >(\n      INITIAL_MESSAGES\n    );\n\n  const [replyFeedback, setReplyFeedback] = useState<Record<string, { rating: \"good\" | \"bad\"; reason?: string }>>({});\n\n  const [\n    memory,\n    setMemory,\n  ] =\n    useState<\n      string[]\n    >([]);\n\n  const [\n    misakiTodayMemory,\n    setMisakiTodayMemory,\n  ] =\n    useState<\n      MisakiTodayMemory\n    >(\n      createEmptyTodayMemory()\n    );\n\n  const [\n    relationshipPoints,\n    setRelationshipPoints,\n  ] =\n    useState(0);\n\n  const [\n    dailyUsage,\n    setDailyUsage,\n  ] =\n    useState<\n      DailyUsage\n    >({\n      date:\n        getJapanDateKey(),\n\n      count:\n        0,\n    });\n\n  const [\n    plan,\n    setPlan,\n  ] =\n    useState<\n      Plan\n    >(\n      \"free\"\n    );\n\n  const [\n    accountLoaded,\n    setAccountLoaded,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showPremium,\n    setShowPremium,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showMemory,\n    setShowMemory,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    showMenu,\n    setShowMenu,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    loading,\n    setLoading,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    waitingOnReply,\n    setWaitingOnReply,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    sendError,\n    setSendError,\n  ] =\n    useState(\n      \"\"\n    );\n\n  const [\n    loaded,\n    setLoaded,\n  ] =\n    useState(\n      false\n    );\n\n  const [\n    notificationPermission,\n    setNotificationPermission,\n  ] =\n    useState<\n      | \"default\"\n      | \"granted\"\n      | \"denied\"\n      | \"unsupported\"\n    >(\n      \"default\"\n    );\n\n  const isPremium =\n    plan ===\n    \"premium\";\n\n  const today =\n    getJapanDateKey();\n\n  const usageCountToday =\n    dailyUsage.date ===\n    today\n      ? dailyUsage.count\n      : 0;\n\n  const freeRemaining =\n    Math.max(\n      0,\n      FREE_DAILY_LIMIT -\n        usageCountToday\n    );\n\n  const freeLimitReached =\n    accountLoaded &&\n    !isPremium &&\n    usageCountToday >=\n      FREE_DAILY_LIMIT;\n\n  useEffect(\n    () => {\n      let active =\n        true;\n\n      async function loadEntitlement(\n        userId:\n          string\n      ) {\n        for (\n          let attempt =\n            0;\n          attempt <\n            5;\n          attempt +=\n            1\n        ) {\n          const {\n            data,\n            error,\n          } =\n            await supabase\n              .from(\n                \"user_entitlements\"\n              )\n              .select(\n                \"plan,premium_until\"\n              )\n              .eq(\n                \"user_id\",\n                userId\n              )\n              .maybeSingle();\n\n          if (\n            error\n          ) {\n            throw error;\n          }\n\n          if (\n            data\n          ) {\n            return isPremiumActive(\n              data.plan,\n              data.premium_until\n            );\n          }\n\n          await new Promise(\n            (\n              resolve\n            ) =>\n              window.setTimeout(\n                resolve,\n                350\n              )\n          );\n        }\n\n        return false;\n      }\n\n      async function loadDailyUsage() {\n        const {\n          data,\n          error,\n        } =\n          await supabase.rpc(\n            \"get_daily_message_usage\"\n          );\n\n        if (\n          error\n        ) {\n          throw error;\n        }\n\n        const usage =\n          getFirstRpcRow<\n            UsageRpcResult\n          >(\n            data\n          );\n\n        return {\n          count:\n            typeof usage\n              ?.message_count ===\n              \"number\"\n              ? Math.max(\n                  0,\n                  Math.floor(\n                    usage\n                      .message_count\n                  )\n                )\n              : 0,\n\n          isPremium:\n            usage\n              ?.is_premium ===\n            true,\n        };\n      }\n\n      async function initializeAccount() {\n        try {\n          const {\n            data:\n              sessionData,\n            error:\n              sessionError,\n          } =\n            await supabase\n              .auth\n              .getSession();\n\n          if (\n            sessionError\n          ) {\n            throw sessionError;\n          }\n\n          let user =\n            sessionData\n              .session\n              ?.user ??\n            null;\n\n          if (\n            !user\n          ) {\n            const {\n              data:\n                signInData,\n              error:\n                signInError,\n            } =\n              await supabase\n                .auth\n                .signInAnonymously();\n\n            if (\n              signInError\n            ) {\n              throw signInError;\n            }\n\n            user =\n              signInData\n                .user ??\n              null;\n          }\n\n          if (\n            !user\n          ) {\n            throw new Error(\n              \"Supabase user was not created.\"\n            );\n          }\n\n          const [\n            entitlementPremium,\n            usage,\n          ] =\n            await Promise\n              .all([\n                loadEntitlement(\n                  user.id\n                ),\n\n                loadDailyUsage(),\n              ]);\n\n          if (\n            !active\n          ) {\n            return;\n          }\n\n          const premium =\n            entitlementPremium ||\n            usage\n              .isPremium;\n\n          setPlan(\n            premium\n              ? \"premium\"\n              : \"free\"\n          );\n\n          setDailyUsage({\n            date:\n              getJapanDateKey(),\n\n            count:\n              usage.count,\n          });\n        } catch (\n          error\n        ) {\n          console.error(\n            \"Supabase account initialization failed:\",\n            error\n          );\n\n          if (\n            active\n          ) {\n            setPlan(\n              \"free\"\n            );\n\n            setDailyUsage({\n              date:\n                getJapanDateKey(),\n\n              count:\n                0,\n            });\n          }\n        } finally {\n          if (\n            active\n          ) {\n            setAccountLoaded(\n              true\n            );\n          }\n        }\n      }\n\n      initializeAccount();\n\n      return () => {\n        active =\n          false;\n      };\n    },\n    []\n  );\n\n  useEffect(\n    () => {\n      if (\n        !accountLoaded\n      ) {\n        return;\n      }\n\n      if (\n        isPremium\n      ) {\n        setShowPremium(\n          false\n        );\n\n        return;\n      }\n\n      if (\n        usageCountToday >=\n        FREE_DAILY_LIMIT\n      ) {\n        setShowPremium(\n          true\n        );\n      }\n    },\n    [\n      accountLoaded,\n      isPremium,\n      usageCountToday,\n    ]\n  );\n\n  useEffect(\n    () => {\n      if (\n        \"serviceWorker\" in\n        navigator\n      ) {\n        navigator\n          .serviceWorker\n          .register(\n            \"/sw.js\"\n          )\n          .then(\n            (\n              registration\n            ) => {\n              console.log(\n                \"Service Worker registered:\",\n                registration\n              );\n            }\n          )\n          .catch(\n            (\n              error\n            ) => {\n              console.error(\n                \"Service Worker registration failed:\",\n                error\n              );\n            }\n          );\n      }\n    },\n    []\n  );\n\n  useEffect(\n    () => {\n      if (\n        !(\n          \"Notification\" in\n          window\n        )\n      ) {\n        setNotificationPermission(\n          \"unsupported\"\n        );\n\n        return;\n      }\n\n      setNotificationPermission(\n        Notification\n          .permission\n      );\n    },\n    []\n  );\n\n  useEffect(() => {\n    let active = true;\n    function applyRoot(state: any) {\n      if (!active || !state) return;\n      if (Array.isArray(state.memory)) setMemory(state.memory);\n      if (typeof state.relationshipPoints === \"number\") setRelationshipPoints(state.relationshipPoints);\n      if (state.misakiTodayMemory) applyTodayMemory(state.misakiTodayMemory);\n    }\n    const receive = (event: Event) => applyRoot((event as CustomEvent).detail);\n    const receiveHistory = (event: Event) => {\n      const history = (event as CustomEvent).detail;\n      if (active && Array.isArray(history)) setMessages(history.slice(-MAX_MESSAGES));\n    };\n    const receiveUsage = (event: Event) => applyApiUsage((event as CustomEvent).detail);\n    window.addEventListener(\"misaki-root-state\", receive);\n    window.addEventListener(\"misaki-history-state\", receiveHistory);\n    window.addEventListener(\"misaki-usage-state\", receiveUsage);\n    async function load() {\n      // Enable locally with sessionStorage.setItem(\"misaki-history-timing\", \"1\").\n      // Timings only: never log tokens, history, user IDs or temporary state.\n      const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? \"\");\n      const timingEnabled = urlDiagnostics || sessionStorage.getItem(\"misaki-history-timing\") === \"1\";\n      if (active) setShowHistoryDiagnostics(urlDiagnostics);\n      const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n      const startedAt = timingEnabled ? nowMs() : 0;\n      let previousAt = startedAt;\n      const timings: Record<string, number> = {};\n      const checkpoint = (name: string) => {\n        if (!timingEnabled) return;\n        const now = nowMs();\n        timings[name] = Math.round(now - previousAt);\n        previousAt = now;\n      };\n      try {\n        // A full remount ends the previous page's in-flight UI send marker.\n        sessionStorage.removeItem(\"misaki-chat-sending\");\n        // Do not display unverified caches or persist an empty error-state over them.\n        const accessToken = await getAccessToken();\n        checkpoint(\"accessTokenMs\");\n        const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);\n        const response = await fetch(\"/api/persona/history\", {\n          method: \"POST\",\n          headers: { \"Content-Type\": \"application/json\", Authorization: `Bearer ${accessToken}` },\n          body: JSON.stringify({ action: \"load\", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),\n            pending: JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\") }),\n        });\n        checkpoint(\"historyApiMs\");\n        if (timingEnabled) {\n          const serverTiming = response.headers.get(\"Server-Timing\");\n          const duration = serverTiming?.match(/(?:^|,)\\s*history;dur=([\\d.]+)/)?.[1];\n          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));\n          const authDuration = serverTiming?.match(/(?:^|,)\\s*auth;dur=([\\d.]+)/)?.[1];\n          const requestDuration = serverTiming?.match(/(?:^|,)\\s*request;dur=([\\d.]+)/)?.[1];\n          if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration));\n          if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration));\n        }\n        if (!response.ok) {\n          const result = await response.json().catch(() => null);\n          if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);\n          throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || \"美咲の状態を読み込めませんでした。\");\n        }\n        const state = await response.json();\n        checkpoint(\"jsonParseMs\");\n        const { data: latest } = await supabase.auth.getSession();\n        checkpoint(\"sessionVerificationMs\");\n        if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;\n        applyRoot(state);\n        const pending = JSON.parse(sessionStorage.getItem(\"misaki-pending-chat-turn\") || \"null\");\n        if (state.recoveredTurn || state.history?.some((item: any) => item.requestId === pending?.requestId)) {\n          sessionStorage.removeItem(\"misaki-pending-chat-turn\");\n        }\n        if (typeof state.temporaryState === \"string\") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);\n        // Permanent history is canonical. Anonymous history remains a display cache.\n        if (active && Array.isArray(state.history)) setMessages(state.history);\n        for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);\n        if (active) { setRecoveryCode(null); setLoaded(true); }\n        checkpoint(\"stateEnqueueMs\");\n        if (timingEnabled) {\n          const summary = { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) };\n          console.info(\"[misaki-history-timing]\", summary);\n          if (active && urlDiagnostics) setHistoryDiagnostics(summary);\n        }\n      } catch (error) {\n        if (active) setSendError(error instanceof Error ? error.message : \"状態を読み込めませんでした。\");\n      }\n    }\n    void load();\n    return () => {\n      active = false;\n      window.removeEventListener(\"misaki-root-state\", receive);\n      window.removeEventListener(\"misaki-history-state\", receiveHistory);\n      window.removeEventListener(\"misaki-usage-state\", receiveUsage);\n    };\n  }, []);\n\n  useEffect(\n    () => {\n      if (\n        ",
+        "sha256": "dfd8af81fd576f87e1960e0427c5b1006ef0900810139e8cc5c1ba5b52325fc2"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "22889788d6519a00a53bce163a5e4d2830a21103",
+      "message": "feat(chat): show opt-in history load timings on iPhone\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/22889788d6519a00a53bce163a5e4d2830a21103"
+    },
+    {
+      "sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "message": "fix(chat): support diagnostic flag in isolated UI tests\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/29f09d07a2c3b80eaa8300af6827851d127264cc"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42846032017",
+      "id": 42846032017,
+      "updated_at": "2026-11-10T15:36:17Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42846032443",
+      "id": 42846032443,
+      "updated_at": "2026-11-10T15:36:16Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42840888264",
+      "id": 42840888264,
+      "updated_at": "2026-11-10T15:06:37Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "failure",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42840419918",
+      "id": 42840419918,
+      "updated_at": "2026-11-10T15:06:56Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42840419915",
+      "id": 42840419915,
+      "updated_at": "2026-11-10T15:03:48Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "29f09d07a2c3b80eaa8300af6827851d127264cc",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42840419873",
+      "id": 42840419873,
+      "updated_at": "2026-11-10T15:04:31Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Development inventory (read-only)",
+      "head_sha": "3b95259a9eeb9327980aae54baae0332dcc32601",
+      "conclusion": null,
+      "status": "in_progress",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42846062011",
+      "id": 42846062011,
+      "updated_at": "2026-11-10T15:36:16Z",
+      "event": "push"
+    },
+    {
+      "name": "Ledger facts proposal PR (review required)",
+      "head_sha": "3b95259a9eeb9327980aae54baae0332dcc32601",
+      "conclusion": null,
+      "status": "in_progress",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/42846061788",
+      "id": 42846061788,
+      "updated_at": "2026-11-10T15:36:16Z",
+      "event": "push"
+    }
+  ],
+  "symbols": [
+    "ChatPage",
+    "FREE_DAILY_LIMIT",
+    "INITIAL_MESSAGES",
+    "MAX_MESSAGES",
+    "MEMORY_KEY",
+    "MISAKI_TODAY_MEMORY_KEY",
+    "RELATIONSHIP_KEY",
+    "STORAGE_KEY",
+    "accessToken",
+    "active",
+    "applyRoot",
+    "attempt",
+    "authDuration",
+    "beginIndependentConversation",
+    "checkpoint",
+    "createEmptyTodayMemory",
+    "duration",
+    "expectedOwner",
+    "expiresAt",
+    "freeLimitReached",
+    "freeRemaining",
+    "getFirstRpcRow",
+    "getJapanCurrentTime",
+    "getJapanDateKey",
+    "history",
+    "initializeAccount",
+    "isPremium",
+    "isPremiumActive",
+    "key",
+    "load",
+    "loadDailyUsage",
+    "loadEntitlement",
+    "now",
+    "nowMs",
+    "pending",
+    "premium",
+    "previousAt",
+    "receive",
+    "receiveHistory",
+    "receiveUsage",
+    "requestDuration",
+    "response",
+    "result",
+    "serverTiming",
+    "startedAt",
+    "state",
+    "summary",
+    "timingEnabled",
+    "timings",
+    "today",
+    "urlDiagnostics",
+    "usage",
+    "usageCountToday",
+    "user"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "cf572cf704df64510411e0d004446018e356e02aa8e6529b27d797e76384cd49",
+  "ci_digest": "fbb70310eb248d4e1ae9bf968ac97e39da89a5068a490bcd7a3496cc055cda13",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}

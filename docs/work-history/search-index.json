@@ -1,14 +1,31 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-10T14:55:18.215712+00:00",
+  "generated_at": "2026-11-10T15:36:22.658937+00:00",
   "coverage": {
-    "prs": 174,
-    "pr_cases": 174,
-    "branches": 197,
+    "prs": 175,
+    "pr_cases": 175,
+    "branches": 198,
     "errors": [],
     "api_calls": 10
   },
   "cases": [
+    {
+      "id": "pr-180",
+      "title": "feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル",
+      "summary": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "開発管理",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル 会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 {} ## 目的\niPhone Safariで約5秒かかる履歴表示について、既存の計測値を画面上で確認できるようにする。\n\n## 変更\n- `/chat?historyDiagnostics=1` でのみ計測パネルを表示。\n- 既存の `misaki-history-timing` 計測値を再利用し、ミリ秒単位で表示。会話・トークン・ユーザーIDは表示しない。\n- 通常アクセスでは表示しない。閉じる操作あり。\n\n## 検証と反映条件\n- 最新HEAD `29f09d07a2c3b80eaa8300af6827851d127264cc` のテスト・TypeScript・build 成功: https://github.com/miyazaki1016/misaki/actions/runs/42840419873\n- 過去PR #151の既存計測を拡張し、PR #44の履歴同期・PR #131の既存設計を再利用。重複調査なし。\n- ユーザーは本番マージ・反映を明示許可済み。診断はURL指定時だけ表示。実機計測と5秒の根本原因解決は未完了。\n\n<!-- history-preflight {\"decisions\":[{\"id\":\"pr-151\",\"decision\":\"extend\",\"reason\":\"PR151で実装済みのクライアント履歴計測を再利用し、iPhone上の表示だけを追加する。既存計測は再実装しない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\"},{\"id\":\"pr-44\",\"decision\":\"reuse\",\"reason\":\"PR44の既存履歴同期・再取得の設計をそのまま利用し、今回の変更では履歴取得処理自体に手を加えない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/44\"},{\"id\":\"pr-131\",\"decision\":\"distinct\",\"reason\":\"PR131の関連既存実装を保持し、今回の変更は画面上の任意診断表示だけに限定して既存処理を変更しない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"}]} --> ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MEMORY_KEY MISAKI_TODAY_MEMORY_KEY RELATIONSHIP_KEY STORAGE_KEY accessToken active applyRoot attempt authDuration beginIndependentConversation checkpoint createEmptyTodayMemory duration expectedOwner expiresAt freeLimitReached freeRemaining getFirstRpcRow getJapanCurrentTime getJapanDateKey history initializeAccount isPremium isPremiumActive key load loadDailyUsage loadEntitlement now nowMs pending premium previousAt receive receiveHistory receiveUsage requestDuration response result serverTiming startedAt state summary timingEnabled timings today urlDiagnostics usage usageCountToday user [{\"file\": \"app/chat/page.tsx\", \"kind\": \"テストの期待値・条件\", \"expression\": \"const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? \\\"\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (active) setShowHistoryDiagnostics(urlDiagnostics);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (timingEnabled) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (active && urlDiagnostics) setHistoryDiagnostics(summary);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/29f09d07a2c3b80eaa8300af6827851d127264cc/app/chat/page.tsx\"}] app/chat/page.tsx "
+    },
     {
       "id": "pr-179",
       "title": "docs: 照合待機から本題まで追加合図なしで継続する",
@@ -3972,6 +3989,23 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "feat/inventory-triage-ledger-proposals-20261101 ブランチ差分を収録 {}   [] .github/workflows/development-inventory.yml scripts/development_inventory_delta.py tests/test_development_inventory_delta.py "
+    },
+    {
+      "id": "branch-e2b97d56bae63d53",
+      "title": "feat/iphone-history-diagnostics-20261110",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "feat/iphone-history-diagnostics-20261110 ブランチ差分を収録 {}   [] app/chat/page.tsx "
     },
     {
       "id": "branch-02f9f023f7c9991c",

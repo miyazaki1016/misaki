@@ -1,0 +1,58 @@
+{
+  "id": "branch-d4bd494d2ca8e9db",
+  "title": "fix/chat-scroll-and-load-diagnostics-20261104",
+  "head": "3ccc345375985e09836979f04617c0f7cc90d197",
+  "head_ref": "fix/chat-scroll-and-load-diagnostics-20261104",
+  "linked_prs": [
+    151
+  ],
+  "files": [
+    {
+      "path": "app/api/persona/history/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/api/persona/history/route.ts"
+    },
+    {
+      "path": "app/chat/initial-chat-scroll.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/chat/initial-chat-scroll.tsx"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/chat/page.tsx"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/initial-chat-scroll.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/tests/initial-chat-scroll.test.cjs"
+    }
+  ],
+  "commits": "3ccc345375985e09836979f04617c0f7cc90d197 test(chat): prevent keyboard navigation race and verify follow recovery\n1e5dd939078dd62c14f9f8ae6a57fd55b3a9635c fix(chat): respect upward keyboard navigation before scroll events\n786b7b5713e10f5d5fef33a515b0abaa4a627753 test(chat): cover touchmove-before-scroll race and follow recovery\ne205c61c9bce6bc7dd04193cb73bee03fbc30488 fix(chat): suspend auto-follow immediately on Safari touch movement\n923291cba26dfbeca26190672a60ffb42a114b0b test(chat): cover initial scroll, early touch, reader position, reflow and cleanup\n4d06043b2d5d73054a2ba5b6edadf7217c5ef459 test(chat): simplify timing metric match for reliable regression check\n6cb5a59857d34fc3e9474793d51a68f0deaa643e test(chat): verify privacy-safe history Server-Timing and VM fallback\nb179fcfc3393cba9f806760894bc03c5a11a6c64 fix(chat): support history timing in isolated test runtimes without performance\nbdb60d3f1713cb532aee1b3f31995a16e948f134 fix(chat): report server authentication and total request timings\nd3e8d2b63a03d9ba0ddcc889d7518e273d753a53 fix(chat): expose auth and total request timing alongside history load\ncb9c00cd1ee87d37ef57a28f6460c8a9352be161 Merge main into PR #151 and preserve current docs; guard early scroll gestures\n4c8b9a508bc655b272fbbff298a1daf1ddddbce5 chore: include server-side history load duration in opt-in timing diagnostics\n6362654d8240721ef65467a07c825f1a9a765ec3 chore: expose privacy-safe server timing for history load\n9e1208199656131fdf263d3f6e12f758f1b27c9f fix: make opt-in history timings safe in test runtimes without performance\n157b7788de57af5205822bf91804d9af6a053912 chore: add opt-in privacy-safe client history load timing checkpoints\n12a94e111490bb86d9636715167046989769a67d fix: distinguish scrolling gestures from taps in initial chat scroll\n1a13022649170f25caf328b83f6fbfb754c72b25 docs: record draft chat scroll change and outstanding validation\n4cf92c9453fdcc2dea02a8f261834e6d18d2f307 docs: record draft chat scroll change and outstanding validation\n79eb8a9ca84dcf712911899d59dee3fb959940fb fix: distinguish user scrolling from layout-driven scrolling\nf0651faefe43d15df91bed29f62083f2f73e5715 fix: keep chat at latest without interrupting history reading",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "96d272cf37b8ee83672e3f4d5783772f75ebdb079b1e805a3c6caaf7e52106b8",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}

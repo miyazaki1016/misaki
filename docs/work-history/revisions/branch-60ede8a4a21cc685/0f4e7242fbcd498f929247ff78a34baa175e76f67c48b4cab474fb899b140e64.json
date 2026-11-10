@@ -1,0 +1,20 @@
+{
+  "id": "branch-60ede8a4a21cc685",
+  "title": "sora/remove-relationship-temporary-diagnostics",
+  "head": "e4f870f0ab76271daee76882fbd1b3fefae3a9bb",
+  "head_ref": "sora/remove-relationship-temporary-diagnostics",
+  "linked_prs": [
+    52
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "0d0ef75cca35eac619f362ad7108c8e05da606a5c0a935d64cf67011f251f706",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}

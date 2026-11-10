@@ -1,0 +1,42 @@
+{
+  "id": "branch-b5b1d46a6468bd59",
+  "title": "feat/inventory-classification-phase3-20261101",
+  "head": "9a46c7d9178abada8d012696a5ca79fb10190fa1",
+  "head_ref": "feat/inventory-classification-phase3-20261101",
+  "linked_prs": [
+    122
+  ],
+  "files": [
+    {
+      "path": "scripts/development_inventory.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9a46c7d9178abada8d012696a5ca79fb10190fa1/scripts/development_inventory.py"
+    },
+    {
+      "path": "scripts/development_inventory_delta.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9a46c7d9178abada8d012696a5ca79fb10190fa1/scripts/development_inventory_delta.py"
+    },
+    {
+      "path": "tests/test_development_inventory_delta.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9a46c7d9178abada8d012696a5ca79fb10190fa1/tests/test_development_inventory_delta.py"
+    }
+  ],
+  "commits": "9a46c7d9178abada8d012696a5ca79fb10190fa1 Test PR-title case matching without ledger status changes\n6e01a6204764bb6515ef1d15eae0144b8a190149 Correct regex for canonical case index rows\n8348c409a5b4cff6446bbc703d3467d5fb88a866 Fix case table parsing and Japanese PR evidence matching\n51167b6edee2d9a23dd2af20854ffaa920ad98d0 Use PR titles and descriptions as read-only classification evidence\n3efd5bcad59d67a65b5d0f964c23d811f4698c6a Include bounded PR metadata in read-only snapshot\n2ac48dbd38d9246a155268a10ee8dd87dfc8563b Recognize Japanese tokens in inventory candidate classification",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a27e3349119d2ec5e679f8210fff33a5034332ba61cceb93a65e7b0cdeaf36c0",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}

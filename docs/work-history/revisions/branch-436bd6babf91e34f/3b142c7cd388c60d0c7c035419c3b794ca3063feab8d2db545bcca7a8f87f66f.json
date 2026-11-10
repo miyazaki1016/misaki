@@ -1,0 +1,49 @@
+{
+  "id": "branch-436bd6babf91e34f",
+  "title": "chore/inventory-index-facts-proposal",
+  "head": "6e3df7b41bdce757191c0650a66fad977a8a198e",
+  "head_ref": "chore/inventory-index-facts-proposal",
+  "linked_prs": [
+    141
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6e3df7b41bdce757191c0650a66fad977a8a198e/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": ".github/workflows/ledger-facts-proposal.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6e3df7b41bdce757191c0650a66fad977a8a198e/.github/workflows/ledger-facts-proposal.yml"
+    },
+    {
+      "path": "scripts/development_index_proposal.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6e3df7b41bdce757191c0650a66fad977a8a198e/scripts/development_index_proposal.py"
+    },
+    {
+      "path": "tests/test_development_index_proposal.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6e3df7b41bdce757191c0650a66fad977a8a198e/tests/test_development_index_proposal.py"
+    }
+  ],
+  "commits": "6e3df7b41bdce757191c0650a66fad977a8a198e Run index proposal regression tests for PR changes\n86cf8faf1492bd50ad2ebf99f6d04997a586d3a0 Extend existing ledger review PR to update operations index facts\n6662caee31ee3e7bb46a8b4e4ab18b73df19f3e1 Test idempotent index updates and fail-closed validation\nafbc72859f14ea7d68b81836c826a2e68b567c38 Propose deterministic index facts without changing case judgments",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "f820bfb1cef4578f12ac8c412499ca4564c8bbbfa1ed0fa6c3d32c37235478b4",
+  "collected_at": "2026-11-10T15:36:22.658937+00:00"
+}
