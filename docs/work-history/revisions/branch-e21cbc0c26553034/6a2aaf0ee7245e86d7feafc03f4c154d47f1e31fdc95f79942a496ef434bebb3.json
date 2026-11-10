@@ -1,0 +1,42 @@
+{
+  "id": "branch-e21cbc0c26553034",
+  "title": "fix/lounge-transition-flash-20261030",
+  "head": "d804b0233133359a7894e608848c72fdabf9313e",
+  "head_ref": "fix/lounge-transition-flash-20261030",
+  "linked_prs": [
+    97
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d804b0233133359a7894e608848c72fdabf9313e/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d804b0233133359a7894e608848c72fdabf9313e/public/lab/transparent-lounge-shortcuts/index.html"
+    },
+    {
+      "path": "public/lab/transparent-lounge-vertical/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d804b0233133359a7894e608848c72fdabf9313e/public/lab/transparent-lounge-vertical/index.html"
+    }
+  ],
+  "commits": "d804b0233133359a7894e608848c72fdabf9313e docs(lounge): record top-layer transition flash fix and iPhone QA\na697ada6f2ee5655e69b781bec5afc7b832ca8cb fix(lounge): keep opening top layer covered until chat loads, preventing flash\nf3dd22c673d2a6ed976c1b7702122bbd4df8b9cc fix(lounge): keep opening top layer covered until chat loads, preventing flash",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "35c59e46b02db77a8fb2633adec91e0153a1068482c9316bd27f009d1a2e5754",
+  "collected_at": "2026-11-10T05:33:59.190381+00:00"
+}

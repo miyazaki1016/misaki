@@ -1,0 +1,42 @@
+{
+  "id": "branch-bbf5a2c293af40b5",
+  "title": "fix/history-main-evidence-search-20261109",
+  "head": "b4b46c92dc4d11093b125fd92821299929e13b4c",
+  "head_ref": "fix/history-main-evidence-search-20261109",
+  "linked_prs": [
+    169
+  ],
+  "files": [
+    {
+      "path": "docs/approval-dashboard/history.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b4b46c92dc4d11093b125fd92821299929e13b4c/docs/approval-dashboard/history.html"
+    },
+    {
+      "path": "scripts/development_history_evidence.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b4b46c92dc4d11093b125fd92821299929e13b4c/scripts/development_history_evidence.py"
+    },
+    {
+      "path": "tests/test_development_history_evidence.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b4b46c92dc4d11093b125fd92821299929e13b4c/tests/test_development_history_evidence.py"
+    }
+  ],
+  "commits": "b4b46c92dc4d11093b125fd92821299929e13b4c fix(history): distinguish main ancestry and retain searchable test evidence",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "04001c615f0cda3d4f76ce85270904e01c03a635b530f74603111bc223abdc6b",
+  "collected_at": "2026-11-10T05:33:59.190381+00:00"
+}
