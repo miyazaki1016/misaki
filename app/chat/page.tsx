@@ -760,7 +760,7 @@ export default function ChatPage() {
     async function load() {
       // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
       // Timings only: never log tokens, history, user IDs or temporary state.
-      const urlDiagnostics = new URLSearchParams(window.location.search).get("historyDiagnostics") === "1";
+      const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? "");
       const timingEnabled = urlDiagnostics || sessionStorage.getItem("misaki-history-timing") === "1";
       if (active) setShowHistoryDiagnostics(urlDiagnostics);
       const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
