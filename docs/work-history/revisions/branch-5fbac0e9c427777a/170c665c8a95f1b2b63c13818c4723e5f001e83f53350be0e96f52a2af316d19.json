@@ -1,0 +1,18 @@
+{
+  "id": "branch-5fbac0e9c427777a",
+  "title": "chore/inventory-index-proposal",
+  "head": "ad39f1393cadfe224a5da524afa2da7ecda82cfb",
+  "head_ref": "chore/inventory-index-proposal",
+  "linked_prs": [],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "PR未関連のブランチ差分",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "f8bbd30320f2fa8c8f3f578089b901a1aff229e452013ab52e62642c434fd86e",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

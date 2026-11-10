@@ -1,0 +1,28 @@
+{
+  "id": "branch-bc36378a11db8be8",
+  "title": "fix/chat-request-diagnostics",
+  "head": "47f39994a79e68fa47cbe5234ba75ce2a19d5965",
+  "head_ref": "fix/chat-request-diagnostics",
+  "linked_prs": [
+    7
+  ],
+  "files": [
+    {
+      "path": "app/api/chat-proxy/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/47f39994a79e68fa47cbe5234ba75ce2a19d5965/app/api/chat-proxy/route.ts"
+    }
+  ],
+  "commits": "47f39994a79e68fa47cbe5234ba75ce2a19d5965 会話履歴の実受信状況を安全に診断できるようにする",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "54391f433507387b1f04275917a3a0ada5ac95c97eaaf9b71ef3cb51c3d2dd8e",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

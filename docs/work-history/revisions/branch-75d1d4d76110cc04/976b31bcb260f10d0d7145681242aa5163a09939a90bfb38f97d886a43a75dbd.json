@@ -1,0 +1,28 @@
+{
+  "id": "branch-75d1d4d76110cc04",
+  "title": "refine/proactive-action-tags",
+  "head": "693bb5822e1f0de7c409e844ae3f1285458af0ab",
+  "head_ref": "refine/proactive-action-tags",
+  "linked_prs": [
+    14
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/693bb5822e1f0de7c409e844ae3f1285458af0ab/supabase/functions/body-clock/proactive-decision.ts"
+    }
+  ],
+  "commits": "693bb5822e1f0de7c409e844ae3f1285458af0ab Refine proactive tags to respect relationship actions",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "c302930408be36a9d37d51193268dc2a3b3cbb31f2643f003922af164e01a61e",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

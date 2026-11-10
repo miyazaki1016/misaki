@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-10T02:50:24.064930+00:00
+更新 (UTC): 2026-11-10T05:03:55.377163+00:00
 
 ## 全案件
 
@@ -204,6 +204,7 @@
 | [experiment/shared-conversation-history-v1-20261015](cases/branch-fc35db20bd870b9a.md) | 雨量・全国検知・記憶・会話・開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/ledger-workflow-yaml-corruption-20261103](cases/branch-fd3715b29c8dd1a1.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/require-history-first-20261109](cases/branch-fe43e3f34e45c959.md) | 開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [docs/handoff-validation-stages-20261110](cases/branch-ffc3354680bad3ec.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [匿名会話と記憶をメール確認前に同じユーザーへ保存する](cases/pr-1.md) | 記憶・会話・通知・配信・開発管理・画面・表示：匿名会話と記憶をメール確認前に同じユーザーへ保存する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [proxy再試行による利用回数の二重消費を防ぐ](cases/pr-10.md) | 記憶・会話：proxy再試行による利用回数の二重消費を防ぐ | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序](cases/pr-100.md) | 記憶・会話・認証・安全性：設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
@@ -285,6 +286,7 @@
 | [feat(history): 着手前に「以前の実装・検証」を自動提示して再利用判断を確認](cases/pr-171.md) | 開発管理・画面・表示：新規作業の依頼文から過去の実装・未統合研究を自動照合し、原本の再利用判断を着手前に記録する。 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs(history): 着手前自動照合の実測と再利用判断を保存](cases/pr-172.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs: 日本語開発履歴の引継ぎを通常チャット・Actions経由に対応](cases/pr-173.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [feat(history): Issueへ照合結果を返却し、引継ぎと検証・完成を分離](cases/pr-175.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [会話同期で同じチャットターンが二重保存されるのを防ぐ](cases/pr-18.md) | 記憶・会話：会話同期で同じチャットターンが二重保存されるのを防ぐ | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -493,6 +495,7 @@
 - scripts/context-ab-live.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/context-ab-quality-live.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/context-ab-smoke.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/development-preflight-publish.mjs：[branch-ffc3354680bad3ec](cases/branch-ffc3354680bad3ec.md), [pr-175](cases/pr-175.md)
 - scripts/development_branch_case_handoff.py：[branch-38e6283b99123cd5](cases/branch-38e6283b99123cd5.md), [pr-147](cases/pr-147.md)
 - scripts/development_branch_compare.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [branch-b23be022a75304ba](cases/branch-b23be022a75304ba.md), [branch-ed894c05ef854553](cases/branch-ed894c05ef854553.md), [pr-139](cases/pr-139.md), [pr-145](cases/pr-145.md), [pr-148](cases/pr-148.md)
 - scripts/development_branch_review_queue.py：[branch-2f842ea0ac1d18a4](cases/branch-2f842ea0ac1d18a4.md), [pr-149](cases/pr-149.md)

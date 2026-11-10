@@ -1,0 +1,28 @@
+{
+  "id": "branch-c8b5b69bea16cfe8",
+  "title": "fix/workday-grounding",
+  "head": "6f25eba602fca1183383588ad0183d4c4a16d37c",
+  "head_ref": "fix/workday-grounding",
+  "linked_prs": [
+    20
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6f25eba602fca1183383588ad0183d4c4a16d37c/app/api/chat/route.ts"
+    }
+  ],
+  "commits": "6f25eba602fca1183383588ad0183d4c4a16d37c Ground user work status and Misaki work timing",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "9e2ba519064b769e35a83920b5be58130594b5d616dd644b21f4d01dc5ff0679",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

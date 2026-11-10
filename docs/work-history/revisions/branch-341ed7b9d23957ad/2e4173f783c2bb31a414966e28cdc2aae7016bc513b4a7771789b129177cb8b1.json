@@ -1,0 +1,20 @@
+{
+  "id": "branch-341ed7b9d23957ad",
+  "title": "sora/history-sync-source-proof",
+  "head": "850e2acccef3722fc487dd17df687056b3b58911",
+  "head_ref": "sora/history-sync-source-proof",
+  "linked_prs": [
+    36
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "90f1cc87175d521a6c4b0cea7b64b72ec425ee94d8593f2778b7412a8a64b0b1",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

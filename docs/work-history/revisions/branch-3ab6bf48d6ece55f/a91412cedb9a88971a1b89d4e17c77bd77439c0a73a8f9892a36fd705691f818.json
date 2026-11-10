@@ -1,0 +1,49 @@
+{
+  "id": "branch-3ab6bf48d6ece55f",
+  "title": "feat/inventory-ledger-auto-record-phase4-20261101",
+  "head": "95900b6fe269676614b0e55f84fd89ddeb7796fd",
+  "head_ref": "feat/inventory-ledger-auto-record-phase4-20261101",
+  "linked_prs": [
+    124
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/95900b6fe269676614b0e55f84fd89ddeb7796fd/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "docs/DEVELOPMENT_OPERATIONS_INDEX.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/95900b6fe269676614b0e55f84fd89ddeb7796fd/docs/DEVELOPMENT_OPERATIONS_INDEX.md"
+    },
+    {
+      "path": "scripts/development_ledger_proposal.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/95900b6fe269676614b0e55f84fd89ddeb7796fd/scripts/development_ledger_proposal.py"
+    },
+    {
+      "path": "tests/test_development_ledger_proposal.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/95900b6fe269676614b0e55f84fd89ddeb7796fd/tests/test_development_ledger_proposal.py"
+    }
+  ],
+  "commits": "95900b6fe269676614b0e55f84fd89ddeb7796fd Validate and attach read-only ledger proposal to inventory artifact\n479aae94907ff3efeb7d7991b94cb19c47ff86ea Test idempotent and non-destructive ledger proposals\n0e861e348df805d8fa3e527e796e5eb33a7b7a4c Generate deterministic review-only ledger proposals from inventory facts\n6efda9e201975cd37d73847c984f703f9cbaa01f Define safe phase-4 ledger automation contract",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "9815d78f8436b801a57797a1f487e1282b7c9720431b1004148ccc17d66232f5",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

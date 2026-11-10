@@ -1,0 +1,35 @@
+{
+  "id": "branch-70fc9c695854889a",
+  "title": "feature/proactive-derived-tags",
+  "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+  "head_ref": "feature/proactive-derived-tags",
+  "linked_prs": [
+    12
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    }
+  ],
+  "commits": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86 Use derived proactive tags for body clock photo matching\nb8f53f1a1f83e839a4c4f2710e84a7acd2153d30 Derive proactive expression tags from decision context",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b81951ec026aef6224d47fd402cf581252aa34d7f56bc9251167d778ffc060a2",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}

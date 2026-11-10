@@ -1,0 +1,227 @@
+{
+  "id": "branch-fc35db20bd870b9a",
+  "title": "experiment/shared-conversation-history-v1-20261015",
+  "head": "2ae90d70ff143c8de935f25ec12f291e9b82613a",
+  "head_ref": "experiment/shared-conversation-history-v1-20261015",
+  "linked_prs": [
+    88
+  ],
+  "files": [
+    {
+      "path": "docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/docs/AMAFURU_WEATHER_DISASTER_INTEGRATION_HANDOFF_20261016.md"
+    },
+    {
+      "path": "docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/docs/CONVERSATION_ENGINE_MULTICHARACTER_GAP_AUDIT_20261016.md"
+    },
+    {
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/docs/CONVERSATION_ENGINE_PROMPT_EXTRACTION_GATE_20261015.md"
+    },
+    {
+      "path": "docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/docs/CONVERSATION_ENGINE_PROMPT_INSTRUCTION_INVENTORY_20261016.md"
+    },
+    {
+      "path": "lib/conversation-engine/amahuru-rain-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/amahuru-rain-context.ts"
+    },
+    {
+      "path": "lib/conversation-engine/attempt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/attempt.ts"
+    },
+    {
+      "path": "lib/conversation-engine/base-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/base-prompt.ts"
+    },
+    {
+      "path": "lib/conversation-engine/character-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/character-context.ts"
+    },
+    {
+      "path": "lib/conversation-engine/character-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/character-prompt.ts"
+    },
+    {
+      "path": "lib/conversation-engine/context-format.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/context-format.ts"
+    },
+    {
+      "path": "lib/conversation-engine/history.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/history.ts"
+    },
+    {
+      "path": "lib/conversation-engine/layered-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/layered-context.ts"
+    },
+    {
+      "path": "lib/conversation-engine/layered-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/layered-prompt.ts"
+    },
+    {
+      "path": "lib/conversation-engine/memory.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/memory.ts"
+    },
+    {
+      "path": "lib/conversation-engine/relationship-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/relationship-context.ts"
+    },
+    {
+      "path": "lib/conversation-engine/retry-guides.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/lib/conversation-engine/retry-guides.ts"
+    },
+    {
+      "path": "tests/conversation-engine-amahuru-rain-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-amahuru-rain-context.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-attempt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-attempt.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-base-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-base-prompt.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-character-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-character-context.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-character-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-character-prompt.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-context-format.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-context-format.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-history.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-history.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-layered-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-layered-context.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-layered-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-layered-prompt.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-memory.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-memory.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-prompt-inventory.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-prompt-inventory.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-relationship-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-relationship-context.test.ts"
+    },
+    {
+      "path": "tests/conversation-engine-retry-guides.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/2ae90d70ff143c8de935f25ec12f291e9b82613a/tests/conversation-engine-retry-guides.test.ts"
+    }
+  ],
+  "commits": "2ae90d70ff143c8de935f25ec12f291e9b82613a test: offline Amahuru rain contract fail-closed cases and forecast/observation distinction\n1b7257ef54d3cc8ddbbf0d5299fefbfd7f532ab8 fix: permit future forecast windows while rejecting future observations\n9ac865c569e389ef9aa83defc7b6ea26e6e2b113 feat: add offline fail-closed Amahuru rain context adapter (Draft only)\n9ca4f4d0bef5c2a46142d3feec3d45aa20a380c0 docs: cross-link Amahuru/Misaki shared weather integration contract\n918abffbe341d9264ee161c28d5d2e3b8b1ceb41 docs: add explicit JSON schema key checklist for prompt drift gate\nc9bf0d9058a78266e2b2950a67da5a71e136007b test: alarm on drift in audited prompt fields headings and response schema\na793c5fa7521b203b40a6433d2f4996c557f9f3e docs: classify every dynamic field and static section of Misaki base prompt\n45872c0fc4c335723be6579acc22ad64bacb47de docs: audit production-to-layered prompt gaps and multi-character migration gates\n63b80449a989b1ed833677dcb2463adc9c06378a test: compare two characters using shared rules without identity leakage\n35838ad81c1e979e60bce59589a4b70297028e61 feat: assemble experimental character-independent layered prompts\n1d99c205583c8262b57718d8af96ef04dd729310 test: verify layered character context and scope safety\n17ba87fda5abcf0d9ed0fd3b11cc20166dba50aa feat: define shared policy, character identity and scoped relationship layers\nabf17d8fe5fca445e0c3e75ec67c3b33239bcf12 test: ensure non-Misaki persona cannot inherit Misaki-specific prompt\nded453d9baa7ccf13eb4762da236998d9ac6b56a feat: guard character-scoped prompt assembly against Misaki template reuse\nc92e2c8574bb3fa01fc46b8fcac16f71a138d751 test: enforce character persona isolation and cross-user state boundaries\na5b3f001c5eccb785e09f928ac63de7d93dc711f feat: add isolated character persona and conversation scope contracts\n2ead1de19742da1f9d2e6e811b8d6b25ce9471de test: guard complete shared base prompt against production template drift\n731171a0c9697659693ab9449a8cbdc0c32c1f7a feat: extract complete production base prompt into pure resolved-context builder\n86593ec0f0d5c325c42532b0039f9ec6b45fa7ab fix: resolve runtime history import in attempt assembly\n8752f588b7e36fe6fac239af4e8665e4fbd388fa fix: resolve shared attempt imports in Node TypeScript tests\n3e28068c0f0546ec2bfe4b7854ad79802cf67acc test: initial retry and expression attempt exact concatenation\n7d55f41411934d7f98cd698167e0be0dd5cb4861 feat: add pure shared Gemini attempt assembly without model calls\ndffe80e395d4296d2b8f6d97749330345021366b test: pure retry and expression guide formatting\n58089c70b4e71c466c3e38fe668f70c84358f7cf refactor: add pure retry and relationship expression prompt suffix builders\n07dce6253d090770f4ee77c690269848ded101c5 docs: establish exact prompt extraction parity gates and source order\nacb816f2478c08af77ef163fd52680b021addb2e fix: use resolvable TypeScript import for Node test runner\n62ce7891b88209ca3fc0ff5226f58898e3b3df8e test: legacy, explicit, and engine relationship guide parity\n696a81641ff7bd0626e0cda528d9156bf172e1dd refactor: add pure relationship acting context adapter using production interpreter\n25b39f5331b66ba2e5448a1d1db2ef3280b99a53 test: exact prompt context formatting fixtures\n0b52e5b02a433a3489100deba117761249fe0827 refactor: extract pure memory and recent-topic prompt formatting\n4002e49733ea678e7cf7a569e9e9d03b73d6ba0f test: memory limits, normalization and date rollover parity fixtures\n8bf2c3e6e31be8ada26720fbaa0740481f6cca26 refactor: add pure memory snapshot normalizers matching chat route\n89369c59b5bc3d326bc64a5342177cd49bc0f2db test: verify pure history mapping, filtering and 60-turn cap\n9fa52cdea7bb71f740a59bb5e8482a7adaaebeb0 fix: zero history budget yields empty array\n2c6f5b926fc740b835a6a5b9638d4715b75b267c refactor: add pure production-equivalent conversation history adapter",
+  "topics": [
+    "雨量・全国検知",
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b6947cca17cdca6e1e7a439295287ce8e20ecb1b742ce28a6e932989e819c87d",
+  "collected_at": "2026-11-10T05:03:55.377163+00:00"
+}
