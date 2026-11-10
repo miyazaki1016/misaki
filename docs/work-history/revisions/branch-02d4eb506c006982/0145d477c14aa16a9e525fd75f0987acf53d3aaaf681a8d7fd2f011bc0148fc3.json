@@ -1,0 +1,20 @@
+{
+  "id": "branch-02d4eb506c006982",
+  "title": "sora/remove-timestamp-history-poll",
+  "head": "829ee4671443140386043396ffb70c0a8a8daaae",
+  "head_ref": "sora/remove-timestamp-history-poll",
+  "linked_prs": [
+    39
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a887ee5a2ff5739ab6ef7ddd380b69daba3e90a9024c4829d73bd5e3acc8121d",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}

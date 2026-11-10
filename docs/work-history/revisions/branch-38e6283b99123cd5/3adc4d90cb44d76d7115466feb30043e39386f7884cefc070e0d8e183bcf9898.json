@@ -1,0 +1,42 @@
+{
+  "id": "branch-38e6283b99123cd5",
+  "title": "chore/inventory-branch-case-handoff",
+  "head": "9758a5c6f496eb6614f08485262f9c735bdc350c",
+  "head_ref": "chore/inventory-branch-case-handoff",
+  "linked_prs": [
+    147
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9758a5c6f496eb6614f08485262f9c735bdc350c/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "scripts/development_branch_case_handoff.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9758a5c6f496eb6614f08485262f9c735bdc350c/scripts/development_branch_case_handoff.py"
+    },
+    {
+      "path": "tests/test_development_branch_case_handoff.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9758a5c6f496eb6614f08485262f9c735bdc350c/tests/test_development_branch_case_handoff.py"
+    }
+  ],
+  "commits": "9758a5c6f496eb6614f08485262f9c735bdc350c Integrate branch-case handoff artifact and tests into inventory workflow\n345ce978a7169ac74517be31b5cc4ffeb0d9a09d Test conservative branch to canonical-case handoff\nc27ca8ae813b0cf3ffe51fcc87ac36b36f1ae028 Generate evidence-only branch to PR to case handoff",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ed72dcb682894b61d921ccb33d0636bcaec50a621ca253e9f20e31b93a8e7709",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}

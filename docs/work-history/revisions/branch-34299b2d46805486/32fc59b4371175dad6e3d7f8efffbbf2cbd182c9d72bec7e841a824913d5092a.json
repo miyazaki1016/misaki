@@ -1,0 +1,49 @@
+{
+  "id": "branch-34299b2d46805486",
+  "title": "docs/production-source-of-truth-reconciliation",
+  "head": "ce8e41f47af98f766c75e1f27787d0b585c452a7",
+  "head_ref": "docs/production-source-of-truth-reconciliation",
+  "linked_prs": [
+    81
+  ],
+  "files": [
+    {
+      "path": "docs/HANDOFF_NEXT_SORA_2026-10-14.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ce8e41f47af98f766c75e1f27787d0b585c452a7/docs/HANDOFF_NEXT_SORA_2026-10-14.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ce8e41f47af98f766c75e1f27787d0b585c452a7/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/MULTI_CHARACTER_PHASE0_AUDIT.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ce8e41f47af98f766c75e1f27787d0b585c452a7/docs/MULTI_CHARACTER_PHASE0_AUDIT.md"
+    },
+    {
+      "path": "docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ce8e41f47af98f766c75e1f27787d0b585c452a7/docs/PRODUCTION_SOURCE_OF_TRUTH_RECONCILIATION.md"
+    }
+  ],
+  "commits": "ce8e41f47af98f766c75e1f27787d0b585c452a7 docs: add next Sora handoff for Oct 14\n9e2b951defacad24a2cdb5aa3770b7022a908cee docs: correct migration version mismatch count\n11b0e771d81cb034fbc6595b3ae18de0856aea38 docs: add Oct 14 handoff and work inventory\n0088ab3d31b787ddf88882b07940e1591986c4b7 docs: record relationship-time 403 provenance findings\n815c85e8a5f9857811d9dd5df18abecb1b114125 docs: record relationship-time UUID overload PR search\n010c60cb1c94265fb3526bb7560134e13a3cf815 docs: correct relationship-time migration comparison\neaea35524c46dd11876d2d7d7fbb66cafc39e2d8 docs: confirm emotion RPC body matches production\n9c2fba40a61cd3aad9005685fb38d65ba40da8f1 docs: correct emotion RPC migration provenance finding\n4d6e8f25880b4afd659e8e66dbe5d17b995c27d4 docs: distinguish historical integration PR status from current production truth\n5d3a6c40fe102e2dcf39b600ec360d9d995c215d docs: record emotion action RPC production contract drift\ndc893ee3db42346fbd1bebd35d626d28a299b72b docs: record production relationship-time overload contracts\nf3f94262ae89c826615e45753c90a0588b890c96 docs: record relationship RPC provenance search results\n24a8b06d01745a008708f424703e00cc46568cfb docs: record live relationship RPC overload drift\na345de84f4a447bc9f7a671abf3ac53654795a60 docs: record concrete RPC migration provenance drift\na0c7e3d05fb386c1f4178e9db5fc2128dd9483bc docs: record live Relationship Engine v2 RPC catalog\n77a1eaebfa89c35eb2d355a1b6434bf58f1bd3b4 docs: align phase 0 audit with verified production baseline\neb90ffb3a485adabdb724c268ab01cd725d78d05 docs: record production source-of-truth reconciliation",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "24e23a6223b5e63588a35b8ff0faa7d15c56101e73c7cf99fd3d2560330cd84c",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}

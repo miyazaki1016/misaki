@@ -1,0 +1,183 @@
+{
+  "id": "branch-a5961576a6beffe1",
+  "title": "work/relationship-identity-v1",
+  "head": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4",
+  "head_ref": "work/relationship-identity-v1",
+  "linked_prs": [
+    67
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/app/api/chat/route.ts"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/canonical-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/canonical-state.ts"
+    },
+    {
+      "path": "lib/relationship-acting-guide.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/relationship-acting-guide.ts"
+    },
+    {
+      "path": "lib/relationship-analyzer-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/relationship-analyzer-v1.ts"
+    },
+    {
+      "path": "lib/relationship-engine-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/relationship-engine-v1.ts"
+    },
+    {
+      "path": "lib/relationship-identity-resolver.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/relationship-identity-resolver.ts"
+    },
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/package.json"
+    },
+    {
+      "path": "supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql"
+    },
+    {
+      "path": "tests/fixtures/relationship-identity-baseline.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/fixtures/relationship-identity-baseline.sql"
+    },
+    {
+      "path": "tests/relationship-acting-guide.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-acting-guide.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-anonymous-runtime.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-anonymous-runtime.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-audit.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-audit.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-persistence.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-persistence.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-resolver.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-resolver.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-sql.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-sql.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-temporary-import.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-identity-temporary-import.test.ts"
+    },
+    {
+      "path": "tests/relationship-mutual-acceptance.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9cbe2146d4a9ad09edd16100c27d950e95a8bcc4/tests/relationship-mutual-acceptance.test.ts"
+    }
+  ],
+  "commits": "9cbe2146d4a9ad09edd16100c27d950e95a8bcc4 test: cover relationship identity acting guide\n6266cf8c367da4e822d33c92fae89a0588718962 docs: distinguish preview deployment from acceptance\n9f61e12b02449e26ded0815ce9fbdc3c1aae960b docs: clarify anonymous identity import trigger\na2f166ac45c95dc5879cbfde7384db5c77f00ba7 docs: record Relationship Identity follow-up audit\nece799c20d685f00c007cb2f897bdd6b2443a2d3 docs: record Acting Guide lover acceptance\nc6bd6b58a6cf09e9ea99681a972bc65a0d460feb docs: record canonical lover acceptance milestone\ncd2479ee1cad11294132563049a86662f8652576 test: cover mutual romantic acceptance grounding\n2b1046427839d1cea0d3e5548004f3253d51ac2a fix: recognize explicit mutual romantic acceptance\n3c8a2e746e833859f32b05f6eb0993bdaa549970 chore: align Identity migrations with production history and keep gate off\n2eb4b905cab950178f7981612e66b4c42bdcf8c3 chore: align 20261007114143_relationship_identity_v1_canonical.sql with production migration history\n636c3fd613a58912b7cb6a1655b44314405eac69 docs: record relationship identity audit and pre-production verification gates\n555d35bc19e7003dd9b051d02762b4bdfac1b192 fix: audit relationship identity migration order and canonical continuity\n2b97931217ab816018d70ddc63d0f764bb8bf276 test: lock adjacency distance ranking\n5a86c905745a82273105950dcc04803aa8fd4173 fix: rank adjacent identities by canonical distance\nf326cb13606ec7acfffb419168881de6ad34b812 test: match permanent romance provenance assignment semantics\n9e154854a4c253cbd457272272e60c3bf6dabfdb test: lock romance reentry runtime provenance flow\ne8f12e510272788ada309224104a7493d588cb11 test: lock namespace-safe romance reentry import\nebce979a2d37b645f5376d734f4517551c271f8d feat: import anonymous romance reentry as namespace-safe fact\nc769243c557f9a79eaef0a60821208b3a28fd0e1 feat: map anonymous romance reentry fact into permanent version namespace\n4021f1a32e2059dc9895602cb43309ec5b1cb888 fix: preserve anonymous critical-only identity source contract\n4f73f1a7ed7fd8d9dcd8e6434df50d5e782c13e5 feat: persist romance reentry provenance in anonymous identity state\n2f0d8b9271ad061ef1dee37db3a08ab71cc10880 feat: wire romance reentry provenance through permanent identity worker\n7a5d8b3bb19f3393cb78929b143ff5cbbf14676e feat: persist relationship identity romance reentry provenance\nf456dc7cca722df376e03251ee4178e53a2a8577 fix: normalize romance reentry provenance lines\nad66c35eefab3772bc850f10ca07f25413ffd90e test: lock persistent romance reentry provenance\n3e23c7c0c2884fee18045eb17186e7e2ae86da1d feat: persist constrained romance reentry provenance in resolver state\n1ffcafe6e1641678b7510dc8177f9d2ccf9dafc4 feat: let Misaki answer direct relationship questions from identity\nc7b2abb20c528c3ffbceaa43dbc79d2c72306bda test: lock relationship identity feature gate off paths\n13f44a7eefb2e9b1f7fcadd6c279993eee74b21a test: lock anonymous critical-only identity resolution\n4e075ec29a8cb3655eeb5115a78744911cd46b4c fix: normalize romance reentry resolver lines\n702c3781562a72326563abe17475350b2f13be21 fix: remove escaped newline from romance reentry resolver\ne510334e9bcac12773067a7d3a5c9e9c98052b24 test: lock constrained romance reentry provenance\ne5392017dba5d28c127a3ce9601ba2677fab5307 feat: ground constrained romance reentry in canonical state application\nf0833c88b7a9ceb049dba182352d2b99104a8dc5 feat: allow romance reentry only from new canonical romance pattern\nb1467647bcda838f36d20a79241b50807d2972e8 fix: read identity import migration in persistence tests\nd70ab23ec3d1886529ca287541151b174714f905 test: lock temporary identity import transition ledger\n746b68b518aa0b16710f5ed12644836694bfeadd fix: record identity transition on temporary import\n2209fa4a195128e25151cac6eca396cf92da4c12 test: lock temporary identity version remapping\n99f651688ddbc5a8bae34f3ddbfff0a247554e2a fix: remap temporary identity versions at permanent import\nfb9b098652f17162a576e428be532a93043bee80 test: distinguish raw identity confirmation from transition step\n2034619895d78b452c934f1a94fbb6637da9c0c5 fix: prefer semantic first step in identity adjacency\nfcbd0fd28cbb571a057dce1138169d9f30501680 fix: allow stable distant identity after two canonical confirmations\ne70ed5ce919deadf49ec6eee4b97ed02d1a45044 fix: ignore proposal-only events in identity resolver\na58d42dd299b8b452bc49eb243c86a96383ceafa fix: make ordinary identity growth adjacency-first\ncee087d8f2187095f57dc53359663aeb8349345a fix: restore constrained identity target declaration\n8fe208d0231a9f6ac85c85a0389b71a052d701cc fix: separate constrained identity rebuilding from ordinary adjacency\nb4ae8aeb7953ee0c7b0702cbf6bf34b99c239728 fix: reserve identity adjacency escape for overwhelming canonical shape\nb7fccd1baaddc7310da832d9602d0cff31a3cf1e test: distinguish ordinary adjacency from strong-shape escape\n2d2f08025ca67d24f21089f104851e6e0d2b5829 fix: satisfy narrowed identity target type\n8972815d5c5538c9dbcbf2e661a1974a21c90d18 fix: gate anonymous identity acting fallback\nbda3fa4e0519e3f7b3303691a40e0bd5ccde2cc2 fix: keep identity worker and import behind feature gate\n6a95df71c1c12c1219d5632df0ae266839d80c76 fix: fail closed on enabled identity read errors\n31181e6761b662f05491ba4f2ed3d34c20683a91 feat: gate relationship identity independently\n23c52950f3c30347269dccc65b8347d3566c8eb9 test: lock identity adjacency and escape behavior\n41530d2b009a2cf338466989d856c113c8791f8d feat: prefer adjacent relationship identity transitions\nd5a0d8be37d275f37fd8c162c9cf4f4af10e0d09 test: keep post-breakup constraint semantic after rebuilding\n029afcb453ce72ba3a116728f310043c2b6d1452 fix: resolve anonymous identity after critical-only state changes\n3b5be8a09d5c046baebca184e50c215229f57ddd test: lock post-constraint identity rebuilding semantics\n510ee94d6fbd8e7f15b635177fb01797abe8c04b feat: read canonical identity constraint anchor\nf7d39f04ecc1dca18e06f5096726a02748270f90 feat: propagate relationship constraint anchor at runtime\n77a9ed2442a2a15c2cd3d2b6b18b356bd92c5a6f feat: carry constraint anchor through temporary import\n26bab07f49059bd38693d941454f898918631252 feat: persist identity constraint anchor version\n9c45e1d11e2f4cadc014d179abe202361f100783 fix: anchor relationship constraints to canonical state version\nc76a2b482b4129760b6682b4e199d445ef6501ff feat: feed derived relationship traits into acting guide\n1dfa7b23c98bd1f84c90e39ce006898c1c50b235 refactor: expose derived relationship traits\n76fc5af1f718140b5ad88ad2fafb698aa88bbc11 feat: feed canonical identity into relationship acting guide\na0a08638a68708e4b700308d889c644f2446c2cc feat: read only version-aligned relationship identity\n02b21471a11e356e2c57ba62dafb6edaf3e024ce feat: interpret identity as acting direction\n3bbf819298b52294087244c72d8d0314a728fa86 refactor: accept identity context in acting guide\nd5445dbbd4cb912e7253f73f8293445bf4f1bba3 test: lock atomic temporary identity import\n1af23d0e0c2d9f72ffb46d697c2c4c546f2f58dc feat: atomically materialize temporary identity on email save\n9032f0dc5c5c2f975bfc74fc11c76dabbbb4d013 feat: atomically import temporary relationship identity\nd97e8becaf71b3291c884e6c7af2aadadd8464a2 feat: resolve identity for anonymous canonical state changes\n50952acec86db15edc96006bfd14ddbd71ba0ee0 feat: carry relationship identity in temporary snapshot\n0eb31b758b84b167efd7c482610c2354dfca345d feat: process identity after canonical relationship application\n3e7ef88f0b57fe3de415a22c8062518541f9f4ac test: lock relationship identity persistence invariants\n2cc6104a89f19da1c3f171769d9a00172d485178 feat: add relationship identity canonical persistence\neea0a65a64812b78ccb91d2ca25350f0ec50ab29 test: enforce distinct canonical identity confirmations\nfea8b1cb9c550d2dddea6001ebecfcdae0136720 fix: require distinct state versions for identity confirmation\n8de06c51a14f1489347eee9ddcc769b8d12d475e test: cover relationship identity invariants\n8703df49a2d7d3148ad6cca63a5482c7504e50ee feat: add pure relationship identity resolver",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "330398b94ccee954524a8a97d9969ed793b1437c8b2385e39d4dada11d9b5f3e",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}

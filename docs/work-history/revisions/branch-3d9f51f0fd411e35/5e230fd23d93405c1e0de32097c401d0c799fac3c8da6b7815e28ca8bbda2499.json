@@ -1,0 +1,37 @@
+{
+  "id": "branch-3d9f51f0fd411e35",
+  "title": "docs/forecast-horizon-investigation-20261101",
+  "head": "4f537d806213caa6144131ac22e0d6ca250fda97",
+  "head_ref": "docs/forecast-horizon-investigation-20261101",
+  "linked_prs": [
+    111
+  ],
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4f537d806213caa6144131ac22e0d6ca250fda97/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/audits/CHAT_METRICS_PATH_20261101.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/4f537d806213caa6144131ac22e0d6ca250fda97/docs/audits/CHAT_METRICS_PATH_20261101.md"
+    }
+  ],
+  "commits": "4f537d806213caa6144131ac22e0d6ca250fda97 docs: index current-path investigation\n50549c9d7e81d1c31accef57e7acf163376904a4 docs: distinguish production chat telemetry from legacy metrics",
+  "topics": [
+    "雨量・全国検知",
+    "記憶・会話",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "6f25cd9a214e37846a75ca17d996beba28fb688afbd40465e0484d12ead78b85",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}

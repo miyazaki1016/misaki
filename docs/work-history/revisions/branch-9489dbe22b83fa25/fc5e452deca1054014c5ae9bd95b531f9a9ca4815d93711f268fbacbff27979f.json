@@ -1,0 +1,64 @@
+{
+  "id": "branch-9489dbe22b83fa25",
+  "title": "feat/lounges-autoload-assets-20261029",
+  "head": "fda55141d873e29190c14910725c397d7931dfae",
+  "head_ref": "feat/lounges-autoload-assets-20261029",
+  "linked_prs": [
+    89
+  ],
+  "files": [
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/index.html"
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4"
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki_lounge_12fps.webp",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki_lounge_12fps.webp"
+    },
+    {
+      "path": "public/lab/transparent-lounge/misaki_lounge_24fps.webp",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/fda55141d873e29190c14910725c397d7931dfae/public/lab/transparent-lounge/misaki_lounge_24fps.webp"
+    }
+  ],
+  "commits": "fda55141d873e29190c14910725c397d7931dfae docs(lounge): record verified GitHub MP4 arrival and final asset paths\nb9b93c77f3ade4c59043aee8387cf012624148f4 fix(lounge): point vertical opening to uploaded verified MP4\nab9bfb11161bc2353fa3b416dff19e5c2a27bfee Add files via upload\n44e0bc303adb2bea86edb6f58387282e28326f33 docs(lounge): record uploaded WebP and pending opening MP4\n0dea18d4d5500b61dd53705b74ea004b9da2ee31 fix(lounge): reference uploaded 24fps WebP filename\nf5de0580d6d2f2cc87e35ae05d4680ecc40439ed Add files via upload\n8832ba7bc7d9384ffda4240ab549fd57c072d1fb docs: update implementation overview for lounge video integration\n042794ed7add1b053fbef41f159b59e1175d68ef docs(lounge): track video assets, validation and release gates\ne4bd3c6cd239653006c981464704c5bb0187751a fix(lounge): preserve existing experimental sofa background asset\n7cfe82d553c610e0c9804785cb01aabab84da88f feat(lounge): auto-load verified 24fps WebP and switch to vertical opening MP4",
+  "topics": [
+    "ラウンジ・画面",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "6091f7ac68f62e8ae78191b1c334a62f286c0643a825e0745d07dcea06c8f310",
+  "collected_at": "2026-11-10T17:39:18.100903+00:00"
+}
