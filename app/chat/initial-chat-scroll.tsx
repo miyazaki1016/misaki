@@ -59,6 +59,11 @@ export default function InitialChatScroll() {
       if (touchStartY === null || currentY === undefined) return;
       if (Math.abs(currentY - touchStartY) < 8) return;
       userIntent();
+      // Touchmove can arrive before Safari updates scrollTop or emits scroll.
+      // Suspend queued follow immediately so an in-flight layout shift cannot
+      // pull the reader back down during the gesture. onScroll restores follow
+      // once the reader actually reaches the bottom again.
+      following = false;
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) userIntent();
