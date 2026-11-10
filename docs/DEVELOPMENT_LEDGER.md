@@ -193,7 +193,7 @@
 | #148 | Inventory: compare exact code patch evidence across branches | merged | `8ab1c012268ad647a80cf5e7fd58f8e39167e2d6` | 2026-11-02T20:49:11Z |
 | #149 | Inventory: ranked, evidence-only human review queue | merged | `d9d22481493f88fc93da426895defc29a5c5d0a8` | 2026-11-02T20:53:30Z |
 | #150 | fix: reuse existing ledger facts PR on repeated inventory runs | merged | `b47d2a35d48f1df34c987b80fd8dc22dacd2778b` | 2026-11-02T23:27:02Z |
-| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | open | `4d06043b2d5d73054a2ba5b6edadf7217c5ef459` | 2026-11-10T08:06:36Z |
+| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | merged | `3ccc345375985e09836979f04617c0f7cc90d197` | 2026-11-10T14:55:02Z |
 | #152 | fix: restore ledger facts workflow after invalid YAML merge | merged | `6e5dc7f5964229787069f60f2cd8114596003489` | 2026-11-03T23:40:05Z |
 | #153 | feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru | merged | `823e019139b3c3c66762a54e61ae938fe9c154b3` | 2026-11-03T23:53:14Z |
 | #154 | docs: document Pages retry procedure after activation | merged | `445b5106d44a042820c20699ac535bfb1791f41f` | 2026-11-03T23:59:06Z |
