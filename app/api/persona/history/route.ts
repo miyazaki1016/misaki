@@ -31,11 +31,14 @@ export async function GET(request: Request) {
   }
 }
 export async function POST(request: Request) {
+  // Monotonic timings only; never include identifiers or conversation contents.
+  const requestStartedAt = performance.now();
   // Anonymous "load" renews the root, so it is a write too.
   const maintenance = await maintenanceResponse();
   if (maintenance) return maintenance;
   try {
     const user = await authenticate(request);
+    const authenticatedAt = performance.now();
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json();
     if (body.saveAnonymous === true) {
@@ -66,7 +69,11 @@ export async function POST(request: Request) {
     if (body.action === "load") {
       const loadStartedAt = performance.now();
       const timedResponse = (payload: unknown) => Response.json(payload, {
-        headers: { "Cache-Control": "no-store", "Server-Timing": `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}` },
+        headers: { "Cache-Control": "no-store", "Server-Timing": [
+          `auth;dur=${(authenticatedAt - requestStartedAt).toFixed(1)}`,
+          `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}`,
+          `request;dur=${(performance.now() - requestStartedAt).toFixed(1)}`,
+        ].join(", ") },
       });
       if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
