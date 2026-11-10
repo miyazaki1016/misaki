@@ -787,6 +787,10 @@ export default function ChatPage() {
           const serverTiming = response.headers.get("Server-Timing");
           const duration = serverTiming?.match(/(?:^|,)\s*history;dur=([\d.]+)/)?.[1];
           if (duration) timings.historyServerLoadMs = Math.round(Number(duration));
+          const authDuration = serverTiming?.match(/(?:^|,)\s*auth;dur=([\d.]+)/)?.[1];
+          const requestDuration = serverTiming?.match(/(?:^|,)\s*request;dur=([\d.]+)/)?.[1];
+          if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration));
+          if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration));
         }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
