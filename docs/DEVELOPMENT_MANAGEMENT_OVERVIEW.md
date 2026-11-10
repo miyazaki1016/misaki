@@ -6,6 +6,8 @@
 
 ## まず開く場所
 
+**引継ぎ先は通常チャットが基本。** [総覧の共通ひな形](IMPLEMENTATION_OVERVIEW.md)を使い、Pythonを実行できなければ[Issue登録 → GitHub Actions実行 → 原本確認・判断記録 → 再チェック](WORK_HISTORY_PREFLIGHT.md)で進める。WorkやPC操作を前提にしない。
+
 **担当AIの最初の作業は[既存成果の自動照合](WORK_HISTORY_PREFLIGHT.md)。** 依頼文を渡すだけで、類似する過去の実装・未統合研究・数値結論を提示する。原本を確認して再利用判断を記録するまで新規実装・再測定を開始しない。Issue／PRでも自動チェックする。
 
 > [!CAUTION]
@@ -15,7 +17,7 @@
 | --- | --- |
 | **着手前の必須確認：過去の日本語開発履歴** | [美咲・アメふる共通検索](https://miyazaki1016.github.io/misaki/history.html) · [運用手順](WORK_HISTORY_OPERATIONS.md) |
 | スマホで自分の判断案件を見る | [❤️ 美咲 × ☔ アメふる承認ボード](https://miyazaki1016.github.io/misaki/) の「あなたの判断待ち」 |
-| 案件を担当ソラに渡す | 同じ画面の「ソラへの引き継ぎ」→ 対象案件の**引き継ぎ指示をコピー** → 既存の担当ソラのチャットまたはWorkに貼り付ける |
+| 案件を担当ソラに渡す | 同じ画面の「ソラへの引き継ぎ」→ 対象案件の**引き継ぎ指示をコピー** → 既存の担当ソラの通常チャットに貼り付ける（実行環境が必要な作業でWorkを選ぶことも可能） |
 | ダッシュボードの仕様・運用を確認 | [承認ボード運用マニュアル](approval-dashboard/README.md) |
 | 2026-11-04時点の全36件の一次仕分けを見る | [一次仕分け結果](approval-dashboard/OWNER_TRIAGE_20261104.md) |
 | **美咲の過去の作業内容・検証結果を探す** | [美咲の履歴索引](WORK_HISTORY_INDEX.md) → 日次棚卸しの `work-history.md`（全PR・作業ブランチ） |
