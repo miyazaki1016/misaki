@@ -1,0 +1,35 @@
+{
+  "id": "branch-0632d4cc74411c0e",
+  "title": "automation/ledger-facts-41483251398-1",
+  "head": "c8bfa3c562018d05594715b97bd7195583137b45",
+  "head_ref": "automation/ledger-facts-41483251398-1",
+  "linked_prs": [
+    146
+  ],
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c8bfa3c562018d05594715b97bd7195583137b45/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/DEVELOPMENT_OPERATIONS_INDEX.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c8bfa3c562018d05594715b97bd7195583137b45/docs/DEVELOPMENT_OPERATIONS_INDEX.md"
+    }
+  ],
+  "commits": "c8bfa3c562018d05594715b97bd7195583137b45 docs: refresh existing inventory proposal\ne6767276f34a5d42a35782bf4a2648b90954ecbb docs: refresh existing inventory proposal\nb5847df5a48555dbb7a14ab7356e35cc5bc38b19 docs: refresh existing inventory proposal\nc20325c13adfb0fa02d7b3d69cb989999819f79b docs: refresh existing inventory proposal\nc8c1227dab0642980ff0f3deb3dc59bd10e22505 docs: refresh existing inventory proposal\n77a01e4494cf69bf2c6cfbcc00e0210408163f60 docs: refresh existing inventory proposal\nee2e3475d034ea6a0bd5fb45deca1cfface752bd docs: refresh existing inventory proposal\na6bd880dc250418a5251be43bdd9ff1fb6c29cee docs: refresh existing inventory proposal\n959fc294f3cec95eef3f439c7611cda32a1d8615 docs: refresh existing inventory proposal\nb086bb4826ce5351b3f19828f3bbb9fe06985f0f docs: refresh existing inventory proposal\nd60ba9fbb178b21b1bd7453b9b98a388e79441d1 docs: refresh existing inventory proposal\nfe5f4806521b70c207445cffd1438fae1750b16b docs: refresh existing inventory proposal\n5d2e5fdb824a3ef6faa968d14f0320011279bb45 docs: refresh existing inventory proposal\naa4dd7c7ea3a8e40b3ab5dce3ae4a211d75a3b33 docs: refresh existing inventory proposal\n7c5365a4bfc5ed3e7093db76808f3d52e3831bec docs: refresh existing inventory proposal\nfb1c299d66e195a6ed399ae0d0e4181ea2a01e0f docs: refresh existing inventory proposal\n86d8d4f67355fa5255c01815815cc7e7b6d98cb0 docs: refresh existing inventory proposal\na3aee2f147d1363479a3fbd4482fb10a04c95778 docs: refresh existing inventory proposal\n4864580ab7ea22ec75e01470e5901a0ccd16261f docs: refresh existing inventory proposal\nb85affdff5f6d64d0800c167445da2a5bacb7eb9 docs: refresh existing inventory proposal\n366f17961a339d0e9045d7d01d9fa9afccc98469 docs: propose factual GitHub ledger and operations index snapshot",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "76dbe7e68addeacec700394451713ad3e9008aada058c92265977759f8daed24",
+  "collected_at": "2026-11-10T02:50:24.064930+00:00"
+}

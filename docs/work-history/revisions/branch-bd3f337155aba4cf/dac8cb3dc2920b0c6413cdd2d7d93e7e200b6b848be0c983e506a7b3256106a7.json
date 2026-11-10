@@ -1,0 +1,35 @@
+{
+  "id": "branch-bd3f337155aba4cf",
+  "title": "docs/inventory-investigation-20261101",
+  "head": "d411a319192f7b764d7bd639845f7256f7006903",
+  "head_ref": "docs/inventory-investigation-20261101",
+  "linked_prs": [
+    104
+  ],
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d411a319192f7b764d7bd639845f7256f7006903/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/audits/INVENTORY_RECONCILIATION_20261101.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d411a319192f7b764d7bd639845f7256f7006903/docs/audits/INVENTORY_RECONCILIATION_20261101.md"
+    }
+  ],
+  "commits": "d411a319192f7b764d7bd639845f7256f7006903 docs: link inventory investigation from management index\nc869db49b80eb71d9d9ff938302c4eeb8d883769 docs: preserve 2026-11-01 inventory and investigation evidence",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ef7847e5c6228cb07fabdee051867ea60f83568392048c0cc40affaa44be17c6",
+  "collected_at": "2026-11-10T02:50:24.064930+00:00"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "branch-e520db4a8eac7868",
+  "title": "feat/lounge-encounter-shortcut-20261030",
+  "head": "44e8ec5eb2ab636b76926777b714ff803ebe8aa5",
+  "head_ref": "feat/lounge-encounter-shortcut-20261030",
+  "linked_prs": [
+    99
+  ],
+  "files": [
+    {
+      "path": "app/chat/anonymous-session-guard.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/44e8ec5eb2ab636b76926777b714ff803ebe8aa5/app/chat/anonymous-session-guard.tsx"
+    },
+    {
+      "path": "docs/LOUNGE_ENCOUNTER_SHORTCUT_20261030.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/44e8ec5eb2ab636b76926777b714ff803ebe8aa5/docs/LOUNGE_ENCOUNTER_SHORTCUT_20261030.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/44e8ec5eb2ab636b76926777b714ff803ebe8aa5/public/lab/transparent-lounge-shortcuts/index.html"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/44e8ec5eb2ab636b76926777b714ff803ebe8aa5/tests/account-conversation.test.cjs"
+    }
+  ],
+  "commits": "44e8ec5eb2ab636b76926777b714ff803ebe8aa5 test(auth): simulate truly missing session rather than default anonymous user\n8196441895669f08ab28b915373e963b17704322 test(auth): update missing-session expectation for persistent anonymous sessions\n08b9a60fac1db186f2be258d7146c349b851e2fc test(auth): verify anonymous identity and chat persist across browser restarts\ne7cb3e5b721f7bf9b60c00ce685b7674fb0df346 docs(lounge): record encounter shortcut and anonymous continuity scope\nd130e42e7c48a75206886972abab48d67b7ca0a2 feat(auth): preserve existing anonymous Supabase identity across browser restarts\n0dc052603fac7ba1f6880e4faf6ef8aaae2ae7b3 feat(lounge): show empty encounter ring for newcomers and chat avatar after first message",
+  "topics": [
+    "記憶・会話",
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "07bfe4dc09a77b5867cf60465c5cf18aa2600986dff52a2f26062cc549ece242",
+  "collected_at": "2026-11-10T02:50:24.064930+00:00"
+}

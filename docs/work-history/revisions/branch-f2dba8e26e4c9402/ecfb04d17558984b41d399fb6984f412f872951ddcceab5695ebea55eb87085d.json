@@ -1,0 +1,576 @@
+{
+  "id": "branch-f2dba8e26e4c9402",
+  "title": "work/context-no-duplicate-replies-ab",
+  "head": "a849bec92059d326940ffc358635164ea7d391c9",
+  "head_ref": "work/context-no-duplicate-replies-ab",
+  "linked_prs": [
+    78
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/context-ab-live-manual.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/.github/workflows/context-ab-live-manual.yml"
+    },
+    {
+      "path": ".github/workflows/context-ab-validation.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/.github/workflows/context-ab-validation.yml"
+    },
+    {
+      "path": ".github/workflows/isolated-replay-tests.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/.github/workflows/isolated-replay-tests.yml"
+    },
+    {
+      "path": ".github/workflows/manual-synthetic-quality-evaluation.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/.github/workflows/manual-synthetic-quality-evaluation.yml"
+    },
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/api/chat/route.ts"
+    },
+    {
+      "path": "app/api/experiments/blind-quality/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/api/experiments/blind-quality/route.ts"
+    },
+    {
+      "path": "app/api/experiments/replay-ab/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/api/experiments/replay-ab/route.ts"
+    },
+    {
+      "path": "app/api/experiments/synthetic-quality-run/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/api/experiments/synthetic-quality-run/route.ts"
+    },
+    {
+      "path": "app/experiments/blind-quality-review/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/experiments/blind-quality-review/page.tsx"
+    },
+    {
+      "path": "app/experiments/replay-self-check/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/app/experiments/replay-self-check/page.tsx"
+    },
+    {
+      "path": "docs/CONTEXT_AB_EXPERIMENT.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/CONTEXT_AB_EXPERIMENT.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/context-ab-blind-review-template.csv",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/context-ab-blind-review-template.csv"
+    },
+    {
+      "path": "docs/context-ab-blind-review.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/context-ab-blind-review.md"
+    },
+    {
+      "path": "docs/context-ab-execution-gate.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/context-ab-execution-gate.md"
+    },
+    {
+      "path": "docs/context-ab-real-history-quality-review.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/context-ab-real-history-quality-review.md"
+    },
+    {
+      "path": "docs/context-ab-validation-protocol.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/context-ab-validation-protocol.md"
+    },
+    {
+      "path": "docs/conversation-context-compression-spike.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/conversation-context-compression-spike.md"
+    },
+    {
+      "path": "docs/memory-certainty-design.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/memory-certainty-design.md"
+    },
+    {
+      "path": "docs/misaki-blind-quality-evaluation-fixtures.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/misaki-blind-quality-evaluation-fixtures.md"
+    },
+    {
+      "path": "docs/misaki-synthetic-live-evaluation-runbook.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/misaki-synthetic-live-evaluation-runbook.md"
+    },
+    {
+      "path": "docs/misaki-synthetic-reference-replies-and-self-scores.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/docs/misaki-synthetic-reference-replies-and-self-scores.md"
+    },
+    {
+      "path": "lib/canonical-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/canonical-state.ts"
+    },
+    {
+      "path": "lib/context-ab-approved-replay.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-approved-replay.ts"
+    },
+    {
+      "path": "lib/context-ab-balanced.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-balanced.ts"
+    },
+    {
+      "path": "lib/context-ab-blind-quality.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-blind-quality.ts"
+    },
+    {
+      "path": "lib/context-ab-gemini-adapter.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-gemini-adapter.ts"
+    },
+    {
+      "path": "lib/context-ab-long-fixture.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-long-fixture.ts"
+    },
+    {
+      "path": "lib/context-ab-offline-harness.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-offline-harness.ts"
+    },
+    {
+      "path": "lib/context-ab-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-prompt.ts"
+    },
+    {
+      "path": "lib/context-ab-quality-long-history.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-quality-long-history.ts"
+    },
+    {
+      "path": "lib/context-ab-quality.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-quality.ts"
+    },
+    {
+      "path": "lib/context-ab-replay-boundary.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-replay-boundary.ts"
+    },
+    {
+      "path": "lib/context-ab-replay-preflight.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-replay-preflight.ts"
+    },
+    {
+      "path": "lib/context-ab-replay-privacy.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-replay-privacy.ts"
+    },
+    {
+      "path": "lib/context-ab-results.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-results.ts"
+    },
+    {
+      "path": "lib/context-ab-reviewed-snapshot.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-ab-reviewed-snapshot.ts"
+    },
+    {
+      "path": "lib/context-overlap-analysis.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-overlap-analysis.ts"
+    },
+    {
+      "path": "lib/context-size-measurement.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/context-size-measurement.ts"
+    },
+    {
+      "path": "lib/relationship-acting-guide.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/relationship-acting-guide.ts"
+    },
+    {
+      "path": "lib/relationship-analyzer-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/relationship-analyzer-v1.ts"
+    },
+    {
+      "path": "lib/relationship-engine-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/relationship-engine-v1.ts"
+    },
+    {
+      "path": "lib/relationship-identity-resolver.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/relationship-identity-resolver.ts"
+    },
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/package.json"
+    },
+    {
+      "path": "scripts/context-ab-live.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/scripts/context-ab-live.ts"
+    },
+    {
+      "path": "scripts/context-ab-quality-live.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "path": "scripts/context-ab-smoke.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/scripts/context-ab-smoke.ts"
+    },
+    {
+      "path": "scripts/run-live-synthetic-quality-eval.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/scripts/run-live-synthetic-quality-eval.ts"
+    },
+    {
+      "path": "scripts/run-synthetic-quality-checks.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/scripts/run-synthetic-quality-checks.ts"
+    },
+    {
+      "path": "supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql"
+    },
+    {
+      "path": "supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql"
+    },
+    {
+      "path": "tests/context-ab-approved-replay.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-approved-replay.test.ts"
+    },
+    {
+      "path": "tests/context-ab-balanced.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-balanced.test.ts"
+    },
+    {
+      "path": "tests/context-ab-blind-quality.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-blind-quality.test.ts"
+    },
+    {
+      "path": "tests/context-ab-gemini-adapter.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-gemini-adapter.test.ts"
+    },
+    {
+      "path": "tests/context-ab-offline-harness.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-offline-harness.test.ts"
+    },
+    {
+      "path": "tests/context-ab-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-prompt.test.ts"
+    },
+    {
+      "path": "tests/context-ab-quality-long-history.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-quality-long-history.test.ts"
+    },
+    {
+      "path": "tests/context-ab-quality.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-quality.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-boundary.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-replay-boundary.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-order.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-replay-order.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-preflight.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-replay-preflight.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-privacy.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-replay-privacy.test.ts"
+    },
+    {
+      "path": "tests/context-ab-results.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-results.test.ts"
+    },
+    {
+      "path": "tests/context-ab-reviewed-snapshot.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-ab-reviewed-snapshot.test.ts"
+    },
+    {
+      "path": "tests/context-overlap-analysis.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-overlap-analysis.test.ts"
+    },
+    {
+      "path": "tests/context-size-measurement.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/context-size-measurement.test.ts"
+    },
+    {
+      "path": "tests/fixtures/relationship-identity-baseline.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/fixtures/relationship-identity-baseline.sql"
+    },
+    {
+      "path": "tests/relationship-identity-anonymous-runtime.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-anonymous-runtime.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-audit.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-audit.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-persistence.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-persistence.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-resolver.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-resolver.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-sql.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-sql.test.ts"
+    },
+    {
+      "path": "tests/relationship-identity-temporary-import.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-identity-temporary-import.test.ts"
+    },
+    {
+      "path": "tests/relationship-mutual-acceptance.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a849bec92059d326940ffc358635164ea7d391c9/tests/relationship-mutual-acceptance.test.ts"
+    }
+  ],
+  "commits": "a849bec92059d326940ffc358635164ea7d391c9 Add manual workflow for capped synthetic quality evaluation\n0a0f22909c888e8b2d715bf9c524229cea72484a Add capped manual synthetic quality evaluator\n8fc85594c91f4d7e06b7302def9c67feffacdeb2 Add isolated fixed-fixture synthetic quality evaluation endpoint\nfe81aa5f541f7b2d4ff7516d326fc07c811872fe Document isolated synthetic quality evaluation runbook\nd59a1ec8ba0c9cb4ea45bbad7479f6c5a0dd930a Add initial self-scored synthetic reference replies\n692fa6c5c1093aa35ebdfd3dae91f9b83f2a6ab4 Run synthetic quality regression checks in CI\n9cd9c352a6db2fe9d1d2bc5ff8de94fe691a7410 Run synthetic quality regression checks with the test suite\nb833c8d5741362f1de3aa88613026f40ae5bd48e Document local synthetic quality regression runner\n29d4a6140224c7f6fc051c53b4239ea462681d99 Add npm command for local synthetic quality checks\nb499c2f2a98a114dbc7aee673d422be902593486 Fix regression runner check accounting\n09e289051919c7a05c8c0cc4878b2d74f42c3394 Add local synthetic quality regression runner\n497df69b0a154343fb4fdfb22d1474259a56e8de Test safety blocker in blind quality scoring\n2fd18b450d3dc009a235f38eafc2ff57291a09df Add explicit safety blocker to blind quality summary\nce5072cb75015f89db70556d49355523c3b7c6c8 Fix five-point score select typing\nb655e65508f98f70b751fbfee807318b830d70cd Add local-only synthetic dry-run controls to blind review\nf2a5ed167e34c6a4c9822d1cc26987450404c33c Test five-point blind quality score range\n5bf98e98be2544e5707526af4b019cc585d551bc Use documented five-point blind quality rubric\n382cad65fd7b99a411afc2526caed754a305d577 Align blind quality score types with five-point rubric\nc98e3ac01353404ac4b80c6d8fcf7f64d2fedf7a docs: add synthetic blind quality evaluation fixtures\n487718f6a38a1109b76896ca5e88b25a91ee822d Fix replay self-check JSX and clarify read-only behavior\n594060d6ba246839ee1b39a7d73c8928d96ac99f Fix JSX after disabling live A/B action\n65798bad37a4cd55857d272ffcbb3093624cf562 Remove live A/B action from self-check UI\n7abb2d0f5d3585b342ae4aaebbc24dcbb7eb1a39 Gate live replay A/B behind explicit approval\nee2a487427566b2020291191e9cdd470765dffd3 Clarify blind review is manual while live generation is disabled\n1aca58b17a8a28c4d321fbc04f8c0b77a4d69eb1 Fail closed for live blind quality generation pending explicit approval\n646633f5384d19d2da361610621ad2e21003aa11 Strengthen synthetic quality scenario assertions\nf1f48bd463643850561369ae31c6a95c4946a940 Link blinded review scoring template\n3e5295f7dbefbc113343b987656fbffb9c7de461 Add blinded A/B review scoring template\n84ceaf6cf42311b9d3db3d7fa0eeb6c79e9bd73b Link blinded quality review protocol from execution gate\nd04b47bc1e62a8d71a3630fd45f37a0e31eae416 Document blinded A/B quality review protocol\n6022cebca4de2ceada6a6e132944877fee46beef Record offline quality harness validation\n19cc84667a1a205a6b4b7193f74637197ba938df Test blind quality score aggregation\n57e4266a644a1933d187c32a597e256c990959ab Add varied synthetic quality scenarios\n43ff2847669e92589e580243666abe64a68eede1 docs: record first synthetic Gemini A/B smoke results\nc94022d2a4741e41fe227c712301dc156d830458 Fix manual A/B workflow checkout target\nbb87d56e3551f222a82cebade87f9b409cdcf647 chore: make the one manual A/B workflow unmistakable\nad86a8d565aa502f872b4a867584e2fa576659a4 docs: define context A/B quality and release gates\n4902078c9d6065ec5311ab53a55be346c3551708 fix: avoid TypeScript parameter properties in strip-only CI\nb98733f159760560b8ababa80fcc35dc9f92fa76 docs: clarify memory certainty handoff status\n08978b780dd42c4d0259287f723527680ab1c31d docs: update implementation overview with memory certainty plan\n4830db51c767276936b632bc83a054dbcc847686 docs: clarify body clock certainty gate and lease contract\nc5f03274310da442f7c08e20838f5f3dec923006 docs: trace memory certainty checkpoint and body clock gates\n3a7e9e24156a30188955f895e805271378b5fa2e docs: verify memory certainty design branch scope\na54ae37a63a35069ff46a08ea6d96dad9eaa82b9 docs: record Gemini validation and memory certainty follow-up\ncd28e1779455bf4dbf56057006d8f7fa993cc3f6 docs: summarize memory certainty work and link design\n94a117e072e765041217daaa1519640b8cd53c69 docs: trace checkpoint and proactive memory paths\na9221040d4321123f3ceb92e2260e79fa370fcca docs: document canonical RPC safety contract\n76a81c54b0dbdff373746b8d7bd2cd5d1161312d docs: trace canonical and temporary life memory writes\nbff1e78faf1076a034ca6e6e0896a3589db012a8 docs: record read-only memory certainty audit\n9dbf05ab0c5cb33fa76a2da1f968b229d3f60ca3 docs: define memory certainty v1 review gates\n18194fec8c02b25e3d4590a7c16c31813df86417 docs: translate memory certainty design into Japanese\n769f7bcc73f5345cfa0221872fc5a58b663d94b5 docs: design tentative and confirmed memory handling\ned1be79bb99d3afaa841be90df85fa3f43f69809 test: cover blind quality response parsing without live Gemini\nf1dd9428c8a847814aa1e114423f18b5c8d82653 fix: expose safe blind quality failure diagnostics without reply text\n2c8ebd453dbe6242715ea39f6e63a4d0fb2d0315 test: add safe blind quality response diagnostics\n89e2de3b97157a949267abb0d16d1da64131cb7e docs: record four research findings in Misaki implementation overview without changing main\nd42d82515c04d2711d12afaa8bf9d4a14d2c1761 docs: capture four weekly Misaki research findings as unimplemented design candidates\ne30d839aad03d57962e689566380fe5b462855ef experiment: expose non-sensitive failure stage for blind Gemini quality diagnosis\n600f06a7f8adda04ece8d7d9f4149b40755c957b fix: valid JSX template literals in quality review screen\ndae65af2d8864df8d6d87c53f08a176c8958d8c9 experiment: connect blind quality UI to consent-gated Gemini Preview endpoint\n5bce35e6d0e2fad5e0dabb33300d70c075025713 experiment: add consent-gated owner-only Preview Gemini blind quality endpoint\nec9571522104879a5148c252bd438cd4bbedd428 experiment: add client-only blind five-axis reply review sheet\n5b016060ab05d61a14449a002a8b848d7b993f7e experiment: add deterministic five-axis blind quality scoring summary\nf4e086cfa7cdabe70741201e04742a72c86b9a07 experiment: define blinded real-history quality review and go/no-go criteria\n59170f0807db6be175e6369159b51381ef56451c experiment: clarify explicit Gemini consent and display in-memory numeric multi-run averages\nfa96cd2be47e402522b1a9deff428f1b2478c30d experiment: clarify preview runs A/B once each, not balanced ABBA\n12a67e145c2bea9324ec7997bd7b6f29a2f1b0eb ci: include balanced ABBA test in isolated replay workflow\n12c56568c24512ee3e089eb9e1ab7e4a52841474 test: verify isolated ABBA ordering, aggregation and no raw conversation in results\n46e96c46c4f4ba409ea38f092b30e4c68b50cda6 experiment: isolated ABBA measurement and numeric-only aggregation helper\n1a374f297c0a277312781e187640a5ea927a7e08 experiment: add explicit opt-in real-history Gemini A/B trigger and numeric-only result UI\n13c491cf29415945d9d404dfb9a14cde7cd34ab5 experiment: preview-only authenticated read-only two-call real-history Gemini A/B\n0874965d368d6c46c11da94062f94275abe068e2 experiment: offer opt-in local-only history export for reviewed Gemini replay\n36b4063cdf04cff805b9214872d64cd3b31b387d experiment: add client-side authenticated read-only replay self-check\nf198d4c8324fe3992ec2b369c62d3d20bedb1595 ci: test replay boundary and future-turn exclusion\n3fc1f52ca596a20ad50cf9da74c8fc44ce88e5b3 test: prevent future-message leakage in replay boundary selection\nd8d831ac1e648921677d6135b7ae74f62c0823b5 experiment: choose replay turn without leaking future conversation\ne085ddd442732add1231cef73896ada98321de21 ci: include reviewed snapshot A/B integration test\ne2a462f7b47f28628a19b9d75c99ecf1003b48be test: verify same approved history is passed to both offline A/B variants\n993e061187afba5ac2a21e4e9451327c9a559d7c test: connect manually reviewed replay to isolated A/B harness\nf76630ed26f97edb42cf66c08a7b15a59ac842bf ci: add offline-only replay tests on draft PR\n73cdc11b6d21c507037af5d008c270e95bd07952 test: preserve consecutive Misaki turns and all 60 stored messages\nfb3d2f930472e72429bafd891df327d6f22684b9 test: ensure replay preflight is local and requires manual approval\nfb9447eaf96bb53e82678a8318b71c7ddfcf6ac1 test: combine local replay mapping and mandatory privacy review\n1a91cd68c51c1512815c8d65c7cf989e37a3f242 test: verify privacy screening never authorizes automatic export\n3c2f0203c3f3f842fd2517fc5445263981aec52e test: add conservative local replay privacy screening without exporting text\n8ce0097c2dbe61895e92aaa3f3bceee20b67246f test: cover local-only replay adapter and full 60-turn history\nefb955d97d71769c80bde5861ef60645722ed68a fix: support 60 history turns plus separate replay user input\n24730f1365e9c738a0b884a00bd586de5714d707 test: add local-only approved conversation replay adapter\n9a40d98c4ecec2f17eef1489a687acc1e24f338e test: assert 60-message synthetic quality context and eight repeated replies\n8ab05f15fba02ecce1318f51c0a4a050ff74793e test: allow extended 60-message synthetic quality histories without changing default\nfde4c18c0d70d80084f785a04a61cba5d413f8be test: add 60-message synthetic histories for extended quality A/B\nc62cd88b72c81d4d85a40596f35d7dfe3db18091 test: opt-in blinded synthetic reply export for human quality review\nf18b5ea58cc34f148d5bc08fc710f7a4606766a5 fix: use literal JSON schema example without escape ambiguity\nbdc412db081d3f6df4f4f8be412d65112d98b5cc fix: instruct quality A/B Gemini to return the production reply JSON field\n02b9885772bc67fbdf0170e5284d63acdb264437 test: diagnose synthetic quality failures with boolean-only checks\nf71754a599ae94f91ca31b94cfcfb7d24029ce25 test: add opt-in isolated Gemini quality A/B with numeric-only results\ncc33a00aa9ccf6d32fad00765c39ca60b4123c97 test: validate synthetic quality scenarios and rubric\n6c2c40a27e841a185d5de273eb52e1dfccfd0bc2 test: add synthetic quality scenarios and deterministic safety rubric\nd159ac70fb95be23204e04c4d91b453f1f7894f3 test: add bounded configurable delay between isolated Gemini A/B calls\nc1a66ecc3d6e1c913311873e0f0096f23d1ecd02 test: break down invalid JSON into HTTP, empty candidate and malformed JSON counts\n3c9ba801a8601c84fce791cec0b0125550d03e1b test: type HTTP status telemetry for A/B trials\n099f7f9742c7df4fe6b89a3e0c57af21d0aad365 test: capture numeric HTTP status and empty candidate in isolated A/B\n04781ea0b3cf2ed4a0d5a7ab356712e1cacf2dbb test: add explicit synthetic long-context fixture selection to isolated runner\n1801d61e76043c79417997ba630ac0ecdb1b31ac test: add deterministic synthetic long-context fixture\n11125c5d796e0a9461847874b0f4bdfbe6f10158 ci: add manual-only two-request synthetic Gemini A/B workflow\n9d7b14d42e279d249f48482209b6d130f36674d9 test: align opt-in Gemini fixture with eight-reply A/B smoke case\n72865591536b8c5d06a1eac9eac21e273b90ebb8 test: use realistic eight-reply smoke fixture and avoid fake token counts\nc3ab25746f0cf76b07c56581aa393182915e4a75 docs: specify safe local preflight, two-call live gate and validity limits\n966e1b5ce6629c5aa5b1ecb63f588c2c420d4eb2 feat: opt-in synthetic Gemini A/B runner with hard limits and no DB writes\nbd02fe37783659901d8a56717ae755fd8420eaab ci: include zero-network A/B smoke test in validation workflow\n70c4050cf7ba6f9b9309702716328d18e7fcd2eb test: add zero-network synthetic 20x20 A/B smoke runner\na54d76493e322a1abeb6777676a3370e369b7454 test: reject unapproved live Gemini calls in A/B harness\nbb91452f6040340028323cb18798d6faf6c4343c safety: require explicit opt-in before billable Gemini benchmark calls\ne401cf2f296e7f488904fa5ff904fffa9aa3ca34 fix: use explicit TS imports for Node strip-types test runner\n55147326194406edfd87a95dcca9c68a9c98d7bf test: mock Gemini adapter without live model or canonical state changes\n183f9f315eabb5cbef5754f15b6800e6533c02b2 feat: isolated Gemini A/B adapter without chat route or canonical writes\n83d67339ba0c1f1c221e81b737b1265ea743c8fd ci: run test and TypeScript checks on isolated A/B branch\n7c7f75596c2fd16b7db1d9f58cb759c9c7c83a83 test: verify frozen-state A/B harness ordering and zero canonical writes\ndc2c84d804cafc9199a95c7e62044d52cc317576 feat: add offline-only frozen-snapshot A/B harness with injected model adapter\n3a9df4132af5b703bbfe1b88770397bde2671511 test: verify offline A/B metric aggregation including missing tokens\na442db5dc6ca13632fe6e31dd1b0a06c0885900f feat: add read-only A/B latency token and error summary utility\n5b93e2c8f1feb81b19376f768b2b886976bd33fd test: assert isolated A/B prompt construction without state mutation\n8bd6413b6126efc64cd3b4ffcf2c2dc02b027c9b feat: pure offline A/B prompt variant builder with no canonical writes\n1c38296e8f8c5387333edb8e09934cf8877645bd docs: define controlled non-committing A/B benchmark and measured baseline\n474af31eeb4b7eff833d20a007ae4f6cf5231255 experiment: enable numeric-only metrics on isolated B variant Preview\na415c84dc15a526cc28bab622e97094ee77fb138 experiment: omit duplicate recent replies from system prompt while preserving repetition guidance\n10275b666387115ced06312570111b21d0276e17 feat: connect numeric prompt overlap diagnostics in isolated Preview\n0e2b616bc12aaec9a22cd651b938e627d49c8a0e test: verify numeric-only overlap analysis and repeated reply detection\n0075c3d42c219f78de42b9cd2a204d6358251ba8 feat: add pure prompt section and reply overlap analysis helpers\n02a1af5930821113dae2cf94b3c39f095d57ac10 feat: enable numeric context diagnostics only on isolated Preview branch\nc3d6cee63bebfabd3189f796a2676daeecd4c97d test: validate disabled context size metrics and privacy boundaries\nd105bec6251dde2a3825ea8792bb47c500656ad3 feat: add disabled-by-default numeric prompt size logging\n7ad9f047c955fed6563fc0f15c3a72d25a1b9de6 feat: add numeric-only prompt size measurement helper\n49fc3567f2171320236c1af739bf9367adc06852 docs: establish measurement-first conversation context compression experiment\nece799c20d685f00c007cb2f897bdd6b2443a2d3 docs: record Acting Guide lover acceptance\nc6bd6b58a6cf09e9ea99681a972bc65a0d460feb docs: record canonical lover acceptance milestone\ncd2479ee1cad11294132563049a86662f8652576 test: cover mutual romantic acceptance grounding\n2b1046427839d1cea0d3e5548004f3253d51ac2a fix: recognize explicit mutual romantic acceptance\n3c8a2e746e833859f32b05f6eb0993bdaa549970 chore: align Identity migrations with production history and keep gate off\n2eb4b905cab950178f7981612e66b4c42bdcf8c3 chore: align 20261007114143_relationship_identity_v1_canonical.sql with production migration history\n636c3fd613a58912b7cb6a1655b44314405eac69 docs: record relationship identity audit and pre-production verification gates\n555d35bc19e7003dd9b051d02762b4bdfac1b192 fix: audit relationship identity migration order and canonical continuity\n2b97931217ab816018d70ddc63d0f764bb8bf276 test: lock adjacency distance ranking\n5a86c905745a82273105950dcc04803aa8fd4173 fix: rank adjacent identities by canonical distance\nf326cb13606ec7acfffb419168881de6ad34b812 test: match permanent romance provenance assignment semantics\n9e154854a4c253cbd457272272e60c3bf6dabfdb test: lock romance reentry runtime provenance flow\ne8f12e510272788ada309224104a7493d588cb11 test: lock namespace-safe romance reentry import\nebce979a2d37b645f5376d734f4517551c271f8d feat: import anonymous romance reentry as namespace-safe fact\nc769243c557f9a79eaef0a60821208b3a28fd0e1 feat: map anonymous romance reentry fact into permanent version namespace\n4021f1a32e2059dc9895602cb43309ec5b1cb888 fix: preserve anonymous critical-only identity source contract\n4f73f1a7ed7fd8d9dcd8e6434df50d5e782c13e5 feat: persist romance reentry provenance in anonymous identity state\n2f0d8b9271ad061ef1dee37db3a08ab71cc10880 feat: wire romance reentry provenance through permanent identity worker\n7a5d8b3bb19f3393cb78929b143ff5cbbf14676e feat: persist relationship identity romance reentry provenance\nf456dc7cca722df376e03251ee4178e53a2a8577 fix: normalize romance reentry provenance lines\nad66c35eefab3772bc850f10ca07f25413ffd90e test: lock persistent romance reentry provenance\n3e23c7c0c2884fee18045eb17186e7e2ae86da1d feat: persist constrained romance reentry provenance in resolver state\n1ffcafe6e1641678b7510dc8177f9d2ccf9dafc4 feat: let Misaki answer direct relationship questions from identity\nc7b2abb20c528c3ffbceaa43dbc79d2c72306bda test: lock relationship identity feature gate off paths\n13f44a7eefb2e9b1f7fcadd6c279993eee74b21a test: lock anonymous critical-only identity resolution\n4e075ec29a8cb3655eeb5115a78744911cd46b4c fix: normalize romance reentry resolver lines\n702c3781562a72326563abe17475350b2f13be21 fix: remove escaped newline from romance reentry resolver\ne510334e9bcac12773067a7d3a5c9e9c98052b24 test: lock constrained romance reentry provenance\ne5392017dba5d28c127a3ce9601ba2677fab5307 feat: ground constrained romance reentry in canonical state application\nf0833c88b7a9ceb049dba182352d2b99104a8dc5 feat: allow romance reentry only from new canonical romance pattern\nb1467647bcda838f36d20a79241b50807d2972e8 fix: read identity import migration in persistence tests\nd70ab23ec3d1886529ca287541151b174714f905 test: lock temporary identity import transition ledger\n746b68b518aa0b16710f5ed12644836694bfeadd fix: record identity transition on temporary import\n2209fa4a195128e25151cac6eca396cf92da4c12 test: lock temporary identity version remapping\n99f651688ddbc5a8bae34f3ddbfff0a247554e2a fix: remap temporary identity versions at permanent import\nfb9b098652f17162a576e428be532a93043bee80 test: distinguish raw identity confirmation from transition step\n2034619895d78b452c934f1a94fbb6637da9c0c5 fix: prefer semantic first step in identity adjacency\nfcbd0fd28cbb571a057dce1138169d9f30501680 fix: allow stable distant identity after two canonical confirmations\ne70ed5ce919deadf49ec6eee4b97ed02d1a45044 fix: ignore proposal-only events in identity resolver\na58d42dd299b8b452bc49eb243c86a96383ceafa fix: make ordinary identity growth adjacency-first\ncee087d8f2187095f57dc53359663aeb8349345a fix: restore constrained identity target declaration\n8fe208d0231a9f6ac85c85a0389b71a052d701cc fix: separate constrained identity rebuilding from ordinary adjacency\nb4ae8aeb7953ee0c7b0702cbf6bf34b99c239728 fix: reserve identity adjacency escape for overwhelming canonical shape\nb7fccd1baaddc7310da832d9602d0cff31a3cf1e test: distinguish ordinary adjacency from strong-shape escape\n2d2f08025ca67d24f21089f104851e6e0d2b5829 fix: satisfy narrowed identity target type\n8972815d5c5538c9dbcbf2e661a1974a21c90d18 fix: gate anonymous identity acting fallback\nbda3fa4e0519e3f7b3303691a40e0bd5ccde2cc2 fix: keep identity worker and import behind feature gate\n6a95df71c1c12c1219d5632df0ae266839d80c76 fix: fail closed on enabled identity read errors\n31181e6761b662f05491ba4f2ed3d34c20683a91 feat: gate relationship identity independently\n23c52950f3c30347269dccc65b8347d3566c8eb9 test: lock identity adjacency and escape behavior\n41530d2b009a2cf338466989d856c113c8791f8d feat: prefer adjacent relationship identity transitions\nd5a0d8be37d275f37fd8c162c9cf4f4af10e0d09 test: keep post-breakup constraint semantic after rebuilding\n029afcb453ce72ba3a116728f310043c2b6d1452 fix: resolve anonymous identity after critical-only state changes\n3b5be8a09d5c046baebca184e50c215229f57ddd test: lock post-constraint identity rebuilding semantics\n510ee94d6fbd8e7f15b635177fb01797abe8c04b feat: read canonical identity constraint anchor\nf7d39f04ecc1dca18e06f5096726a02748270f90 feat: propagate relationship constraint anchor at runtime\n77a9ed2442a2a15c2cd3d2b6b18b356bd92c5a6f feat: carry constraint anchor through temporary import\n26bab07f49059bd38693d941454f898918631252 feat: persist identity constraint anchor version\n9c45e1d11e2f4cadc014d179abe202361f100783 fix: anchor relationship constraints to canonical state version\nc76a2b482b4129760b6682b4e199d445ef6501ff feat: feed derived relationship traits into acting guide\n1dfa7b23c98bd1f84c90e39ce006898c1c50b235 refactor: expose derived relationship traits\n76fc5af1f718140b5ad88ad2fafb698aa88bbc11 feat: feed canonical identity into relationship acting guide\na0a08638a68708e4b700308d889c644f2446c2cc feat: read only version-aligned relationship identity\n02b21471a11e356e2c57ba62dafb6edaf3e024ce feat: interpret identity as acting direction\n3bbf819298b52294087244c72d8d0314a728fa86 refactor: accept identity context in acting guide\nd5445dbbd4cb912e7253f73f8293445bf4f1bba3 test: lock atomic temporary identity import\n1af23d0e0c2d9f72ffb46d697c2c4c546f2f58dc feat: atomically materialize temporary identity on email save\n9032f0dc5c5c2f975bfc74fc11c76dabbbb4d013 feat: atomically import temporary relationship identity\nd97e8becaf71b3291c884e6c7af2aadadd8464a2 feat: resolve identity for anonymous canonical state changes\n50952acec86db15edc96006bfd14ddbd71ba0ee0 feat: carry relationship identity in temporary snapshot\n0eb31b758b84b167efd7c482610c2354dfca345d feat: process identity after canonical relationship application\n3e7ef88f0b57fe3de415a22c8062518541f9f4ac test: lock relationship identity persistence invariants\n2cc6104a89f19da1c3f171769d9a00172d485178 feat: add relationship identity canonical persistence\neea0a65a64812b78ccb91d2ca25350f0ec50ab29 test: enforce distinct canonical identity confirmations\nfea8b1cb9c550d2dddea6001ebecfcdae0136720 fix: require distinct state versions for identity confirmation\n8de06c51a14f1489347eee9ddcc769b8d12d475e test: cover relationship identity invariants\n8703df49a2d7d3148ad6cca63a5482c7504e50ee feat: add pure relationship identity resolver",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "e3d130bc347239e6f052f02f68f283172b79977fef3dba1677a4831fae19cf51",
+  "collected_at": "2026-11-10T02:50:24.064930+00:00"
+}

@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-09T10:10:20.576470+00:00
+更新 (UTC): 2026-11-10T02:50:24.064930+00:00
 
 ## 全案件
 
@@ -153,6 +153,7 @@
 | [fix/chat-request-diagnostics](cases/branch-bc36378a11db8be8.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/inventory-investigation-20261101](cases/branch-bd3f337155aba4cf.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/ledger-automation-observability-20261102](cases/branch-bda2266ea4ea3de8.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [docs/chat-first-handoff-20261110](cases/branch-bde3cb29f6100882.md) | 記憶・会話・開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/expired-temporary-relationship-import](cases/branch-c03166e140979a0c.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/lounge-opening-fullscreen-20261029](cases/branch-c1628f2ed519dfb9.md) | ラウンジ・画面・開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/relationship-time-v2-design](cases/branch-c1c09c8589ffaf5e.md) | 記憶・会話・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -283,6 +284,7 @@
 | [docs: require Japanese work-history review before any new development](cases/pr-170.md) | 開発管理・画面・表示：開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [feat(history): 着手前に「以前の実装・検証」を自動提示して再利用判断を確認](cases/pr-171.md) | 開発管理・画面・表示：新規作業の依頼文から過去の実装・未統合研究を自動照合し、原本の再利用判断を着手前に記録する。 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs(history): 着手前自動照合の実測と再利用判断を保存](cases/pr-172.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [docs: 日本語開発履歴の引継ぎを通常チャット・Actions経由に対応](cases/pr-173.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [会話同期で同じチャットターンが二重保存されるのを防ぐ](cases/pr-18.md) | 記憶・会話：会話同期で同じチャットターンが二重保存されるのを防ぐ | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
