@@ -32,13 +32,14 @@ export async function GET(request: Request) {
 }
 export async function POST(request: Request) {
   // Monotonic timings only; never include identifiers or conversation contents.
-  const requestStartedAt = performance.now();
+  const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+  const requestStartedAt = nowMs();
   // Anonymous "load" renews the root, so it is a write too.
   const maintenance = await maintenanceResponse();
   if (maintenance) return maintenance;
   try {
     const user = await authenticate(request);
-    const authenticatedAt = performance.now();
+    const authenticatedAt = nowMs();
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json();
     if (body.saveAnonymous === true) {
@@ -67,12 +68,12 @@ export async function POST(request: Request) {
       return Response.json({ synced: true, result: data });
     }
     if (body.action === "load") {
-      const loadStartedAt = performance.now();
+      const loadStartedAt = nowMs();
       const timedResponse = (payload: unknown) => Response.json(payload, {
         headers: { "Cache-Control": "no-store", "Server-Timing": [
           `auth;dur=${(authenticatedAt - requestStartedAt).toFixed(1)}`,
-          `history;dur=${(performance.now() - loadStartedAt).toFixed(1)}`,
-          `request;dur=${(performance.now() - requestStartedAt).toFixed(1)}`,
+          `history;dur=${(nowMs() - loadStartedAt).toFixed(1)}`,
+          `request;dur=${(nowMs() - requestStartedAt).toFixed(1)}`,
         ].join(", ") },
       });
       if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
