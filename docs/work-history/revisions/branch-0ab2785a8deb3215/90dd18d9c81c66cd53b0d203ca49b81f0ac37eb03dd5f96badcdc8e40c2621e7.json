@@ -1,0 +1,43 @@
+{
+  "id": "branch-0ab2785a8deb3215",
+  "title": "feat/lounge-chat-handoff-20261030",
+  "head": "c454ee11d3adc40548d87de4a0516f0491394749",
+  "head_ref": "feat/lounge-chat-handoff-20261030",
+  "linked_prs": [
+    96
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c454ee11d3adc40548d87de4a0516f0491394749/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c454ee11d3adc40548d87de4a0516f0491394749/public/lab/transparent-lounge-shortcuts/index.html"
+    },
+    {
+      "path": "public/lab/transparent-lounge-vertical/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c454ee11d3adc40548d87de4a0516f0491394749/public/lab/transparent-lounge-vertical/index.html"
+    }
+  ],
+  "commits": "c454ee11d3adc40548d87de4a0516f0491394749 docs(lounge): record authenticated chat handoff and QA gates\nf8778d0c02ded528d0a0ae469b96dd13c4beed08 feat(lounge): hand off video end/skip and returning visitors to existing chat\n71e2a27ba5b0cb374ffc8926bc50f985a2b398be feat(lounge): hand off video end/skip and returning visitors to existing chat",
+  "topics": [
+    "記憶・会話",
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b32b18ebffc00b6a4a93ae9db021e7ce7996980928cdfac9a707c282599b48dd",
+  "collected_at": "2026-11-10T08:32:01.331994+00:00"
+}

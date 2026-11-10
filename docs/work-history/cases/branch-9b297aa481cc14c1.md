@@ -16,7 +16,7 @@
 
 **次の作業：** 関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない
 
-根拠取得日時 (UTC)：2026-11-10T05:33:59.190381+00:00
+根拠取得日時 (UTC)：2026-11-10T08:32:01.331994+00:00
 
 
 ## 実際の変更処理（コードから抽出）
@@ -48,7 +48,7 @@
 ```text
 diff --git a/misaki-loop.mp4 b/misaki-loop.mp4
 new file mode 100644
-index 0000000..60a8f74
+index 00000000..60a8f74d
 Binary files /dev/null and b/misaki-loop.mp4 differ
 
 ```
@@ -58,7 +58,7 @@ Binary files /dev/null and b/misaki-loop.mp4 differ
 ```text
 diff --git a/public/lab/transparent-lounge/index.html b/public/lab/transparent-lounge/index.html
 new file mode 100644
-index 0000000..e45c13c
+index 00000000..e45c13c4
 --- /dev/null
 +++ b/public/lab/transparent-lounge/index.html
 @@ -0,0 +1,9 @@
@@ -80,7 +80,7 @@ index 0000000..e45c13c
 ```text
 diff --git a/public/lab/transparent-lounge/lounge-bg.png b/public/lab/transparent-lounge/lounge-bg.png
 new file mode 100644
-index 0000000..6b10431
+index 00000000..6b104319
 Binary files /dev/null and b/public/lab/transparent-lounge/lounge-bg.png differ
 
 ```
@@ -90,7 +90,7 @@ Binary files /dev/null and b/public/lab/transparent-lounge/lounge-bg.png differ
 ```text
 diff --git a/public/lab/transparent-lounge/misaki-alpha.webp b/public/lab/transparent-lounge/misaki-alpha.webp
 new file mode 100644
-index 0000000..fe88b23
+index 00000000..fe88b233
 Binary files /dev/null and b/public/lab/transparent-lounge/misaki-alpha.webp differ
 
 ```
@@ -100,7 +100,7 @@ Binary files /dev/null and b/public/lab/transparent-lounge/misaki-alpha.webp dif
 ```text
 diff --git a/public/lab/transparent-lounge/misaki-opening-complete-preview.mp4 b/public/lab/transparent-lounge/misaki-opening-complete-preview.mp4
 new file mode 100644
-index 0000000..7c39f45
+index 00000000..7c39f451
 Binary files /dev/null and b/public/lab/transparent-lounge/misaki-opening-complete-preview.mp4 differ
 
 ```

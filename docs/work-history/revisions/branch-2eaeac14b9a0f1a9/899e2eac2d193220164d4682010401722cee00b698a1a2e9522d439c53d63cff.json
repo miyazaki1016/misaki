@@ -1,0 +1,20 @@
+{
+  "id": "branch-2eaeac14b9a0f1a9",
+  "title": "sora/relationship-analyzer-structured-output-hotfix",
+  "head": "319865a5f9351899ef260754aaad2604623552d5",
+  "head_ref": "sora/relationship-analyzer-structured-output-hotfix",
+  "linked_prs": [
+    48
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "dac9f34e1ff3e8c6468917f2c149afc0f38e196240868a6ee0559069c3e917b3",
+  "collected_at": "2026-11-10T08:32:01.331994+00:00"
+}

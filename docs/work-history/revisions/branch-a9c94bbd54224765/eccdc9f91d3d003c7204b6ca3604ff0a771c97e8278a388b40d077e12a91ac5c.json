@@ -1,0 +1,218 @@
+{
+  "id": "branch-a9c94bbd54224765",
+  "title": "experiment/interpreter-gradual-acting-20261015",
+  "head": "ef5bd23246a75b02a0df60302263f971de061843",
+  "head_ref": "experiment/interpreter-gradual-acting-20261015",
+  "linked_prs": [
+    85
+  ],
+  "files": [
+    {
+      "path": "docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/CONVERSATION_TUNING_LAB_PLAN_20261015.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/INTERPRETER_GRADUAL_COMPARISON_20261015.md"
+    },
+    {
+      "path": "docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/MISAKI_FREE_PREMIUM_MEMORY_PROACTIVE_BASELINE_20261019.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_ACTING_DTO_CANONICAL_CONTRACT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_ACTING_DTO_CANONICAL_CONTRACT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_PARITY_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_ACTING_PARITY_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_ACTING_WIRING_PLAN_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_ACTING_WIRING_PLAN_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_CANONICAL_READ_CONTRACT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_CANONICAL_READ_CONTRACT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_DTO_PREWIRING_REVIEW_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_DTO_PREWIRING_REVIEW_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_EXISTING_VERSION_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_EXISTING_VERSION_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_IMPORT_VERSION_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_IMPORT_VERSION_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_PROMPT_PRECEDENCE_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_PROMPT_PRECEDENCE_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_RACE_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_BODY_CLOCK_RPC_VERIFICATION_GAP_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_FIVE_AXIS_GROWTH_PACE_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_FIVE_AXIS_GROWTH_PACE_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_MOMENTUM_SOURCE_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_MOMENTUM_SOURCE_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_PROMPT_WIRING_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/docs/RELATIONSHIP_VERSION_LEGACY_WRITER_AUDIT_20261015.md"
+    },
+    {
+      "path": "lib/relationship-acting-guide-gradual-experiment.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/lib/relationship-acting-guide-gradual-experiment.ts"
+    },
+    {
+      "path": "tests/relationship-acting-dto-contract-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-acting-dto-contract-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-acting-gradual-playfulness-boundary.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-acting-gradual-playfulness-boundary.test.ts"
+    },
+    {
+      "path": "tests/relationship-acting-guide-gradual-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-acting-guide-gradual-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-acting-guide-integration-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-acting-guide-integration-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-body-clock-acting-boundary-adapter-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-body-clock-acting-boundary-adapter-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-body-clock-acting-parity-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-body-clock-acting-parity-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-body-clock-prompt-boundary-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-body-clock-prompt-boundary-experiment.test.ts"
+    },
+    {
+      "path": "tests/relationship-body-clock-romantic-tag-characterization.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-body-clock-romantic-tag-characterization.test.ts"
+    },
+    {
+      "path": "tests/relationship-body-clock-source-normalization-experiment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ef5bd23246a75b02a0df60302263f971de061843/tests/relationship-body-clock-source-normalization-experiment.test.ts"
+    }
+  ],
+  "commits": "ef5bd23246a75b02a0df60302263f971de061843 docs: record agreed Free/Premium proactive memory and shared-memories product baseline\n170f4d76d39c3521ff62a1bf032c066007a632d3 docs: establish multi-character persona and state isolation as shared engine design gate\na23e8070106c78305e785e6503f8beaa7d239c22 docs: record proactive care, context selection, frequency and safety principles in overview\n1e8f5e7bdad8560b3f311290932816e9917f3de5 docs: consolidate validation history and conversation tuning handoff in canonical overview\nb471cf2e3f9f18a6a4d0b8657ab373605273d498 docs: audit existing acting lab and establish conversation tuning plan\nf820c502f3b53cb9d9a34476b87ed1d8c3868d97 docs: reconcile Body Clock relationship version writer audit into canonical overview with explicit gaps\n140b1b417bfc65bfa87cc35832fa27234f80486d docs: audit legacy relationship writers and distinguish five-axis version scope\ndc8071e59a905ef6fae439ac33d8d7f06f4602ed docs: verify temporary import increments relationship version for Body Clock race design\n98aa340084943ee33fa51dc35a431c9338f6a2e6 docs: identify existing relationship state version and atomic delivery guard design\n3f8278a4bf7627013fc2b2fc2bb05ca13d4189a7 docs: record RPC migration verification gap without assuming relationship concurrency guard\n4e76a8e70f21acb69e30a81791d1a6ae8831cbc1 docs: audit Body Clock relationship state race and atomic delivery guards\n552267b9413cd26aa063a1870f9db2e0ee26f401 docs: review Body Clock acting DTO pre-wiring consistency and concurrency risks\n3ee0bd31000417ad85e8df6448a54e6093864d1e test: prototype fail-closed permanent and anonymous acting DTO normalization\n337d4716e123cc30cd39918d5b6edd33ff09c165 test: prototype reusable Body Clock acting boundary adapter without Edge wiring\nb31c74c9b721000adfa0eb2cc6338d9f5544523d docs: define relationship status and emotion-tag prompt precedence after green tests\n23080d67ed0a37327293492f9127c83bdf8d5078 test: prototype status-aware Body Clock acting and emotion-tag prompt boundary\nd28947be906d7162b1b9ffeb7f7c101cc4628616 fix(test): correct regex escapes in Body Clock source characterization\nabc6949cee0178b2482cecd733491231aff4f4e2 fix(test): avoid importing Deno Edge module into Next TypeScript compilation\n6f05bc886cc4858badd71412c3f9a5915eaadb6e test: characterize Body Clock romance tag behavior before status-aware wiring\n730208b04a95bf59dc47771fbabcf309b4eb824f docs: map Body Clock acting wiring and identify romantic tag consistency risk\n399b65a916679564b457d5524896b9d2c4d3577f test: add isolated Body Clock relationship acting parity and fail-closed cases\na568b90ddc61959d843b140b036cbeaa96ef06f6 test: guard gradual acting against contradictory low playfulness guidance\n1e4e57b7f3d5b8f5be31c9057db00a2b897e2b80 fix(experiment): avoid conflicting playfulness notes below baseline threshold\n22bc35036d334acbe238f731a497003242b18d95 test: add isolated canonical relationship acting DTO parity cases\n73189d53dff0bc4a26025a2b39c7beb03e94ded2 docs: define canonical relationship acting DTO for permanent and anonymous Body Clock\n013f7609cab089ca933cf6c5c4c599cfdb571ccf docs: map permanent and anonymous canonical inputs for Body Clock acting parity\n5e2f30c0070754e890c24a2c8734cea97e7068b9 docs: verify Body Clock relationship acting prompt gap against main\ne44ae6456b6cf01be7a898c11a742d843bd4c1af docs: verify chat prompt relationship wiring and identify remaining proactive audit\nebf1715abbbe22c65559636559ac44cbe88e8803 docs: audit canonical inputs and missing contracts for momentum derivation\n569f2259971674d7fffcb954700635b51c7868f6 docs: quantify conditional five-axis growth pace against actual pattern rules\n87da558c0e3e864961acf78073b55c3f1033ba66 test: assert actual trust guidance wording in integration candidate\nb8a472f4673ce266cdf1cc77ccbe9cbf47c12aec test: ensure experimental integration retains canonical acting guards\n9522e3421f216766416b72302bf31afe9c77ef4c experiment: integrate intermediate-axis notes while retaining baseline guards\n51e4eb157068bd26b05571f8222fc1e5003fbf96 docs: compare baseline and gradual interpreter and record regression risks\n74e442d59971906ecc7a8ab56b77030af68a8086 test: compare gradual interpreter stages without model calls\n715fcbf060c51293b8cca1757f969c8fa588a113 experiment: add opt-in gradual five-axis acting guide",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a63a45bfd9dcdaf9dbf452e80d5e97623a5455db4c56d65f0921676ad74cf0d5",
+  "collected_at": "2026-11-10T08:32:01.331994+00:00"
+}

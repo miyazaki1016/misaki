@@ -1,0 +1,20 @@
+{
+  "id": "branch-d1691037dd1d0dbb",
+  "title": "fix/relationship-analyzer-bounded-retry",
+  "head": "90ac90bba86f716ccf46e50542097d1b81e23702",
+  "head_ref": "fix/relationship-analyzer-bounded-retry",
+  "linked_prs": [
+    65
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "69e2e5e11c762f8574ac76227b79c828b3fecdca14df66740852bda1301427a2",
+  "collected_at": "2026-11-10T08:32:01.331994+00:00"
+}

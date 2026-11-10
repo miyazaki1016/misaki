@@ -1,0 +1,35 @@
+{
+  "id": "branch-edcb044341b88c74",
+  "title": "docs/legacy-audit-followup-20261101",
+  "head": "897bf1c7e084ba88de75440c0d0e2042ead3be00",
+  "head_ref": "docs/legacy-audit-followup-20261101",
+  "linked_prs": [
+    105
+  ],
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/897bf1c7e084ba88de75440c0d0e2042ead3be00/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/audits/LEGACY_AUDIT_FOLLOWUP_20261101.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/897bf1c7e084ba88de75440c0d0e2042ead3be00/docs/audits/LEGACY_AUDIT_FOLLOWUP_20261101.md"
+    }
+  ],
+  "commits": "897bf1c7e084ba88de75440c0d0e2042ead3be00 docs: link legacy audit follow-up from development ledger\n4c12001514c0ac299d7f192a088f9d9c65ecd43f docs: preserve legacy audit branch evidence and caveats",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "eef6987830cf83381817264e3887fdaa46b02a9804f51ffb2cf33f6ad0dc15ef",
+  "collected_at": "2026-11-10T08:32:01.331994+00:00"
+}

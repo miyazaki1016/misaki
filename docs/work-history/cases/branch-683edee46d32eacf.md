@@ -16,7 +16,7 @@
 
 **次の作業：** 関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない
 
-根拠取得日時 (UTC)：2026-11-10T05:33:59.190381+00:00
+根拠取得日時 (UTC)：2026-11-10T08:32:01.331994+00:00
 
 
 ## 実際の変更処理（コードから抽出）
@@ -43,7 +43,7 @@
 
 ```text
 diff --git a/docs/DEVELOPMENT_LEDGER.md b/docs/DEVELOPMENT_LEDGER.md
-index 52a15d1..d1d4192 100644
+index 52a15d1b..d1d41929 100644
 --- a/docs/DEVELOPMENT_LEDGER.md
 +++ b/docs/DEVELOPMENT_LEDGER.md
 @@ -108,3 +108,147 @@ A: main実装確認 / B: ブランチ実装・main未確認 / C: 実験・検証
@@ -192,6 +192,6 @@ index 52a15d1..d1d4192 100644
 +| #133 | docs: 競合AIコンパニオン研究とWork利用節約方針を総覧に反映 | merged | `7c02c3cf349db24f6e41e63acbd50c821c195754` | 2026-11-02T02:57:45Z |
 +| #134 | Add fail-closed PR promotion policy (review only) | merged | `9db5760f0024e6665a116b79a6f0085bfe3a2af6` | 2026-11-02T03:59:49Z |
 +| #135 | Run review-only promotion classification on PR updates | merged | `7014081f1cefa490db694139c147e36a10bbe18e` | 2026-11-02T04:05:16Z |
-+| #136 | Add open PR review handoff report to existing inventory | merged | `4caa708bac259ad2293c7a33ab9442b6
++| #136 | Add open PR review handoff report to existing inventory | merged | `4caa708bac259ad2293c7a33ab9442
 ```
 

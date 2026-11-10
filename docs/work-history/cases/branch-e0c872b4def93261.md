@@ -18,7 +18,7 @@
 
 関連PR：[#32](https://github.com/miyazaki1016/misaki/pull/32)
 
-根拠取得日時 (UTC)：2026-11-10T05:33:59.190381+00:00
+根拠取得日時 (UTC)：2026-11-10T08:32:01.331994+00:00
 
 
 ## 実際の変更処理（コードから抽出）
@@ -45,7 +45,7 @@
 
 ```text
 diff --git a/docs/IMPLEMENTATION_OVERVIEW.md b/docs/IMPLEMENTATION_OVERVIEW.md
-index b488876..3eb6a94 100644
+index b4888763..3eb6a941 100644
 --- a/docs/IMPLEMENTATION_OVERVIEW.md
 +++ b/docs/IMPLEMENTATION_OVERVIEW.md
 @@ -1542,3 +1542,104 @@ Production DB側には統合branch版Body Clockが必要とするcanonical対応
