@@ -1,0 +1,28 @@
+{
+  "id": "branch-80302ec778694c1b",
+  "title": "perf/chat-stage-timing",
+  "head": "ead9d6283b68579f6014e07bef46add2a41fb791",
+  "head_ref": "perf/chat-stage-timing",
+  "linked_prs": [
+    26
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/ead9d6283b68579f6014e07bef46add2a41fb791/app/api/chat/route.ts"
+    }
+  ],
+  "commits": "ead9d6283b68579f6014e07bef46add2a41fb791 Measure chat stages and extend Gemini timeout",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "5f32f202e051b2b14e7e9eb002e6cdc0fe142aa6c902b633c9c2933fc87683cb",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

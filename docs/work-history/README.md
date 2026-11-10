@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-10T08:32:01.331994+00:00
+更新 (UTC): 2026-11-10T14:55:18.215712+00:00
 
 ## 全案件
 
@@ -264,7 +264,7 @@
 | [Inventory: ranked, evidence-only human review queue](cases/pr-149.md) | 開発管理：根拠だけで人の確認順序を付けるレビュー一覧を追加 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [sleepyを深夜の身体状態タグとして正式化する](cases/pr-15.md) | その他の開発：sleepyを深夜の身体状態タグとして正式化する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [fix: reuse existing ledger facts PR on repeated inventory runs](cases/pr-150.md) | 開発管理：棚卸しの繰返し時に既存の台帳更新PRを再利用 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
-| [WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了）](cases/pr-151.md) | 記憶・会話・開発管理・画面・表示：チャット初期スクロールの追従制御と、会話読込み遅延の調査。 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
+| [WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了）](cases/pr-151.md) | 記憶・会話・開発管理・画面・表示：チャット初期スクロールの追従制御と、会話読込み遅延の調査。 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [fix: restore ledger facts workflow after invalid YAML merge](cases/pr-152.md) | 開発管理：不正なYAML統合後の台帳更新ワークフローを復旧 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [feat: mobile GitHub Pages approval dashboard for Misaki and Amefuru](cases/pr-153.md) | 開発管理・画面・表示：美咲・アメふる共通のスマートフォン向け承認ボードを追加 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs: document Pages retry procedure after activation](cases/pr-154.md) | 開発管理・画面・表示：Pages有効化後の再実行手順を記録 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |

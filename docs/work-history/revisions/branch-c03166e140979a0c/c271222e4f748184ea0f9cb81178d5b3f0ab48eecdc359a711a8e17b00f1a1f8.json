@@ -1,0 +1,20 @@
+{
+  "id": "branch-c03166e140979a0c",
+  "title": "fix/expired-temporary-relationship-import",
+  "head": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+  "head_ref": "fix/expired-temporary-relationship-import",
+  "linked_prs": [
+    64
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b2f26a832ab1272bb52b6b34755e2085e3a2979590f5905a7e8511aa7d0700c9",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

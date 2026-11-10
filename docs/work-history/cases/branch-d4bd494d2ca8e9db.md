@@ -18,17 +18,18 @@
 
 関連PR：[#151](https://github.com/miyazaki1016/misaki/pull/151)
 
-根拠取得日時 (UTC)：2026-11-10T08:32:01.331994+00:00
+根拠取得日時 (UTC)：2026-11-10T14:55:18.215712+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [app/api/persona/history/route.ts](https://github.com/miyazaki1016/misaki/blob/4d06043b2d5d73054a2ba5b6edadf7217c5ef459/app/api/persona/history/route.ts)：同一HEADのPR案件に原文収録
-- [app/chat/initial-chat-scroll.tsx](https://github.com/miyazaki1016/misaki/blob/4d06043b2d5d73054a2ba5b6edadf7217c5ef459/app/chat/initial-chat-scroll.tsx)：同一HEADのPR案件に原文収録
-- [app/chat/page.tsx](https://github.com/miyazaki1016/misaki/blob/4d06043b2d5d73054a2ba5b6edadf7217c5ef459/app/chat/page.tsx)：同一HEADのPR案件に原文収録
-- [tests/account-conversation.test.cjs](https://github.com/miyazaki1016/misaki/blob/4d06043b2d5d73054a2ba5b6edadf7217c5ef459/tests/account-conversation.test.cjs)：同一HEADのPR案件に原文収録
+- [app/api/persona/history/route.ts](https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/api/persona/history/route.ts)：同一HEADのPR案件に原文収録
+- [app/chat/initial-chat-scroll.tsx](https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/chat/initial-chat-scroll.tsx)：同一HEADのPR案件に原文収録
+- [app/chat/page.tsx](https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/app/chat/page.tsx)：同一HEADのPR案件に原文収録
+- [tests/account-conversation.test.cjs](https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/tests/account-conversation.test.cjs)：同一HEADのPR案件に原文収録
+- [tests/initial-chat-scroll.test.cjs](https://github.com/miyazaki1016/misaki/blob/3ccc345375985e09836979f04617c0f7cc90d197/tests/initial-chat-scroll.test.cjs)：同一HEADのPR案件に原文収録
 
 ## 検証実行の事実
 

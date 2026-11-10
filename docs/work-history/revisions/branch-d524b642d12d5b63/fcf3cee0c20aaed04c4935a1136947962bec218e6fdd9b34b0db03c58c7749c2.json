@@ -1,0 +1,20 @@
+{
+  "id": "branch-d524b642d12d5b63",
+  "title": "sora/anonymous-history-get-noop",
+  "head": "368afb0dfbf9ea66837c83834d8fc24837813554",
+  "head_ref": "sora/anonymous-history-get-noop",
+  "linked_prs": [
+    33
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "89d661a927733ee14f2c38b2dad985312d01e232ed0040637146715d4fc9b558",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

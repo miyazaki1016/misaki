@@ -1,0 +1,20 @@
+{
+  "id": "branch-b4b9b56366106e55",
+  "title": "sora/sync-free-usage-with-history",
+  "head": "f67b388e965bb9bfb3f8d6820fd62e9d273123b6",
+  "head_ref": "sora/sync-free-usage-with-history",
+  "linked_prs": [
+    44
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "38ddab17628850e2ee97f3159b23a62737ad93c003ca6877d8557f1006ebdd47",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

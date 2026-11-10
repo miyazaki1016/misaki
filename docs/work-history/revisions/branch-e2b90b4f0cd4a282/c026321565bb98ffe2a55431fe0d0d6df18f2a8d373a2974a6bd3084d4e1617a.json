@@ -1,0 +1,49 @@
+{
+  "id": "branch-e2b90b4f0cd4a282",
+  "title": "fix/grow-relationship-from-first-meeting",
+  "head": "98675cd45ea3723150031ba6d89e90ceadae5a8c",
+  "head_ref": "fix/grow-relationship-from-first-meeting",
+  "linked_prs": [
+    27
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/98675cd45ea3723150031ba6d89e90ceadae5a8c/app/api/chat/route.ts"
+    },
+    {
+      "path": "lib/persona/fallback-persona.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/98675cd45ea3723150031ba6d89e90ceadae5a8c/lib/persona/fallback-persona.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/fallback-persona.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/98675cd45ea3723150031ba6d89e90ceadae5a8c/supabase/functions/body-clock/fallback-persona.ts"
+    },
+    {
+      "path": "supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/98675cd45ea3723150031ba6d89e90ceadae5a8c/supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql"
+    }
+  ],
+  "commits": "98675cd45ea3723150031ba6d89e90ceadae5a8c Update active persona relationship starting point\nbbf50e83854a3ae9cd5df47cb48de7423d0c43e2 Make relationship status follow conversation evidence\n0f8443a4df2c86ceade8740d3b8cf6cd256409a1 Let relationship grow from first meeting\nf4a3fb5417afb5aaf0f555d91fb5fb94e5dc8b7e Let relationship grow from first meeting",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ce4663c2f966988a1fd666d5149cb6f3b544ec11cb003983b945d76dacfcdcf9",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

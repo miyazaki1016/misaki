@@ -1,0 +1,20 @@
+{
+  "id": "branch-b368fa9f8b5f424e",
+  "title": "sora/fix-relationship-polarity-transport",
+  "head": "66bec2792d571c697aa891ff0142e78f4941456e",
+  "head_ref": "sora/fix-relationship-polarity-transport",
+  "linked_prs": [
+    53
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "fb5ccc41c690b74823353bfa160e811d9ac43ddf1cd9d77811f5c55b79871710",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

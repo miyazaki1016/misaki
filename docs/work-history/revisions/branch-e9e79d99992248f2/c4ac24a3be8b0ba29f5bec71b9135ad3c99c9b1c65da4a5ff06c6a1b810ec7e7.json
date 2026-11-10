@@ -1,0 +1,28 @@
+{
+  "id": "branch-e9e79d99992248f2",
+  "title": "work/ab-paced-dispatch",
+  "head": "266c6a1ce74bc6ba0889e41590004854386fab31",
+  "head_ref": "work/ab-paced-dispatch",
+  "linked_prs": [
+    72
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/266c6a1ce74bc6ba0889e41590004854386fab31/.github/workflows/isolated-gemini-ab-manual.yml"
+    }
+  ],
+  "commits": "266c6a1ce74bc6ba0889e41590004854386fab31 ci: add manual Gemini A/B request pacing option",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "5e01b9ee8220f6c424c5c35c28c91fd609d29f1a549f315afa4ef3f32e157ef4",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

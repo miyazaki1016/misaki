@@ -1,0 +1,246 @@
+{
+  "id": "branch-ae082efda294b17a",
+  "title": "experiment/conversation-lab-offline-v1-20261015",
+  "head": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e",
+  "head_ref": "experiment/conversation-lab-offline-v1-20261015",
+  "linked_prs": [
+    86
+  ],
+  "files": [
+    {
+      "path": "app/api/conversation-review/smoke/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/app/api/conversation-review/smoke/route.ts"
+    },
+    {
+      "path": "app/conversation-review/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/app/conversation-review/page.tsx"
+    },
+    {
+      "path": "docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_LAB_PRODUCTION_PARITY_AUDIT_20261015.md"
+    },
+    {
+      "path": "docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_LAB_PROMPT_EXTRACTION_CONTRACT_20261015.md"
+    },
+    {
+      "path": "docs/CONVERSATION_LONG_TERM_PROBES_20261019.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_LONG_TERM_PROBES_20261019.md"
+    },
+    {
+      "path": "docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_QUALITY_MULTITURN_GATE_20261017.md"
+    },
+    {
+      "path": "docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_REAL_MODEL_READINESS_AUDIT_20261019.md"
+    },
+    {
+      "path": "docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/CONVERSATION_SMOKE_OPERATOR_RUNBOOK_20261019.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/conversation-lab/evaluation.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/evaluation.ts"
+    },
+    {
+      "path": "lib/conversation-lab/github-one-shot-claim.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/github-one-shot-claim.ts"
+    },
+    {
+      "path": "lib/conversation-lab/live-smoke-probe.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/live-smoke-probe.ts"
+    },
+    {
+      "path": "lib/conversation-lab/quality-assessment.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/quality-assessment.ts"
+    },
+    {
+      "path": "lib/conversation-lab/quality-probe-runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/quality-probe-runner.ts"
+    },
+    {
+      "path": "lib/conversation-lab/quality-probes.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/quality-probes.ts"
+    },
+    {
+      "path": "lib/conversation-lab/quality-review-packet.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/quality-review-packet.ts"
+    },
+    {
+      "path": "lib/conversation-lab/quality-reviewed-comparison.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/quality-reviewed-comparison.ts"
+    },
+    {
+      "path": "lib/conversation-lab/recorded-reply-import.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/recorded-reply-import.ts"
+    },
+    {
+      "path": "lib/conversation-lab/runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/runner.ts"
+    },
+    {
+      "path": "lib/conversation-lab/scenarios.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/lib/conversation-lab/scenarios.ts"
+    },
+    {
+      "path": "scripts/run-conversation-smoke.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/scripts/run-conversation-smoke.ts"
+    },
+    {
+      "path": "tests/conversation-github-one-shot-claim.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-github-one-shot-claim.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-evaluation.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-evaluation.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-live-smoke-probe.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-live-smoke-probe.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-quality-assessment.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-quality-assessment.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-quality-probe-runner.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-quality-probe-runner.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-quality-probes.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-quality-probes.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-quality-review-packet.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-quality-review-packet.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-quality-reviewed-comparison.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-quality-reviewed-comparison.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-recorded-reply-import.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-recorded-reply-import.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-runner.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-lab-runner.test.ts"
+    },
+    {
+      "path": "tests/conversation-live-smoke-mocked.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/f92250fc1ac79efa44c72468e00449d3fdc7ce6e/tests/conversation-live-smoke-mocked.test.ts"
+    }
+  ],
+  "commits": "f92250fc1ac79efa44c72468e00449d3fdc7ce6e test: ensure offline suite rejects oversized later probes before callbacks\n4efa62b017ca80fe79403a55c172f22a754f2d29 docs: hand off October 20 conversation lab progress and unresolved smoke-test blockers\nd51c9cb6a235b4eb6d5cace028e1cdab30c6353d test: invalid later probe prevents partial suite execution\n22f78c84114ceaadd3f9b50030b404b1723611d2 fix: validate entire offline quality probe suite before running callbacks\n13cdf0b6064ad99857c15972b53cdba505ac4892 test: derive scenario suite size from fixtures to prevent stale count failures\nb72ec28445f88cb1fde4a905ef0992cda5b961f6 test: ensure quality probe IDs stay sequential without hardcoded exact count\nab50dace3f7237d696f91a4c903a2010ad08efc5 test: align quality probe suite assertions with 22 scenarios\ne55945b94f8e614bc26c9ae61e5a39871cef1d7c test: align quality probe suite assertions with 22 scenarios\n430f205ee63a51a37802fc2a598ccff5ebc4e2b2 test: expand offline conversation quality probes for delivery honesty and project continuity\n4b347ee3b9346a68a5604d7c917065cd5dc263d9 docs: preserve Q02 offline CI, Vercel region and expired-log findings\n0e8171ff797ecb73dd85b9980bf00edd5e4f8d94 test: offline-only second-turn and response-body timeout cases with hard no-retry budget\n6b3f061f14372337c2e38fb5680844d4bf0880c0 docs: record Q02 v2 failure and offline timeout versus network diagnostics\n78df95903165eac963722424896310dcb6b4a4b6 ux: distinguish timeout from network in bounded Q02 diagnostic text\nadb646d4a409d80ba040a9f1ab614b53555acfab test: offline-only timeout vs network Q02 classification without API calls\nc69cbd55cbd69c80c4e0c83d62b5ef200bcff0a9 testability: allow shorter mocked Q02 deadline without increasing production timeout\ne410c30d190cb9861ca3e7abfe69196c1b8f7dce fix: distinguish own request timeout from other Q02 network failures without exposing errors\n61c909324ba548a13ae3bd569e65ab563dbf0a7b docs: record Q02 v2 independent one-shot and disabled-until-approval gates\na78b6d0b7dd4ba958a4cd2646af9f21488e0a790 test: ensure future Q02 v2 quota cannot modify already-used v1 record\n732c874324ddae5b57a2481ddb1179652576acc2 prepare: hard-disable second real Q02 run until explicit v2 approval and unique GitHub quota are configured\na19b192b25130f98be675b810f4a5cfb02f9c3ec prepare: permit distinct Q02 v2 one-shot claim without modifying consumed v1\n5ef556eea20070192b16e79534309ce7779f7de0 docs: record no-cost Q02 output robustness assessment and no-retroactive-causality guard\nc795726841924f34f71c9cf24e3e0d20d5a05fa7 test: check bounded output and minimal thinking in offline Q02 fixture\nb251a35021e94329d9bdf6e468237bbed96f1131 test: check bounded output and minimal thinking in offline Q02 fixture\n566e476284455f6ebae33237528cede74c2bcb18 fix: budget Q02 output for short replies and explicitly minimize thinking without live calls\nab7993bff6431e5be3347ff4ac6a2cc3dd3f36fc test: align existing Q02 failure assertions with structured safe diagnostic code\n9038bdaa1cd343e519eb3090b14bc40a4b0e1964 fix: avoid TypeScript parameter properties unsupported by Node strip-types CI\n8b8dbc1fc5311aba8837892073501be3cd6e7a50 docs: explain Q02 retrospective limits and bounded future diagnostics without live Gemini\n9a818df52720e21bace2c3444f6b40dfa878a9a5 test: verify bounded model error classification and non-disclosure without live calls\n3f10a826e379ffad153ccbb5aa9b573289e488c8 ux: show bounded Q02 failure category without exposing Gemini response\na7fcc580cf89c7e89f80edf0b83029046cfcad70 feat: return only safe model-failure category on failed Q02 one-shot response\n5fa69fa6d6df8be05f04e4fd780085ecae276d36 feat: classify Q02 model failures with fixed safe codes and attempted-call count\nb6a65dc53f45404a0d3d5858644b2d7420281c52 test: model-free Q02 smoke cases for two turns, non-retry, malformed outputs and opt-in\n45ccf56db97923b34d924de9e3745e9255a918bd docs: record consumed Q02 quota and no-cost fail-closed safeguards\n026f025a54817e348c8e114ae84ace36b5c0a308 test: verify one-shot status is read-only, fail-closed and disables used quota\n1880ad68a25eabe10d64139005d177236b2bb10e ux: show Q02 quota already used; disable retry button after failed POST\ndd2902c07b7ea1ddb9202f5686ecb1be762c344d fix: disable used Q02 one-shot run at GET status level without Gemini call\n01fa3dbe141937121dbc24d1a0ca2a79968d576c fix: read one-shot claim state without reserving another quota or using Gemini\n0422f8b0b478405e1f98b166c5f30dabf3779988 docs: record stable Q02 Preview alias and login-origin implications\ncaba82a0bed2e15c6819be69ad51591dc8f13795 ux: explain stable Preview origin and anonymous-auth scope on iPhone review screen\n8c3c33bd9866e37d015e2275347e2ae36f5bbed5 docs: record explicit opt-in anonymous Preview test login and Auth-only write semantics\ne1950e5675bc349c0164db0fd5b9b4d0948515eb feat: add opt-in anonymous test identity button directly on mobile review page\n05287d74f878884653f7b917c236875eb39bce19 docs: pin quota repo and correct Preview chat production-DB risk in source of truth\n6ab38effc3dd66b32e2b12243fdbe592af858150 safety: avoid directing testers to Preview chat connected to production data\n62a1e64806e1e9e0a1a6238cc2e5cb6cfcbeb0df security: pin GitHub one-shot quota to a dedicated fixed repo and main branch\ned5f0ffd4828fa3e7f9e239722ee73c297cf7444 docs: log mobile auth check, owner UID display and outstanding quota repo setup\n24121017efa1e7744526290faf8f89d47c432528 ux: keep live experiment disabled when Preview auth session is unavailable\ne8e0d769874b966f5def0d201a37a8c30259049d feat: show Preview auth readiness and copyable owner UID on iPhone review screen\ncf2ebe76d060a56422a33e70ba0a4b9019dd1933 docs: record branch-pinned, readiness-gated iPhone Gemini test and outstanding GitHub setup\n8fa15a3f2c2a6b5fd970ce67ae1101538610e824 ux: disable mobile Gemini test button until server explicitly reports readiness\nda92da155420c1725ac9a3d6350513495c09c28e security: restrict smoke to exact experiment Preview branch and expose safe readiness status\n517260638e0833d80916a413c95266987d00c3dd docs: keep implementation overview current on no-third-Supabase Q02 test design\n68692540752f015aa45501ce5961eb9c27801680 docs: adopt free GitHub atomic quota in place of third Supabase project\nc38a203c38893131d27d3575c46176611a5812ec copy: reflect free GitHub-based quota in iPhone review UI\n3b05beef247b42dac3564a9ccd8855b20c654837 docs: remove obsolete Supabase quota migration; use GitHub one-shot storage instead\n754c0f415e761753180a605699618fa0fb4c4c4b test: assert GitHub one-shot claim fails closed on conflicts and errors\n723948c0c67f16bc0875ec8eb5e7be14199983a6 feat: switch Preview one-shot Gemini gate from DB to dedicated GitHub claim\nc640711cc57d68c1bb3974e17202060a2e57d6dc feat: durable one-shot GitHub claim without Supabase writes or paid DB project\nc20729e60bfc42be576f7ee4ab9b439a400e0a12 docs: audit live Vercel configuration and prevent shared production Supabase quota access\na8b6af7114c685067d3f02b98d7fac3f076eef30 security: separate production user auth from isolated Preview smoke quota database\n390cd20e7506977c6eda0bb34b5901f49c16a07e docs: record wired mobile one-shot button and remaining isolation blockers\n16877908e72dd4545379b6dc8f8148cc5dc4ad95 feat: wire iPhone Q02 review page to fail-closed one-shot Preview smoke endpoint\n2f0593f7d057fc2b279aadf4cf04c723934ec555 docs: record disabled owner-only Preview smoke route and isolated DB prerequisites\na01d224a34a423a088425f129fa026b464b0cdce fix: require explicit isolated Preview DB confirmation before smoke route activation\ned0f539d672c41a6c399fad7d9d089e7b1a75442 docs: draft isolated preview DB atomic one-shot claim migration; not applied\n79c7cb7e1185299ef0283728d2a8ff12e2a646b2 feat: fail-closed owner-only one-shot Preview smoke route requiring atomic DB claim\n23554082f5ef7e4e0cd4fb1b6d7a0a34533a21f9 docs: record mobile offline review page and remaining authenticated generation gate\n2bd40568cdd8b54069558779d382fce4ed483476 feat: add mobile-only local Q02 conversation review workspace without billable endpoint\n3ee3a5c6981c47ac1bffef2cfc2e0a3a76384116 docs: link approved two-request operator runbook and clarify secret handling\na901723a9573a1f6d7842c67f56d703ae782ca4a docs: give one-shot operator steps without extracting Vercel secrets\nd0d774b6fea97d27164d8286786db3e5534a08c6 docs: add local-only one-shot smoke command and operational prerequisites\nccf41d72fc958bb6daf675d06eddab648980c14d feat: provide non-public one-shot operator CLI for approved two-call Misaki smoke\n84e768a90013c8a084e80304b241f24e63d0874b docs: index PR86 live model evaluation status and remaining execution gate in overview\n43de98de5c1c68bf96dc21fa841eb4822b342776 docs: record preview readiness and fail-closed Gemini smoke preflight\na5bb543e0d67fc188d75dc0e27a9df7f72928915 test: reject incorrect provenance and personal-memory fixtures before paid smoke calls\na7544e473b20971281d1a34b26531060134bfbe3 fix: reject invalid live-smoke manifest before any paid request\nc17237727a505556672f6d96c2e78d61f6ab6bdc refactor: expose manifest validation for fail-closed live probe preflight\n4918ec73042b19d0df896211dd9408852cdf968b docs: record opt-in two-request smoke adapter and pending live execution boundary\n6f06b8ab1d529d88646deda7eaddd36986a2bf40 test: assert no calls without opt-in and two-request cap for live smoke adapter\naff61aae06faac3e3961e2767f2e63deb60cb372 feat: add bounded two-call opt-in Gemini conversation smoke experiment\ncb9e01cd3bed34f0e2ae8627a50993b8cabc963b docs: link real-model readiness audit from quality gate\nb0437d2dd88e26a2f09ad2083cf4dd54012531e4 docs: audit real-model lab blockers and establish approval and cost gates\n9a24cffbbd656fda142f1f09e6eaac9a6ea2b297 docs: index fixture-matched human review comparison gate\nc3219e67bcd4574d86a1a5c321067b469db34ce1 test: reject incomparable recorded conversation snapshots before quality comparison\n43056be180bac508330fee514463b71a47c2d48f feat: gate human-reviewed comparisons on matching recorded reply fixtures\n686c90f0de735ab3ad5caefcd05bd47a0cc46c87 fix: accept offset-aware ISO fixture timestamp in recorded reply intake\n838c07678229046a6477b28686dc4145e8cb3ea6 docs: document offline recorded-reply intake validation and privacy gate\na697b864569ddbc00909322d950eb7b29407ee79 test: enforce fixture alignment and metadata in offline recorded-reply intake\n39f5b2f03fdcd76b9f9fb8bf35905551d685f8a4 feat: validate offline recorded-reply import and fixed comparison context\nb5d172cdb80dba5960d91b8b9454df60f538efaa docs: document unscored human-review packet gate and privacy constraints\nc2865251f8937ada6e60a14d2dc6ca167cb0dbea test: verify unscored review packet integrity and provenance limits\n3e2f7c4f37a910474606b6b8b144dc847100d2da feat: generate unscored offline conversation review packet\na7eba1acdacc1f01cae7fccc2ad2b35935b6a7a2 docs: record additional longitudinal Free Premium quality probes\n86bcdfdd962d702dcd323abe50a05e03736ccef0 test: run all eighteen offline quality scenarios\n0f0f0eafbdfb6ac14b6669df6ee02f31f0118887 test: expect eighteen quality probes\naca95236d24ddde694f0ce46354614e41ea73c8d test: expand long-term relationship and plan-boundary probes\n817349b518e884012c6c7ee99dd3c56751a597ac docs: outline long-term relationship conversation probes\n1b08a7e6620a8e4a244374b17423f4df91f586ae docs: record evidence-based review schema and prohibit synthetic quality claims\n276ca625337de01f2e39217dd25cd03a64572bbd test: require complete evidence-backed quality findings and avoid synthetic improvement claims\n80de07aacad5a915f996261ebb32194539ac5ea9 feat: add evidence-based quality assessment records for multi-turn lab\nd216055233957e5a61e6cf15e744d0af0b6189e3 docs: record offline quality probe runner wiring and remaining evaluation gates\nafcc66ade7c7ca49959eaea00ad3fa63a6291b7e test: verify fixed-turn lab replay, history, safety and error reporting\nd4d334b3d77fa136ec008db00ac2fbf6d6db022d feat: replay fixed multi-turn quality probes through offline lab harness\n68e76fab3af6112369ae054f029f93d4c3d8bfc6 docs: define measured multi-turn conversation quality gate and lab handoff\nebcb846a6543c6bd28814f5a312c8a9e69bccdc2 test: enforce multi-turn evaluation probe coverage and provenance\n58cef5d62ffeeac5028b486b7aa3c594e3752b39 feat: add multi-turn offline conversation quality probes across eight dimensions\nf9f24a2f383855b2b4ec1437f929b5de4920579b docs: freeze production prompt parity contract before any extraction\n2d5d2eddb5cabca44f50f3c498f64d7aa98160db docs: audit production chat versus isolated conversation lab and safety gates\n004f4d7607079c7ef1e258b92afe1f25e30a4283 test: add offline baseline fixture and eight-axis regression comparison tests\nccb8500e9eab029572abb5f9d1dd12610699ec99 experiment: add eight-axis review comparison and synthetic provenance labeling\n273482a320a5cb03ed3f2be262f559d29d8ca1d5 test: cover multi-turn history, budget, and partial failures\n9b5d29018672145c4b2ca97fb4cff006350e4c49 experiment: add dependency-injected multi-turn offline lab runner\nccfaea0b5185a6aa70763ccb9b391868e62171e7 experiment: add offline conversation lab scenarios and history validation",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b0e87d9d5b176ee65d4e01130d04732b2f83581a9d7fc236d8a0bda32272bb00",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

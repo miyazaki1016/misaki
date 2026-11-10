@@ -1,0 +1,18 @@
+{
+  "id": "branch-7a839c530ad00ad2",
+  "title": "fix/safari-load-failed-ui",
+  "head": "b88b7a8d9c4b1f2f4fc0844186a312fe975ee4ab",
+  "head_ref": "fix/safari-load-failed-ui",
+  "linked_prs": [],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "画面・表示"
+  ],
+  "state": "PR未関連のブランチ差分",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "86c73ad20a56a496ba67dad8f6647ee51209a9bed7978a498d650d850656edf1",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

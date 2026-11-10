@@ -1,0 +1,99 @@
+{
+  "id": "branch-01116240ec96678b",
+  "title": "feat/automatic-history-preflight-20261109",
+  "head": "54e6017b56f435b28fb91a2d6932ca87b9f7bced",
+  "head_ref": "feat/automatic-history-preflight-20261109",
+  "linked_prs": [
+    171
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": ".github/workflows/development-preflight.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/.github/workflows/development-preflight.yml"
+    },
+    {
+      "path": "AGENTS.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/AGENTS.md"
+    },
+    {
+      "path": "docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md"
+    },
+    {
+      "path": "docs/WORK_HISTORY_INDEX.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/docs/WORK_HISTORY_INDEX.md"
+    },
+    {
+      "path": "docs/WORK_HISTORY_OPERATIONS.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/docs/WORK_HISTORY_OPERATIONS.md"
+    },
+    {
+      "path": "docs/WORK_HISTORY_PREFLIGHT.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/docs/WORK_HISTORY_PREFLIGHT.md"
+    },
+    {
+      "path": "scripts/development_preflight.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/scripts/development_preflight.py"
+    },
+    {
+      "path": "scripts/vercel-build-guard.mjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/scripts/vercel-build-guard.mjs"
+    },
+    {
+      "path": "scripts/vercel_build_guard.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/scripts/vercel_build_guard.py"
+    },
+    {
+      "path": "tests/test_development_preflight.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/54e6017b56f435b28fb91a2d6932ca87b9f7bced/tests/test_development_preflight.py"
+    }
+  ],
+  "commits": "54e6017b56f435b28fb91a2d6932ca87b9f7bced feat(history): automatically check existing work before implementation",
+  "topics": [
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "f2928b8a75a40e59e94eb080726ab7736b4c88d91d82670614a01f451a41de47",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "branch-6dc14770cd5818cc",
+  "title": "chore/vercel-safe-build-guard-20261102",
+  "head": "f836e26f758edce57f19c5a4ee0bcb31d039a171",
+  "head_ref": "chore/vercel-safe-build-guard-20261102",
+  "linked_prs": [],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "画面・表示"
+  ],
+  "state": "PR未関連のブランチ差分",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "150a68e11772924c7350d267fb81db206c2158fee2912e15affd5aa6aef196a5",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}

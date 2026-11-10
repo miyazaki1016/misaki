@@ -1,0 +1,20 @@
+{
+  "id": "branch-05b52c58efea561d",
+  "title": "sora/fix-waiting-reply-layout",
+  "head": "f3a613291569a60e471065372135cbee07373702",
+  "head_ref": "sora/fix-waiting-reply-layout",
+  "linked_prs": [
+    41
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b37d67721b7de705af92a5220efe08fe94991ba38b1e448b8cf8c16dbbfbd963",
+  "collected_at": "2026-11-10T14:55:18.215712+00:00"
+}
