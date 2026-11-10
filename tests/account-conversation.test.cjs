@@ -241,6 +241,29 @@ test('API rejects foreign user and checkpoints verified temporary state', async 
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);
 });
 
+test('history load timing splits auth, history and request without exposing state', async () => {
+  // VM intentionally omits performance: the route must still work in the test runtime.
+  const h = harness();
+  const route = h.load('app/api/persona/history/route.ts');
+  const response = await route.POST(new Request('https://example.test/api/persona/history', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'load', temporaryState: 'verified' }),
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const serverTiming = response.headers.get('Server-Timing');
+  for (const name of ['auth', 'history', 'request']) {
+    const value = serverTiming.match(new RegExp(name + ';dur=([0-9.]+)'));
+    assert.ok(value, name + ' timing missing: ' + serverTiming);
+    assert.ok(Number.isFinite(Number(value[1])) && Number(value[1]) >= 0);
+  }
+  assert.ok(!serverTiming.includes('verified'));
+  const data = await response.json();
+  assert.deepEqual(data.memory, ['remember']);
+  assert.equal(data.temporaryState, 'verified');
+});
+
 test('modified display cache is never uploaded as canonical history or memory', async () => {
   const h = harness({ id: 'a', is_anonymous: false });
   let posts = 0;

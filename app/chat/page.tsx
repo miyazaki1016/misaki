@@ -756,11 +756,25 @@ export default function ChatPage() {
     window.addEventListener("misaki-history-state", receiveHistory);
     window.addEventListener("misaki-usage-state", receiveUsage);
     async function load() {
+      // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
+      // Timings only: never log tokens, history, user IDs or temporary state.
+      const timingEnabled = sessionStorage.getItem("misaki-history-timing") === "1";
+      const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+      const startedAt = timingEnabled ? nowMs() : 0;
+      let previousAt = startedAt;
+      const timings: Record<string, number> = {};
+      const checkpoint = (name: string) => {
+        if (!timingEnabled) return;
+        const now = nowMs();
+        timings[name] = Math.round(now - previousAt);
+        previousAt = now;
+      };
       try {
         // A full remount ends the previous page's in-flight UI send marker.
         sessionStorage.removeItem("misaki-chat-sending");
         // Do not display unverified caches or persist an empty error-state over them.
         const accessToken = await getAccessToken();
+        checkpoint("accessTokenMs");
         const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);
         const response = await fetch("/api/persona/history", {
           method: "POST",
@@ -768,13 +782,25 @@ export default function ChatPage() {
           body: JSON.stringify({ action: "load", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
             pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null") }),
         });
+        checkpoint("historyApiMs");
+        if (timingEnabled) {
+          const serverTiming = response.headers.get("Server-Timing");
+          const duration = serverTiming?.match(/(?:^|,)\s*history;dur=([\d.]+)/)?.[1];
+          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));
+          const authDuration = serverTiming?.match(/(?:^|,)\s*auth;dur=([\d.]+)/)?.[1];
+          const requestDuration = serverTiming?.match(/(?:^|,)\s*request;dur=([\d.]+)/)?.[1];
+          if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration));
+          if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration));
+        }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
           if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);
           throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
         }
         const state = await response.json();
+        checkpoint("jsonParseMs");
         const { data: latest } = await supabase.auth.getSession();
+        checkpoint("sessionVerificationMs");
         if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;
         applyRoot(state);
         const pending = JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null");
@@ -786,6 +812,8 @@ export default function ChatPage() {
         if (active && Array.isArray(state.history)) setMessages(state.history);
         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
         if (active) { setRecoveryCode(null); setLoaded(true); }
+        checkpoint("stateEnqueueMs");
+        if (timingEnabled) console.info("[misaki-history-timing]", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
       }
