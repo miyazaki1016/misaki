@@ -216,4 +216,5 @@
 | #172 | docs(history): 着手前自動照合の実測と再利用判断を保存 | merged | `2f8ab3ed5c1c1c9a8de55a8514d17929eb5abcd2` | 2026-11-09T09:51:29Z |
 | #173 | docs: 日本語開発履歴の引継ぎを通常チャット・Actions経由に対応 | merged | `b02e1e9161c1b46eba111c261bdafc69f54acaa5` | 2026-11-10T02:50:11Z |
 | #175 | feat(history): Issueへ照合結果を返却し、引継ぎと検証・完成を分離 | merged | `ab90b75a222676fd3ede283bcf3dabcbc0532ee6` | 2026-11-10T05:03:42Z |
+| #178 | docs: 自動照合の合格確認まで案件調査を開始しない | merged | `814dd54d8352b99e1ae1e738108c8d00f68e4d33` | 2026-11-10T05:33:42Z |
 <!-- INVENTORY_FACTS_END -->
