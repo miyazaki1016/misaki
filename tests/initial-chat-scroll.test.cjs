@@ -112,3 +112,26 @@ test("unmount cancels a queued scroll", () => {
   h.flush();
   assert.equal(h.scrollingElement.scrollTop, 0);
 });
+
+
+test("touch movement suspends queued follow before Safari dispatches scroll", () => {
+  const h = setup();
+  h.showBubble();
+  h.flush();
+  // A mutation queues a frame while the reader is still at the bottom.
+  h.scrollingElement.scrollHeight += 200;
+  h.mutate();
+  // Safari may deliver touchmove before scrollTop changes or scroll fires.
+  h.gesture("touchstart", { touches: [{ clientY: 120 }] });
+  h.gesture("touchmove", { touches: [{ clientY: 150 }] });
+  h.flush();
+  assert.equal(h.scrollingElement.scrollTop, 1200);
+  // After actual scroll moves back to the bottom, following resumes.
+  h.scrollingElement.scrollTop = 1400;
+  h.gesture("scroll", {});
+  h.scrollingElement.scrollHeight += 200;
+  h.resize();
+  h.flush();
+  assert.equal(h.scrollingElement.scrollTop, 1600);
+  h.unmount();
+});
