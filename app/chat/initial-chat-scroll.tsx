@@ -66,7 +66,14 @@ export default function InitialChatScroll() {
       following = false;
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) userIntent();
+      if (["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "].includes(event.key)) {
+        userIntent();
+        // Safari may deliver keydown before scrollTop updates. Upward navigation
+        // must not be overridden by an already queued follow frame.
+        if (["ArrowUp", "PageUp", "Home"].includes(event.key) || (event.key === " " && event.shiftKey)) {
+          following = false;
+        }
+      }
     };
 
     const onScroll = () => {
