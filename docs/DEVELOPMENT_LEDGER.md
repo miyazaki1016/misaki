@@ -4,6 +4,57 @@
 
 **案件の状態・担当・次の一手を更新する場所はここ。** 状態を変える際は、確認日・PRやブランチ・該当ファイル・検証証拠を残す。main、本番、実機は別々に判定する。
 
+## 中断と再開のチェックポイント（正本）
+
+親目的は [Issue #102](https://github.com/miyazaki1016/misaki/issues/102)。既存の忘れ物棚卸しを再利用し、「エンジン総点検」自体を未完了のまま追跡する。[中断・復帰の手順](WORK_RESUME.md)に従う。自動生成物は候補表示であり、この正本の状態を書き換えない。
+
+初回確認：PR #66は忘却と再学習の実装・テストがある一方、原本では実モデル・本番受入が未完了。PR #100は匿名24時間記憶の設計資料。PR #101は記憶・自律性の監査・計画資料であり、すべて実装済みという証拠ではない。これらは今回再実験せず総点検の入口として再利用する。現在本番の動作は未確認。
+
+<!-- work-resume:v1
+{
+  "checkpoints": [
+    {
+      "issue": 102,
+      "goal": "エンジン総点検：埋もれた成果の所在・実装・本番利用と再開先を確認",
+      "status": "active",
+      "updated": "2026-11-11",
+      "pause_reason": "",
+      "blocked_by": [],
+      "next": "PR #66・#100・#101と既存エンジン台帳を起点に、現在mainの呼び出し元・有効化条件・未確認の受入条件を照合する。新しい不具合へ移る前に本記録へ中断位置と子Issueを残す。",
+      "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/issues/102",
+        "https://github.com/miyazaki1016/misaki/pull/66",
+        "https://github.com/miyazaki1016/misaki/pull/100",
+        "https://github.com/miyazaki1016/misaki/pull/101"
+      ],
+      "stages": {
+        "implementation": {
+          "status": "unconfirmed",
+          "evidence": []
+        },
+        "verification": {
+          "status": "unconfirmed",
+          "evidence": []
+        },
+        "main": {
+          "status": "unconfirmed",
+          "evidence": []
+        },
+        "production": {
+          "status": "unconfirmed",
+          "evidence": []
+        },
+        "device": {
+          "status": "unconfirmed",
+          "evidence": []
+        }
+      }
+    }
+  ]
+}
+-->
+
 ## 再開時に見る案件
 
 | 案件 | 確認すること | 根拠・入口 |
