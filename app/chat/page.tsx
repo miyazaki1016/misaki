@@ -205,6 +205,8 @@ function getFirstRpcRow<T>(
 }
 
 export default function ChatPage() {
+  const [historyDiagnostics, setHistoryDiagnostics] = useState<Record<string, number> | null>(null);
+  const [showHistoryDiagnostics, setShowHistoryDiagnostics] = useState(false);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [recoveryStarting, setRecoveryStarting] = useState(false);
   async function beginIndependentConversation() {
@@ -758,7 +760,9 @@ export default function ChatPage() {
     async function load() {
       // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
       // Timings only: never log tokens, history, user IDs or temporary state.
-      const timingEnabled = sessionStorage.getItem("misaki-history-timing") === "1";
+      const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? "");
+      const timingEnabled = urlDiagnostics || sessionStorage.getItem("misaki-history-timing") === "1";
+      if (active) setShowHistoryDiagnostics(urlDiagnostics);
       const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
       const startedAt = timingEnabled ? nowMs() : 0;
       let previousAt = startedAt;
@@ -813,7 +817,11 @@ export default function ChatPage() {
         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
         if (active) { setRecoveryCode(null); setLoaded(true); }
         checkpoint("stateEnqueueMs");
-        if (timingEnabled) console.info("[misaki-history-timing]", { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) });
+        if (timingEnabled) {
+          const summary = { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) };
+          console.info("[misaki-history-timing]", summary);
+          if (active && urlDiagnostics) setHistoryDiagnostics(summary);
+        }
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
       }
@@ -3077,6 +3085,16 @@ export default function ChatPage() {
           }
         }
       `}</style>
+      {showHistoryDiagnostics && (
+        <aside aria-label="履歴読み込み診断" style={{ position: "fixed", bottom: 12, left: 12, right: 12, zIndex: 9999, maxHeight: "45vh", overflow: "auto", padding: 14, borderRadius: 12, background: "#fff", color: "#333", boxShadow: "0 2px 16px #0004", fontSize: 12 }}>
+          <strong>履歴読み込み診断（ミリ秒）</strong>
+          <button type="button" onClick={() => setShowHistoryDiagnostics(false)} style={{ float: "right" }}>閉じる</button>
+          {historyDiagnostics ? Object.entries(historyDiagnostics).map(([name, ms]) => (
+            <div key={name}>{name}: {ms} ms</div>
+          )) : <div>計測中…</div>}
+          <small>数値のみ表示。会話内容・認証情報は表示しません。</small>
+        </aside>
+      )}
     </main>
   );
 }
