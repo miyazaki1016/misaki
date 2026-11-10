@@ -39,6 +39,7 @@
 | #88 | refactor: pure conversation history adapter (first shared engine seam) | experiment/shared-conversation-history-v1-20261015 |
 | #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | design/anonymous-per-item-24h-memory-20261030 |
 | #165 | docs: 美咲のバックアップ対象と安全な復元試験の設計 | docs/backup-restore-inventory-20261105 |
+| #182 | feat(history): iPhone履歴読み込みのDB段階別計測 (#181) | feat/history-stage-timing-20261111 |
 
 全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。
 既存案件ID・判断欄は変更しません。
