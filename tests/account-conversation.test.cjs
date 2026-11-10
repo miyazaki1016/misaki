@@ -254,7 +254,7 @@ test('history load timing splits auth, history and request without exposing stat
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
   const serverTiming = response.headers.get('Server-Timing');
   for (const name of ['auth', 'history', 'request']) {
-    const value = serverTiming.match(new RegExp('(?:^|,\\\\s*)' + name + ';dur=([\\\\d.]+)'));
+    const value = serverTiming.match(new RegExp(name + ';dur=([0-9.]+)'));
     assert.ok(value, name + ' timing missing: ' + serverTiming);
     assert.ok(Number.isFinite(Number(value[1])) && Number(value[1]) >= 0);
   }
