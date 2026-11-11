@@ -1,0 +1,15 @@
+{
+  "generated_at": "2026-11-11T07:44:26.645038+00:00",
+  "changes": [
+    {
+      "id": "pr-146",
+      "previous": "87b51260315ef05b696ea11ba9c190c9d06014fbfcf6aff6084b3740ccfa3e03",
+      "revision": "a61339c03302876cd0fa6647962870fbb53f74a3a6b32482b4641da00abf1466"
+    },
+    {
+      "id": "branch-0632d4cc74411c0e",
+      "previous": "d0317559e105e434996ce648b26b66618abf0551e72b59e022a7c0fde6d3adee",
+      "revision": "4fd825f1a8be11a398a234d92a0047b5639519ba2b2b68c6d5214ec88f18db65"
+    }
+  ]
+}
