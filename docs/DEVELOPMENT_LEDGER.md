@@ -20,7 +20,7 @@
       "updated": "2026-11-12",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "同台帳の2026-11-12総点検から再開。P0: 匿名root期限切れ12/12の削除経路とPR #66忘却範囲、感情v2の会話確定後CAS競合を隔離環境で検証。続いてBody Clock再送、人格進化、5軸・Identity、共通会話。最新main機能CIと実機は未確認。",
+      "next": "P0は #187 の情報単位期限と匿名root削除後の保持・起動契約、#188 の感情v2再開を優先。#189 は #66 の隔離Supabase・実モデル・実機受入へ。P1／P2は総点検の既存再開表から個別照合する。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
@@ -30,7 +30,9 @@
         "https://github.com/miyazaki1016/misaki/actions/runs/42867815350",
         "https://github.com/miyazaki1016/misaki/commit/be797f615546b675fe551a3f74f87229bb668b2a",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6775321357",
-        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6805959826"
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6805959826",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346",
+        "https://github.com/miyazaki1016/misaki/pull/190"
       ],
       "stages": {
         "implementation": {
@@ -53,6 +55,12 @@
           "status": "unconfirmed",
           "evidence": []
         }
+      },
+      "resumed": {
+        "by": "美咲エンジン総点検担当",
+        "at": "2026-11-12T17:21:37+09:00",
+        "from": "P0着手前照合から、忘却の現行main統合と期限切れrootの隔離実装を再開",
+        "evidence": "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
       }
     }
   ]
@@ -107,6 +115,21 @@
 1. **P0 匿名期限／忘却と感情v2**。匿名の物理保持境界と #66 の抑止範囲を確定し、感情v2は既存のCAS・復旧設計を起点に隔離DBで失敗を再現。日英で既存Issueを検索し、個別の修正追跡先は検索範囲では見つからなかったため親 #102 に記録する。忘却と匿名設計は既存PR #66/#100を再開先とする。[匿名・cron証拠](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6777213807) ／ [感情CAS証拠](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6775321357) ／ [感情復旧のテスト境界](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6776650717)
 2. **P1 Body Clock、人格進化、5軸とIdentity、記憶品質**。本文の再開順と受入条件を使い、最新SHA CI、DB、env、実機の証拠を個別に追記する。[既存DB集計](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6777002340) ／ [再送契約](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6805959826)
 3. **P2 共通会話、マルチキャラ、想い出・約束・日常**。#86–88、#79–80、#101を再利用。未検証が残るため親 #102 はOPEN。今回の変更は台帳とIssueの監査記録のみ。次の担当は上記のP0から開始し、作業範囲を変更する際は着手前照合を確認する。
+
+## 2026-11-12 P0一括開発の進捗・再開地点
+
+[親Issueの進捗記録](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346)。
+
+読み取り専用の旧照合 [42867815350](https://github.com/miyazaki1016/misaki/actions/runs/42867815350) は監査結果の再利用に使用。実装範囲は [#187](https://github.com/miyazaki1016/misaki/issues/187) [43180605768](https://github.com/miyazaki1016/misaki/actions/runs/43180605768)、[#188](https://github.com/miyazaki1016/misaki/issues/188) [43180663292](https://github.com/miyazaki1016/misaki/actions/runs/43180663292)、[#189](https://github.com/miyazaki1016/misaki/issues/189) [43180665532](https://github.com/miyazaki1016/misaki/actions/runs/43180665532) の各最新依頼・判断で確定公開・REVIEW_RECORDED・preflight成功を確認。
+
+| P0 | 実装・統合とブランチ | 隔離テスト・最新HEAD CI | 残課題・次の作業 |
+| --- | --- | --- | --- |
+| 忘却・再学習 | 既存 [Draft #66](https://github.com/miyazaki1016/misaki/pull/66) を現行mainと統合。匿名復旧回帰と運用資料を維持。 `work/forget-control-v1` / `b29e209b75ae714cedb6b5c7af9d33f3efed5686` | ローカル408件・型検査・ビルド成功。[統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43181660671)・[着手前CI](https://github.com/miyazaki1016/misaki/actions/runs/43181660728) 成功 | 受入手順に沿って隔離Supabase・実モデル・実画面・Body Clockを検証。 |
+| 期限切れ匿名データ | [Draft #190](https://github.com/miyazaki1016/misaki/pull/190) に失効済み暗号化rootのrevision照合付き単件削除と同一匿名IDの復活防止。 `work/anonymous-expired-root-purge` / `054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2` | PGliteと匿名復旧回帰成功。[統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43182149490)・[着手前CI](https://github.com/miyazaki1016/misaki/actions/runs/43182149617) 成功 | 移行順、運用起動・多重実行、別匿名IDへの復旧、receipt・メール保存済みデータ・バックアップ保持を隔離検証。 |
+| 情報単位24時間 | [Draft #100](https://github.com/miyazaki1016/misaki/pull/100) の設計を再利用。 `design/anonymous-per-item-24h-memory-20261030` / `1e48f266cf40b51220bf9197006d8b939fb00b9e` | 今回の機能変更・隔離テスト・機能CI未実施。[旧設計HEAD CI](https://github.com/miyazaki1016/misaki/actions/runs/40983679786) | 信頼できる作成時刻と既存時刻なし状態の方針を固定し、チャット・Body Clock・復元・登録への全境界に実装する。 |
+| 感情・行動v2 | [Draft #31](https://github.com/miyazaki1016/misaki/pull/31) の既存経路と設計を再利用。 `sora/relationship-time-v2-design` / `e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64` | mainの既存RPC契約テスト9件成功。新しい修正の隔離テスト・CI未実施。[旧設計HEAD CI](https://github.com/miyazaki1016/misaki/actions/runs/36121699019) | 会話確定と再生入力を同時保存し、順序・request IDによる冪等性・競合時の再計算を検証する。 |
+
+#66 と #190 の最新HEADをCI確認後に再取得し一致を確認。両HEADのローカル合成ツリーは競合なし・テスト410件成功。新しい実装のmain統合、本番反映、本番DB変更・削除、実機確認は未実施。P1・P2は今回の変更未着手。既存台帳の総点検表を引き継ぎ、P0の残工程に続いて個別照合する。機能完成0件。親 #102 はOPEN。
 
 ## 再開時に見る案件
 

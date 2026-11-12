@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-11-09",
+  "reviewed_at": "2026-11-12",
   "prs": {
     "1": {
       "summary": "匿名会話と記憶をメール確認前に同じユーザーへ保存する",
@@ -459,10 +459,12 @@
       ]
     },
     "66": {
-      "summary": "正本記憶の忘却と確認付き再学習を設計・実装する案",
-      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "summary": "忘却と確認付き再学習の既存実装を現行mainへ追随",
+      "conclusion": "Draftの最新HEADでローカル408テストとGitHub統合CIに成功。実モデル・隔離Supabase・実機・main・本番は未確認。",
       "evidence": [
-        "https://github.com/miyazaki1016/misaki/pull/66"
+        "https://github.com/miyazaki1016/misaki/pull/66",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43181660671",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
       ]
     },
     "67": {
@@ -1165,6 +1167,15 @@
         "https://github.com/miyazaki1016/emergencyalert/pull/164",
         "https://github.com/miyazaki1016/emergencyalert/actions/runs/42746003789",
         "https://github.com/miyazaki1016/emergencyalert/compare/7e61e6c7fc653735dcc327fa2e1ade34beb4dab1...56fe1fc85725c7f88931e5e77ed353a540a2e5eb"
+      ]
+    },
+    "190": {
+      "summary": "期限切れ匿名rootの単件削除と同一IDへの復活防止",
+      "conclusion": "Draftの最新HEADでPGlite・匿名復旧回帰とGitHub統合CIに成功。receipt・メール保存済みデータ・バックアップ・起動運用は未完了。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/190",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43182149490",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
       ]
     }
   }
