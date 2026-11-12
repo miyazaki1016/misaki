@@ -40,6 +40,7 @@ before(async()=>{
  await db.exec(read('supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql'));
  await db.exec(read('supabase/migrations/20261112082000_relationship_emotion_resume.sql'));
  await db.exec(read('supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql'));
+ await db.exec(read('supabase/migrations/20261112084000_relationship_emotion_recovery.sql'));
  await db.exec('grant usage on schema public,auth,misaki_operations to service_role,authenticated;grant select,insert,update on all tables in schema public to service_role;grant select on auth.users to service_role;grant usage,select on all sequences in schema public to service_role;');
 });
 after(async()=>{if(db)await db.close();});
@@ -174,6 +175,16 @@ test('canonical save invalidates the pre-generation CAS, but queued emotion safe
     "select apply_misaki_queued_emotion($1,$2,$3,$4,30,'NORMAL','','','','[]','[]') as result", [id,request,rev,primary])).rows[0].result;
   const eventCount = async event => (await db.query(
     'select count(*)::int as n from misaki_relationship_events where user_id=$1 and event_type=$2',[id,event])).rows[0].n;
+
+  const claim = async () => (await db.query('select * from claim_misaki_emotion_recovery()')).rows;
+  assert.equal((await db.query(`select has_function_privilege('authenticated',
+    'claim_misaki_emotion_recovery()', 'execute') as allowed`)).rows[0].allowed, false);
+  await db.exec('set local role service_role');
+  assert.deepEqual(await claim(), [{ user_id: id }]);
+  assert.deepEqual(await claim(), []); // A second scheduler must not claim this user's next turn.
+  await db.query("update misaki_emotion_turns set recovery_after = '-infinity' where request_id=$1", [first]);
+  assert.deepEqual(await claim(), [{ user_id: id }]); // The scheduler can retry without another chat.
+  await db.exec('reset role');
 
   assert.equal(await eventCount('chat_turn_completed'), 2);
   assert.equal(await eventCount('emotion_action_v2_after_chat'), 0);

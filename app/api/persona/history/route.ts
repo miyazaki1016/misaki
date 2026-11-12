@@ -1,4 +1,4 @@
-import { anonymousCheckpointState } from "../../../../supabase/functions/_shared/anonymous-memory-expiry";
+import { anonymousCheckpointState, anonymousInferenceState } from "../../../../supabase/functions/_shared/anonymous-memory-expiry";
 import { TemporaryStateUnavailableError, temporaryStateMessage } from "../../../../lib/temporary-state-error";
 import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
@@ -17,9 +17,10 @@ async function authenticate(request: Request) {
 }
 function responseState(state: RootState, ephemeral = false) {
   const history = state.history ?? [];
-  return { exists: true, history, memory: state.memory, relationshipPoints: state.relationshipPoints,
-    misakiTodayMemory: state.todayMemory, ephemeral, messageCount: history.length,
-    userMessageCount: history.filter((item: any) => item?.role === "user").length, memoryCount: state.memory.length, updatedAt: state.updatedAt ?? null };
+  const active = ephemeral ? anonymousInferenceState(state, Date.now()) : state;
+  return { exists: true, history, memory: active.memory, relationshipPoints: active.relationshipPoints,
+    misakiTodayMemory: active.todayMemory, ephemeral, messageCount: history.length,
+    userMessageCount: history.filter((item: any) => item?.role === "user").length, memoryCount: active.memory.length, updatedAt: state.updatedAt ?? null };
 }
 export async function GET(request: Request) {
   try {

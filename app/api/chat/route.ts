@@ -1819,7 +1819,7 @@ export async function POST(
       if (forgetVersion(latestRoot.forgetControls) !== (replay.forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
       after(() => resumeRelationshipProcessing(userData.user.id, true));
       const active = anonymousInferenceState(temporary.state, Date.now());
-      return Response.json(publicChatResult({ ...replay, memory: active.memory, misakiTodayMemory: active.todayMemory, temporaryState }));
+      return Response.json(publicChatResult({ ...replay, memory: active.memory, misakiTodayMemory: active.todayMemory, relationshipPoints: active.relationshipPoints, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);

@@ -194,7 +194,7 @@ function temporaryResponse(token: string, message: string) {
   if (!temporary?.result || temporary.result.originalMessage !== message) throw new Error("Temporary replay unavailable");
   const { originalMessage, ...result } = temporary.result;
   const active = anonymousInferenceState(temporary.state, Date.now());
-  return { ...result, memory: active.memory, misakiTodayMemory: active.todayMemory, temporaryState: token };
+  return { ...result, memory: active.memory, misakiTodayMemory: active.todayMemory, relationshipPoints: active.relationshipPoints, temporaryState: token };
 }
 
 export async function loadCompletedTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown) {

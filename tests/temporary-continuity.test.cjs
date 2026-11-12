@@ -205,6 +205,39 @@ test('anonymous memory expires per item across renewal, replacement auth ID and 
   const active = anonymousInferenceState(resumed, h.now());
   assert.deepEqual(Array.from(active.memory), ['newer fact']);
   assert.equal(active.relationshipPoints, 0);
+  const reconnect = await h.load('app/api/persona/history/route.ts').POST(
+    h.request({ action: 'load', temporaryState: second.temporaryState }));
+  assert.equal(reconnect.status, 200);
+  const view = await reconnect.json();
+  assert.deepEqual(view.memory, ['newer fact']);
+  assert.equal(view.memoryCount, 1);
+  assert.equal(view.relationshipPoints, 0);
+  assert.ok(view.history.some(item => item.text === '最初の情報'));
   await save(h, second.temporaryState);
   assert.deepEqual(Array.from(h.rootState.memory), ['newer fact']);
+});
+
+test('anonymous replay cannot return expired relationship points through either receipt path', async () => {
+  const h = harness({ anonymous: true });
+  const canonical = h.load('lib/canonical-state.ts');
+  const oldEvidence = h.now() - 23 * 3600000;
+  const parent = canonical.sealTemporaryState({
+    history: [], memory: [], todayMemory: { date: '', items: [] },
+    relationshipPoints: 40, relationshipEvidenceAt: oldEvidence,
+  }, 'previous-turn');
+  const api = h.load('app/api/chat/route.ts');
+  const requestId = require('node:crypto').randomUUID();
+  const message = '今日は晴れだね';
+  const send = temporaryState => api.POST(h.request({ message, requestId, temporaryState }));
+  const first = await send(parent);
+  assert.equal(first.status, 200);
+  const result = await first.json();
+  assert.ok(result.relationshipPoints > 0);
+  h.advanceClock(3600000);
+  for (const token of [parent, result.temporaryState]) {
+    const replay = await send(token);
+    assert.equal(replay.status, 200);
+    assert.equal((await replay.json()).relationshipPoints, 0);
+  }
+  assert.equal(h.consumed, 1);
 });

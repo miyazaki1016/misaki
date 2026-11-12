@@ -98,8 +98,8 @@ export function emotionTurnInput(context: RelationshipTimeContext | null, assess
   };
 }
 
-export async function resumeRelationshipEmotion(supabase: SupabaseClient, userId: string) {
-  for (let attempt = 0; attempt < 8; attempt++) {
+export async function resumeRelationshipEmotion(supabase: SupabaseClient, userId: string, maxAttempts = 8) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
     const { data: pending, error } = await supabase.from("misaki_emotion_turns")
       .select("request_id,input").eq("user_id", userId).not("input", "is", null)
       .order("event_id").limit(1).maybeSingle();
@@ -112,6 +112,8 @@ export async function resumeRelationshipEmotion(supabase: SupabaseClient, userId
     const { elapsedHours, intimacyLevel, assessment, patterns } = pending.input as ReturnType<typeof emotionTurnInput>;
     const result = await persistRelationshipEmotionFromSignals(supabase, false,
       { ...current, elapsedHours, intimacyLevel }, assessment, patterns, userId, pending.request_id);
-    if (!result.applied && !result.conflict) throw new Error("Emotion queue write deferred");
+    if (!result.applied && (!result.conflict || attempt === maxAttempts - 1)) {
+      throw new Error("Emotion queue write deferred");
+    }
   }
 }
