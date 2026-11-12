@@ -41,7 +41,7 @@ for (const scenario of qualityScenarios) {
   const captured: Partial<Record<"A"|"B",string>> = {};
   for (const variant of ["A","B"] as const) {
     if (count >= MAX_CALLS) throw new Error("Maximum Gemini call count reached");
-    const instruction = variants[variant] + '\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {"reply":"こんにちは"}。他のキーは任意です。';
+    const instruction = variants[variant] + '\n\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {"reply":"こんにちは"}。他のキーは任意です。';
     const inputChars = instruction.length + scenario.userText.length + scenarioHistory.reduce((n,h)=>n+h.text.length,0);
     // Conservative pre-call estimate; API billing can differ from this estimate.
     const reservedUsd = ((Math.ceil(inputChars / 2) * INPUT_USD_PER_MILLION) + MAX_OUTPUT_TOKENS * OUTPUT_USD_PER_MILLION) / 1_000_000;
