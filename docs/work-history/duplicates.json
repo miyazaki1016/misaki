@@ -216,9 +216,11 @@
     "branch-a5961576a6beffe1",
     "branch-b5de3976fb8764e4",
     "branch-b9ec7a2266a17fe2",
+    "branch-cf063db3d4301a2a",
     "branch-f2dba8e26e4c9402",
     "pr-131",
     "pr-182",
+    "pr-190",
     "pr-29",
     "pr-32",
     "pr-47",
@@ -1046,5 +1048,9 @@
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"
+  ],
+  "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql": [
+    "branch-cf063db3d4301a2a",
+    "pr-190"
   ]
 }

@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-12T06:52:19.052618+00:00
+更新 (UTC): 2026-11-12T08:19:17.286042+00:00
 
 ## 全案件
 
@@ -170,6 +170,7 @@
 | [codex/legacy-maintenance-drain](cases/branch-c9e11b1515cb305d.md) | 雨量・全国検知・記憶・会話・通知・配信・開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/event-driven-ledger-proposals-20261101](cases/branch-ca1310f5dea43c82.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41477941977](cases/branch-ce4aa0014fb13e1b.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [work/anonymous-expired-root-purge](cases/branch-cf063db3d4301a2a.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/ledger-rerun-branch-collision](cases/branch-cf3fed7f263eaf9b.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/relationship-analyzer-bounded-retry](cases/branch-d1691037dd1d0dbb.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/audit-overview-against-source](cases/branch-d1c7bd152670a9a9.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -303,6 +304,7 @@
 | [feat(history): 中断した親目的と再開候補を既存台帳で追跡する](cases/pr-183.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [feat(history): 作業の再開待ちと復帰記録を引き継ぎに表示する](cases/pr-186.md) | 開発管理・画面・表示：開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [P0 期限切れ匿名rootの安全な物理削除](cases/pr-190.md) | 認証・安全性：認証・アクセス制御に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [直近の実装・修正総覧を更新する](cases/pr-21.md) | その他の開発：直近の実装・修正総覧を更新する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -421,7 +423,7 @@
 - app/experiments/blind-quality-review/page.tsx：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/experiments/replay-self-check/page.tsx：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/page.tsx：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [pr-130](cases/pr-130.md), [pr-62](cases/pr-62.md), [pr-63](cases/pr-63.md)
-- lib/canonical-state.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-182](cases/pr-182.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-47](cases/pr-47.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md)
+- lib/canonical-state.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-cf063db3d4301a2a](cases/branch-cf063db3d4301a2a.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-182](cases/pr-182.md), [pr-190](cases/pr-190.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-47](cases/pr-47.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md)
 - lib/chat-recall.ts：[pr-29](cases/pr-29.md), [pr-45](cases/pr-45.md)
 - lib/context-ab-approved-replay.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - lib/context-ab-balanced.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
@@ -578,6 +580,7 @@
 - supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 - supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 - supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- supabase/migrations/20261112081000_purge_expired_anonymous_root.sql：[branch-cf063db3d4301a2a](cases/branch-cf063db3d4301a2a.md), [pr-190](cases/pr-190.md)
 
 ## 更新と制約
 
