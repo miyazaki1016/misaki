@@ -1186,6 +1186,16 @@
         "https://github.com/miyazaki1016/misaki/actions/runs/43183072388",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069"
       ]
+    },
+    "193": {
+      "summary": "既存P0 Draft統合、匿名個別記憶の固定期限と感情v2の安全な再開",
+      "conclusion": "ローカル415件と最新HEADのGitHub統合CI・照合CI成功。実Auth、実機・実モデル、別表現の再抽出、Body Clock実競合、本番は未確認。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/193",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43212257045",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43212257100",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795"
+      ]
     }
   }
 }

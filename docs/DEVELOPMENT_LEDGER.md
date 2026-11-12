@@ -20,7 +20,7 @@
       "updated": "2026-11-12",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "P0は #187 で #191 の匿名履歴期限に続き個別記憶メタデータ・登録移行を実装し、#190 の削除後保持・起動契約を検証する。#188 は隔離再現済みCASの順序付き再開を実装。#189 は #66 の隔離Supabase・実モデル・実機受入へ。P1／P2は総点検の既存再開表から個別照合する。",
+      "next": "P0統合Draft #193の実Supabase Auth・iPhone Safari・実モデル受入を隔離環境で確認し、別表現からの再抽出とBody Clockの実競合を検証する。mainマージと本番変更は個別承認。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
@@ -36,7 +36,9 @@
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6806161708",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6815091619",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069",
-        "https://github.com/miyazaki1016/misaki/pull/191"
+        "https://github.com/miyazaki1016/misaki/pull/191",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795",
+        "https://github.com/miyazaki1016/misaki/pull/193"
       ],
       "stages": {
         "implementation": {
@@ -62,9 +64,9 @@
       },
       "resumed": {
         "by": "美咲エンジン総点検担当",
-        "at": "2026-11-12T17:21:37+09:00",
-        "from": "P0着手前照合から、忘却の現行main統合と期限切れrootの隔離実装を再開",
-        "evidence": "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
+        "at": "2026-11-12T20:49:05+09:00",
+        "from": "既存Draft #66・#190・#191を統合し、P0の期限と感情再開を検証",
+        "evidence": "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795"
       }
     }
   ]
@@ -143,6 +145,18 @@
 - 今回の3Draftはmain未統合、本番未反映、実機未検証。親 #102 はOPEN。次の実装は #187 の情報単位記憶メタデータ、#188 の再開可能なCAS、#190の削除運用と保持範囲。P1・P2は既存の総点検結果から順次再開する。
 
 [親Issueの追加検証記録](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069)。
+
+## P0継続・統合準備（2026-11-12）
+
+[統合Draft #193](https://github.com/miyazaki1016/misaki/pull/193) `work/p0-engine-integration` / `3289311ffea5d453b6035f5687558dc755389448`。#66・#190・#191の既存HEADを祖先に保持し、mainへの実マージなしで競合を解消。着手前CLI照合はREVIEW_RECORDED（履歴版 f19aa9ca9b41be6385838bccb0f0d7c86a489864）。
+
+- #187 匿名の個別記憶と当日要約の固定期限を、チャット、匿名復元、Body Clock、登録前の保存とメール確認時に適用。失効・時刻不明の記憶を推論から除き、匿名表示用履歴は保持。旧い根拠に依存する匿名関係性スナップショットは保守的にリセット。23:59:59と24:00:00、複数記憶、Safari相当の匿名ID変更、確認遅延、既存登録記憶を隔離検証。
+- #188 既存の古いrevisionによる失敗再現を再利用。会話確定と感情の処理待ちを同じトランザクションにし、古い処理から最新revisionで適用。同一request IDの再試行と失敗後再開を検証。Body Clock競合は共有revisionへの割込みとして再現。回復の起点は次の会話成功または同じrequest IDの再送。
+- #189 既存忘却・再学習テスト、生活事実・要約、Body Clock、登録移行と関係性5軸・人格回帰を統合実行。ローカル最新ツリーは415件成功・0件失敗、型検査成功。
+- 過去の既存HEADとCIは直前記録を参照。統合HEADは [統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43212257045)、[照合CI](https://github.com/miyazaki1016/misaki/actions/runs/43212257100) が成功。CI確認後のHEADも一致。
+- 承認後の候補は #193 による一括統合。先に個別PRを別々にマージすると履歴・忘却経路の競合を再解消する必要がある。DBは既存忘却と匿名削除のmigration後に感情処理待ち・登録確認期限の順。旧Next/Edgeとの混在、実Supabase Auth・iPhone Safari・実モデル、別表現や別の新しい発言に転載された事実の期限・忘却、実Body Clock同時実行は未確認。本番変更・通知・有料Geminiテスト未実施。親 #102 はOPEN、P1は対象外。
+
+[親Issueの継続記録](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795)。
 
 ## 再開時に見る案件
 
