@@ -16,14 +16,14 @@ class ResumeTests(unittest.TestCase):
     def test_completed_child_only_proposes_resume(self):
         source = row()
         result = build([source], lambda n: dict(number=n, state='closed', state_reason='completed'))
-        self.assertEqual(result[0]['candidate'], '再開候補')
+        self.assertEqual(result[0]['candidate'], '再開待ち')
         self.assertEqual(result[0]['status'], 'paused')
         self.assertFalse(result[0]['auto_applied'])
         self.assertNotIn('children', source)
 
     def test_open_missing_failed_and_not_planned_never_resume(self):
         for issue in [dict(number=181, state='open'), {}, dict(number=181, state='closed', state_reason='not_planned'), dict(number=182, state='closed', state_reason='completed')]:
-            self.assertNotEqual(build([row()], lambda n: issue)[0]['candidate'], '再開候補')
+            self.assertNotEqual(build([row()], lambda n: issue)[0]['candidate'], '再開待ち')
         def fail(n):
             raise OSError('unavailable')
         self.assertEqual(build([row()], fail)[0]['candidate'], '要確認')
@@ -53,6 +53,32 @@ class ResumeTests(unittest.TestCase):
     def test_real_ledger_parses(self):
         data = checkpoints((Path(__file__).resolve().parents[1]/'docs/DEVELOPMENT_LEDGER.md').read_text())
         self.assertEqual(data[0]['issue'], 102)
+
+    def test_handoff_shows_recorded_resumption_and_next_action(self):
+        source = row(resumed={'by': '担当ソラ', 'at': '2026-11-12T14:00:21+09:00',
+                              'from': '匿名期限の確認', 'evidence': 'https://example.org/resume'})
+        source.update(status='active', blocked_by=[], pause_reason='')
+        rows = checkpoints('<!-- work-resume:v1\n' + json.dumps({'checkpoints': [source]}) + '\n-->')
+        result = build(rows, lambda n: {})
+        self.assertEqual(result[0]['candidate'], '再開記録あり')
+        output = render(result, 'owner/repo', 'now')
+        for value in ('担当ソラ', '匿名期限の確認', 'https://example.org/resume', source['next'], source['completion']):
+            self.assertIn(value, output)
+        source['status'] = 'paused'
+        source['pause_reason'] = '再中断'
+        with self.assertRaises(ValueError):
+            checkpoints('<!-- work-resume:v1\n' + json.dumps({'checkpoints': [source]}) + '\n-->')
+
+    def test_verification_head_change_and_missing_evidence(self):
+        source = row(stages={'verification': {'status': 'passed', 'pr': 66,
+                     'head_sha': 'a' * 40, 'evidence': ['https://example.org/old-ci']}})
+        for prs, expected in [({}, 'unconfirmed'), ({'66': {'head': 'a' * 40}}, 'matched'),
+                              ({'66': {'head': 'b' * 40}}, 'changed')]:
+            with self.subTest(expected=expected):
+                result = build([source], lambda n: {}, prs)
+                self.assertEqual(result[0]['verification_head']['status'], expected)
+                self.assertEqual(source['stages']['verification']['head_sha'], 'a' * 40)
+        self.assertIn('最新HEADのCIを再確認', render(result, 'owner/repo', 'now'))
 
 
 if __name__ == '__main__':

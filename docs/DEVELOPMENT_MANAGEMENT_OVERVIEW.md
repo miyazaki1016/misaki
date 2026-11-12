@@ -65,7 +65,7 @@ GitHub（美咲／アメふる）
 - [チャット表示・履歴読み込み改善：Draft PR #151](https://github.com/miyazaki1016/misaki/pull/151) — 未マージ。実機確認・実測は未完了。
 - [記憶・関係性のバックアップと復元：Issue #159](https://github.com/miyazaki1016/misaki/issues/159) — 調査中。既存バックアップの対象網羅性に課題あり。自動実行・復元成功は未確認。
 
-詳細な状態・次の一手は[美咲の開発台帳](DEVELOPMENT_LEDGER.md)を正本とします。
+詳細な状態・次の一手は[美咲の開発台帳](DEVELOPMENT_LEDGER.md)を正本とします。 中断からの復帰と次の担当への引き継ぎは[中断・復帰手順](WORK_RESUME.md)から確認できます。
 
 ## 判断・引き継ぎ・マージのルール
 
