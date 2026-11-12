@@ -20,7 +20,7 @@
       "updated": "2026-11-13",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "P0統合Draft #193はNO-GO。期限切れ事実の別表現の再保存を防ぎ、明示的な再学習と区別する回帰を追加。その後、実Supabase Auth、iPhone Safari相当、Body Clockの実競合、回収定期実行を隔離検証。",
+      "next": "P0統合Draft #193は条件付きGO。実Geminiの意味照合、隔離Supabase Auth、Body Clockの実競合、iPhone Safari/WebKit、回収定期実行を検証し、P0の統合判定を確定する。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
@@ -47,9 +47,9 @@
         },
         "verification": {
           "status": "unconfirmed",
-          "evidence": ["https://github.com/miyazaki1016/misaki/actions/runs/43323186421"],
+          "evidence": ["https://github.com/miyazaki1016/misaki/actions/runs/43332076768"],
           "pr": 193,
-          "head_sha": "5c77d9f09f63791635597b7e87da717f9a7e4255"
+          "head_sha": "51172011f7fac44950a6aa68494771ecdfe2bd76"
         },
         "main": {
           "status": "unconfirmed",
@@ -366,3 +366,15 @@
 - 本番は承認後にDBバックアップ・適用履歴確認・保守切替を行い、DB／Next／Body Clock Edgeの互換境界を協調させる。匿名期限・忘却のユーザー単位フラグはこの差分にない。感情回収は `MISAKI_EMOTION_RECOVERY_SECRET` と専用の定期POSTを設定した段階で有効化できる。定期実行は通知送信とは独立し、同時実行上限を設け、隔離環境で認証と再試行を確認してから設定する。
 - 有効化後は待ち件数、最古の未処理時刻、回収HTTP失敗とclaim件数、CAS競合・Auth確認エラー・Body Clock失敗を監視。待ち時間の増加や失敗の連続で回収を停止し、待ち入力と忘却制御を保持して原因を特定する。
 - 切り戻しはまず定期POSTと削除起動を止め、保守モードで書込みを止める。忘却・期限の保護を持つ互換Next/Edgeを使用し、旧バイナリだけを戻して忘却情報を参照させない。回収単体を戻す場合は待ち入力を保持し、依存する呼出しを止めたうえでclaim RPCと `recovery_after` の逆順解除を隔離確認。適用済みの忘却制御や失効マーカーを消さず、匿名登録で既に除外されたデータは自動復元しない。残りのDDL切り戻しは実Auth・実データ相当の互換試験が通るまで未承認。
+
+## 2026-11-13 P0再受入 — 匿名記憶の根拠追跡（親 #102、統合Draft #193）
+
+**条件付きGO。隔離環境で前回のNO-GO再現ケースを解消。実環境に近い受入条件を満たしてからマージ可否を確定する。** 出発点は `5c77d9f09f63791635597b7e87da717f9a7e4255`、416成功・0失敗。今回の依頼範囲でCLI照合REVIEW_RECORDED（履歴版 `f19aa9ca9b41be6385838bccb0f0d7c86a489864`）。#1の同一ID登録移行と#100の匿名24時間仕様を再利用し、#193の忘却・確認・再送・期限判定に追加した。
+
+- 匿名チャットの長期記憶・当日要約・生活事実の新規候補は、サーバーが記録した期限内のユーザー発言に対して一括で意味を照合する。照合に使う発言は、最新40行の忘却適用後の履歴と現在の発言。改変された履歴・モデルやBody Clockの発言・期限切れの発言は根拠から除く。引用とIDをサーバーで検査し、不一致・不明・照合不能の新規候補は保存しない。意味照合は新規候補がある匿名ターンに最大1回、8秒で打ち切る。
+- 匿名の暗号化状態に根拠ごとのrequest ID・出所・発言時刻・期限を保存し、記憶の有効期限は最も早い根拠期限までとする。既存の時刻付き記憶は元の期限を維持する。明示的忘却は既存の再提示・確認・肯定を通し、確認済み記憶にも元の発言と確認のIDを保持する。登録移行では既存の期限判定に合わせて時刻を引き継ぎ、登録済みアカウントの長期記憶契約を維持する。
+- 新規回帰4件で、鉄道への言い換え拒否と明示的な再提供、Body Clock生成文の根拠排除、複数根拠の期限、生活事実・要約と照合障害、忘却後の確認付き再学習、同一ID再送を検証。既存回帰で匿名ID変更・再接続・登録移行・登録済み記憶も再検証。前回のSQL・アプリ回帰と同じ隔離環境を使用した。表示用の既存履歴やBody Clockの生成自体は別の境界であり、今回の受入は新規記憶への保存を対象とする。
+- 感情v2の定期回収は専用スケジューラから `POST /api/cron/emotion-recovery` を呼び、`Authorization: Bearer <専用秘密値>` とサーバーの `MISAKI_EMOTION_RECOVERY_SECRET` を揃える。ローカルのビルド済みNextで未設定503・資格情報なし／不正401・正しい資格情報で回収経路に進むことを確認。DB資格情報を外した状態で実施したため、正しい資格情報のケースの応答は回収不可503。隔離SQL回帰でユーザー単位の最古1件、上限8件、競合claimの抑止、2分後の再取得、CASとrequest IDによる二重適用防止を確認。定期実行の間隔は隔離運用で決める。HTTP 503、failed件数、最古の未処理時間と待ち件数の増加を監視し、停止しても処理待ちは保持する。
+- 今回の追加DB migrationはない。P0全体の適用順・切り戻しは前回記録を継続し、隔離環境でNext・Body Clock Edge・Auth移行を組み合わせて確認する。実Geminiの意味照合精度、追加の応答時間・費用、実Supabase Auth、実Body Clock同時実行、iPhone Safari/WebKitは未確認。これらの受入と個別承認が統合の条件。本番定期実行の設定変更、mainマージ、本番デプロイ・DB変更・通知・有料Gemini実行は未実施。親 #102 はOPEN、P1未着手。
+
+[PR #193](https://github.com/miyazaki1016/misaki/pull/193) のHEAD [`51172011f7fac44950a6aa68494771ecdfe2bd76`](https://github.com/miyazaki1016/misaki/commit/51172011f7fac44950a6aa68494771ecdfe2bd76) をCI後に再確認。**420件成功・0失敗・0スキップ**、型検査・ビルド成功。[統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43332076768)・[照合CI](https://github.com/miyazaki1016/misaki/actions/runs/43332076745)・[昇格分類CI](https://github.com/miyazaki1016/misaki/actions/runs/43332076829)。main `58eaed8bf7ed8d08f5adda1a9824fec7a38ee7ca` との統合ツリーは #193 HEAD と一致。

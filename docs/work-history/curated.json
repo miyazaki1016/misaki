@@ -1189,14 +1189,16 @@
     },
     "193": {
       "summary": "P0統合の最終受入で匿名の再接続と感情v2回収を検証",
-      "conclusion": "ローカル415件と最新HEADのGitHub統合CI・照合CI成功。実Auth、実機・実モデル、別表現の再抽出、Body Clock実競合、本番は未確認。 416件成功、型検査・ビルド・統合CI成功。合成モデルが期限切れ事実を言い換えると新規記憶として保存されることを隔離再現。NO-GO。感情回収は専用定期POSTの設定が必要。",
+      "conclusion": "ローカル415件と最新HEADのGitHub統合CI・照合CI成功。実Auth、実機・実モデル、別表現の再抽出、Body Clock実競合、本番は未確認。 416件成功、型検査・ビルド・統合CI成功。合成モデルが期限切れ事実を言い換えると新規記憶として保存されることを隔離再現。NO-GO。感情回収は専用定期POSTの設定が必要。 2026-11-13再受入：有効なユーザー発言の出所と最短期限を保存。前回の言い換えを隔離回帰で拒否。420件成功、型検査・ビルド・照合CI成功。実環境受入を条件にGO。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/pull/193",
         "https://github.com/miyazaki1016/misaki/actions/runs/43212257045",
         "https://github.com/miyazaki1016/misaki/actions/runs/43212257100",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795",
         "https://github.com/miyazaki1016/misaki/commit/5c77d9f09f63791635597b7e87da717f9a7e4255",
-        "https://github.com/miyazaki1016/misaki/actions/runs/43323186421"
+        "https://github.com/miyazaki1016/misaki/actions/runs/43323186421",
+        "https://github.com/miyazaki1016/misaki/commit/51172011f7fac44950a6aa68494771ecdfe2bd76",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43332076768"
       ]
     }
   }
