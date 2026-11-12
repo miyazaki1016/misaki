@@ -1,0 +1,29 @@
+{
+  "id": "branch-7f356df67d09c22d",
+  "title": "fix/recall-history-grounding",
+  "head": "475410541b700562e0f535484cb3fd02d9f76b1a",
+  "head_ref": "fix/recall-history-grounding",
+  "linked_prs": [
+    8
+  ],
+  "files": [
+    {
+      "path": "app/api/chat-proxy/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/475410541b700562e0f535484cb3fd02d9f76b1a/app/api/chat-proxy/route.ts"
+    }
+  ],
+  "commits": "475410541b700562e0f535484cb3fd02d9f76b1a 記憶確認時に直近会話を回答根拠として再提示する",
+  "topics": [
+    "記憶・会話",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "c4a4de70171292f8dbbeb39410703f4a934429c3283766435b07057d4fb32049",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

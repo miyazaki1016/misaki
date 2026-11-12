@@ -1,0 +1,28 @@
+{
+  "id": "branch-48ad449fb30cd746",
+  "title": "fix/gemini-chat-timeout",
+  "head": "469578ea12663c594a32c62a05263b23e7190891",
+  "head_ref": "fix/gemini-chat-timeout",
+  "linked_prs": [
+    25
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    }
+  ],
+  "commits": "469578ea12663c594a32c62a05263b23e7190891 Simplify Unicode diagnostics for chat timeout\ndff0c2a09d847609cc21030b6d3db3e35c68901c Add timeout and diagnostics to Gemini chat fetch",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "f44f88d584c8ab1bc7106b417ca03a334d3a4d6b6b6615e583b6e7c38d4b2fef",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

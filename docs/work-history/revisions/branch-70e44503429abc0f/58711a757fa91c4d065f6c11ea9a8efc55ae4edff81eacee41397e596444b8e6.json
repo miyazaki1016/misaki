@@ -1,0 +1,79 @@
+{
+  "id": "branch-70e44503429abc0f",
+  "title": "fix/iphone-lounge-reply-context",
+  "head": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d",
+  "head_ref": "fix/iphone-lounge-reply-context",
+  "linked_prs": [
+    140
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/app/api/chat/route.ts"
+    },
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/conversation-turn-context.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/lib/conversation-turn-context.ts"
+    },
+    {
+      "path": "public/lab/transparent-lounge/lounge-bg.png",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/public/lab/transparent-lounge/lounge-bg.png"
+    },
+    {
+      "path": "public/lounge/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/public/lounge/index.html"
+    },
+    {
+      "path": "tests/conversation-turn-context.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/conversation-turn-context.test.ts"
+    },
+    {
+      "path": "tests/lounge-entry.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/0ba21aabc7c0abb0fd1e629400a3e2376577db8d/tests/lounge-entry.test.cjs"
+    }
+  ],
+  "commits": "0ba21aabc7c0abb0fd1e629400a3e2376577db8d Fix portrait lounge and ground user-initiated replies",
+  "topics": [
+    "記憶・会話",
+    "ラウンジ・画面",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "d6d551ee3060cc66e1427398ebc8e86af8349d590bee2bb374d46a5a31c53872",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

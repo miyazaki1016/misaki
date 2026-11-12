@@ -1,0 +1,20 @@
+{
+  "id": "branch-561d4f92479230e8",
+  "title": "sora/profile-aware-life-events",
+  "head": "610e50b6cd4d63ccdfcfd5aaf57516bb016468bb",
+  "head_ref": "sora/profile-aware-life-events",
+  "linked_prs": [
+    34
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "32c07b0ac57b1820ae5754510e100da8c59e279f9f457891a73dd299ca0ec4c9",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

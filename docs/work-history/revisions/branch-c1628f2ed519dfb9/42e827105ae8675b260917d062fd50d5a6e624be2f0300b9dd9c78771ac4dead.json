@@ -1,0 +1,36 @@
+{
+  "id": "branch-c1628f2ed519dfb9",
+  "title": "feat/lounge-opening-fullscreen-20261029",
+  "head": "47e97ab221c0a5325484f8af0a49d7f2da1b7843",
+  "head_ref": "feat/lounge-opening-fullscreen-20261029",
+  "linked_prs": [
+    90
+  ],
+  "files": [
+    {
+      "path": "docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/47e97ab221c0a5325484f8af0a49d7f2da1b7843/docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md"
+    },
+    {
+      "path": "public/lab/transparent-lounge/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/47e97ab221c0a5325484f8af0a49d7f2da1b7843/public/lab/transparent-lounge/index.html"
+    }
+  ],
+  "commits": "47e97ab221c0a5325484f8af0a49d7f2da1b7843 docs(lounge): record iPhone full-viewport opening behavior\n2e172966268d243d63a7c645cb1b3b4afdc34c66 feat(lounge): launch vertical opening in full-viewport non-resizable overlay on iPhone",
+  "topics": [
+    "ラウンジ・画面",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "764f9b813b3f5c766e1a525f56913ae694fb3f77f8096ebada90ee39457d2160",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

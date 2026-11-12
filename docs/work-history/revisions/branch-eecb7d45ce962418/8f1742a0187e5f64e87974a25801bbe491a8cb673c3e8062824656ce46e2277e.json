@@ -1,0 +1,49 @@
+{
+  "id": "branch-eecb7d45ce962418",
+  "title": "chore/vercel-build-policy-20261105",
+  "head": "9ef26156431126c48789016d18e501d56a37cc25",
+  "head_ref": "chore/vercel-build-policy-20261105",
+  "linked_prs": [
+    162
+  ],
+  "files": [
+    {
+      "path": "docs/VERCEL_BUILD_POLICY.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9ef26156431126c48789016d18e501d56a37cc25/docs/VERCEL_BUILD_POLICY.md"
+    },
+    {
+      "path": "scripts/vercel-build-guard.mjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9ef26156431126c48789016d18e501d56a37cc25/scripts/vercel-build-guard.mjs"
+    },
+    {
+      "path": "tests/vercel-build-guard.test.mjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9ef26156431126c48789016d18e501d56a37cc25/tests/vercel-build-guard.test.mjs"
+    },
+    {
+      "path": "vercel.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9ef26156431126c48789016d18e501d56a37cc25/vercel.json"
+    }
+  ],
+  "commits": "9ef26156431126c48789016d18e501d56a37cc25 ci: configure selective Vercel builds\nc31219290979c7140837ffa1d725e6f612521d79 ci: configure selective Vercel builds\n873156b4bb78b9e76b730f2bbde7501c36d0eaae ci: configure selective Vercel builds\nb72a1870a390bdec65073bad5832b86ba67379fb ci: configure selective Vercel builds",
+  "topics": [
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "d37b00a3545898b0c22b5e1ec2d0940f356f82c7b8ce22a1ec0a8576f9a78089",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

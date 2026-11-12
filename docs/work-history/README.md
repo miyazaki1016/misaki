@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-11T07:44:26.645038+00:00
+更新 (UTC): 2026-11-12T06:52:19.052618+00:00
 
 ## 全案件
 
@@ -43,12 +43,14 @@
 | [docs/inventory-delta-review-rule-20261101](cases/branch-2998075cfb7f66d5.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/preflight-autonomous-wait-20261110](cases/branch-2bbd01068ad41bd0.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [design/anonymous-per-item-24h-memory-20261030](cases/branch-2d46fd727138840e.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [docs/engine-audit-102-20261112](cases/branch-2d598b681827000d.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/solo-chat-entry-20261102](cases/branch-2db397ec82c28320.md) | 記憶・会話・ラウンジ・画面・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/relationship-analyzer-structured-output-hotfix](cases/branch-2eaeac14b9a0f1a9.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/inventory-case-review-priority](cases/branch-2f842ea0ac1d18a4.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/skip-unnecessary-vercel-builds](cases/branch-2fcb912568edd503.md) | 開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41320015496](cases/branch-305423a5cfb91a5d.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41471124602](cases/branch-33ee0ec275f67002.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [feat/confirm-work-resume-20261112](cases/branch-33f4a4f17ebfada9.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/history-sync-source-proof](cases/branch-341ed7b9d23957ad.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/production-source-of-truth-reconciliation](cases/branch-34299b2d46805486.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/inventory-index-review](cases/branch-35677a391b35c95c.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -123,6 +125,7 @@
 | [sora/drop-ungrounded-relationship-evidence](cases/branch-88e2b40f5b6d498e.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/gemini-unit-cost-telemetry](cases/branch-8c1c252f0c53fa36.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/remove-false-busy-wait](cases/branch-8f7424f62a838c0f.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [work/context-ab-quality-budget-guard-184](cases/branch-8fb3e7f76aab269c.md) | 記憶・会話・開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/test-case-reconciliation-20261101](cases/branch-9386e47050e9d8a9.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/lounges-autoload-assets-20261029](cases/branch-9489dbe22b83fa25.md) | ラウンジ・画面・開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/development-management-overview-20261105](cases/branch-960672b5dd3f4958.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -298,6 +301,7 @@
 | [feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル](cases/pr-180.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [feat(history): iPhone履歴読み込みのDB段階別計測 (#181)](cases/pr-182.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [feat(history): 中断した親目的と再開候補を既存台帳で追跡する](cases/pr-183.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [feat(history): 作業の再開待ちと復帰記録を引き継ぎに表示する](cases/pr-186.md) | 開発管理・画面・表示：開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット返答失敗時に回数を戻してエラーを表示する](cases/pr-19.md) | 記憶・会話・画面・表示：チャット返答失敗時に回数を戻してエラーを表示する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -396,12 +400,12 @@
 - app/account/page.tsx：[branch-3a1e2cf011e9082f](cases/branch-3a1e2cf011e9082f.md), [pr-1](cases/pr-1.md), [pr-131](cases/pr-131.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md)
 - app/api/body-clock/route.ts：[branch-1a583769a497875d](cases/branch-1a583769a497875d.md), [pr-23](cases/pr-23.md)
 - app/api/chat-proxy/route.ts：[branch-387e38e3f392a033](cases/branch-387e38e3f392a033.md), [branch-48dee2d1fc902874](cases/branch-48dee2d1fc902874.md), [branch-70d16bafe238aa7a](cases/branch-70d16bafe238aa7a.md), [branch-7ebc2377f6ae2086](cases/branch-7ebc2377f6ae2086.md), [branch-7f356df67d09c22d](cases/branch-7f356df67d09c22d.md), [branch-992ef09e7aa2e87b](cases/branch-992ef09e7aa2e87b.md), [branch-bc36378a11db8be8](cases/branch-bc36378a11db8be8.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [pr-10](cases/pr-10.md), [pr-29](cases/pr-29.md), [pr-3](cases/pr-3.md), [pr-30](cases/pr-30.md), [pr-5](cases/pr-5.md), [pr-6](cases/pr-6.md), [pr-7](cases/pr-7.md), [pr-8](cases/pr-8.md), [pr-9](cases/pr-9.md)
-- app/api/chat/route.ts：[branch-48ad449fb30cd746](cases/branch-48ad449fb30cd746.md), [branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [branch-7e7349e1c0857db1](cases/branch-7e7349e1c0857db1.md), [branch-80302ec778694c1b](cases/branch-80302ec778694c1b.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [branch-c8b5b69bea16cfe8](cases/branch-c8b5b69bea16cfe8.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [branch-e2b90b4f0cd4a282](cases/branch-e2b90b4f0cd4a282.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-140](cases/pr-140.md), [pr-19](cases/pr-19.md), [pr-20](cases/pr-20.md), [pr-25](cases/pr-25.md), [pr-26](cases/pr-26.md), [pr-27](cases/pr-27.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md), [pr-34](cases/pr-34.md), [pr-40](cases/pr-40.md), [pr-43](cases/pr-43.md), [pr-45](cases/pr-45.md), [pr-47](cases/pr-47.md), [pr-61](cases/pr-61.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md), [pr-78](cases/pr-78.md)
+- app/api/chat/route.ts：[branch-48ad449fb30cd746](cases/branch-48ad449fb30cd746.md), [branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [branch-7e7349e1c0857db1](cases/branch-7e7349e1c0857db1.md), [branch-80302ec778694c1b](cases/branch-80302ec778694c1b.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [branch-c8b5b69bea16cfe8](cases/branch-c8b5b69bea16cfe8.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [branch-e2b90b4f0cd4a282](cases/branch-e2b90b4f0cd4a282.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-140](cases/pr-140.md), [pr-19](cases/pr-19.md), [pr-20](cases/pr-20.md), [pr-25](cases/pr-25.md), [pr-26](cases/pr-26.md), [pr-27](cases/pr-27.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md), [pr-34](cases/pr-34.md), [pr-40](cases/pr-40.md), [pr-43](cases/pr-43.md), [pr-45](cases/pr-45.md), [pr-47](cases/pr-47.md), [pr-61](cases/pr-61.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md), [pr-78](cases/pr-78.md)
 - app/api/conversation-review/smoke/route.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - app/api/dev/relationship-naturalness/route.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
-- app/api/experiments/blind-quality/route.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- app/api/experiments/replay-ab/route.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- app/api/experiments/synthetic-quality-run/route.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- app/api/experiments/blind-quality/route.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- app/api/experiments/replay-ab/route.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- app/api/experiments/synthetic-quality-run/route.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/api/feedback/reply/route.ts：[pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md)
 - app/api/persona/evolution/analyze/route.ts：[branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-66](cases/pr-66.md)
 - app/api/persona/history/route.ts：[branch-3a1e2cf011e9082f](cases/branch-3a1e2cf011e9082f.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [branch-d4bd494d2ca8e9db](cases/branch-d4bd494d2ca8e9db.md), [pr-1](cases/pr-1.md), [pr-131](cases/pr-131.md), [pr-151](cases/pr-151.md), [pr-182](cases/pr-182.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-32](cases/pr-32.md), [pr-33](cases/pr-33.md), [pr-66](cases/pr-66.md)
@@ -414,27 +418,27 @@
 - app/chat/layout.tsx：[branch-3a1e2cf011e9082f](cases/branch-3a1e2cf011e9082f.md), [pr-1](cases/pr-1.md)
 - app/chat/page.tsx：[branch-1a583769a497875d](cases/branch-1a583769a497875d.md), [branch-637f3c0ed7eca805](cases/branch-637f3c0ed7eca805.md), [branch-7e7349e1c0857db1](cases/branch-7e7349e1c0857db1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [branch-d4bd494d2ca8e9db](cases/branch-d4bd494d2ca8e9db.md), [branch-e2b97d56bae63d53](cases/branch-e2b97d56bae63d53.md), [pr-11](cases/pr-11.md), [pr-131](cases/pr-131.md), [pr-151](cases/pr-151.md), [pr-180](cases/pr-180.md), [pr-182](cases/pr-182.md), [pr-19](cases/pr-19.md), [pr-23](cases/pr-23.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-32](cases/pr-32.md), [pr-40](cases/pr-40.md), [pr-42](cases/pr-42.md), [pr-44](cases/pr-44.md), [pr-66](cases/pr-66.md)
 - app/conversation-review/page.tsx：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
-- app/experiments/blind-quality-review/page.tsx：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- app/experiments/replay-self-check/page.tsx：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- app/experiments/blind-quality-review/page.tsx：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- app/experiments/replay-self-check/page.tsx：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/page.tsx：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [pr-130](cases/pr-130.md), [pr-62](cases/pr-62.md), [pr-63](cases/pr-63.md)
-- lib/canonical-state.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-182](cases/pr-182.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-47](cases/pr-47.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md)
+- lib/canonical-state.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-182](cases/pr-182.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-47](cases/pr-47.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md)
 - lib/chat-recall.ts：[pr-29](cases/pr-29.md), [pr-45](cases/pr-45.md)
-- lib/context-ab-approved-replay.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-balanced.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-blind-quality.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-gemini-adapter.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-long-fixture.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-offline-harness.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-prompt.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-quality-long-history.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-quality.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-replay-boundary.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-replay-preflight.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-replay-privacy.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-results.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-ab-reviewed-snapshot.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- lib/context-overlap-analysis.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md)
-- lib/context-size-measurement.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md)
+- lib/context-ab-approved-replay.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-balanced.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-blind-quality.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-gemini-adapter.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-long-fixture.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-offline-harness.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-prompt.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-quality-long-history.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-quality.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-replay-boundary.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-replay-preflight.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-replay-privacy.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-results.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-ab-reviewed-snapshot.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- lib/context-overlap-analysis.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md)
+- lib/context-size-measurement.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md)
 - lib/conversation-engine/amahuru-rain-context.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
 - lib/conversation-engine/attempt.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
 - lib/conversation-engine/base-prompt.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
@@ -470,21 +474,21 @@
 - lib/persona/persona-store.ts：[branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [pr-131](cases/pr-131.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-66](cases/pr-66.md)
 - lib/proactive-photo.ts：[branch-1a583769a497875d](cases/branch-1a583769a497875d.md), [branch-5e09e6de95bfa770](cases/branch-5e09e6de95bfa770.md), [pr-13](cases/pr-13.md), [pr-23](cases/pr-23.md)
 - lib/relationship-acting-guide-gradual-experiment.ts：[branch-a9c94bbd54224765](cases/branch-a9c94bbd54224765.md), [pr-85](cases/pr-85.md)
-- lib/relationship-acting-guide.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-45](cases/pr-45.md), [pr-47](cases/pr-47.md), [pr-67](cases/pr-67.md)
+- lib/relationship-acting-guide.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-45](cases/pr-45.md), [pr-47](cases/pr-47.md), [pr-67](cases/pr-67.md)
 - lib/relationship-action-reducer.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
-- lib/relationship-analyzer-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-48](cases/pr-48.md), [pr-50](cases/pr-50.md), [pr-51](cases/pr-51.md), [pr-52](cases/pr-52.md), [pr-53](cases/pr-53.md), [pr-54](cases/pr-54.md), [pr-55](cases/pr-55.md), [pr-56](cases/pr-56.md), [pr-57](cases/pr-57.md), [pr-61](cases/pr-61.md), [pr-65](cases/pr-65.md), [pr-67](cases/pr-67.md)
+- lib/relationship-analyzer-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-48](cases/pr-48.md), [pr-50](cases/pr-50.md), [pr-51](cases/pr-51.md), [pr-52](cases/pr-52.md), [pr-53](cases/pr-53.md), [pr-54](cases/pr-54.md), [pr-55](cases/pr-55.md), [pr-56](cases/pr-56.md), [pr-57](cases/pr-57.md), [pr-61](cases/pr-61.md), [pr-65](cases/pr-65.md), [pr-67](cases/pr-67.md)
 - lib/relationship-conversation-generator.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
 - lib/relationship-conversation-preview.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
 - lib/relationship-conversation-prompt.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
 - lib/relationship-emotion-reducer.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
 - lib/relationship-emotion-store.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
-- lib/relationship-engine-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-67](cases/pr-67.md)
-- lib/relationship-identity-resolver.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- lib/relationship-engine-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-67](cases/pr-67.md)
+- lib/relationship-identity-resolver.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 - lib/relationship-life-context.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
 - lib/relationship-naturalness-scenario.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
 - lib/relationship-patterns.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
 - lib/relationship-points.ts：[pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md)
-- lib/relationship-runtime-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-49](cases/pr-49.md), [pr-52](cases/pr-52.md), [pr-61](cases/pr-61.md), [pr-64](cases/pr-64.md), [pr-67](cases/pr-67.md)
+- lib/relationship-runtime-v1.ts：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-47](cases/pr-47.md), [pr-49](cases/pr-49.md), [pr-52](cases/pr-52.md), [pr-61](cases/pr-61.md), [pr-64](cases/pr-64.md), [pr-67](cases/pr-67.md)
 - lib/relationship-signal.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
 - lib/relationship-time.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
 - lib/relationship-turn-expression.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-29](cases/pr-29.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md)
@@ -502,9 +506,9 @@
 - public/lounge/entry.js：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [pr-130](cases/pr-130.md)
 - public/lounge/index.html：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [pr-130](cases/pr-130.md), [pr-140](cases/pr-140.md)
 - scripts/check_approval_dashboard.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [branch-284e2dc6d0c96cbb](cases/branch-284e2dc6d0c96cbb.md), [branch-602fd94b750fc7fd](cases/branch-602fd94b750fc7fd.md), [branch-6a84c634aa234f1c](cases/branch-6a84c634aa234f1c.md), [branch-d727762241e2e4e1](cases/branch-d727762241e2e4e1.md), [branch-ea4df54e8d029f57](cases/branch-ea4df54e8d029f57.md), [pr-153](cases/pr-153.md), [pr-155](cases/pr-155.md), [pr-156](cases/pr-156.md), [pr-158](cases/pr-158.md), [pr-160](cases/pr-160.md), [pr-167](cases/pr-167.md)
-- scripts/context-ab-live.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- scripts/context-ab-quality-live.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- scripts/context-ab-smoke.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/context-ab-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/context-ab-quality-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/context-ab-smoke.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/development-preflight-publish.mjs：[branch-ffc3354680bad3ec](cases/branch-ffc3354680bad3ec.md), [pr-175](cases/pr-175.md)
 - scripts/development_branch_case_handoff.py：[branch-38e6283b99123cd5](cases/branch-38e6283b99123cd5.md), [pr-147](cases/pr-147.md)
 - scripts/development_branch_compare.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [branch-b23be022a75304ba](cases/branch-b23be022a75304ba.md), [branch-ed894c05ef854553](cases/branch-ed894c05ef854553.md), [pr-139](cases/pr-139.md), [pr-145](cases/pr-145.md), [pr-148](cases/pr-148.md)
@@ -516,15 +520,15 @@
 - scripts/development_inventory_delta.py：[branch-1601ee37d65ba186](cases/branch-1601ee37d65ba186.md), [branch-4fd3d1bdc2b892c1](cases/branch-4fd3d1bdc2b892c1.md), [branch-7ea3560ec516692d](cases/branch-7ea3560ec516692d.md), [branch-b30df8ff98a54148](cases/branch-b30df8ff98a54148.md), [branch-b34c306bc7fd0b72](cases/branch-b34c306bc7fd0b72.md), [branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d5f02538fc12def5](cases/branch-d5f02538fc12def5.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-116](cases/pr-116.md), [pr-118](cases/pr-118.md), [pr-119](cases/pr-119.md), [pr-120](cases/pr-120.md), [pr-121](cases/pr-121.md), [pr-122](cases/pr-122.md), [pr-123](cases/pr-123.md), [pr-132](cases/pr-132.md)
 - scripts/development_ledger_proposal.py：[branch-08e76fdd73cd4686](cases/branch-08e76fdd73cd4686.md), [branch-3ab6bf48d6ece55f](cases/branch-3ab6bf48d6ece55f.md), [branch-7b4c2cf2503a3179](cases/branch-7b4c2cf2503a3179.md), [branch-ac4d9f4766a37ec1](cases/branch-ac4d9f4766a37ec1.md), [pr-124](cases/pr-124.md), [pr-125](cases/pr-125.md), [pr-126](cases/pr-126.md), [pr-128](cases/pr-128.md)
 - scripts/development_preflight.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [pr-171](cases/pr-171.md)
-- scripts/development_resume.py：[branch-aa6ccfcaeac7df87](cases/branch-aa6ccfcaeac7df87.md), [pr-183](cases/pr-183.md)
+- scripts/development_resume.py：[branch-33f4a4f17ebfada9](cases/branch-33f4a4f17ebfada9.md), [branch-aa6ccfcaeac7df87](cases/branch-aa6ccfcaeac7df87.md), [pr-183](cases/pr-183.md), [pr-186](cases/pr-186.md)
 - scripts/development_work_history.py：[branch-d63cd059b3aaad0f](cases/branch-d63cd059b3aaad0f.md), [pr-166](cases/pr-166.md)
 - scripts/pr_approval_routing.py：[branch-7ae456f5639d43f4](cases/branch-7ae456f5639d43f4.md), [pr-137](cases/pr-137.md)
 - scripts/pr_promotion_policy.py：[branch-f70b38dbc740ec35](cases/branch-f70b38dbc740ec35.md), [pr-134](cases/pr-134.md)
 - scripts/pr_promotion_review.py：[branch-a448d35df12eb780](cases/branch-a448d35df12eb780.md), [pr-135](cases/pr-135.md)
 - scripts/pr_review_handoff.py：[branch-136d018fe1cd5ebc](cases/branch-136d018fe1cd5ebc.md), [pr-136](cases/pr-136.md)
 - scripts/run-conversation-smoke.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
-- scripts/run-live-synthetic-quality-eval.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- scripts/run-synthetic-quality-checks.ts：[branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/run-live-synthetic-quality-eval.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
+- scripts/run-synthetic-quality-checks.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/vercel-build-guard.mjs：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-eecb7d45ce962418](cases/branch-eecb7d45ce962418.md), [pr-162](cases/pr-162.md), [pr-171](cases/pr-171.md)
 - scripts/vercel_build_guard.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-2fcb912568edd503](cases/branch-2fcb912568edd503.md), [pr-138](cases/pr-138.md), [pr-171](cases/pr-171.md)
 - scripts/verify_ledger_proposal.py：[branch-7b4c2cf2503a3179](cases/branch-7b4c2cf2503a3179.md), [pr-128](cases/pr-128.md)
@@ -570,10 +574,10 @@
 - supabase/migrations/20260930131930_relationship_server_rpc_user_context.sql：[branch-155e832b29009650](cases/branch-155e832b29009650.md), [pr-82](cases/pr-82.md)
 - supabase/migrations/20261004045307_gemini_usage_telemetry.sql：[branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [pr-61](cases/pr-61.md)
 - supabase/migrations/20261006200002_forget_control_v1.sql：[branch-b5de3976fb8764e4](cases/branch-b5de3976fb8764e4.md), [pr-66](cases/pr-66.md)
-- supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
-- supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
-- supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
-- supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
+- supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 
 ## 更新と制約
 

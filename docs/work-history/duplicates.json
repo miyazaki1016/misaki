@@ -40,6 +40,7 @@
     "branch-7e7349e1c0857db1",
     "branch-80302ec778694c1b",
     "branch-8c1c252f0c53fa36",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-b5de3976fb8764e4",
     "branch-c1c09c8589ffaf5e",
@@ -77,14 +78,17 @@
     "pr-31"
   ],
   "app/api/experiments/blind-quality/route.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "app/api/experiments/replay-ab/route.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "app/api/experiments/synthetic-quality-run/route.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
@@ -191,10 +195,12 @@
     "pr-86"
   ],
   "app/experiments/blind-quality-review/page.tsx": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "app/experiments/replay-self-check/page.tsx": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
@@ -206,6 +212,7 @@
   ],
   "lib/canonical-state.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-b5de3976fb8764e4",
     "branch-b9ec7a2266a17fe2",
@@ -223,67 +230,83 @@
     "pr-45"
   ],
   "lib/context-ab-approved-replay.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-balanced.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-blind-quality.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-gemini-adapter.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-long-fixture.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-offline-harness.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-prompt.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-quality-long-history.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-quality.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-replay-boundary.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-replay-preflight.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-replay-privacy.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-results.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-ab-reviewed-snapshot.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "lib/context-overlap-analysis.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402"
   ],
   "lib/context-size-measurement.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402"
   ],
   "lib/conversation-engine/amahuru-rain-context.ts": [
@@ -439,6 +462,7 @@
   ],
   "lib/relationship-acting-guide.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-45",
@@ -454,6 +478,7 @@
   "lib/relationship-analyzer-v1.ts": [
     "branch-5b98ae5ac6b68600",
     "branch-8c1c252f0c53fa36",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-47",
@@ -496,6 +521,7 @@
   ],
   "lib/relationship-engine-v1.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-47",
@@ -503,6 +529,7 @@
   ],
   "lib/relationship-identity-resolver.ts": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"
@@ -530,6 +557,7 @@
   "lib/relationship-runtime-v1.ts": [
     "branch-5b98ae5ac6b68600",
     "branch-8c1c252f0c53fa36",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-47",
@@ -654,14 +682,17 @@
     "pr-167"
   ],
   "scripts/context-ab-live.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "scripts/context-ab-quality-live.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "scripts/context-ab-smoke.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
@@ -742,8 +773,10 @@
     "pr-171"
   ],
   "scripts/development_resume.py": [
+    "branch-33f4a4f17ebfada9",
     "branch-aa6ccfcaeac7df87",
-    "pr-183"
+    "pr-183",
+    "pr-186"
   ],
   "scripts/development_work_history.py": [
     "branch-d63cd059b3aaad0f",
@@ -770,10 +803,12 @@
     "pr-86"
   ],
   "scripts/run-live-synthetic-quality-eval.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
   "scripts/run-synthetic-quality-checks.ts": [
+    "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
   ],
@@ -986,24 +1021,28 @@
   ],
   "supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"
   ],
   "supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"
   ],
   "supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"
   ],
   "supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql": [
     "branch-5b98ae5ac6b68600",
+    "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
     "branch-f2dba8e26e4c9402",
     "pr-67"

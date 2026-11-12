@@ -1,0 +1,21 @@
+{
+  "id": "branch-2163060a0d173d3c",
+  "title": "sora/update-overview-relationship-v1-production",
+  "head": "4a59cbc7b163b199ffcf9f975a969cbc254cbfe2",
+  "head_ref": "sora/update-overview-relationship-v1-production",
+  "linked_prs": [
+    59,
+    58
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b02da2bc0bda99f427c4295ed04dfbe148069cf54adb1049d1f4f9bc85e0084c",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}

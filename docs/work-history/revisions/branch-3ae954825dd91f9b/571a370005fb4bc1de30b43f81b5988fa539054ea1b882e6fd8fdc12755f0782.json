@@ -1,0 +1,28 @@
+{
+  "id": "branch-3ae954825dd91f9b",
+  "title": "work/ab-manual-workflow-only",
+  "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+  "head_ref": "work/ab-manual-workflow-only",
+  "linked_prs": [
+    68
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd/.github/workflows/isolated-gemini-ab-manual.yml"
+    }
+  ],
+  "commits": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd ci: stage manual isolated Gemini A/B dispatcher only; no app code changes",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "1f4c54384ada3b6ca61b47aa86564490c78684bdcbd9642943d2bd7248159618",
+  "collected_at": "2026-11-12T06:52:19.052618+00:00"
+}
