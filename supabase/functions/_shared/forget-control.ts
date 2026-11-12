@@ -39,13 +39,19 @@ reoffer: input {targets,text}. Return {offers:[{targetIndex,fact,evidence}],ambi
 Only facts explicitly asserted in THIS text qualify. Questions, quotations, hypothetical statements, inferred
 relationships, names alone and forget requests do not qualify. evidence must be an exact substring of text.
 fact must itself be an exact substring of text; do not import a value from targets.
+memory_evidence: input {rows:[candidate text],sources:[{requestId,text}]}. Return
+{rows:[{index,supported,sources:[{requestId,quote}]}]} with one row per candidate in input order.
+Mark supported only when the supplied user assertions explicitly entail ALL claims, including subject,
+time and negation. Synonyms are allowed. Reject unrelated, ambiguous, hypothetical, quoted, question-only,
+assistant-derived, or superseded claims. For [life:v1] rows, verify the factual claim and its qualifiers.
+Use the minimum set of supporting source IDs; quote the explicit assertion from each exactly.
 Output only JSON with the specified keys.`;
 
 export function createForgetJudge(apiKey: string, fetcher: typeof fetch = fetch): SemanticJudge {
   return async (task, input) => {
     if (!apiKey) throw new Error("forget_resolver_unavailable");
     const response = await fetcher(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`, {
-      method: "POST", signal: AbortSignal.timeout(25_000), headers: { "Content-Type": "application/json" },
+      method: "POST", signal: AbortSignal.timeout(task === "memory_evidence" ? 8_000 : 25_000), headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ systemInstruction: { parts: [{ text: POLICY }] },
         contents: [{ role: "user", parts: [{ text: JSON.stringify({ task, input }) }] }],
         generationConfig: { temperature: 0, responseMimeType: "application/json" } }),

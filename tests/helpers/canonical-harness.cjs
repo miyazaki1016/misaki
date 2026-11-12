@@ -11,6 +11,10 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   const completed = new Map(), temporaryReceipts = new Map(), temporaryRoots = new Map(), calls = [], prompts = [], geminiCalls = [];
   let checkpoint = false, revision = 0;
   let openaiPayload = null;
+  let memoryEvidenceJudge = (input) => ({ rows: input.rows.map((text, index) => {
+    const source = input.sources.find(row => row.text === text);
+    return { index, supported: !!source, sources: source ? [{ requestId: source.requestId, quote: text }] : [] };
+  }) });
   let maintenance = false; const forgetPayloads = new Map(); let semanticJudge = null;
   const client = {
     auth: { getUser: async () => ({ data: { user }, error: null }) },
@@ -116,6 +120,10 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         const payload = JSON.parse(options.body);
         let task; try { task = JSON.parse(payload.contents?.[0]?.parts?.[0]?.text); } catch {}
         geminiCalls.push({ task: task?.task ?? 'reply', rows: task?.input?.rows?.length ?? null });
+        if (task?.task === 'memory_evidence') {
+          const result = await memoryEvidenceJudge(task.input);
+          return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(result) }] } }] });
+        }
         if (task?.task && !semanticJudge) {
           if (task.task === 'target') return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ ambiguous:false, targets:task.input.candidates.map((c,i)=>({subject:'user',predicate:'fixture',value:c.text,scope:'fact',evidenceIndex:i,evidence:c.text})) }) }] } }] });
           if (task.task === 'mask') return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ rows:task.input.rows.map((r,index)=>({index,uncertain:false,spans:task.input.targets.filter(t=>r.text===t.value).map(t=>t.value)})) }) }] } }] });
@@ -157,6 +165,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   }
   return { client, user, now: () => clock, forgetPayloads, geminiCalls, setSemanticJudge: value => { semanticJudge = value; }, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
+    setMemoryEvidenceJudge(value) { memoryEvidenceJudge = value; },
     setOpenaiPayload(value) { openaiPayload = value; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },
       body: JSON.stringify({ message: 'こんにちは', requestId: 'ab9289d2-80b2-458a-b989-cc0640ef0a1e', ...body }) }); },

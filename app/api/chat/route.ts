@@ -1,3 +1,4 @@
+import { anonymousUserSources, evidenceMetadata, verifyAnonymousMemory } from "../../../lib/anonymous-memory-evidence";
 import { advanceAnonymousMemory, anonymousInferenceState } from "../../../supabase/functions/_shared/anonymous-memory-expiry";
 import { USER_REPLY_CONTEXT } from "../../../lib/conversation-turn-context";
 import { after } from "next/server";
@@ -2837,9 +2838,34 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     };
     let completedResult: Record<string, unknown>;
     if (isAnonymous) {
+      const currentTurn = { role: "user", requestId: usageRequestId, sentAt: userMessageAt, text: message.slice(0, 2000) };
+      const evidenceNow = Date.now();
+      const rawSources = anonymousUserSources([...inferenceRoot.history, currentTurn], evidenceNow);
+      const sources = anonymousUserSources([...forgetView.history.slice(-40), currentTurn], evidenceNow);
+      for (const [id, source] of sources) {
+        if (rawSources.get(id)?.text !== source.text) sources.delete(id);
+      }
+      const candidates = [...new Set([
+        ...updatedMemory.filter(item => !forgetView.memory.includes(item)),
+        ...updatedTodayMemory.items.filter(item => !safeTodayMemory.items.includes(item)),
+      ])];
+      const evidence = await verifyAnonymousMemory(forgetTurn.reply ? [] : candidates, sources, forgetJudge);
+      // A confirmed reoffer already passed Forget Control. Keep the time of the
+      // original assertion, as well as the ID of the later confirmation.
+      if (forgetTurn.learned.length) {
+        const confirmation = rawSources.get(usageRequestId);
+        for (const control of inferenceRoot.forgetControls ?? []) {
+          const pending = control.pending;
+          if (!pending || !confirmation || !forgetTurn.learned.includes(pending.fact)) continue;
+          const source = rawSources.get(pending.sourceRequestId);
+          if (source?.text.includes(pending.fact)) {
+            evidence.set(pending.fact, [evidenceMetadata(source), evidenceMetadata(confirmation)]);
+          }
+        }
+      }
       const now = Date.now();
-      const memorySnapshot = advanceAnonymousMemory(updatedMemory, rootState.memory, rootState.memoryTimes, now);
-      const todaySnapshot = advanceAnonymousMemory(updatedTodayMemory.items, rootState.todayMemory.items, rootState.todayMemoryTimes, now);
+      const memorySnapshot = advanceAnonymousMemory(updatedMemory, forgetView.memory, rootState.memoryTimes, evidence, now);
+      const todaySnapshot = advanceAnonymousMemory(updatedTodayMemory.items, safeTodayMemory.items, rootState.todayMemoryTimes, evidence, now);
       const todayMemory = { ...updatedTodayMemory, items: todaySnapshot.items };
       completedResult = { ...generatedResult, memory: memorySnapshot.items, misakiTodayMemory: todayMemory, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };

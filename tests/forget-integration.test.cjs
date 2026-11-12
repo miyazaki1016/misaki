@@ -110,3 +110,35 @@ test('persona loader excludes old trait facts after forget and after release whi
   const prompt=await store.loadPersonaPrompt(client,h.user.id,'chat',null,c);assert.equal(prompt.source,'database');assert.ok(!prompt.text.includes('隆紀'));assert.ok(prompt.text.includes('猫が好き'));
  }
 });
+
+test('anonymous semantic paraphrase stays forgotten until explicit reoffer and confirmation', async () => {
+  const h = setup({ anonymous: true });
+  const paraphrase = '私の下のきょうだいは隆紀という名前';
+  h.setSemanticJudge(async (task, input) => {
+    const result = await judge(task, input);
+    if (task === 'mask' && input.targets.some(target => target.value === '隆紀')) {
+      input.rows.forEach((row, index) => {
+        if (row.text === paraphrase) result.rows[index].spans = [paraphrase];
+      });
+    }
+    return result;
+  });
+  const first = await remembered(h);
+  safePayload(h);
+  const gone = await turn(h, '隆紀のことは忘れて', first.body.temporaryState);
+  assert.equal(gone.response.status, 200);
+  h.setOpenaiPayload({ reply: 'うん', memory: [paraphrase], misakiTodayMemory: { items: [paraphrase] } });
+  const restated = await turn(h, 'おはよう', gone.body.temporaryState);
+  assert.equal(restated.response.status, 200);
+  assert.deepEqual(restated.body.memory, []);
+  assert.deepEqual(restated.body.misakiTodayMemory.items, []);
+  const offer = await turn(h, '弟の名前は隆紀だよ', restated.body.temporaryState);
+  assert.equal(offer.response.status, 200);
+  assert.match(offer.body.reply, /覚えてもいい/);
+  assert.deepEqual(offer.body.memory, []);
+  const yes = await turn(h, 'はい', offer.body.temporaryState);
+  assert.equal(yes.response.status, 200);
+  assert.deepEqual(yes.body.memory, ['弟の名前は隆紀だよ']);
+  const state = h.load('lib/canonical-state.ts').openTemporaryState(yes.body.temporaryState).state;
+  assert.deepEqual(Array.from(state.memoryTimes[0][2], source => source.requestId), [offer.requestId, yes.requestId]);
+});
