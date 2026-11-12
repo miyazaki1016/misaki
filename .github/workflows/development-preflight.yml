@@ -1,0 +1,106 @@
+name: Existing work preflight (read-only)
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: '新しい作業の内容を日本語で入力（機能名だけでなく目的・変更内容）'
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: work-preflight-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  cancel-in-progress: true
+jobs:
+  regression:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Offline matching, reuse decisions and incomplete-data tests
+        run: python3 -m unittest discover -s tests -p 'test_development_preflight.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Issue result publication, no-loop and stale-result tests (no API)
+        run: node --test tests/development-preflight-publish.nodecheck.mjs
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      # Always run the BASE implementation; PR contents and Issue text are data.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Check prior work before accepting a new task
+        env:
+          PREFLIGHT_TASK: ${{ inputs.task }}
+        run: |
+          if ! test -f scripts/development_preflight.py; then
+            echo 'Bootstrap PR: preflight becomes active after main integration. Regression job tests its implementation.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          if test "$GITHUB_EVENT_NAME" = workflow_dispatch; then
+            python3 scripts/development_preflight.py --task "$PREFLIGHT_TASK" --output preflight-output
+          else
+            python3 scripts/development_preflight.py --event "$GITHUB_EVENT_PATH" --output preflight-output
+          fi
+      - name: Show candidates, conclusions, evidence and missing review
+        if: always()
+        run: |
+          if test -f preflight-output/preflight.md; then
+            cat preflight-output/preflight.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: existing-work-preflight
+          path: preflight-output/
+          if-no-files-found: ignore
+          retention-days: 30
+
+  publish-issue-result:
+    needs: preflight
+    # Issue comments do not trigger this workflow. Never run write-capable code on a PR.
+    if: always() && github.event_name == 'issues' && !cancelled()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: existing-work-preflight
+          path: preflight-output
+      - name: Return the existing analysis and run ID to one managed Issue comment
+        uses: actions/github-script@v7
+        env:
+          PREFLIGHT_JOB_RESULT: ${{ needs.preflight.result }}
+        with:
+          script: |
+            const fs = require('node:fs');
+            const {pathToFileURL} = require('node:url');
+            try {
+              const {publishResult} = await import(pathToFileURL(process.env.GITHUB_WORKSPACE + '/scripts/development-preflight-publish.mjs').href);
+              let report = null, markdown = '';
+              try { report = JSON.parse(fs.readFileSync('preflight-output/preflight.json','utf8')); markdown = fs.readFileSync('preflight-output/preflight.md','utf8'); } catch {}
+              const result = await publishResult({github,context,report,markdown,jobResult:process.env.PREFLIGHT_JOB_RESULT,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT)});
+              core.info(JSON.stringify(result));
+              if (result.status === "INCOMPLETE") core.setFailed("Preflight result is incomplete; do not begin development.");
+            } catch (error) {
+              core.setFailed('Issue result publication failed; result is not confirmed. HTTP status: ' + (Number(error.status) || 'unavailable'));
+            }

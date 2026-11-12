@@ -1,4 +1,6 @@
 "use client";
+import { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from "../../lib/recovery-session";
+
 
 import { useLayoutEffect, useState, type ReactNode } from "react";
 import { supabase } from "../../lib/supabase";
@@ -19,8 +21,6 @@ export default function AnonymousSessionGuard({ children }: { children: ReactNod
 
     async function reconcileAuth() {
       try {
-        const hadBrowserSession = sessionStorage.getItem(BROWSER_SESSION_KEY) === "1";
-        const lastAuthKind = localStorage.getItem(AUTH_KIND_KEY);
         const deviceOwner = localStorage.getItem(DEVICE_USER_KEY);
         const pendingOwner = localStorage.getItem(EMAIL_SAVE_USER_KEY);
         const legacyCleanupDone = localStorage.getItem(LEGACY_OWNERLESS_CLEANUP_KEY) === "1";
@@ -40,9 +40,9 @@ export default function AnonymousSessionGuard({ children }: { children: ReactNod
           localStorage.setItem(LEGACY_OWNERLESS_CLEANUP_KEY, "1");
         }
 
-        // Supabase の匿名セッション自体は localStorage に残るため、
-        // ブラウザを閉じた後の新規セッションでは匿名認証も作り直す。
-        if (!user || (!hadBrowserSession && lastAuthKind === "anonymous" && user.is_anonymous && !pendingSave)) {
+        // 匿名セッションは同じ端末のブラウザに保持し、翌日も同じ user.id と会話履歴を引き継ぐ。
+        // セッションが失われた場合だけ新規匿名認証を行う。
+        if (!user) {
           clearMisakiDeviceData();
           if (user) {
             const { error: signOutError } = await supabase.auth.signOut({ scope: "local" });

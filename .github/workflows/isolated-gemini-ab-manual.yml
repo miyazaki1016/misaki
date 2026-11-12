@@ -1,0 +1,103 @@
+name: Isolated Gemini A/B (manual only)
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_billable_requests:
+        description: 'Type YES to authorize billable synthetic Gemini requests (quality: 8 calls; latency: 2 or 40)'
+        required: true
+        type: string
+      experiment:
+        description: 'Latency/token or four-scenario quality A/B'
+        required: true
+        type: choice
+        default: 'latency'
+        options:
+          - 'latency'
+          - 'quality'
+      fixture:
+        description: 'Synthetic fixture: short or long (approx. 12k chars + 60 history messages)'
+        required: true
+        type: choice
+        default: 'short'
+        options:
+          - 'short'
+          - 'long'
+      delay_ms:
+        description: 'Delay between Gemini requests in milliseconds (0 or 10000)'
+        required: true
+        type: choice
+        default: '10000'
+        options:
+          - '0'
+          - '10000'
+      quality_history:
+        description: 'Quality scenarios: short or 60-message synthetic history (quality mode only)'
+        required: true
+        type: choice
+        default: 'short'
+        options:
+          - 'short'
+          - 'long'
+      runs_per_variant:
+        description: 'Runs per variant: 1 (2 requests) or 20 (40 requests)'
+        required: true
+        type: choice
+        default: '1'
+        options:
+          - '1'
+          - '20'
+permissions:
+  contents: read
+jobs:
+  isolated-ab:
+    if: ${{ github.event.inputs.confirm_billable_requests == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout pinned experiment commit (not Production)
+        uses: actions/checkout@v4
+        with:
+          ref: 9a40d98c4ecec2f17eef1489a687acc1e24f338e
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts
+      - name: Run explicitly approved synthetic Gemini A/B requests
+        env:
+          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}
+          MISAKI_AB_LIVE: 'YES'
+          MISAKI_AB_MODEL: gemini-3.1-flash-lite
+          MISAKI_AB_RUNS: ${{ inputs.runs_per_variant }}
+          MISAKI_AB_FIXTURE: ${{ inputs.fixture }}
+          MISAKI_AB_DELAY_MS: ${{ inputs.delay_ms }}
+          MISAKI_AB_QUALITY_HISTORY: ${{ inputs.quality_history }}
+          MISAKI_AB_EXPORT_REVIEW: ${{ inputs.experiment == 'quality' && 'YES' || 'NO' }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo 'Secret missing; refusing live calls.'
+            exit 1
+          fi
+          if [ "${{ inputs.experiment }}" = "quality" ]; then
+            node --experimental-strip-types scripts/context-ab-quality-live.ts
+          else
+            node --experimental-strip-types scripts/context-ab-live.ts
+          fi
+      - name: Upload blinded synthetic replies for human review
+        if: ${{ success() && inputs.experiment == 'quality' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-blind-review
+          path: ab-review-output/blind-review.json
+          if-no-files-found: error
+          retention-days: 1
+      - name: Upload separate answer key
+        if: ${{ success() && inputs.experiment == 'quality' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-review-key
+          path: ab-review-output/blind-key.json
+          if-no-files-found: error
+          retention-days: 1

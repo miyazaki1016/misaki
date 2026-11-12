@@ -1,3 +1,4 @@
+import { TemporaryStateUnavailableError, temporaryStateMessage } from "../../../../lib/temporary-state-error";
 import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
 import { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot, forgetControlPayload } from "../../../../lib/canonical-state";
@@ -26,16 +27,20 @@ export async function GET(request: Request) {
     if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { "Cache-Control": "no-store" } });
     return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    console.error("CONVERSATION STATE READ FAILED", error);
+    console.error("CONVERSATION STATE READ FAILED", { code: "STATE_READ_FAILED" });
     return Response.json({ error: "Conversation state could not be loaded." }, { status: 500 });
   }
 }
 export async function POST(request: Request) {
+  // Monotonic timings only; never include identifiers or conversation contents.
+  const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+  const requestStartedAt = nowMs();
   // Anonymous "load" renews the root, so it is a write too.
   const maintenance = await maintenanceResponse();
   if (maintenance) return maintenance;
   try {
     const user = await authenticate(request);
+    const authenticatedAt = nowMs();
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json();
     if (body.saveAnonymous === true) {
@@ -59,30 +64,33 @@ export async function POST(request: Request) {
         p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),
       });
       if (error) {
-        console.error("EMAIL CHECKPOINT ERROR", {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-        });
+        console.error("EMAIL CHECKPOINT ERROR", { code: "STATE_COMMIT_FAILED" });
         throw new Error("Email checkpoint failed");
       }
       return Response.json({ synced: true, result: data });
     }
     if (body.action === "load") {
+      const loadStartedAt = nowMs();
+      const timedResponse = (payload: unknown) => Response.json(payload, {
+        headers: { "Cache-Control": "no-store", "Server-Timing": [
+          `auth;dur=${(authenticatedAt - requestStartedAt).toFixed(1)}`,
+          `history;dur=${(nowMs() - loadStartedAt).toFixed(1)}`,
+          `request;dur=${(nowMs() - requestStartedAt).toFixed(1)}`,
+        ].join(", ") },
+      });
       if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
         const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);
         if (replay) {
           const recovered = openTemporaryState(replay.temporaryState);
           if (recovered) {
             const latest = await loadTemporaryRoot(user.id, replay.temporaryState);
-            return Response.json({ ...responseState(latest, true),
+            return timedResponse({ ...responseState(latest, true),
               temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, "load") : sealTemporaryState(latest, "load"), recoveredTurn: true });
           }
         }
       }
       const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
-      return Response.json({ ...responseState(state, !!user.is_anonymous),
+      return timedResponse({ ...responseState(state, !!user.is_anonymous),
         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }
     if (!["deleteMemory", "clearMemory", "clearHistory"].includes(body.action) ||
@@ -115,7 +123,15 @@ export async function POST(request: Request) {
     if (error) throw new Error("Conversation edit failed");
     return Response.json(responseState(await loadCanonicalState(user.id)));
   } catch (error) {
-    console.error("CONVERSATION STATE WRITE FAILED", error);
+    if (error instanceof TemporaryStateUnavailableError) {
+      const status = error.reason === "expired" ? 410 : 409;
+      const code = error.reason === "expired" ? "TEMPORARY_STATE_EXPIRED" : "TEMPORARY_STATE_UNVERIFIABLE";
+      console.error("CONVERSATION STATE UNAVAILABLE", { code, status });
+      return Response.json({ code, error: temporaryStateMessage(status, { code }) },
+        { status, headers: { "Cache-Control": "no-store" } });
+    }
+    // Never log arbitrary exception payloads (may contain private data).
+    console.error("CONVERSATION STATE WRITE FAILED", { code: "STATE_OPERATION_FAILED" });
     return Response.json({ error: "Conversation state could not be saved." }, { status: 500 });
   }
 }

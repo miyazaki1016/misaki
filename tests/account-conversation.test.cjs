@@ -35,7 +35,7 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
     updateUser: async () => { calls.push('email'); return { error: null }; },
     onAuthStateChange: fn => { listeners.push(fn); return { data: { subscription: { unsubscribe() {} } } }; },
   }, rpc: async (name, args) => { calls.push({ name, args }); return { data: { saved: true }, error: null }; } };
-  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON,
+  const context = vm.createContext({ localStorage, sessionStorage, Response, Request, Date, JSON, navigator: {}, crypto: require("node:crypto").webcrypto, AbortSignal,
     CustomEvent: class { constructor(type, init) { this.type = type; this.detail = init?.detail; } },
     console: { error() {} }, fetch: (...args) => h.fetch(...args),
     window: { location: { origin: 'https://example.test', reload: () => calls.push('reload') },
@@ -52,6 +52,8 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name === 'react') return react;
       if (name === 'react/jsx-runtime') return { jsx: (type, props) => ({ type, props }), jsxs: (type, props) => ({ type, props }), Fragment: 'fragment' };
       if (name === '@supabase/supabase-js') return { createClient: () => client };
+      if (name.endsWith('/push-notifications')) return { registerPushSubscription: async () => {}, sendTestPushNotification: async () => {} };
+      if (name.endsWith('/maintenance-result')) return load('lib/maintenance-result.ts');
       if (name.endsWith('/maintenance')) return { maintenanceResponse: async () => null };
       if (name.endsWith('/supabase')) return { supabase: client };
       if (name.endsWith('/canonical-state')) return {
@@ -62,6 +64,8 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
           : { memory: [], history: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0 },
         sealTemporaryState: () => 'verified',
       };
+      if (name.endsWith('/temporary-state-error')) return load('lib/temporary-state-error.ts');
+      if (name.endsWith('/recovery-session')) return load('lib/recovery-session.ts');
       if (name.endsWith('/_shared/forget-control')) return {};
       if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');
       throw Error(name);
@@ -70,7 +74,7 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
     cache.set(file, module.exports);
     return module.exports;
   }
-  const h = { localStorage, sessionStorage, states, calls, client, load,
+  const h = { window: context.window, localStorage, sessionStorage, states, calls, client, load,
     fetch: async () => Response.json({ exists: true, history, memory: ['remember'] }),
     setUser: u => { currentUser = u; }, emit: (event, u) => listeners.forEach(fn => fn(event, u ? { user: u } : null)),
     render(file, props = {}) { cursor = 0; const tree = load(file).default(props); mounted = true; return tree; },
@@ -150,10 +154,18 @@ test('pending email save keeps the anonymous user when a fresh tab opens', async
   await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });
   assert.deepEqual(h.calls, []); assert.equal(h.localStorage.getItem(ownerKey), 'a');
 });
-test('ordinary expired anonymous browser session still clears all misaki caches', async () => {
-  const h = harness(undefined, { 'misaki-today-memory': 'old', unrelated: 'keep' });
+test('existing anonymous user survives a new browser session with history and identity', async () => {
+  const h = harness({ id: 'a', is_anonymous: true });
+  await h.mount('app/chat/anonymous-session-guard.tsx', { children: 'chat' });
+  assert.deepEqual(h.calls, []);
+  assert.equal(h.localStorage.getItem(ownerKey), 'a');
+  assert.deepEqual(JSON.parse(h.localStorage.getItem('misaki-chat-history')), history);
+  assert.equal(h.sessionStorage.getItem('misaki-browser-session'), '1');
+});
+test('missing anonymous auth session clears old caches and signs in anew', async () => {
+  const h = harness(null, { 'misaki-today-memory': 'old', unrelated: 'keep' });
   await h.mount('app/chat/anonymous-session-guard.tsx');
-  assert.deepEqual(h.calls, ['signOut', 'signIn']);
+  assert.deepEqual(h.calls, ['signIn']);
   assert.equal(h.localStorage.getItem('misaki-chat-history'), null);
   assert.equal(h.localStorage.getItem('misaki-today-memory'), null);
   assert.equal(h.localStorage.getItem('unrelated'), 'keep'); assert.equal(h.localStorage.getItem(ownerKey), 'new');
@@ -231,6 +243,29 @@ test('API rejects foreign user and checkpoints verified temporary state', async 
   assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: 'a', history, memory: [] }))).status, 409);
 });
 
+test('history load timing splits auth, history and request without exposing state', async () => {
+  // VM intentionally omits performance: the route must still work in the test runtime.
+  const h = harness();
+  const route = h.load('app/api/persona/history/route.ts');
+  const response = await route.POST(new Request('https://example.test/api/persona/history', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer token', 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'load', temporaryState: 'verified' }),
+  }));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('Cache-Control'), 'no-store');
+  const serverTiming = response.headers.get('Server-Timing');
+  for (const name of ['auth', 'history', 'request']) {
+    const value = serverTiming.match(new RegExp(name + ';dur=([0-9.]+)'));
+    assert.ok(value, name + ' timing missing: ' + serverTiming);
+    assert.ok(Number.isFinite(Number(value[1])) && Number(value[1]) >= 0);
+  }
+  assert.ok(!serverTiming.includes('verified'));
+  const data = await response.json();
+  assert.deepEqual(data.memory, ['remember']);
+  assert.equal(data.temporaryState, 'verified');
+});
+
 test('modified display cache is never uploaded as canonical history or memory', async () => {
   const h = harness({ id: 'a', is_anonymous: false });
   let posts = 0;
@@ -246,4 +281,55 @@ test('ongoing send blocks history polling and reload', async () => {
   await h.mount('app/chat/conversation-history-sync.tsx');
   assert.ok(!h.calls.includes('reload'));
   assert.equal(polls, 0);
+});
+
+function allElements(tree, predicate) {
+  if (!tree || typeof tree !== 'object') return [];
+  return [...(predicate(tree) ? [tree] : []), ...[tree.props?.children].flat(Infinity).flatMap(x => allElements(x, predicate))];
+}
+for (const [status, code, text] of [[410,'TEMPORARY_STATE_EXPIRED','有効期限'],[409,'TEMPORARY_STATE_UNVERIFIABLE','検証できません']]) {
+ test(`actual chat UI ${status}: shows reason, requires confirmation, preserves old cache and disables send`, async () => {
+  const h=harness();h.fetch=async url=>String(url).endsWith('/admission') ? Response.json({accepting:true}) : Response.json({code},{status});
+  h.window.location.assign=url=>h.calls.push({navigate:url});h.window.confirm=()=>false;
+  const before=h.localStorage.getItem('misaki-chat-history');
+  await h.mount('app/chat/page.tsx');let tree=h.render('app/chat/page.tsx');
+  const errors=allElements(tree,x=>x.props?.className==='sendError');assert.ok(errors.some(x=>x.props.children.includes(text)));
+  const input=allElements(tree,x=>x.type==='input'&&x.props.placeholder?.includes('美咲に'))[0];assert.equal(input.props.disabled,true);
+  let button=find(tree,'古い状態を残して、独立した新しい会話を始める');assert.ok(button);
+  await button.props.onClick();assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);
+  assert.equal(h.localStorage.getItem('misaki-chat-history'),before);
+  h.window.confirm=()=>true;await button.props.onClick();
+  assert.ok(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'));assert.deepEqual(h.calls.filter(x=>x.navigate),[{navigate:'/chat'}]);
+  assert.equal(h.localStorage.getItem('misaki-chat-history'),before);assert.ok(!h.calls.includes('signOut'));h.unmount();
+ });
+}
+test('actual chat UI: account changed to registered while error displayed cannot trigger anonymous recovery',async()=>{
+ const h=harness();h.fetch=async()=>Response.json({code:'TEMPORARY_STATE_EXPIRED'},{status:410});h.window.confirm=()=>true;
+ await h.mount('app/chat/page.tsx');h.setUser({id:'registered',is_anonymous:false});
+ await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
+ assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.ok(!h.calls.includes('signOut'));h.unmount();
+});
+test('actual chat UI: valid state enables chat without recovery button',async()=>{
+ const h=harness();h.fetch=async()=>Response.json({history, memory:[],relationshipPoints:0});await h.mount('app/chat/page.tsx');
+ const tree=h.render('app/chat/page.tsx');assert.equal(find(tree,'古い状態を残して、独立した新しい会話を始める'),null);
+ const input=allElements(tree,x=>x.type==='input'&&x.props.placeholder?.includes('美咲に'))[0];assert.equal(input.props.disabled,false);h.unmount();
+});
+
+for (const accepting of [false, null, 'network-failure']) test(`actual chat UI admission ${accepting}: keeps old data and does not navigate`,async()=>{
+ const h=harness();h.window.confirm=()=>true;h.window.location.assign=url=>h.calls.push({navigate:url});
+ h.fetch=async url=>{
+  if(!String(url).endsWith('/admission'))return Response.json({code:'TEMPORARY_STATE_UNVERIFIABLE'},{status:409});
+  if(accepting==='network-failure')throw Error('synthetic network failure');
+  return Response.json({accepting});
+ };
+ const oldLocal=h.localStorage.getItem('misaki-chat-history');
+ await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
+ assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.equal(h.localStorage.getItem('misaki-chat-history'),oldLocal);
+ assert.equal(h.calls.filter(x=>x.navigate).length,0);assert.ok(h.states.some(x=>typeof x==='string'&&x.includes('復旧受付を一時停止')));h.unmount();
+});
+test('account switch while waiting for admission cannot start an independent recovery',async()=>{
+ const h=harness();h.window.confirm=()=>true;
+ h.fetch=async url=>{if(String(url).endsWith('/admission')){h.setUser({id:'registered-other',is_anonymous:false});return Response.json({accepting:true})}return Response.json({code:'TEMPORARY_STATE_EXPIRED'},{status:410})};
+ await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
+ assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.ok(!h.calls.includes('signOut'));h.unmount();
 });

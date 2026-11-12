@@ -1,4 +1,8 @@
 "use client";
+import { conversationLocalStorage as localStorage, conversationSessionStorage as sessionStorage } from "../../lib/recovery-session";
+
+import { startIndependentRecovery, checkRecoveryAdmission } from "../../lib/recovery-session";
+import { temporaryStateMessage } from "../../lib/temporary-state-error";
 
 import { maintenanceMessage } from "../../lib/maintenance-result";
 
@@ -201,6 +205,35 @@ function getFirstRpcRow<T>(
 }
 
 export default function ChatPage() {
+  const [historyDiagnostics, setHistoryDiagnostics] = useState<Record<string, number> | null>(null);
+  const [showHistoryDiagnostics, setShowHistoryDiagnostics] = useState(false);
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
+  const [recoveryStarting, setRecoveryStarting] = useState(false);
+  async function beginIndependentConversation() {
+    if (recoveryStarting || !recoveryCode) return;
+    if (!window.confirm("古い状態を保全したまま、このタブで独立した新しい会話を始めます。古い会話や記憶は引き継ぎません。よろしいですか？")) return;
+    setRecoveryStarting(true);
+    try {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      if (!await checkRecoveryAdmission(fetch)) {
+        setRecoveryStarting(false);
+        setSendError("新しい会話の復旧受付を一時停止しています。既存の会話や保存情報は変更していません。");
+        return;
+      }
+      // Admission check is asynchronous; never carry an old user's decision across an account switch.
+      const { data: current, error: currentError } = await supabase.auth.getSession();
+      if (currentError || !current.session?.user.is_anonymous || current.session.user.id !== data.session?.user.id) {
+        throw new Error("Account changed during recovery admission");
+      }
+      startIndependentRecovery(current.session.user, recoveryCode, crypto.randomUUID());
+      window.location.assign('/chat'); // Full navigation creates the isolated client.
+    } catch {
+      setRecoveryStarting(false);
+      setSendError("新しい会話を開始できませんでした。既存データは変更していません。");
+    }
+  }
+
   const [
     message,
     setMessage,
@@ -725,13 +758,27 @@ export default function ChatPage() {
     window.addEventListener("misaki-history-state", receiveHistory);
     window.addEventListener("misaki-usage-state", receiveUsage);
     async function load() {
+      // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
+      // Timings only: never log tokens, history, user IDs or temporary state.
+      const urlDiagnostics = /(?:^|[?&])historyDiagnostics=1(?:&|$)/.test(window.location?.search ?? "");
+      const timingEnabled = urlDiagnostics || sessionStorage.getItem("misaki-history-timing") === "1";
+      if (active) setShowHistoryDiagnostics(urlDiagnostics);
+      const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
+      const startedAt = timingEnabled ? nowMs() : 0;
+      let previousAt = startedAt;
+      const timings: Record<string, number> = {};
+      const checkpoint = (name: string) => {
+        if (!timingEnabled) return;
+        const now = nowMs();
+        timings[name] = Math.round(now - previousAt);
+        previousAt = now;
+      };
       try {
         // A full remount ends the previous page's in-flight UI send marker.
         sessionStorage.removeItem("misaki-chat-sending");
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const cached = raw ? JSON.parse(raw) : [];
-        if (Array.isArray(cached)) setMessages(cached.slice(-MAX_MESSAGES));
+        // Do not display unverified caches or persist an empty error-state over them.
         const accessToken = await getAccessToken();
+        checkpoint("accessTokenMs");
         const expectedOwner = localStorage.getItem(DEVICE_USER_KEY);
         const response = await fetch("/api/persona/history", {
           method: "POST",
@@ -739,12 +786,25 @@ export default function ChatPage() {
           body: JSON.stringify({ action: "load", temporaryState: sessionStorage.getItem(TEMPORARY_STATE_KEY),
             pending: JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null") }),
         });
+        checkpoint("historyApiMs");
+        if (timingEnabled) {
+          const serverTiming = response.headers.get("Server-Timing");
+          const duration = serverTiming?.match(/(?:^|,)\s*history;dur=([\d.]+)/)?.[1];
+          if (duration) timings.historyServerLoadMs = Math.round(Number(duration));
+          const authDuration = serverTiming?.match(/(?:^|,)\s*auth;dur=([\d.]+)/)?.[1];
+          const requestDuration = serverTiming?.match(/(?:^|,)\s*request;dur=([\d.]+)/)?.[1];
+          if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration));
+          if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration));
+        }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
-          throw new Error(maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
+          if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);
+          throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
         }
         const state = await response.json();
+        checkpoint("jsonParseMs");
         const { data: latest } = await supabase.auth.getSession();
+        checkpoint("sessionVerificationMs");
         if (!active || latest.session?.user.id !== expectedOwner || localStorage.getItem(DEVICE_USER_KEY) !== expectedOwner) return;
         applyRoot(state);
         const pending = JSON.parse(sessionStorage.getItem("misaki-pending-chat-turn") || "null");
@@ -753,11 +813,18 @@ export default function ChatPage() {
         }
         if (typeof state.temporaryState === "string") sessionStorage.setItem(TEMPORARY_STATE_KEY, state.temporaryState);
         // Permanent history is canonical. Anonymous history remains a display cache.
-        if (active && Array.isArray(state.history) && (!state.ephemeral || state.recoveredTurn || cached.length === 0)) setMessages(state.history);
+        if (active && Array.isArray(state.history)) setMessages(state.history);
         for (const key of [MEMORY_KEY, RELATIONSHIP_KEY, MISAKI_TODAY_MEMORY_KEY]) localStorage.removeItem(key);
+        if (active) { setRecoveryCode(null); setLoaded(true); }
+        checkpoint("stateEnqueueMs");
+        if (timingEnabled) {
+          const summary = { ...timings, totalUntilStateEnqueueMs: Math.round(nowMs() - startedAt) };
+          console.info("[misaki-history-timing]", summary);
+          if (active && urlDiagnostics) setHistoryDiagnostics(summary);
+        }
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
-      } finally { if (active) setLoaded(true); }
+      }
     }
     void load();
     return () => {
@@ -1028,7 +1095,7 @@ export default function ChatPage() {
     });
     if (!response.ok) {
       const result = await response.json().catch(() => null);
-      throw new Error(maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
+      throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "保存できませんでした。もう一度お試しください。");
     }
     const state = await response.json();
     const { data: latest } = await supabase.auth.getSession();
@@ -2003,6 +2070,9 @@ export default function ChatPage() {
             {sendError}
           </div>
         )}
+        {recoveryCode && <button type="button" disabled={recoveryStarting} onClick={beginIndependentConversation}>
+          古い状態を残して、独立した新しい会話を始める
+        </button>}
       </section>
 
       {/* =========================
@@ -3015,6 +3085,16 @@ export default function ChatPage() {
           }
         }
       `}</style>
+      {showHistoryDiagnostics && (
+        <aside aria-label="履歴読み込み診断" style={{ position: "fixed", bottom: 12, left: 12, right: 12, zIndex: 9999, maxHeight: "45vh", overflow: "auto", padding: 14, borderRadius: 12, background: "#fff", color: "#333", boxShadow: "0 2px 16px #0004", fontSize: 12 }}>
+          <strong>履歴読み込み診断（ミリ秒）</strong>
+          <button type="button" onClick={() => setShowHistoryDiagnostics(false)} style={{ float: "right" }}>閉じる</button>
+          {historyDiagnostics ? Object.entries(historyDiagnostics).map(([name, ms]) => (
+            <div key={name}>{name}: {ms} ms</div>
+          )) : <div>計測中…</div>}
+          <small>数値のみ表示。会話内容・認証情報は表示しません。</small>
+        </aside>
+      )}
     </main>
   );
 }

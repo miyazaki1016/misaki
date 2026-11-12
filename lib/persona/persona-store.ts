@@ -224,7 +224,7 @@ function createRelationshipContinuityGuide(
   } catch (error) {
     console.error(
       "RELATIONSHIP CONTINUITY GUIDE FALLBACK:",
-      error
+      "PERSONA_CONTEXT_UNAVAILABLE"
     );
 
     return "";
@@ -298,7 +298,7 @@ export async function loadPersonaPrompt(
   } catch (error) {
     console.error(
       "PERSONA DB FALLBACK:",
-      error
+      "PERSONA_CONTEXT_UNAVAILABLE"
     );
 
     return {

@@ -1,0 +1,357 @@
+{
+  "snapshot": "2026-11-04",
+  "source": "docs/approval-dashboard/OWNER_TRIAGE_20261104.md",
+  "note": "一次仕分け。GitHubのPR状態・実装・CI・本番は毎回再検証する。ここから別チャットは自動起動されない。",
+  "tasks": [
+    {
+      "repo": "misaki",
+      "number": 151,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "チャット初期スクロール",
+      "state": "Draft",
+      "reason": "開発担当：読み込み速度の計測・iPhone Safari検証が未完了",
+      "next": "計測と回帰、CIと実機を先に実施。オーナーに即時マージ判断を求めない"
+    },
+    {
+      "repo": "misaki",
+      "number": 146,
+      "role": "棚卸し担当ソラ",
+      "kind": "inventory",
+      "title": "台帳更新事実",
+      "state": "Open",
+      "reason": "管理作業：自動取得の事実欄",
+      "next": "既存台帳との矛盾、想定外変更、CI、重複を安全ゲートで照合。自動マージは未承認"
+    },
+    {
+      "repo": "misaki",
+      "number": 100,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "匿名24時間記憶設計",
+      "state": "Draft",
+      "reason": "開発担当：設計のみで本番適用なし",
+      "next": "既存記憶仕様・移行安全性照合"
+    },
+    {
+      "repo": "misaki",
+      "number": 88,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "共通会話エンジン純粋アダプタ",
+      "state": "Draft",
+      "reason": "開発担当：段階抽出・CI・並行設計 #87 と整合",
+      "next": "共通ルート・テスト採否を証拠で確認"
+    },
+    {
+      "repo": "misaki",
+      "number": 87,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "共通会話エンジン設計",
+      "state": "Draft",
+      "reason": "**将来の承認ゲートあり**：課金Gemini呼出しや本番投入にはオーナー承認必要。ただし現在は設計のみ",
+      "next": "具体的な実行計画・費用・品質検証が揃ったら判断依頼を起票"
+    },
+    {
+      "repo": "misaki",
+      "number": 86,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "会話ラボ",
+      "state": "Draft",
+      "reason": "開発担当：本番非接続の実験",
+      "next": "既存実装とテストの重複を照合"
+    },
+    {
+      "repo": "misaki",
+      "number": 85,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "Interpreter中間成長案",
+      "state": "Draft",
+      "reason": "開発担当：実Gemini A/B未実施、閾値は仮説",
+      "next": "比較データを整えるまで採否判断を保留"
+    },
+    {
+      "repo": "misaki",
+      "number": 84,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "5軸成長方針資料",
+      "state": "Draft",
+      "reason": "開発担当：既存の方針と記録の整合",
+      "next": "主張の重複を調整"
+    },
+    {
+      "repo": "misaki",
+      "number": 83,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "関係性指示比較テスト",
+      "state": "Draft",
+      "reason": "開発担当：観測テスト",
+      "next": "現行のテスト・動作と比較"
+    },
+    {
+      "repo": "misaki",
+      "number": 81,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "canonical DB監査",
+      "state": "Draft",
+      "reason": "開発担当：本番DB状態は未確認",
+      "next": "DB適用とソースの記録を分離"
+    },
+    {
+      "repo": "misaki",
+      "number": 80,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "マルチキャラRPC監査",
+      "state": "Draft",
+      "reason": "開発担当：別PR #79ブランチがbase",
+      "next": "#79と整合、ベース依存を確認"
+    },
+    {
+      "repo": "misaki",
+      "number": 79,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "マルチキャラデータスコープ",
+      "state": "Draft",
+      "reason": "開発担当：設計上の分離検討",
+      "next": "既存RPC・権限・DB正本を再照合"
+    },
+    {
+      "repo": "misaki",
+      "number": 78,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "会話再生テスト",
+      "state": "Draft",
+      "reason": "開発担当：別作業ブランチがbase",
+      "next": "依存元・統合必要性を確認"
+    },
+    {
+      "repo": "misaki",
+      "number": 67,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "Relationship Identity",
+      "state": "Draft",
+      "reason": "開発担当：記憶・migration・本番状態に関わる",
+      "next": "migrationと現行main・本番を別々に検証"
+    },
+    {
+      "repo": "misaki",
+      "number": 66,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "忘却制御",
+      "state": "Draft",
+      "reason": "開発担当：データ削除・記憶の安全性に関わる",
+      "next": "canonical transactionと回帰の証拠が先"
+    },
+    {
+      "repo": "misaki",
+      "number": 60,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "Relationship Engine設計資料",
+      "state": "Draft",
+      "reason": "開発担当：文書のみ、歴史的経緯",
+      "next": "総覧との重複を確認"
+    },
+    {
+      "repo": "misaki",
+      "number": 31,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "関係時間v2",
+      "state": "Draft",
+      "reason": "開発担当：関係・感情・永続化の実装",
+      "next": "本番コード・DB/移行との整合を確認"
+    },
+    {
+      "repo": "misaki",
+      "number": 30,
+      "role": "美咲担当ソラ",
+      "kind": "engineering",
+      "title": "maintenance/drain",
+      "state": "Draft",
+      "reason": "**技術的BLOCKED** とPR本文に明記",
+      "next": "旧接続の受付・COMMIT問題を修正するまでマージ禁止"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 155,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "JASPICメール移行",
+      "state": "Draft",
+      "reason": "**実メール送信禁止**。旧Windows版との互換検証中",
+      "next": "SMTP実送信・本番切替なしで互換・独立性を検証"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 147,
+      "role": "棚卸し担当ソラ",
+      "kind": "inventory",
+      "title": "台帳更新事実",
+      "state": "Open",
+      "reason": "管理作業：自動取得の事実欄",
+      "next": "重複・変更範囲・CIを照合。自動マージ未導入"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 109,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "大雨継続性研究",
+      "state": "Draft",
+      "reason": "開発担当：本番通知非接続、保存上限・CI等のゲートが残る",
+      "next": "研究データと容量・稼働安全を確認。通知条件変更はしない"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 98,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "通知答え合わせ設計",
+      "state": "Draft",
+      "reason": "開発担当：設計資料。後続に統合済み実装がある",
+      "next": "後続PRの成果と重複しないよう記録保全"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 97,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "外部AIレビュー公開総覧",
+      "state": "Draft",
+      "reason": "**プレビュー限定・本番公開禁止**",
+      "next": "公開範囲の検証が先"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 96,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "外部AIレビュー静的ページ",
+      "state": "Draft",
+      "reason": "**プレビュー限定・本番公開禁止**",
+      "next": "#97との重複・認証情報漏出の有無を確認"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 95,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "雨接近メッセージ設計",
+      "state": "Draft",
+      "reason": "開発担当：仕様と回帰条件、未実装",
+      "next": "最新の通知方針と整合"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 94,
+      "role": "棚卸し担当ソラ",
+      "kind": "inventory",
+      "title": "「降るよ」最優先の方針資料",
+      "state": "Open",
+      "reason": "管理作業：既にユーザー確定の方針の記録",
+      "next": "最新main総覧との重複と日付を検査してから文書統合可否を判定"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 93,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "Push重複防止監査",
+      "state": "Draft",
+      "reason": "開発担当：監査記録、本番変更なし",
+      "next": "#104/#105以降の対策と重複しないよう保全"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 88,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "通知見直し仕様",
+      "state": "Draft",
+      "reason": "開発担当：仕様記録、本番なし",
+      "next": "既存仕様と統合できるか確認"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 73,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "過去通知履歴の表示",
+      "state": "Draft",
+      "reason": "開発担当：既存RLS・画面の回帰確認",
+      "next": "最新履歴画面と差分比較"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 63,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "通知履歴・フィードバック",
+      "state": "Draft",
+      "reason": "**マージ禁止**とPR本文に明記。DB前提あり",
+      "next": "最新実装との差分、権限、DBゲートを先に検証"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 62,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "JMA stride2計測",
+      "state": "Draft",
+      "reason": "開発担当：研究・独立CI",
+      "next": "既存計測との重複チェック"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 61,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "LIVE JAPAN試作",
+      "state": "Draft",
+      "reason": "**将来のデザイン判断あり**。実データ未接続・実機プレビュー未検証",
+      "next": "実機表示と画面説明を先に用意し、採否を1問で提示"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 60,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "美咲連携API設計",
+      "state": "Draft",
+      "reason": "開発担当：read-only API契約案、未実装",
+      "next": "両リポジトリの契約を照合"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 59,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "全国大雨スキャン",
+      "state": "Open",
+      "reason": "**Production readiness: NO** とPR本文に明記。技術ゲート未完了",
+      "next": "読取/DB/cron/Push接続・マージを止めて継続調査"
+    },
+    {
+      "repo": "emergencyalert",
+      "number": 25,
+      "role": "アメふる担当ソラ",
+      "kind": "engineering",
+      "title": "JMA実況のCIスモーク",
+      "state": "Open",
+      "reason": "開発担当：CI追加。既存のCI仕様との重複の可能性",
+      "next": "現行CIと比較して必要性・安定性を判断"
+    }
+  ]
+}

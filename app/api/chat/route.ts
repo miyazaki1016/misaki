@@ -1,3 +1,4 @@
+import { USER_REPLY_CONTEXT } from "../../../lib/conversation-turn-context";
 import { after } from "next/server";
 import { createForgetJudge, prepareForgetTurn, forgetContext, maskForgetRows, forgetVersion } from "../../../supabase/functions/_shared/forget-control";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
@@ -240,7 +241,7 @@ async function consumeDailyMessageWithRetry(
 
     console.error(
       `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,
-      error
+      "OPERATION_FAILED"
     );
 
     const text =
@@ -305,7 +306,7 @@ async function refundDailyMessage(
   if (error) {
     console.error(
       "USAGE REFUND ERROR:",
-      error
+      "OPERATION_FAILED"
     );
     return null;
   }
@@ -496,7 +497,7 @@ async function getTokyoWeather():
   } catch (error) {
     console.error(
       "WEATHER FETCH ERROR:",
-      error
+      "OPERATION_FAILED"
     );
 
     return null;
@@ -1650,9 +1651,7 @@ export async function POST(
             startedAt,
           ok: false,
           error:
-            error instanceof Error
-              ? error.message
-              : String(error),
+            "STAGE_FAILED",
         }
       );
 
@@ -1801,6 +1800,9 @@ export async function POST(
     const isAnonymous = userData.user.is_anonymous === true;
     const relationshipSupabase = isAnonymous ? null : createServerSupabase();
     const userMessageAt = new Date().toISOString();
+    // Validate the canonical anonymous root before serving any old replay token/receipt.
+    // Expired or unverifiable roots must never revive through a replay fast path.
+    const anonymousRoot = isAnonymous ? await loadTemporaryRoot(userData.user.id, temporaryState) : null;
     const temporary = isAnonymous ? openTemporaryState(temporaryState) : null;
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
@@ -1828,7 +1830,7 @@ export async function POST(
       }
     }
     const rootState = isAnonymous
-      ? await loadTemporaryRoot(userData.user.id, temporaryState)
+      ? anonymousRoot!
       : await loadCanonicalState(userData.user.id);
     const forgetJudge = createForgetJudge(process.env.GEMINI_API_KEY!);
     const forgetTurn = await prepareForgetTurn(rootState, message, usageRequestId, userMessageAt,
@@ -2268,6 +2270,8 @@ export async function POST(
 
     const baseSystemPrompt = `
 ${personaPrompt}
+
+${USER_REPLY_CONTEXT}
 ${forgetTurn.controls.length ? "【忘却した情報の扱い】過去に忘れてほしいと言われた情報を、履歴や推測から作り直さないでください。再記憶は本人への確認と肯定が成立した今回の情報だけに基づきます。知らない名前や事実を補完せず、制御の内部情報を会話に出さないでください。" : ""}
 
 ${relationshipGuide}
@@ -2501,7 +2505,7 @@ ${retryProblems
             attempt,
             status: result.status,
             elapsedMs,
-            data: result.data,
+            code: "MODEL_RESPONSE_FAILED",
           });
           return null;
         }
@@ -2529,7 +2533,7 @@ ${retryProblems
           traceId,
           attempt,
           elapsedMs,
-          error,
+          code: "MODEL_TRANSPORT_FAILED",
         });
         throw error;
       }
@@ -2613,7 +2617,7 @@ ${retryProblems
     ) {
       console.log(
         "MISAKI REPLY RETRY:",
-        firstProblems
+        { count: firstProblems.length }
       );
 
       const retryParsed =
@@ -2695,8 +2699,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     ) {
       console.warn(
         "MISAKI FINAL REPLY PROBLEMS:",
-        finalProblems,
-        reply
+        { count: finalProblems.length }
       );
     }
 
@@ -2904,7 +2907,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
         elapsedMs:
           Date.now() -
           requestStartedAt,
-        error,
+        code: "CHAT_FAILED",
       }
     );
 

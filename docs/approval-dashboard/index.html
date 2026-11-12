@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://api.github.com; img-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'">
+<title>開発承認ボード | 美咲・アメふる</title>
+<style>
+:root{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:#e8ebf6;background:#0c1220;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0;line-height:1.6}main{max-width:1040px;margin:auto;padding:24px 16px 72px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}h1{font-size:clamp(1.55rem,4vw,2.25rem);margin:0}h2{font-size:1.12rem}p{margin:.4em 0}small,.muted{color:#aab5cb}.badge{display:inline-block;border-radius:30px;padding:4px 10px;font-size:.77rem;font-weight:700;background:#263551;color:#e6ecfa}
+.hero{background:linear-gradient(125deg,#1e2c4a,#12263a);border:1px solid #344765;border-radius:18px;margin:20px 0;padding:20px}
+.counter{font-size:2.6rem;line-height:1.1;font-weight:800;color:#fff}.panels{display:flex;gap:12px;flex-wrap:wrap}.panel{flex:1;min-width:160px;padding:16px;background:#161f33;border:1px solid #2b3b56;border-radius:14px}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin:20px 0}.controls button,.controls select{border:1px solid #526080;border-radius:10px;background:#1b2841;color:#fff;padding:11px 13px;font-size:1rem;cursor:pointer}.controls button:focus-visible,.controls select:focus-visible,a:focus-visible{outline:3px solid #8cd0fa;outline-offset:3px}.controls button.active{background:#375d8e}
+#items{display:grid;gap:13px}.card{background:#151f31;border:1px solid #334259;border-radius:15px;padding:17px}.card h3{font-size:1.04rem;margin:.35em 0;overflow-wrap:anywhere}.card .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.card .meta{font-size:.85rem;color:#b1bed5;overflow-wrap:anywhere}
+.card .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}.action{display:inline-block;text-decoration:none;color:white;padding:10px 14px;border-radius:10px;background:#315d96;font-weight:700}.action.secondary{background:#293a53}.action:hover{filter:brightness(1.18)}
+.note{border-left:4px solid #72b4ec;padding:12px 15px;background:#14283d;border-radius:7px;margin:18px 0}.warning{border-color:#e9bd77;background:#32291a}
+.decision{padding:12px 14px;margin:12px 0;border-radius:10px;background:#1f304b;border:1px solid #365078}
+.decision strong{display:block;color:#c0defc;font-size:.9rem}.decision p{white-space:pre-wrap;overflow-wrap:anywhere;margin:3px 0 12px}
+.decision p:last-child{margin-bottom:0}.decision.missing{background:#2d281d;border-color:#77623c}
+.handoff{background:#172b2a;border:1px solid #365a58;padding:14px;border-radius:11px;margin:12px 0}
+.handoff strong{display:block;color:#b9f2df;margin-top:6px}
+.handoff p{white-space:pre-wrap;overflow-wrap:anywhere}
+.handoff button{border:1px solid #75b7a1;background:#23685a;color:white;border-radius:10px;font-size:1rem;padding:11px 14px;cursor:pointer}
+.handoff button:focus-visible{outline:3px solid #8cd0fa;outline-offset:3px}
+.status{padding:10px 0;min-height:32px}details{margin-top:10px}summary{cursor:pointer;color:#d0ddf8}.ci{font-size:.87rem;white-space:pre-wrap}.empty{border:1px dashed #465a76;border-radius:14px;padding:32px;text-align:center;color:#bed0e8}
+footer{margin-top:36px;color:#a1acc3;font-size:.85rem}a{color:#a5d2ff}
+@media(min-width:650px){.card{padding:20px}.card h3{font-size:1.12rem}}
+</style>
+</head><body>
+<p style="padding:12px;text-align:center"><a href="history.html">📚 日本語開発履歴・過去のコードと検証を検索</a></p>
+<main>
+<header><div><span class="badge">開発管理 / GitHub連携</span><h1>❤️ 美咲 × ☔ アメふる<br>承認ボード</h1><p class="muted">あなたの判断が必要な案件だけを、理由と推奨付きで。</p></div><button id="reload" class="action" type="button">↻ 更新</button></header>
+<section class="hero"><div class="panels"><div class="panel"><div class="counter" id="pendingCount">—</div><span>あなたの判断待ち</span></div><div class="panel"><div class="counter" id="draftCount">—</div><span>未整理・準備中</span></div><div class="panel"><div class="counter" id="handoffCount">—</div><span>ソラへ引き継ぐ候補</span></div></div><p class="muted" id="updated">GitHubから取得します</p></section>
+<div class="note"><strong>安全な承認：</strong>この画面は読み取り専用。ボタンでGitHubの該当PRを開き、変更差分とCIを確認したうえでGitHub上でマージします。承認やマージを勝手に実行しません。</div>
+<div class="controls" aria-label="表示を切り替え">
+<button class="active" data-view="pending" type="button">あなたの判断待ち</button>
+<button data-view="handoff" type="button">ソラへの引き継ぎ</button>
+<button data-view="untriaged" type="button">未整理</button>
+<button data-view="draft" type="button">準備中</button>
+<button data-view="all" type="button">すべて</button>
+<select id="project" aria-label="プロジェクト"><option value="all">両プロジェクト</option><option value="misaki">❤️ 美咲</option><option value="emergencyalert">☔ アメふる</option></select>
+</div>
+<p role="status" id="status" class="status"></p><section id="items" aria-live="polite"></section>
+<div class="note warning"><strong>注意：</strong>「あなたの判断待ち」は、PRに専用ラベルを付けて明示された案件だけです。「ソラへの引き継ぎ」は2026年11月4日の一次仕分けから生成した候補で、自動で別チャットを起動する機能ではありません。PRが開いているだけでは承認可能とは限りません。CI失敗、マージ競合、本番・DB・通知への影響などはGitHub上で再確認してください。台帳更新PRも、自動マージの安全審査が完成するまでは候補として表示します。</div>
+<footer>公開リポジトリのGitHub APIから取得。トークン・パスワード不要／保存なし。GitHub Pagesは一般公開なので秘密情報を置かないでください。API制限やネットワークにより表示できない場合があります。</footer>
+</main>
+<script>
+'use strict';
+(function(){
+  const repos=[{id:'misaki',label:'❤️ 美咲',name:'miyazaki1016/misaki'},{id:'emergencyalert',label:'☔ アメふる',name:'miyazaki1016/emergencyalert'}];
+  const byId=id=>document.getElementById(id); let rows=[],handoffs=[],handoffError='',view='pending',mergeReady=false;
+  const decisionLabels=['owner-decision','needs-owner-decision','user-approval-required'];
+  function needsDecision(p){return p.labels.some(x=>decisionLabels.includes(x.toLowerCase()))}
+  function section(body, names){
+    const lines=String(body||'').split(/\r?\n/);
+    const headings=names.split('|');
+    const begin=lines.findIndex(line=>{
+      const title=line.trim().replace(/^#{2,4}\s*/, '').trim();
+      return /^#{2,4}\s+/.test(line.trim()) && headings.includes(title);
+    });
+    if(begin<0)return '';
+    const out=[];
+    for(let i=begin+1;i<lines.length;i++){
+      if(/^#{1,4}\s+/.test(lines[i]))break;
+      out.push(lines[i]);
+    }
+    return out.join('\n').trim().slice(0,1000);
+  }
+  function decisionFacts(p){
+    return {
+      summary:section(p.body,'変更概要|What changes|Summary'),
+      question:section(p.body,'判断してほしいこと|あなたに判断してほしいこと|Decision required'),
+      recommendation:section(p.body,'推奨と理由|推奨|Recommendation')
+    };
+  }
+  const status=byId('status'),items=byId('items');
+  function el(tag,cls,value){const n=document.createElement(tag);if(cls)n.className=cls;if(value!==undefined)n.textContent=value;return n}
+  async function fetchRepo(repo){
+    const url='https://api.github.com/repos/'+repo.name+'/pulls?state=open&per_page=100';
+    const response=await fetch(url,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+    if(!response.ok)throw Error(repo.label+' の取得失敗（HTTP '+response.status+'）');
+    const data=await response.json();
+    if(!Array.isArray(data))throw Error(repo.label+' の形式が不正');
+    if(data.length===100)throw Error(repo.label+' は100件を超える可能性があるため全件表示を保証できません');
+    return data.map(p=>({project:repo.id,projectLabel:repo.label,number:p.number,title:p.title,url:p.html_url,draft:!!p.draft,updated:p.updated_at,head:p.head&&p.head.sha,labels:(p.labels||[]).map(x=>x.name||''),body:p.body||'',base:p.base&&p.base.ref}));
+  }
+
+  function handoffInstruction(t,p){
+    const repository='miyazaki1016/'+t.repo;
+    const label=t.role;
+    const lines=[
+      '【'+label+'への作業引き継ぎ】',
+      '対象: '+repository+' PR #'+t.number+'（'+p.title+'）',
+      'URL: '+p.url,
+      'PR最新head SHA: '+p.head,
+      '一次仕分け日時: 2026-11-04（古い可能性あり。最新状態を必ず照合）',
+      '一次仕分け時の状態: '+t.state,
+      '判断の根拠: '+t.reason,
+      '次に調査すること: '+t.next,
+      '',
+      '【作業条件】',
+      'mainだけでなく既存ブランチ・PR・Issue・開発台帳・関連コミットを照合する。既存実装を作り直さない。',
+      'PRの最新head・変更差分・CI・依存ブランチ・mainへ既に含まれる実装の有無を確認してから着手する。',
+      'Draftや禁止記載のあるPRは無断でマージ・公開しない。認証・DB・通知・本番・送信は無断変更しない。',
+      '実機/本番で未検証のことを完了と呼ばない。差分がなければ不要なPRやコミットを増やさない。',
+      '実施結果、未解決事項、証拠URL、次の担当判断をPRまたは台帳に残す。',
+      '仕様・費用・公開範囲等で本人の選択が必要になったときだけ、具体的な質問・選択肢・推奨理由を記載し owner-decision を登録する。',
+      'まず状況を確認し、証拠に応じて必要な作業を進めてください。'
+    ];
+    if(t.repo==='emergencyalert'&&t.number===155)lines.push('JASPICメールの実送信・本番切替は明示承認まで禁止。');
+    return lines.join('\n');
+  }
+  async function copyInstruction(textValue,button){
+    try{
+      if(navigator.clipboard && window.isSecureContext)await navigator.clipboard.writeText(textValue);
+      else {
+        const textarea=document.createElement('textarea');
+        textarea.value=textValue;textarea.style.position='fixed';textarea.style.left='-9999px';
+        document.body.append(textarea);textarea.select();
+        const success=document.execCommand('copy');textarea.remove();
+        if(!success)throw Error('Copy unavailable');
+      }
+      const original=button.textContent;button.textContent='✅ コピーしました';
+      setTimeout(()=>{button.textContent=original},1800);
+    }catch(_){button.textContent='コピー不可。GitHubから内容を確認してください。'}
+  }
+  function renderHandoffs(relevant){
+    const project=byId('project').value;
+    if(handoffError){items.append(el('div','empty','引き継ぎ台帳の取得に失敗: '+handoffError));return}
+    const map=new Map(relevant.map(p=>[p.project+'#'+p.number,p]));
+    const active=handoffs.filter(t=>(project==='all'||t.repo===project)&&map.has(t.repo+'#'+t.number));
+    byId('handoffCount').textContent=active.length;
+    if(!active.length){items.append(el('div','empty','現在のopen PRと一致する引き継ぎ候補はありません。'));return}
+    for(const t of active){
+      const p=map.get(t.repo+'#'+t.number),card=el('article','card'),top=el('div','top');
+      top.append(el('span','badge',p.projectLabel),el('span','badge',t.role),el('span','badge',p.draft?'Draft・マージ禁止':'事実確認が先'));
+      card.append(top,el('h3','',p.title),el('p','meta','#'+p.number+' · PR更新 '+(p.updated?new Date(p.updated).toLocaleString('ja-JP'):'不明')+' · 一次仕分け 2026-11-04'));
+      const box=el('div','handoff');
+      box.append(el('strong','','なぜ担当へ戻す？'),el('p','',t.reason),
+                 el('strong','','次にやること'),el('p','',t.next));
+      card.append(box);
+      const actions=el('div','actions');
+      const button=el('button','','📋 引き継ぎ指示をコピー');
+      button.type='button';button.addEventListener('click',()=>copyInstruction(handoffInstruction(t,p),button));
+      const link=el('a','action secondary','元のPRを見る →');link.href=p.url;link.target='_blank';link.rel='noopener noreferrer';
+      actions.append(button,link);card.append(actions);
+      items.append(card);
+    }
+  }
+  function render(){
+    items.replaceChildren();
+    const project=byId('project').value;
+    const relevant=rows.filter(p=>project==='all'||p.project===project);
+    const actionable=relevant.filter(needsDecision);
+    const untriaged=relevant.filter(p=>!p.draft&&!needsDecision(p));
+    const drafts=relevant.filter(p=>p.draft&&!needsDecision(p));
+    const filtered=view==='pending'?actionable:view==='untriaged'?untriaged:view==='draft'?drafts:relevant;
+    byId('pendingCount').textContent=actionable.length;
+    byId('draftCount').textContent=untriaged.length+drafts.length;
+    byId('handoffCount').textContent=handoffs.filter(t=>relevant.some(p=>p.project===t.repo&&p.number===t.number)).length;
+    if(view==='handoff'){renderHandoffs(relevant);return}
+    if(!filtered.length){
+      const message=view==='pending'?'今、判断依頼が明示された案件はありません。未整理タブには従来のPRが残っています。':'該当するPRはありません。';
+      items.append(el('div','empty',message));return;
+    }
+    for(const p of filtered){
+      const decision=needsDecision(p),facts=decisionFacts(p),card=el('article','card'),top=el('div','top');
+      top.append(el('span','badge',p.projectLabel),el('span','badge',decision?'あなたの判断待ち':p.draft?'準備中（Draft）':'未整理（判断依頼なし）'));
+      const auto=p.title.toLowerCase().includes('ledger')||p.title.includes('台帳');
+      if(auto)top.append(el('span','badge','台帳・管理'));
+      card.append(top,el('h3','',p.title),el('div','meta','#'+p.number+' · '+p.project+' · '+(p.base||'対象不明')+' 向け · 更新 '+(p.updated?new Date(p.updated).toLocaleString('ja-JP'):'不明')));
+      if(p.labels.length)card.append(el('p','meta','ラベル: '+p.labels.join(' / ')));
+      const info=el('div','decision'+(decision&&(!facts.question||!facts.recommendation)?' missing':''));
+      const fields=[
+        ['何が変わる？',facts.summary||'変更概要の記載がありません。PR本文・差分を確認してください。'],
+        ['何を判断する？',facts.question||(decision?'判断内容が未記入です。担当者に具体的な質問の追記を依頼してください。':'判断依頼が明示されていません。owner-decisionラベルを付け、PR本文に判断内容を記載してください。')],
+        ['推奨と理由',facts.recommendation||'根拠付き推奨が未記入のため、自動的な承認推奨はしません。']
+      ];
+      for(const [label,value] of fields){info.append(el('strong','',label),el('p','',value))}
+      card.append(info);
+      const actions=el('div','actions'),go=el('a','action',p.draft?'GitHubで内容を確認 →':'GitHubで確認・マージ →'),diff=el('a','action secondary','変更差分を見る');
+      for(const a of [go,diff]){a.target='_blank';a.rel='noopener noreferrer'}
+      go.href=p.url;diff.href=p.url+'/files';actions.append(go,diff);
+      if(mergeReady && decision && !p.draft && /^[a-f0-9]{40}$/.test(p.head||'')){
+        const direct=el('a','action','🔐 承認してマージ');
+        direct.href='./merge.html?'+new URLSearchParams({repo:p.project,number:String(p.number),sha:p.head});
+        actions.prepend(direct);
+      }
+      card.append(actions);
+      const details=el('details'),summary=el('summary','', 'CIの状態を取得する（開いた時だけ）'),ci=el('p','ci','未取得');details.append(summary,ci);
+      details.addEventListener('toggle',async function(){
+        if(!details.open||details.dataset.loaded)return;details.dataset.loaded='1';ci.textContent='GitHubのチェックを確認中…';
+        try{
+          const u='https://api.github.com/repos/miyazaki1016/'+p.project+'/commits/'+encodeURIComponent(p.head)+'/check-runs?per_page=100';
+          const res=await fetch(u,{headers:{'Accept':'application/vnd.github+json'},cache:'no-store'});
+          if(!res.ok)throw Error('HTTP '+res.status);
+          const body=await res.json(),checks=body.check_runs||[];
+          ci.textContent=checks.length?checks.map(c=>String(c.conclusion||c.status)+' · '+c.name).join('\n'):'チェック情報なし。GitHubのPR画面で確認してください。';
+        }catch(err){ci.textContent='取得できませんでした（'+err.message+'）。GitHubで確認してください。'}
+      });
+      card.append(details);items.append(card);
+    }
+  }
+  async function load(){
+    byId('reload').disabled=true;status.textContent='最新のPRを確認しています…';
+    const config=await fetch('./merge-config.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).catch(()=>null);
+    mergeReady=!!(config && config.enabled===true && config.supabaseUrl==='https://tzozajnwznxqgxnjikoy.supabase.co' && typeof config.publishableKey==='string' && config.publishableKey.length>20);
+    try{
+      const q=await fetch('./handoff-queue.json',{cache:'no-store'});
+      if(!q.ok)throw Error('HTTP '+q.status);
+      const data=await q.json();
+      if(!Array.isArray(data.tasks)||data.tasks.length>100)throw Error('管理台帳の形式が不正');
+      handoffs=data.tasks.filter(t=>['misaki','emergencyalert'].includes(t.repo)&&Number.isSafeInteger(t.number)&&typeof t.next==='string'&&typeof t.role==='string');
+      handoffError='';
+    }catch(e){handoffs=[];handoffError=String(e.message||e)}
+    const results=await Promise.allSettled(repos.map(fetchRepo));
+    rows=results.filter(r=>r.status==='fulfilled').flatMap(r=>r.value).sort((a,b)=>b.updated.localeCompare(a.updated));
+    const errors=results.filter(r=>r.status==='rejected').map(r=>r.reason.message);
+    status.textContent=errors.length?'一部取得に失敗: '+errors.join(' / '):'取得成功 · '+rows.length+'件のオープンPR（判断依頼は専用ラベルで抽出）';
+    byId('updated').textContent='取得日時: '+new Date().toLocaleString('ja-JP')+'（リアルタイム表示、非保存）';
+    render();byId('reload').disabled=false;
+  }
+  document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',function(){view=b.dataset.view;document.querySelectorAll('[data-view]').forEach(x=>x.classList.toggle('active',x===b));render()}));
+  byId('project').addEventListener('change',render);byId('reload').addEventListener('click',load);load();
+})();
+</script></body></html>

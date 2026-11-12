@@ -196,3 +196,5 @@ test('ordinary chat wait does not falsely claim Misaki is busy', () => {
   assert.ok(!source.includes('setWaitingOnReply(true), 1_800'));
   assert.ok(!source.includes('window.clearTimeout(waitingTimer)'));
 });
+
+module.exports = { harness };

@@ -54,7 +54,7 @@ export default function HomePage() {
               </div>
             </div>
           </Link>
-          <Link href="/chat" className="headerCta">話してみる</Link>
+          <Link href="/lounge/" className="headerCta">話してみる</Link>
         </header>
 
         {/* HERO */}
@@ -80,7 +80,7 @@ export default function HomePage() {
                 今日あったことも、くだらない話も。<br />
                 二人の間に起きたことが、少しずつ積み重なっていきます。
               </p>
-              <Link href="/chat" className="mainCta">美咲に会ってみる <span>→</span></Link>
+              <Link href="/lounge/" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
@@ -91,7 +91,7 @@ export default function HomePage() {
                 最初から、恋人じゃない。<br />
                 まだあなたのことを知らない美咲と、ここから始まります。
               </p>
-              <Link href="/chat" className="mainCta">美咲に会ってみる <span>→</span></Link>
+              <Link href="/lounge/" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function HomePage() {
               </div>
               <div className="profileBottomRight">
                 <div className="profileNote"><span>“</span> なんでも話してね。<br />…待ってるよ。 ♡</div>
-                <Link href="/chat" className="profileCta">美咲と話してみる <span>→</span></Link>
+                <Link href="/lounge/" className="profileCta">美咲と話してみる <span>→</span></Link>
                 <p>無料版は1日20回まで</p>
               </div>
             </div>
@@ -343,7 +343,7 @@ export default function HomePage() {
                 いつか、もっと特別な存在になるかもしれない。<br />
                 でも、全部ここから始まります。
               </p>
-              <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
+              <Link href="/lounge/" className="mainCta">美咲に会いにいく <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
@@ -351,7 +351,7 @@ export default function HomePage() {
               <p className="mobileEyebrow">MISAKI</p>
               <h2>どんな関係になるかは、<br /><span>まだ誰にもわからない。</span></h2>
               <p className="mobileFinalLead">友達かもしれない。親友かもしれない。<br />でも、全部ここから始まります。</p>
-              <Link href="/chat" className="mainCta">美咲に会いにいく <span>→</span></Link>
+              <Link href="/lounge/" className="mainCta">美咲に会いにいく <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
           </div>

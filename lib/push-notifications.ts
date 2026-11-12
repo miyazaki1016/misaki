@@ -1,3 +1,4 @@
+import { recoveryScope } from "./recovery-session";
 import {
   supabase,
 } from "./supabase";
@@ -129,6 +130,7 @@ async function getCurrentUser() {
 }
 
 export async function registerPushSubscription() {
+  if (recoveryScope) throw new Error("独立した新しい会話では通知を変更できません。");
   if (
     typeof window ===
     "undefined"
@@ -315,6 +317,7 @@ export async function getPushSubscription() {
 }
 
 export async function unregisterPushSubscription() {
+  if (recoveryScope) throw new Error("独立した新しい会話では通知を変更できません。");
   if (
     typeof window ===
     "undefined"
