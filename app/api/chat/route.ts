@@ -1,3 +1,4 @@
+import { activeAnonymousHistory } from "../../../supabase/functions/_shared/anonymous-history-expiry";
 import { USER_REPLY_CONTEXT } from "../../../lib/conversation-turn-context";
 import { after } from "next/server";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
@@ -1828,6 +1829,7 @@ export async function POST(
     memory = rootState.memory;
     misakiTodayMemory = rootState.todayMemory;
     history = "history" in rootState ? rootState.history : [];
+    if (isAnonymous) history = activeAnonymousHistory(history, Date.parse(userMessageAt));
     const canonicalRelationshipPoints = rootState.relationshipPoints;
     const recallMode = isMemoryRecallQuestion(message);
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
@@ -2823,7 +2825,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
             },
           }].slice(-40),
         },
-        history: [...(Array.isArray(history) ? history : []),
+        history: [...(Array.isArray(rootState.history) ? rootState.history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
           .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))

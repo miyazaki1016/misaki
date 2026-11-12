@@ -26,7 +26,7 @@ function bodyClock(h) {
     if (file === 'index.ts') code += '\nmodule.exports.processUser = processUser;';
     const module = { exports: {} };
     const req = name => name.startsWith('npm:') ? { createClient: () => h.client }
-      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.slice(2));
+      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.startsWith('./') ? name.slice(2) : name);
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
   }
@@ -161,4 +161,25 @@ test('Body Clock skips a missing shared root even when old replay receipts remai
   const h = harness({ anonymous: true }); await chat(h, '古い応答');
   h.temporaryRoots.clear();
   assert.equal((await bodyClock(h).send()).skipped, 'temporary_state_unavailable');
+});
+
+test('anonymous chat omits expired history from inference but retains it for display', async () => {
+  const h = harness({ anonymous: true });
+  const canonical = h.load('lib/canonical-state.ts');
+  const history = [
+    { role: 'user', text: 'old-anonymous-context', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },
+    { role: 'user', text: 'active-anonymous-context', sentAt: new Date(Date.now() - 3600000).toISOString() },
+    { role: 'user', text: 'untimed-anonymous-context' },
+  ];
+  const token = canonical.sealTemporaryState({
+    history, memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0,
+  }, 'prior-turn');
+
+  const result = await chat(h, '今日も話そう', token);
+  const prompt = JSON.stringify(h.prompts);
+  assert.match(prompt, /active-anonymous-context/);
+  assert.doesNotMatch(prompt, /old-anonymous-context|untimed-anonymous-context/);
+  const saved = canonical.openTemporaryState(result.temporaryState).state.history;
+  assert.equal(saved[0].text, 'old-anonymous-context');
+  assert.equal(saved[0].sentAt, history[0].sentAt);
 });

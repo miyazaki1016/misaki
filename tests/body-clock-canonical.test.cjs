@@ -12,7 +12,10 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
   const iv = nodeCrypto.randomBytes(12);
   const cipher = nodeCrypto.createCipheriv('aes-256-gcm', nodeCrypto.createHash('sha256').update('misaki-temporary-state-v1:test').digest(), iv);
   const encrypted = Buffer.concat([cipher.update(JSON.stringify({ expires: Date.now() + (expired ? -1000 : 60000),
-    result: { reply: 'ok' }, state: { relationshipPoints: 80, history: [{ role: 'user', text: 'canonical history' }], memory: ['canonical memory'] } })), cipher.final()]);
+    result: { reply: 'ok' }, state: { relationshipPoints: 80, history: [
+      { role: 'user', text: 'expired anonymous history', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },
+      { role: 'user', text: 'canonical history', sentAt: new Date(Date.now() - 1000).toISOString() },
+    ], memory: ['canonical memory'] } })), cipher.final()]);
   const bytes = Buffer.concat([iv, cipher.getAuthTag(), encrypted]);
   if (tampered) bytes[40] ^= 1;
   const token = bytes.toString('base64url');
@@ -56,7 +59,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     const req = name => {
       if (name.startsWith('npm:')) return { createClient: () => client };
       if (name === './persona-store.ts') return { loadPersonaPrompt: async () => ({ text: '美咲' }) };
-      return load(name.replace('./', ''));
+      return load(name.startsWith('./') ? name.slice(2) : name);
     };
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
@@ -68,6 +71,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     assert.equal(prompts.length, 0); assert.equal(calls.length, 0); return;
   }
   const prompt = JSON.stringify(prompts);
+  assert.ok(!prompt.includes('expired anonymous history'));
   assert.ok(prompt.includes('関係性ポイント: 80')); assert.ok(prompt.includes('canonical memory')); assert.ok(prompt.includes('canonical history'));
   assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999'));
   const delivery = calls.find(call => call.name === 'finish_misaki_body_clock_delivery').args;
