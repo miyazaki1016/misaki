@@ -48,6 +48,7 @@ for (const scenario of qualityScenarios) {
     if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) throw new Error("Estimated cost guard reached");
     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));
     const stats=totals[variant]; stats.calls++;
+    let usageAccounted = false;
     try {
       const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
         method:"POST",
@@ -69,11 +70,13 @@ for (const scenario of qualityScenarios) {
         usageByVariant[variant].inputTokens+=input;
         usageByVariant[variant].outputTokens+=output;
         estimatedUsd+=(input*INPUT_USD_PER_MILLION+output*OUTPUT_USD_PER_MILLION)/1_000_000;
+        usageAccounted = true;
         metrics[variant+"InputTokens"]=input;
         metrics[variant+"OutputTokens"]=output;
       } else {
         usageMissing++;
         estimatedUsd+=reservedUsd;
+        usageAccounted = true;
         metrics[variant+"UsageMissing"]=true;
       }
       const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??"").join("")??"";
@@ -92,6 +95,7 @@ for (const scenario of qualityScenarios) {
       metrics[variant+"Passed"]=passed;
       if(passed)stats.passed++;
     }catch{
+      if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }
       metrics[variant+"HttpStatus"]=0;
       metrics[variant+"Passed"]=false;
       metrics[variant+"RequestError"]=true;
