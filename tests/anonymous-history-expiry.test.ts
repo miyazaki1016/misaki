@@ -11,6 +11,6 @@ test("anonymous history expires at 24 hours without rewriting its timestamp", ()
 
   assert.deepEqual(activeAnonymousHistory(history, now), [active]);
   assert.deepEqual(activeAnonymousHistory(history, now + 1000), [history[2]]);
-  assert.equal(history[1].sentAt, "2026-11-11T08:00:01.000Z");
+  assert.equal(active.sentAt, "2026-11-11T08:00:01.000Z");
   assert.deepEqual(activeAnonymousHistory(null, now), []);
 });
