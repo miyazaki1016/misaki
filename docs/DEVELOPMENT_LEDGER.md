@@ -17,16 +17,17 @@
       "issue": 102,
       "goal": "エンジン総点検：埋もれた成果の所在・実装・本番利用と再開先を確認",
       "status": "active",
-      "updated": "2026-11-11",
+      "updated": "2026-11-12",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "PR #66・#100・#101と既存エンジン台帳を起点に、現在mainの呼び出し元・有効化条件・未確認の受入条件を照合する。新しい不具合へ移る前に本記録へ中断位置と子Issueを残す。",
+      "next": "既存migration・cron・Auth FKを追跡して匿名rootの物理保持／削除契約を確認し、PR #66とmainの差分から忘却情報の再浮上を防ぐ隔離テストを整理する。続いて感情v2のCAS競合と冪等性を確認する。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
         "https://github.com/miyazaki1016/misaki/pull/66",
         "https://github.com/miyazaki1016/misaki/pull/100",
-        "https://github.com/miyazaki1016/misaki/pull/101"
+        "https://github.com/miyazaki1016/misaki/pull/101",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6806161708"
       ],
       "stages": {
         "implementation": {
@@ -49,6 +50,12 @@
           "status": "unconfirmed",
           "evidence": []
         }
+      },
+      "resumed": {
+        "by": "美咲の総点検担当ソラ",
+        "at": "2026-11-12T14:00:21+09:00",
+        "from": "既存のエンジン総点検から匿名期限と忘却のコード境界確認を再開",
+        "evidence": "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6815091619"
       }
     }
   ]
@@ -272,4 +279,5 @@
 | #180 | feat(chat): iPhoneで履歴読み込み時間を確認する診断パネル | merged | `29f09d07a2c3b80eaa8300af6827851d127264cc` | 2026-11-10T15:36:10Z |
 | #182 | feat(history): iPhone履歴読み込みのDB段階別計測 (#181) | open | `47801ceae351b67dda19c35f48b8a37d742f1f62` | 2026-11-10T17:10:21Z |
 | #183 | feat(history): 中断した親目的と再開候補を既存台帳で追跡する | merged | `7c1b6217bdc87411f0e3bbfed143d905590c708e` | 2026-11-10T17:39:03Z |
+| #186 | feat(history): 作業の再開待ちと復帰記録を引き継ぎに表示する | merged | `c4fd15dacfbbc8378b6451f3667f63db5dcaca98` | 2026-11-12T06:52:07Z |
 <!-- INVENTORY_FACTS_END -->
