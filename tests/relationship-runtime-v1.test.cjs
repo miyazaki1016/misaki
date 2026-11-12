@@ -46,7 +46,7 @@ function harness({ failure = false, outside = false, importRace = false, expired
     cache.set(file, module.exports); return module.exports;
   }
   const engine = load('lib/relationship-engine-v1.ts');
-  root = { history: outside ? [] : [{ role: 'user', text: turn.message, requestId: turn.requestId }, { role: 'misaki', text: turn.reply, requestId: turn.requestId }], memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 160, temporaryRevision: '1', relationshipEngine: {
+  root = { relationshipEvidenceAt: Date.now() - 1000, history: outside ? [] : [{ role: 'user', text: turn.message, sentAt: new Date(Date.now() - 1000).toISOString(), requestId: turn.requestId }, { role: 'misaki', text: turn.reply, sentAt: new Date(Date.now() - 1000).toISOString(), requestId: turn.requestId }], memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 160, temporaryRevision: '1', relationshipEngine: {
     state: load('lib/relationship-acting-guide.ts').createLegacyRelationshipActingState(160), version: 0,
     episodes: [1, 2].map(day => engine.episodeFor(evidence, { ...turn, requestId: String(day), savedAt: `2026-10-0${day}T00:00:00Z` })),
     appliedPatterns: [], processed: [], pending: [turn],

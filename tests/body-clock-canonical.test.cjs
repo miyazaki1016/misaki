@@ -18,7 +18,11 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
   const iv = nodeCrypto.randomBytes(12);
   const cipher = nodeCrypto.createCipheriv('aes-256-gcm', nodeCrypto.createHash('sha256').update('misaki-temporary-state-v1:test').digest(), iv);
   const encrypted = Buffer.concat([cipher.update(JSON.stringify({ expires: Date.now() + (expired ? -1000 : 60000),
-    result: { reply: 'ok' }, state: { todayMemory, forgetControls: controls, relationshipPoints: 80, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] } })), cipher.final()]);
+    result: { reply: 'ok' }, state: { todayMemory, forgetControls: controls, relationshipPoints: 80, relationshipEvidenceAt: Date.now() - 1000, history: [
+      { role: 'user', text: 'expired anonymous history', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },
+      { role: 'user', text: 'canonical history', sentAt: new Date(Date.now() - 1000).toISOString() },
+      ...facts.map(fact => ({ ...fact, sentAt: new Date(Date.now() - 1000).toISOString() })),
+    ], memory: ['canonical memory',...memories], memoryTimes: ['canonical memory',...memories].map(text => [text, Date.now() - 1000]), todayMemoryTimes: todayMemory.items.map(text => [text, Date.now() - 1000]) } })), cipher.final()]);
   const bytes = Buffer.concat([iv, cipher.getAuthTag(), encrypted]);
   if (tampered) bytes[40] ^= 1;
   const token = bytes.toString('base64url');
@@ -29,7 +33,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
         single: async () => ({ data: { next_push_at: 'lease' }, error: null }),
         maybeSingle: async () => ({ data: table === 'misaki_forget_controls' ? (forget ? {payload:forgetPayload}:null) : table === 'misaki_temporary_roots' ? { token, revision: 'root-generation', expires_at: new Date(Date.now() + 60000).toISOString() } : table === 'daily_message_requests' ? { temporary_result: token } : table === 'misaki_relationship_state'
           ? { intimacy_points: anonymous ? 999 : 80, intimacy_level: anonymous ? 'very_intimate' : 'intimate', action_state: 'NORMAL', emotion_state: { primary: 'happy', intensity: 34 } }
-          : { today_memory:todayMemory, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories] }, error: table==='misaki_forget_controls'&&forgetReadFailure?{message:'failed'}:null }),
+          : { today_memory:todayMemory, history: [{ role: 'user', text: 'canonical history' },...facts], memory: ['canonical memory',...memories], memoryTimes: ['canonical memory',...memories].map(text => [text, Date.now() - 1000]), todayMemoryTimes: todayMemory.items.map(text => [text, Date.now() - 1000]) }, error: table==='misaki_forget_controls'&&forgetReadFailure?{message:'failed'}:null }),
         limit() { return query; }, then(resolve) { resolve({ data: table==='misaki_persona_versions'?[{id:'v',version_code:'v'}]:table==='misaki_prompt_modules'?[{content:'美咲',metadata:{channels:['proactive']}}]:table==='misaki_user_relationship_traits'&&withTraits?[{content:'猫が好き'}]:[], error: null }); },
         insert: async item => { calls.push({ event: item }); return { error: null }; },
       };
@@ -66,7 +70,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     const req = name => {
       if (name.startsWith('npm:')) return { createClient: () => client };
       if (name === './persona-store.ts' && !realPersonaStore) return { loadPersonaPrompt: async () => ({ text: '美咲' }) };
-      return load(name.startsWith('../') ? name : name.slice(2));
+      return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)));
     };
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
@@ -78,6 +82,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered = 
     assert.equal(prompts.length, 0); assert.equal(calls.length, 0); return;
   }
   const prompt = JSON.stringify(prompts);
+  assert.ok(!prompt.includes('expired anonymous history'));
   assert.ok(prompt.includes('関係性ポイント: 80')); assert.ok(prompt.includes('canonical memory')); assert.ok(prompt.includes('canonical history'));
   if(forget) assert.ok(!prompt.includes('隆紀'));
   assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999'));

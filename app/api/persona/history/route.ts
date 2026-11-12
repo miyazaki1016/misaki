@@ -1,3 +1,4 @@
+import { anonymousCheckpointState } from "../../../../supabase/functions/_shared/anonymous-memory-expiry";
 import { TemporaryStateUnavailableError, temporaryStateMessage } from "../../../../lib/temporary-state-error";
 import { maintenanceResponse } from "../../../../lib/maintenance";
 import { createClient } from "@supabase/supabase-js";
@@ -56,10 +57,11 @@ export async function POST(request: Request) {
           if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);
         }
       }
+      const active = anonymousCheckpointState(state, Date.now());
       const { data, error } = await createServerSupabase().rpc("save_misaki_temporary_state", {
-        p_user_id: user.id, p_history: state.history ?? [], p_memory: state.memory,
-        p_today_memory: state.todayMemory, p_points: state.relationshipPoints,
-        p_relationship: state.temporaryRelationship ?? null,
+        p_user_id: user.id, p_history: active.history, p_memory: active.memory,
+        p_today_memory: active.todayMemory, p_points: active.relationshipPoints,
+        p_relationship: active.temporaryRelationship,
         p_expected_revision: state.temporaryRevision ?? null,
         p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),
       });

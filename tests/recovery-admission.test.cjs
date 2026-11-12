@@ -62,3 +62,23 @@ test('actual release artifact exposes its policy without reading or writing conv
  const r=h.load('app/api/anonymous-recovery/admission/route.ts').GET();assert.equal((await r.json()).accepting,expected);
  assert.equal(h.calls.length,0);assert.equal(h.generated,0);assert.equal(h.temporaryRoots.size,0);
 });
+
+test('a purged root still rejects an otherwise valid browser token for the same user', async () => {
+  const h = harness({ anonymous: true });
+  const from = h.client.from.bind(h.client);
+  h.client.from = table => {
+    const query = from(table);
+    if (table === 'misaki_expired_temporary_root_users') {
+      query.maybeSingle = async () => ({ data: { user_id: h.user.id }, error: null });
+    }
+    return query;
+  };
+  const canonical = h.load('lib/canonical-state.ts');
+  const token = canonical.sealTemporaryState({
+    history: [], memory: ['old memory'], todayMemory: { date: '', items: [] }, relationshipPoints: 0,
+  }, 'prior-turn');
+  assert.ok(canonical.openTemporaryState(token));
+  for (const candidate of [token, null]) {
+    await assert.rejects(canonical.loadTemporaryRoot(h.user.id, candidate), { reason: 'expired' });
+  }
+});

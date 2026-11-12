@@ -36,6 +36,10 @@ before(async()=>{
  await db.exec(base.slice(base.indexOf('create function public.guard_misaki_completed_turn_refund'),base.indexOf('-- All temporary writers')));
  const migration=fs.readdirSync(path.join(root,'supabase/migrations')).find(x=>x.endsWith('_forget_control_v1.sql'));
  await db.exec(read('supabase/migrations/'+migration));
+ await db.exec("create function auth.role() returns text language sql as $$select 'service_role'::text$$");
+ await db.exec(read('supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql'));
+ await db.exec(read('supabase/migrations/20261112082000_relationship_emotion_resume.sql'));
+ await db.exec(read('supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql'));
  await db.exec('grant usage on schema public,auth,misaki_operations to service_role,authenticated;grant select,insert,update on all tables in schema public to service_role;grant select on auth.users to service_role;grant usage,select on all sequences in schema public to service_role;');
 });
 after(async()=>{if(db)await db.close();});
@@ -96,7 +100,7 @@ for (const {invalidPayload,keepUnrelated} of [{invalidPayload:false,keepUnrelate
  h.setOpenaiPayload({reply:'うん、わかったよ。',memory:original,misakiTodayMemory:{items:[]}});
  const mockRpc=h.client.rpc.bind(h.client);let rpcError;
  h.client.rpc=async(name,args)=>{
-  if(name!=='complete_misaki_chat_turn') {
+  if(name!=='complete_misaki_chat_turn_with_emotion') {
    if(name==='consume_daily_message')await db.query("insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)",[args.p_request_id,id]);
    return mockRpc(name,args);
   }
@@ -104,7 +108,7 @@ for (const {invalidPayload,keepUnrelated} of [{invalidPayload:false,keepUnrelate
   await db.exec('savepoint route_commit');
   try {
    const result={...args.p_result,...(invalidPayload?{forgetControlPayload:null}:{})};
-   const data=(await db.query('select complete_misaki_chat_turn($1,$2,$3,$4,$5::jsonb)result',[id,args.p_request_id,args.p_message,args.p_user_message_at,JSON.stringify(result)])).rows[0].result;
+   const data=(await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,$4,$5::jsonb,$6::jsonb)result',[id,args.p_request_id,args.p_message,args.p_user_message_at,JSON.stringify(result),JSON.stringify(args.p_emotion_input)])).rows[0].result;
    return {data,error:null};
   } catch(error) {rpcError=error.message;await db.exec('rollback to route_commit');return {data:null,error:{message:error.message}};}
  };
@@ -143,4 +147,74 @@ test('anonymous root checkpoint refresh and receipt retry preserve latest contro
  await db.query('select complete_misaki_temporary_turn($1,$2,$3,$4,$5,$6,$7::jsonb)',args);assert.equal((await controls(id))[0].payload,payload+'updated');
  await db.query('update auth.users set is_anonymous=false where id=$1',[id]);rev=(await db.query('select revision from misaki_temporary_roots where user_id=$1',[id])).rows[0].revision;
  await db.exec('savepoint imported');await assert.rejects(db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,$5,$6::jsonb,$7,$8)',[id,'[]','[]','{}',0,null,rev,payload]),/anonymous account required/);await db.exec('rollback to imported');assert.equal((await controls(id)).length,1);
+}));
+
+test('canonical save invalidates the pre-generation CAS, but queued emotion safely resumes in order', () => isolated(async () => {
+  const id = await seed();
+  const stale = '2026-01-01T00:00:00Z';
+  await db.query('insert into misaki_relationship_state(user_id,state_updated_at) values($1,$2)', [id, stale]);
+  const first = randomUUID();
+  const second = randomUUID();
+  const enqueue = async request => {
+    const before = await state(id);
+    await db.query('insert into daily_message_requests(request_id,user_id,allowed,processed) values($1,$2,true,true) on conflict do nothing', [request,id]);
+    const result = { reply: 'fixture reply', memory: [], misakiTodayMemory: { date: '', items: [] },
+      rootUpdatedAt: before?.updated_at ?? null, forgetControlPayload: payload };
+    await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,clock_timestamp(),$4::jsonb,$5::jsonb)',
+      [id,request,'fixture',JSON.stringify(result),'{"elapsedHours":9}']);
+  };
+  await enqueue(first);
+  const legacy = await db.query("select apply_relationship_emotion_action_v2('happy',30,'NORMAL','','','','[]','[]',$1,$2) as result", [stale,id]);
+  assert.deepEqual(legacy.rows[0].result, { ok: false, conflict: true });
+  await enqueue(second);
+  await enqueue(first);
+  const revision = async () => (await db.query(
+    'select state_updated_at::text as rev from misaki_relationship_state where user_id=$1', [id])).rows[0].rev;
+  const apply = async (request, rev, primary = 'happy') => (await db.query(
+    "select apply_misaki_queued_emotion($1,$2,$3,$4,30,'NORMAL','','','','[]','[]') as result", [id,request,rev,primary])).rows[0].result;
+  const eventCount = async event => (await db.query(
+    'select count(*)::int as n from misaki_relationship_events where user_id=$1 and event_type=$2',[id,event])).rows[0].n;
+
+  assert.equal(await eventCount('chat_turn_completed'), 2);
+  assert.equal(await eventCount('emotion_action_v2_after_chat'), 0);
+  assert.equal((await apply(second, await revision())).conflict, true);
+  const beforeBodyClock = await revision();
+  // Simulate the shared relationship-state revision changing between read and apply.
+  await db.query('update misaki_relationship_state set state_updated_at=clock_timestamp() where user_id=$1',[id]);
+  assert.equal((await apply(first, beforeBodyClock)).conflict, true);
+  await db.exec('savepoint apply_error');
+  await assert.rejects(apply(first, await revision(), 'invalid'), /invalid emotion/);
+  await db.exec('rollback to apply_error');
+  assert.equal(await eventCount('emotion_action_v2_after_chat'), 0);
+  assert.equal((await apply(first, await revision())).ok, true);
+  assert.equal((await apply(first, beforeBodyClock)).replayed, true);
+  assert.equal((await apply(second, await revision())).ok, true);
+  assert.equal(await eventCount('chat_turn_completed'), 2);
+  assert.equal(await eventCount('emotion_action_v2_after_chat'), 2);
+}));
+
+test('delayed email confirmation rechecks anonymous expiry before permanent reads', () => isolated(async () => {
+  const id = await seed(true);
+  const now = Date.now();
+  const old = now - 25 * 3600000;
+  const fresh = now - 3600000;
+  const history = [old, fresh].map(at => ({ role: 'user', text: String(at), sentAt: new Date(at).toISOString() }));
+  const memory = ['old memory', 'fresh memory'];
+  const expiry = { memory: [[memory[0], old], [memory[1], fresh]], today: [['old summary', old]], relationship: old };
+  await db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,40,$5::jsonb,null,$6)',
+    [id, JSON.stringify(history), JSON.stringify(memory), '{"date":"test","items":["old summary"]}',
+      JSON.stringify({ emotionPrimary: 'happy', anonymousExpiry: expiry }), payload]);
+  assert.deepEqual((await state(id)).memory, memory);
+  await db.query('update auth.users set is_anonymous=false where id=$1',[id]);
+  const permanent = await state(id);
+  assert.deepEqual(permanent.memory, [memory[1]]);
+  assert.deepEqual(permanent.history, [history[1]]);
+  assert.deepEqual(permanent.today_memory.items, []);
+  assert.equal((await db.query('select intimacy_points from misaki_relationship_state where user_id=$1',[id])).rows[0].intimacy_points,0);
+  const checkpoint = (await db.query("select metadata from misaki_relationship_events where user_id=$1 and event_type='email_save_checkpoint'",[id])).rows[0].metadata;
+  assert.equal(checkpoint.anonymousExpiry, undefined);
+  const registered = await seed(false);
+  await complete(registered, randomUUID());
+  await db.query('update auth.users set is_anonymous=false where id=$1',[registered]);
+  assert.deepEqual((await state(registered)).memory, ['safe memory']);
 }));

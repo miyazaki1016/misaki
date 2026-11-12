@@ -91,7 +91,7 @@ test('anonymous relationship emotion survives into the next temporary-root turn'
 test('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {
   const h = harness({ anonymous: true });
   const crypto = h.load('lib/canonical-state.ts');
-  const token = crypto.sealTemporaryState({ memory: ['verified memory'], history: [{ role: 'user', text: 'verified' }],
+  const token = crypto.sealTemporaryState({ memory: ['verified memory'], memoryTimes: [['verified memory', h.now()]], history: [{ role: 'user', text: 'verified', sentAt: new Date(h.now()).toISOString() }],
     todayMemory: { date: '', items: [] }, relationshipPoints: 7 }, 'previous');
   const api = h.load('app/api/persona/history/route.ts');
   assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409);

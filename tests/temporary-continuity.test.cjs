@@ -8,7 +8,11 @@ const { harness } = require('./helpers/canonical-harness.cjs');
 
 function bodyClock(h) {
   const cache = new Map();
-  const context = vm.createContext({ Date, JSON, Math, URL, Request, Response, AbortSignal,
+  class EdgeDate extends Date {
+    constructor(...args) { super(...(args.length ? args : [h.now()])); }
+    static now() { return h.now(); }
+  }
+  const context = vm.createContext({ Date: EdgeDate, JSON, Math, URL, Request, Response, AbortSignal,
     crypto: require('node:crypto').webcrypto, TextEncoder, TextDecoder, atob, btoa, Uint8Array, console,
     Deno: { env: { get: () => 'server-only-test-key' }, serve() {} },
     fetch: async (url, options) => {
@@ -26,7 +30,7 @@ function bodyClock(h) {
     if (file === 'index.ts') code += '\nmodule.exports.processUser = processUser;';
     const module = { exports: {} };
     const req = name => name.startsWith('npm:') ? { createClient: () => h.client }
-      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.startsWith('../') ? name : name.slice(2));
+      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name)));
     vm.runInContext(`(function(require,module,exports){${code}\n})`, context)(req, module, module.exports);
     cache.set(file, module.exports); return module.exports;
   }
@@ -161,4 +165,46 @@ test('Body Clock skips a missing shared root even when old replay receipts remai
   const h = harness({ anonymous: true }); await chat(h, '古い応答');
   h.temporaryRoots.clear();
   assert.equal((await bodyClock(h).send()).skipped, 'temporary_state_unavailable');
+});
+
+test('anonymous chat omits expired history from inference but retains it for display', async () => {
+  const h = harness({ anonymous: true });
+  const canonical = h.load('lib/canonical-state.ts');
+  const history = [
+    { role: 'user', text: 'old-anonymous-context', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },
+    { role: 'user', text: 'active-anonymous-context', sentAt: new Date(Date.now() - 3600000).toISOString() },
+    { role: 'user', text: 'untimed-anonymous-context' },
+  ];
+  const token = canonical.sealTemporaryState({
+    history, memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0,
+  }, 'prior-turn');
+
+  const result = await chat(h, '今日も話そう', token);
+  const prompt = JSON.stringify(h.prompts);
+  assert.match(prompt, /active-anonymous-context/);
+  assert.doesNotMatch(prompt, /old-anonymous-context|untimed-anonymous-context/);
+  const saved = canonical.openTemporaryState(result.temporaryState).state.history;
+  assert.equal(saved[0].text, 'old-anonymous-context');
+  assert.equal(saved[0].sentAt, history[0].sentAt);
+});
+
+test('anonymous memory expires per item across renewal, replacement auth ID and email save', async () => {
+  const h = harness({ anonymous: true });
+  const canonical = h.load('lib/canonical-state.ts');
+  const first = await chat(h, '最初の情報');
+  const old = canonical.openTemporaryState(first.temporaryState).state;
+  h.advanceClock(60 * 60 * 1000);
+  h.setOpenaiPayload({ reply: 'うん', memory: [...old.memory, 'newer fact'], misakiTodayMemory: { items: [] } });
+  const second = await chat(h, '次の情報', first.temporaryState);
+  h.advanceClock(23 * 60 * 60 * 1000 - 1000);
+  h.user.id = 'safari-replacement';
+  const resumed = await canonical.loadTemporaryRoot(h.user.id, second.temporaryState);
+  const { anonymousInferenceState } = h.load('supabase/functions/_shared/anonymous-memory-expiry.ts');
+  assert.deepEqual(Array.from(anonymousInferenceState(resumed, h.now()).memory), [...old.memory, 'newer fact']);
+  h.advanceClock(1000);
+  const active = anonymousInferenceState(resumed, h.now());
+  assert.deepEqual(Array.from(active.memory), ['newer fact']);
+  assert.equal(active.relationshipPoints, 0);
+  await save(h, second.temporaryState);
+  assert.deepEqual(Array.from(h.rootState.memory), ['newer fact']);
 });

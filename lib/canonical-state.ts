@@ -1,3 +1,4 @@
+import { anonymousCheckpointState, anonymousInferenceState, type MemoryTimes } from "../supabase/functions/_shared/anonymous-memory-expiry";
 import { TemporaryStateUnavailableError } from "./temporary-state-error";
 import { createClient } from "@supabase/supabase-js";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
@@ -10,8 +11,11 @@ export type RootState = {
   forgetControls?: ForgetControl[];
   history?: unknown[];
   memory: string[];
+  memoryTimes?: MemoryTimes;
+  todayMemoryTimes?: MemoryTimes;
   todayMemory: { date: string; items: string[] };
   relationshipPoints: number;
+  relationshipEvidenceAt?: number;
   updatedAt?: string | null;
   temporaryRevision?: string | null;
   relationshipEngine?: Snapshot;
@@ -146,6 +150,10 @@ export async function loadTemporaryRoot(userId: string, token: unknown): Promise
     if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError("expired");
     return { ...verified.state, temporaryRevision: root.revision };
   }
+  const { data: expired, error: expiryError } = await createServerSupabase()
+    .from("misaki_expired_temporary_root_users").select("user_id").eq("user_id", userId).maybeSingle();
+  if (expiryError) throw new Error("Temporary root expiry marker read failed");
+  if (expired) throw new TemporaryStateUnavailableError("expired");
   // A valid bearer state can seed a replacement Safari anonymous auth ID.
   // Once this ID has a server root, browser snapshots cannot overwrite it.
   if (temporary) return { ...temporary.state, temporaryRevision: null };
@@ -168,9 +176,10 @@ export async function loadCompletedTurn(userId: string, requestId: string, messa
 }
 
 export async function completeCanonicalTurn(userId: string, requestId: string, message: string,
-  userMessageAt: string, result: Record<string, unknown>) {
+  userMessageAt: string, result: Record<string, unknown>, emotionInput?: unknown) {
   const { forgetControls, ...publicResult } = result;
-  const { data, error } = await createServerSupabase().rpc("complete_misaki_chat_turn", {
+  const { data, error } = await createServerSupabase().rpc(emotionInput ? "complete_misaki_chat_turn_with_emotion" : "complete_misaki_chat_turn", {
+    ...(emotionInput ? { p_emotion_input: emotionInput } : {}),
     p_user_id: userId, p_request_id: requestId, p_message: message,
     p_user_message_at: userMessageAt, p_result: { ...publicResult, forgetControlPayload: await forgetControlPayload(userId, (forgetControls ?? []) as ForgetControl[]) },
   });
@@ -184,7 +193,8 @@ function temporaryResponse(token: string, message: string) {
   const temporary = openTemporaryState(token);
   if (!temporary?.result || temporary.result.originalMessage !== message) throw new Error("Temporary replay unavailable");
   const { originalMessage, ...result } = temporary.result;
-  return { ...result, temporaryState: token };
+  const active = anonymousInferenceState(temporary.state, Date.now());
+  return { ...result, memory: active.memory, misakiTodayMemory: active.todayMemory, temporaryState: token };
 }
 
 export async function loadCompletedTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown) {
@@ -206,7 +216,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
   const { data, error } = await createServerSupabase().rpc("complete_misaki_temporary_turn", {
     p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),
     p_parent_hash: digest(typeof parent === "string" ? parent : ""), p_token: token,
-    p_expected_revision: revision, p_state: { ...verified.state, forgetControlPayload: await forgetControlPayload(userId, verified.state.forgetControls ?? []) },
+    p_expected_revision: revision, p_state: { ...anonymousCheckpointState(verified.state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, verified.state.forgetControls ?? []) },
   });
   if (error || typeof data !== "string") {
     if (error) {
@@ -220,7 +230,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
 export async function editTemporaryRoot(userId: string, state: RootState, purpose = "edit") {
   const token = sealTemporaryState(state, purpose);
   const { error } = await createServerSupabase().rpc("write_misaki_temporary_root", {
-    p_user_id: userId, p_token: token, p_state: { ...state, forgetControlPayload: await forgetControlPayload(userId, state.forgetControls ?? []) }, p_expected_revision: state.temporaryRevision ?? null,
+    p_user_id: userId, p_token: token, p_state: { ...anonymousCheckpointState(state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, state.forgetControls ?? []) }, p_expected_revision: state.temporaryRevision ?? null,
   });
   if (error) throw new Error("Temporary edit commit failed");
   return token;

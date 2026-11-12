@@ -46,7 +46,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         refunded++; return { data: [{ refunded: true, message_count: 0, remaining: 20, is_premium: false }], error: null };
       }
       if (name === 'get_relationship_time_context') return { data: { exists: true, intimacy_points: points }, error: null };
-      if (name === 'complete_misaki_chat_turn') {
+      if (name === 'complete_misaki_chat_turn' || name === 'complete_misaki_chat_turn_with_emotion') {
         if (commitFailure) return { data: null, error: { message: 'commit failed' } };
         assert.equal(args.p_user_id, user.id);
         const found = completed.get(args.p_request_id);
@@ -104,7 +104,10 @@ function harness({ anonymous = false, premium = false, generationFailure = false
   }
   client.auth.admin = { getUserById: async () => ({ data: { user }, error: null }) };
   let clock = Date.now();
-  class TestDate extends Date { static now() { return clock; } }
+  class TestDate extends Date {
+    constructor(...args) { super(...(args.length ? args : [clock])); }
+    static now() { return clock; }
+  }
   const context = vm.createContext({ Response, Request, Date: TestDate, JSON, Buffer, URL, crypto: require('node:crypto').webcrypto,
     AbortController, AbortSignal, TextEncoder, TextDecoder, Uint8Array, atob, btoa, structuredClone, performance, setTimeout, clearTimeout, process: { env: { GEMINI_API_KEY: 'test', SUPABASE_SERVICE_ROLE_KEY: 'server-only-test-key' } },
     console: { log() {}, warn() {}, error() {} },
@@ -152,7 +155,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
     }
     cache.set(file, module.exports); return module.exports;
   }
-  return { client, user, forgetPayloads, geminiCalls, setSemanticJudge: value => { semanticJudge = value; }, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
+  return { client, user, now: () => clock, forgetPayloads, geminiCalls, setSemanticJudge: value => { semanticJudge = value; }, setMaintenance: value => { maintenance = value; }, temporaryRoots, temporaryReceipts, advanceClock: ms => { clock += ms; }, load, rootState, calls, prompts, get points() { return points; }, get consumed() { return consumed; },
     get refunded() { return refunded; }, get generated() { return generated; },
     setOpenaiPayload(value) { openaiPayload = value; },
     request(body) { return new Request('https://test/api/chat', { method: 'POST', headers: { Authorization: 'Bearer token' },

@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { RelationshipTimeContext } from "./relationship-time";
+import { loadRelationshipTimeContext, type RelationshipTimeContext } from "./relationship-time";
 import {
   reduceRelationshipEmotion,
   type EmotionPrimary,
@@ -30,7 +30,8 @@ export async function persistRelationshipEmotionFromSignals(
   context: RelationshipTimeContext | null,
   assessment: RelationshipSignalAssessment,
   patterns?: RelationshipPatternContext,
-  userId?: string
+  userId?: string,
+  requestId?: string
 ): Promise<{ applied: boolean; conflict: boolean; emotion: EmotionReducerResult; action: ActionDecision }> {
   const learnedPatterns = patterns ?? await loadRelationshipPatterns(supabase as any, isAnonymous);
   const emotion = reduceRelationshipEmotion({
@@ -58,8 +59,9 @@ export async function persistRelationshipEmotionFromSignals(
   }));
 
   const { data, error } = await (supabase.rpc as any)(
-    "apply_relationship_emotion_action_v2",
+    requestId ? "apply_misaki_queued_emotion" : "apply_relationship_emotion_action_v2",
     {
+      ...(requestId ? { p_request_id: requestId } : {}),
       p_primary: emotion.primary,
       p_intensity: emotion.intensity,
       p_action: action.action,
@@ -74,7 +76,7 @@ export async function persistRelationshipEmotionFromSignals(
   );
 
   if (error) {
-    console.error("RELATIONSHIP EMOTION V2 WRITE ERROR:", error);
+    console.error("RELATIONSHIP EMOTION V2 WRITE ERROR");
     return { applied: false, conflict: false, emotion, action };
   }
 
@@ -85,4 +87,31 @@ export async function persistRelationshipEmotionFromSignals(
     emotion,
     action,
   };
+}
+
+export function emotionTurnInput(context: RelationshipTimeContext | null, assessment: RelationshipSignalAssessment, patterns: RelationshipPatternContext) {
+  return {
+    elapsedHours: context?.elapsedHours ?? 0,
+    intimacyLevel: context?.intimacyLevel ?? "initial",
+    assessment: { ...assessment, signals: assessment.signals.map(signal => ({ ...signal, evidence: "" })) },
+    patterns,
+  };
+}
+
+export async function resumeRelationshipEmotion(supabase: SupabaseClient, userId: string) {
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const { data: pending, error } = await supabase.from("misaki_emotion_turns")
+      .select("request_id,input").eq("user_id", userId).not("input", "is", null)
+      .order("event_id").limit(1).maybeSingle();
+    if (error) throw new Error("Emotion queue read failed");
+    if (!pending) return;
+
+    const current = await loadRelationshipTimeContext(supabase, false, userId);
+    if (!current?.exists) throw new Error("Emotion state unavailable");
+
+    const { elapsedHours, intimacyLevel, assessment, patterns } = pending.input as ReturnType<typeof emotionTurnInput>;
+    const result = await persistRelationshipEmotionFromSignals(supabase, false,
+      { ...current, elapsedHours, intimacyLevel }, assessment, patterns, userId, pending.request_id);
+    if (!result.applied && !result.conflict) throw new Error("Emotion queue write deferred");
+  }
 }

@@ -59,14 +59,16 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
       if (name.endsWith('/canonical-state')) return {
         createServerSupabase: () => client,
         forgetControlPayload: async () => 'encrypted-forget-control-fixture',
-        openTemporaryState: token => token === 'verified' ? { state: { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 } } : null,
-        loadTemporaryRoot: async (_id, token) => token === 'verified' ? { memory: ['remember'], history, todayMemory: { date: '', items: [] }, relationshipPoints: 2 }
+        openTemporaryState: token => token === 'verified' ? { state: { memory: ['remember'], memoryTimes: [['remember', Date.now() - 1000]], history: history.map(item => ({ ...item, sentAt: new Date(Date.now() - 1000).toISOString() })), todayMemory: { date: '', items: [] }, relationshipPoints: 2 } } : null,
+        loadTemporaryRoot: async (_id, token) => token === 'verified' ? { memory: ['remember'], memoryTimes: [['remember', Date.now() - 1000]], history: history.map(item => ({ ...item, sentAt: new Date(Date.now() - 1000).toISOString() })), todayMemory: { date: '', items: [] }, relationshipPoints: 2 }
           : { memory: [], history: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0 },
         sealTemporaryState: () => 'verified',
       };
       if (name.endsWith('/temporary-state-error')) return load('lib/temporary-state-error.ts');
       if (name.endsWith('/recovery-session')) return load('lib/recovery-session.ts');
       if (name.endsWith('/_shared/forget-control')) return {};
+      if (name.endsWith('/_shared/anonymous-memory-expiry')) return load('supabase/functions/_shared/anonymous-memory-expiry.ts');
+      if (name === './anonymous-history-expiry.ts') return load('supabase/functions/_shared/anonymous-history-expiry.ts');
       if (name.endsWith('/device-conversation')) return load('lib/device-conversation.ts');
       throw Error(name);
     };

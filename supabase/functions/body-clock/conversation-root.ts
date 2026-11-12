@@ -1,4 +1,5 @@
 import { openForgetControls } from "../_shared/forget-control.ts";
+import { anonymousInferenceState } from "../_shared/anonymous-memory-expiry.ts";
 import type { SupabaseClient } from "npm:@supabase/supabase-js@2.57.4";
 import { openTemporaryReceipt } from "./temporary-state.ts";
 
@@ -12,7 +13,8 @@ export async function loadBodyClockRoot(s: SupabaseClient, userId: string) {
     if (root) {
       const state = await openTemporaryReceipt(root.token, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
       if (!state || Date.parse(root.expires_at) <= Date.now()) return null;
-      return { history: state.history, memory: state.memory, forgetControls: state.forgetControls ?? [], todayMemory: state.todayMemory ?? { date: "", items: [] }, temporaryPoints: state.relationshipPoints,
+      const active = anonymousInferenceState(state, Date.now());
+      return { history: active.history, memory: active.memory, forgetControls: state.forgetControls ?? [], todayMemory: active.todayMemory, temporaryPoints: active.relationshipPoints,
         temporaryState: state, temporaryRevision: root.revision, temporaryExpiresAt: root.expires_at, updatedAt: null };
     }
     // An immutable replay receipt can be older than an edit or delivery.
