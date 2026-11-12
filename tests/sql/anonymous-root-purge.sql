@@ -25,4 +25,5 @@ insert into public.misaki_relationship_events values
 grant usage on schema auth to service_role;
 grant select, update on auth.users to service_role;
 grant select on public.misaki_relationship_events to service_role;
-grant select, delete on public.misaki_temporary_roots to service_role;
+alter role service_role bypassrls;
+grant select, insert, delete on public.misaki_temporary_roots to service_role;

@@ -6,7 +6,7 @@ const vm = require('node:vm');
 const ts = require('typescript');
 const root = path.join(__dirname, '..');
 
-function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79 } = {}) {
+function harness({ anonymous = false, premium = false, generationFailure = false, commitFailure = false, stateFailure = false, initialPoints = 79, expiredRootMarker = false } = {}) {
   const user = { id: 'account-a', is_anonymous: anonymous };
   const rootState = { history: [], memory: ['server memory'], today_memory: { date: '', items: [] } };
   let points = initialPoints, consumed = 0, refunded = 0, generated = 0;
@@ -22,6 +22,7 @@ function harness({ anonymous = false, premium = false, generationFailure = false
         async maybeSingle() {
           if (table === 'misaki_maintenance_control') return { data: { enabled: maintenance }, error: null };
           if (stateFailure) return { error: { message: 'unavailable' }, data: null };
+          if (table === 'misaki_expired_temporary_root_users') return { data: expiredRootMarker ? { user_id: user.id } : null, error: null };
           if (table === 'misaki_temporary_roots') return { data: temporaryRoots.get(user.id) ?? null, error: null };
           if (table === 'misaki_relationship_state') return { data: { intimacy_points: points }, error: null };
           if (table === 'misaki_user_conversation_state') return { data: rootState, error: null };
@@ -330,4 +331,16 @@ test('ordinary chat wait does not falsely claim Misaki is busy', () => {
   assert.ok(source.includes('美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね'));
   assert.ok(!source.includes('setWaitingOnReply(true), 1_800'));
   assert.ok(!source.includes('window.clearTimeout(waitingTimer)'));
+});
+
+test('a purged root still rejects an otherwise valid browser token for the same user', async () => {
+  const h = harness({ anonymous: true, expiredRootMarker: true });
+  const canonical = h.load('lib/canonical-state.ts');
+  const token = canonical.sealTemporaryState({
+    history: [], memory: ['old memory'], todayMemory: { date: '', items: [] }, relationshipPoints: 0,
+  }, 'prior-turn');
+  assert.ok(canonical.openTemporaryState(token));
+  for (const candidate of [token, null]) {
+    await assert.rejects(canonical.loadTemporaryRoot(h.user.id, candidate), { reason: 'expired' });
+  }
 });

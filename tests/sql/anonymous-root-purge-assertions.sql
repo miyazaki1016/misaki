@@ -28,7 +28,14 @@ begin
   if public.purge_expired_misaki_anonymous_root(expired, expired) then
     raise exception 'cleanup retry did not return false';
   end if;
-  if (select count(*) from public.misaki_temporary_roots) <> 3
+  begin
+    insert into public.misaki_temporary_roots values (expired, expired, clock_timestamp());
+    raise exception 'purged root was recreated';
+  exception when raise_exception then
+    if sqlerrm <> 'temporary state expired' then raise; end if;
+  end;
+  if (select user_id from public.misaki_expired_temporary_root_users) is distinct from expired
+     or (select count(*) from public.misaki_temporary_roots) <> 3
      or (select count(*) from auth.users) <> 4
      or (select count(*) from public.misaki_relationship_events) <> 1 then
     raise exception 'cleanup modified unexpected rows';
