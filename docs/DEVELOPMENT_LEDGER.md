@@ -17,10 +17,10 @@
       "issue": 102,
       "goal": "エンジン総点検：埋もれた成果の所在・実装・本番利用と再開先を確認",
       "status": "active",
-      "updated": "2026-11-12",
+      "updated": "2026-11-13",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "P0統合Draft #193の実Supabase Auth・iPhone Safari・実モデル受入を隔離環境で確認し、別表現からの再抽出とBody Clockの実競合を検証する。mainマージと本番変更は個別承認。",
+      "next": "P0統合Draft #193はNO-GO。期限切れ事実の別表現の再保存を防ぎ、明示的な再学習と区別する回帰を追加。その後、実Supabase Auth、iPhone Safari相当、Body Clockの実競合、回収定期実行を隔離検証。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
@@ -47,7 +47,9 @@
         },
         "verification": {
           "status": "unconfirmed",
-          "evidence": []
+          "evidence": ["https://github.com/miyazaki1016/misaki/actions/runs/43323186421"],
+          "pr": 193,
+          "head_sha": "5c77d9f09f63791635597b7e87da717f9a7e4255"
         },
         "main": {
           "status": "unconfirmed",
@@ -343,3 +345,24 @@
 | #141 | Complete reviewed ledger and main operations-index fact proposals | merged | `6e3df7b41bdce757191c0650a66fad977a8a198e` | 2026-11-02T16:04:56Z |
 | #143 | fix: avoid proposal branch collisions on GitHub Actions reruns | merged | `4dfd89e9cf0f333b948e1f9eeba7112b94e73b65` | 2026-11-02T16:21:24Z |
 <!-- INVENTORY_FACTS_END -->
+
+## 2026-11-13 P0最終受入の判定（親 #102、統合Draft #193）
+
+**NO-GO。期限切れ匿名記憶の言い換えが再保存される経路を隔離環境で再現した。** 親 #102 はOPEN、P1未着手。着手前CLI照合は今回の依頼文でREVIEW_RECORDED、履歴版 `f19aa9ca9b41be6385838bccb0f0d7c86a489864`。候補 #66 の忘却と確認付き再学習、#190 の失効root削除、#101 の既存監査を再利用した。
+
+### 変更と証拠
+
+- [Draft #193](https://github.com/miyazaki1016/misaki/pull/193) の `work/p0-engine-integration`、検証対象 [`5c77d9f09f63791635597b7e87da717f9a7e4255`](https://github.com/miyazaki1016/misaki/commit/5c77d9f09f63791635597b7e87da717f9a7e4255)。全テスト **416成功・0失敗・0スキップ**、型検査・Next.jsビルド成功。[統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43323186421)・[照合CI](https://github.com/miyazaki1016/misaki/actions/runs/43323186757)・[昇格分類CI](https://github.com/miyazaki1016/misaki/actions/runs/43323186423) 成功。
+- 匿名の履歴再取得・編集応答から、期限切れの個別記憶、当日要約、関係性ポイントを除外した。画面用の会話履歴は保持。トークン直接再送とサーバーreceipt再送の両方で期限切れのポイントを返さない回帰を追加した。匿名ID交換と登録前保存の既存テストに再接続時の表示・記憶件数確認を追加した。
+- 感情v2は、会話・再送が無ければ従来の処理待ちに残る。独立した認証付き回収エンドポイントとDB claimを追加した。最古の処理待ちをユーザーごとに1件、1回最大8ユーザー取得し、同じ処理の再取得まで2分空ける。CAS・順序・request IDによる二重適用防止は既存RPCを再利用。PGliteで再呼出し、次の会話なしでの再取得、権限、競合・失敗後の再開を検証した。定期実行の設定が稼働条件。
+- 関係性全体のリセットは、古い根拠と新しい根拠が混ざるスナップショットで新しい寄与も失う。現在の形式では寄与の期限を分離できないため、部分維持は保留。新しい個別記憶と表示履歴が残ることは回帰テストで確認済み。関係性を部分維持するには、時刻付きの根拠から再構築して登録時にも同じ境界を検証する。
+- 未合格の再現手順。既存 `tests/helpers/canonical-harness.cjs` で匿名rootに「通勤はいつも電車」を保存し、作成時刻を `h.now() - 86400000` に設定。次のユーザー発言は「おはよう」、生成代替の `memory` は「職場へは鉄道で通う」とする。チャット応答は HTTP 200、言い換えが新規記憶として保存された。出力の根拠と期限を結び付け、期限切れの内容とユーザーによる新規提供を区別する回帰が次の着手点。明示的忘却には既存の再提示・確認・肯定のルールを引き続き適用する。
+- 代替検証はPGliteのSQL、合成Auth遷移・Safari相当の匿名ID交換、モデル・Push代替を用いた既存の回帰。並行呼出しの隔離プローブではchatが先に確定し、Body Clock側は古いrevisionで拒否され、再送による二重会話なし。実Supabase Auth・複数接続のDBロック・稼働中のBody Clockとの競合・iPhone Safari/WebKit・実Gemini・実端末複数台は未確認。Supabaseに既存の隔離ブランチは見つからなかった。
+
+### 統合・DB・切り戻し
+
+- `git merge-tree` で main `58eaed8bf7ed8d08f5adda1a9824fec7a38ee7ca` に対して競合なし、統合ツリーは #193 HEADと同一。#66・#190・#191 のHEADを #193 が含むため、個別マージは行わず #193 で一括統合する方針。#192 は台帳・履歴の文書Draftで、製品差分と独立。
+- 承認後に隔離Supabaseで適用履歴と旧版互換を検証。新規分の適用順は `20261006200002` 忘却 → `20261112081000` 失効rootマーカーと削除RPC → `20261112082000` 感情待ち → `20261112083000` 登録確認トリガー → `20261112084000` 回収claim。失効root削除RPCの導入だけでは物理削除は起動しない。既存登録データの書換えは対象外。匿名の時刻不明データは期限を証明できず登録確認で落ち得るため、既存のメール確認待ちと旧Next/Edge混在で要検証。
+- 本番は承認後にDBバックアップ・適用履歴確認・保守切替を行い、DB／Next／Body Clock Edgeの互換境界を協調させる。匿名期限・忘却のユーザー単位フラグはこの差分にない。感情回収は `MISAKI_EMOTION_RECOVERY_SECRET` と専用の定期POSTを設定した段階で有効化できる。定期実行は通知送信とは独立し、同時実行上限を設け、隔離環境で認証と再試行を確認してから設定する。
+- 有効化後は待ち件数、最古の未処理時刻、回収HTTP失敗とclaim件数、CAS競合・Auth確認エラー・Body Clock失敗を監視。待ち時間の増加や失敗の連続で回収を停止し、待ち入力と忘却制御を保持して原因を特定する。
+- 切り戻しはまず定期POSTと削除起動を止め、保守モードで書込みを止める。忘却・期限の保護を持つ互換Next/Edgeを使用し、旧バイナリだけを戻して忘却情報を参照させない。回収単体を戻す場合は待ち入力を保持し、依存する呼出しを止めたうえでclaim RPCと `recovery_after` の逆順解除を隔離確認。適用済みの忘却制御や失効マーカーを消さず、匿名登録で既に除外されたデータは自動復元しない。残りのDDL切り戻しは実Auth・実データ相当の互換試験が通るまで未承認。
