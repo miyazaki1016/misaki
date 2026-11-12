@@ -1177,6 +1177,15 @@
         "https://github.com/miyazaki1016/misaki/actions/runs/43182149490",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
       ]
+    },
+    "191": {
+      "summary": "匿名履歴の推論入力を発言単位の24時間に制限",
+      "conclusion": "Draftの最新HEADで通常チャット・Body Clockの隔離試験と統合CIに成功。個別記憶・関係性派生・登録移行・本番・実機は未完了。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/191",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43183072388",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069"
+      ]
     }
   }
 }

@@ -20,7 +20,7 @@
       "updated": "2026-11-12",
       "pause_reason": "",
       "blocked_by": [],
-      "next": "P0は #187 の情報単位期限と匿名root削除後の保持・起動契約、#188 の感情v2再開を優先。#189 は #66 の隔離Supabase・実モデル・実機受入へ。P1／P2は総点検の既存再開表から個別照合する。",
+      "next": "P0は #187 で #191 の匿名履歴期限に続き個別記憶メタデータ・登録移行を実装し、#190 の削除後保持・起動契約を検証する。#188 は隔離再現済みCASの順序付き再開を実装。#189 は #66 の隔離Supabase・実モデル・実機受入へ。P1／P2は総点検の既存再開表から個別照合する。",
       "completion": "重要エンジンの所在・実装・検証・main・本番利用・実機状態を根拠付きで分類し、未完了の全候補に再開先を残す。全件確認前に親Issueを閉じない。",
       "evidence": [
         "https://github.com/miyazaki1016/misaki/issues/102",
@@ -32,7 +32,11 @@
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6775321357",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6805959826",
         "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346",
-        "https://github.com/miyazaki1016/misaki/pull/190"
+        "https://github.com/miyazaki1016/misaki/pull/190",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6806161708",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6815091619",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069",
+        "https://github.com/miyazaki1016/misaki/pull/191"
       ],
       "stages": {
         "implementation": {
@@ -130,6 +134,15 @@
 | 感情・行動v2 | [Draft #31](https://github.com/miyazaki1016/misaki/pull/31) の既存経路と設計を再利用。 `sora/relationship-time-v2-design` / `e2eb89df45e0cc315cbc7491b597b0bdc1cb5f64` | mainの既存RPC契約テスト9件成功。新しい修正の隔離テスト・CI未実施。[旧設計HEAD CI](https://github.com/miyazaki1016/misaki/actions/runs/36121699019) | 会話確定と再生入力を同時保存し、順序・request IDによる冪等性・競合時の再計算を検証する。 |
 
 #66 と #190 の最新HEADをCI確認後に再取得し一致を確認。両HEADのローカル合成ツリーは競合なし・テスト410件成功。新しい実装のmain統合、本番反映、本番DB変更・削除、実機確認は未実施。P1・P2は今回の変更未着手。既存台帳の総点検表を引き継ぎ、P0の残工程に続いて個別照合する。機能完成0件。親 #102 はOPEN。
+
+## 2026-11-12 P0追加検証と引き継ぎ
+
+- **情報単位24時間の一部** [Draft #191](https://github.com/miyazaki1016/misaki/pull/191) `work/anonymous-history-24h` / `accf2ef33c01e0a45ee96bea543fde01350e87f2`。PR #100の設計から匿名チャット・Body Clockの履歴推論入力に発言単位の固定24hを実装。時刻なし・不正・未来時刻を推論から除外し、表示用履歴を保持。ローカル389テスト、境界・実経路を隔離確認。[統合CI](https://github.com/miyazaki1016/misaki/actions/runs/43183072388) と [照合CI](https://github.com/miyazaki1016/misaki/actions/runs/43183072422) 成功。個別の長期・当日記憶、関係性派生、メール登録と別匿名IDでの復元は残る。
+- **感情・行動v2** PGliteの合成データで現行mainの `complete_misaki_chat_turn` と `apply_relationship_emotion_action_v2` を実行。会話確定1件の直後に生成前revisionを渡すと `{ok:false, conflict:true}`、感情イベント0件。#188で修正と再開実装を継続する。今回の試験は障害の再現。
+- **組み合わせ** #66・#190の組み合わせはマージ競合なし・410テスト成功。#191を加えるとchatとBody Clock・テストに競合。隔離したローカル合成で、履歴の期限判定を忘却の意味判定より前に適用し、表示用履歴と既存忘却テストを保持して412テスト成功。各Draftを統合する際に同じ解消を適用し、GitHub CIを再実行する。
+- 今回の3Draftはmain未統合、本番未反映、実機未検証。親 #102 はOPEN。次の実装は #187 の情報単位記憶メタデータ、#188 の再開可能なCAS、#190の削除運用と保持範囲。P1・P2は既存の総点検結果から順次再開する。
+
+[親Issueの追加検証記録](https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069)。
 
 ## 再開時に見る案件
 
