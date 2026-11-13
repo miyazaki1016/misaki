@@ -1,0 +1,373 @@
+{
+  "id": "branch-df145aa691117ae1",
+  "title": "work/p0-engine-integration",
+  "head": "51172011f7fac44950a6aa68494771ecdfe2bd76",
+  "head_ref": "work/p0-engine-integration",
+  "linked_prs": [
+    193
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/app/api/chat/route.ts"
+    },
+    {
+      "path": "app/api/cron/emotion-recovery/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/app/api/cron/emotion-recovery/route.ts"
+    },
+    {
+      "path": "app/api/persona/evolution/analyze/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/app/api/persona/evolution/analyze/route.ts"
+    },
+    {
+      "path": "app/api/persona/history/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/app/api/persona/history/route.ts"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/app/chat/page.tsx"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "lib/anonymous-memory-evidence.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/anonymous-memory-evidence.ts"
+    },
+    {
+      "path": "lib/canonical-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/canonical-state.ts"
+    },
+    {
+      "path": "lib/persona/evolution-runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/persona/evolution-runner.ts"
+    },
+    {
+      "path": "lib/persona/persona-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/persona/persona-store.ts"
+    },
+    {
+      "path": "lib/relationship-emotion-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/relationship-emotion-store.ts"
+    },
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/package.json"
+    },
+    {
+      "path": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/_shared/anonymous-history-expiry.ts"
+    },
+    {
+      "path": "supabase/functions/_shared/anonymous-memory-expiry.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/_shared/anonymous-memory-expiry.ts"
+    },
+    {
+      "path": "supabase/functions/_shared/forget-control.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/_shared/forget-control.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/body-clock/conversation-root.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/index.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/body-clock/index.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/persona-store.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/body-clock/persona-store.ts"
+    },
+    {
+      "path": "supabase/functions/body-clock/temporary-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/functions/body-clock/temporary-state.ts"
+    },
+    {
+      "path": "supabase/migrations/20261006200002_forget_control_v1.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/migrations/20261006200002_forget_control_v1.sql"
+    },
+    {
+      "path": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "path": "supabase/migrations/20261112082000_relationship_emotion_resume.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/migrations/20261112082000_relationship_emotion_resume.sql"
+    },
+    {
+      "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql"
+    },
+    {
+      "path": "supabase/migrations/20261112084000_relationship_emotion_recovery.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/supabase/migrations/20261112084000_relationship_emotion_recovery.sql"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/anonymous-history-expiry.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "path": "tests/anonymous-root-purge.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/anonymous-root-purge.test.cjs"
+    },
+    {
+      "path": "tests/body-clock-canonical.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/body-clock-canonical.test.cjs"
+    },
+    {
+      "path": "tests/forget-batch-evaluate.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-batch-evaluate.ts"
+    },
+    {
+      "path": "tests/forget-batch.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-batch.test.ts"
+    },
+    {
+      "path": "tests/forget-call-count.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-call-count.test.cjs"
+    },
+    {
+      "path": "tests/forget-control.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-control.test.ts"
+    },
+    {
+      "path": "tests/forget-database.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-database.test.cjs"
+    },
+    {
+      "path": "tests/forget-fixture.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-fixture.cjs"
+    },
+    {
+      "path": "tests/forget-integration.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/forget-integration.test.cjs"
+    },
+    {
+      "path": "tests/helpers/canonical-harness.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/helpers/canonical-harness.cjs"
+    },
+    {
+      "path": "tests/helpers/forget-batch-evaluation.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/helpers/forget-batch-evaluation.ts"
+    },
+    {
+      "path": "tests/helpers/forget-batch-fixtures.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/helpers/forget-batch-fixtures.ts"
+    },
+    {
+      "path": "tests/helpers/forget-batch-runner.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/helpers/forget-batch-runner.ts"
+    },
+    {
+      "path": "tests/maintenance.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/maintenance.test.cjs"
+    },
+    {
+      "path": "tests/recovery-admission.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/recovery-admission.test.cjs"
+    },
+    {
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/relationship-runtime-v1.test.cjs"
+    },
+    {
+      "path": "tests/reports/forget-batch-evaluation.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/reports/forget-batch-evaluation.md"
+    },
+    {
+      "path": "tests/reports/forget-batch-scripted.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/reports/forget-batch-scripted.json"
+    },
+    {
+      "path": "tests/server-canonical.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/server-canonical.test.cjs"
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge-assertions.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/sql/anonymous-root-purge-assertions.sql"
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "path": "tests/temporary-continuity.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/51172011f7fac44950a6aa68494771ecdfe2bd76/tests/temporary-continuity.test.cjs"
+    }
+  ],
+  "commits": "51172011f7fac44950a6aa68494771ecdfe2bd76 fix(p0): ground new anonymous memories in unexpired user turns\n5c77d9f09f63791635597b7e87da717f9a7e4255 fix(p0): recover queued emotion without a new chat and enforce anonymous expiry on reconnect\n3289311ffea5d453b6035f5687558dc755389448 Integrate P0 drafts with per-item expiry and durable emotion resumption\naccf2ef33c01e0a45ee96bea543fde01350e87f2 Keep anonymous expiry assertions typed after equality narrowing\n138eaf7a181d49d53e722ab7d63f7092dded20f6 Limit anonymous conversation history used for inference to 24 hours\n054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2 Cover purge recovery without conflicting with the Forget Control harness\n8b685902c0adb3f150ccf0b14b72b030819762e6 Retain the expiry decision after deleting the anonymous root payload\nb29e209b75ae714cedb6b5c7af9d33f3efed5686 Preserve Forget Control acceptance and rollback documentation\na536eb4bdb3a61989805400027d12b094d2d8826 Add revision-fenced cleanup for expired anonymous transport roots\na26be8ec765a23632a187636f8b077edf83c2d9f Integrate current main into Forget Control and preserve recovery coverage\n84d147ba5b46698d3b46fb727a9859f87f79f3d2 Document Forget Control Preview acceptance gate\na13fb439d1a78f76f5607b8bb6465287fa95b3a3 Document Gemini Shadow blockers and separate batch optimization\nfb5768089494c62b35d11442d309bf3fe6df57fd Add verification-only Forget batch comparison and measurement harness\n3cb98b7e70b601602c0c473136b75fce02db6ff0 Prove canonical Soft Forget removal and measure resolver call counts\nbb6c98d635a6016a6e1d8b7fa1a39eacffb6cb3c Implement canonical Forget Control v1 with confirmed relearning",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ac58060d4b364d4ba66d1898dee2d9ba68d2b02e88d6c3d549b4ce64802a0770",
+  "collected_at": "2026-11-13T07:56:54.305234+00:00"
+}

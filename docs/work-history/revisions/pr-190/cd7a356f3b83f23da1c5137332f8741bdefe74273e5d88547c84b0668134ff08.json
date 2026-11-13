@@ -1,0 +1,427 @@
+{
+  "id": "pr-190",
+  "number": 190,
+  "title": "P0 期限切れ匿名rootの安全な物理削除",
+  "topics": [
+    "認証・安全性"
+  ],
+  "purpose": "認証・アクセス制御に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "親 #102、作業 #187。[着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/43180605768)。\n\n期限切れ匿名rootをIDとrevisionで指定して削除するservice_role専用RPC。Auth・登録済み・メール保存済み・未失効rootを保護する。PGliteで権限、対象選別、revision不一致、再実行を検証。スケジュール起動、receipt・バックアップの保持範囲、情報ごとの期限、本番・実機は継続。\n\n削除と同時に同じ匿名IDの期限切れマーカーを残し、ブラウザーに古いトークンが残っていても同じIDでrootを復活させない。migrationを先に適用し、期限切れマーカー対応のアプリ配備と互換性確認が済むまで削除RPCの起動は行わない。ローカルの関連54テスト成功。旧アプリとの混在、別匿名IDへの復旧、receipt・チェックポイント・バックアップのデータ保持は引き続き検証対象。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-100\",\"decision\":\"extend\",\"reason\":\"情報単位の固定24時間・全読み取り境界・回帰試験の設計を再利用し、未実装分を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/100\"},{\"id\":\"pr-1\",\"decision\":\"extend\",\"reason\":\"同一ユーザーへのメール保存契約と既存テストを再利用し、失効した情報の登録時復活を防ぐ境界を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-171\",\"decision\":\"reuse\",\"reason\":\"既存の着手前照合ワークフローを使用する。匿名記憶実装では照合システムの変更は不要\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/171\"},{\"id\":\"pr-131\",\"decision\":\"extend\",\"reason\":\"匿名復旧の認証スコープ、期限切れroot拒否、リプレイ・revisionの回帰証拠を流用し、情報単位期限を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"},{\"id\":\"pr-29\",\"decision\":\"extend\",\"reason\":\"正本化で導入された期限・revision・保守ガードを削除条件に再利用\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/29\"},{\"id\":\"pr-61\",\"decision\":\"distinct\",\"reason\":\"package.jsonが共通だがGemini費用計測は削除RPCと別\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/61\"},{\"id\":\"pr-66\",\"decision\":\"reuse\",\"reason\":\"既存PGliteのバージョンを再利用して隔離DBで削除条件を検証\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/66\"},{\"id\":\"pr-33\",\"decision\":\"extend\",\"reason\":\"匿名GET no-opを維持し、期限拒否は匿名のtemporary root読取経路で確認する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/33\"},{\"id\":\"pr-35\",\"decision\":\"extend\",\"reason\":\"匿名から恒久履歴を同期しない回帰を維持し、既存テストハーネスに削除後の同一ID再利用拒否を追加\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/35\"}]}\n-->",
+  "snapshot_head": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+  "snapshot_consistent": true,
+  "head": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+  "base": "58eaed8bf7ed8d08f5adda1a9824fec7a38ee7ca",
+  "base_ref": "main",
+  "head_ref": "work/anonymous-expired-root-purge",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-12T08:20:31Z",
+  "code_facts": [
+    {
+      "file": "lib/canonical-state.ts",
+      "kind": "DB・ストレージ操作の呼出し",
+      "expression": ".from(\"misaki_expired_temporary_root_users\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts"
+    },
+    {
+      "file": "lib/canonical-state.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (expiryError) throw new Error(\"Temporary root expiry marker read failed\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts"
+    },
+    {
+      "file": "lib/canonical-state.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (expired) throw new TemporaryStateUnavailableError(\"expired\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create table public.misaki_expired_temporary_root_users (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "alter table public.misaki_expired_temporary_root_users enable row level security;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant select, insert on public.misaki_expired_temporary_root_users to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create function public.reject_expired_misaki_root_recreation()",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "関数・クラス定義",
+      "expression": "revoke all on function public.reject_expired_misaki_root_recreation() from public, anon, authenticated;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "関数・クラス定義",
+      "expression": "for each row execute function public.reject_expired_misaki_root_recreation();",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "テストの期待値・条件",
+      "expression": "-- Installing the function does not run it or schedule cleanup.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create function public.purge_expired_misaki_anonymous_root(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "関数・クラス定義",
+      "expression": "revoke all on function public.purge_expired_misaki_anonymous_root(uuid, uuid)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant execute on function public.purge_expired_misaki_anonymous_root(uuid, uuid)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "file": "tests/anonymous-root-purge.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "const { test } = require('node:test');",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/anonymous-root-purge.test.cjs"
+    },
+    {
+      "file": "tests/anonymous-root-purge.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('expired anonymous root cleanup protects current revisions and accounts', async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/anonymous-root-purge.test.cjs"
+    },
+    {
+      "file": "tests/recovery-admission.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('a purged root still rejects an otherwise valid browser token for the same user', async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs"
+    },
+    {
+      "file": "tests/recovery-admission.test.cjs",
+      "kind": "条件分岐・閾値",
+      "expression": "if (table === 'misaki_expired_temporary_root_users') {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs"
+    },
+    {
+      "file": "tests/recovery-admission.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(canonical.openTemporaryState(token));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs"
+    },
+    {
+      "file": "tests/recovery-admission.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "await assert.rejects(canonical.loadTemporaryRoot(h.user.id, candidate), { reason: 'expired' });",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge-assertions.sql",
+      "kind": "条件分岐・閾値",
+      "expression": "if (select user_id from public.misaki_expired_temporary_root_users) is distinct from expired",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge-assertions.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create table auth.users (id uuid primary key, is_anonymous boolean not null);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create table public.misaki_temporary_roots (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "create table public.misaki_relationship_events (user_id uuid, event_type text);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant select, update on auth.users to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant select on public.misaki_relationship_events to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    },
+    {
+      "file": "tests/sql/anonymous-root-purge.sql",
+      "kind": "SQL定義・権限",
+      "expression": "grant select, insert, delete on public.misaki_temporary_roots to service_role;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    }
+  ],
+  "files": [
+    {
+      "path": "lib/canonical-state.ts",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 0,
+      "patch": "diff --git a/lib/canonical-state.ts b/lib/canonical-state.ts\nindex 16880551..0d744f86 100644\n--- a/lib/canonical-state.ts\n+++ b/lib/canonical-state.ts\n@@ -132,6 +132,10 @@ export async function loadTemporaryRoot(userId: string, token: unknown): Promise\n     if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError(\"expired\");\n     return { ...verified.state, temporaryRevision: root.revision };\n   }\n+  const { data: expired, error: expiryError } = await createServerSupabase()\n+    .from(\"misaki_expired_temporary_root_users\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();\n+  if (expiryError) throw new Error(\"Temporary root expiry marker read failed\");\n+  if (expired) throw new TemporaryStateUnavailableError(\"expired\");\n   // A valid bearer state can seed a replacement Safari anonymous auth ID.\n   // Once this ID has a server root, browser snapshots cannot overwrite it.\n   if (temporary) return { ...temporary.state, temporaryRevision: null };\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts",
+      "source": {
+        "path": "lib/canonical-state.ts",
+        "coverage": "全文",
+        "text": "import { TemporaryStateUnavailableError } from \"./temporary-state-error\";\nimport { createClient } from \"@supabase/supabase-js\";\nimport { createCipheriv, createDecipheriv, createHash, randomBytes } from \"node:crypto\";\nimport { engineEnabled, canonicalActingState, type Snapshot } from \"./relationship-engine-v1\";\nimport { createLegacyRelationshipActingState, type RelationshipActingState } from \"./relationship-acting-guide\";\nimport { criticalCandidates } from \"./relationship-analyzer-v1\";\n\nexport type RootState = {\n  history?: unknown[];\n  memory: string[];\n  todayMemory: { date: string; items: string[] };\n  relationshipPoints: number;\n  updatedAt?: string | null;\n  temporaryRevision?: string | null;\n  relationshipEngine?: Snapshot;\n  relationshipActingState?: RelationshipActingState;\n  relationshipCriticalPending?: boolean;\n  relationshipImportPending?: boolean;\n  temporaryRelationship?: {\n    emotionPrimary: string;\n    emotionIntensity: number;\n    actionState: string;\n    lastInteractionAt: string | null;\n    signals: Array<{ name: string; strength: number; confidence: number }>;\n    events?: Array<{\n      event_type: \"emotion_action_v2_after_chat\";\n      created_at: string;\n      metadata: { signal_summary: Array<{ name: string; strength: number; confidence: number }> };\n    }>;\n  } | null;\n};\n\nexport function createServerSupabase() {\n  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;\n  if (!key) throw new Error(\"Canonical state server credentials missing\");\n  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || \"https://tzozajnwznxqgxnjikoy.supabase.co\", key, {\n    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },\n  });\n}\n\nfunction encryptionKey() {\n  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;\n  if (!key) throw new Error(\"Temporary state server credentials missing\");\n  return createHash(\"sha256\").update(`misaki-temporary-state-v1:${key}`).digest();\n}\n\nexport function sealTemporaryState(state: RootState, requestId: string, result?: Record<string, unknown>) {\n  const iv = randomBytes(12);\n  const cipher = createCipheriv(\"aes-256-gcm\", encryptionKey(), iv);\n  const payload = Buffer.from(JSON.stringify({ state, requestId, result, expires: Date.now() + 24 * 60 * 60 * 1000 }));\n  const encrypted = Buffer.concat([cipher.update(payload), cipher.final()]);\n  return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString(\"base64url\");\n}\n\n// Anonymous state is a server-authenticated, temporary browser-session token.\n// It is not a permanent account state and clients cannot choose its points/memory.\n// Do not bind to the anonymous auth ID: Safari's transient auth recovery replaces\n// that ID while preserving this live browser session. Permanent accounts ignore it.\nfunction inspectTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown>; expires: number } | null {\n  if (typeof token !== \"string\" || token.length > 512_000) return null;\n  try {\n    const buffer = Buffer.from(token, \"base64url\");\n    const decipher = createDecipheriv(\"aes-256-gcm\", encryptionKey(), buffer.subarray(0, 12));\n    decipher.setAuthTag(buffer.subarray(12, 28));\n    const parsed = JSON.parse(Buffer.concat([decipher.update(buffer.subarray(28)), decipher.final()]).toString());\n    if (!Number.isFinite(parsed.expires)) return null;\n    return parsed;\n  } catch {\n    return null;\n  }\n}\n\nexport function openTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown> } | null {\n  const parsed = inspectTemporaryState(token);\n  return parsed && parsed.expires > Date.now() ? parsed : null;\n}\n\nexport async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {\n  const db = createServerSupabase();\n  let relationshipImportPending = false;\n  if (engineEnabled()) {\n    // Read path never starts permanent Relationship work without ownership.\n    // The post-save worker imports the frozen anonymous trajectory under its lease.\n    const [imported, temporary] = await Promise.all([\n      db.from(\"misaki_relationship_temporary_v1_imports\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle(),\n      db.from(\"misaki_temporary_roots\").select(\"token\").eq(\"user_id\", userId).maybeSingle(),\n    ]);\n    relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);\n  }\n  const [relationship, conversation] = await Promise.all([\n    db.from(\"misaki_relationship_state\").select(\"*\").eq(\"user_id\", userId).maybeSingle(),\n    db.from(\"misaki_user_conversation_state\").select(\"history,memory,today_memory,updated_at\").eq(\"user_id\", userId).maybeSingle(),\n  ]);\n  if (relationship.error || conversation.error) throw new Error(\"Canonical state read failed\");\n  let relationshipCriticalPending = relationshipImportPending;\n  if (engineEnabled()) {\n    const { data, error } = await db.from(\"misaki_relationship_critical_pending\").select(\"request_id\").eq(\"user_id\", userId).in(\"status\", [\"pending\", \"processing\", \"failed\"]);\n    relationshipCriticalPending ||= !!error || !!data?.length;\n    // Bridge the interval after chat commit but before the after() worker creates pending rows.\n    const { data: recent, error: recentError } = await db.from(\"misaki_relationship_events\").select(\"request_id,metadata\")\n      .eq(\"user_id\", userId).eq(\"event_type\", \"chat_turn_completed\").order(\"id\", { ascending: false }).limit(3);\n    const { data: processed, error: processedError } = await db.from(\"misaki_relationship_processing\").select(\"request_id\")\n      .eq(\"user_id\", userId).eq(\"processing_version\", \"relationship-v1.1\").eq(\"status\", \"applied\");\n    relationshipCriticalPending ||= !!recentError || !!processedError || !!recent?.some(t =>\n      typeof t.metadata?.message === \"string\" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));\n  }\n  return {\n    relationshipPoints: relationship.data?.intimacy_points ?? 0,\n    history: conversation.data?.history ?? [],\n    memory: conversation.data?.memory ?? [],\n    todayMemory: conversation.data?.today_memory ?? { date: \"\", items: [] },\n    updatedAt: conversation.data?.updated_at ?? null,\n    relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,\n      createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,\n    relationshipCriticalPending, relationshipImportPending,\n  };\n}\n\nexport async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {\n  const temporary = openTemporaryState(token);\n  if (token && !temporary) {\n    const inspected = inspectTemporaryState(token);\n    throw new TemporaryStateUnavailableError(inspected ? \"expired\" : \"unverifiable\");\n  }\n  const { data: root, error: rootError } = await createServerSupabase().from(\"misaki_temporary_roots\")\n    .select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n  if (rootError) throw new Error(\"Temporary root read failed\");\n  if (root) {\n    const verified = inspectTemporaryState(root.token);\n    const expires = Date.parse(root.expires_at);\n    if (!verified || !Number.isFinite(expires)) throw new TemporaryStateUnavailableError(\"unverifiable\");\n    if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError(\"expired\");\n    return { ...verified.state, temporaryRevision: root.revision };\n  }\n  const { data: expired, error: expiryError } = await createServerSupabase()\n    .from(\"misaki_expired_temporary_root_users\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();\n  if (expiryError) throw new Error(\"Temporary root expiry marker read failed\");\n  if (expired) throw new TemporaryStateUnavailableError(\"expired\");\n  // A valid bearer state can seed a replacement Safari anonymous auth ID.\n  // Once this ID has a server root, browser snapshots cannot overwrite it.\n  if (temporary) return { ...temporary.state, temporaryRevision: null };\n  // Only an explicit email checkpoint is eligible for fresh-tab restoration.\n  // Ordinary anonymous chat creates no plaintext permanent conversation root.\n  const { data, error } = await createServerSupabase().from(\"misaki_relationship_events\")\n    .select(\"id\").eq(\"user_id\", userId).eq(\"event_type\", \"email_save_checkpoint\").maybeSingle();\n  if (error) throw new Error(\"Temporary checkpoint read failed\");\n  return data ? loadCanonicalState(userId) : { history: [], memory: [], todayMemory: { date: \"\", items: [] }, relationshipPoints: 0 };\n}\n\nexport async function loadCompletedTurn(userId: string, requestId: string, message: string) {\n  const { data, error } = await createServerSupabase().from(\"misaki_relationship_events\")\n    .select(\"metadata\").eq(\"user_id\", userId).eq(\"request_id\", requestId)\n    .eq(\"event_type\", \"chat_turn_completed\").maybeSingle();\n  if (error) throw new Error(\"Completed turn read failed\");\n  if (!data) return null;\n  if (data.metadata.message !== message) throw new Error(\"Request ID reused for another message\");\n  return data.metadata.result as Record<string, unknown>;\n}\n\nexport async function completeCanonicalTurn(userId: string, requestId: string, message: string,\n  userMessageAt: string, result: Record<string, unknown>) {\n  const { data, error } = await createServerSupabase().rpc(\"complete_misaki_chat_turn\", {\n    p_user_id: userId, p_request_id: requestId, p_message: message,\n    p_user_message_at: userMessageAt, p_result: result,\n  });\n  if (error || !data) throw new Error(\"Canonical turn commit failed\");\n  return data as Record<string, unknown>;\n}\n\nfunction digest(value: string) { return createHash(\"sha256\").update(value).digest(\"hex\"); }\n\nfunction temporaryResponse(token: string, message: string) {\n  const temporary = openTemporaryState(token);\n  if (!temporary?.result || temporary.result.originalMessage !== message) throw new Error(\"Temporary replay unavailable\");\n  const { originalMessage, ...result } = temporary.result;\n  return { ...result, temporaryState: token };\n}\n\nexport async function loadCompletedTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown) {\n  const { data, error } = await createServerSupabase().from(\"daily_message_requests\")\n    .select(\"completed_at,temporary_result,message_hash,parent_hash\")\n    .eq(\"user_id\", userId).eq(\"request_id\", requestId).maybeSingle();\n  if (error) throw new Error(\"Temporary receipt read failed\");\n  if (!data?.completed_at) return null;\n  if (data.message_hash !== digest(message) || data.parent_hash !== digest(typeof parent === \"string\" ? parent : \"\")) {\n    throw new Error(\"Request ID reused for another temporary turn\");\n  }\n  return temporaryResponse(data.temporary_result, message);\n}\n\nexport async function completeTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown,\n  token: string, revision: string | null = null) {\n  const verified = openTemporaryState(token);\n  if (!verified) throw new Error(\"Temporary commit state invalid\");\n  const { data, error } = await createServerSupabase().rpc(\"complete_misaki_temporary_turn\", {\n    p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),\n    p_parent_hash: digest(typeof parent === \"string\" ? parent : \"\"), p_token: token,\n    p_expected_revision: revision, p_state: verified.state,\n  });\n  if (error || typeof data !== \"string\") {\n    if (error) {\n      console.error(\"TEMPORARY RECEIPT COMMIT ERROR\", { code: \"STATE_COMMIT_FAILED\" });\n    }\n    throw new Error(\"Temporary receipt commit failed\");\n  }\n  return temporaryResponse(data, message);\n}\n\nexport async function editTemporaryRoot(userId: string, state: RootState, purpose = \"edit\") {\n  const token = sealTemporaryState(state, purpose);\n  const { error } = await createServerSupabase().rpc(\"write_misaki_temporary_root\", {\n    p_user_id: userId, p_token: token, p_state: state, p_expected_revision: state.temporaryRevision ?? null,\n  });\n  if (error) throw new Error(\"Temporary edit commit failed\");\n  return token;\n}\n",
+        "sha256": "8a548cbed40a5a71c88f6a74bef4debaeb5ed92a9216af0cb7fe2f4cc4ac42c0"
+      }
+    },
+    {
+      "path": "package-lock.json",
+      "status": "modified",
+      "additions": 14,
+      "deletions": 0,
+      "patch": "diff --git a/package-lock.json b/package-lock.json\nindex e79ef054..519fb1e0 100644\n--- a/package-lock.json\n+++ b/package-lock.json\n@@ -17,6 +17,7 @@\n         \"web-push\": \"^3.6.7\"\n       },\n       \"devDependencies\": {\n+        \"@electric-sql/pglite\": \"0.5.8\",\n         \"@types/node\": \"^20\",\n         \"@types/react\": \"^19\",\n         \"@types/react-dom\": \"^19\",\n@@ -24,6 +25,13 @@\n         \"typescript\": \"^5\"\n       }\n     },\n+    \"node_modules/@electric-sql/pglite\": {\n+      \"version\": \"0.5.8\",\n+      \"resolved\": \"https://registry.npmjs.org/@electric-sql/pglite/-/pglite-0.5.8.tgz\",\n+      \"integrity\": \"sha512-n9tsbUOhwx2epK1V0ZG9Ar4SHWUju04dhmzZXiSBXwBoleOvIfals33NAaWgagQVAL4Rbvx/Ptsu3P+pA09f6Q==\",\n+      \"dev\": true,\n+      \"license\": \"Apache-2.0\"\n+    },\n     \"node_modules/@emnapi/runtime\": {\n       \"version\": \"1.11.3\",\n       \"resolved\": \"https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz\",\n@@ -1232,6 +1240,12 @@\n     }\n   },\n   \"dependencies\": {\n+    \"@electric-sql/pglite\": {\n+      \"version\": \"0.5.8\",\n+      \"resolved\": \"https://registry.npmjs.org/@electric-sql/pglite/-/pglite-0.5.8.tgz\",\n+      \"integrity\": \"sha512-n9tsbUOhwx2epK1V0ZG9Ar4SHWUju04dhmzZXiSBXwBoleOvIfals33NAaWgagQVAL4Rbvx/Ptsu3P+pA09f6Q==\",\n+      \"dev\": true\n+    },\n     \"@emnapi/runtime\": {\n       \"version\": \"1.11.3\",\n       \"resolved\": \"https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz\",\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package-lock.json",
+      "source": {
+        "path": "package-lock.json",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "{\n  \"name\": \"misaki\",\n  \"version\": \"1.0.0\",\n  \"lockfileVersion\": 2,\n  \"requires\": true,\n  \"packages\": {\n    \"\": {\n      \"name\": \"misaki\",\n      \"version\": \"1.0.0\",\n      \"dependencies\": {\n        \"@supabase/supabase-js\": \"^2.57.4\",\n        \"next\": \"15.5.24\",\n        \"openai\": \"5.0.0\",\n        \"react\": \"19.1.1\",\n        \"react-dom\": \"19.1.1\",\n        \"server-only\": \"0.0.1\",\n        \"web-push\": \"^3.6.7\"\n      },\n      \"devDependencies\": {\n        \"@electric-sql/pglite\": \"0.5.8\",\n        \"@types/node\": \"^20\",\n        \"@types/react\": \"^19\",\n        \"@types/react-dom\": \"^19\",\n        \"@types/web-push\": \"^3.6.4\",\n        \"typescript\": \"^5\"\n      }\n    },\n    \"node_modules/@electric-sql/pglite\": {\n      \"version\": \"0.5.8\",\n      \"resolved\": \"https://registry.npmjs.org/@electric-sql/pglite/-/pglite-0.5.8.tgz\",\n      \"integrity\": \"sha512-n9tsbUOhwx2epK1V0ZG9Ar4SHWUju04dhmzZXiSBXwBoleOvIfals33NAaWgagQVAL4Rbvx/Ptsu3P+pA09f6Q==\",\n      \"dev\": true,\n      \"license\": \"Apache-2.0\"\n    },\n    \"node_modules/@emnapi/runtime\": {\n      \"version\": \"1.11.3\",\n      \"resolved\": \"https://registry.npmjs.org/@emnapi/runtime/-/runtime-1.11.3.tgz\",\n      \"integrity\": \"sha512-Xz4Tpyki7XyrpbUK1jR1AhdAdaXyhhY4lZ3neLodmhpuWfy2PAQN5B46sAiU4liOXGLkHypn/qU+jvfWSCYYLA==\",\n      \"optional\": true,\n      \"dependencies\": {\n        \"tslib\": \"^2.4.0\"\n      }\n    },\n    \"node_modules/@img/colour\": {\n      \"version\": \"1.1.0\",\n      \"resolved\": \"https://registry.npmjs.org/@img/colour/-/colour-1.1.0.tgz\",\n      \"integrity\": \"sha512-Td76q7j57o/tLVdgS746cYARfSyxk8iEfRxewL9h4OMzYhbW4TAcppl0mT4eyqXddh6L/jwoM75mo7ixa/pCeQ==\",\n      \"optional\": true,\n      \"engines\": {\n        \"node\": \">=18\"\n      }\n    },\n    \"node_modules/@img/sharp-darwin-arm64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-darwin-arm64/-/sharp-darwin-arm64-0.35.4.tgz\",\n      \"integrity\": \"sha512-Uhfl4V4lhP2nbUVF9+hyH1+luj86f1gUFeo8ALYxFoULoU+G87D43BfeMP8XHsk9boxAnCY/bf2EHwhA7MuGsA==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-darwin-arm64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-darwin-x64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-darwin-x64/-/sharp-darwin-x64-0.35.4.tgz\",\n      \"integrity\": \"sha512-hWniXY3bG5qKpkKrAwPe4y+VTPmf086YQAnkxWh7uA1YrlRouWGa0M0Mxj3ZjnXFkv7/TD1bTy9lGUK26vRvWw==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-darwin-x64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-freebsd-wasm32\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-freebsd-wasm32/-/sharp-freebsd-wasm32-0.35.4.tgz\",\n      \"integrity\": \"sha512-lIsKw/BU+kjB4eZjxrYrZmwOJYi3Ajrv66iAlBmUPyKc3HpnloevB1g3wxGD9P/5BbQ1brBGl65VRRrCvQDEqA==\",\n      \"optional\": true,\n      \"os\": [\n        \"freebsd\"\n      ],\n      \"dependencies\": {\n        \"@img/sharp-wasm32\": \"0.35.4\"\n      },\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-darwin-arm64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-darwin-arm64/-/sharp-libvips-darwin-arm64-1.3.3.tgz\",\n      \"integrity\": \"sha512-suTBPTDGrI9WodccaDdwZItTSaBYASlBk1NSfElSHrUfzu3szG6lvIF58+WiFvnfzuK8ZBFS5zE00PxqxnRiPg==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-darwin-x64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-darwin-x64/-/sharp-libvips-darwin-x64-1.3.3.tgz\",\n      \"integrity\": \"sha512-FVJZ5mITMobmXIz/hPDTw0EintTW5H3WfrxwLqEqjiIihlu+hVRyGrFQ60xl0Lxn7Bt3zdpevPaQi0HEzqz9fw==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-arm\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-arm/-/sharp-libvips-linux-arm-1.3.3.tgz\",\n      \"integrity\": \"sha512-3rbU4vqXXc3hY/OiXdl52xZvT0F1yEngWfvqudtPJg/KkyiaQw2DRsFrNzpmLvfavbwOq3qXn36GP8obHRULQA==\",\n      \"cpu\": [\n        \"arm\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-arm64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-arm64/-/sharp-libvips-linux-arm64-1.3.3.tgz\",\n      \"integrity\": \"sha512-0DaL0A6Xu6sQSQFwe4iVCrKWU2cCTItnRsYsCdxAMm9NF6twAA9BKnoqy4hqz4+azQ0JHuA26qiUKsf1XJ/v5A==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-ppc64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-ppc64/-/sharp-libvips-linux-ppc64-1.3.3.tgz\",\n      \"integrity\": \"sha512-cdn1OvUBwsXhbC0zSzJnNzf5MZ/mTrobawDvNXBTxe8VtqKAm0sRuEY2Evzovb/w9JMk4TvRxqt1mekSuJz64w==\",\n      \"cpu\": [\n        \"ppc64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-riscv64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-riscv64/-/sharp-libvips-linux-riscv64-1.3.3.tgz\",\n      \"integrity\": \"sha512-HjPVx7yKz+0lqdhDlTw1tt90wamBoxhiXpvl1XZpJLiHH4RCJ5yDTqH+VlYPv2fwFs89JFw4c1IexYOcQUi4IQ==\",\n      \"cpu\": [\n        \"riscv64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-s390x\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-s390x/-/sharp-libvips-linux-s390x-1.3.3.tgz\",\n      \"integrity\": \"sha512-neWLh+3yCNThxnfy3c4BbVBeGgt9aftno+XbT56iK28RgeDs3UOFWviLWlUu0bArYVYJaFDK+RRohbicUNCm8Q==\",\n      \"cpu\": [\n        \"s390x\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linux-x64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linux-x64/-/sharp-libvips-linux-x64-1.3.3.tgz\",\n      \"integrity\": \"sha512-4vKmvAst9nrowcqquKFAyZJUDolUaIp8uRiN0mWFguJ1IplC9/pitXtlnnlU4aa/eJw3J7i67V+pwUL+wZGdsA==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linuxmusl-arm64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linuxmusl-arm64/-/sharp-libvips-linuxmusl-arm64-1.3.3.tgz\",\n      \"integrity\": \"sha512-Y9kQaLMuNoB0bPYOOdcZMaseNrFpPodIWWMrx+CZyydf2xn68j9WYc6sWWRrDwNkzCQjKYfc68L7jKjGlHMibw==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-libvips-linuxmusl-x64\": {\n      \"version\": \"1.3.3\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-libvips-linuxmusl-x64/-/sharp-libvips-linuxmusl-x64-1.3.3.tgz\",\n      \"integrity\": \"sha512-fj8Mv0HHfD1Rr+4I68+3agJynxDWtBFgicTbSOb9Bke6pIwzGcJ+RX/yHjmiEGFMCavY/dxvem7MyNaJF+wDiw==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-arm\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-arm/-/sharp-linux-arm-0.35.4.tgz\",\n      \"integrity\": \"sha512-7OAS8gI0EReKGVN2HssHlM6umJgxF5VI3xN0p9FA91p/YO+ou5hiNghLdZ5BEHztwaaK5+bLKRf8x/o2L2nk9A==\",\n      \"cpu\": [\n        \"arm\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-arm\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-arm64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-arm64/-/sharp-linux-arm64-0.35.4.tgz\",\n      \"integrity\": \"sha512-De4jpEnAU8Hd5oT0j1G3uL4ZvTuipVMn7YC6vPaJhy6/7EwEae0SVAoBrUMYQbkLGDm85taVWwuPc1a44LTzCQ==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-arm64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-ppc64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-ppc64/-/sharp-linux-ppc64-0.35.4.tgz\",\n      \"integrity\": \"sha512-2oYZJeIl4kCcMGk4ouZVjnkCtFrpQFlNEtJ6GbxzhHQchwH0NH/qEb9ykmOl29dqwMq+JhFdZn+1ak2FKhI9fQ==\",\n      \"cpu\": [\n        \"ppc64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-ppc64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-riscv64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-riscv64/-/sharp-linux-riscv64-0.35.4.tgz\",\n      \"integrity\": \"sha512-cPbNChoRURAWdebDIHSenxRpgEdy7JkPydSnUxRm9VvKD7m0/xVaR/8Fzlu81pk5nHEvHH87UZUA7cTtwnbJSA==\",\n      \"cpu\": [\n        \"riscv64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-riscv64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-s390x\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-s390x/-/sharp-linux-s390x-0.35.4.tgz\",\n      \"integrity\": \"sha512-RY0JFY8Fd6RonCBtHz+DvadaPkXDSI1AUn6yWL9TipqkZ1vY8w8evqdgyDFnkm4/K1ve1TvZiaePP5oSd4+WVQ==\",\n      \"cpu\": [\n        \"s390x\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-s390x\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linux-x64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linux-x64/-/sharp-linux-x64-0.35.4.tgz\",\n      \"integrity\": \"sha512-9qvvEAuk8k89TfWUoX2htWjbAMX8p+NxCppjpcg5k6xMsjhBQPTsoIh36h9Qde4WRuGpJeYnOjdosDn/cnv+OA==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linux-x64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linuxmusl-arm64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linuxmusl-arm64/-/sharp-linuxmusl-arm64-0.35.4.tgz\",\n      \"integrity\": \"sha512-KB5jxpfWQTr0nc3xdHtWChdbifHrBGsd2SM62Eyxrl8afikm+f5qGBU75SJIZBT/S1MC8XyacdlXBMSWq6OURA==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linuxmusl-arm64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-linuxmusl-x64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-linuxmusl-x64/-/sharp-linuxmusl-x64-0.35.4.tgz\",\n      \"integrity\": \"sha512-f+eZJZIQNEEd26RPSW+76chwOf1XtA2Y/O+5ocVyLliHkeih3e+jhLVBdNTd2rS3IbNXK8+ug93Vf5ZXtF5Lxg==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      },\n      \"optionalDependencies\": {\n        \"@img/sharp-libvips-linuxmusl-x64\": \"1.3.3\"\n      }\n    },\n    \"node_modules/@img/sharp-wasm32\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-wasm32/-/sharp-wasm32-0.35.4.tgz\",\n      \"integrity\": \"sha512-zQnl4Kwp7Q6NHsENtU2T/00Zi+w3AQNwz3+UaTyVBy2FpXrzXzGjndpK61onhZjRtRpQXxCTeqw19bVyXOh7jA==\",\n      \"optional\": true,\n      \"dependencies\": {\n        \"@emnapi/runtime\": \"^1.11.3\"\n      },\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-webcontainers-wasm32\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-webcontainers-wasm32/-/sharp-webcontainers-wasm32-0.35.4.tgz\",\n      \"integrity\": \"sha512-ESfNkywmCfPNyaZjxooddJQiQ+l/nTpGEOGthxiLnIHXC/CmcBixnfwUleX9mCz9ovrUUvKMap/pm8RYbzfwaA==\",\n      \"cpu\": [\n        \"wasm32\"\n      ],\n      \"optional\": true,\n      \"dependencies\": {\n        \"@img/sharp-wasm32\": \"0.35.4\"\n      },\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-win32-arm64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-win32-arm64/-/sharp-win32-arm64-0.35.4.tgz\",\n      \"integrity\": \"sha512-iNdlBX9gLVvqe2I3uIJSIKTq6wckP/DYxZtcqxm09x5Gi24DnFBmPAWZmr60ZyYMG0xlzo6goG3670ar+RXvRw==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"win32\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-win32-ia32\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-win32-ia32/-/sharp-win32-ia32-0.35.4.tgz\",\n      \"integrity\": \"sha512-kqRsbaa5CS6KHlpxnN7WhE6vAAugXyZButpRdvDWetlv6Qv4N9WTcrWzF7tXfB9T7MsoadqdI8hmwLq6UlLvtw==\",\n      \"cpu\": [\n        \"ia32\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"win32\"\n      ],\n      \"engines\": {\n        \"node\": \"^20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@img/sharp-win32-x64\": {\n      \"version\": \"0.35.4\",\n      \"resolved\": \"https://registry.npmjs.org/@img/sharp-win32-x64/-/sharp-win32-x64-0.35.4.tgz\",\n      \"integrity\": \"sha512-XtmnYhBcrORsJ4XJngyzr/EWP0hRZLAZRFaApdKuviyqF78+ylxh2y06ZmtULAMOnObJ3ucpN0AcwSWnMowTRg==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"win32\"\n      ],\n      \"engines\": {\n        \"node\": \">=20.9.0\"\n      },\n      \"funding\": {\n        \"url\": \"https://opencollective.com/libvips\"\n      }\n    },\n    \"node_modules/@next/env\": {\n      \"version\": \"15.5.24\",\n      \"resolved\": \"https://registry.npmjs.org/@next/env/-/env-15.5.24.tgz\",\n      \"integrity\": \"sha512-mBDF7T0XKZjs9SpUAl0buizVO+O02ULjOvWX8o/AZo/5AGw/UAS1Zzcylmd4pqbftzmKQi+L/nB4jgBYKEAl5Q==\"\n    },\n    \"node_modules/@next/swc-darwin-arm64\": {\n      \"version\": \"15.5.24\",\n      \"resolved\": \"https://registry.npmjs.org/@next/swc-darwin-arm64/-/swc-darwin-arm64-15.5.24.tgz\",\n      \"integrity\": \"sha512-AGdNLvxZNY6eR2iSnV+6wUa8CiHTMr4F7g3uHH7fT4ICIJBE00R9u4tzN/Vuwsw0cOi8MTD2HJcTCb6siMH88Q==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"engines\": {\n        \"node\": \">= 10\"\n      }\n    },\n    \"node_modules/@next/swc-darwin-x64\": {\n      \"version\": \"15.5.24\",\n      \"resolved\": \"https://registry.npmjs.org/@next/swc-darwin-x64/-/swc-darwin-x64-15.5.24.tgz\",\n      \"integrity\": \"sha512-9HrQajBMmGcrrrvDfRimiCrbAPh3E6uHJmwBovYr6Yrmi9p9PZqI876BrXX280wICh3o2XwUlp4blkB0NNBqFg==\",\n      \"cpu\": [\n        \"x64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"darwin\"\n      ],\n      \"engines\": {\n        \"node\": \">= 10\"\n      }\n    },\n    \"node_modules/@next/swc-linux-arm64-gnu\": {\n      \"version\": \"15.5.24\",\n      \"resolved\": \"https://registry.npmjs.org/@next/swc-linux-arm64-gnu/-/swc-linux-arm64-gnu-15.5.24.tgz\",\n      \"integrity\": \"sha512-rl9LSfE75si0WT3cDgdUC1XYCKS+TgxC+/IjitmeycrAG18X/plIP1/vy8dd/HPycYcIvE688PD7FuvEAiEAew==\",\n      \"cpu\": [\n        \"arm64\"\n      ],\n      \"optional\": true,\n      \"os\": [\n        \"linux\"\n      ],\n      \"engines\": {\n        \"node\": \">= 10\"\n      }\n    },\n    \"node_modules/@next/swc-linux-arm64-musl\": {\n      \"version\": \"15.5.24\",\n      \"resolve",
+        "sha256": "4823c77308a8d76aafeb88d9100e761013947399d5e4d09045af6b52e958ffbc"
+      }
+    },
+    {
+      "path": "package.json",
+      "status": "modified",
+      "additions": 1,
+      "deletions": 0,
+      "patch": "diff --git a/package.json b/package.json\nindex e1552676..55ce3cc4 100644\n--- a/package.json\n+++ b/package.json\n@@ -18,6 +18,7 @@\n     \"web-push\": \"^3.6.7\"\n   },\n   \"devDependencies\": {\n+    \"@electric-sql/pglite\": \"0.5.8\",\n     \"@types/node\": \"^20\",\n     \"@types/react\": \"^19\",\n     \"@types/react-dom\": \"^19\",\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package.json",
+      "source": {
+        "path": "package.json",
+        "coverage": "全文",
+        "text": "{\n  \"name\": \"misaki\",\n  \"version\": \"1.0.0\",\n  \"private\": true,\n  \"scripts\": {\n    \"dev\": \"next dev\",\n    \"build\": \"next build\",\n    \"start\": \"next start\",\n    \"test\": \"node --test --experimental-strip-types tests/*.test.ts tests/*.test.cjs\"\n  },\n  \"dependencies\": {\n    \"@supabase/supabase-js\": \"^2.57.4\",\n    \"next\": \"15.5.24\",\n    \"openai\": \"5.0.0\",\n    \"react\": \"19.1.1\",\n    \"react-dom\": \"19.1.1\",\n    \"server-only\": \"0.0.1\",\n    \"web-push\": \"^3.6.7\"\n  },\n  \"devDependencies\": {\n    \"@electric-sql/pglite\": \"0.5.8\",\n    \"@types/node\": \"^20\",\n    \"@types/react\": \"^19\",\n    \"@types/react-dom\": \"^19\",\n    \"@types/web-push\": \"^3.6.4\",\n    \"typescript\": \"^5\"\n  }\n}\n",
+        "sha256": "fe4cadb54f0f662f2cfaa9aa883cee0ba78eb534ccb7731b8189dc8dbf55a91c"
+      }
+    },
+    {
+      "path": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "status": "modified",
+      "additions": 81,
+      "deletions": 0,
+      "patch": "diff --git a/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql b/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql\nnew file mode 100644\nindex 00000000..62b343b1\n--- /dev/null\n+++ b/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql\n@@ -0,0 +1,81 @@\n+-- Retain the expiry decision after removing the encrypted payload. Otherwise a\n+-- previously issued bearer token could seed this user again after root deletion.\n+create table public.misaki_expired_temporary_root_users (\n+  user_id uuid primary key references auth.users(id) on delete cascade\n+);\n+alter table public.misaki_expired_temporary_root_users enable row level security;\n+revoke all on public.misaki_expired_temporary_root_users from public, anon, authenticated;\n+grant select, insert on public.misaki_expired_temporary_root_users to service_role;\n+\n+create function public.reject_expired_misaki_root_recreation()\n+returns trigger\n+language plpgsql\n+security invoker\n+set search_path = ''\n+as $$\n+begin\n+  if exists (\n+    select 1 from public.misaki_expired_temporary_root_users where user_id = new.user_id\n+  ) then\n+    raise exception 'temporary state expired';\n+  end if;\n+  return new;\n+end;\n+$$;\n+revoke all on function public.reject_expired_misaki_root_recreation() from public, anon, authenticated;\n+\n+create trigger misaki_reject_expired_root_recreation\n+before insert on public.misaki_temporary_roots\n+for each row execute function public.reject_expired_misaki_root_recreation();\n+\n+-- Explicit, revision-checked cleanup for one expired encrypted transport root.\n+-- Keep the same auth -> root lock order as chat and email checkpoint writers.\n+-- Installing the function does not run it or schedule cleanup.\n+create function public.purge_expired_misaki_anonymous_root(\n+  p_user_id uuid,\n+  p_expected_revision uuid\n+) returns boolean\n+language plpgsql\n+security invoker\n+set search_path = ''\n+as $$\n+declare\n+  v_deleted integer;\n+begin\n+  perform 1\n+  from auth.users\n+  where id = p_user_id and is_anonymous\n+  for update;\n+\n+  if not found then\n+    return false;\n+  end if;\n+\n+  if exists (\n+    select 1 from public.misaki_relationship_events\n+    where user_id = p_user_id and event_type = 'email_save_checkpoint'\n+  ) then\n+    return false;\n+  end if;\n+\n+  delete from public.misaki_temporary_roots\n+  where user_id = p_user_id\n+    and revision = p_expected_revision\n+    and expires_at <= clock_timestamp();\n+\n+  get diagnostics v_deleted = row_count;\n+  if v_deleted = 0 then\n+    return false;\n+  end if;\n+\n+  insert into public.misaki_expired_temporary_root_users (user_id)\n+  values (p_user_id)\n+  on conflict (user_id) do nothing;\n+  return true;\n+end;\n+$$;\n+\n+revoke all on function public.purge_expired_misaki_anonymous_root(uuid, uuid)\n+  from public, anon, authenticated;\n+grant execute on function public.purge_expired_misaki_anonymous_root(uuid, uuid)\n+  to service_role;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "source": {
+        "path": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+        "coverage": "全文",
+        "text": "-- Retain the expiry decision after removing the encrypted payload. Otherwise a\n-- previously issued bearer token could seed this user again after root deletion.\ncreate table public.misaki_expired_temporary_root_users (\n  user_id uuid primary key references auth.users(id) on delete cascade\n);\nalter table public.misaki_expired_temporary_root_users enable row level security;\nrevoke all on public.misaki_expired_temporary_root_users from public, anon, authenticated;\ngrant select, insert on public.misaki_expired_temporary_root_users to service_role;\n\ncreate function public.reject_expired_misaki_root_recreation()\nreturns trigger\nlanguage plpgsql\nsecurity invoker\nset search_path = ''\nas $$\nbegin\n  if exists (\n    select 1 from public.misaki_expired_temporary_root_users where user_id = new.user_id\n  ) then\n    raise exception 'temporary state expired';\n  end if;\n  return new;\nend;\n$$;\nrevoke all on function public.reject_expired_misaki_root_recreation() from public, anon, authenticated;\n\ncreate trigger misaki_reject_expired_root_recreation\nbefore insert on public.misaki_temporary_roots\nfor each row execute function public.reject_expired_misaki_root_recreation();\n\n-- Explicit, revision-checked cleanup for one expired encrypted transport root.\n-- Keep the same auth -> root lock order as chat and email checkpoint writers.\n-- Installing the function does not run it or schedule cleanup.\ncreate function public.purge_expired_misaki_anonymous_root(\n  p_user_id uuid,\n  p_expected_revision uuid\n) returns boolean\nlanguage plpgsql\nsecurity invoker\nset search_path = ''\nas $$\ndeclare\n  v_deleted integer;\nbegin\n  perform 1\n  from auth.users\n  where id = p_user_id and is_anonymous\n  for update;\n\n  if not found then\n    return false;\n  end if;\n\n  if exists (\n    select 1 from public.misaki_relationship_events\n    where user_id = p_user_id and event_type = 'email_save_checkpoint'\n  ) then\n    return false;\n  end if;\n\n  delete from public.misaki_temporary_roots\n  where user_id = p_user_id\n    and revision = p_expected_revision\n    and expires_at <= clock_timestamp();\n\n  get diagnostics v_deleted = row_count;\n  if v_deleted = 0 then\n    return false;\n  end if;\n\n  insert into public.misaki_expired_temporary_root_users (user_id)\n  values (p_user_id)\n  on conflict (user_id) do nothing;\n  return true;\nend;\n$$;\n\nrevoke all on function public.purge_expired_misaki_anonymous_root(uuid, uuid)\n  from public, anon, authenticated;\ngrant execute on function public.purge_expired_misaki_anonymous_root(uuid, uuid)\n  to service_role;\n",
+        "sha256": "b2ba9a0444c44dcac91c008f3622a000b3cea74d3e2d74a3d1ae38b8bb4432a7"
+      }
+    },
+    {
+      "path": "tests/anonymous-root-purge.test.cjs",
+      "status": "modified",
+      "additions": 19,
+      "deletions": 0,
+      "patch": "diff --git a/tests/anonymous-root-purge.test.cjs b/tests/anonymous-root-purge.test.cjs\nnew file mode 100644\nindex 00000000..a10be371\n--- /dev/null\n+++ b/tests/anonymous-root-purge.test.cjs\n@@ -0,0 +1,19 @@\n+const { test } = require('node:test');\n+const { readFileSync } = require('node:fs');\n+const { join } = require('node:path');\n+\n+test('expired anonymous root cleanup protects current revisions and accounts', async () => {\n+  const { PGlite } = await import('@electric-sql/pglite');\n+  const db = new PGlite();\n+  try {\n+    for (const file of [\n+      'tests/sql/anonymous-root-purge.sql',\n+      'supabase/migrations/20261112081000_purge_expired_anonymous_root.sql',\n+      'tests/sql/anonymous-root-purge-assertions.sql',\n+    ]) {\n+      await db.exec(readFileSync(join(__dirname, '..', file), 'utf8'));\n+    }\n+  } finally {\n+    await db.close();\n+  }\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/anonymous-root-purge.test.cjs",
+      "source": {
+        "path": "tests/anonymous-root-purge.test.cjs",
+        "coverage": "全文",
+        "text": "const { test } = require('node:test');\nconst { readFileSync } = require('node:fs');\nconst { join } = require('node:path');\n\ntest('expired anonymous root cleanup protects current revisions and accounts', async () => {\n  const { PGlite } = await import('@electric-sql/pglite');\n  const db = new PGlite();\n  try {\n    for (const file of [\n      'tests/sql/anonymous-root-purge.sql',\n      'supabase/migrations/20261112081000_purge_expired_anonymous_root.sql',\n      'tests/sql/anonymous-root-purge-assertions.sql',\n    ]) {\n      await db.exec(readFileSync(join(__dirname, '..', file), 'utf8'));\n    }\n  } finally {\n    await db.close();\n  }\n});\n",
+        "sha256": "883175b8c38cfaeac7c2b8e1130d5fb9d10aa9e750b5b12cfa34a13d408cbaf2"
+      }
+    },
+    {
+      "path": "tests/recovery-admission.test.cjs",
+      "status": "modified",
+      "additions": 20,
+      "deletions": 0,
+      "patch": "diff --git a/tests/recovery-admission.test.cjs b/tests/recovery-admission.test.cjs\nindex daace918..ddaf77f7 100644\n--- a/tests/recovery-admission.test.cjs\n+++ b/tests/recovery-admission.test.cjs\n@@ -62,3 +62,23 @@ test('actual release artifact exposes its policy without reading or writing conv\n  const r=h.load('app/api/anonymous-recovery/admission/route.ts').GET();assert.equal((await r.json()).accepting,expected);\n  assert.equal(h.calls.length,0);assert.equal(h.generated,0);assert.equal(h.temporaryRoots.size,0);\n });\n+\n+test('a purged root still rejects an otherwise valid browser token for the same user', async () => {\n+  const h = harness({ anonymous: true });\n+  const from = h.client.from.bind(h.client);\n+  h.client.from = table => {\n+    const query = from(table);\n+    if (table === 'misaki_expired_temporary_root_users') {\n+      query.maybeSingle = async () => ({ data: { user_id: h.user.id }, error: null });\n+    }\n+    return query;\n+  };\n+  const canonical = h.load('lib/canonical-state.ts');\n+  const token = canonical.sealTemporaryState({\n+    history: [], memory: ['old memory'], todayMemory: { date: '', items: [] }, relationshipPoints: 0,\n+  }, 'prior-turn');\n+  assert.ok(canonical.openTemporaryState(token));\n+  for (const candidate of [token, null]) {\n+    await assert.rejects(canonical.loadTemporaryRoot(h.user.id, candidate), { reason: 'expired' });\n+  }\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs",
+      "source": {
+        "path": "tests/recovery-admission.test.cjs",
+        "coverage": "全文",
+        "text": "const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');\nconst {harness}=require('./server-canonical.test.cjs');\nconst {randomUUID}=require('node:crypto');\nfunction recoveryClient(){const module={exports:{}};const local=new Map(),session=new Map();const store=m=>({getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,v)});\n vm.runInNewContext('(function(module,exports){'+ts.transpileModule(fs.readFileSync('lib/recovery-session.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText+'})',{window:{},localStorage:store(local),sessionStorage:store(session),AbortSignal})(module,module.exports);return {api:module.exports,session};}\nfunction admission(accepting){const module={exports:{}};\n vm.runInNewContext('(function(require,module,exports){'+ts.transpileModule(fs.readFileSync('app/api/anonymous-recovery/admission/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText+'})',{Response})(()=>({ACCEPT_NEW_ANONYMOUS_RECOVERY:accepting}),module,module.exports);return module.exports.GET();}\nfor(const enabled of [true,false])test(`admission endpoint ${enabled} has no-store and no auth/state writes`,async()=>{\n const r=admission(enabled);assert.equal(r.status,200);assert.equal((await r.json()).accepting,enabled);\n for(const name of ['Cache-Control','CDN-Cache-Control','Vercel-CDN-Cache-Control'])assert.match(r.headers.get(name),/no-store/);\n});\ntest('mounted client follows OFF -> ON admission without replacing existing pointer or auth data',async()=>{\n const c=recoveryClient(),id=randomUUID();c.api.startIndependentRecovery({is_anonymous:true},'TEMPORARY_STATE_EXPIRED',id);\n const before=JSON.stringify([...c.session]);\n assert.equal(await c.api.checkRecoveryAdmission(async()=>admission(false)),false);assert.equal(JSON.stringify([...c.session]),before);\n assert.equal(await c.api.checkRecoveryAdmission(async()=>admission(true)),true);assert.equal(JSON.stringify([...c.session]),before);\n assert.equal(await c.api.checkRecoveryAdmission(async()=>{throw Error('network')}),false);assert.equal(JSON.stringify([...c.session]),before);\n});\nfor(const kind of ['normal-anonymous','registered','recovered-expired','recovered-unverifiable'])test(`compatible stopped release preserves ${kind} conversation, save and reload`,async()=>{\n const h=harness({anonymous:kind!=='registered'}),chat=h.load('app/api/chat/route.ts'),history=h.load('app/api/persona/history/route.ts');let token;\n if(kind.startsWith('recovered')){\n  await chat.POST(h.request({message:'old-secret',requestId:randomUUID()}));const old=h.temporaryRoots.get(h.user.id);\n  if(kind==='recovered-expired')old.expires_at=new Date(0).toISOString();else old.token='unverifiable';\n  const saved=JSON.stringify(old);h.user.id='recovered-'+randomUUID();h.old={root:old,saved};\n }\n let state=await (await history.POST(h.request({action:'load'}))).json();token=state.temporaryState;\n const first=await chat.POST(h.request({message:'before-stop',requestId:randomUUID(),temporaryState:token}));assert.equal(first.status,200);token=(await first.json()).temporaryState;\n // Deploying only policy OFF changes no API/auth/storage code or persisted data.\n assert.equal((await admission(false).json()).accepting,false);\n for(const word of ['during-stop','after-reload']){\n  state=await (await history.POST(h.request({action:'load',temporaryState:token}))).json();token=state.temporaryState;\n  const r=await chat.POST(h.request({message:word,requestId:randomUUID(),temporaryState:token}));assert.equal(r.status,200);token=(await r.json()).temporaryState;\n }\n const reloaded=await (await history.POST(h.request({action:'load',temporaryState:token}))).json();\n assert.ok(reloaded.history.some(x=>x.text==='during-stop'));assert.ok(reloaded.history.some(x=>x.text==='after-reload'));\n if(h.old){assert.equal(JSON.stringify(h.old.root),h.old.saved);assert.ok(!JSON.stringify(reloaded).includes('old-secret'))}\n});\ntest('policy is referenced only by admission endpoint; chat/history/auth/expiry never depend on it',()=>{\n for(const file of ['app/api/chat/route.ts','app/api/persona/history/route.ts','lib/canonical-state.ts','lib/supabase.ts','lib/device-conversation.ts']){\n  const s=fs.readFileSync(file,'utf8');assert.ok(!s.includes('recovery-admission-policy'));assert.ok(!s.includes('checkRecoveryAdmission'));\n }\n});\ntest('OFF release keeps deleted memory deleted despite a stale browser token and stale edit',async()=>{\n const h=harness({anonymous:true}),chat=h.load('app/api/chat/route.ts'),api=h.load('app/api/persona/history/route.ts'),canonical=h.load('lib/canonical-state.ts');\n h.setOpenaiPayload({reply:'synthetic reply',memory:['removed-synthetic'],misakiTodayMemory:{items:[]}});\n const first=await (await chat.POST(h.request({message:'seed',requestId:randomUUID()}))).json();\n const stale=await canonical.loadTemporaryRoot(h.user.id,first.temporaryState);\n assert.equal((await api.POST(h.request({action:'deleteMemory',value:'removed-synthetic',temporaryState:first.temporaryState}))).status,200);\n const beforePolicy=JSON.stringify(h.temporaryRoots.get(h.user.id));\n assert.equal((await admission(false).json()).accepting,false);assert.equal((await admission(true).json()).accepting,true);\n assert.equal(JSON.stringify(h.temporaryRoots.get(h.user.id)),beforePolicy);\n await assert.rejects(()=>canonical.editTemporaryRoot(h.user.id,stale),/commit failed/);\n h.setOpenaiPayload({reply:'new synthetic reply',memory:[],misakiTodayMemory:{items:[]}});\n const start=h.prompts.length;\n assert.equal((await chat.POST(h.request({message:'new message',requestId:randomUUID(),temporaryState:first.temporaryState}))).status,200);\n assert.ok(!JSON.stringify(h.prompts.slice(start)).includes('removed-synthetic'));\n assert.ok(!(await canonical.loadTemporaryRoot(h.user.id,null)).memory.includes('removed-synthetic'));\n});\ntest('actual release artifact exposes its policy without reading or writing conversation state',async()=>{\n const h=harness(),expected=h.load('lib/recovery-admission-policy.ts').ACCEPT_NEW_ANONYMOUS_RECOVERY;\n assert.equal(typeof expected,'boolean');\n const r=h.load('app/api/anonymous-recovery/admission/route.ts').GET();assert.equal((await r.json()).accepting,expected);\n assert.equal(h.calls.length,0);assert.equal(h.generated,0);assert.equal(h.temporaryRoots.size,0);\n});\n\ntest('a purged root still rejects an otherwise valid browser token for the same user', async () => {\n  const h = harness({ anonymous: true });\n  const from = h.client.from.bind(h.client);\n  h.client.from = table => {\n    const query = from(table);\n    if (table === 'misaki_expired_temporary_root_users') {\n      query.maybeSingle = async () => ({ data: { user_id: h.user.id }, error: null });\n    }\n    return query;\n  };\n  const canonical = h.load('lib/canonical-state.ts');\n  const token = canonical.sealTemporaryState({\n    history: [], memory: ['old memory'], todayMemory: { date: '', items: [] }, relationshipPoints: 0,\n  }, 'prior-turn');\n  assert.ok(canonical.openTemporaryState(token));\n  for (const candidate of [token, null]) {\n    await assert.rejects(canonical.loadTemporaryRoot(h.user.id, candidate), { reason: 'expired' });\n  }\n});\n",
+        "sha256": "d24d17a59ea22e443a5aa1916a3743b0f38bcb325699d9d19d5623ab476f256a"
+      }
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge-assertions.sql",
+      "status": "modified",
+      "additions": 45,
+      "deletions": 0,
+      "patch": "diff --git a/tests/sql/anonymous-root-purge-assertions.sql b/tests/sql/anonymous-root-purge-assertions.sql\nnew file mode 100644\nindex 00000000..b77b7ed8\n--- /dev/null\n+++ b/tests/sql/anonymous-root-purge-assertions.sql\n@@ -0,0 +1,45 @@\n+-- Apply anonymous-root-purge.sql, then the migration, before these assertions.\n+do $$\n+begin\n+  if has_function_privilege('anon', 'public.purge_expired_misaki_anonymous_root(uuid,uuid)', 'execute')\n+     or has_function_privilege('authenticated', 'public.purge_expired_misaki_anonymous_root(uuid,uuid)', 'execute') then\n+    raise exception 'cleanup must not be exposed to clients';\n+  end if;\n+end;\n+$$;\n+\n+set role service_role;\n+do $$\n+declare\n+  expired uuid := '00000000-0000-4000-8000-000000000001';\n+  active uuid := '00000000-0000-4000-8000-000000000002';\n+  registered uuid := '00000000-0000-4000-8000-000000000003';\n+  checkpointed uuid := '00000000-0000-4000-8000-000000000004';\n+begin\n+  if public.purge_expired_misaki_anonymous_root(expired, active)\n+     or public.purge_expired_misaki_anonymous_root(active, active)\n+     or public.purge_expired_misaki_anonymous_root(registered, registered)\n+     or public.purge_expired_misaki_anonymous_root(checkpointed, checkpointed) then\n+    raise exception 'a protected root was deleted';\n+  end if;\n+  if not public.purge_expired_misaki_anonymous_root(expired, expired) then\n+    raise exception 'expired root was not deleted';\n+  end if;\n+  if public.purge_expired_misaki_anonymous_root(expired, expired) then\n+    raise exception 'cleanup retry did not return false';\n+  end if;\n+  begin\n+    insert into public.misaki_temporary_roots values (expired, expired, clock_timestamp());\n+    raise exception 'purged root was recreated';\n+  exception when raise_exception then\n+    if sqlerrm <> 'temporary state expired' then raise; end if;\n+  end;\n+  if (select user_id from public.misaki_expired_temporary_root_users) is distinct from expired\n+     or (select count(*) from public.misaki_temporary_roots) <> 3\n+     or (select count(*) from auth.users) <> 4\n+     or (select count(*) from public.misaki_relationship_events) <> 1 then\n+    raise exception 'cleanup modified unexpected rows';\n+  end if;\n+end;\n+$$;\n+reset role;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge-assertions.sql",
+      "source": {
+        "path": "tests/sql/anonymous-root-purge-assertions.sql",
+        "coverage": "全文",
+        "text": "-- Apply anonymous-root-purge.sql, then the migration, before these assertions.\ndo $$\nbegin\n  if has_function_privilege('anon', 'public.purge_expired_misaki_anonymous_root(uuid,uuid)', 'execute')\n     or has_function_privilege('authenticated', 'public.purge_expired_misaki_anonymous_root(uuid,uuid)', 'execute') then\n    raise exception 'cleanup must not be exposed to clients';\n  end if;\nend;\n$$;\n\nset role service_role;\ndo $$\ndeclare\n  expired uuid := '00000000-0000-4000-8000-000000000001';\n  active uuid := '00000000-0000-4000-8000-000000000002';\n  registered uuid := '00000000-0000-4000-8000-000000000003';\n  checkpointed uuid := '00000000-0000-4000-8000-000000000004';\nbegin\n  if public.purge_expired_misaki_anonymous_root(expired, active)\n     or public.purge_expired_misaki_anonymous_root(active, active)\n     or public.purge_expired_misaki_anonymous_root(registered, registered)\n     or public.purge_expired_misaki_anonymous_root(checkpointed, checkpointed) then\n    raise exception 'a protected root was deleted';\n  end if;\n  if not public.purge_expired_misaki_anonymous_root(expired, expired) then\n    raise exception 'expired root was not deleted';\n  end if;\n  if public.purge_expired_misaki_anonymous_root(expired, expired) then\n    raise exception 'cleanup retry did not return false';\n  end if;\n  begin\n    insert into public.misaki_temporary_roots values (expired, expired, clock_timestamp());\n    raise exception 'purged root was recreated';\n  exception when raise_exception then\n    if sqlerrm <> 'temporary state expired' then raise; end if;\n  end;\n  if (select user_id from public.misaki_expired_temporary_root_users) is distinct from expired\n     or (select count(*) from public.misaki_temporary_roots) <> 3\n     or (select count(*) from auth.users) <> 4\n     or (select count(*) from public.misaki_relationship_events) <> 1 then\n    raise exception 'cleanup modified unexpected rows';\n  end if;\nend;\n$$;\nreset role;\n",
+        "sha256": "e777df1a494555a95cc3d6d48e9cf6ef52b4f6fc32c3c47af1f17c5bc0d25773"
+      }
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge.sql",
+      "status": "modified",
+      "additions": 29,
+      "deletions": 0,
+      "patch": "diff --git a/tests/sql/anonymous-root-purge.sql b/tests/sql/anonymous-root-purge.sql\nnew file mode 100644\nindex 00000000..4140a07a\n--- /dev/null\n+++ b/tests/sql/anonymous-root-purge.sql\n@@ -0,0 +1,29 @@\n+-- Run only against a fresh disposable PostgreSQL database.\n+create role anon;\n+create role authenticated;\n+create role service_role;\n+create schema auth;\n+create table auth.users (id uuid primary key, is_anonymous boolean not null);\n+create table public.misaki_temporary_roots (\n+  user_id uuid primary key references auth.users(id),\n+  revision uuid not null,\n+  expires_at timestamptz not null\n+);\n+create table public.misaki_relationship_events (user_id uuid, event_type text);\n+\n+insert into auth.users\n+select ('00000000-0000-4000-8000-' || lpad(n::text, 12, '0'))::uuid, n <> 3\n+from generate_series(1, 4) as ids(n);\n+insert into public.misaki_temporary_roots\n+select id, id, case when id::text like '%2'\n+  then clock_timestamp() + interval '1 hour'\n+  else clock_timestamp() - interval '1 hour' end\n+from auth.users;\n+insert into public.misaki_relationship_events values\n+  ('00000000-0000-4000-8000-000000000004', 'email_save_checkpoint');\n+\n+grant usage on schema auth to service_role;\n+grant select, update on auth.users to service_role;\n+grant select on public.misaki_relationship_events to service_role;\n+alter role service_role bypassrls;\n+grant select, insert, delete on public.misaki_temporary_roots to service_role;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql",
+      "source": {
+        "path": "tests/sql/anonymous-root-purge.sql",
+        "coverage": "全文",
+        "text": "-- Run only against a fresh disposable PostgreSQL database.\ncreate role anon;\ncreate role authenticated;\ncreate role service_role;\ncreate schema auth;\ncreate table auth.users (id uuid primary key, is_anonymous boolean not null);\ncreate table public.misaki_temporary_roots (\n  user_id uuid primary key references auth.users(id),\n  revision uuid not null,\n  expires_at timestamptz not null\n);\ncreate table public.misaki_relationship_events (user_id uuid, event_type text);\n\ninsert into auth.users\nselect ('00000000-0000-4000-8000-' || lpad(n::text, 12, '0'))::uuid, n <> 3\nfrom generate_series(1, 4) as ids(n);\ninsert into public.misaki_temporary_roots\nselect id, id, case when id::text like '%2'\n  then clock_timestamp() + interval '1 hour'\n  else clock_timestamp() - interval '1 hour' end\nfrom auth.users;\ninsert into public.misaki_relationship_events values\n  ('00000000-0000-4000-8000-000000000004', 'email_save_checkpoint');\n\ngrant usage on schema auth to service_role;\ngrant select, update on auth.users to service_role;\ngrant select on public.misaki_relationship_events to service_role;\nalter role service_role bypassrls;\ngrant select, insert, delete on public.misaki_temporary_roots to service_role;\n",
+        "sha256": "311bd7659384360155842e1208b7e995ab50d5c3818505da3b7d5cc5941cba8a"
+      }
+    }
+  ],
+  "file_count": 8,
+  "reported_file_count": 8,
+  "commits": [
+    {
+      "sha": "a536eb4bdb3a61989805400027d12b094d2d8826",
+      "message": "Add revision-fenced cleanup for expired anonymous transport roots\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/a536eb4bdb3a61989805400027d12b094d2d8826"
+    },
+    {
+      "sha": "8b685902c0adb3f150ccf0b14b72b030819762e6",
+      "message": "Retain the expiry decision after deleting the anonymous root payload\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8b685902c0adb3f150ccf0b14b72b030819762e6"
+    },
+    {
+      "sha": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+      "message": "Cover purge recovery without conflicting with the Forget Control harness\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43182149580",
+      "id": 43182149580,
+      "updated_at": "2026-11-12T08:20:47Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43182149617",
+      "id": 43182149617,
+      "updated_at": "2026-11-12T08:20:47Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43182149490",
+      "id": 43182149490,
+      "updated_at": "2026-11-12T08:21:27Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "admission",
+    "before",
+    "beforePolicy",
+    "buffer",
+    "c",
+    "candidate",
+    "canonical",
+    "cipher",
+    "completeCanonicalTurn",
+    "completeTemporaryTurn",
+    "createServerSupabase",
+    "db",
+    "decipher",
+    "digest",
+    "does",
+    "editTemporaryRoot",
+    "enabled",
+    "encrypted",
+    "encryptionKey",
+    "expires",
+    "file",
+    "first",
+    "from",
+    "h",
+    "inspectTemporaryState",
+    "inspected",
+    "iv",
+    "key",
+    "kind",
+    "loadCanonicalState",
+    "loadCompletedTemporaryTurn",
+    "loadCompletedTurn",
+    "loadTemporaryRoot",
+    "local",
+    "module",
+    "name",
+    "old",
+    "openTemporaryState",
+    "parsed",
+    "payload",
+    "public",
+    "query",
+    "r",
+    "recoveryClient",
+    "relationshipCriticalPending",
+    "relationshipImportPending",
+    "reloaded",
+    "s",
+    "saved",
+    "sealTemporaryState",
+    "stale",
+    "start",
+    "state",
+    "store",
+    "temporary",
+    "temporaryResponse",
+    "token",
+    "verified",
+    "word"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "fe9d4b8483619ad6eb6989a43e0edc6df4edd1a2bda5395e8cb5fdedaf214f7c",
+  "ci_digest": "008e83fd1ee74c30231e42393cadb724ed7aaa20131564d108451ae26f9507e8",
+  "collected_at": "2026-11-13T07:56:54.305234+00:00"
+}

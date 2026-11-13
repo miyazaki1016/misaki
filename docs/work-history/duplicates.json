@@ -34,6 +34,7 @@
     "pr-9"
   ],
   "app/api/chat/route.ts": [
+    "branch-1d18194bd4fc9125",
     "branch-48ad449fb30cd746",
     "branch-5b98ae5ac6b68600",
     "branch-70e44503429abc0f",
@@ -46,11 +47,14 @@
     "branch-c1c09c8589ffaf5e",
     "branch-c8b5b69bea16cfe8",
     "branch-c9e11b1515cb305d",
+    "branch-df145aa691117ae1",
     "branch-e2b90b4f0cd4a282",
     "branch-f2dba8e26e4c9402",
     "pr-131",
     "pr-140",
     "pr-19",
+    "pr-191",
+    "pr-193",
     "pr-20",
     "pr-25",
     "pr-26",
@@ -72,6 +76,10 @@
   "app/api/conversation-review/smoke/route.ts": [
     "branch-ae082efda294b17a",
     "pr-86"
+  ],
+  "app/api/cron/emotion-recovery/route.ts": [
+    "branch-df145aa691117ae1",
+    "pr-193"
   ],
   "app/api/dev/relationship-naturalness/route.ts": [
     "branch-c1c09c8589ffaf5e",
@@ -99,6 +107,8 @@
   "app/api/persona/evolution/analyze/route.ts": [
     "branch-b5de3976fb8764e4",
     "branch-c9e11b1515cb305d",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-29",
     "pr-30",
     "pr-66"
@@ -109,10 +119,12 @@
     "branch-b9ec7a2266a17fe2",
     "branch-c9e11b1515cb305d",
     "branch-d4bd494d2ca8e9db",
+    "branch-df145aa691117ae1",
     "pr-1",
     "pr-131",
     "pr-151",
     "pr-182",
+    "pr-193",
     "pr-29",
     "pr-30",
     "pr-32",
@@ -174,6 +186,7 @@
     "branch-b9ec7a2266a17fe2",
     "branch-c9e11b1515cb305d",
     "branch-d4bd494d2ca8e9db",
+    "branch-df145aa691117ae1",
     "branch-e2b97d56bae63d53",
     "pr-11",
     "pr-131",
@@ -181,6 +194,7 @@
     "pr-180",
     "pr-182",
     "pr-19",
+    "pr-193",
     "pr-23",
     "pr-29",
     "pr-30",
@@ -210,6 +224,10 @@
     "pr-62",
     "pr-63"
   ],
+  "lib/anonymous-memory-evidence.ts": [
+    "branch-df145aa691117ae1",
+    "pr-193"
+  ],
   "lib/canonical-state.ts": [
     "branch-5b98ae5ac6b68600",
     "branch-8fb3e7f76aab269c",
@@ -217,10 +235,12 @@
     "branch-b5de3976fb8764e4",
     "branch-b9ec7a2266a17fe2",
     "branch-cf063db3d4301a2a",
+    "branch-df145aa691117ae1",
     "branch-f2dba8e26e4c9402",
     "pr-131",
     "pr-182",
     "pr-190",
+    "pr-193",
     "pr-29",
     "pr-32",
     "pr-47",
@@ -437,6 +457,8 @@
   ],
   "lib/persona/evolution-runner.ts": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-66"
   ],
   "lib/persona/fallback-persona.ts": [
@@ -447,7 +469,9 @@
   ],
   "lib/persona/persona-store.ts": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
     "pr-131",
+    "pr-193",
     "pr-29",
     "pr-32",
     "pr-66"
@@ -517,6 +541,8 @@
   ],
   "lib/relationship-emotion-store.ts": [
     "branch-c1c09c8589ffaf5e",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-29",
     "pr-31",
     "pr-32"
@@ -561,7 +587,9 @@
     "branch-8c1c252f0c53fa36",
     "branch-8fb3e7f76aab269c",
     "branch-a5961576a6beffe1",
+    "branch-df145aa691117ae1",
     "branch-f2dba8e26e4c9402",
+    "pr-193",
     "pr-47",
     "pr-49",
     "pr-52",
@@ -691,6 +719,7 @@
   "scripts/context-ab-quality-live.ts": [
     "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
+    "pr-194",
     "pr-78"
   ],
   "scripts/context-ab-smoke.ts": [
@@ -842,8 +871,20 @@
     "branch-d727762241e2e4e1",
     "pr-158"
   ],
+  "supabase/functions/_shared/anonymous-history-expiry.ts": [
+    "branch-1d18194bd4fc9125",
+    "branch-df145aa691117ae1",
+    "pr-191",
+    "pr-193"
+  ],
+  "supabase/functions/_shared/anonymous-memory-expiry.ts": [
+    "branch-df145aa691117ae1",
+    "pr-193"
+  ],
   "supabase/functions/_shared/forget-control.ts": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-66"
   ],
   "supabase/functions/body-clock/contact-timing.ts": [
@@ -851,7 +892,11 @@
     "pr-31"
   ],
   "supabase/functions/body-clock/conversation-root.ts": [
+    "branch-1d18194bd4fc9125",
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-191",
+    "pr-193",
     "pr-29",
     "pr-66"
   ],
@@ -868,7 +913,9 @@
     "branch-b5de3976fb8764e4",
     "branch-c1c09c8589ffaf5e",
     "branch-c9e11b1515cb305d",
+    "branch-df145aa691117ae1",
     "pr-15",
+    "pr-193",
     "pr-29",
     "pr-30",
     "pr-31",
@@ -880,6 +927,8 @@
   ],
   "supabase/functions/body-clock/persona-store.ts": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-66"
   ],
   "supabase/functions/body-clock/proactive-decision.ts": [
@@ -918,6 +967,8 @@
   ],
   "supabase/functions/body-clock/temporary-state.ts": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-29",
     "pr-66"
   ],
@@ -1019,6 +1070,8 @@
   ],
   "supabase/migrations/20261006200002_forget_control_v1.sql": [
     "branch-b5de3976fb8764e4",
+    "branch-df145aa691117ae1",
+    "pr-193",
     "pr-66"
   ],
   "supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql": [
@@ -1051,6 +1104,20 @@
   ],
   "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql": [
     "branch-cf063db3d4301a2a",
-    "pr-190"
+    "branch-df145aa691117ae1",
+    "pr-190",
+    "pr-193"
+  ],
+  "supabase/migrations/20261112082000_relationship_emotion_resume.sql": [
+    "branch-df145aa691117ae1",
+    "pr-193"
+  ],
+  "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql": [
+    "branch-df145aa691117ae1",
+    "pr-193"
+  ],
+  "supabase/migrations/20261112084000_relationship_emotion_recovery.sql": [
+    "branch-df145aa691117ae1",
+    "pr-193"
   ]
 }

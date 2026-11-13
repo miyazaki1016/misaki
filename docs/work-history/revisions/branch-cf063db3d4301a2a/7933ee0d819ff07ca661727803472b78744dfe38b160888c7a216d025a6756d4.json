@@ -1,0 +1,77 @@
+{
+  "id": "branch-cf063db3d4301a2a",
+  "title": "work/anonymous-expired-root-purge",
+  "head": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+  "head_ref": "work/anonymous-expired-root-purge",
+  "linked_prs": [
+    190
+  ],
+  "files": [
+    {
+      "path": "lib/canonical-state.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts"
+    },
+    {
+      "path": "package-lock.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package-lock.json"
+    },
+    {
+      "path": "package.json",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package.json"
+    },
+    {
+      "path": "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql"
+    },
+    {
+      "path": "tests/anonymous-root-purge.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/anonymous-root-purge.test.cjs"
+    },
+    {
+      "path": "tests/recovery-admission.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs"
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge-assertions.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge-assertions.sql"
+    },
+    {
+      "path": "tests/sql/anonymous-root-purge.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql"
+    }
+  ],
+  "commits": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2 Cover purge recovery without conflicting with the Forget Control harness\n8b685902c0adb3f150ccf0b14b72b030819762e6 Retain the expiry decision after deleting the anonymous root payload\na536eb4bdb3a61989805400027d12b094d2d8826 Add revision-fenced cleanup for expired anonymous transport roots",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b87db2201dd6091a68a376706554cb748daf313e296fa868e2e4055ebd151461",
+  "collected_at": "2026-11-13T07:56:54.305234+00:00"
+}
