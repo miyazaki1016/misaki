@@ -18,6 +18,57 @@ class FakeAPI:
         return {'title':'Stride experiment','body':'47 regions missed','head':{'sha':'a'*40,'ref':'research'},'base':{'sha':'b'*40,'ref':'feature'},'state':'closed','merged_at':'2026-01-01','merge_commit_sha':'c'*40,'updated_at':'2026-01-02','draft':False}
 
 class HistoryTests(unittest.TestCase):
+    def test_extracts_node_assert_and_skips_interpolated_test_titles(self):
+        case = {'files': [
+            {'path': 'lib/turn.ts', 'url': 'code', 'source': {
+                'text': 'export function canResume(ready) {\n  return ready === true;\n}\n'}},
+            {'path': 'tests/turn.test.ts', 'url': 'test', 'source': {'text': (
+                'import assert from "node:assert/strict";\n'
+                'import {canResume} from "../lib/turn.ts";\n'
+                'test("待機中は復帰しない", () => {assert.equal(canResume(false), false);});\n'
+                'test(`state ${ready ? "ready" : "waiting"}`, () => {assert.equal(canResume(true), true);});\n')}},
+        ]}
+        decision, = history.decision_candidates(case, 'test/repo')
+        self.assertEqual(decision['links'], ['code#L1', 'test#L3'])
+        self.assertIn('assert.equal(canResume(false), false)', decision['verification'])
+        self.assertIn('未確認', decision['verification'])
+
+    def test_decision_candidates_link_test_code_and_proof_without_pr_summary(self):
+        head = 'a' * 40
+        root = 'https://github.com/test/repo'
+        def file(path, text):
+            return {'path': path, 'url': f'{root}/blob/{head}/{path}', 'source': {'text': text}}
+        files = [
+            file('lib/cycle.ts', 'export function retain(input) {\n  return input.newTime <= input.oldTime;\n}\n'),
+            file('lib/cycle.test.ts', 'test("drops an older retry when a newer candidate exists", () => {\n'
+                 ' expect(retain({oldTime:"20260101003000",newTime:"20260101003700"})).toBe(false);\n});'),
+            file('scripts/http-503-retry-proof.ts', 'const schedule = process.env.RETRY_SCHEDULE_MS ?? "30000,60000";'),
+            file('.github/workflows/proof.yml', 'run: npx tsx scripts/http-503-retry-proof.ts'),
+        ]
+        case = {'id':'pr-42','title':'isolated sample','head':head,'files':files,
+                'curated': {'proof_observations': {'scripts/http-503-retry-proof.ts': {'run_id':7,'result':'1件復帰'}}},
+                'runs':[{'id':7,'head_sha':'b'*40,'conclusion':'success','url':f'{root}/actions/runs/7'}]}
+        case['decisions'] = history.decision_candidates(case,'test/repo')
+        proof, decision = case['decisions']
+        self.assertIn('0.5分・1分', proof['behavior'])
+        self.assertIn('未確認', proof['verification'])
+        self.assertIn('proof.yml', proof['links'][1])
+        self.assertIn('toBe(false)', decision['verification'])
+        self.assertIn('return input.newTime', decision['behavior'])
+        self.assertTrue(decision['links'][1].endswith('lib/cycle.test.ts#L1'))
+        for query in ['503 リトライ','503を取り直してる間に次の7分が来たら？']:
+            self.assertEqual(history.search({'pr-42':case},query), [case])
+        case['runs'][0]['head_sha'] = head
+        case['decisions'] = history.decision_candidates(case,'test/repo')
+        proof = case['decisions'][0]
+        self.assertIn('1件復帰', proof['verification'])
+        self.assertIn(f'{root}/actions/runs/7', proof['links'])
+        with tempfile.TemporaryDirectory() as temp:
+            history.render_output({'generated_at':'now','cases':{'pr-42':case},'coverage':{'errors':[]}},temp,'test/repo')
+            index = json.loads(Path(temp,'search-index.json').read_text())['cases'][0]
+            self.assertIn('503を取り直してる間に次の7分が来たら？',index['search_text'])
+            self.assertIn('1件復帰', index['search_text'])
+
     def test_phone_filters_main_ancestry_instead_of_pr_merged_state(self):
         import subprocess
         page=(Path(__file__).resolve().parents[1]/'docs/approval-dashboard/history.html').read_text()
