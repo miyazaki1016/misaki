@@ -69,11 +69,14 @@ export async function POST(request: Request) {
     }
     if (body.action === "load") {
       const loadStartedAt = nowMs();
+      const stageTimings: Record<string, number> = {};
+      const onStageTiming = (stage: string, durationMs: number) => { stageTimings[stage] = durationMs; };
       const timedResponse = (payload: unknown) => Response.json(payload, {
         headers: { "Cache-Control": "no-store", "Server-Timing": [
           `auth;dur=${(authenticatedAt - requestStartedAt).toFixed(1)}`,
           `history;dur=${(nowMs() - loadStartedAt).toFixed(1)}`,
           `request;dur=${(nowMs() - requestStartedAt).toFixed(1)}`,
+          ...Object.entries(stageTimings).map(([stage, duration]) => `${stage};dur=${duration.toFixed(1)}`),
         ].join(", ") },
       });
       if (user.is_anonymous && typeof body.pending?.requestId === "string" && typeof body.pending?.message === "string") {
@@ -87,7 +90,7 @@ export async function POST(request: Request) {
           }
         }
       }
-      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
+      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id, onStageTiming);
       return timedResponse({ ...responseState(state, !!user.is_anonymous),
         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }

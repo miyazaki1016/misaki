@@ -795,6 +795,10 @@ export default function ChatPage() {
           const requestDuration = serverTiming?.match(/(?:^|,)\s*request;dur=([\d.]+)/)?.[1];
           if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration));
           if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration));
+          for (const [stage, key] of [["imports", "historyDbImportsMs"], ["canonical", "historyDbCanonicalMs"], ["critical", "historyDbCriticalMs"], ["events", "historyDbEventsMs"], ["processing", "historyDbProcessingMs"]] as const) {
+            const value = serverTiming?.match(new RegExp(`(?:^|,)\\s*${stage};dur=([\\d.]+)`))?.[1];
+            if (value) timings[key] = Math.round(Number(value));
+          }
         }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
