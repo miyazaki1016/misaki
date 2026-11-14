@@ -132,6 +132,10 @@ export async function loadTemporaryRoot(userId: string, token: unknown): Promise
     if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError("expired");
     return { ...verified.state, temporaryRevision: root.revision };
   }
+  const { data: expired, error: expiryError } = await createServerSupabase()
+    .from("misaki_expired_temporary_root_users").select("user_id").eq("user_id", userId).maybeSingle();
+  if (expiryError) throw new Error("Temporary root expiry marker read failed");
+  if (expired) throw new TemporaryStateUnavailableError("expired");
   // A valid bearer state can seed a replacement Safari anonymous auth ID.
   // Once this ID has a server root, browser snapshots cannot overwrite it.
   if (temporary) return { ...temporary.state, temporaryRevision: null };
