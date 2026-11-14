@@ -1,0 +1,56 @@
+{
+  "id": "branch-33f4a4f17ebfada9",
+  "title": "feat/confirm-work-resume-20261112",
+  "head": "c4fd15dacfbbc8378b6451f3667f63db5dcaca98",
+  "head_ref": "feat/confirm-work-resume-20261112",
+  "linked_prs": [
+    186
+  ],
+  "files": [
+    {
+      "path": "docs/DEVELOPMENT_LEDGER.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c4fd15dacfbbc8378b6451f3667f63db5dcaca98/docs/DEVELOPMENT_LEDGER.md"
+    },
+    {
+      "path": "docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c4fd15dacfbbc8378b6451f3667f63db5dcaca98/docs/DEVELOPMENT_MANAGEMENT_OVERVIEW.md"
+    },
+    {
+      "path": "docs/WORK_RESUME.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c4fd15dacfbbc8378b6451f3667f63db5dcaca98/docs/WORK_RESUME.md"
+    },
+    {
+      "path": "scripts/development_resume.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c4fd15dacfbbc8378b6451f3667f63db5dcaca98/scripts/development_resume.py"
+    },
+    {
+      "path": "tests/test_development_resume.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/c4fd15dacfbbc8378b6451f3667f63db5dcaca98/tests/test_development_resume.py"
+    }
+  ],
+  "commits": "c4fd15dacfbbc8378b6451f3667f63db5dcaca98 feat(history): track work resumption and verification evidence",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "ff1172ba78be20551c7ca43052807a9765f75c28fcfee2ccd00d6e6741245a53",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

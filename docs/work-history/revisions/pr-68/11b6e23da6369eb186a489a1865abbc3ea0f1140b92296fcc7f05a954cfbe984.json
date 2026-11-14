@@ -1,0 +1,106 @@
+{
+  "id": "pr-68",
+  "number": 68,
+  "title": "ci: manual-only isolated Gemini A/B dispatcher (no app changes)",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Adds only `.github/workflows/isolated-gemini-ab-manual.yml` to the default branch so GitHub displays the manual workflow. It checks out a pinned experimental commit, uses a repository secret, and sends exactly 2 synthetic billable Gemini requests only after manual confirmation. No application source, deployment config, database or Production runtime changes. DRAFT: do not merge until owner explicitly approves enabling this workflow.",
+  "snapshot_head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+  "snapshot_consistent": true,
+  "head": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+  "base": "18e2c0bdfa007c980858f85341eb8c78e0e5301a",
+  "base_ref": "main",
+  "head_ref": "work/ab-manual-workflow-only",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-08T02:42:12Z",
+  "merge_commit_sha": "f99a3dfd88874c44ad4e3471e33e3e3600b05b13",
+  "updated_at": "2026-10-08T02:42:12Z",
+  "code_facts": [
+    {
+      "file": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "kind": "実行する検証コマンド",
+      "expression": "- run: npm ci",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd/.github/workflows/isolated-gemini-ab-manual.yml"
+    },
+    {
+      "file": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "kind": "テストの期待値・条件",
+      "expression": "- run: node --experimental-strip-types --test tests/context-ab-*.test.ts",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd/.github/workflows/isolated-gemini-ab-manual.yml"
+    },
+    {
+      "file": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "kind": "実行する検証コマンド",
+      "expression": "run: |",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd/.github/workflows/isolated-gemini-ab-manual.yml"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+      "status": "modified",
+      "additions": 39,
+      "deletions": 0,
+      "patch": "diff --git a/.github/workflows/isolated-gemini-ab-manual.yml b/.github/workflows/isolated-gemini-ab-manual.yml\nnew file mode 100644\nindex 0000000..4a637d5\n--- /dev/null\n+++ b/.github/workflows/isolated-gemini-ab-manual.yml\n@@ -0,0 +1,39 @@\n+name: Isolated Gemini A/B (manual only)\n+on:\n+  workflow_dispatch:\n+    inputs:\n+      confirm_two_billable_requests:\n+        description: 'Type YES to authorize 2 billable Gemini requests with synthetic data'\n+        required: true\n+        type: string\n+permissions:\n+  contents: read\n+jobs:\n+  isolated-ab:\n+    if: ${{ github.event.inputs.confirm_two_billable_requests == 'YES' }}\n+    runs-on: ubuntu-latest\n+    timeout-minutes: 10\n+    steps:\n+      - name: Checkout pinned experiment commit (not Production)\n+        uses: actions/checkout@v4\n+        with:\n+          ref: 9d7b14d42e279d249f48482209b6d130f36674d9\n+          persist-credentials: false\n+      - uses: actions/setup-node@v4\n+        with:\n+          node-version: '22'\n+          cache: npm\n+      - run: npm ci\n+      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts\n+      - name: Run exactly two synthetic Gemini requests\n+        env:\n+          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}\n+          MISAKI_AB_LIVE: 'YES'\n+          MISAKI_AB_MODEL: gemini-3.1-flash-lite\n+          MISAKI_AB_RUNS: '1'\n+        run: |\n+          if [ -z \"$GEMINI_API_KEY\" ]; then\n+            echo 'Secret missing; refusing live calls.'\n+            exit 1\n+          fi\n+          node --experimental-strip-types scripts/context-ab-live.ts\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd/.github/workflows/isolated-gemini-ab-manual.yml",
+      "source": {
+        "path": ".github/workflows/isolated-gemini-ab-manual.yml",
+        "coverage": "全文",
+        "text": "name: Isolated Gemini A/B (manual only)\non:\n  workflow_dispatch:\n    inputs:\n      confirm_two_billable_requests:\n        description: 'Type YES to authorize 2 billable Gemini requests with synthetic data'\n        required: true\n        type: string\npermissions:\n  contents: read\njobs:\n  isolated-ab:\n    if: ${{ github.event.inputs.confirm_two_billable_requests == 'YES' }}\n    runs-on: ubuntu-latest\n    timeout-minutes: 10\n    steps:\n      - name: Checkout pinned experiment commit (not Production)\n        uses: actions/checkout@v4\n        with:\n          ref: 9d7b14d42e279d249f48482209b6d130f36674d9\n          persist-credentials: false\n      - uses: actions/setup-node@v4\n        with:\n          node-version: '22'\n          cache: npm\n      - run: npm ci\n      - run: node --experimental-strip-types --test tests/context-ab-*.test.ts\n      - name: Run exactly two synthetic Gemini requests\n        env:\n          GEMINI_API_KEY: ${{ secrets.MISAKI_AB_GEMINI_API_KEY }}\n          MISAKI_AB_LIVE: 'YES'\n          MISAKI_AB_MODEL: gemini-3.1-flash-lite\n          MISAKI_AB_RUNS: '1'\n        run: |\n          if [ -z \"$GEMINI_API_KEY\" ]; then\n            echo 'Secret missing; refusing live calls.'\n            exit 1\n          fi\n          node --experimental-strip-types scripts/context-ab-live.ts\n",
+        "sha256": "9bdaae50f3779d8bd9464118a9859f521b3c02dd80fb6ce9819273c94cc62d8e"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+      "message": "ci: stage manual isolated Gemini A/B dispatcher only; no app code changes\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37719110493",
+      "id": 37719110493,
+      "updated_at": "2026-10-08T02:42:32Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [
+    {
+      "path": "scripts/context-ab-live.ts",
+      "coverage": "削除済み／取得不能・差分参照"
+    }
+  ],
+  "curated": {
+    "summary": "手動実行だけの隔離Gemini A/B比較を追加",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/68"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "d0c06caac8162ae27437ab182cd3c7cf9f5c9bb43df34201af6bf2483afab416",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

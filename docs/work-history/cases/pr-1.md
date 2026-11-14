@@ -28,6 +28,18 @@
 
 - [根拠](https://github.com/miyazaki1016/misaki/pull/1)
 
+## 実装判断の検索候補（コード・テスト・検証資料）
+
+テスト名と期待値は同じコミットのソースを読むための手掛かりです。
+
+### API rejects foreign expected user ID and accepts memory-only explicit save
+
+- 条件：API rejects foreign expected user ID and accepts memory-only explicit save
+- 動作・設定：if (&quot;error&quot; in auth) { ／ return Response.json({ error: auth.error }, { status: 401 }); ／ if (body?.saveAnonymous === true) { ／ if (!auth.isAnonymous &#124;&#124; body.expectedUserId !== auth.userId) { ／ return Response.json({ error: &quot;Anonymous account mismatch.&quot; }, { status: 409 }); ／ if (error) { ／ return Response.json({ error: &quot;Conversation could not be saved.&quot; }, { status: 500 }); ／ return Response.json({ synced: true, result: data });
+- 検証範囲：テストの期待値: assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: &#x27;b&#x27;, history, memory: [] }))).status, 409) ／ assert.equal(h.calls.length, 0) ／ assert.equal((await route.POST(request({ saveAnonymous: true, expectedUserId: &#x27;a&#x27;, history: [], memory: [&#x27;remember&#x27;] }))).status, 200) ／ 実行証拠: 個別の実行結果は未確認
+- 残課題：呼び出し元・本番採用・実機を確認
+- 根拠：[原本](https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/app/api/persona/history/route.ts#L136) ／ [原本](https://github.com/miyazaki1016/misaki/blob/27e83d2366de22053a7f41d62b77cfe6d7a748a8/tests/account-conversation.test.cjs#L146)
+
 ## 実際の変更処理（コードから抽出）
 
 AUTH_KIND_KEY、AccountPage、AnonymousSessionGuard、BROWSER_SESSION_KEY、CHAT_HISTORY_KEY、ChatLayout、ConversationHistorySync、DEVICE_USER_KEY、EMAIL_SAVE_USER_KEY、GET、LONG_MEMORY_KEY、POST、SUPABASE_PUBLISHABLE_KEY、SUPABASE_URL、SYNC_INTERVAL_MS、accessToken、active、arraysEqual、assert、auth、authError、authorization、bindDeviceUser、body、bootstrap、cache、child、cleanup、clearMisakiDeviceData、clearMisakiLocalData、client、context、createAuthenticatedSupabase、currentUser、cursor、fetchServerState、find、flush、fs、getAuthenticatedClient、getBearerToken、h、hadBrowserSession、handleVisibility、harness、history、historyChanged、i、initialized、intervalId、isAnonymous、isExistingAccountError、isPermanent、key、lastAuthKind、load、localHistory、localMemory、localStorage、map

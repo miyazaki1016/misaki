@@ -1,0 +1,106 @@
+{
+  "id": "pr-92",
+  "number": 92,
+  "title": "美咲：縦画面ラウンジに「いつもの女の子」ショートカット比較版を追加",
+  "topics": [
+    "ラウンジ・画面",
+    "画面・表示"
+  ],
+  "purpose": "ラウンジ・映像・画面演出に関する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "既存の縦画面ラウンジを壊さず、独立した `/lab/transparent-lounge-shortcuts/` で上部の丸い顔アイコン／会話直通の動線を比較できます。\n\n- 既存24fps WebP・21秒MP4をそのまま使用\n- 既存のブラウザ内会話履歴がある場合だけ `/chat` へ直通\n- 履歴なしの場合は配置サンプル（アイコンからはチャットへ遷移しない）\n- 丸アイコンはユーザー提供画像の仮置きとして既存 `/misaki-profile.webp` を使用。画像そのものの配置は後日\n- DB、認証、既存ラウンジ、ホームには変更なし\n- 台帳 `docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md` 更新\n\nCI成功後に独立プレビューだけ本番に公開し、iPhoneで位置関係を確認する。",
+  "snapshot_head": "dbbc1311cd867cd23ea6b09f0a0d753e3786649d",
+  "snapshot_consistent": true,
+  "head": "dbbc1311cd867cd23ea6b09f0a0d753e3786649d",
+  "base": "290ee7ede697e22d2afe2e69a2716e0d08de63fc",
+  "base_ref": "main",
+  "head_ref": "feat/lounge-shortcut-preview-20261030",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-29T16:53:44Z",
+  "merge_commit_sha": "171184adc1d0b7b9e1ddae238b0d7776c1b4dbbd",
+  "updated_at": "2026-10-29T16:53:44Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+      "status": "modified",
+      "additions": 23,
+      "deletions": 0,
+      "patch": "diff --git a/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md b/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md\nnew file mode 100644\nindex 0000000..891df87\n--- /dev/null\n+++ b/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md\n@@ -0,0 +1,23 @@\n+# ラウンジ「いつもの女の子」ショートカット配置試作（2026-10-30）\n+\n+## 目的\n+ユーザーが提示した丸型の美咲顔アイコンを参考に、既存の縦画面ラウンジを壊さず、画面上部へ直通ショートカットを配置してiPhoneで比較する。\n+\n+## 実装\n+- 独立ページ `/lab/transparent-lounge-shortcuts/` を追加。従来の `/lab/transparent-lounge/` と縦型 `/lab/transparent-lounge-vertical/` は変更なし。\n+- 画面上部に「いつもの女の子」と丸アイコンの横並び領域を配置。既存の24fps透過WebP・背景・21秒オープニングと操作導線はそのまま。\n+- 現時点ではユーザーの提示画像そのものがリポジトリに未配置のため、公開済みの `/misaki-profile.webp` を仮アイコンとして使用（最終差し替えが必要）。\n+- 既存のブラウザ保存 `misaki-chat-history` に会話履歴がある場合に限り `/chat` 直通を有効化。履歴がない場合はUIを見せるだけの配置サンプルにしてチャットへは遷移しない。\n+- 匿名ログインのブラウザセッションを跨ぐ保存・メール登録・複数キャラ対応・チャットへの完全な状態連携は、今回**実装しない**。現時点での会話履歴は美咲単独のため、将来複数キャラにするときはキャラID付きの関係保存を設計する。\n+- 本試作では画面左からのソファ表示、女の子の選択、右・左スワイプ、オープニング動画の表示とスキップは維持。\n+\n+## 実機で確認\n+- 上部ショートカットが顔やタイトルと重ならないか\n+- 丸アイコンのサイズとラベルが適切か\n+- 会話済みのときのみ直通が有効か\n+- ソファの24fps・縦オープニングに影響がないか\n+\n+## 本採用前の対応\n+- ユーザー提供の丸型美咲アイコンを正式公開素材として配置\n+- 匿名履歴の継続方針を決め、キャラ別の会話履歴判定を行う\n+- ラウンジの上部に最大3人のショートカットを置く場合、折返しまたはスクロールUIを検証\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/dbbc1311cd867cd23ea6b09f0a0d753e3786649d/docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+      "source": {
+        "path": "docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md",
+        "coverage": "全文",
+        "text": "# ラウンジ「いつもの女の子」ショートカット配置試作（2026-10-30）\n\n## 目的\nユーザーが提示した丸型の美咲顔アイコンを参考に、既存の縦画面ラウンジを壊さず、画面上部へ直通ショートカットを配置してiPhoneで比較する。\n\n## 実装\n- 独立ページ `/lab/transparent-lounge-shortcuts/` を追加。従来の `/lab/transparent-lounge/` と縦型 `/lab/transparent-lounge-vertical/` は変更なし。\n- 画面上部に「いつもの女の子」と丸アイコンの横並び領域を配置。既存の24fps透過WebP・背景・21秒オープニングと操作導線はそのまま。\n- 現時点ではユーザーの提示画像そのものがリポジトリに未配置のため、公開済みの `/misaki-profile.webp` を仮アイコンとして使用（最終差し替えが必要）。\n- 既存のブラウザ保存 `misaki-chat-history` に会話履歴がある場合に限り `/chat` 直通を有効化。履歴がない場合はUIを見せるだけの配置サンプルにしてチャットへは遷移しない。\n- 匿名ログインのブラウザセッションを跨ぐ保存・メール登録・複数キャラ対応・チャットへの完全な状態連携は、今回**実装しない**。現時点での会話履歴は美咲単独のため、将来複数キャラにするときはキャラID付きの関係保存を設計する。\n- 本試作では画面左からのソファ表示、女の子の選択、右・左スワイプ、オープニング動画の表示とスキップは維持。\n\n## 実機で確認\n- 上部ショートカットが顔やタイトルと重ならないか\n- 丸アイコンのサイズとラベルが適切か\n- 会話済みのときのみ直通が有効か\n- ソファの24fps・縦オープニングに影響がないか\n\n## 本採用前の対応\n- ユーザー提供の丸型美咲アイコンを正式公開素材として配置\n- 匿名履歴の継続方針を決め、キャラ別の会話履歴判定を行う\n- ラウンジの上部に最大3人のショートカットを置く場合、折返しまたはスクロールUIを検証\n",
+        "sha256": "292e22f5cbe56a9eb0756e3aa7c0642df97c6f9a74088070176a4e7af087a017"
+      }
+    },
+    {
+      "path": "public/lab/transparent-lounge-shortcuts/index.html",
+      "status": "modified",
+      "additions": 40,
+      "deletions": 0,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/dbbc1311cd867cd23ea6b09f0a0d753e3786649d/public/lab/transparent-lounge-shortcuts/index.html",
+      "source": {
+        "path": "public/lab/transparent-lounge-shortcuts/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    }
+  ],
+  "file_count": 2,
+  "reported_file_count": 2,
+  "commits": [
+    {
+      "sha": "2f6bdacc01a87f169a688bf5c6081186c9f920c9",
+      "message": "feat(lounge): separate full-height shortcut-layout comparison preview\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/2f6bdacc01a87f169a688bf5c6081186c9f920c9"
+    },
+    {
+      "sha": "86c55e6f30a6b0c954711fdd437413dd94220196",
+      "message": "docs(lounge): record standalone shortcut preview and limitations\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/86c55e6f30a6b0c954711fdd437413dd94220196"
+    },
+    {
+      "sha": "dbbc1311cd867cd23ea6b09f0a0d753e3786649d",
+      "message": "fix(lounge): show return shortcut only after user has spoken\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/dbbc1311cd867cd23ea6b09f0a0d753e3786649d"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "dbbc1311cd867cd23ea6b09f0a0d753e3786649d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/40915790000",
+      "id": 40915790000,
+      "updated_at": "2026-10-29T16:53:13Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "美咲：縦画面ラウンジに「いつもの女の子」ショートカット比較版を追加",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/92"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "32ec387f863ea12701db5ad31190957ad0c470912ae1409d8e648e2e90925102",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

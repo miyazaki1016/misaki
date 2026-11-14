@@ -1,0 +1,168 @@
+{
+  "id": "pr-25",
+  "number": 25,
+  "title": "Gemini返答待ちにタイムアウトと診断ログを追加する",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "匿名実機テストで、特定入力時に送信はサーバーまで到達して利用回数も消費される一方、Gemini返答待ちのまま「・・・」が続き、最終的に返答が出ないケースが再現しました。\n\n変更:\n- Gemini generateContent fetch に20秒の明示タイムアウトを追加\n- タイムアウト時は例外として既存の catch に戻し、既存の refund_daily_message で利用回数を返却\n- 初回/意味的リトライ、HTTP status、所要時間をログ\n- 入力本文はログせず、messageLength / codePointLength / supplementary Unicode 有無のみ記録\n- 特定の絵文字を原因と断定せず、次回実機再現時に比較できる情報だけ残す\n\nこれにより、外部APIがハングしてもVercel側の長いタイムアウトまで待たず、クライアントへエラーを返して入力中表示を終了できます。",
+  "snapshot_head": "469578ea12663c594a32c62a05263b23e7190891",
+  "snapshot_consistent": true,
+  "head": "469578ea12663c594a32c62a05263b23e7190891",
+  "base": "21a5dcd93cb69336a5486614762478be636f6aeb",
+  "base_ref": "main",
+  "head_ref": "fix/gemini-chat-timeout",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-18T01:25:26Z",
+  "merge_commit_sha": "b3530b4e3569bd2796c1758eba8514f3b684d633",
+  "updated_at": "2026-09-18T01:25:26Z",
+  "code_facts": [
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const GEMINI_TIMEOUT_MS = 20_000;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "テストの期待値・条件",
+      "expression": ".test(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "HTTP要求",
+      "expression": "await fetch(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!response.ok) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    },
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "status": "modified",
+      "additions": 141,
+      "deletions": 43,
+      "patch": "diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts\nindex 35d1e82..891320b 100644\n--- a/app/api/chat/route.ts\n+++ b/app/api/chat/route.ts\n@@ -67,6 +67,7 @@ type ActivityEvidence = {\n const MAX_HISTORY = 60;\n const MAX_MEMORY = 30;\n const MAX_TODAY_MEMORY = 12;\n+const GEMINI_TIMEOUT_MS = 20_000;\n \n const SUPABASE_URL =\n   \"https://tzozajnwznxqgxnjikoy.supabase.co\";\n@@ -2200,62 +2201,159 @@ ${retryProblems\n `\n           : \"\";\n \n-      const response =\n-        await fetch(\n-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,\n-          {\n-            method: \"POST\",\n-            headers: {\n-              \"Content-Type\":\n-                \"application/json\",\n-            },\n-            body:\n-              JSON.stringify({\n-                systemInstruction: {\n-                  parts: [\n-                    {\n-                      text:\n-                        baseSystemPrompt +\n-                        retryGuide,\n-                    },\n-                  ],\n-                },\n-                contents: [\n-                  ...contents,\n-                  {\n-                    role: \"user\",\n+      const controller =\n+        new AbortController();\n+      const startedAt =\n+        Date.now();\n+      const timeout =\n+        setTimeout(\n+          () =>\n+            controller.abort(),\n+          GEMINI_TIMEOUT_MS\n+        );\n+\n+      const attempt =\n+        retryProblems &&\n+        retryProblems.length > 0\n+          ? \"retry\"\n+          : \"initial\";\n+      const hasSupplementaryUnicode =\n+        /[\\uD800-\\uDBFF][\\uDC00-\\uDFFF]/\n+          .test(\n+            message\n+          );\n+\n+      console.log(\n+        \"GEMINI FETCH START:\",\n+        {\n+          attempt,\n+          messageLength:\n+            message.length,\n+          hasSupplementaryUnicode,\n+        }\n+      );\n+\n+      try {\n+        const response =\n+          await fetch(\n+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=${apiKey}`,\n+            {\n+              method: \"POST\",\n+              headers: {\n+                \"Content-Type\":\n+                  \"application/json\",\n+              },\n+              signal:\n+                controller.signal,\n+              body:\n+                JSON.stringify({\n+                  systemInstruction: {\n                     parts: [\n                       {\n-                        text: message,\n+                        text:\n+                          baseSystemPrompt +\n+                          retryGuide,\n                       },\n                     ],\n                   },\n-                ],\n-                generationConfig: {\n-                  responseMimeType:\n-                    \"application/json\",\n-                },\n-              }),\n+                  contents: [\n+                    ...contents,\n+                    {\n+                      role: \"user\",\n+                      parts: [\n+                        {\n+                          text: message,\n+                        },\n+                      ],\n+                    },\n+                  ],\n+                  generationConfig: {\n+                    responseMimeType:\n+                      \"application/json\",\n+                  },\n+                }),\n+            }\n+          );\n+\n+        const elapsedMs =\n+          Date.now() -\n+          startedAt;\n+\n+        console.log(\n+          \"GEMINI FETCH END:\",\n+          {\n+            attempt,\n+            status:\n+              response.status,\n+            elapsedMs,\n           }\n         );\n \n-      const data =\n-        await response.json();\n+        const data =\n+          await response.json();\n+\n+        if (!response.ok) {\n+          console.error(\n+            \"GEMINI API ERROR:\",\n+            {\n+              attempt,\n+              status:\n+                response.status,\n+              elapsedMs,\n+              data,\n+            }\n+          );\n+\n+          return null;\n+        }\n+\n+        return parseGeminiText(\n+          data?.candidates?.[0]\n+            ?.content?.parts?.[0]\n+            ?.text\n+        );\n+      } catch (error) {\n+        const elapsedMs =\n+          Date.now() -\n+          startedAt;\n+\n+        if (\n+          error instanceof\n+            Error &&\n+          error.name ===\n+            \"AbortError\"\n+        ) {\n+          console.error(\n+            \"GEMINI FETCH TIMEOUT:\",\n+            {\n+              attempt,\n+              elapsedMs,\n+              messageLength:\n+                message.length,\n+              hasSupplementaryUnicode,\n+            }\n+          );\n+\n+          throw new Error(\n+            \"GEMINI_TIMEOUT\"\n+          );\n+        }\n \n-      if (!response.ok) {\n         console.error(\n-          \"GEMINI API ERROR:\",\n-          data\n+          \"GEMINI FETCH FAILED:\",\n+          {\n+            attempt,\n+            elapsedMs,\n+            error,\n+          }\n         );\n \n-        return null;\n+        throw error;\n+      } finally {\n+        clearTimeout(\n+          timeout\n+        );\n       }\n-\n-      return parseGeminiText(\n-        data?.candidates?.[0]\n-          ?.content?.parts?.[0]\n-          ?.text\n-      );\n     }\n \n     let parsed =\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts",
+      "source": {
+        "path": "app/api/chat/route.ts",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "import {\n  createClient,\n  type SupabaseClient,\n} from \"@supabase/supabase-js\";\n\nimport {\n  createTokyoLifeEventsGuide,\n  getTokyoLifeEvents,\n} from \"../../../lib/tokyo-life-events\";\n\nimport {\n  buildUserProfile,\n  createTaxiContextGuide,\n  createUserProfileGuide,\n  type ChatMessage,\n} from \"../../../lib/user-profile\";\n\nimport {\n  loadPersonaPrompt,\n} from \"../../../lib/persona/persona-store\";\n\ntype TokyoWeather = {\n  temperature: number | null;\n  apparentTemperature: number | null;\n  relativeHumidity: number | null;\n  precipitation: number | null;\n  rain: number | null;\n  weatherCode: number | null;\n  windSpeed: number | null;\n  description: string;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype GeminiResult = {\n  reply?: string;\n  memory?: string[];\n  misakiTodayMemory?: {\n    date?: string;\n    items?: string[];\n  };\n};\n\ntype UsageResult = {\n  allowed?: boolean;\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype MisakiDayType =\n  | \"work\"\n  | \"off\";\n\ntype MisakiLifeContext = {\n  dayType: MisakiDayType;\n  guide: string;\n};\n\ntype ActivityEvidence = {\n  texts: string[];\n};\n\nconst MAX_HISTORY = 60;\nconst MAX_MEMORY = 30;\nconst MAX_TODAY_MEMORY = 12;\nconst GEMINI_TIMEOUT_MS = 20_000;\n\nconst SUPABASE_URL =\n  \"https://tzozajnwznxqgxnjikoy.supabase.co\";\n\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\n\nconst MISAKI_LATITUDE = 35.6728;\nconst MISAKI_LONGITUDE = 139.8174;\n\n/* =========================================================\n   BASIC\n========================================================= */\n\nfunction hashText(text: string) {\n  let hash = 0;\n\n  for (\n    let i = 0;\n    i < text.length;\n    i += 1\n  ) {\n    hash =\n      (\n        hash * 31 +\n        text.charCodeAt(i)\n      ) >>> 0;\n  }\n\n  return hash;\n}\n\nfunction getHour(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /(\\d{1,2}):(\\d{2})/\n    );\n\n  return match\n    ? Number(match[1])\n    : 18;\n}\n\nfunction getDateKey(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /\\d{4}\\/\\d{1,2}\\/\\d{1,2}/\n    );\n\n  return match?.[0] ??\n    currentTime.slice(0, 10);\n}\n\nfunction getFirstRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(value) &&\n    value.length > 0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value === \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\n/* =========================================================\n   USAGE / AUTH\n========================================================= */\n\nfunction createAuthenticatedSupabase(\n  accessToken: string\n) {\n  return createClient(\n    SUPABASE_URL,\n    SUPABASE_PUBLISHABLE_KEY,\n    {\n      global: {\n        headers: {\n          Authorization:\n            `Bearer ${accessToken}`,\n        },\n      },\n      auth: {\n        persistSession: false,\n        autoRefreshToken: false,\n        detectSessionInUrl: false,\n      },\n    }\n  );\n}\n\nasync function consumeDailyMessageWithRetry(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const maxAttempts = 3;\n\n  for (\n    let attempt = 1;\n    attempt <= maxAttempts;\n    attempt += 1\n  ) {\n    const {\n      data,\n      error,\n    } =\n      await (\n        supabase.rpc as any\n      )(\n        \"consume_daily_message\",\n        {\n          p_request_id:\n            requestId,\n        }\n      );\n\n    if (!error) {\n      return {\n        data,\n        error: null,\n      };\n    }\n\n    console.error(\n      `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,\n      error\n    );\n\n    const text =\n      typeof error.message ===\n      \"string\"\n        ? error.message.toLowerCase()\n        : \"\";\n\n    const retryable =\n      text.includes(\"timeout\") ||\n      text.includes(\n        \"temporarily unavailable\"\n      ) ||\n      text.includes(\n        \"fetch failed\"\n      );\n\n    if (\n      !retryable ||\n      attempt === maxAttempts\n    ) {\n      return {\n        data: null,\n        error,\n      };\n    }\n\n    await new Promise(\n      (resolve) =>\n        setTimeout(\n          resolve,\n          500 * attempt\n        )\n    );\n  }\n\n  return {\n    data: null,\n    error: new Error(\n      \"Usage retry failed\"\n    ),\n  };\n}\n\nasync function refundDailyMessage(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const {\n    data,\n    error,\n  } = await (\n    supabase.rpc as any\n  )(\n    \"refund_daily_message\",\n    {\n      p_request_id:\n        requestId,\n    }\n  );\n\n  if (error) {\n    console.error(\n      \"USAGE REFUND ERROR:\",\n      error\n    );\n    return null;\n  }\n\n  return getFirstRow<{\n    refunded?: boolean;\n    message_count?: number;\n    remaining?: number;\n    is_premium?: boolean;\n  }>(data);\n}\n\n/* =========================================================\n   WEATHER\n========================================================= */\n\nfunction weatherCodeToText(\n  code: number | null\n) {\n  if (code === null) return \"不明\";\n  if (code === 0) return \"快晴\";\n  if (\n    code === 1 ||\n    code === 2\n  ) return \"晴れ時々くもり\";\n  if (code === 3) return \"くもり\";\n  if (\n    code === 45 ||\n    code === 48\n  ) return \"霧\";\n  if (\n    [51, 53, 55].includes(code)\n  ) return \"霧雨\";\n  if (\n    [56, 57].includes(code)\n  ) return \"着氷性の霧雨\";\n  if (\n    [61, 63, 65].includes(code)\n  ) return \"雨\";\n  if (\n    [66, 67].includes(code)\n  ) return \"着氷性の雨\";\n  if (\n    [71, 73, 75].includes(code)\n  ) return \"雪\";\n  if (code === 77) return \"雪粒\";\n  if (\n    [80, 81, 82].includes(code)\n  ) return \"にわか雨\";\n  if (\n    [85, 86].includes(code)\n  ) return \"にわか雪\";\n  if (code === 95) return \"雷雨\";\n  if (\n    [96, 99].includes(code)\n  ) return \"ひょうを伴う雷雨\";\n\n  return \"不明\";\n}\n\nfunction getHumidityFeel(\n  weather: TokyoWeather\n) {\n  const humidity =\n    weather.relativeHumidity;\n\n  const temperature =\n    weather.temperature;\n\n  if (\n    humidity === null ||\n    temperature === null\n  ) {\n    return null;\n  }\n\n  if (\n    temperature >= 27 &&\n    humidity >= 75\n  ) {\n    return \"かなり蒸し暑く感じやすい\";\n  }\n\n  if (\n    temperature >= 24 &&\n    humidity >= 65\n  ) {\n    return \"やや蒸し暑く感じやすい\";\n  }\n\n  if (humidity >= 75) {\n    return \"湿気を感じやすい\";\n  }\n\n  if (humidity <= 40) {\n    return \"空気はやや乾燥気味\";\n  }\n\n  return \"湿度は特に極端ではない\";\n}\n\nasync function getTokyoWeather():\n  Promise<TokyoWeather | null> {\n  try {\n    const url =\n      \"https://api.open-meteo.com/v1/forecast\" +\n      `?latitude=${MISAKI_LATITUDE}` +\n      `&longitude=${MISAKI_LONGITUDE}` +\n      \"&current=\" +\n      [\n        \"temperature_2m\",\n        \"apparent_temperature\",\n        \"relative_humidity_2m\",\n        \"precipitation\",\n        \"rain\",\n        \"weather_code\",\n        \"wind_speed_10m\",\n      ].join(\",\") +\n      \"&timezone=Asia%2FTokyo\";\n\n    const response =\n      await fetch(\n        url,\n        {\n          next: {\n            revalidate: 600,\n          },\n        }\n      );\n\n    if (!response.ok) {\n      return null;\n    }\n\n    const data =\n      await response.json();\n\n    const current =\n      data?.current;\n\n    if (!current) {\n      return null;\n    }\n\n    const numberOrNull = (\n      value: unknown\n    ) =>\n      typeof value === \"number\"\n        ? value\n        : null;\n\n    const weatherCode =\n      numberOrNull(\n        current.weather_code\n      );\n\n    return {\n      temperature:\n        numberOrNull(\n          current.temperature_2m\n        ),\n      apparentTemperature:\n        numberOrNull(\n          current.apparent_temperature\n        ),\n      relativeHumidity:\n        numberOrNull(\n          current.relative_humidity_2m\n        ),\n      precipitation:\n        numberOrNull(\n          current.precipitation\n        ),\n      rain:\n        numberOrNull(\n          current.rain\n        ),\n      weatherCode,\n      windSpeed:\n        numberOrNull(\n          current.wind_speed_10m\n        ),\n      description:\n        weatherCodeToText(\n          weatherCode\n        ),\n    };\n  } catch (error) {\n    console.error(\n      \"WEATHER FETCH ERROR:\",\n      error\n    );\n\n    return null;\n  }\n}\n\nfunction createWeatherGuide(\n  weather: TokyoWeather | null\n) {\n  if (!weather) {\n    return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n現在、天気情報を取得できていません。\n\n分からない天気を\n想像で作らないでください。\n`.trim();\n  }\n\n  const lines = [\n    `天気：${weather.description}`,\n  ];\n\n  if (\n    weather.temperature !== null\n  ) {\n    lines.push(\n      `気温：${weather.temperature}℃`\n    );\n  }\n\n  if (\n    weather.apparentTemperature !==\n    null\n  ) {\n    lines.push(\n      `体感温度：${weather.apparentTemperature}℃`\n    );\n  }\n\n  if (\n    weather.relativeHumidity !==\n    null\n  ) {\n    lines.push(\n      `相対湿度：${weather.relativeHumidity}%`\n    );\n  }\n\n  if (weather.rain !== null) {\n    lines.push(\n      `現在の雨量：${weather.rain}mm`\n    );\n  }\n\n  if (\n    weather.precipitation !== null\n  ) {\n    lines.push(\n      `降水量：${weather.precipitation}mm`\n    );\n  }\n\n  if (\n    weather.windSpeed !== null\n  ) {\n    lines.push(\n      `風速：${weather.windSpeed}km/h`\n    );\n  }\n\n  const humidityFeel =\n    getHumidityFeel(weather);\n\n  if (humidityFeel) {\n    lines.push(\n      `体感：${humidityFeel}`\n    );\n  }\n\n  return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n${lines\n  .map((line) => `・${line}`)\n  .join(\"\\n\")}\n\nこれは今現在の情報です。\n\n・現在観測だけから過去の天気経過を作らない\n・短時間予報より先まで断定しない\n・情報入手経路を作らない\n・数値は必要なときだけ自然に使う\n・湿度と気温に反する体感表現をしない\n`.trim();\n}\n\n/* =========================================================\n   MISAKI LIFE\n========================================================= */\n\nfunction getMisakiDayType(\n  currentTime: string\n): MisakiDayType {\n  const seed =\n    hashText(\n      getDateKey(\n        currentTime\n      )\n    );\n\n  return seed % 4 < 2\n    ? \"work\"\n    : \"off\";\n}\n\nfunction createMisakiLife(\n  currentTime: string\n): MisakiLifeContext {\n  const dateKey =\n    getDateKey(currentTime);\n\n  const seed =\n    hashText(dateKey);\n\n  const hour =\n    getHour(currentTime);\n\n  const dayType =\n    getMisakiDayType(\n      currentTime\n    );\n\n  const moods = [\n    \"今日はわりと機嫌がいい\",\n    \"今日は少し甘えたい気分\",\n    \"今日は普通に落ち着いている\",\n    \"今日はちょっとだけ眠い\",\n    \"今日はのんびり話したい気分\",\n    \"今日はなんとなくユーザーと話したい気分\",\n  ];\n\n  const smallThings = [\n    \"甘いものをちょっと食べたい気分\",\n    \"少しゆっくりしたい気分\",\n    \"少しだけ眠気がある\",\n    \"ちょっとぼーっとしたい気分\",\n    \"今夜は少し長く話したい気分\",\n    \"なんとなくユーザーのことを思い出すことがある\",\n    \"ちょっと小腹が空いている\",\n    \"少し力を抜きたい気分\",\n  ];\n\n  const mood =\n    moods[\n      (seed >> 3) %\n        moods.length\n    ];\n\n  const smallThing =\n    smallThings[\n      (seed >> 6) %\n        smallThings.length\n    ];\n\n  const timeBand =\n    hour >= 5 && hour < 10\n      ? \"朝\"\n      : hour >= 10 &&\n        hour < 17\n      ? \"昼間\"\n      : hour >= 17 &&\n        hour < 22\n      ? \"夕方から夜\"\n      : \"夜遅め\";\n\n  const dayLabel =\n    dayType === \"work\"\n      ? \"仕事の日\"\n      : \"休みの日\";\n\n  const workTimingGuide =\n    dayType !== \"work\"\n      ? \"\"\n      : hour < 10\n        ? `\n今日は仕事の日ですが、現在は朝です。\n夜勤ではありません。\n\nこの時間帯は、\n「これから仕事」\n「出勤前」\n「準備している」\n程度なら自然です。\n\n「あと少しで仕事が終わる」\n「仕事終わった」\n「勤務がもうすぐ終わる」\nなど、夜勤明けのような発言はしないでください。\n`.trim()\n        : hour < 17\n          ? `\n今日は仕事の日で、現在は昼間です。\n勤務中として話して構いません。\n\nただし、具体的な業務内容や休憩状況は\n会話に根拠がない限り作らないでください。\n`.trim()\n          : `\n今日は仕事の日ですが、現在は夕方以降です。\n通常の日中勤務として扱い、\n夜勤中・夜勤明けの設定を新しく作らないでください。\n\n「まだ仕事中」\n「あと少しで仕事が終わる」\nなどは、会話に明確な根拠がある場合だけ使ってください。\n`.trim();\n\n  const consistency =\n    dayType === \"work\"\n      ? `\n今日は仕事の日です。\n\n${workTimingGuide}\n\n「今ちょっとゆっくりしている」\n「少し休憩したい」\n程度は構いません。\n\nただし、\n「今日は暇」\n「今日は一日のんびり」\n「今日はずっとだらだら」\nなど、\n一日全体が休日であるように\n広げないでください。\n`.trim()\n      : `\n今日は休みの日です。\n\n今日の記憶や会話履歴に\n別の根拠がない限り、\n\n「今日は仕事」\n「今仕事中」\n「これから仕事」\n「仕事終わった」\n\nなどを新しく作らないでください。\n\n休みの日だからといって\n「買い物してきた」\n「一日中寝ていた」\nなどの具体的行動も\n勝手に作らないでください。\n`.trim();\n\n  return {\n    dayType,\n    guide: `\n【今日の美咲の生活背景】\n\n・今日は「${dayLabel}」\n・現在は「${dayLabel}の${timeBand}」\n・${mood}\n・${smallThing}\n\nこの仕事日／休日は\n今日一日固定です。\n\n${consistency}\n\n【気分と行動は別】\n\n「眠い」\n「甘いもの食べたい」\n「ゆっくりしたい」\nなどの気分だけから、\n\n「今日は暇」\n「ずっと寝ていた」\n「さっき買い物していた」\n\nなどの具体的事実を\n作らないでください。\n`.trim(),\n  };\n}\n\nfunction createTimeGuide(\n  currentTime: string\n) {\n  const hour =\n    getHour(currentTime);\n\n  if (hour < 5) {\n    return `\n現在は深夜です。\nまだ朝ではありません。\n\n挨拶だけから\nユーザーが徹夜しているなどと\n推測しないでください。\n`.trim();\n  }\n\n  if (hour < 10) {\n    return `\n現在は朝です。\n\n朝らしい会話はできますが、\n睡眠・朝食・外出などを\n勝手に事実化しないでください。\n`.trim();\n  }\n\n  if (hour < 17) {\n    return `\n現在は昼間です。\n\n時間帯だけから、\n昼食・買い物・外出などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  if (hour < 22) {\n    return `\n現在は夕方から夜です。\n\n時間帯だけから、\n帰宅・夕食・入浴などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  return `\n現在は夜遅めです。\n\n時間帯だけから、\n美咲やユーザーの\n直前の行動を作らないでください。\n`.trim();\n}\n\nfunction createRelationshipGuide(\n  points: number\n) {\n  if (points >= 160) {\n    return `\n【現在の関係性：とても深い恋人関係】\n\n・かなり自然体\n・自然な甘え\n・軽いからかい\n・時々嫉妬\n・短い返事だけでも成立する\n・毎回質問しなくてよい\n`.trim();\n  }\n\n  if (points >= 80) {\n    return `\n【現在の関係性：かなり親密な恋人】\n\n・遠慮が少ない\n・自然な甘え\n・軽いからかい\n・無理に質問しない\n`.trim();\n  }\n\n  if (points >= 30) {\n    return `\n【現在の関係性：親密な恋人】\n\n・自然体\n・軽いからかい\n・時々甘える\n・会話のための質問を減らす\n`.trim();\n  }\n\n  return `\n【現在の関係性：安定した恋人】\n\n二人はすでに恋人です。\n\n・自然なタメ口\n・少し甘える\n・無理に質問しない\n`.trim();\n}\n\n/* =========================================================\n   MEMORY / ACTIVITY\n========================================================= */\n\nfunction createTodayMemoryGuide(\n  todayMemory: MisakiTodayMemory,\n  currentDate: string\n) {\n  if (\n    todayMemory.date !==\n      currentDate ||\n    todayMemory.items.length ===\n      0\n  ) {\n    return `\n【美咲の今日の記憶】\n\n今日はまだ、\n保存済みの美咲自身の\n具体的な出来事はありません。\n\n会話履歴にも根拠がない\n具体的な過去行動を\n新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲の今日の記憶】\n\n${todayMemory.items\n  .map((item) => `・${item}`)\n  .join(\"\\n\")}\n\nここにある出来事だけを、\n今日すでに起きた美咲自身の出来事として\n自然に使えます。\n`.trim();\n}\n\nfunction buildActivityEvidence(\n  history: ChatMessage[],\n  todayMemory: MisakiTodayMemory\n): ActivityEvidence {\n  return {\n    texts: [\n      ...history\n        .filter(\n          (item) =>\n            item.role === \"misaki\"\n        )\n        .slice(-20)\n        .map(\n          (item) => item.text\n        ),\n      ...todayMemory.items,\n    ],\n  };\n}\n\nconst activityGroups = [\n  {\n    name: \"買い物\",\n    patterns: [\n      \"買い物\",\n      \"スーパー\",\n      \"コンビニ\",\n    ],\n  },\n  {\n    name: \"外出\",\n    patterns: [\n      \"出かけ\",\n      \"外出\",\n      \"散歩\",\n    ],\n  },\n  {\n    name: \"帰宅\",\n    patterns: [\n      \"帰ってき\",\n      \"帰宅\",\n      \"家に戻\",\n    ],\n  },\n  {\n    name: \"仕事\",\n    patterns: [\n      \"仕事して\",\n      \"仕事だった\",\n      \"仕事終わ\",\n      \"勤務して\",\n      \"会社\",\n    ],\n  },\n  {\n    name: \"入浴\",\n    patterns: [\n      \"お風呂\",\n      \"風呂\",\n      \"シャワー\",\n    ],\n  },\n  {\n    name: \"食事\",\n    patterns: [\n      \"ご飯食べ\",\n      \"ごはん食べ\",\n      \"夕飯\",\n      \"晩ごはん\",\n      \"昼ごはん\",\n      \"朝ごはん\",\n      \"食べてた\",\n    ],\n  },\n  {\n    name: \"睡眠\",\n    patterns: [\n      \"昼寝\",\n      \"寝てた\",\n      \"寝ていた\",\n      \"仮眠\",\n    ],\n  },\n  {\n    name: \"料理\",\n    patterns: [\n      \"料理して\",\n      \"ご飯作\",\n      \"ごはん作\",\n    ],\n  },\n  {\n    name: \"掃除\",\n    patterns: [\n      \"掃除して\",\n      \"片付けて\",\n      \"片づけて\",\n    ],\n  },\n];\n\nfunction containsAny(\n  text: string,\n  patterns: string[]\n) {\n  return patterns.some(\n    (pattern) =>\n      text.includes(pattern)\n  );\n}\n\nfunction findUnsupportedActivityGroups(\n  reply: string,\n  evidence: ActivityEvidence\n) {\n  const pastMarkers = [\n    \"さっき\",\n    \"少し前\",\n    \"帰ってき\",\n    \"帰宅\",\n    \"してた\",\n    \"していた\",\n    \"だった\",\n    \"終わった\",\n    \"済ませ\",\n    \"行ってた\",\n    \"行ってきた\",\n  ];\n\n  if (\n    !containsAny(\n      reply,\n      pastMarkers\n    )\n  ) {\n    return [];\n  }\n\n  return activityGroups\n    .filter(\n      (group) =>\n        containsAny(\n          reply,\n          group.patterns\n        ) &&\n        !evidence.texts.some(\n          (text) =>\n            containsAny(\n              text,\n              group.patterns\n            )\n        )\n    )\n    .map(\n      (group) => group.name\n    );\n}\n\nfunction createActivityGroundingGuide(\n  evidence: ActivityEvidence\n) {\n  if (\n    evidence.texts.length === 0\n  ) {\n    return `\n【美咲自身の過去行動】\n\n現在、\n会話履歴にも今日の記憶にも\n美咲自身の具体的な過去行動の根拠はありません。\n\n「さっき買い物してた」\n「今帰ってきた」\n「仕事終わったところ」\n「お風呂入ってた」\n「ご飯食べてた」\nなどを新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲自身の過去行動】\n\n具体的な過去行動として\n根拠にできるのは次だけです。\n\n${evidence.texts\n  .slice(-20)\n  .map((text) => `・${text}`)\n  .join(\"\\n\")}\n\nここにない別の行動を\n新しく過去の事実として\n作らないでください。\n`.trim();\n}\n\n/* =========================================================\n   VALIDATION\n========================================================= */\n\nfunction isWeatherText(\n  text: string\n) {\n  return containsAny(\n    text,\n    [\n      \"天気\",\n      \"雨\",\n      \"霧雨\",\n      \"雷\",\n      \"降\",\n      \"晴\",\n      \"曇\",\n      \"気温\",\n      \"暑\",\n      \"寒\",\n      \"蒸し\",\n      \"湿気\",\n      \"湿度\",\n      \"風\",\n    ]\n  );\n}\n\nfunction hasRecentMisakiWeatherContext(\n  history: ChatMessage[]\n) {\n  return history\n    .slice(-8)\n    .some(\n      (item) =>\n        item.role === \"misaki\" &&\n        isWeatherText(\n          item.text\n        )\n    );\n}\n\nfunction userAskedMisakiWeather(\n  message: string\n) {\n  return (\n    isWeatherText(message) &&\n    containsAny(\n      message,\n      [\n        \"そっち\",\n        \"そちら\",\n        \"美咲\",\n      ]\n    )\n  );\n}\n\nfunction userIsActuallyInDanger(\n  message: string\n) {\n  return containsAny(\n    message,\n    [\n      \"事故った\",\n      \"事故にあった\",\n      \"怪我した\",\n      \"けがした\",\n      \"血が出て\",\n      \"救急車\",\n      \"病院\",\n      \"倒れた\",\n      \"具合悪い\",\n      \"体調悪い\",\n      \"高熱\",\n      \"息苦しい\",\n      \"地震すごい\",\n      \"避難\",\n      \"冠水\",\n      \"浸水\",\n      \"動けない\",\n      \"閉じ込め\",\n    ]\n  );\n}\n\nfunction findDayTypeProblems(\n  reply: string,\n  dayType: MisakiDayType,\n  currentTime?: string\n) {\n  const problems: string[] = [];\n\n  if (\n    dayType === \"work\" &&\n    containsAny(\n      reply,\n      [\n        \"今日は暇\",\n        \"今日は何も予定ない\",\n        \"今日は予定ない\",\n        \"今日は一日のんびり\",\n        \"今日はずっとのんびり\",\n        \"今日はずっとだらだら\",\n        \"一日中だらだら\",\n      ]\n    )\n  ) {\n    problems.push(\n      \"今日は仕事の日なのに、一日が完全な休み・暇であるように話している\"\n    );\n  }\n\n  if (\n    dayType === \"off\" &&\n    containsAny(\n      reply,\n      [\n        \"今日は仕事\",\n        \"今仕事中\",\n        \"勤務中\",\n        \"仕事してる\",\n        \"これから仕事\",\n        \"仕事行ってくる\",\n      ]\n    )\n  ) {\n    problems.push(\n      \"今日は休みの日なのに、仕事の日であるように話している\"\n    );\n  }\n\n  if (\n    dayType === \"work\" &&\n    currentTime &&\n    getHour(currentTime) < 10 &&\n    containsAny(\n      reply,\n      [\n        \"仕事終わる\",\n        \"仕事が終わる\",\n        \"仕事終わった\",\n        \"勤務が終わる\",\n        \"勤務終わる\",\n        \"あと少しで仕事\",\n        \"もうすぐ仕事終\",\n      ]\n    )\n  ) {\n    problems.push(\n      \"朝なのに、美咲が夜勤明けのように仕事の",
+        "sha256": "bf2385efad16692222cc4d7584c3761254611bea30e9042f84228a23852019e4"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "dff0c2a09d847609cc21030b6d3db3e35c68901c",
+      "message": "Add timeout and diagnostics to Gemini chat fetch\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/dff0c2a09d847609cc21030b6d3db3e35c68901c"
+    },
+    {
+      "sha": "469578ea12663c594a32c62a05263b23e7190891",
+      "message": "Simplify Unicode diagnostics for chat timeout\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/469578ea12663c594a32c62a05263b23e7190891"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "GEMINI_TIMEOUT_MS",
+    "MAX_HISTORY",
+    "MAX_MEMORY",
+    "MAX_TODAY_MEMORY",
+    "MISAKI_LATITUDE",
+    "MISAKI_LONGITUDE",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "activityGroups",
+    "attempt",
+    "buildActivityEvidence",
+    "consistency",
+    "consumeDailyMessageWithRetry",
+    "containsAny",
+    "controller",
+    "createActivityGroundingGuide",
+    "createAuthenticatedSupabase",
+    "createMisakiLife",
+    "createRelationshipGuide",
+    "createTimeGuide",
+    "createTodayMemoryGuide",
+    "createWeatherGuide",
+    "current",
+    "data",
+    "dateKey",
+    "dayLabel",
+    "dayType",
+    "elapsedMs",
+    "findDayTypeProblems",
+    "findUnsupportedActivityGroups",
+    "getDateKey",
+    "getFirstRow",
+    "getHour",
+    "getHumidityFeel",
+    "getMisakiDayType",
+    "getTokyoWeather",
+    "hasRecentMisakiWeatherContext",
+    "hasSupplementaryUnicode",
+    "hash",
+    "hashText",
+    "hour",
+    "humidity",
+    "humidityFeel",
+    "i",
+    "isWeatherText",
+    "lines",
+    "match",
+    "maxAttempts",
+    "mood",
+    "moods",
+    "numberOrNull",
+    "parsed",
+    "pastMarkers",
+    "problems",
+    "refundDailyMessage",
+    "response",
+    "retryable",
+    "seed",
+    "smallThing",
+    "smallThings"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "Gemini返答待ちにタイムアウトと診断ログを追加する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/25"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "e8b294741be9349474b0a6420f2b5c668458fa37c8ffedab6ea29fc402d814d4",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

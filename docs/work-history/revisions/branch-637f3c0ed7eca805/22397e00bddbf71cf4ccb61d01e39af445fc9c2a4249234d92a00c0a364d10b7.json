@@ -1,0 +1,29 @@
+{
+  "id": "branch-637f3c0ed7eca805",
+  "title": "fix/safari-load-failed-message",
+  "head": "08ee64b09567900a5abd8e557c74d3a8cd16961e",
+  "head_ref": "fix/safari-load-failed-message",
+  "linked_prs": [
+    11
+  ],
+  "files": [
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/08ee64b09567900a5abd8e557c74d3a8cd16961e/app/chat/page.tsx"
+    }
+  ],
+  "commits": "08ee64b09567900a5abd8e557c74d3a8cd16961e Safariの通信例外を会話に表示しない",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "863fa34452e14edd3f8ab1e81b102d391afc20447c3339c5af64f76d587ff1b2",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

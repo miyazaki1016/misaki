@@ -1,0 +1,82 @@
+{
+  "id": "pr-41",
+  "number": 41,
+  "title": "待機メッセージの縦崩れを直す",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "PR #40 の待機表示が typing dot 用の span サイズ（6px × 6px）を継承して縦に崩れる問題だけを修正します。\n\n待機テキストでは dot 用の width/height/background/animation を解除し、1行表示用の横幅を確保します。Gemini retry ロジックには触れません。",
+  "snapshot_head": "f3a613291569a60e471065372135cbee07373702",
+  "snapshot_consistent": true,
+  "head": "f3a613291569a60e471065372135cbee07373702",
+  "base": "1b691e6cb352ee37b279f1608c2571d26053cbea",
+  "base_ref": "main",
+  "head_ref": "sora/fix-waiting-reply-layout",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-02T11:55:10Z",
+  "merge_commit_sha": "3b068fcf970c7ddab5cf6cbdaf3490b76d3c5a58",
+  "updated_at": "2026-10-02T11:55:10Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "app/globals.css",
+      "status": "modified",
+      "additions": 22,
+      "deletions": 0,
+      "patch": "diff --git a/app/globals.css b/app/globals.css\nindex 0c2a185..ec9e161 100644\n--- a/app/globals.css\n+++ b/app/globals.css\n@@ -465,6 +465,28 @@ button {\n     ease-in-out;\n }\n \n+.shell .typingBubble .waitingReplyText {\n+  width: auto;\n+  height: auto;\n+  display: inline;\n+  border-radius: 0;\n+  background: transparent;\n+  animation: none;\n+  white-space: nowrap;\n+  font-size: 13px;\n+  line-height: 1.4;\n+  color: #8f737b;\n+}\n+\n+.shell .typingBubble:has(.waitingReplyText) {\n+  width: auto;\n+  min-width: 0;\n+  height: auto;\n+  min-height: 40px;\n+  max-width: min(78vw, 330px);\n+  padding: 9px 13px;\n+}\n+\n .shell\n   .typingBubble\n   span:nth-child(1) {\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f3a613291569a60e471065372135cbee07373702/app/globals.css",
+      "source": {
+        "path": "app/globals.css",
+        "coverage": "全文",
+        "text": ":root {\n  --misaki-main: #ff6680;\n  --misaki-main-dark: #e95872;\n  --misaki-sub: #ffd5de;\n  --misaki-beige: #f8efea;\n  --misaki-paper: #fffafa;\n  --misaki-white: #ffffff;\n  --misaki-text: #6c5c62;\n  --misaki-title: #49383e;\n  --misaki-muted: #9a8b90;\n  --misaki-line: rgba(108, 92, 98, 0.11);\n}\n\n* {\n  box-sizing: border-box;\n}\n\nhtml,\nbody {\n  margin: 0;\n  padding: 0;\n  min-height: 100%;\n}\n\nhtml {\n  background: var(--misaki-beige);\n}\n\nbody {\n  background:\n    radial-gradient(\n      circle at 50% 0%,\n      rgba(255, 213, 222, 0.35),\n      transparent 380px\n    ),\n    var(--misaki-beige);\n\n  color: var(--misaki-text);\n\n  font-family:\n    -apple-system,\n    BlinkMacSystemFont,\n    \"Hiragino Sans\",\n    \"Yu Gothic\",\n    \"Meiryo\",\n    sans-serif;\n\n  -webkit-font-smoothing: antialiased;\n}\n\nbutton,\ninput,\ntextarea {\n  font: inherit;\n}\n\nbutton {\n  -webkit-tap-highlight-color: transparent;\n}\n\n/* ========================================\n   CHAT APP\n======================================== */\n\n.shell {\n  width: 100%;\n  max-width: 480px;\n  min-height: 100dvh;\n\n  margin: 0 auto;\n\n  display: flex;\n  flex-direction: column;\n\n  position: relative;\n\n  background:\n    linear-gradient(\n      180deg,\n      #fffafa 0%,\n      #fdf5f5 34%,\n      #f8efea 100%\n    );\n\n  color: var(--misaki-text);\n\n  overflow-x: hidden;\n}\n\n/* ========================================\n   HEADER\n======================================== */\n\n.shell .card {\n  position: sticky;\n  top: 0;\n  z-index: 20;\n\n  min-height: 79px;\n\n  display: flex;\n  align-items: center;\n  gap: 11px;\n\n  padding:\n    calc(11px + env(safe-area-inset-top))\n    14px\n    11px;\n\n  background:\n    rgba(255, 250, 250, 0.94);\n\n  border-bottom:\n    1px solid\n    rgba(108, 92, 98, 0.08);\n\n  box-shadow:\n    0 5px 24px\n    rgba(82, 55, 64, 0.055);\n\n  backdrop-filter:\n    blur(18px);\n\n  -webkit-backdrop-filter:\n    blur(18px);\n}\n\n.shell .avatar {\n  flex: 0 0 auto;\n\n  width: 49px;\n  height: 49px;\n\n  padding: 2px;\n\n  border-radius: 50%;\n\n  background:\n    linear-gradient(\n      145deg,\n      #ffd5de,\n      #ff6680\n    );\n\n  box-shadow:\n    0 5px 16px\n    rgba(189, 84, 107, 0.18);\n}\n\n.shell .avatar img {\n  width: 100%;\n  height: 100%;\n\n  display: block;\n\n  object-fit: cover;\n\n  border:\n    2px solid\n    rgba(255, 255, 255, 0.94);\n\n  border-radius: 50%;\n}\n\n.shell .card h1 {\n  margin: 0;\n\n  color:\n    var(--misaki-title);\n\n  font-size: 18px;\n  line-height: 1.15;\n\n  font-weight: 800;\n\n  letter-spacing:\n    0.04em;\n}\n\n.shell .card p {\n  margin:\n    4px 0 0;\n\n  color:\n    var(--misaki-muted);\n\n  font-size: 10px;\n  line-height: 1.3;\n}\n\n/*\n  page.tsx 側のヘッダーボタンは\n  inline style を使っているので、\n  ブランド色へ統一する。\n*/\n\n.shell .card button {\n  color:\n    var(--misaki-text) !important;\n\n  font-weight: 600;\n}\n\n.shell .card button:first-of-type {\n  background:\n    var(--misaki-main) !important;\n\n  color:\n    #ffffff !important;\n\n  box-shadow:\n    0 5px 14px\n    rgba(255, 102, 128, 0.18);\n}\n\n/* ========================================\n   SAFETY NOTICE\n======================================== */\n\n.shell .notice {\n  margin:\n    11px 13px 0;\n\n  padding:\n    9px 13px;\n\n  border:\n    1px solid\n    rgba(255, 102, 128, 0.08);\n\n  border-radius:\n    13px;\n\n  background:\n    rgba(255, 255, 255, 0.68);\n\n  color:\n    #918086;\n\n  font-size:\n    10px;\n\n  line-height:\n    1.55;\n\n  text-align:\n    center;\n\n  box-shadow:\n    0 5px 18px\n    rgba(74, 52, 59, 0.025);\n}\n\n/* ========================================\n   CHAT AREA\n======================================== */\n\n.shell .chat {\n  flex: 1;\n\n  width: 100%;\n\n  padding:\n    20px\n    13px\n    126px;\n\n  display: flex;\n  flex-direction: column;\n\n  gap: 13px;\n}\n\n/* ========================================\n   CHAT BUBBLES\n======================================== */\n\n.shell .chat .bubble {\n  position: relative;\n\n  width:\n    fit-content;\n\n  max-width:\n    78%;\n\n  padding:\n    10px 14px;\n\n  color:\n    var(--misaki-text);\n\n  font-size:\n    15px;\n\n  line-height:\n    1.58;\n\n  letter-spacing:\n    0.005em;\n\n  white-space:\n    pre-wrap;\n\n  overflow-wrap:\n    anywhere;\n\n  box-shadow:\n    0 4px 14px\n    rgba(73, 50, 58, 0.045);\n}\n\n/* 美咲 */\n\n.shell\n  .chat\n  .bubble:not(.user) {\n  align-self:\n    flex-start;\n\n  margin-left:\n    45px;\n\n  background:\n    rgba(255, 255, 255, 0.96);\n\n  border:\n    1px solid\n    rgba(108, 92, 98, 0.045);\n\n  border-radius:\n    18px\n    18px\n    18px\n    5px;\n}\n\n.shell\n  .chat\n  .bubble:not(.user)::before {\n  content: \"\";\n\n  position:\n    absolute;\n\n  left:\n    -45px;\n\n  top:\n    0;\n\n  width:\n    35px;\n\n  height:\n    35px;\n\n  border:\n    2px solid\n    #ffffff;\n\n  border-radius:\n    50%;\n\n  background-image:\n    url(\"/icon-192.png\");\n\n  background-size:\n    cover;\n\n  background-position:\n    center;\n\n  background-repeat:\n    no-repeat;\n\n  box-shadow:\n    0 4px 12px\n    rgba(90, 58, 69, 0.11);\n}\n\n/* ユーザー */\n\n.shell\n  .chat\n  .bubble.user {\n  align-self:\n    flex-end;\n\n  margin-left:\n    auto;\n\n  background:\n    linear-gradient(\n      145deg,\n      #ffdce3,\n      var(--misaki-sub)\n    );\n\n  color:\n    #5f4c53;\n\n  border:\n    1px solid\n    rgba(216, 104, 128, 0.06);\n\n  border-radius:\n    18px\n    18px\n    5px\n    18px;\n\n  box-shadow:\n    0 4px 13px\n    rgba(199, 98, 120, 0.055);\n}\n\n/* ========================================\n   TYPING\n======================================== */\n\n.shell .typingBubble {\n  min-width:\n    61px;\n\n  height:\n    40px;\n\n  display:\n    flex;\n\n  align-items:\n    center;\n\n  justify-content:\n    center;\n\n  gap:\n    5px;\n\n  padding:\n    0 13px;\n}\n\n.shell .typingBubble span {\n  width:\n    6px;\n\n  height:\n    6px;\n\n  display:\n    block;\n\n  border-radius:\n    50%;\n\n  background:\n    #c08f99;\n\n  animation:\n    typingDot\n    1.2s\n    infinite\n    ease-in-out;\n}\n\n.shell .typingBubble .waitingReplyText {\n  width: auto;\n  height: auto;\n  display: inline;\n  border-radius: 0;\n  background: transparent;\n  animation: none;\n  white-space: nowrap;\n  font-size: 13px;\n  line-height: 1.4;\n  color: #8f737b;\n}\n\n.shell .typingBubble:has(.waitingReplyText) {\n  width: auto;\n  min-width: 0;\n  height: auto;\n  min-height: 40px;\n  max-width: min(78vw, 330px);\n  padding: 9px 13px;\n}\n\n.shell\n  .typingBubble\n  span:nth-child(1) {\n  animation-delay:\n    0s;\n}\n\n.shell\n  .typingBubble\n  span:nth-child(2) {\n  animation-delay:\n    0.18s;\n}\n\n.shell\n  .typingBubble\n  span:nth-child(3) {\n  animation-delay:\n    0.36s;\n}\n\n@keyframes typingDot {\n  0%,\n  60%,\n  100% {\n    opacity:\n      0.3;\n\n    transform:\n      translateY(0);\n  }\n\n  30% {\n    opacity:\n      1;\n\n    transform:\n      translateY(-4px);\n  }\n}\n\n/* ========================================\n   INPUT AREA\n======================================== */\n\n.shell .inputArea {\n  position:\n    fixed;\n\n  z-index:\n    30;\n\n  left:\n    50%;\n\n  bottom:\n    0;\n\n  transform:\n    translateX(-50%);\n\n  width:\n    min(\n      100%,\n      480px\n    );\n\n  display:\n    flex;\n\n  align-items:\n    center;\n\n  gap:\n    8px;\n\n  padding:\n    9px\n    10px\n    calc(\n      9px +\n      env(\n        safe-area-inset-bottom\n      )\n    );\n\n  background:\n    rgba(\n      255,\n      250,\n      250,\n      0.96\n    );\n\n  border-top:\n    1px solid\n    rgba(\n      108,\n      92,\n      98,\n      0.08\n    );\n\n  box-shadow:\n    0 -7px 25px\n    rgba(\n      73,\n      48,\n      57,\n      0.055\n    );\n\n  backdrop-filter:\n    blur(18px);\n\n  -webkit-backdrop-filter:\n    blur(18px);\n}\n\n.shell\n  .inputArea\n  textarea,\n.shell\n  .inputArea\n  input {\n  flex:\n    1;\n\n  min-width:\n    0;\n\n  min-height:\n    43px;\n\n  max-height:\n    110px;\n\n  padding:\n    10px 15px;\n\n  border:\n    1px solid\n    rgba(\n      108,\n      92,\n      98,\n      0.13\n    );\n\n  border-radius:\n    22px;\n\n  outline:\n    none;\n\n  resize:\n    none;\n\n  background:\n    #ffffff;\n\n  color:\n    var(--misaki-text);\n\n  font-size:\n    16px;\n\n  box-shadow:\n    inset\n    0 1px 2px\n    rgba(\n      73,\n      48,\n      57,\n      0.025\n    );\n\n  transition:\n    border-color\n    0.2s\n    ease,\n    box-shadow\n    0.2s\n    ease;\n}\n\n.shell\n  .inputArea\n  input::placeholder,\n.shell\n  .inputArea\n  textarea::placeholder {\n  color:\n    #b6a9ad;\n}\n\n.shell\n  .inputArea\n  textarea:focus,\n.shell\n  .inputArea\n  input:focus {\n  border-color:\n    rgba(\n      255,\n      102,\n      128,\n      0.56\n    );\n\n  box-shadow:\n    0 0 0 3px\n    rgba(\n      255,\n      102,\n      128,\n      0.08\n    );\n}\n\n/* 送信ボタン */\n\n.shell .inputArea button {\n  flex:\n    0 0 auto;\n\n  min-width:\n    62px;\n\n  height:\n    43px;\n\n  padding:\n    0 15px;\n\n  border:\n    none;\n\n  border-radius:\n    22px;\n\n  background:\n    var(--misaki-main);\n\n  color:\n    #ffffff;\n\n  font-size:\n    13px;\n\n  font-weight:\n    800;\n\n  box-shadow:\n    0 7px 17px\n    rgba(\n      255,\n      102,\n      128,\n      0.22\n    );\n\n  cursor:\n    pointer;\n\n  transition:\n    transform\n    0.15s\n    ease,\n    opacity\n    0.15s\n    ease;\n}\n\n.shell\n  .inputArea\n  button:active:not(\n    :disabled\n  ) {\n  transform:\n    scale(0.96);\n}\n\n.shell\n  .inputArea\n  button:disabled {\n  opacity:\n    0.42;\n\n  box-shadow:\n    none;\n}\n\n/* ========================================\n   MEMORY / PLAN PANELS\n\n   page.tsx 内に inline style があるので\n   そのままでもブランドに馴染むよう\n   shell 内の section を調整。\n======================================== */\n\n.shell > section[style] {\n  color:\n    var(--misaki-text);\n}\n\n.shell\n  > section[style]\n  strong {\n  color:\n    var(--misaki-title);\n}\n\n.shell\n  > section[style]\n  button {\n  color:\n    var(--misaki-text);\n}\n\n/* プラン表示 */\n\n.shell\n  > section[style]\n  > span {\n  color:\n    #8e7e84;\n}\n\n/* Premium CTA */\n\n.shell\n  > section[style]\n  button[style*=\"background\"] {\n  background:\n    var(--misaki-main) !important;\n\n  color:\n    #ffffff !important;\n}\n\n/* ========================================\n   EMPTY / COMING\n======================================== */\n\n.shell .coming {\n  margin:\n    20px 12px;\n\n  padding:\n    18px;\n\n  text-align:\n    center;\n\n  background:\n    rgba(\n      255,\n      255,\n      255,\n      0.8\n    );\n\n  border:\n    1px solid\n    rgba(\n      108,\n      92,\n      98,\n      0.05\n    );\n\n  border-radius:\n    18px;\n\n  box-shadow:\n    0 10px 25px\n    rgba(\n      75,\n      52,\n      60,\n      0.05\n    );\n}\n\n.shell .coming strong {\n  color:\n    var(--misaki-main-dark);\n\n  font-size:\n    17px;\n}\n\n.shell .coming p {\n  margin-bottom:\n    0;\n\n  line-height:\n    1.7;\n\n  color:\n    var(--misaki-text);\n}\n\n/* ========================================\n   DESKTOP\n======================================== */\n\n@media (\n  min-width:\n    481px\n) {\n  body {\n    background:\n      linear-gradient(\n        135deg,\n        #f8efea,\n        #fff7f8\n      );\n  }\n\n  .shell {\n    box-shadow:\n      0 0 55px\n      rgba(\n        72,\n        48,\n        56,\n        0.12\n      );\n  }\n}\n\n/* ========================================\n   SMALL iPHONE\n======================================== */\n\n@media (\n  max-width:\n    390px\n) {\n  .shell .card {\n    padding-left:\n      11px;\n\n    padding-right:\n      11px;\n\n    gap:\n      8px;\n  }\n\n  .shell .avatar {\n    width:\n      44px;\n\n    height:\n      44px;\n  }\n\n  .shell .card h1 {\n    font-size:\n      17px;\n  }\n\n  .shell .card p {\n    font-size:\n      9px;\n  }\n\n  .shell\n    .chat\n    .bubble {\n    max-width:\n      80%;\n\n    font-size:\n      14px;\n  }\n\n  .shell\n    .inputArea\n    button {\n    min-width:\n      56px;\n\n    padding:\n      0 12px;\n  }\n}\n",
+        "sha256": "c8ff384750060e16a5a062b8ab46959893b12ae5389d43316a4a363a978de2e5"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "f3a613291569a60e471065372135cbee07373702",
+      "message": "Fix waiting reply bubble layout\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f3a613291569a60e471065372135cbee07373702"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "f3a613291569a60e471065372135cbee07373702",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37003491626",
+      "id": 37003491626,
+      "updated_at": "2026-10-02T11:54:08Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [],
+  "related_sources": [],
+  "curated": {
+    "summary": "待機メッセージの縦崩れを直す",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/41"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "87363c0aaeeecdd4d479736f3e7733f858144dc3d1e3fb80b7715881a5545c34",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

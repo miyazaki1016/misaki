@@ -1,0 +1,20 @@
+{
+  "id": "branch-16f9e4998a78f826",
+  "title": "sora/history-get-trace",
+  "head": "524596dedf44806da95c8d84e2096f2a5411440d",
+  "head_ref": "sora/history-get-trace",
+  "linked_prs": [
+    37
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "aa1450dfaacd5bcd91eb4d957049129c2c6ffdc3c9f3ecd22011571dcf31ba60",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

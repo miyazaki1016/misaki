@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-13T07:56:54.305234+00:00
+更新 (UTC): 2026-11-14T00:17:41.049806+00:00
 
 ## 全案件
 
@@ -39,6 +39,7 @@
 | [codex/server-canonical-foundation](cases/branch-1dd581eeab2e2c3b.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/update-overview-relationship-v1-production](cases/branch-2163060a0d173d3c.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/ab-long-fixture-dispatch](cases/branch-2481cf5a1a0046dd.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [feat/history-decision-evidence-20261114](cases/branch-25d8098e6a33cdc6.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/development-approval-dashboard-20261104](cases/branch-284e2dc6d0c96cbb.md) | 開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/inventory-actions-read-permission-20261101](cases/branch-28fc3c410f8d2108.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/inventory-delta-review-rule-20261101](cases/branch-2998075cfb7f66d5.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -311,6 +312,7 @@
 | [美咲エンジン総点検とP0の検証結果を開発台帳に記録](cases/pr-192.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [P0 統合 — 匿名個別記憶の24時間期限と感情v2の再開](cases/pr-193.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [test: add bounded synthetic context A/B quality evaluation (#184)](cases/pr-194.md) | その他の開発：変更対象ファイルに関する開発。具体的な目的は原文・差分を確認 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
+| [美咲の開発履歴で実装判断と検証根拠を検索できるようにする](cases/pr-196.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [直近の実装・修正総覧を更新する](cases/pr-21.md) | その他の開発：直近の実装・修正総覧を更新する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -523,7 +525,7 @@
 - scripts/development_branch_case_handoff.py：[branch-38e6283b99123cd5](cases/branch-38e6283b99123cd5.md), [pr-147](cases/pr-147.md)
 - scripts/development_branch_compare.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [branch-b23be022a75304ba](cases/branch-b23be022a75304ba.md), [branch-ed894c05ef854553](cases/branch-ed894c05ef854553.md), [pr-139](cases/pr-139.md), [pr-145](cases/pr-145.md), [pr-148](cases/pr-148.md)
 - scripts/development_branch_review_queue.py：[branch-2f842ea0ac1d18a4](cases/branch-2f842ea0ac1d18a4.md), [pr-149](cases/pr-149.md)
-- scripts/development_history_evidence.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [branch-412ffa2ddbe80074](cases/branch-412ffa2ddbe80074.md), [branch-bbf5a2c293af40b5](cases/branch-bbf5a2c293af40b5.md), [pr-167](cases/pr-167.md), [pr-168](cases/pr-168.md), [pr-169](cases/pr-169.md)
+- scripts/development_history_evidence.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [branch-25d8098e6a33cdc6](cases/branch-25d8098e6a33cdc6.md), [branch-412ffa2ddbe80074](cases/branch-412ffa2ddbe80074.md), [branch-bbf5a2c293af40b5](cases/branch-bbf5a2c293af40b5.md), [pr-167](cases/pr-167.md), [pr-168](cases/pr-168.md), [pr-169](cases/pr-169.md), [pr-196](cases/pr-196.md)
 - scripts/development_index_proposal.py：[branch-436bd6babf91e34f](cases/branch-436bd6babf91e34f.md), [pr-141](cases/pr-141.md)
 - scripts/development_index_review.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [pr-139](cases/pr-139.md)
 - scripts/development_inventory.py：[branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d92ca54cbab20357](cases/branch-d92ca54cbab20357.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-103](cases/pr-103.md), [pr-116](cases/pr-116.md), [pr-122](cases/pr-122.md)

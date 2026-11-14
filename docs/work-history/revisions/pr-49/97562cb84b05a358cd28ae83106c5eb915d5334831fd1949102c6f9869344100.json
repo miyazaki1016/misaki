@@ -1,0 +1,109 @@
+{
+  "id": "pr-49",
+  "number": 49,
+  "title": "Log Relationship processing exception name and message",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Relationship処理のcatchが原因を記録せず、Vercel runtime logから失敗原因を判断できないため、例外のname/messageだけを記録します。stack・例外オブジェクト・userIdは記録せず、成功済みチャットへの影響、catch/finally、DB、lease、retry、task deduplicationは維持します。\n\n変更はlib/relationship-runtime-v1.tsのログだけです。\n\n検証：全249テスト、TypeScript、production build、git diff --check成功。追加の診断確認でError/string rejectionのログがname/messageの2項目だけで、pending保持・writeなしを確認。\n\nGitHub CIはpull_request起点のため、同じ検証をローカルで成功させた後にDraft PRを作成しました。更新commit `7b68b97c3feae99d21f9f1dd937b29218b40997b` の[GitHub CI #320](https://github.com/miyazaki1016/misaki/actions/runs/37119163218)も成功しています。merge・設定変更は行っていません。",
+  "snapshot_head": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+  "snapshot_consistent": true,
+  "head": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+  "base": "867e227b7d2efb31c214d248e94b26e390e9f845",
+  "base_ref": "main",
+  "head_ref": "work/relationship-error-diagnostics",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-03T11:19:37Z",
+  "merge_commit_sha": "0051cd39e2b7f75ee22eddb7c627cb48295e46c2",
+  "updated_at": "2026-10-03T11:19:37Z",
+  "code_facts": [],
+  "files": [
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 1,
+      "patch": "diff --git a/lib/relationship-runtime-v1.ts b/lib/relationship-runtime-v1.ts\nindex 08a3a11..35327ef 100644\n--- a/lib/relationship-runtime-v1.ts\n+++ b/lib/relationship-runtime-v1.ts\n@@ -75,7 +75,12 @@ export async function resumeRelationshipProcessing(userId: string, anonymous: bo\n   const key = `${userId}:${anonymous}`;\n   if (running.has(key)) return running.get(key);\n   const task = (anonymous ? runAnonymous(userId) : runPermanent(userId))\n-    .catch(() => { console.error(\"RELATIONSHIP V1 PROCESSING RETRY REQUIRED\", { userId }); })\n+    .catch((error: unknown) => {\n+      console.error(\"RELATIONSHIP V1 PROCESSING RETRY REQUIRED\", {\n+        name: error instanceof Error ? error.name : \"UnknownError\",\n+        message: error instanceof Error ? error.message : typeof error === \"string\" ? error : \"Non-Error rejection\",\n+      });\n+    })\n     .finally(() => running.delete(key));\n   running.set(key, task);\n   return task;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/7b68b97c3feae99d21f9f1dd937b29218b40997b/lib/relationship-runtime-v1.ts",
+      "source": {
+        "path": "lib/relationship-runtime-v1.ts",
+        "coverage": "全文",
+        "text": "import { createServerSupabase, loadTemporaryRoot, editTemporaryRoot, openTemporaryState, type RootState } from \"./canonical-state\";\nimport { createLegacyRelationshipActingState } from \"./relationship-acting-guide\";\nimport { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from \"./relationship-engine-v1\";\nimport { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from \"./relationship-analyzer-v1\";\nimport { CanonicalRelationshipStore, processRelationshipTurn } from \"./relationship-processing-v1\";\n\n// Local deduplication is an optimization; DB leases serialize distributed workers.\nconst running = new Map<string, Promise<void>>();\nexport function enqueueTemporaryTurn(root: RootState, turn: Turn): Snapshot | undefined {\n  if (!engineEnabled()) return root.relationshipEngine;\n  const snapshot = root.relationshipEngine ?? { state: createLegacyRelationshipActingState(root.relationshipPoints), version: 0, episodes: [], appliedPatterns: [], processed: [], pending: [], criticalEvents: [] };\n  return snapshot.processed.includes(turn.requestId) || snapshot.pending.some(t => t.requestId === turn.requestId)\n    ? snapshot : { ...snapshot, pending: [...snapshot.pending, turn] };\n}\n\nasync function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>, check?: () => Promise<void>) {\n  let snapshot = root.relationshipEngine!;\n  for (const turn of snapshot.pending) {\n    const history = root.history as any[];\n    if (!history?.some(t => t.requestId === turn.requestId && t.role === \"user\" && t.text === turn.message) ||\n      !history.some(t => t.requestId === turn.requestId && t.role === \"misaki\" && t.text === turn.reply)) throw new Error(\"temporary_canonical_turn_required\");\n    // Pending turn remains encrypted/durable if validation or analysis fails.\n    for (const type of criticalCandidates(turn.message)) {\n      const events = snapshot.criticalEvents ?? [];\n      if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;\n      await check?.();\n      const confirmed = await validateCriticalEvent(turn, type, events);\n      await check?.();\n      if (confirmed) {\n        snapshot = { ...snapshot, state: { ...snapshot.state,\n          relationshipStatus: type === \"romantic_acceptance\" ? \"romantic_partner\" : type === \"relationship_end\" ? \"none\" : snapshot.state.relationshipStatus },\n          version: snapshot.version + 1, criticalEvents: [...events, { request_id: turn.requestId, event_type: type }] };\n      }\n    }\n    await check?.();\n    const evidence = await analyzeRelationshipEvidence(turn);\n    await check?.();\n    snapshot = applyTemporaryEvidence(snapshot, turn, evidence);\n    if (save) await save(snapshot);\n  }\n  return snapshot;\n}\n\nasync function runAnonymous(userId: string) {\n  let root = await loadTemporaryRoot(userId, null);\n  if (!root.relationshipEngine) return;\n  await analyzeTemporarySnapshot(root, async snapshot => {\n    await editTemporaryRoot(userId, { ...root, relationshipEngine: snapshot }, \"relationship-analysis\");\n    root = await loadTemporaryRoot(userId, null);\n  });\n}\n\nasync function runPermanent(userId: string) {\n  // Import and ordinary processing share the claimed per-user lease.\n  const store = new CanonicalRelationshipStore(createServerSupabase());\n  // Scan saved canonical turns chronologically; one failed predecessor stops later application.\n  const turns = await store.rows(\"misaki_relationship_events\", userId, q => q.eq(\"event_type\", \"chat_turn_completed\").order(\"id\", { ascending: true }));\n  const ledgers = await store.rows(\"misaki_relationship_processing\", userId, q => q.eq(\"processing_version\", PROCESSING_VERSION));\n  // Do not analyze pre-cutover history with a new model/version.\n  const boundary = process.env.MISAKI_RELATIONSHIP_ENGINE_START_AT;\n  if (!boundary || !Number.isFinite(Date.parse(boundary))) throw new Error(\"relationship_start_boundary_required\");\n  let count = 0;\n  for (const turn of turns) {\n    if (Date.parse(turn.created_at) < Date.parse(boundary)) continue;\n    if (ledgers.some(l => l.request_id === turn.request_id && l.status === \"applied\")) continue;\n    if (++count > 3) break;\n    const result = await processRelationshipTurn(store, userId, turn.request_id, undefined, undefined, (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));\n    if (result.status === \"deferred\") break;\n  }\n}\n\n/** Called via Next after(): never changes an already-successful chat/quota receipt. */\nexport async function resumeRelationshipProcessing(userId: string, anonymous: boolean) {\n  if (!engineEnabled()) return;\n  const key = `${userId}:${anonymous}`;\n  if (running.has(key)) return running.get(key);\n  const task = (anonymous ? runAnonymous(userId) : runPermanent(userId))\n    .catch((error: unknown) => {\n      console.error(\"RELATIONSHIP V1 PROCESSING RETRY REQUIRED\", {\n        name: error instanceof Error ? error.name : \"UnknownError\",\n        message: error instanceof Error ? error.message : typeof error === \"string\" ? error : \"Non-Error rejection\",\n      });\n    })\n    .finally(() => running.delete(key));\n  running.set(key, task);\n  return task;\n}\n\nexport async function importPermanentRelationship(userId: string, requestId: string, token: string, check: () => Promise<void>) {\n  if (!engineEnabled()) return;\n  await check();\n  const db = createServerSupabase();\n  const { data: imported, error: importError } = await db.from(\"misaki_relationship_temporary_v1_imports\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();\n  if (importError) throw new Error(\"relationship_import_read_failed\");\n  if (imported) return;\n  const { data: root, error } = await db.from(\"misaki_temporary_roots\").select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n  if (error) throw new Error(\"relationship_import_root_read_failed\");\n  if (!root) return;\n  const verified = openTemporaryState(root.token);\n  if (!verified || Date.parse(root.expires_at) <= Date.now()) throw new Error(\"relationship_import_root_expired\");\n  let snapshot = verified.state.relationshipEngine;\n  if (!snapshot) return;\n  // Once auth is permanent the temporary writer rejects writes. Finish the frozen\n  // verified trajectory in memory and materialize atomically through the import RPC.\n  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check);\n  await check();\n  const { error: rpcError } = await db.rpc(\"import_misaki_temporary_relationship_v2\", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,\n    ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? \"none\",\n    p_engine_version: PROCESSING_VERSION, p_payload: snapshot });\n  if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? \"\"}:${rpcError.message ?? \"\"}`);\n}\n\nexport function pendingRelationshipGuide(root: RootState) {\n  return root.relationshipCriticalPending || root.relationshipEngine?.pending.some(t => criticalCandidates(t.message).length)\n    ? \"【未解決の明示的関係イベント】直近の関係変更は検証待ち。成立・継続・復縁を断定せず、現在のユーザーの境界を優先してください。\" : \"\";\n}\n",
+        "sha256": "a43a6c6540ab34f54dc8c11457a2ab35681c2daaafa3b302636868c52c1f4c86"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+      "message": "Log Relationship processing exception name and message\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7b68b97c3feae99d21f9f1dd937b29218b40997b"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "7b68b97c3feae99d21f9f1dd937b29218b40997b",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37119163218",
+      "id": 37119163218,
+      "updated_at": "2026-10-03T11:18:07Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "analyzeTemporarySnapshot",
+    "boundary",
+    "confirmed",
+    "count",
+    "db",
+    "enqueueTemporaryTurn",
+    "events",
+    "evidence",
+    "history",
+    "importPermanentRelationship",
+    "key",
+    "ledgers",
+    "pendingRelationshipGuide",
+    "result",
+    "resumeRelationshipProcessing",
+    "root",
+    "runAnonymous",
+    "runPermanent",
+    "running",
+    "snapshot",
+    "store",
+    "task",
+    "turn",
+    "turns",
+    "type",
+    "verified"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "関係性処理の例外名・メッセージを記録",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/49"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "6e74758a66073f33b80539518a778183bbdf8a093f308ec0c463c915b2c0a0f9",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

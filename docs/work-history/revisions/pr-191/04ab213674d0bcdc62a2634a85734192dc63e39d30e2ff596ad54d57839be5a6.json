@@ -1,0 +1,361 @@
+{
+  "id": "pr-191",
+  "number": 191,
+  "title": "P0 匿名会話履歴の推論入力に24時間期限を適用",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "親 #102、作業 #187。[着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/43180605768)。PR #100の匿名24時間設計から会話履歴の読み取り境界を実装。\n\n通常チャットとBody Clockの履歴入力を、各発言のサーバー記録時刻から24時間未満に制限する。期限不明・不正・未来時刻は推論から外す。画面表示用の元履歴は保持する。24時間ちょうど、継続保存で時刻を変えないこと、双方の推論経路を隔離テスト。個別の記憶・当日記憶、関係性、登録移行の期限は継続。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-100\",\"decision\":\"extend\",\"reason\":\"情報単位の固定24時間・全読み取り境界・回帰試験の設計を再利用し、未実装分を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/100\"},{\"id\":\"pr-1\",\"decision\":\"extend\",\"reason\":\"同一ユーザーへのメール保存契約と既存テストを再利用し、失効した情報の登録時復活を防ぐ境界を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-171\",\"decision\":\"reuse\",\"reason\":\"既存の着手前照合ワークフローを使用する。匿名記憶実装では照合システムの変更は不要\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/171\"},{\"id\":\"pr-131\",\"decision\":\"extend\",\"reason\":\"匿名復旧の認証スコープ、期限切れroot拒否、リプレイ・revisionの回帰証拠を流用し、情報単位期限を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"},{\"id\":\"pr-32\",\"decision\":\"extend\",\"reason\":\"既存の正本会話とBody Clock入力を再利用し、匿名の推論時だけ発言単位の期限判定を追加する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/32\"},{\"id\":\"pr-66\",\"decision\":\"extend\",\"reason\":\"忘却が参照する正本履歴・表示用履歴の境界を維持し、両Draftの統合前に推論時の期限と忘却マスクの両方を回帰検証する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/66\"}]}\n-->",
+  "snapshot_head": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+  "snapshot_consistent": true,
+  "head": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+  "base": "58eaed8bf7ed8d08f5adda1a9824fec7a38ee7ca",
+  "base_ref": "main",
+  "head_ref": "work/anonymous-history-24h",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-12T08:27:19Z",
+  "code_facts": [
+    {
+      "file": "app/api/chat/route.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (isAnonymous) history = activeAnonymousHistory(history, Date.parse(userMessageAt));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/app/api/chat/route.ts"
+    },
+    {
+      "file": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const ANONYMOUS_HISTORY_TTL_MS = 24 * 60 * 60 * 1000;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts"
+    },
+    {
+      "file": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function activeAnonymousHistory(history: unknown, now: number): unknown[] {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts"
+    },
+    {
+      "file": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!Array.isArray(history)) return [];",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts"
+    },
+    {
+      "file": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (typeof item?.sentAt !== \"string\") return false;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"anonymous history expires at 24 hours without rewriting its timestamp\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(activeAnonymousHistory(history, now), [active]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(activeAnonymousHistory(history, now + 1000), [history[2]]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(active.sentAt, \"2026-11-11T08:00:01.000Z\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/anonymous-history-expiry.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(activeAnonymousHistory(null, now), []);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts"
+    },
+    {
+      "file": "tests/body-clock-canonical.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.ok(!prompt.includes('expired anonymous history'));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/body-clock-canonical.test.cjs"
+    },
+    {
+      "file": "tests/temporary-continuity.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('anonymous chat omits expired history from inference but retains it for display', async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs"
+    },
+    {
+      "file": "tests/temporary-continuity.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(prompt, /active-anonymous-context/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs"
+    },
+    {
+      "file": "tests/temporary-continuity.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.doesNotMatch(prompt, /old-anonymous-context|untimed-anonymous-context/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs"
+    },
+    {
+      "file": "tests/temporary-continuity.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(saved[0].text, 'old-anonymous-context');",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs"
+    },
+    {
+      "file": "tests/temporary-continuity.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(saved[0].sentAt, history[0].sentAt);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/api/chat/route.ts",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 1,
+      "patch": "diff --git a/app/api/chat/route.ts b/app/api/chat/route.ts\nindex 557dc785..370f5d02 100644\n--- a/app/api/chat/route.ts\n+++ b/app/api/chat/route.ts\n@@ -1,3 +1,4 @@\n+import { activeAnonymousHistory } from \"../../../supabase/functions/_shared/anonymous-history-expiry\";\n import { USER_REPLY_CONTEXT } from \"../../../lib/conversation-turn-context\";\n import { after } from \"next/server\";\n import { engineEnabled } from \"../../../lib/relationship-engine-v1\";\n@@ -1828,6 +1829,7 @@ export async function POST(\n     memory = rootState.memory;\n     misakiTodayMemory = rootState.todayMemory;\n     history = \"history\" in rootState ? rootState.history : [];\n+    if (isAnonymous) history = activeAnonymousHistory(history, Date.parse(userMessageAt));\n     const canonicalRelationshipPoints = rootState.relationshipPoints;\n     const recallMode = isMemoryRecallQuestion(message);\n     const modelMessage = createRecallAwareMessage(message, history, recallMode);\n@@ -2823,7 +2825,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ\n             },\n           }].slice(-40),\n         },\n-        history: [...(Array.isArray(history) ? history : []),\n+        history: [...(Array.isArray(rootState.history) ? rootState.history : []),\n           { role: \"user\", text: message, sentAt: userMessageAt, requestId: usageRequestId },\n           { role: \"misaki\", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)\n           .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/app/api/chat/route.ts",
+      "source": {
+        "path": "app/api/chat/route.ts",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "import { activeAnonymousHistory } from \"../../../supabase/functions/_shared/anonymous-history-expiry\";\nimport { USER_REPLY_CONTEXT } from \"../../../lib/conversation-turn-context\";\nimport { after } from \"next/server\";\nimport { engineEnabled } from \"../../../lib/relationship-engine-v1\";\nimport { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from \"../../../lib/relationship-runtime-v1\";\nimport { maintenanceResponse } from \"../../../lib/maintenance\";\nimport { createRecallAwareMessage, isMemoryRecallQuestion } from \"../../../lib/chat-recall\";\nimport { createServerSupabase, loadCanonicalState, loadCompletedTurn, completeCanonicalTurn, openTemporaryState, sealTemporaryState, loadTemporaryRoot, loadCompletedTemporaryTurn, completeTemporaryTurn } from \"../../../lib/canonical-state\";\nimport { createLifeUnderstandingGuide, extractExplicitLifeFacts, selectRelevantLifeFacts, encodeLifeFactMemory, splitLifeFactMemory, type LifeFact } from \"../../../lib/relationship-life-context\";\nimport {\n  createClient,\n  type SupabaseClient,\n} from \"@supabase/supabase-js\";\n\nimport {\n  createTokyoLifeEventsGuide,\n  getTokyoLifeEvents,\n} from \"../../../lib/tokyo-life-events\";\n\nimport {\n  buildUserProfile,\n  createTaxiContextGuide,\n  createUserProfileGuide,\n  type ChatMessage,\n} from \"../../../lib/user-profile\";\n\nimport {\n  loadPersonaPrompt,\n} from \"../../../lib/persona/persona-store\";\n\nimport {\n  createRelationshipSignalGuide,\n  sanitizeRelationshipSignalAssessment,\n  type RelationshipSignalAssessment,\n} from \"../../../lib/relationship-signal\";\nimport {\n  loadRelationshipTimeContext,\n  createRelationshipTimeGuide,\n  recordRelationshipChatTurn,\n} from \"../../../lib/relationship-time\";\n\nimport { persistRelationshipEmotionFromSignals } from \"../../../lib/relationship-emotion-store\";\nimport {\n  previewRelationshipTurn,\n  createCurrentTurnActionGuide,\n} from \"../../../lib/relationship-turn-expression\";\nimport { loadRelationshipHistory, deriveRelationshipPatterns, deriveRelationshipStory } from \"../../../lib/relationship-patterns\";\nimport { deriveRelationshipPointDelta } from \"../../../lib/relationship-points\";\nimport { generateGeminiJson } from \"../../../lib/gemini-json-generator\";\nimport { createGeminiTelemetrySink } from \"../../../lib/gemini-usage-telemetry-server\";\nimport {\n  createLegacyRelationshipActingState,\n  createRelationshipActingGuide,\n} from \"../../../lib/relationship-acting-guide\";\n\ntype TokyoWeather = {\n  temperature: number | null;\n  apparentTemperature: number | null;\n  relativeHumidity: number | null;\n  precipitation: number | null;\n  rain: number | null;\n  weatherCode: number | null;\n  windSpeed: number | null;\n  description: string;\n};\n\ntype MisakiTodayMemory = {\n  date: string;\n  items: string[];\n};\n\ntype GeminiResult = {\n  reply?: string;\n  memory?: string[];\n  relationshipSignals?: unknown;\n  relationshipExpression?: { reply?: string };\n  misakiTodayMemory?: {\n    date?: string;\n    items?: string[];\n  };\n};\n\ntype UsageResult = {\n  allowed?: boolean;\n  message_count?: number;\n  remaining?: number;\n  is_premium?: boolean;\n};\n\ntype MisakiDayType =\n  | \"work\"\n  | \"off\";\n\ntype MisakiLifeContext = {\n  dayType: MisakiDayType;\n  guide: string;\n};\n\ntype ActivityEvidence = {\n  texts: string[];\n};\n\nconst MAX_HISTORY = 60;\nconst MAX_MEMORY = 30;\nconst MAX_TODAY_MEMORY = 12;\nconst GEMINI_TIMEOUT_MS = 30_000;\n\nconst SUPABASE_URL =\n  \"https://tzozajnwznxqgxnjikoy.supabase.co\";\n\nconst SUPABASE_PUBLISHABLE_KEY =\n  \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\";\n\nconst MISAKI_LATITUDE = 35.6728;\nconst MISAKI_LONGITUDE = 139.8174;\n\n/* =========================================================\n   BASIC\n========================================================= */\n\nfunction hashText(text: string) {\n  let hash = 0;\n\n  for (\n    let i = 0;\n    i < text.length;\n    i += 1\n  ) {\n    hash =\n      (\n        hash * 31 +\n        text.charCodeAt(i)\n      ) >>> 0;\n  }\n\n  return hash;\n}\n\nfunction getHour(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /(\\d{1,2}):(\\d{2})/\n    );\n\n  return match\n    ? Number(match[1])\n    : 18;\n}\n\nfunction getDateKey(\n  currentTime: string\n) {\n  const match =\n    currentTime.match(\n      /\\d{4}\\/\\d{1,2}\\/\\d{1,2}/\n    );\n\n  return match?.[0] ??\n    currentTime.slice(0, 10);\n}\n\nfunction getFirstRow<T>(\n  value: unknown\n): T | null {\n  if (\n    Array.isArray(value) &&\n    value.length > 0\n  ) {\n    return value[0] as T;\n  }\n\n  if (\n    value &&\n    typeof value === \"object\"\n  ) {\n    return value as T;\n  }\n\n  return null;\n}\n\n/* =========================================================\n   USAGE / AUTH\n========================================================= */\n\nfunction createAuthenticatedSupabase(\n  accessToken: string\n) {\n  return createClient(\n    SUPABASE_URL,\n    SUPABASE_PUBLISHABLE_KEY,\n    {\n      global: {\n        headers: {\n          Authorization:\n            `Bearer ${accessToken}`,\n        },\n      },\n      auth: {\n        persistSession: false,\n        autoRefreshToken: false,\n        detectSessionInUrl: false,\n      },\n    }\n  );\n}\n\nasync function consumeDailyMessageWithRetry(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const maxAttempts = 3;\n\n  for (\n    let attempt = 1;\n    attempt <= maxAttempts;\n    attempt += 1\n  ) {\n    const {\n      data,\n      error,\n    } =\n      await (\n        supabase.rpc as any\n      )(\n        \"consume_daily_message\",\n        {\n          p_request_id:\n            requestId,\n        }\n      );\n\n    if (!error) {\n      return {\n        data,\n        error: null,\n      };\n    }\n\n    console.error(\n      `USAGE RPC ERROR (${attempt}/${maxAttempts}):`,\n      \"OPERATION_FAILED\"\n    );\n\n    const text =\n      typeof error.message ===\n      \"string\"\n        ? error.message.toLowerCase()\n        : \"\";\n\n    const retryable =\n      text.includes(\"timeout\") ||\n      text.includes(\n        \"temporarily unavailable\"\n      ) ||\n      text.includes(\n        \"fetch failed\"\n      );\n\n    if (\n      !retryable ||\n      attempt === maxAttempts\n    ) {\n      return {\n        data: null,\n        error,\n      };\n    }\n\n    await new Promise(\n      (resolve) =>\n        setTimeout(\n          resolve,\n          500 * attempt\n        )\n    );\n  }\n\n  return {\n    data: null,\n    error: new Error(\n      \"Usage retry failed\"\n    ),\n  };\n}\n\nasync function refundDailyMessage(\n  supabase: SupabaseClient,\n  requestId: string\n) {\n  const {\n    data,\n    error,\n  } = await (\n    supabase.rpc as any\n  )(\n    \"refund_daily_message\",\n    {\n      p_request_id:\n        requestId,\n    }\n  );\n\n  if (error) {\n    console.error(\n      \"USAGE REFUND ERROR:\",\n      \"OPERATION_FAILED\"\n    );\n    return null;\n  }\n\n  return getFirstRow<{\n    refunded?: boolean;\n    message_count?: number;\n    remaining?: number;\n    is_premium?: boolean;\n  }>(data);\n}\n\n/* =========================================================\n   WEATHER\n========================================================= */\n\nfunction weatherCodeToText(\n  code: number | null\n) {\n  if (code === null) return \"不明\";\n  if (code === 0) return \"快晴\";\n  if (\n    code === 1 ||\n    code === 2\n  ) return \"晴れ時々くもり\";\n  if (code === 3) return \"くもり\";\n  if (\n    code === 45 ||\n    code === 48\n  ) return \"霧\";\n  if (\n    [51, 53, 55].includes(code)\n  ) return \"霧雨\";\n  if (\n    [56, 57].includes(code)\n  ) return \"着氷性の霧雨\";\n  if (\n    [61, 63, 65].includes(code)\n  ) return \"雨\";\n  if (\n    [66, 67].includes(code)\n  ) return \"着氷性の雨\";\n  if (\n    [71, 73, 75].includes(code)\n  ) return \"雪\";\n  if (code === 77) return \"雪粒\";\n  if (\n    [80, 81, 82].includes(code)\n  ) return \"にわか雨\";\n  if (\n    [85, 86].includes(code)\n  ) return \"にわか雪\";\n  if (code === 95) return \"雷雨\";\n  if (\n    [96, 99].includes(code)\n  ) return \"ひょうを伴う雷雨\";\n\n  return \"不明\";\n}\n\nfunction getHumidityFeel(\n  weather: TokyoWeather\n) {\n  const humidity =\n    weather.relativeHumidity;\n\n  const temperature =\n    weather.temperature;\n\n  if (\n    humidity === null ||\n    temperature === null\n  ) {\n    return null;\n  }\n\n  if (\n    temperature >= 27 &&\n    humidity >= 75\n  ) {\n    return \"かなり蒸し暑く感じやすい\";\n  }\n\n  if (\n    temperature >= 24 &&\n    humidity >= 65\n  ) {\n    return \"やや蒸し暑く感じやすい\";\n  }\n\n  if (humidity >= 75) {\n    return \"湿気を感じやすい\";\n  }\n\n  if (humidity <= 40) {\n    return \"空気はやや乾燥気味\";\n  }\n\n  return \"湿度は特に極端ではない\";\n}\n\nasync function getTokyoWeather():\n  Promise<TokyoWeather | null> {\n  try {\n    const url =\n      \"https://api.open-meteo.com/v1/forecast\" +\n      `?latitude=${MISAKI_LATITUDE}` +\n      `&longitude=${MISAKI_LONGITUDE}` +\n      \"&current=\" +\n      [\n        \"temperature_2m\",\n        \"apparent_temperature\",\n        \"relative_humidity_2m\",\n        \"precipitation\",\n        \"rain\",\n        \"weather_code\",\n        \"wind_speed_10m\",\n      ].join(\",\") +\n      \"&timezone=Asia%2FTokyo\";\n\n    const response =\n      await fetch(\n        url,\n        {\n          next: {\n            revalidate: 600,\n          },\n        }\n      );\n\n    if (!response.ok) {\n      return null;\n    }\n\n    const data =\n      await response.json();\n\n    const current =\n      data?.current;\n\n    if (!current) {\n      return null;\n    }\n\n    const numberOrNull = (\n      value: unknown\n    ) =>\n      typeof value === \"number\"\n        ? value\n        : null;\n\n    const weatherCode =\n      numberOrNull(\n        current.weather_code\n      );\n\n    return {\n      temperature:\n        numberOrNull(\n          current.temperature_2m\n        ),\n      apparentTemperature:\n        numberOrNull(\n          current.apparent_temperature\n        ),\n      relativeHumidity:\n        numberOrNull(\n          current.relative_humidity_2m\n        ),\n      precipitation:\n        numberOrNull(\n          current.precipitation\n        ),\n      rain:\n        numberOrNull(\n          current.rain\n        ),\n      weatherCode,\n      windSpeed:\n        numberOrNull(\n          current.wind_speed_10m\n        ),\n      description:\n        weatherCodeToText(\n          weatherCode\n        ),\n    };\n  } catch (error) {\n    console.error(\n      \"WEATHER FETCH ERROR:\",\n      \"OPERATION_FAILED\"\n    );\n\n    return null;\n  }\n}\n\nfunction createWeatherGuide(\n  weather: TokyoWeather | null\n) {\n  if (!weather) {\n    return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n現在、天気情報を取得できていません。\n\n分からない天気を\n想像で作らないでください。\n`.trim();\n  }\n\n  const lines = [\n    `天気：${weather.description}`,\n  ];\n\n  if (\n    weather.temperature !== null\n  ) {\n    lines.push(\n      `気温：${weather.temperature}℃`\n    );\n  }\n\n  if (\n    weather.apparentTemperature !==\n    null\n  ) {\n    lines.push(\n      `体感温度：${weather.apparentTemperature}℃`\n    );\n  }\n\n  if (\n    weather.relativeHumidity !==\n    null\n  ) {\n    lines.push(\n      `相対湿度：${weather.relativeHumidity}%`\n    );\n  }\n\n  if (weather.rain !== null) {\n    lines.push(\n      `現在の雨量：${weather.rain}mm`\n    );\n  }\n\n  if (\n    weather.precipitation !== null\n  ) {\n    lines.push(\n      `降水量：${weather.precipitation}mm`\n    );\n  }\n\n  if (\n    weather.windSpeed !== null\n  ) {\n    lines.push(\n      `風速：${weather.windSpeed}km/h`\n    );\n  }\n\n  const humidityFeel =\n    getHumidityFeel(weather);\n\n  if (humidityFeel) {\n    lines.push(\n      `体感：${humidityFeel}`\n    );\n  }\n\n  return `\n【美咲のいる江東区・塩浜周辺の現在の天気】\n\n${lines\n  .map((line) => `・${line}`)\n  .join(\"\\n\")}\n\nこれは今現在の情報です。\n\n・現在観測だけから過去の天気経過を作らない\n・短時間予報より先まで断定しない\n・情報入手経路を作らない\n・数値は必要なときだけ自然に使う\n・湿度と気温に反する体感表現をしない\n`.trim();\n}\n\n/* =========================================================\n   MISAKI LIFE\n========================================================= */\n\nfunction getMisakiDayType(\n  currentTime: string\n): MisakiDayType {\n  const seed =\n    hashText(\n      getDateKey(\n        currentTime\n      )\n    );\n\n  return seed % 4 < 2\n    ? \"work\"\n    : \"off\";\n}\n\nfunction createMisakiLife(\n  currentTime: string\n): MisakiLifeContext {\n  const dateKey =\n    getDateKey(currentTime);\n\n  const seed =\n    hashText(dateKey);\n\n  const hour =\n    getHour(currentTime);\n\n  const dayType =\n    getMisakiDayType(\n      currentTime\n    );\n\n  const moods = [\n    \"今日はわりと機嫌がいい\",\n    \"今日は少し甘えたい気分\",\n    \"今日は普通に落ち着いている\",\n    \"今日はちょっとだけ眠い\",\n    \"今日はのんびり話したい気分\",\n    \"今日はなんとなくユーザーと話したい気分\",\n  ];\n\n  const smallThings = [\n    \"甘いものをちょっと食べたい気分\",\n    \"少しゆっくりしたい気分\",\n    \"少しだけ眠気がある\",\n    \"ちょっとぼーっとしたい気分\",\n    \"今夜は少し長く話したい気分\",\n    \"なんとなくユーザーのことを思い出すことがある\",\n    \"ちょっと小腹が空いている\",\n    \"少し力を抜きたい気分\",\n  ];\n\n  const mood =\n    moods[\n      (seed >> 3) %\n        moods.length\n    ];\n\n  const smallThing =\n    smallThings[\n      (seed >> 6) %\n        smallThings.length\n    ];\n\n  const timeBand =\n    hour >= 5 && hour < 10\n      ? \"朝\"\n      : hour >= 10 &&\n        hour < 17\n      ? \"昼間\"\n      : hour >= 17 &&\n        hour < 22\n      ? \"夕方から夜\"\n      : \"夜遅め\";\n\n  const dayLabel =\n    dayType === \"work\"\n      ? \"仕事の日\"\n      : \"休みの日\";\n\n  const workTimingGuide =\n    dayType !== \"work\"\n      ? \"\"\n      : hour < 10\n        ? `\n今日は仕事の日ですが、現在は朝です。\n夜勤ではありません。\n\nこの時間帯は、\n「これから仕事」\n「出勤前」\n「準備している」\n程度なら自然です。\n\n「あと少しで仕事が終わる」\n「仕事終わった」\n「勤務がもうすぐ終わる」\nなど、夜勤明けのような発言はしないでください。\n`.trim()\n        : hour < 17\n          ? `\n今日は仕事の日で、現在は昼間です。\n勤務中として話して構いません。\n\nただし、具体的な業務内容や休憩状況は\n会話に根拠がない限り作らないでください。\n`.trim()\n          : `\n今日は仕事の日ですが、現在は夕方以降です。\n通常の日中勤務として扱い、\n夜勤中・夜勤明けの設定を新しく作らないでください。\n\n「まだ仕事中」\n「あと少しで仕事が終わる」\nなどは、会話に明確な根拠がある場合だけ使ってください。\n`.trim();\n\n  const consistency =\n    dayType === \"work\"\n      ? `\n今日は仕事の日です。\n\n${workTimingGuide}\n\n「今ちょっとゆっくりしている」\n「少し休憩したい」\n程度は構いません。\n\nただし、\n「今日は暇」\n「今日は一日のんびり」\n「今日はずっとだらだら」\nなど、\n一日全体が休日であるように\n広げないでください。\n`.trim()\n      : `\n今日は休みの日です。\n\n今日の記憶や会話履歴に\n別の根拠がない限り、\n\n「今日は仕事」\n「今仕事中」\n「これから仕事」\n「仕事終わった」\n\nなどを新しく作らないでください。\n\n休みの日だからといって\n「買い物してきた」\n「一日中寝ていた」\nなどの具体的行動も\n勝手に作らないでください。\n`.trim();\n\n  return {\n    dayType,\n    guide: `\n【今日の美咲の生活背景】\n\n・今日は「${dayLabel}」\n・現在は「${dayLabel}の${timeBand}」\n・${mood}\n・${smallThing}\n\nこの仕事日／休日は\n今日一日固定です。\n\n${consistency}\n\n【気分と行動は別】\n\n「眠い」\n「甘いもの食べたい」\n「ゆっくりしたい」\nなどの気分だけから、\n\n「今日は暇」\n「ずっと寝ていた」\n「さっき買い物していた」\n\nなどの具体的事実を\n作らないでください。\n`.trim(),\n  };\n}\n\nfunction createTimeGuide(\n  currentTime: string\n) {\n  const hour =\n    getHour(currentTime);\n\n  if (hour < 5) {\n    return `\n現在は深夜です。\nまだ朝ではありません。\n\n挨拶だけから\nユーザーが徹夜しているなどと\n推測しないでください。\n`.trim();\n  }\n\n  if (hour < 10) {\n    return `\n現在は朝です。\n\n朝らしい会話はできますが、\n睡眠・朝食・外出などを\n勝手に事実化しないでください。\n`.trim();\n  }\n\n  if (hour < 17) {\n    return `\n現在は昼間です。\n\n時間帯だけから、\n昼食・買い物・外出などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  if (hour < 22) {\n    return `\n現在は夕方から夜です。\n\n時間帯だけから、\n帰宅・夕食・入浴などを\n過去の事実にしないでください。\n`.trim();\n  }\n\n  return `\n現在は夜遅めです。\n\n時間帯だけから、\n美咲やユーザーの\n直前の行動を作らないでください。\n`.trim();\n}\n\nfunction createRelationshipGuide(\n  points: number\n) {\n  const statusRule = `\n【関係性の共通ルール】\n\nrelationshipPoints は親しさの目安であって、\n「付き合っている」という事実そのものではありません。\n\n恋人・交際中・前から好きだった等の関係事実は、\n現在の会話履歴または長期記憶に\n明確な根拠がある場合だけ使ってください。\n\n根拠がないのに\n「ずっと前から好き」\n「前から大好き」\n「私たち恋人でしょ」\nなど、過去から続いていた関係を作らないでください。\n`.trim();\n\n  if (points >= 160) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり深い関係】\n\n・かなり自然体\n・距離の近い自然体な言い方\n・短い返事や自然な省略\n・短い返事だけでも成立する\n・毎回質問しなくてよい\n・交際が会話や記憶で確定している場合は、恋人らしい強い愛情表現も自然に使える\n`.trim();\n  }\n\n  if (points >= 80) {\n    return `\n${statusRule}\n\n【現在の距離感：かなり親しい】\n\n・遠慮が少ない\n・遠慮を減らした自然体な言い方\n・短い返事や自然な省略を使える\n・交際がまだ確定していない場合は、恋人扱いを先取りしない\n・無理に質問しない\n`.trim();\n  }\n\n  if (points >= 30) {\n    return `\n${statusRule}\n\n【現在の距離感：少しずつ近づいている】\n\n・自然体\n・少し肩の力を抜いた自然体な言い方\n・会話の流れに合う短い返事や省略を少し使える\n・恋人関係を前提にしない\n・会話のための質問を減らす\n`.trim();\n  }\n\n  return `\n${statusRule}\n\n【現在の距離感：出会ったばかり】\n\n二人はまだ関係を作り始めた段階です。\n\n・親しみやすい自然なタメ口\n・相手を知ろうとする\n・相手をよく知っている前提の馴れ馴れしさは避ける\n・「好き」「大好き」「愛してる」を既成事実として言わない\n・「前から」「ずっと」など、存在しない恋愛の過去を作らない\n・恋人関係を前提にしない\n`.trim();\n}\n\n/* =========================================================\n   MEMORY / ACTIVITY\n========================================================= */\n\nfunction createTodayMemoryGuide(\n  todayMemory: MisakiTodayMemory,\n  currentDate: string\n) {\n  if (\n    todayMemory.date !==\n      currentDate ||\n    todayMemory.items.length ===\n      0\n  ) {\n    return `\n【美咲の今日の記憶】\n\n今日はまだ、\n保存済みの美咲自身の\n具体的な出来事はありません。\n\n会話履歴にも根拠がない\n具体的な過去行動を\n新しく作らないでください。\n`.trim();\n  }\n\n  return `\n【美咲の今日の記憶】\n\n${todayMemory.items\n  .map((item) => `・${item}`)\n  .join(\"\\n\")}\n\nここにある出来事だけを、\n今日すでに起きた美咲自身の出来事として\n自然に使えます。\n`.trim();\n}\n\nfunction buildActivityEvidence(\n  history: ChatMessage[],\n  todayMemory: MisakiTodayMemory\n): ActivityEvidence {\n  return {\n    texts: [\n      ...history\n        .filter(\n          (item) =>\n            item.role === \"misaki\"\n        )\n        .slice(-20)\n        .map(\n          (item) => item.text\n        ),\n      ...todayMemory.items,\n    ],\n  };\n}\n\nconst activityGroups = [\n  {\n    name: \"買い物\",\n    patterns: [\n      \"買い物\",\n      \"スーパー\",\n      \"コンビニ\",\n    ],\n  },\n  {\n    name: \"外出\",\n    patterns: [\n      \"出かけ\",\n      \"外出\",\n      \"散歩\",\n    ],\n  },\n  {\n    name: \"帰宅\",\n    patterns: [\n      \"帰ってき\",\n      \"帰宅\",\n      \"家に戻\",\n    ],\n  },\n  {\n    name: \"仕事\",\n    patterns: [\n      \"仕事して\",\n      \"仕事だった\",\n      \"仕事終わ\",\n      \"勤務して\",\n      \"会社\",\n    ],\n  },\n  {\n    name: \"入浴\",\n    patterns: [\n      \"お風呂\",\n      \"風呂\",\n      \"シャワー\",\n    ],\n  },\n  {\n    name: \"食事\",\n    patterns: [\n      \"ご飯食べ\",\n      \"ごはん食べ\",\n      \"夕飯\",\n      \"晩ごはん\",\n      \"昼ごはん\",\n      \"朝ごはん\",\n      \"食べてた\",\n    ],\n  },\n  {\n    name: \"睡眠\",\n    patterns: [\n      \"昼寝\",\n      \"寝てた\",\n      \"寝ていた\",\n      \"仮眠\",\n    ],\n  },\n  {\n    name: \"料理\",\n    patterns: [\n      \"料理して\",\n      \"ご飯作\",\n      \"ごはん作\",\n    ],\n  },\n  {\n    name: \"掃除\",\n    patterns: [\n      \"掃除して\",\n      \"片付けて\",\n      \"片づけて\",\n    ],\n  },\n];\n\nfunction containsAny(\n  text: string,\n  patterns: string[]\n) {\n  return patterns.some(\n    (pattern) =>\n      text.includes(pattern)\n  );\n}\n\nfunction findUnsupportedActivityGroups(\n  reply: string,\n  evidence: ActivityEvidence\n) {\n  const pastMarkers = [\n    \"さっき\",\n    \"少し前\",\n    \"帰ってき\",\n    \"帰宅\",\n    \"してた\",\n    \"していた\",\n    \"だった\",\n    \"終わった\",\n    \"済ませ\",\n    \"行ってた\",\n    \"行ってきた\",\n  ];\n\n  if (\n    !containsAny(\n      reply,\n      pastMarkers\n    )\n  ) {\n    return [];\n  }\n\n  return activityGroups\n    .filter(\n      (group) =>\n        containsAny(\n          reply,\n          group.patterns\n        ) &&\n        !evidence.texts.some(\n          (text) =>\n            containsAny(\n              text,\n              group.patterns\n            )\n   ",
+        "sha256": "5d311c9ee2a61df2e85976868d50c78f6e74a543dd1a2283b98ad7006114f356"
+      }
+    },
+    {
+      "path": "supabase/functions/_shared/anonymous-history-expiry.ts",
+      "status": "modified",
+      "additions": 13,
+      "deletions": 0,
+      "patch": "diff --git a/supabase/functions/_shared/anonymous-history-expiry.ts b/supabase/functions/_shared/anonymous-history-expiry.ts\nnew file mode 100644\nindex 00000000..c42545a1\n--- /dev/null\n+++ b/supabase/functions/_shared/anonymous-history-expiry.ts\n@@ -0,0 +1,13 @@\n+const ANONYMOUS_HISTORY_TTL_MS = 24 * 60 * 60 * 1000;\n+\n+// Only a timestamp from the server-authenticated root can qualify a message\n+// for inference. The browser's display cache does not extend its lifetime.\n+export function activeAnonymousHistory(history: unknown, now: number): unknown[] {\n+  if (!Array.isArray(history)) return [];\n+\n+  return history.filter(item => {\n+    if (typeof item?.sentAt !== \"string\") return false;\n+    const sentAt = Date.parse(item.sentAt);\n+    return sentAt > now - ANONYMOUS_HISTORY_TTL_MS && sentAt <= now;\n+  });\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts",
+      "source": {
+        "path": "supabase/functions/_shared/anonymous-history-expiry.ts",
+        "coverage": "全文",
+        "text": "const ANONYMOUS_HISTORY_TTL_MS = 24 * 60 * 60 * 1000;\n\n// Only a timestamp from the server-authenticated root can qualify a message\n// for inference. The browser's display cache does not extend its lifetime.\nexport function activeAnonymousHistory(history: unknown, now: number): unknown[] {\n  if (!Array.isArray(history)) return [];\n\n  return history.filter(item => {\n    if (typeof item?.sentAt !== \"string\") return false;\n    const sentAt = Date.parse(item.sentAt);\n    return sentAt > now - ANONYMOUS_HISTORY_TTL_MS && sentAt <= now;\n  });\n}\n",
+        "sha256": "c4e271fc0954979a68225e413dba02bdfa3bb934afc829731b3658727f2836f3"
+      }
+    },
+    {
+      "path": "supabase/functions/body-clock/conversation-root.ts",
+      "status": "modified",
+      "additions": 2,
+      "deletions": 1,
+      "patch": "diff --git a/supabase/functions/body-clock/conversation-root.ts b/supabase/functions/body-clock/conversation-root.ts\nindex 95429120..33b9064d 100644\n--- a/supabase/functions/body-clock/conversation-root.ts\n+++ b/supabase/functions/body-clock/conversation-root.ts\n@@ -1,3 +1,4 @@\n+import { activeAnonymousHistory } from \"../_shared/anonymous-history-expiry.ts\";\n import type { SupabaseClient } from \"npm:@supabase/supabase-js@2.57.4\";\n import { openTemporaryReceipt } from \"./temporary-state.ts\";\n \n@@ -11,7 +12,7 @@ export async function loadBodyClockRoot(s: SupabaseClient, userId: string) {\n     if (root) {\n       const state = await openTemporaryReceipt(root.token, Deno.env.get(\"SUPABASE_SERVICE_ROLE_KEY\")!);\n       if (!state || Date.parse(root.expires_at) <= Date.now()) return null;\n-      return { history: state.history, memory: state.memory, temporaryPoints: state.relationshipPoints,\n+      return { history: activeAnonymousHistory(state.history, Date.now()), memory: state.memory, temporaryPoints: state.relationshipPoints,\n         temporaryState: state, temporaryRevision: root.revision, temporaryExpiresAt: root.expires_at, updatedAt: null };\n     }\n     // An immutable replay receipt can be older than an edit or delivery.\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/body-clock/conversation-root.ts",
+      "source": {
+        "path": "supabase/functions/body-clock/conversation-root.ts",
+        "coverage": "全文",
+        "text": "import { activeAnonymousHistory } from \"../_shared/anonymous-history-expiry.ts\";\nimport type { SupabaseClient } from \"npm:@supabase/supabase-js@2.57.4\";\nimport { openTemporaryReceipt } from \"./temporary-state.ts\";\n\nexport async function loadBodyClockRoot(s: SupabaseClient, userId: string) {\n  const { data: account, error: accountError } = await s.auth.admin.getUserById(userId);\n  if (accountError || !account.user) throw new Error(\"body_clock_account_unavailable\");\n  if (account.user.is_anonymous) {\n    const { data: root, error: rootError } = await s.from(\"misaki_temporary_roots\")\n      .select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n    if (rootError) throw rootError;\n    if (root) {\n      const state = await openTemporaryReceipt(root.token, Deno.env.get(\"SUPABASE_SERVICE_ROLE_KEY\")!);\n      if (!state || Date.parse(root.expires_at) <= Date.now()) return null;\n      return { history: activeAnonymousHistory(state.history, Date.now()), memory: state.memory, temporaryPoints: state.relationshipPoints,\n        temporaryState: state, temporaryRevision: root.revision, temporaryExpiresAt: root.expires_at, updatedAt: null };\n    }\n    // An immutable replay receipt can be older than an edit or delivery.\n    // Never reconstruct a shared root from that separate source.\n    return null;\n  }\n  const { data, error } = await s.from(\"misaki_user_conversation_state\")\n    .select(\"history,memory,today_memory,updated_at\").eq(\"user_id\", userId).maybeSingle();\n  if (error) throw error;\n  return { history: data?.history, memory: data?.memory, temporaryPoints: undefined,\n    temporaryState: undefined, temporaryRevision: null, temporaryExpiresAt: null, updatedAt: data?.updated_at ?? null };\n}\n",
+        "sha256": "75be9c80ec3e91487938656d7cde1ab721b06e4d36fa9e85f79b9e31b41d99d0"
+      }
+    },
+    {
+      "path": "tests/anonymous-history-expiry.test.ts",
+      "status": "modified",
+      "additions": 16,
+      "deletions": 0,
+      "patch": "diff --git a/tests/anonymous-history-expiry.test.ts b/tests/anonymous-history-expiry.test.ts\nnew file mode 100644\nindex 00000000..cdda876c\n--- /dev/null\n+++ b/tests/anonymous-history-expiry.test.ts\n@@ -0,0 +1,16 @@\n+import assert from \"node:assert/strict\";\n+import test from \"node:test\";\n+import { activeAnonymousHistory } from \"../supabase/functions/_shared/anonymous-history-expiry.ts\";\n+\n+test(\"anonymous history expires at 24 hours without rewriting its timestamp\", () => {\n+  const now = Date.parse(\"2026-11-12T08:00:00.000Z\");\n+  const at = (offset: number) => ({ sentAt: new Date(now + offset).toISOString() });\n+  const cutoff = -24 * 60 * 60 * 1000;\n+  const active = at(cutoff + 1000);\n+  const history = [at(cutoff), active, at(1), null, {}, { sentAt: \"invalid\" }];\n+\n+  assert.deepEqual(activeAnonymousHistory(history, now), [active]);\n+  assert.deepEqual(activeAnonymousHistory(history, now + 1000), [history[2]]);\n+  assert.equal(active.sentAt, \"2026-11-11T08:00:01.000Z\");\n+  assert.deepEqual(activeAnonymousHistory(null, now), []);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts",
+      "source": {
+        "path": "tests/anonymous-history-expiry.test.ts",
+        "coverage": "全文",
+        "text": "import assert from \"node:assert/strict\";\nimport test from \"node:test\";\nimport { activeAnonymousHistory } from \"../supabase/functions/_shared/anonymous-history-expiry.ts\";\n\ntest(\"anonymous history expires at 24 hours without rewriting its timestamp\", () => {\n  const now = Date.parse(\"2026-11-12T08:00:00.000Z\");\n  const at = (offset: number) => ({ sentAt: new Date(now + offset).toISOString() });\n  const cutoff = -24 * 60 * 60 * 1000;\n  const active = at(cutoff + 1000);\n  const history = [at(cutoff), active, at(1), null, {}, { sentAt: \"invalid\" }];\n\n  assert.deepEqual(activeAnonymousHistory(history, now), [active]);\n  assert.deepEqual(activeAnonymousHistory(history, now + 1000), [history[2]]);\n  assert.equal(active.sentAt, \"2026-11-11T08:00:01.000Z\");\n  assert.deepEqual(activeAnonymousHistory(null, now), []);\n});\n",
+        "sha256": "163542634b8ffb9e5572c76c677f26413b610959c01c019489510deb1812e89d"
+      }
+    },
+    {
+      "path": "tests/body-clock-canonical.test.cjs",
+      "status": "modified",
+      "additions": 6,
+      "deletions": 2,
+      "patch": "diff --git a/tests/body-clock-canonical.test.cjs b/tests/body-clock-canonical.test.cjs\nindex f8162052..be31a626 100644\n--- a/tests/body-clock-canonical.test.cjs\n+++ b/tests/body-clock-canonical.test.cjs\n@@ -12,7 +12,10 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered =\n   const iv = nodeCrypto.randomBytes(12);\n   const cipher = nodeCrypto.createCipheriv('aes-256-gcm', nodeCrypto.createHash('sha256').update('misaki-temporary-state-v1:test').digest(), iv);\n   const encrypted = Buffer.concat([cipher.update(JSON.stringify({ expires: Date.now() + (expired ? -1000 : 60000),\n-    result: { reply: 'ok' }, state: { relationshipPoints: 80, history: [{ role: 'user', text: 'canonical history' }], memory: ['canonical memory'] } })), cipher.final()]);\n+    result: { reply: 'ok' }, state: { relationshipPoints: 80, history: [\n+      { role: 'user', text: 'expired anonymous history', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },\n+      { role: 'user', text: 'canonical history', sentAt: new Date(Date.now() - 1000).toISOString() },\n+    ], memory: ['canonical memory'] } })), cipher.final()]);\n   const bytes = Buffer.concat([iv, cipher.getAuthTag(), encrypted]);\n   if (tampered) bytes[40] ^= 1;\n   const token = bytes.toString('base64url');\n@@ -56,7 +59,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered =\n     const req = name => {\n       if (name.startsWith('npm:')) return { createClient: () => client };\n       if (name === './persona-store.ts') return { loadPersonaPrompt: async () => ({ text: '美咲' }) };\n-      return load(name.replace('./', ''));\n+      return load(name.startsWith('./') ? name.slice(2) : name);\n     };\n     vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);\n     cache.set(file, module.exports); return module.exports;\n@@ -68,6 +71,7 @@ async function verifyBodyClock({ anonymous = false, expired = false, tampered =\n     assert.equal(prompts.length, 0); assert.equal(calls.length, 0); return;\n   }\n   const prompt = JSON.stringify(prompts);\n+  assert.ok(!prompt.includes('expired anonymous history'));\n   assert.ok(prompt.includes('関係性ポイント: 80')); assert.ok(prompt.includes('canonical memory')); assert.ok(prompt.includes('canonical history'));\n   assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999'));\n   const delivery = calls.find(call => call.name === 'finish_misaki_body_clock_delivery').args;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/body-clock-canonical.test.cjs",
+      "source": {
+        "path": "tests/body-clock-canonical.test.cjs",
+        "coverage": "全文",
+        "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst nodeCrypto = require('node:crypto');\nconst directory = path.join(__dirname, '../supabase/functions/body-clock');\n\nasync function verifyBodyClock({ anonymous = false, expired = false, tampered = false } = {}) {\n  const calls = [], prompts = [];\n  const iv = nodeCrypto.randomBytes(12);\n  const cipher = nodeCrypto.createCipheriv('aes-256-gcm', nodeCrypto.createHash('sha256').update('misaki-temporary-state-v1:test').digest(), iv);\n  const encrypted = Buffer.concat([cipher.update(JSON.stringify({ expires: Date.now() + (expired ? -1000 : 60000),\n    result: { reply: 'ok' }, state: { relationshipPoints: 80, history: [\n      { role: 'user', text: 'expired anonymous history', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },\n      { role: 'user', text: 'canonical history', sentAt: new Date(Date.now() - 1000).toISOString() },\n    ], memory: ['canonical memory'] } })), cipher.final()]);\n  const bytes = Buffer.concat([iv, cipher.getAuthTag(), encrypted]);\n  if (tampered) bytes[40] ^= 1;\n  const token = bytes.toString('base64url');\n  const client = {\n    auth: { admin: { getUserById: async () => ({ data: { user: { is_anonymous: anonymous } }, error: null }) } },\n    from(table) {\n      const query = { select() { return query; }, eq() { return query; }, not() { return query; }, order() { return query; },\n        single: async () => ({ data: { next_push_at: 'lease' }, error: null }),\n        maybeSingle: async () => ({ data: table === 'misaki_temporary_roots' ? { token, revision: 'root-generation', expires_at: new Date(Date.now() + 60000).toISOString() } : table === 'daily_message_requests' ? { temporary_result: token } : table === 'misaki_relationship_state'\n          ? { intimacy_points: anonymous ? 999 : 80, intimacy_level: anonymous ? 'very_intimate' : 'intimate', action_state: 'NORMAL', emotion_state: { primary: 'happy', intensity: 34 } }\n          : { history: [{ role: 'user', text: 'canonical history' }], memory: ['canonical memory'] }, error: null }),\n        limit() { return query; }, then(resolve) { resolve({ data: [], error: null }); },\n        insert: async item => { calls.push({ event: item }); return { error: null }; },\n      };\n      return query;\n    },\n    rpc: async (name, args) => {\n      calls.push({ name, args });\n      if (name === 'sign_misaki_body_clock_relay') return { data: 'a'.repeat(64), error: null };\n      return { data: { deliveryId: 'delivery', pushesToday: 1, nextPushAt: 'next' }, error: null };\n    },\n  };\n  const context = vm.createContext({ Date, JSON, Math, URL, Request, Response, AbortSignal,\n    crypto: nodeCrypto.webcrypto, TextEncoder, TextDecoder, atob, btoa, Uint8Array,\n    console, Deno: { env: { get: () => 'test' }, serve() {} },\n    fetch: async (url, options) => {\n      if (String(url).includes('generativelanguage')) {\n        prompts.push(JSON.parse(options.body));\n        return Response.json({ candidates: [{ content: { parts: [{ text: '{\"reply\":\"今日はいい感じ😊\"}' }] } }] });\n      }\n      calls.push({ push: JSON.parse(options.body) }); return Response.json({ sent: 1, failed: 0 });\n    },\n  });\n  const cache = new Map();\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    let code = ts.transpileModule(fs.readFileSync(path.join(directory, file), 'utf8'), { compilerOptions: {\n      module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    if (file === 'index.ts') code += '\\nmodule.exports.processUser = processUser;';\n    const module = { exports: {} };\n    const req = name => {\n      if (name.startsWith('npm:')) return { createClient: () => client };\n      if (name === './persona-store.ts') return { loadPersonaPrompt: async () => ({ text: '美咲' }) };\n      return load(name.startsWith('./') ? name.slice(2) : name);\n    };\n    vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);\n    cache.set(file, module.exports); return module.exports;\n  }\n  const result = await load('index.ts').processUser(client, 'test', { user_id: 'account', relationship_points: 999,\n    recent_history: [{ role: 'user', text: 'forged history' }], long_term_memory: ['forged memory'], notifications_enabled: true });\n  if (expired || tampered) {\n    assert.equal(result.skipped, 'temporary_state_unavailable');\n    assert.equal(prompts.length, 0); assert.equal(calls.length, 0); return;\n  }\n  const prompt = JSON.stringify(prompts);\n  assert.ok(!prompt.includes('expired anonymous history'));\n  assert.ok(prompt.includes('関係性ポイント: 80')); assert.ok(prompt.includes('canonical memory')); assert.ok(prompt.includes('canonical history'));\n  assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999'));\n  const delivery = calls.find(call => call.name === 'finish_misaki_body_clock_delivery').args;\n  assert.equal(delivery.p_photo_context.relationshipPoints, 80);\n  assert.equal(delivery.p_photo_context.intimacyLevel, 2);\n  assert.equal(delivery.p_photo_context.selectorVersion, 4);\n  assert.equal(delivery.p_photo_context.emotion, 'happy');\n  assert.ok(delivery.p_delay_minutes >= 55 && delivery.p_delay_minutes <= 210);\n  assert.equal(calls.find(call => call.push).push.deliveryId, 'delivery');\n  assert.ok(!calls.some(call => call.name === 'complete_misaki_chat_turn'));\n}\ntest('Body Clock uses canonical history/memory/points for decision, photo, delivery and push', () => verifyBodyClock());\ntest('anonymous Body Clock decodes the shared server root and uses the same temporary points', () => verifyBodyClock({ anonymous: true }));\ntest('anonymous Body Clock skips expired temporary state before generation or delivery', () => verifyBodyClock({ anonymous: true, expired: true }));\ntest('anonymous Body Clock rejects tampered temporary receipts', () => verifyBodyClock({ anonymous: true, tampered: true }));\n",
+        "sha256": "42a03546050120b4bcff4700a030fce5126b2312935de2ed1c8705c3909e38f7"
+      }
+    },
+    {
+      "path": "tests/temporary-continuity.test.cjs",
+      "status": "modified",
+      "additions": 22,
+      "deletions": 1,
+      "patch": "diff --git a/tests/temporary-continuity.test.cjs b/tests/temporary-continuity.test.cjs\nindex 9d1f0081..87a94e25 100644\n--- a/tests/temporary-continuity.test.cjs\n+++ b/tests/temporary-continuity.test.cjs\n@@ -26,7 +26,7 @@ function bodyClock(h) {\n     if (file === 'index.ts') code += '\\nmodule.exports.processUser = processUser;';\n     const module = { exports: {} };\n     const req = name => name.startsWith('npm:') ? { createClient: () => h.client }\n-      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.slice(2));\n+      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.startsWith('./') ? name.slice(2) : name);\n     vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);\n     cache.set(file, module.exports); return module.exports;\n   }\n@@ -162,3 +162,24 @@ test('Body Clock skips a missing shared root even when old replay receipts remai\n   h.temporaryRoots.clear();\n   assert.equal((await bodyClock(h).send()).skipped, 'temporary_state_unavailable');\n });\n+\n+test('anonymous chat omits expired history from inference but retains it for display', async () => {\n+  const h = harness({ anonymous: true });\n+  const canonical = h.load('lib/canonical-state.ts');\n+  const history = [\n+    { role: 'user', text: 'old-anonymous-context', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },\n+    { role: 'user', text: 'active-anonymous-context', sentAt: new Date(Date.now() - 3600000).toISOString() },\n+    { role: 'user', text: 'untimed-anonymous-context' },\n+  ];\n+  const token = canonical.sealTemporaryState({\n+    history, memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0,\n+  }, 'prior-turn');\n+\n+  const result = await chat(h, '今日も話そう', token);\n+  const prompt = JSON.stringify(h.prompts);\n+  assert.match(prompt, /active-anonymous-context/);\n+  assert.doesNotMatch(prompt, /old-anonymous-context|untimed-anonymous-context/);\n+  const saved = canonical.openTemporaryState(result.temporaryState).state.history;\n+  assert.equal(saved[0].text, 'old-anonymous-context');\n+  assert.equal(saved[0].sentAt, history[0].sentAt);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/temporary-continuity.test.cjs",
+      "source": {
+        "path": "tests/temporary-continuity.test.cjs",
+        "coverage": "全文",
+        "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst { harness } = require('./server-canonical.test.cjs');\n\nfunction bodyClock(h) {\n  const cache = new Map();\n  const context = vm.createContext({ Date, JSON, Math, URL, Request, Response, AbortSignal,\n    crypto: require('node:crypto').webcrypto, TextEncoder, TextDecoder, atob, btoa, Uint8Array, console,\n    Deno: { env: { get: () => 'server-only-test-key' }, serve() {} },\n    fetch: async (url, options) => {\n      if (String(url).includes('generativelanguage')) {\n        h.prompts.push(JSON.parse(options.body));\n        return Response.json({ candidates: [{ content: { parts: [{ text: '{\"reply\":\"自発メッセージを送ったよ\"}' }] } }] });\n      }\n      return Response.json({ sent: 1 });\n    },\n  });\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    let code = ts.transpileModule(fs.readFileSync(path.join(__dirname, '../supabase/functions/body-clock', file), 'utf8'),\n      { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    if (file === 'index.ts') code += '\\nmodule.exports.processUser = processUser;';\n    const module = { exports: {} };\n    const req = name => name.startsWith('npm:') ? { createClient: () => h.client }\n      : name === './persona-store.ts' ? { loadPersonaPrompt: async () => ({ text: '美咲' }) } : load(name.startsWith('./') ? name.slice(2) : name);\n    vm.runInContext(`(function(require,module,exports){${code}\\n})`, context)(req, module, module.exports);\n    cache.set(file, module.exports); return module.exports;\n  }\n  return { load, send: () => load('index.ts').processUser(h.client, 'test', { user_id: h.user.id, notifications_enabled: true }) };\n}\nasync function chat(h, message, token) {\n  const response = await h.load('app/api/chat/route.ts').POST(h.request({ message,\n    requestId: require('node:crypto').randomUUID(), temporaryState: token }));\n  assert.equal(response.status, 200); return response.json();\n}\nasync function save(h, token, pending) {\n  const response = await h.load('app/api/persona/history/route.ts').POST(h.request({ saveAnonymous: true,\n    expectedUserId: h.user.id, temporaryState: token, pending }));\n  assert.equal(response.status, 200); return response.json();\n}\n\ntest('email send failure -> additional chat -> retry checkpoints latest server state even with old token', async () => {\n  const h = harness({ anonymous: true });\n  const first = await chat(h, '最初の会話');\n  await save(h, first.temporaryState); // Transport email failure cannot undo the checkpoint.\n  await chat(h, 'メール失敗後の追加会話', first.temporaryState);\n  await save(h, first.temporaryState);\n  h.user.is_anonymous = false;\n  const state = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);\n  assert.equal(state.relationshipPoints, 0);\n  assert.ok(state.history.some(item => item.text === 'メール失敗後の追加会話'));\n  assert.equal((await h.load('app/api/persona/history/route.ts').POST(h.request({ saveAnonymous: true,\n    expectedUserId: h.user.id, temporaryState: first.temporaryState }))).status, 409);\n  assert.equal(h.points, 0);\n});\n\ntest('pending confirmation -> conversation -> resave -> permanent account retains newest pair', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '確認メール前');\n  await save(h, first.temporaryState);\n  const second = await chat(h, '確認待ち中の会話', first.temporaryState);\n  await save(h, second.temporaryState);\n  h.user.is_anonymous = false;\n  assert.equal(h.rootState.history.length, 4); assert.equal(h.points, 0);\n  assert.ok(h.rootState.history.some(item => item.text === '確認待ち中の会話'));\n});\n\ntest('chat -> Body Clock -> chat -> Body Clock -> email save -> permanent account is one continuous context', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '通常会話1'), edge = bodyClock(h);\n  await edge.send();\n  assert.equal(h.consumed, 1);\n  const before = h.prompts.length;\n  await chat(h, '自発メッセージへの返事', first.temporaryState); // Browser has not seen the delivery.\n  assert.ok(JSON.stringify(h.prompts.slice(before)).includes('自発メッセージを送ったよ'));\n  const beforeNext = h.prompts.length;\n  await edge.send();\n  assert.ok(JSON.stringify(h.prompts.slice(beforeNext)).includes('自発メッセージへの返事'));\n  await save(h, first.temporaryState);\n  h.user.is_anonymous = false;\n  const a = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);\n  const b = await h.load('lib/canonical-state.ts').loadCanonicalState(h.user.id);\n  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 0); assert.equal(a.history.length, 6);\n  assert.equal(a.history.filter(item => item.text === '自発メッセージを送ったよ').length, 2);\n  assert.equal(h.consumed, 2); assert.equal(h.refunded, 0);\n});\n\ntest('chat and Body Clock after checkpoint remain saved even without another save request', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '保存前');\n  await save(h, first.temporaryState);\n  await chat(h, '保存後', first.temporaryState); await bodyClock(h).send();\n  h.user.is_anonymous = false;\n  assert.equal(h.points, 0); assert.equal(h.rootState.history.length, 5);\n  assert.ok(h.rootState.history.some(item => item.text === '自発メッセージを送ったよ'));\n});\n\ntest('lost-response recovery loads latest root including a subsequent Body Clock delivery', async () => {\n  const h = harness({ anonymous: true }), requestId = require('node:crypto').randomUUID();\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request({ requestId }))).status, 200);\n  await bodyClock(h).send();\n  const response = await h.load('app/api/persona/history/route.ts').POST(h.request({ action: 'load',\n    pending: { requestId, message: 'こんにちは', temporaryState: null } }));\n  const recovered = await response.json();\n  assert.equal(recovered.recoveredTurn, true); assert.equal(recovered.history.length, 3);\n  await save(h, null, { requestId, message: 'こんにちは', temporaryState: null });\n  assert.equal(h.rootState.history.length, 3);\n});\n\ntest('explicit anonymous edit advances shared root and is respected by subsequent chat/Body Clock/save', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '削除予定の会話');\n  const api = h.load('app/api/persona/history/route.ts');\n  assert.equal((await api.POST(h.request({ action: 'clearHistory', temporaryState: first.temporaryState }))).status, 200);\n  await bodyClock(h).send(); await save(h, first.temporaryState);\n  assert.equal(h.rootState.history.length, 1);\n  assert.equal(h.points, 0);\n});\n\ntest('an expired shared root cannot fall back to an older browser snapshot or receipt', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '期限前');\n  h.temporaryRoots.get(h.user.id).expires_at = new Date(0).toISOString();\n  await assert.rejects(() => h.load('lib/canonical-state.ts').loadTemporaryRoot(h.user.id, first.temporaryState), /expired/);\n  const result = await bodyClock(h).send(); assert.equal(result.skipped, 'temporary_state_unavailable');\n});\n\ntest('a concurrent root revision prevents stale checkpoints and explicit edits', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '競合前');\n  const canonical = h.load('lib/canonical-state.ts');\n  const stale = await canonical.loadTemporaryRoot(h.user.id, first.temporaryState);\n  await bodyClock(h).send();\n  await assert.rejects(() => canonical.editTemporaryRoot(h.user.id, stale), /commit failed/);\n  const rejected = await h.client.rpc('save_misaki_temporary_state', { p_expected_revision: stale.temporaryRevision });\n  assert.ok(rejected.error);\n  assert.equal((await canonical.loadTemporaryRoot(h.user.id, first.temporaryState)).history.length, 3);\n});\n\ntest('Body Clock advances history without extending anonymous lifetime', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, '期限を開始');\n  const expires = h.temporaryRoots.get(h.user.id).expires_at;\n  h.advanceClock(23 * 60 * 60 * 1000);\n  await bodyClock(h).send();\n  const root = h.temporaryRoots.get(h.user.id);\n  assert.equal(root.expires_at, expires);\n  assert.equal(h.load('lib/canonical-state.ts').openTemporaryState(root.token).state.history.length, 3);\n  h.advanceClock(2 * 60 * 60 * 1000);\n  await assert.rejects(() => h.load('lib/canonical-state.ts').loadTemporaryRoot(h.user.id, null), /expired/);\n});\n\ntest('explicit anonymous load renews live temporary state without adding usage or points', async () => {\n  const h = harness({ anonymous: true }), first = await chat(h, 'ロードで更新');\n  const before = Date.parse(h.temporaryRoots.get(h.user.id).expires_at);\n  h.advanceClock(23 * 60 * 60 * 1000);\n  const response = await h.load('app/api/persona/history/route.ts').POST(h.request({ action: 'load', temporaryState: first.temporaryState }));\n  assert.equal(response.status, 200);\n  assert.ok(Date.parse(h.temporaryRoots.get(h.user.id).expires_at) > before);\n  assert.equal(h.consumed, 1); assert.equal((await response.json()).relationshipPoints, 0);\n});\n\ntest('Body Clock skips a missing shared root even when old replay receipts remain', async () => {\n  const h = harness({ anonymous: true }); await chat(h, '古い応答');\n  h.temporaryRoots.clear();\n  assert.equal((await bodyClock(h).send()).skipped, 'temporary_state_unavailable');\n});\n\ntest('anonymous chat omits expired history from inference but retains it for display', async () => {\n  const h = harness({ anonymous: true });\n  const canonical = h.load('lib/canonical-state.ts');\n  const history = [\n    { role: 'user', text: 'old-anonymous-context', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() },\n    { role: 'user', text: 'active-anonymous-context', sentAt: new Date(Date.now() - 3600000).toISOString() },\n    { role: 'user', text: 'untimed-anonymous-context' },\n  ];\n  const token = canonical.sealTemporaryState({\n    history, memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 0,\n  }, 'prior-turn');\n\n  const result = await chat(h, '今日も話そう', token);\n  const prompt = JSON.stringify(h.prompts);\n  assert.match(prompt, /active-anonymous-context/);\n  assert.doesNotMatch(prompt, /old-anonymous-context|untimed-anonymous-context/);\n  const saved = canonical.openTemporaryState(result.temporaryState).state.history;\n  assert.equal(saved[0].text, 'old-anonymous-context');\n  assert.equal(saved[0].sentAt, history[0].sentAt);\n});\n",
+        "sha256": "e9808ac98e5bf93360bab616b8abb293a012e5305cf1b9abca10c9b1101277ae"
+      }
+    }
+  ],
+  "file_count": 6,
+  "reported_file_count": 6,
+  "commits": [
+    {
+      "sha": "138eaf7a181d49d53e722ab7d63f7092dded20f6",
+      "message": "Limit anonymous conversation history used for inference to 24 hours\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/138eaf7a181d49d53e722ab7d63f7092dded20f6"
+    },
+    {
+      "sha": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+      "message": "Keep anonymous expiry assertions typed after equality narrowing\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/accf2ef33c01e0a45ee96bea543fde01350e87f2"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43183072388",
+      "id": 43183072388,
+      "updated_at": "2026-11-12T08:28:23Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43183072431",
+      "id": 43183072431,
+      "updated_at": "2026-11-12T08:27:35Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/43183072422",
+      "id": 43183072422,
+      "updated_at": "2026-11-12T08:27:39Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "ANONYMOUS_HISTORY_TTL_MS",
+    "GEMINI_TIMEOUT_MS",
+    "MAX_HISTORY",
+    "MAX_MEMORY",
+    "MAX_TODAY_MEMORY",
+    "MISAKI_LATITUDE",
+    "MISAKI_LONGITUDE",
+    "POST",
+    "SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_URL",
+    "a",
+    "active",
+    "activeAnonymousHistory",
+    "activityGroups",
+    "api",
+    "assert",
+    "at",
+    "attempt",
+    "b",
+    "before",
+    "beforeNext",
+    "bodyClock",
+    "buildActivityEvidence",
+    "bytes",
+    "cache",
+    "calls",
+    "canonical",
+    "canonicalRelationshipPoints",
+    "chat",
+    "cipher",
+    "client",
+    "code",
+    "consistency",
+    "consumeDailyMessageWithRetry",
+    "containsAny",
+    "context",
+    "createAuthenticatedSupabase",
+    "createMisakiLife",
+    "createRelationshipGuide",
+    "createTimeGuide",
+    "createTodayMemoryGuide",
+    "createWeatherGuide",
+    "current",
+    "cutoff",
+    "data",
+    "dateKey",
+    "dayLabel",
+    "dayType",
+    "delivery",
+    "directory",
+    "encrypted",
+    "expires",
+    "findUnsupportedActivityGroups",
+    "first",
+    "fs",
+    "getDateKey",
+    "getFirstRow",
+    "getHour",
+    "getHumidityFeel",
+    "getMisakiDayType"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "cfc4ce6fb823e423f8aae1a311427d6e27129784db0e2247e97f4540b8f6a4d9",
+  "ci_digest": "1f468efc8da4639cd7206bbc4d3c44fe8fa68e4c2e185367b66421747048f199",
+  "collected_at": "2026-11-13T07:56:54.305234+00:00",
+  "decisions": [
+    {
+      "kind": "test",
+      "title": "anonymous history expires at 24 hours without rewriting its timestamp",
+      "condition": "anonymous history expires at 24 hours without rewriting its timestamp",
+      "behavior": "if (!Array.isArray(history)) return []; ／ return history.filter(item => { ／ if (typeof item?.sentAt !== \"string\") return false; ／ return sentAt > now - ANONYMOUS_HISTORY_TTL_MS && sentAt <= now;",
+      "verification": "テストの期待値: assert.deepEqual(activeAnonymousHistory(history, now), [active]) ／ assert.deepEqual(activeAnonymousHistory(history, now + 1000), [history[2]]) ／ assert.equal(active.sentAt, \"2026-11-11T08:00:01.000Z\") ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/supabase/functions/_shared/anonymous-history-expiry.ts#L5",
+        "https://github.com/miyazaki1016/misaki/blob/accf2ef33c01e0a45ee96bea543fde01350e87f2/tests/anonymous-history-expiry.test.ts#L5"
+      ]
+    }
+  ]
+}

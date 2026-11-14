@@ -1,0 +1,272 @@
+{
+  "id": "pr-160",
+  "number": 160,
+  "title": "feat: show Solas handoff queue with copyable PR work instructions",
+  "topics": [
+    "開発管理"
+  ],
+  "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Extend existing approval dashboard with a separate ソラへの引き継ぎ tab. Populate a curated 35-case snapshot (17 Misaki engineering, 15 Amefuru engineering, 3 inventory) from the already-merged triage document; the one owner decision stays in the owner tab. Cross-check currently open PRs via GitHub API, show the responsible Sora, why it needs developer attention, next step, and copyable context-rich task prompt with repo/PR/head SHA and do-not-merge/production constraints. Add safe clipboard fallback, validation, and handoff docs. **No automated chat initiation, auto-merge, labels, DB writes or existing app changes.** Owner can paste copied task into the established project chat/Work. CI and review required before publishing.",
+  "snapshot_head": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+  "snapshot_consistent": true,
+  "head": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+  "base": "3bf7126526b4c123a3628b9504b2d3a7895862ad",
+  "base_ref": "main",
+  "head_ref": "feat/sola-handoff-queue-20261105",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-05T01:34:43Z",
+  "merge_commit_sha": "d61e4283daa23f563424ffa32b17a124f6880349",
+  "updated_at": "2026-11-05T01:34:43Z",
+  "code_facts": [
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert len(tasks) == 35, \"Expected 35 audited non-owner PRs in 2026-11-04 snapshot\"",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert len({(t[\"repo\"], t[\"number\"]) for t in tasks}) == len(tasks), \"Duplicate handoffs\"",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert all(t[\"repo\"] in (\"misaki\", \"emergencyalert\") for t in tasks)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert all(t[\"role\"] in (\"美咲担当ソラ\", \"アメふる担当ソラ\", \"棚卸し担当ソラ\") for t in tasks)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert not any(t[\"repo\"] == \"misaki\" and t[\"number\"] == 101 for t in tasks), \"Owner decision must remain separate\"",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"handoff-queue.json\" in html and 'data-view=\"handoff\"' in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"navigator.clipboard.writeText\" in html and \"自動で別チャットを起動\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert \"handoffInstruction(\" in html and \"renderHandoffs(\" in html",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "start = js.index(\"  function handoffInstruction(\")",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "関数・クラス定義",
+      "expression": "end = js.index(\"  function render(){\", start)",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "const assert = require('node:assert/strict');",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    },
+    {
+      "file": "scripts/check_approval_dashboard.py",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(prompt,/PR #155/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py"
+    }
+  ],
+  "files": [
+    {
+      "path": "docs/approval-dashboard/README.md",
+      "status": "modified",
+      "additions": 10,
+      "deletions": 0,
+      "patch": "diff --git a/docs/approval-dashboard/README.md b/docs/approval-dashboard/README.md\nindex 4eae4ca..0c27134 100644\n--- a/docs/approval-dashboard/README.md\n+++ b/docs/approval-dashboard/README.md\n@@ -50,3 +50,13 @@ Pagesが未設定のまま初回デプロイに失敗した後、同じworkflow\n 認証、本人のGithub ID、Supabase publishable key、サーバー側の最小権限GitHubトークン、Edge Functionを設定し、認証・拒否テスト・監査とOwner確認ができるまでは有効化しない。今後のコードの導入手順と防御条件は `../../services/approval-merge-edge/README.md` に記録。\n \n バックエンド側は現段階では **docs配下のMarkdownのみ** に対象を制限し、Draft・CI失敗・重要なコード変更などは従来通りGitHubのレビューが必要。\n+\n+## 担当ソラへの引き継ぎキュー（2026-11-05追加）\n+\n+「ソラへの引き継ぎ」タブは、`OWNER_TRIAGE_20261104.md` の一次仕分けから生成した `handoff-queue.json` を使用する。2026-11-04時点で**35件**（美咲担当17件、アメふる担当15件、棚卸し担当3件）。オーナー判断の美咲 #101 は含まない。\n+\n+GitHub公開APIでその都度取得したオープンPRと突き合わせ、**PRが閉じた案件は表示しない**。タイトル・最新head SHAは取得時の情報を使い、仕分け日時を必ず明記する。PR本文の実装完了判定や最新の対応状況を自動推論したものではない。ラベルがなくても既存棚卸し由来の引き継ぎ候補は一覧に残る。\n+\n+案件ごとに「なぜ担当へ戻すか」「次にやること」「引き継ぎ指示をコピー」を提供する。コピーした指示を該当プロジェクトの**既存の担当ソラのチャット／Work**へ貼り付ける。これにより、担当にPRやブランチの所在を毎回説明せずに済む。\n+\n+**重要な制約**：この画面からChatGPTの別チャットを自動起動したり、作業が実行されたことを保証したりはしない。コピー後に担当側でGitHubの最新状態を再取得して作業する。Draft・マージ禁止・送信禁止などの制約を引き継ぐ。PRクローズや自動マージは行わない。今後の仕分け更新時はこのJSONを既存の監査資料に合わせて改訂する。\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/docs/approval-dashboard/README.md",
+      "source": {
+        "path": "docs/approval-dashboard/README.md",
+        "coverage": "全文",
+        "text": "# 開発承認ボード（美咲 × アメふる）\n\n## 目的\nVercelの追加プロジェクトを使わず、GitHub Pages上で2つのリポジトリの**open PR**をiPhoneからまとめて確認する。既存の開発台帳や棚卸しを置き換えない。\n\n## 表示と操作\n- GitHub公開APIから `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のopen PRを読み取り専用で取得。\n- 初期画面は**「あなたの判断待ち」**。open PRのラベル `owner-decision`、`needs-owner-decision` または `user-approval-required` が明示されたものだけを表示。Draftの仕様判断依頼も表示するが、マージ可能とは扱わない。\n- その他の非Draft PRは「未整理」、Draft PRは「準備中」、全件は「すべて」に分ける。未整理を自動的に承認済み・不要とは判定しない。\n- 判断待ちのカードはPR本文の `### 変更概要` / `### 判断してほしいこと` / `### 推奨と理由` を抽出する。情報不足は「未記入」と明示し、AIによる推測で埋めない。\n- 「GitHubで確認・マージ」からGitHubのPR画面へ移動し、ログイン済みのユーザーが差分・CI・承認条件を確認してマージする。**このダッシュボード内からの直接マージは未実装。**\n- CIチェックはカードを展開した時だけ取得。GitHub APIの制限に達した場合はエラーを表示する。\n- 個人アクセストークンは保存・要求しない。GitHub Pagesは公開サイトとなるので秘密情報は載せない。\n\n## GitHub Pages公開\n`.github/workflows/approval-dashboard-pages.yml` をmainへ統合後、GitHubリポジトリの **Settings → Pages → Build and deployment → Source: GitHub Actions** を設定する。以降、ダッシュボードを変更した時またはActionsの手動実行で公開できる。\n\n想定URL（GitHub Pages有効化後。**現時点で公開確認したURLではない**）:\n`https://miyazaki1016.github.io/misaki/`\n\n## 実際にページ上で直接マージする将来拡張\nGitHub Pagesは静的配信でサーバー側の機密資格情報を安全に保管できない。直接マージには認証済みのバックエンド／GitHub App・最小権限・実行前のCI/branch保護再検証・監査ログが必要。これらなしにトークンをブラウザーへ埋め込まない。\n\n## 再実行時の注意\nPagesが未設定のまま初回デプロイに失敗した後、同じworkflow run内のdeployジョブだけを再実行すると、同名の `github-pages` アーティファクトが2つできて配信に失敗することがある。その場合は**同じジョブの再実行を繰り返さず、Actionsの「Run workflow」で新しいworkflow runを作る**。新しいrunの公開結果を確認してから利用者へURLを案内する。\n\n## 判断依頼の登録規約（両リポジトリ共通）\n\nオーナーに決定してほしい具体的な項目がある場合だけ、対象PRに `owner-decision` ラベルを付与し、PR本文に以下を記載する。ラベルがなければ初期画面には表示されない。\n\n```markdown\n### 変更概要\n誰に何の影響があるか、専門用語を避けて説明する。\n\n### 判断してほしいこと\n選択肢AとB、各案の結果。何を決めればよいかを一問に絞る。\n\n### 推奨と理由\n推奨する選択肢、根拠、確認済みテストと残る懸念。\n```\n\n**運用上の安全境界:** このラベルは決裁が必要という印であり、合格・承認・マージ許可ではない。アプリ本体、認証、本番、DB、通知などの変更は専用PRの検証と承認を維持。ラベル・記載がないPRも「未整理」に残るため、管理から消えない。自動分類や自動マージはこの変更には含まない。\n\n## 🔐 ダッシュボード内からのマージ（将来機能・無効）\n\n`merge.html` はGitHub OAuth（Supabase Auth PKCE）を利用してオーナー本人を確認し、既存Supabaseプロジェクトの独立Edge Functionに依頼する**準備用UI**。GitHubの資格情報はブラウザーへ配布しない。\n\n`merge-config.json` の `enabled` は**false**で固定。これがfalseの限り既存ダッシュボードの「直接マージ」ボタンは表示しない。既存の「GitHubで確認・マージ」ボタンは引き続き使える。\n\n認証、本人のGithub ID、Supabase publishable key、サーバー側の最小権限GitHubトークン、Edge Functionを設定し、認証・拒否テスト・監査とOwner確認ができるまでは有効化しない。今後のコードの導入手順と防御条件は `../../services/approval-merge-edge/README.md` に記録。\n\nバックエンド側は現段階では **docs配下のMarkdownのみ** に対象を制限し、Draft・CI失敗・重要なコード変更などは従来通りGitHubのレビューが必要。\n\n## 担当ソラへの引き継ぎキュー（2026-11-05追加）\n\n「ソラへの引き継ぎ」タブは、`OWNER_TRIAGE_20261104.md` の一次仕分けから生成した `handoff-queue.json` を使用する。2026-11-04時点で**35件**（美咲担当17件、アメふる担当15件、棚卸し担当3件）。オーナー判断の美咲 #101 は含まない。\n\nGitHub公開APIでその都度取得したオープンPRと突き合わせ、**PRが閉じた案件は表示しない**。タイトル・最新head SHAは取得時の情報を使い、仕分け日時を必ず明記する。PR本文の実装完了判定や最新の対応状況を自動推論したものではない。ラベルがなくても既存棚卸し由来の引き継ぎ候補は一覧に残る。\n\n案件ごとに「なぜ担当へ戻すか」「次にやること」「引き継ぎ指示をコピー」を提供する。コピーした指示を該当プロジェクトの**既存の担当ソラのチャット／Work**へ貼り付ける。これにより、担当にPRやブランチの所在を毎回説明せずに済む。\n\n**重要な制約**：この画面からChatGPTの別チャットを自動起動したり、作業が実行されたことを保証したりはしない。コピー後に担当側でGitHubの最新状態を再取得して作業する。Draft・マージ禁止・送信禁止などの制約を引き継ぐ。PRクローズや自動マージは行わない。今後の仕分け更新時はこのJSONを既存の監査資料に合わせて改訂する。\n",
+        "sha256": "8353c4ece3367e47feda67de80fca11e9ef5102615fa80bbcfda04feed278be6"
+      }
+    },
+    {
+      "path": "docs/approval-dashboard/handoff-queue.json",
+      "status": "modified",
+      "additions": 357,
+      "deletions": 0,
+      "patch": "diff --git a/docs/approval-dashboard/handoff-queue.json b/docs/approval-dashboard/handoff-queue.json\nnew file mode 100644\nindex 0000000..4a2e468\n--- /dev/null\n+++ b/docs/approval-dashboard/handoff-queue.json\n@@ -0,0 +1,357 @@\n+{\n+  \"snapshot\": \"2026-11-04\",\n+  \"source\": \"docs/approval-dashboard/OWNER_TRIAGE_20261104.md\",\n+  \"note\": \"一次仕分け。GitHubのPR状態・実装・CI・本番は毎回再検証する。ここから別チャットは自動起動されない。\",\n+  \"tasks\": [\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 151,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"チャット初期スクロール\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：読み込み速度の計測・iPhone Safari検証が未完了\",\n+      \"next\": \"計測と回帰、CIと実機を先に実施。オーナーに即時マージ判断を求めない\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 146,\n+      \"role\": \"棚卸し担当ソラ\",\n+      \"kind\": \"inventory\",\n+      \"title\": \"台帳更新事実\",\n+      \"state\": \"Open\",\n+      \"reason\": \"管理作業：自動取得の事実欄\",\n+      \"next\": \"既存台帳との矛盾、想定外変更、CI、重複を安全ゲートで照合。自動マージは未承認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 100,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"匿名24時間記憶設計\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：設計のみで本番適用なし\",\n+      \"next\": \"既存記憶仕様・移行安全性照合\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 88,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"共通会話エンジン純粋アダプタ\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：段階抽出・CI・並行設計 #87 と整合\",\n+      \"next\": \"共通ルート・テスト採否を証拠で確認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 87,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"共通会話エンジン設計\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**将来の承認ゲートあり**：課金Gemini呼出しや本番投入にはオーナー承認必要。ただし現在は設計のみ\",\n+      \"next\": \"具体的な実行計画・費用・品質検証が揃ったら判断依頼を起票\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 86,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"会話ラボ\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：本番非接続の実験\",\n+      \"next\": \"既存実装とテストの重複を照合\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 85,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"Interpreter中間成長案\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：実Gemini A/B未実施、閾値は仮説\",\n+      \"next\": \"比較データを整えるまで採否判断を保留\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 84,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"5軸成長方針資料\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：既存の方針と記録の整合\",\n+      \"next\": \"主張の重複を調整\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 83,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"関係性指示比較テスト\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：観測テスト\",\n+      \"next\": \"現行のテスト・動作と比較\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 81,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"canonical DB監査\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：本番DB状態は未確認\",\n+      \"next\": \"DB適用とソースの記録を分離\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 80,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"マルチキャラRPC監査\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：別PR #79ブランチがbase\",\n+      \"next\": \"#79と整合、ベース依存を確認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 79,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"マルチキャラデータスコープ\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：設計上の分離検討\",\n+      \"next\": \"既存RPC・権限・DB正本を再照合\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 78,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"会話再生テスト\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：別作業ブランチがbase\",\n+      \"next\": \"依存元・統合必要性を確認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 67,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"Relationship Identity\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：記憶・migration・本番状態に関わる\",\n+      \"next\": \"migrationと現行main・本番を別々に検証\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 66,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"忘却制御\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：データ削除・記憶の安全性に関わる\",\n+      \"next\": \"canonical transactionと回帰の証拠が先\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 60,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"Relationship Engine設計資料\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：文書のみ、歴史的経緯\",\n+      \"next\": \"総覧との重複を確認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 31,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"関係時間v2\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：関係・感情・永続化の実装\",\n+      \"next\": \"本番コード・DB/移行との整合を確認\"\n+    },\n+    {\n+      \"repo\": \"misaki\",\n+      \"number\": 30,\n+      \"role\": \"美咲担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"maintenance/drain\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**技術的BLOCKED** とPR本文に明記\",\n+      \"next\": \"旧接続の受付・COMMIT問題を修正するまでマージ禁止\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 155,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"JASPICメール移行\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**実メール送信禁止**。旧Windows版との互換検証中\",\n+      \"next\": \"SMTP実送信・本番切替なしで互換・独立性を検証\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 147,\n+      \"role\": \"棚卸し担当ソラ\",\n+      \"kind\": \"inventory\",\n+      \"title\": \"台帳更新事実\",\n+      \"state\": \"Open\",\n+      \"reason\": \"管理作業：自動取得の事実欄\",\n+      \"next\": \"重複・変更範囲・CIを照合。自動マージ未導入\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 109,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"大雨継続性研究\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：本番通知非接続、保存上限・CI等のゲートが残る\",\n+      \"next\": \"研究データと容量・稼働安全を確認。通知条件変更はしない\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 98,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"通知答え合わせ設計\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：設計資料。後続に統合済み実装がある\",\n+      \"next\": \"後続PRの成果と重複しないよう記録保全\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 97,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"外部AIレビュー公開総覧\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**プレビュー限定・本番公開禁止**\",\n+      \"next\": \"公開範囲の検証が先\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 96,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"外部AIレビュー静的ページ\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**プレビュー限定・本番公開禁止**\",\n+      \"next\": \"#97との重複・認証情報漏出の有無を確認\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 95,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"雨接近メッセージ設計\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：仕様と回帰条件、未実装\",\n+      \"next\": \"最新の通知方針と整合\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 94,\n+      \"role\": \"棚卸し担当ソラ\",\n+      \"kind\": \"inventory\",\n+      \"title\": \"「降るよ」最優先の方針資料\",\n+      \"state\": \"Open\",\n+      \"reason\": \"管理作業：既にユーザー確定の方針の記録\",\n+      \"next\": \"最新main総覧との重複と日付を検査してから文書統合可否を判定\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 93,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"Push重複防止監査\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：監査記録、本番変更なし\",\n+      \"next\": \"#104/#105以降の対策と重複しないよう保全\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 88,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"通知見直し仕様\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：仕様記録、本番なし\",\n+      \"next\": \"既存仕様と統合できるか確認\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 73,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"過去通知履歴の表示\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：既存RLS・画面の回帰確認\",\n+      \"next\": \"最新履歴画面と差分比較\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 63,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"通知履歴・フィードバック\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**マージ禁止**とPR本文に明記。DB前提あり\",\n+      \"next\": \"最新実装との差分、権限、DBゲートを先に検証\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 62,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"JMA stride2計測\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：研究・独立CI\",\n+      \"next\": \"既存計測との重複チェック\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 61,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"LIVE JAPAN試作\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"**将来のデザイン判断あり**。実データ未接続・実機プレビュー未検証\",\n+      \"next\": \"実機表示と画面説明を先に用意し、採否を1問で提示\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 60,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"美咲連携API設計\",\n+      \"state\": \"Draft\",\n+      \"reason\": \"開発担当：read-only API契約案、未実装\",\n+      \"next\": \"両リポジトリの契約を照合\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 59,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"全国大雨スキャン\",\n+      \"state\": \"Open\",\n+      \"reason\": \"**Production readiness: NO** とPR本文に明記。技術ゲート未完了\",\n+      \"next\": \"読取/DB/cron/Push接続・マージを止めて継続調査\"\n+    },\n+    {\n+      \"repo\": \"emergencyalert\",\n+      \"number\": 25,\n+      \"role\": \"アメふる担当ソラ\",\n+      \"kind\": \"engineering\",\n+      \"title\": \"JMA実況のCIスモーク\",\n+      \"state\": \"Open\",\n+      \"reason\": \"開発担当：CI追加。既存のCI仕様との重複の可能性\",\n+      \"next\": \"現行CIと比較して必要性・安定性を判断\"\n+    }\n+  ]\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/docs/approval-dashboard/handoff-queue.json",
+      "source": {
+        "path": "docs/approval-dashboard/handoff-queue.json",
+        "coverage": "全文",
+        "text": "{\n  \"snapshot\": \"2026-11-04\",\n  \"source\": \"docs/approval-dashboard/OWNER_TRIAGE_20261104.md\",\n  \"note\": \"一次仕分け。GitHubのPR状態・実装・CI・本番は毎回再検証する。ここから別チャットは自動起動されない。\",\n  \"tasks\": [\n    {\n      \"repo\": \"misaki\",\n      \"number\": 151,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"チャット初期スクロール\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：読み込み速度の計測・iPhone Safari検証が未完了\",\n      \"next\": \"計測と回帰、CIと実機を先に実施。オーナーに即時マージ判断を求めない\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 146,\n      \"role\": \"棚卸し担当ソラ\",\n      \"kind\": \"inventory\",\n      \"title\": \"台帳更新事実\",\n      \"state\": \"Open\",\n      \"reason\": \"管理作業：自動取得の事実欄\",\n      \"next\": \"既存台帳との矛盾、想定外変更、CI、重複を安全ゲートで照合。自動マージは未承認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 100,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"匿名24時間記憶設計\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：設計のみで本番適用なし\",\n      \"next\": \"既存記憶仕様・移行安全性照合\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 88,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"共通会話エンジン純粋アダプタ\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：段階抽出・CI・並行設計 #87 と整合\",\n      \"next\": \"共通ルート・テスト採否を証拠で確認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 87,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"共通会話エンジン設計\",\n      \"state\": \"Draft\",\n      \"reason\": \"**将来の承認ゲートあり**：課金Gemini呼出しや本番投入にはオーナー承認必要。ただし現在は設計のみ\",\n      \"next\": \"具体的な実行計画・費用・品質検証が揃ったら判断依頼を起票\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 86,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"会話ラボ\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：本番非接続の実験\",\n      \"next\": \"既存実装とテストの重複を照合\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 85,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"Interpreter中間成長案\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：実Gemini A/B未実施、閾値は仮説\",\n      \"next\": \"比較データを整えるまで採否判断を保留\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 84,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"5軸成長方針資料\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：既存の方針と記録の整合\",\n      \"next\": \"主張の重複を調整\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 83,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"関係性指示比較テスト\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：観測テスト\",\n      \"next\": \"現行のテスト・動作と比較\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 81,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"canonical DB監査\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：本番DB状態は未確認\",\n      \"next\": \"DB適用とソースの記録を分離\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 80,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"マルチキャラRPC監査\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：別PR #79ブランチがbase\",\n      \"next\": \"#79と整合、ベース依存を確認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 79,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"マルチキャラデータスコープ\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：設計上の分離検討\",\n      \"next\": \"既存RPC・権限・DB正本を再照合\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 78,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"会話再生テスト\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：別作業ブランチがbase\",\n      \"next\": \"依存元・統合必要性を確認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 67,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"Relationship Identity\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：記憶・migration・本番状態に関わる\",\n      \"next\": \"migrationと現行main・本番を別々に検証\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 66,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"忘却制御\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：データ削除・記憶の安全性に関わる\",\n      \"next\": \"canonical transactionと回帰の証拠が先\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 60,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"Relationship Engine設計資料\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：文書のみ、歴史的経緯\",\n      \"next\": \"総覧との重複を確認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 31,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"関係時間v2\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：関係・感情・永続化の実装\",\n      \"next\": \"本番コード・DB/移行との整合を確認\"\n    },\n    {\n      \"repo\": \"misaki\",\n      \"number\": 30,\n      \"role\": \"美咲担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"maintenance/drain\",\n      \"state\": \"Draft\",\n      \"reason\": \"**技術的BLOCKED** とPR本文に明記\",\n      \"next\": \"旧接続の受付・COMMIT問題を修正するまでマージ禁止\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 155,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"JASPICメール移行\",\n      \"state\": \"Draft\",\n      \"reason\": \"**実メール送信禁止**。旧Windows版との互換検証中\",\n      \"next\": \"SMTP実送信・本番切替なしで互換・独立性を検証\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 147,\n      \"role\": \"棚卸し担当ソラ\",\n      \"kind\": \"inventory\",\n      \"title\": \"台帳更新事実\",\n      \"state\": \"Open\",\n      \"reason\": \"管理作業：自動取得の事実欄\",\n      \"next\": \"重複・変更範囲・CIを照合。自動マージ未導入\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 109,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"大雨継続性研究\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：本番通知非接続、保存上限・CI等のゲートが残る\",\n      \"next\": \"研究データと容量・稼働安全を確認。通知条件変更はしない\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 98,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"通知答え合わせ設計\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：設計資料。後続に統合済み実装がある\",\n      \"next\": \"後続PRの成果と重複しないよう記録保全\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 97,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"外部AIレビュー公開総覧\",\n      \"state\": \"Draft\",\n      \"reason\": \"**プレビュー限定・本番公開禁止**\",\n      \"next\": \"公開範囲の検証が先\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 96,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"外部AIレビュー静的ページ\",\n      \"state\": \"Draft\",\n      \"reason\": \"**プレビュー限定・本番公開禁止**\",\n      \"next\": \"#97との重複・認証情報漏出の有無を確認\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 95,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"雨接近メッセージ設計\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：仕様と回帰条件、未実装\",\n      \"next\": \"最新の通知方針と整合\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 94,\n      \"role\": \"棚卸し担当ソラ\",\n      \"kind\": \"inventory\",\n      \"title\": \"「降るよ」最優先の方針資料\",\n      \"state\": \"Open\",\n      \"reason\": \"管理作業：既にユーザー確定の方針の記録\",\n      \"next\": \"最新main総覧との重複と日付を検査してから文書統合可否を判定\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 93,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"Push重複防止監査\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：監査記録、本番変更なし\",\n      \"next\": \"#104/#105以降の対策と重複しないよう保全\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 88,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"通知見直し仕様\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：仕様記録、本番なし\",\n      \"next\": \"既存仕様と統合できるか確認\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 73,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"過去通知履歴の表示\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：既存RLS・画面の回帰確認\",\n      \"next\": \"最新履歴画面と差分比較\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 63,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"通知履歴・フィードバック\",\n      \"state\": \"Draft\",\n      \"reason\": \"**マージ禁止**とPR本文に明記。DB前提あり\",\n      \"next\": \"最新実装との差分、権限、DBゲートを先に検証\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 62,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"JMA stride2計測\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：研究・独立CI\",\n      \"next\": \"既存計測との重複チェック\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 61,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"LIVE JAPAN試作\",\n      \"state\": \"Draft\",\n      \"reason\": \"**将来のデザイン判断あり**。実データ未接続・実機プレビュー未検証\",\n      \"next\": \"実機表示と画面説明を先に用意し、採否を1問で提示\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 60,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"美咲連携API設計\",\n      \"state\": \"Draft\",\n      \"reason\": \"開発担当：read-only API契約案、未実装\",\n      \"next\": \"両リポジトリの契約を照合\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 59,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"全国大雨スキャン\",\n      \"state\": \"Open\",\n      \"reason\": \"**Production readiness: NO** とPR本文に明記。技術ゲート未完了\",\n      \"next\": \"読取/DB/cron/Push接続・マージを止めて継続調査\"\n    },\n    {\n      \"repo\": \"emergencyalert\",\n      \"number\": 25,\n      \"role\": \"アメふる担当ソラ\",\n      \"kind\": \"engineering\",\n      \"title\": \"JMA実況のCIスモーク\",\n      \"state\": \"Open\",\n      \"reason\": \"開発担当：CI追加。既存のCI仕様との重複の可能性\",\n      \"next\": \"現行CIと比較して必要性・安定性を判断\"\n    }\n  ]\n}\n",
+        "sha256": "203d80aff63a8beb05847076cfc5571c0c4eefe5af9d1eca373bab92a3699f06"
+      }
+    },
+    {
+      "path": "docs/approval-dashboard/index.html",
+      "status": "modified",
+      "additions": 82,
+      "deletions": 3,
+      "patch": "",
+      "patch_coverage": "差分なし／対象外",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/docs/approval-dashboard/index.html",
+      "source": {
+        "path": "docs/approval-dashboard/index.html",
+        "coverage": "対象外（秘密情報候補／非テキスト）"
+      }
+    },
+    {
+      "path": "scripts/check_approval_dashboard.py",
+      "status": "modified",
+      "additions": 31,
+      "deletions": 0,
+      "patch": "diff --git a/scripts/check_approval_dashboard.py b/scripts/check_approval_dashboard.py\nindex 51b5cfd..423f7d9 100644\n--- a/scripts/check_approval_dashboard.py\n+++ b/scripts/check_approval_dashboard.py\n@@ -60,6 +60,37 @@ assert.equal(decisionFacts({body:\"\"}).question, \"\");\n \"\"\"\n     path.write_text(helpers + chr(10) + smoke, encoding=\"utf-8\")\n     subprocess.run([\"node\", str(path)], check=True)\n+# Handoff queue must contain exactly the existing 35 non-owner cases; never auto-merge.\n+import json\n+handoff = json.loads(Path(\"docs/approval-dashboard/handoff-queue.json\").read_text(encoding=\"utf-8\"))\n+tasks = handoff[\"tasks\"]\n+assert len(tasks) == 35, \"Expected 35 audited non-owner PRs in 2026-11-04 snapshot\"\n+assert len({(t[\"repo\"], t[\"number\"]) for t in tasks}) == len(tasks), \"Duplicate handoffs\"\n+assert all(t[\"repo\"] in (\"misaki\", \"emergencyalert\") for t in tasks)\n+assert all(t[\"role\"] in (\"美咲担当ソラ\", \"アメふる担当ソラ\", \"棚卸し担当ソラ\") for t in tasks)\n+assert not any(t[\"repo\"] == \"misaki\" and t[\"number\"] == 101 for t in tasks), \"Owner decision must remain separate\"\n+assert \"handoff-queue.json\" in html and 'data-view=\"handoff\"' in html\n+assert \"navigator.clipboard.writeText\" in html and \"自動で別チャットを起動\" in html\n+assert \"handoffInstruction(\" in html and \"renderHandoffs(\" in html\n+start = js.index(\"  function handoffInstruction(\")\n+end = js.index(\"  function render(){\", start)\n+handoff_functions = js[start:end]\n+handoff_smoke = r\"\"\"\n+const assert = require('node:assert/strict');\n+const t = {repo:'emergencyalert',number:155,role:'アメふる担当ソラ',state:'Draft',reason:'検証が必要',next:'旧版と比較'};\n+const p = {title:'JASPICメール移行',url:'https://github.com/miyazaki1016/emergencyalert/pull/155',head:'a'.repeat(40)};\n+const prompt = handoffInstruction(t,p);\n+assert.match(prompt,/PR #155/);\n+assert.match(prompt,/実送信/);\n+assert.match(prompt,/作り直さない/);\n+assert.match(prompt,/owner-decision/);\n+assert.match(prompt,/head SHA/);\n+\"\"\"\n+with tempfile.TemporaryDirectory() as directory:\n+    path = Path(directory) / \"handoff.js\"\n+    path.write_text(handoff_functions + chr(10) + handoff_smoke, encoding=\"utf-8\")\n+    subprocess.run([\"node\", \"--check\", str(path)], check=True)\n+    subprocess.run([\"node\", str(path)], check=True)\n # The optional merge screen must also be self-contained and never leak source.\n merge_file = Path(\"docs/approval-dashboard/merge.html\")\n if merge_file.exists():\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/b25d13349b005da467ca654ecb166cc70e67dbc6/scripts/check_approval_dashboard.py",
+      "source": {
+        "path": "scripts/check_approval_dashboard.py",
+        "coverage": "全文",
+        "text": "#!/usr/bin/env python3\n\"\"\"Offline structural check of the static approval dashboard.\"\"\"\nfrom html.parser import HTMLParser\nfrom pathlib import Path\nimport subprocess\nimport tempfile\n\nclass Scripts(HTMLParser):\n    def __init__(self):\n        super().__init__()\n        self.in_script = False\n        self.scripts = []\n    def handle_starttag(self, tag, attrs):\n        if tag == \"script\":\n            self.in_script = True\n            self.scripts.append(\"\")\n    def handle_endtag(self, tag):\n        if tag == \"script\":\n            self.in_script = False\n    def handle_data(self, data):\n        if self.in_script:\n            self.scripts[-1] += data\n\nhtml = Path(\"docs/approval-dashboard/index.html\").read_text(encoding=\"utf-8\")\nparser = Scripts()\nparser.feed(html)\nassert len(parser.scripts) == 1, \"Exactly one inline script expected\"\nassert html.count(\"<script>\") == 1 and html.count(\"</script>\") == 1, \"Script tags must be balanced and unique\"\nassert html.rstrip().endswith(\"</script></body></html>\"), \"No content may leak after the closing HTML\"\nassert \"https://api.github.com/\" in html\nassert \"noopener noreferrer\" in html\nassert \"localStorage\" not in html and \"access_token\" not in html\nassert \"fetchRepo\" in parser.scripts[0]\nassert \"owner-decision\" in html and \"needs-owner-decision\" in html\nassert 'data-view=\"untriaged\"' in html\nassert \"判断してほしいこと\" in html and \"推奨と理由\" in html\nassert \"needsDecision(p)\" in parser.scripts[0]\nassert \"p.body||''\" in parser.scripts[0]\nassert \"eval(\" not in parser.scripts[0]\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / \"dashboard.js\"\n    path.write_text(parser.scripts[0], encoding=\"utf-8\")\n    subprocess.run([\"node\", \"--check\", str(path)], check=True)\n    # Run pure decision helpers against representative owner-approval PRs.\n    js = parser.scripts[0]\n    start = js.index(\"  const decisionLabels=\")\n    end = js.index(\"  const status=byId(\", start)\n    helpers = js[start:end]\n    smoke = r\"\"\"\nconst assert = require(\"node:assert/strict\");\nassert.equal(needsDecision({labels:[\"owner-decision\"]}), true);\nassert.equal(needsDecision({labels:[\"routine-maintenance\"]}), false);\nassert.equal(needsDecision({labels:[]}), false);\nconst body = [\"### 変更概要\",\"会話の表示を変更\",\"### 判断してほしいこと\",\"AかB\",\"### 推奨と理由\",\"Aが安全\"].join(String.fromCharCode(10));\nconst facts = decisionFacts({body});\nassert.equal(facts.summary, \"会話の表示を変更\");\nassert.equal(facts.question, \"AかB\");\nassert.equal(facts.recommendation, \"Aが安全\");\nassert.equal(decisionFacts({body:\"\"}).question, \"\");\n\"\"\"\n    path.write_text(helpers + chr(10) + smoke, encoding=\"utf-8\")\n    subprocess.run([\"node\", str(path)], check=True)\n# Handoff queue must contain exactly the existing 35 non-owner cases; never auto-merge.\nimport json\nhandoff = json.loads(Path(\"docs/approval-dashboard/handoff-queue.json\").read_text(encoding=\"utf-8\"))\ntasks = handoff[\"tasks\"]\nassert len(tasks) == 35, \"Expected 35 audited non-owner PRs in 2026-11-04 snapshot\"\nassert len({(t[\"repo\"], t[\"number\"]) for t in tasks}) == len(tasks), \"Duplicate handoffs\"\nassert all(t[\"repo\"] in (\"misaki\", \"emergencyalert\") for t in tasks)\nassert all(t[\"role\"] in (\"美咲担当ソラ\", \"アメふる担当ソラ\", \"棚卸し担当ソラ\") for t in tasks)\nassert not any(t[\"repo\"] == \"misaki\" and t[\"number\"] == 101 for t in tasks), \"Owner decision must remain separate\"\nassert \"handoff-queue.json\" in html and 'data-view=\"handoff\"' in html\nassert \"navigator.clipboard.writeText\" in html and \"自動で別チャットを起動\" in html\nassert \"handoffInstruction(\" in html and \"renderHandoffs(\" in html\nstart = js.index(\"  function handoffInstruction(\")\nend = js.index(\"  function render(){\", start)\nhandoff_functions = js[start:end]\nhandoff_smoke = r\"\"\"\nconst assert = require('node:assert/strict');\nconst t = {repo:'emergencyalert',number:155,role:'アメふる担当ソラ',state:'Draft',reason:'検証が必要',next:'旧版と比較'};\nconst p = {title:'JASPICメール移行',url:'https://github.com/miyazaki1016/emergencyalert/pull/155',head:'a'.repeat(40)};\nconst prompt = handoffInstruction(t,p);\nassert.match(prompt,/PR #155/);\nassert.match(prompt,/実送信/);\nassert.match(prompt,/作り直さない/);\nassert.match(prompt,/owner-decision/);\nassert.match(prompt,/head SHA/);\n\"\"\"\nwith tempfile.TemporaryDirectory() as directory:\n    path = Path(directory) / \"handoff.js\"\n    path.write_text(handoff_functions + chr(10) + handoff_smoke, encoding=\"utf-8\")\n    subprocess.run([\"node\", \"--check\", str(path)], check=True)\n    subprocess.run([\"node\", str(path)], check=True)\n# The optional merge screen must also be self-contained and never leak source.\nmerge_file = Path(\"docs/approval-dashboard/merge.html\")\nif merge_file.exists():\n    merge_html = merge_file.read_text(encoding=\"utf-8\")\n    assert merge_html.count(\"<script>\") == 1 and merge_html.count(\"</script>\") == 1\n    assert merge_html.rstrip().endswith(\"</script></main></body></html>\")\n    assert \"owner-merge-pkce-verifier\" in merge_html\n    assert \"APPROVAL_GITHUB_TOKEN\" not in merge_html\n    assert \"localStorage\" not in merge_html\n    parsed = Scripts()\n    parsed.feed(merge_html)\n    with tempfile.TemporaryDirectory() as directory:\n        path = Path(directory) / \"owner-merge.js\"\n        path.write_text(parsed.scripts[0], encoding=\"utf-8\")\n        subprocess.run([\"node\", \"--check\", str(path)], check=True)\n    config = Path(\"docs/approval-dashboard/merge-config.json\").read_text(encoding=\"utf-8\")\n    assert '\"enabled\": false' in config, \"Direct merge must remain disabled until verified\"\nprint(\"Dashboard structure and JavaScript syntax OK\")\n",
+        "sha256": "1214e2e07745bbb572e6c00c7d5ae5b10560d39f4afb640ec959fecde3eb9a0b"
+      }
+    }
+  ],
+  "file_count": 4,
+  "reported_file_count": 4,
+  "commits": [
+    {
+      "sha": "cd2566ad551725916c33cfb50b7c1ba60d76a6bf",
+      "message": "feat: curate 35 non-owner PR handoffs from audited triage\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/cd2566ad551725916c33cfb50b7c1ba60d76a6bf"
+    },
+    {
+      "sha": "15a9913be99247ca86163e5f6d647c519c53e521",
+      "message": "feat: add Solas' handoff queue with evidence-based copyable task instructions\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/15a9913be99247ca86163e5f6d647c519c53e521"
+    },
+    {
+      "sha": "8b2f71097ec6b7656044c1c0d16dc062aeceeac1",
+      "message": "test: verify handoff snapshot integrity and copyable prompt safety\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8b2f71097ec6b7656044c1c0d16dc062aeceeac1"
+    },
+    {
+      "sha": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+      "message": "docs: explain manual Solas handoff queue and live PR cross-check\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/b25d13349b005da467ca654ecb166cc70e67dbc6"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41949454890",
+      "id": 41949454890,
+      "updated_at": "2026-11-05T01:34:52Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41949330908",
+      "id": 41949330908,
+      "updated_at": "2026-11-05T01:33:43Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Approval dashboard (GitHub Pages)",
+      "head_sha": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41949330927",
+      "id": 41949330927,
+      "updated_at": "2026-11-05T01:33:44Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "b25d13349b005da467ca654ecb166cc70e67dbc6",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/41949330965",
+      "id": 41949330965,
+      "updated_at": "2026-11-05T01:34:25Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "Scripts",
+    "__init__",
+    "assert",
+    "body",
+    "decisionLabels",
+    "facts",
+    "handle_data",
+    "handle_endtag",
+    "handle_starttag",
+    "handoffInstruction",
+    "p",
+    "prompt",
+    "render",
+    "status",
+    "t"
+  ],
+  "related_sources": [
+    {
+      "path": "docs/approval-dashboard/OWNER_TRIAGE_20261104.md",
+      "coverage": "全文",
+      "text": "# 承認ボード：36件の既存PR一次仕分け（2026-11-04）\n\n対象: `miyazaki1016/misaki` と `miyazaki1016/emergencyalert` のオープンPR。GitHub APIのPR本文・Draft・ラベルを確認した**一次仕分け**であり、全差分・本番状態の最終安全監査ではない。詳細台帳と専用ブランチの既存証拠は保全する。\n\n## 結論\n\n- 36件のopen PR：美咲19件、アメふる17件。\n- **オーナーの具体的な判断依頼が書かれた案件：1件**（美咲 #101、`owner-decision` ラベルと「変更概要／判断してほしいこと／推奨と理由」を確認）。Draftのままで、マージ承認とは異なる。\n- **既存ルールに基づく管理・記録系の照合候補：3件**（美咲 #146、アメふる #147・#94）。機械的な安全ゲートと現行main重複確認が終わるまで自動マージ対象にしない。\n- **その他32件：開発側の調査・テスト・公開可否などの証拠確認が先**。この数字は「未実装」や「放置」の件数ではない。\n\n## 美咲：19件\n\n| PR | 状態 | 仕分け・理由 | 次の一手 |\n|---|---|---|---|\n| #151 チャット初期スクロール | Draft | 開発担当：読み込み速度の計測・iPhone Safari検証が未完了 | 計測と回帰、CIと実機を先に実施。オーナーに即時マージ判断を求めない |\n| #146 台帳更新事実 | Open | 管理作業：自動取得の事実欄 | 既存台帳との矛盾、想定外変更、CI、重複を安全ゲートで照合。自動マージは未承認 |\n| #101 記憶・想い出の公開資料 | Draft・**判断依頼** | **オーナー：一般公開する資料の範囲**。PRに専用ラベルと3項目あり | まず古い状態記述と公開範囲、同名 `docs/DEVELOPMENT_REGISTRY.md` が既存詳細台帳と混同されないかをレビュー。Draftは維持 |\n| #100 匿名24時間記憶設計 | Draft | 開発担当：設計のみで本番適用なし | 既存記憶仕様・移行安全性照合 |\n| #88 共通会話エンジン純粋アダプタ | Draft | 開発担当：段階抽出・CI・並行設計 #87 と整合 | 共通ルート・テスト採否を証拠で確認 |\n| #87 共通会話エンジン設計 | Draft | **将来の承認ゲートあり**：課金Gemini呼出しや本番投入にはオーナー承認必要。ただし現在は設計のみ | 具体的な実行計画・費用・品質検証が揃ったら判断依頼を起票 |\n| #86 会話ラボ | Draft | 開発担当：本番非接続の実験 | 既存実装とテストの重複を照合 |\n| #85 Interpreter中間成長案 | Draft | 開発担当：実Gemini A/B未実施、閾値は仮説 | 比較データを整えるまで採否判断を保留 |\n| #84 5軸成長方針資料 | Draft | 開発担当：既存の方針と記録の整合 | 主張の重複を調整 |\n| #83 関係性指示比較テスト | Draft | 開発担当：観測テスト | 現行のテスト・動作と比較 |\n| #81 canonical DB監査 | Draft | 開発担当：本番DB状態は未確認 | DB適用とソースの記録を分離 |\n| #80 マルチキャラRPC監査 | Draft | 開発担当：別PR #79ブランチがbase | #79と整合、ベース依存を確認 |\n| #79 マルチキャラデータスコープ | Draft | 開発担当：設計上の分離検討 | 既存RPC・権限・DB正本を再照合 |\n| #78 会話再生テスト | Draft | 開発担当：別作業ブランチがbase | 依存元・統合必要性を確認 |\n| #67 Relationship Identity | Draft | 開発担当：記憶・migration・本番状態に関わる | migrationと現行main・本番を別々に検証 |\n| #66 忘却制御 | Draft | 開発担当：データ削除・記憶の安全性に関わる | canonical transactionと回帰の証拠が先 |\n| #60 Relationship Engine設計資料 | Draft | 開発担当：文書のみ、歴史的経緯 | 総覧との重複を確認 |\n| #31 関係時間v2 | Draft | 開発担当：関係・感情・永続化の実装 | 本番コード・DB/移行との整合を確認 |\n| #30 maintenance/drain | Draft | **技術的BLOCKED** とPR本文に明記 | 旧接続の受付・COMMIT問題を修正するまでマージ禁止 |\n\n## アメふる：17件\n\n| PR | 状態 | 仕分け・理由 | 次の一手 |\n|---|---|---|---|\n| #155 JASPICメール移行 | Draft | **実メール送信禁止**。旧Windows版との互換検証中 | SMTP実送信・本番切替なしで互換・独立性を検証 |\n| #147 台帳更新事実 | Open | 管理作業：自動取得の事実欄 | 重複・変更範囲・CIを照合。自動マージ未導入 |\n| #109 大雨継続性研究 | Draft | 開発担当：本番通知非接続、保存上限・CI等のゲートが残る | 研究データと容量・稼働安全を確認。通知条件変更はしない |\n| #98 通知答え合わせ設計 | Draft | 開発担当：設計資料。後続に統合済み実装がある | 後続PRの成果と重複しないよう記録保全 |\n| #97 外部AIレビュー公開総覧 | Draft | **プレビュー限定・本番公開禁止** | 公開範囲の検証が先 |\n| #96 外部AIレビュー静的ページ | Draft | **プレビュー限定・本番公開禁止** | #97との重複・認証情報漏出の有無を確認 |\n| #95 雨接近メッセージ設計 | Draft | 開発担当：仕様と回帰条件、未実装 | 最新の通知方針と整合 |\n| #94 「降るよ」最優先の方針資料 | Open | 管理作業：既にユーザー確定の方針の記録 | 最新main総覧との重複と日付を検査してから文書統合可否を判定 |\n| #93 Push重複防止監査 | Draft | 開発担当：監査記録、本番変更なし | #104/#105以降の対策と重複しないよう保全 |\n| #88 通知見直し仕様 | Draft | 開発担当：仕様記録、本番なし | 既存仕様と統合できるか確認 |\n| #73 過去通知履歴の表示 | Draft | 開発担当：既存RLS・画面の回帰確認 | 最新履歴画面と差分比較 |\n| #63 通知履歴・フィードバック | Draft | **マージ禁止**とPR本文に明記。DB前提あり | 最新実装との差分、権限、DBゲートを先に検証 |\n| #62 JMA stride2計測 | Draft | 開発担当：研究・独立CI | 既存計測との重複チェック |\n| #61 LIVE JAPAN試作 | Draft | **将来のデザイン判断あり**。実データ未接続・実機プレビュー未検証 | 実機表示と画面説明を先に用意し、採否を1問で提示 |\n| #60 美咲連携API設計 | Draft | 開発担当：read-only API契約案、未実装 | 両リポジトリの契約を照合 |\n| #59 全国大雨スキャン | Open | **Production readiness: NO** とPR本文に明記。技術ゲート未完了 | 読取/DB/cron/Push接続・マージを止めて継続調査 |\n| #25 JMA実況のCIスモーク | Open | 開発担当：CI追加。既存のCI仕様との重複の可能性 | 現行CIと比較して必要性・安定性を判断 |\n\n## 承認ボードへの登録基準\n\n`owner-decision` ラベルは**今オーナーの選択が必要**で、PR本文の「変更概要」「判断してほしいこと」「推奨と理由」の3項目が証拠付きで書かれた場合だけ設定する。**CI失敗や技術的ブロッカーをオーナー判断で無理に突破させない。** 未整理・Draftは別タブに保持し、消去・無断クローズしない。\n\n現状の #101 は公開範囲の判断であり、Draft解除・即時マージの承認ではない。#87 の課金API、本番投入、#61 の画面方向性などは、判断に必要な材料が揃うまで担当側が準備する。\n\n本書の区分は管理用一次分類。個別PRのmain統合／本番反映／DB適用／実機確認は、裏付けがない限り未確認のまま扱う。\n",
+      "sha256": "37e19cacbb38dabd5900b13bd1ec61fef9460b03e2fb64932914f091cb3d1175"
+    },
+    {
+      "path": "docs/approval-dashboard/merge-config.json",
+      "coverage": "全文",
+      "text": "{\n  \"enabled\": false,\n  \"supabaseUrl\": \"\",\n  \"publishableKey\": \"\"\n}\n",
+      "sha256": "187d1b681530aca3866f005b04736a56491c436d7467d8509e630d01d01d8126"
+    }
+  ],
+  "curated": {
+    "summary": "担当AI向けにコピーできるPR作業指示一覧を表示",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/160"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "2f91cfa375bb98a2705214a156914897b73a1b18cb5db14c569803bda269a03d",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

@@ -1,0 +1,165 @@
+{
+  "id": "pr-17",
+  "number": 17,
+  "title": "iPhoneで直前のチャットが消える同期競合を修正する",
+  "topics": [
+    "記憶・会話",
+    "開発管理"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 変更内容\n- `ConversationHistorySync` がサーバーの古い履歴で新しいローカル履歴を上書きしないように修正\n- ローカル履歴がサーバー履歴の追記版なら、ローカル側を `/api/persona/history` へ同期\n- サーバー側が明確に新しい場合は従来通りローカルへ復元\n- 通信中にローカル履歴が変化した場合は何も上書きせず次回同期へ回す\n\n## 背景\n本番 `misaki38-ai.com` のiPhoneで、送信直後は表示されるユーザー発言と美咲の返答が、返答タイミング付近で消える現象を確認。`conversation-history-sync.tsx` が5秒ごとにサーバー履歴を取得し、ローカルのほうが新しい場合でもサーバーの古い履歴で `localStorage` を上書きして `window.location.reload()` していたため、直前の会話が巻き戻っていました。\n\n## 非変更範囲\n- チャット生成内容\n- 感情・行動エンジン\n- Body Clock\n- 利用回数\n- 匿名→メール保存の基本ルール\n",
+  "snapshot_head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+  "snapshot_consistent": true,
+  "head": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+  "base": "0042df16070a6f2cf6544363be3ee7cda02d5fbf",
+  "base_ref": "main",
+  "head_ref": "fix/preserve-active-chat-history",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-17T15:58:10Z",
+  "merge_commit_sha": "9690509c220eceb542834b0397dee8519d1d4bc3",
+  "updated_at": "2026-09-17T15:58:10Z",
+  "code_facts": [
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "function historyIsPrefix(prefix: ChatMessage[], history: ChatMessage[]) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (prefix.length > history.length) return false;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "関数・クラス定義",
+      "expression": "async function pushServerState(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "HTTP要求",
+      "expression": "const response = await fetch(\"/api/persona/history\", {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!response.ok) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!historyChanged && !memoryChanged) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "条件分岐・閾値",
+      "expression": "if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    },
+    {
+      "file": "app/chat/conversation-history-sync.tsx",
+      "kind": "テストの期待値・条件",
+      "expression": "// If the server has a strictly newer append-only history, restore it locally.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx"
+    }
+  ],
+  "files": [
+    {
+      "path": "app/chat/conversation-history-sync.tsx",
+      "status": "modified",
+      "additions": 59,
+      "deletions": 0,
+      "patch": "diff --git a/app/chat/conversation-history-sync.tsx b/app/chat/conversation-history-sync.tsx\nindex 879d659..cdedb68 100644\n--- a/app/chat/conversation-history-sync.tsx\n+++ b/app/chat/conversation-history-sync.tsx\n@@ -69,6 +69,11 @@ function arraysEqual(a: unknown[], b: unknown[]) {\n   return JSON.stringify(a) === JSON.stringify(b);\n }\n \n+function historyIsPrefix(prefix: ChatMessage[], history: ChatMessage[]) {\n+  if (prefix.length > history.length) return false;\n+  return arraysEqual(prefix, history.slice(0, prefix.length));\n+}\n+\n async function fetchServerState(token: string): Promise<ServerState> {\n   const response = await fetch(\"/api/persona/history\", {\n     headers: { Authorization: `Bearer ${token}` },\n@@ -82,6 +87,25 @@ async function fetchServerState(token: string): Promise<ServerState> {\n   return state;\n }\n \n+async function pushServerState(\n+  token: string,\n+  history: ChatMessage[],\n+  memory: string[]\n+) {\n+  const response = await fetch(\"/api/persona/history\", {\n+    method: \"POST\",\n+    headers: {\n+      Authorization: `Bearer ${token}`,\n+      \"Content-Type\": \"application/json\",\n+    },\n+    body: JSON.stringify({ history, memory }),\n+  });\n+\n+  if (!response.ok) {\n+    throw new Error(\"Conversation state sync failed.\");\n+  }\n+}\n+\n export default function ConversationHistorySync() {\n   useEffect(() => {\n     let stopped = false;\n@@ -117,7 +141,10 @@ export default function ConversationHistorySync() {\n         const { data: latest } = await supabase.auth.getSession();\n         if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||\n             localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n+\n         // A chat response may have arrived while the server request was in flight.\n+        // In that case the snapshot we started with is stale, so leave both sides alone\n+        // and let the next sync operate on the newest local conversation.\n         if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||\n             !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;\n \n@@ -126,6 +153,38 @@ export default function ConversationHistorySync() {\n         const historyChanged = !arraysEqual(localHistory, serverHistory);\n         const memoryChanged = !arraysEqual(localMemory, serverMemory);\n \n+        if (!historyChanged && !memoryChanged) {\n+          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n+            localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n+          }\n+          return;\n+        }\n+\n+        // Chat messages are append-only. When the local history is a strict extension\n+        // of the server snapshot, the user has sent or just received newer messages on\n+        // this device. Push that newer snapshot instead of overwriting localStorage with\n+        // the older server copy. This prevents iPhone/Safari from reloading and making\n+        // the just-sent user message and Misaki reply disappear.\n+        const localExtendsServer = historyIsPrefix(serverHistory, localHistory);\n+        if (\n+          localHistory.length > serverHistory.length &&\n+          localExtendsServer\n+        ) {\n+          await pushServerState(\n+            session.access_token,\n+            localHistory,\n+            localMemory\n+          );\n+\n+          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n+            localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n+          }\n+          return;\n+        }\n+\n+        // If the server has a strictly newer append-only history, restore it locally.\n+        // Diverged/same-length histories keep the existing server-authoritative fallback\n+        // used by account handoff so we do not merge unrelated device caches silently.\n         localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));\n         localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));\n         if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08/app/chat/conversation-history-sync.tsx",
+      "source": {
+        "path": "app/chat/conversation-history-sync.tsx",
+        "coverage": "全文",
+        "text": "\"use client\";\n\nimport { useEffect } from \"react\";\nimport { supabase } from \"../../lib/supabase\";\nimport { DEVICE_USER_KEY, EMAIL_SAVE_USER_KEY } from \"../../lib/device-conversation\";\n\nconst CHAT_HISTORY_KEY = \"misaki-chat-history\";\nconst LONG_MEMORY_KEY = \"misaki-long-term-memory\";\nconst SYNC_INTERVAL_MS = 5_000;\n\ntype ChatMessage = {\n  role: \"user\" | \"misaki\";\n  text: string;\n  sentAt?: string;\n};\n\ntype ServerState = {\n  exists?: boolean;\n  history?: unknown;\n  memory?: unknown;\n};\n\nfunction readJsonArray(key: string): unknown[] {\n  try {\n    const raw = localStorage.getItem(key);\n    if (!raw) return [];\n    const parsed = JSON.parse(raw);\n    return Array.isArray(parsed) ? parsed : [];\n  } catch {\n    return [];\n  }\n}\n\nfunction sanitizeHistory(value: unknown): ChatMessage[] {\n  if (!Array.isArray(value)) return [];\n  return value\n    .filter(\n      (item): item is ChatMessage =>\n        Boolean(\n          item &&\n            typeof item === \"object\" &&\n            ((item as ChatMessage).role === \"user\" ||\n              (item as ChatMessage).role === \"misaki\") &&\n            typeof (item as ChatMessage).text === \"string\" &&\n            (item as ChatMessage).text.trim()\n        )\n    )\n    .map((item) => ({\n      role: item.role,\n      text: item.text.trim().slice(0, 2000),\n      ...(typeof item.sentAt === \"string\" &&\n      Number.isFinite(new Date(item.sentAt).getTime())\n        ? { sentAt: new Date(item.sentAt).toISOString() }\n        : {}),\n    }))\n    .slice(-60);\n}\n\nfunction sanitizeMemory(value: unknown): string[] {\n  if (!Array.isArray(value)) return [];\n  return value\n    .filter((item): item is string => typeof item === \"string\")\n    .map((item) => item.trim().slice(0, 500))\n    .filter(Boolean)\n    .slice(-30);\n}\n\nfunction arraysEqual(a: unknown[], b: unknown[]) {\n  return JSON.stringify(a) === JSON.stringify(b);\n}\n\nfunction historyIsPrefix(prefix: ChatMessage[], history: ChatMessage[]) {\n  if (prefix.length > history.length) return false;\n  return arraysEqual(prefix, history.slice(0, prefix.length));\n}\n\nasync function fetchServerState(token: string): Promise<ServerState> {\n  const response = await fetch(\"/api/persona/history\", {\n    headers: { Authorization: `Bearer ${token}` },\n    cache: \"no-store\",\n  });\n  if (!response.ok) throw new Error(\"Conversation state load failed.\");\n  const state = await response.json();\n  if (!state || typeof state.exists !== \"boolean\" || !Array.isArray(state.history) || !Array.isArray(state.memory)) {\n    throw new Error(\"Invalid conversation state response.\");\n  }\n  return state;\n}\n\nasync function pushServerState(\n  token: string,\n  history: ChatMessage[],\n  memory: string[]\n) {\n  const response = await fetch(\"/api/persona/history\", {\n    method: \"POST\",\n    headers: {\n      Authorization: `Bearer ${token}`,\n      \"Content-Type\": \"application/json\",\n    },\n    body: JSON.stringify({ history, memory }),\n  });\n\n  if (!response.ok) {\n    throw new Error(\"Conversation state sync failed.\");\n  }\n}\n\nexport default function ConversationHistorySync() {\n  useEffect(() => {\n    let stopped = false;\n    let syncing = false;\n\n    const sync = async () => {\n      if (stopped || syncing) return;\n      syncing = true;\n\n      try {\n        const { data, error } = await supabase.auth.getSession();\n        if (error) throw error;\n\n        const session = data.session;\n\n        // 匿名利用中は会話・記憶をSupabaseへ永続化しない。\n        // ブラウザ内の一時データだけで会話を続ける。\n        if (!session?.access_token || !session.user || session.user.is_anonymous) {\n          return;\n        }\n        const userId = session.user.id;\n        if (localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n\n        const localHistory = sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY));\n        const localMemory = sanitizeMemory(readJsonArray(LONG_MEMORY_KEY));\n        const serverState = await fetchServerState(session.access_token);\n        if (!serverState.exists && localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n          throw new Error(\"Saved conversation state is missing.\");\n        }\n\n        // Email save already persisted the snapshot before sending confirmation.\n        // Never bootstrap a signed-in account from unqualified device caches.\n        const { data: latest } = await supabase.auth.getSession();\n        if (stopped || latest.session?.user.id !== userId || latest.session.user.is_anonymous ||\n            localStorage.getItem(DEVICE_USER_KEY) !== userId) return;\n\n        // A chat response may have arrived while the server request was in flight.\n        // In that case the snapshot we started with is stale, so leave both sides alone\n        // and let the next sync operate on the newest local conversation.\n        if (!arraysEqual(localHistory, sanitizeHistory(readJsonArray(CHAT_HISTORY_KEY))) ||\n            !arraysEqual(localMemory, sanitizeMemory(readJsonArray(LONG_MEMORY_KEY)))) return;\n\n        const serverHistory = sanitizeHistory(serverState.history);\n        const serverMemory = sanitizeMemory(serverState.memory);\n        const historyChanged = !arraysEqual(localHistory, serverHistory);\n        const memoryChanged = !arraysEqual(localMemory, serverMemory);\n\n        if (!historyChanged && !memoryChanged) {\n          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n            localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n          }\n          return;\n        }\n\n        // Chat messages are append-only. When the local history is a strict extension\n        // of the server snapshot, the user has sent or just received newer messages on\n        // this device. Push that newer snapshot instead of overwriting localStorage with\n        // the older server copy. This prevents iPhone/Safari from reloading and making\n        // the just-sent user message and Misaki reply disappear.\n        const localExtendsServer = historyIsPrefix(serverHistory, localHistory);\n        if (\n          localHistory.length > serverHistory.length &&\n          localExtendsServer\n        ) {\n          await pushServerState(\n            session.access_token,\n            localHistory,\n            localMemory\n          );\n\n          if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) {\n            localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n          }\n          return;\n        }\n\n        // If the server has a strictly newer append-only history, restore it locally.\n        // Diverged/same-length histories keep the existing server-authoritative fallback\n        // used by account handoff so we do not merge unrelated device caches silently.\n        localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(serverHistory));\n        localStorage.setItem(LONG_MEMORY_KEY, JSON.stringify(serverMemory));\n        if (localStorage.getItem(EMAIL_SAVE_USER_KEY) === userId) localStorage.removeItem(EMAIL_SAVE_USER_KEY);\n\n        if ((historyChanged || memoryChanged) && !stopped) {\n          window.location.reload();\n        }\n      } catch (error) {\n        console.error(\"CONVERSATION HISTORY SYNC ERROR:\", error);\n      } finally {\n        syncing = false;\n      }\n    };\n\n    void sync();\n    const intervalId = window.setInterval(() => void sync(), SYNC_INTERVAL_MS);\n    const handleVisibility = () => {\n      if (document.visibilityState === \"visible\") void sync();\n    };\n\n    window.addEventListener(\"focus\", sync);\n    document.addEventListener(\"visibilitychange\", handleVisibility);\n\n    const { data: authListener } = supabase.auth.onAuthStateChange(() => {\n      window.setTimeout(() => void sync(), 100);\n    });\n\n    return () => {\n      stopped = true;\n      window.clearInterval(intervalId);\n      window.removeEventListener(\"focus\", sync);\n      document.removeEventListener(\"visibilitychange\", handleVisibility);\n      authListener.subscription.unsubscribe();\n    };\n  }, []);\n\n  return null;\n}\n",
+        "sha256": "87b14b19bcddac3e674e93f86b0e7991645842c1c9188c3c19fe84123d43ea56"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "9bfa64985c390c0f2e0276d4e5b45c9071e4fb08",
+      "message": "Preserve newer local chat history during sync\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9bfa64985c390c0f2e0276d4e5b45c9071e4fb08"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "CHAT_HISTORY_KEY",
+    "ConversationHistorySync",
+    "LONG_MEMORY_KEY",
+    "SYNC_INTERVAL_MS",
+    "arraysEqual",
+    "fetchServerState",
+    "handleVisibility",
+    "historyChanged",
+    "historyIsPrefix",
+    "intervalId",
+    "localExtendsServer",
+    "localHistory",
+    "localMemory",
+    "memoryChanged",
+    "parsed",
+    "pushServerState",
+    "raw",
+    "readJsonArray",
+    "response",
+    "sanitizeHistory",
+    "sanitizeMemory",
+    "serverHistory",
+    "serverMemory",
+    "serverState",
+    "session",
+    "state",
+    "stopped",
+    "sync",
+    "syncing",
+    "the",
+    "userId"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "iPhoneで直前のチャットが消える同期競合を修正する",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/17"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "dd02ba27dc0e79c1a7a1ef448155c0af93d4fe83bbe86f94486a0f94565ac5cd",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

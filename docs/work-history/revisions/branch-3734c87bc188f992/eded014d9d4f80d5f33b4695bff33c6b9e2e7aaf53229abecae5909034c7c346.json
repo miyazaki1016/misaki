@@ -1,0 +1,20 @@
+{
+  "id": "branch-3734c87bc188f992",
+  "title": "sora/relationship-analyzer-stage-diagnostics",
+  "head": "0907d2ff24f6a584c032ece54f9289954ccbeb63",
+  "head_ref": "sora/relationship-analyzer-stage-diagnostics",
+  "linked_prs": [
+    54
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "03fec6d6c29283126828f0cf1ffa2d268ff6e8febe9d6e2468489fbee72b6414",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

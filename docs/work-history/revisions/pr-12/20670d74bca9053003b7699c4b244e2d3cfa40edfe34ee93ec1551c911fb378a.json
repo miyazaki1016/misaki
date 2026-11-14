@@ -1,0 +1,244 @@
+{
+  "id": "pr-12",
+  "number": 12,
+  "title": "自発メッセージの表現タグを感情・行動判断から派生させる",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## 変更内容\n- `ProactiveDecisionContext` に派生 `tags` を追加\n- emotion / action / direction / timeBand / lifeConfidence から表現タグを一意に生成\n- Body Clock のメッセージ生成ガイドと写真選定が同じ派生タグを共有\n- 写真選定の本文キーワード推定をやめ、decision context を親に統一\n\n## 目的\n旧タグロジックと新しい感情・行動エンジンの二重判断をなくし、\n`関係状態 → 感情・行動 → direction → 派生タグ → 文面・写真`\nの一本の因果に揃えます。\n\n## 非変更範囲\n- チャット側の会話・記憶・利用回数・認証ロジック\n- Body Clock の送信間隔・送信可否ゲート\n- 写真添付率（34%）\n- 既存の写真ファイル\n",
+  "snapshot_head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+  "snapshot_consistent": true,
+  "head": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+  "base": "a21673390a45cc96565ed64ed22d2e0f33d05acd",
+  "base_ref": "main",
+  "head_ref": "feature/proactive-derived-tags",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-09-17T13:49:46Z",
+  "merge_commit_sha": "47a616db7641ff3a9d30a2ffaec905349b8c6ed7",
+  "updated_at": "2026-09-17T13:49:47Z",
+  "code_facts": [
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function timeBand(last?: string | null): ProactiveDecisionContext[\"timeBand\"] {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!last) return \"unknown\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (hours < 6) return \"recent\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (hours < 24) return \"same_day\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (hours < 72) return \"one_to_three_days\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (hours < 168) return \"three_to_seven_days\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function action(value: unknown): RelationshipAction {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function emotion(value: unknown): RelationshipEmotion {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function direction(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (currentEmotion === \"concerned\" && life.confidence === \"explicit\") return \"USER\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (currentAction === \"RECONNECT\" || currentAction === \"CHASE\") return \"MISAKI_TO_USER\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (currentAction === \"TEASE\" || currentEmotion === \"happy\") return \"US\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-photo.ts",
+      "kind": "関数・クラス定義",
+      "expression": "function scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-photo.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (target < weight) return photo;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-photo.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!candidates.length) return null;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-photo.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (bestScore > 0) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    },
+    {
+      "file": "supabase/functions/body-clock/proactive-photo.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function getMisakiPhotoCatalog() {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "supabase/functions/body-clock/proactive-decision.ts",
+      "status": "modified",
+      "additions": 202,
+      "deletions": 12,
+      "patch": "diff --git a/supabase/functions/body-clock/proactive-decision.ts b/supabase/functions/body-clock/proactive-decision.ts\nindex 70e46d7..9ae1d8f 100644\n--- a/supabase/functions/body-clock/proactive-decision.ts\n+++ b/supabase/functions/body-clock/proactive-decision.ts\n@@ -4,17 +4,207 @@ import type { ProactiveLifeContext } from \"./proactive-life-context.ts\";\n export type ProactiveDirection = \"MISAKI\" | \"USER\" | \"US\" | \"MISAKI_TO_USER\" | \"MISAKI_TO_US\";\n export type RelationshipAction = \"NORMAL\" | \"WAIT\" | \"TEASE\" | \"SULK\" | \"CHASE\" | \"PULL\" | \"RECONNECT\";\n export type RelationshipEmotion = \"neutral\" | \"happy\" | \"lonely\" | \"sulky\" | \"concerned\" | \"affectionate\";\n+export type ProactiveExpressionTag =\n+  | \"soft\"\n+  | \"cheerful\"\n+  | \"calm\"\n+  | \"romantic\"\n+  | \"sleepy\"\n+  | \"casual\"\n+  | \"affectionate\"\n+  | \"miss_you\"\n+  | \"relax\"\n+  | \"playful\"\n+  | \"encouraging\"\n+  | \"check_in\";\n+\n export type ProactiveDecisionContext = {\n-  shouldSend: true; reason: \"claimed_after_relationship_action_gate\"; direction: ProactiveDirection;\n-  action: RelationshipAction; emotion: RelationshipEmotion; emotionIntensity: number; intimacyLevel: number;\n-  relationshipPoints: number; timeBand: \"recent\"|\"same_day\"|\"one_to_three_days\"|\"three_to_seven_days\"|\"seven_plus_days\"|\"unknown\";\n-  situation: string; plan: string; lifeEvidence: string[]; lifeConfidence: \"none\"|\"explicit\";\n+  shouldSend: true;\n+  reason: \"claimed_after_relationship_action_gate\";\n+  direction: ProactiveDirection;\n+  action: RelationshipAction;\n+  emotion: RelationshipEmotion;\n+  emotionIntensity: number;\n+  intimacyLevel: number;\n+  relationshipPoints: number;\n+  timeBand: \"recent\" | \"same_day\" | \"one_to_three_days\" | \"three_to_seven_days\" | \"seven_plus_days\" | \"unknown\";\n+  situation: string;\n+  plan: string;\n+  lifeEvidence: string[];\n+  lifeConfidence: \"none\" | \"explicit\";\n+  tags: ProactiveExpressionTag[];\n+};\n+\n+type RelationshipRow = {\n+  intimacy_level?: number | null;\n+  emotion_state?: { primary?: string; intensity?: number } | null;\n+  action_state?: string | null;\n+  last_interaction_at?: string | null;\n };\n-type RelationshipRow={intimacy_level?:number|null;emotion_state?:{primary?:string;intensity?:number}|null;action_state?:string|null;last_interaction_at?:string|null};\n-const clamp=(v:number,min:number,max:number)=>Math.max(min,Math.min(max,v));\n-function timeBand(last?:string|null):ProactiveDecisionContext[\"timeBand\"]{if(!last)return\"unknown\";const h=Math.max(0,(Date.now()-new Date(last).getTime())/3600000);if(h<6)return\"recent\";if(h<24)return\"same_day\";if(h<72)return\"one_to_three_days\";if(h<168)return\"three_to_seven_days\";return\"seven_plus_days\"}\n-function action(v:unknown):RelationshipAction{const a=String(v||\"NORMAL\").toUpperCase();return [\"NORMAL\",\"WAIT\",\"TEASE\",\"SULK\",\"CHASE\",\"PULL\",\"RECONNECT\"].includes(a)?a as RelationshipAction:\"NORMAL\"}\n-function emotion(v:unknown):RelationshipEmotion{const e=String(v||\"neutral\").toLowerCase();return [\"neutral\",\"happy\",\"lonely\",\"sulky\",\"concerned\",\"affectionate\"].includes(e)?e as RelationshipEmotion:\"neutral\"}\n-function direction(a:RelationshipAction,e:RelationshipEmotion,life:ProactiveLifeContext):ProactiveDirection{if(e===\"concerned\"&&life.confidence===\"explicit\")return\"USER\";if(a===\"RECONNECT\"||a===\"CHASE\")return\"MISAKI_TO_USER\";if(a===\"TEASE\"||e===\"happy\")return\"US\";if(e===\"affectionate\")return\"MISAKI_TO_US\";return\"MISAKI\"}\n-export async function buildProactiveDecisionContext(s:SupabaseClient,userId:string,points:number,life:ProactiveLifeContext):Promise<ProactiveDecisionContext>{const{data,error}=await s.from(\"misaki_relationship_state\").select(\"intimacy_level,emotion_state,action_state,last_interaction_at\").eq(\"user_id\",userId).maybeSingle();if(error)throw error;const r=(data||{})as RelationshipRow,a=action(r.action_state),e=emotion(r.emotion_state?.primary);return{shouldSend:true,reason:\"claimed_after_relationship_action_gate\",direction:direction(a,e,life),action:a,emotion:e,emotionIntensity:clamp(Number(r.emotion_state?.intensity)||0,0,100),intimacyLevel:Math.max(0,Number(r.intimacy_level)||0),relationshipPoints:Math.max(0,points),timeBand:timeBand(r.last_interaction_at),situation:life.situation,plan:life.plan,lifeEvidence:life.evidence,lifeConfidence:life.confidence}}\n-export function createProactiveDecisionGuide(c:ProactiveDecisionContext){return `【今回の自発行動コンテキスト】\\n方向: ${c.direction}\\n感情: ${c.emotion}（強さ ${c.emotionIntensity}）\\n行動傾向: ${c.action}\\n親密度: ${c.intimacyLevel}\\n関係時間帯: ${c.timeBand}\\n生活根拠の確度: ${c.lifeConfidence}\\n\\nこのコンテキストは文章と写真の共通の原因です。\\n・方向と感情を返事の温度へ自然ににじませる\\n・タグ名や内部状態を本文に書かない\\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`}\n+\n+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));\n+\n+function timeBand(last?: string | null): ProactiveDecisionContext[\"timeBand\"] {\n+  if (!last) return \"unknown\";\n+  const hours = Math.max(0, (Date.now() - new Date(last).getTime()) / 3600000);\n+  if (hours < 6) return \"recent\";\n+  if (hours < 24) return \"same_day\";\n+  if (hours < 72) return \"one_to_three_days\";\n+  if (hours < 168) return \"three_to_seven_days\";\n+  return \"seven_plus_days\";\n+}\n+\n+function action(value: unknown): RelationshipAction {\n+  const normalized = String(value || \"NORMAL\").toUpperCase();\n+  return [\"NORMAL\", \"WAIT\", \"TEASE\", \"SULK\", \"CHASE\", \"PULL\", \"RECONNECT\"].includes(normalized)\n+    ? normalized as RelationshipAction\n+    : \"NORMAL\";\n+}\n+\n+function emotion(value: unknown): RelationshipEmotion {\n+  const normalized = String(value || \"neutral\").toLowerCase();\n+  return [\"neutral\", \"happy\", \"lonely\", \"sulky\", \"concerned\", \"affectionate\"].includes(normalized)\n+    ? normalized as RelationshipEmotion\n+    : \"neutral\";\n+}\n+\n+function direction(\n+  currentAction: RelationshipAction,\n+  currentEmotion: RelationshipEmotion,\n+  life: ProactiveLifeContext\n+): ProactiveDirection {\n+  if (currentEmotion === \"concerned\" && life.confidence === \"explicit\") return \"USER\";\n+  if (currentAction === \"RECONNECT\" || currentAction === \"CHASE\") return \"MISAKI_TO_USER\";\n+  if (currentAction === \"TEASE\" || currentEmotion === \"happy\") return \"US\";\n+  if (currentEmotion === \"affectionate\") return \"MISAKI_TO_US\";\n+  return \"MISAKI\";\n+}\n+\n+export function deriveProactiveTags(input: {\n+  direction: ProactiveDirection;\n+  action: RelationshipAction;\n+  emotion: RelationshipEmotion;\n+  timeBand: ProactiveDecisionContext[\"timeBand\"];\n+  lifeConfidence: ProactiveDecisionContext[\"lifeConfidence\"];\n+}): ProactiveExpressionTag[] {\n+  const tags = new Set<ProactiveExpressionTag>();\n+\n+  switch (input.emotion) {\n+    case \"happy\":\n+      tags.add(\"cheerful\");\n+      break;\n+    case \"lonely\":\n+      tags.add(\"miss_you\");\n+      tags.add(\"romantic\");\n+      break;\n+    case \"sulky\":\n+      tags.add(\"soft\");\n+      tags.add(\"calm\");\n+      break;\n+    case \"concerned\":\n+      tags.add(\"soft\");\n+      tags.add(\"check_in\");\n+      tags.add(\"encouraging\");\n+      break;\n+    case \"affectionate\":\n+      tags.add(\"affectionate\");\n+      tags.add(\"romantic\");\n+      break;\n+    default:\n+      tags.add(\"soft\");\n+  }\n+\n+  switch (input.action) {\n+    case \"TEASE\":\n+      tags.add(\"playful\");\n+      tags.add(\"cheerful\");\n+      break;\n+    case \"CHASE\":\n+      tags.add(\"miss_you\");\n+      tags.add(\"check_in\");\n+      break;\n+    case \"RECONNECT\":\n+      tags.add(\"miss_you\");\n+      tags.add(\"check_in\");\n+      tags.add(\"soft\");\n+      break;\n+    case \"WAIT\":\n+    case \"PULL\":\n+      tags.add(\"calm\");\n+      tags.add(\"soft\");\n+      break;\n+    case \"SULK\":\n+      tags.add(\"calm\");\n+      tags.add(\"soft\");\n+      break;\n+    default:\n+      tags.add(\"casual\");\n+  }\n+\n+  if (input.direction === \"USER\" || input.direction === \"MISAKI_TO_USER\") {\n+    tags.add(\"check_in\");\n+  }\n+\n+  if (input.direction === \"MISAKI_TO_US\") {\n+    tags.add(\"affectionate\");\n+  }\n+\n+  if (input.timeBand === \"seven_plus_days\") {\n+    tags.add(\"miss_you\");\n+  }\n+\n+  if (input.lifeConfidence === \"explicit\" && input.direction === \"USER\") {\n+    tags.add(\"encouraging\");\n+  }\n+\n+  return [...tags];\n+}\n+\n+export async function buildProactiveDecisionContext(\n+  supabase: SupabaseClient,\n+  userId: string,\n+  points: number,\n+  life: ProactiveLifeContext\n+): Promise<ProactiveDecisionContext> {\n+  const { data, error } = await supabase\n+    .from(\"misaki_relationship_state\")\n+    .select(\"intimacy_level,emotion_state,action_state,last_interaction_at\")\n+    .eq(\"user_id\", userId)\n+    .maybeSingle();\n+\n+  if (error) throw error;\n+\n+  const row = (data || {}) as RelationshipRow;\n+  const currentAction = action(row.action_state);\n+  const currentEmotion = emotion(row.emotion_state?.primary);\n+  const currentTimeBand = timeBand(row.last_interaction_at);\n+  const currentDirection = direction(currentAction, currentEmotion, life);\n+  const tags = deriveProactiveTags({\n+    direction: currentDirection,\n+    action: currentAction,\n+    emotion: currentEmotion,\n+    timeBand: currentTimeBand,\n+    lifeConfidence: life.confidence,\n+  });\n+\n+  return {\n+    shouldSend: true,\n+    reason: \"claimed_after_relationship_action_gate\",\n+    direction: currentDirection,\n+    action: currentAction,\n+    emotion: currentEmotion,\n+    emotionIntensity: clamp(Number(row.emotion_state?.intensity) || 0, 0, 100),\n+    intimacyLevel: Math.max(0, Number(row.intimacy_level) || 0),\n+    relationshipPoints: Math.max(0, points),\n+    timeBand: currentTimeBand,\n+    situation: life.situation,\n+    plan: life.plan,\n+    lifeEvidence: life.evidence,\n+    lifeConfidence: life.confidence,\n+    tags,\n+  };\n+}\n+\n+export function createProactiveDecisionGuide(context: ProactiveDecisionContext) {\n+  return `【今回の自発行動コンテキスト】\\n方向: ${context.direction}\\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\\n行動傾向: ${context.action}\\n親密度: ${context.intimacyLevel}\\n関係時間帯: ${context.timeBand}\\n生活根拠の確度: ${context.lifeConfidence}\\n表現タグ: ${context.tags.join(\", \")}\\n\\nこのコンテキストは文章と写真の共通の原因です。\\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\\n・タグ名や内部状態を本文に書かない\\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`;\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-decision.ts",
+      "source": {
+        "path": "supabase/functions/body-clock/proactive-decision.ts",
+        "coverage": "全文",
+        "text": "import type { SupabaseClient } from \"npm:@supabase/supabase-js@2.57.4\";\nimport type { ProactiveLifeContext } from \"./proactive-life-context.ts\";\n\nexport type ProactiveDirection = \"MISAKI\" | \"USER\" | \"US\" | \"MISAKI_TO_USER\" | \"MISAKI_TO_US\";\nexport type RelationshipAction = \"NORMAL\" | \"WAIT\" | \"TEASE\" | \"SULK\" | \"CHASE\" | \"PULL\" | \"RECONNECT\";\nexport type RelationshipEmotion = \"neutral\" | \"happy\" | \"lonely\" | \"sulky\" | \"concerned\" | \"affectionate\";\nexport type ProactiveExpressionTag =\n  | \"soft\"\n  | \"cheerful\"\n  | \"calm\"\n  | \"romantic\"\n  | \"sleepy\"\n  | \"casual\"\n  | \"affectionate\"\n  | \"miss_you\"\n  | \"relax\"\n  | \"playful\"\n  | \"encouraging\"\n  | \"check_in\";\n\nexport type ProactiveDecisionContext = {\n  shouldSend: true;\n  reason: \"claimed_after_relationship_action_gate\";\n  direction: ProactiveDirection;\n  action: RelationshipAction;\n  emotion: RelationshipEmotion;\n  emotionIntensity: number;\n  intimacyLevel: number;\n  relationshipPoints: number;\n  timeBand: \"recent\" | \"same_day\" | \"one_to_three_days\" | \"three_to_seven_days\" | \"seven_plus_days\" | \"unknown\";\n  situation: string;\n  plan: string;\n  lifeEvidence: string[];\n  lifeConfidence: \"none\" | \"explicit\";\n  tags: ProactiveExpressionTag[];\n};\n\ntype RelationshipRow = {\n  intimacy_level?: number | null;\n  emotion_state?: { primary?: string; intensity?: number } | null;\n  action_state?: string | null;\n  last_interaction_at?: string | null;\n};\n\nconst clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));\n\nfunction timeBand(last?: string | null): ProactiveDecisionContext[\"timeBand\"] {\n  if (!last) return \"unknown\";\n  const hours = Math.max(0, (Date.now() - new Date(last).getTime()) / 3600000);\n  if (hours < 6) return \"recent\";\n  if (hours < 24) return \"same_day\";\n  if (hours < 72) return \"one_to_three_days\";\n  if (hours < 168) return \"three_to_seven_days\";\n  return \"seven_plus_days\";\n}\n\nfunction action(value: unknown): RelationshipAction {\n  const normalized = String(value || \"NORMAL\").toUpperCase();\n  return [\"NORMAL\", \"WAIT\", \"TEASE\", \"SULK\", \"CHASE\", \"PULL\", \"RECONNECT\"].includes(normalized)\n    ? normalized as RelationshipAction\n    : \"NORMAL\";\n}\n\nfunction emotion(value: unknown): RelationshipEmotion {\n  const normalized = String(value || \"neutral\").toLowerCase();\n  return [\"neutral\", \"happy\", \"lonely\", \"sulky\", \"concerned\", \"affectionate\"].includes(normalized)\n    ? normalized as RelationshipEmotion\n    : \"neutral\";\n}\n\nfunction direction(\n  currentAction: RelationshipAction,\n  currentEmotion: RelationshipEmotion,\n  life: ProactiveLifeContext\n): ProactiveDirection {\n  if (currentEmotion === \"concerned\" && life.confidence === \"explicit\") return \"USER\";\n  if (currentAction === \"RECONNECT\" || currentAction === \"CHASE\") return \"MISAKI_TO_USER\";\n  if (currentAction === \"TEASE\" || currentEmotion === \"happy\") return \"US\";\n  if (currentEmotion === \"affectionate\") return \"MISAKI_TO_US\";\n  return \"MISAKI\";\n}\n\nexport function deriveProactiveTags(input: {\n  direction: ProactiveDirection;\n  action: RelationshipAction;\n  emotion: RelationshipEmotion;\n  timeBand: ProactiveDecisionContext[\"timeBand\"];\n  lifeConfidence: ProactiveDecisionContext[\"lifeConfidence\"];\n}): ProactiveExpressionTag[] {\n  const tags = new Set<ProactiveExpressionTag>();\n\n  switch (input.emotion) {\n    case \"happy\":\n      tags.add(\"cheerful\");\n      break;\n    case \"lonely\":\n      tags.add(\"miss_you\");\n      tags.add(\"romantic\");\n      break;\n    case \"sulky\":\n      tags.add(\"soft\");\n      tags.add(\"calm\");\n      break;\n    case \"concerned\":\n      tags.add(\"soft\");\n      tags.add(\"check_in\");\n      tags.add(\"encouraging\");\n      break;\n    case \"affectionate\":\n      tags.add(\"affectionate\");\n      tags.add(\"romantic\");\n      break;\n    default:\n      tags.add(\"soft\");\n  }\n\n  switch (input.action) {\n    case \"TEASE\":\n      tags.add(\"playful\");\n      tags.add(\"cheerful\");\n      break;\n    case \"CHASE\":\n      tags.add(\"miss_you\");\n      tags.add(\"check_in\");\n      break;\n    case \"RECONNECT\":\n      tags.add(\"miss_you\");\n      tags.add(\"check_in\");\n      tags.add(\"soft\");\n      break;\n    case \"WAIT\":\n    case \"PULL\":\n      tags.add(\"calm\");\n      tags.add(\"soft\");\n      break;\n    case \"SULK\":\n      tags.add(\"calm\");\n      tags.add(\"soft\");\n      break;\n    default:\n      tags.add(\"casual\");\n  }\n\n  if (input.direction === \"USER\" || input.direction === \"MISAKI_TO_USER\") {\n    tags.add(\"check_in\");\n  }\n\n  if (input.direction === \"MISAKI_TO_US\") {\n    tags.add(\"affectionate\");\n  }\n\n  if (input.timeBand === \"seven_plus_days\") {\n    tags.add(\"miss_you\");\n  }\n\n  if (input.lifeConfidence === \"explicit\" && input.direction === \"USER\") {\n    tags.add(\"encouraging\");\n  }\n\n  return [...tags];\n}\n\nexport async function buildProactiveDecisionContext(\n  supabase: SupabaseClient,\n  userId: string,\n  points: number,\n  life: ProactiveLifeContext\n): Promise<ProactiveDecisionContext> {\n  const { data, error } = await supabase\n    .from(\"misaki_relationship_state\")\n    .select(\"intimacy_level,emotion_state,action_state,last_interaction_at\")\n    .eq(\"user_id\", userId)\n    .maybeSingle();\n\n  if (error) throw error;\n\n  const row = (data || {}) as RelationshipRow;\n  const currentAction = action(row.action_state);\n  const currentEmotion = emotion(row.emotion_state?.primary);\n  const currentTimeBand = timeBand(row.last_interaction_at);\n  const currentDirection = direction(currentAction, currentEmotion, life);\n  const tags = deriveProactiveTags({\n    direction: currentDirection,\n    action: currentAction,\n    emotion: currentEmotion,\n    timeBand: currentTimeBand,\n    lifeConfidence: life.confidence,\n  });\n\n  return {\n    shouldSend: true,\n    reason: \"claimed_after_relationship_action_gate\",\n    direction: currentDirection,\n    action: currentAction,\n    emotion: currentEmotion,\n    emotionIntensity: clamp(Number(row.emotion_state?.intensity) || 0, 0, 100),\n    intimacyLevel: Math.max(0, Number(row.intimacy_level) || 0),\n    relationshipPoints: Math.max(0, points),\n    timeBand: currentTimeBand,\n    situation: life.situation,\n    plan: life.plan,\n    lifeEvidence: life.evidence,\n    lifeConfidence: life.confidence,\n    tags,\n  };\n}\n\nexport function createProactiveDecisionGuide(context: ProactiveDecisionContext) {\n  return `【今回の自発行動コンテキスト】\\n方向: ${context.direction}\\n感情: ${context.emotion}（強さ ${context.emotionIntensity}）\\n行動傾向: ${context.action}\\n親密度: ${context.intimacyLevel}\\n関係時間帯: ${context.timeBand}\\n生活根拠の確度: ${context.lifeConfidence}\\n表現タグ: ${context.tags.join(\", \")}\\n\\nこのコンテキストは文章と写真の共通の原因です。\\n・方向、感情、行動、表現タグを返事の温度へ自然ににじませる\\n・タグ名や内部状態を本文に書かない\\n・USER方向でも、根拠のない現在地・勤務・体調・予定を作らない\\n・MISAKI方向では、美咲自身の今の気分や短い一言を優先してよい\\n・US方向では、二人の関係の空気を優先するが、存在しない出来事を作らない`;\n}\n",
+        "sha256": "a0264cc455dd1f1e88520f3bc3f26af61f6925e75bd0e2ff26156a1f2d9dcbbc"
+      }
+    },
+    {
+      "path": "supabase/functions/body-clock/proactive-photo.ts",
+      "status": "modified",
+      "additions": 91,
+      "deletions": 24,
+      "patch": "diff --git a/supabase/functions/body-clock/proactive-photo.ts b/supabase/functions/body-clock/proactive-photo.ts\nindex aab8add..0b1d2a8 100644\n--- a/supabase/functions/body-clock/proactive-photo.ts\n+++ b/supabase/functions/body-clock/proactive-photo.ts\n@@ -1,13 +1,18 @@\n-import type { ProactiveDecisionContext, ProactiveDirection, RelationshipAction, RelationshipEmotion } from \"./proactive-decision.ts\";\n+import type {\n+  ProactiveDecisionContext,\n+  ProactiveDirection,\n+  ProactiveExpressionTag,\n+  RelationshipAction,\n+  RelationshipEmotion,\n+} from \"./proactive-decision.ts\";\n \n export type MisakiPhotoTime = \"morning\" | \"day\" | \"evening\" | \"night\" | \"any\";\n-export type MisakiPhotoMood = \"soft\" | \"cheerful\" | \"calm\" | \"romantic\" | \"sleepy\" | \"casual\";\n \n export type MisakiPhoto = {\n   id: string;\n   src: string;\n   times: MisakiPhotoTime[];\n-  moods: MisakiPhotoMood[];\n+  tags: ProactiveExpressionTag[];\n   directions: ProactiveDirection[];\n   actions: RelationshipAction[];\n   emotions: RelationshipEmotion[];\n@@ -28,15 +33,58 @@ const ALL_ACTIONS: RelationshipAction[] = [\"NORMAL\", \"WAIT\", \"TEASE\", \"SULK\", \"C\n const ALL_EMOTIONS: RelationshipEmotion[] = [\"neutral\", \"happy\", \"lonely\", \"sulky\", \"concerned\", \"affectionate\"];\n \n const PHOTOS: MisakiPhoto[] = [\n-  { id: \"morning-01\", src: \"/misaki-morning.webp\", times: [\"morning\"], moods: [\"soft\", \"cheerful\", \"casual\"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 0, weight: 5 },\n-  { id: \"day-01\", src: \"/misaki-day-intro.webp\", times: [\"day\"], moods: [\"cheerful\", \"casual\", \"soft\"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 0, weight: 5 },\n-  { id: \"evening-01\", src: \"/misaki-evening.webp\", times: [\"evening\"], moods: [\"calm\", \"soft\", \"romantic\"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 10, weight: 5 },\n-  { id: \"night-01\", src: \"/misaki-night.webp\", times: [\"night\"], moods: [\"calm\", \"romantic\", \"sleepy\", \"soft\"], directions: ALL_DIRECTIONS, actions: ALL_ACTIONS, emotions: ALL_EMOTIONS, minRelationshipPoints: 20, weight: 5 },\n+  {\n+    id: \"morning-01\",\n+    src: \"/misaki-morning.webp\",\n+    times: [\"morning\"],\n+    tags: [\"soft\", \"cheerful\", \"casual\", \"check_in\"],\n+    directions: ALL_DIRECTIONS,\n+    actions: ALL_ACTIONS,\n+    emotions: ALL_EMOTIONS,\n+    minRelationshipPoints: 0,\n+    weight: 5,\n+  },\n+  {\n+    id: \"day-01\",\n+    src: \"/misaki-day-intro.webp\",\n+    times: [\"day\"],\n+    tags: [\"cheerful\", \"casual\", \"soft\", \"playful\", \"encouraging\", \"check_in\"],\n+    directions: ALL_DIRECTIONS,\n+    actions: ALL_ACTIONS,\n+    emotions: ALL_EMOTIONS,\n+    minRelationshipPoints: 0,\n+    weight: 5,\n+  },\n+  {\n+    id: \"evening-01\",\n+    src: \"/misaki-evening.webp\",\n+    times: [\"evening\"],\n+    tags: [\"calm\", \"soft\", \"romantic\", \"affectionate\", \"relax\", \"miss_you\"],\n+    directions: ALL_DIRECTIONS,\n+    actions: ALL_ACTIONS,\n+    emotions: ALL_EMOTIONS,\n+    minRelationshipPoints: 10,\n+    weight: 5,\n+  },\n+  {\n+    id: \"night-01\",\n+    src: \"/misaki-night.webp\",\n+    times: [\"night\"],\n+    tags: [\"calm\", \"romantic\", \"sleepy\", \"soft\", \"affectionate\", \"miss_you\", \"relax\"],\n+    directions: ALL_DIRECTIONS,\n+    actions: ALL_ACTIONS,\n+    emotions: ALL_EMOTIONS,\n+    minRelationshipPoints: 20,\n+    weight: 5,\n+  },\n ];\n \n function hashText(text: string) {\n   let hash = 2166136261;\n-  for (let i = 0; i < text.length; i += 1) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 16777619); }\n+  for (let i = 0; i < text.length; i += 1) {\n+    hash ^= text.charCodeAt(i);\n+    hash = Math.imul(hash, 16777619);\n+  }\n   return hash >>> 0;\n }\n \n@@ -49,22 +97,22 @@ function getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, \"any\"> {\n   return \"night\";\n }\n \n-function inferMood(reply: string, decision: ProactiveDecisionContext): MisakiPhotoMood {\n-  if (decision.emotion === \"affectionate\" || decision.emotion === \"lonely\") return \"romantic\";\n-  if (decision.emotion === \"happy\" || decision.action === \"TEASE\") return \"cheerful\";\n-  if (decision.emotion === \"concerned\") return \"soft\";\n-  const text = reply.toLowerCase();\n-  if (/眠|ねむ|おやすみ|寝/.test(text)) return \"sleepy\";\n-  if (/落ち着|ゆっくり|のんびり|ほっと/.test(text)) return \"calm\";\n-  if (/ちょっと|なんとなく|ふと|ねえ|ねぇ/.test(text)) return \"casual\";\n-  return \"soft\";\n+function scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {\n+  return tags.reduce(\n+    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),\n+    0\n+  );\n }\n \n function weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {\n   if (!photos.length) return null;\n   const total = photos.reduce((sum, photo) => sum + Math.max(1, photo.weight), 0);\n   let target = seed % total;\n-  for (const photo of photos) { const weight = Math.max(1, photo.weight); if (target < weight) return photo; target -= weight; }\n+  for (const photo of photos) {\n+    const weight = Math.max(1, photo.weight);\n+    if (target < weight) return photo;\n+    target -= weight;\n+  }\n   return photos[0] ?? null;\n }\n \n@@ -72,11 +120,13 @@ export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): Misak\n   const { currentTime, reply, decision, recentPhotoIds = [] } = input;\n   if (!decision.shouldSend || !reply.trim()) return null;\n \n-  const seed = hashText(`${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${reply}`);\n+  const seed = hashText(\n+    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${decision.tags.join(\",\")}|${reply}`\n+  );\n+\n   if (seed % 10000 >= Math.floor(PHOTO_ATTACH_RATE * 10000)) return null;\n \n   const timeBucket = getTimeBucket(currentTime);\n-  const mood = inferMood(reply, decision);\n   let candidates = PHOTOS.filter((photo) =>\n     decision.relationshipPoints >= photo.minRelationshipPoints &&\n     (photo.times.includes(timeBucket) || photo.times.includes(\"any\")) &&\n@@ -85,12 +135,29 @@ export function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): Misak\n     photo.emotions.includes(decision.emotion)\n   );\n \n-  const moodMatched = candidates.filter((photo) => photo.moods.includes(mood) || photo.moods.includes(\"soft\"));\n-  if (moodMatched.length) candidates = moodMatched;\n+  if (!candidates.length) return null;\n+\n+  const scored = candidates.map((photo) => ({\n+    photo,\n+    score: scorePhoto(photo, decision.tags),\n+  }));\n+  const bestScore = Math.max(...scored.map((item) => item.score));\n+\n+  if (bestScore > 0) {\n+    candidates = scored\n+      .filter((item) => item.score === bestScore)\n+      .map((item) => item.photo);\n+  }\n+\n   const withoutRecent = candidates.filter((photo) => !recentPhotoIds.includes(photo.id));\n   if (withoutRecent.length) candidates = withoutRecent;\n \n-  return weightedPick(candidates, hashText(`${seed}|${mood}|${timeBucket}|${decision.direction}`));\n+  return weightedPick(\n+    candidates,\n+    hashText(`${seed}|${decision.tags.join(\"|\")}|${timeBucket}|${decision.direction}`)\n+  );\n }\n \n-export function getMisakiPhotoCatalog() { return PHOTOS; }\n+export function getMisakiPhotoCatalog() {\n+  return PHOTOS;\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/9d2d6257e845b61f8e3b8b68db63eabf56bafc86/supabase/functions/body-clock/proactive-photo.ts",
+      "source": {
+        "path": "supabase/functions/body-clock/proactive-photo.ts",
+        "coverage": "全文",
+        "text": "import type {\n  ProactiveDecisionContext,\n  ProactiveDirection,\n  ProactiveExpressionTag,\n  RelationshipAction,\n  RelationshipEmotion,\n} from \"./proactive-decision.ts\";\n\nexport type MisakiPhotoTime = \"morning\" | \"day\" | \"evening\" | \"night\" | \"any\";\n\nexport type MisakiPhoto = {\n  id: string;\n  src: string;\n  times: MisakiPhotoTime[];\n  tags: ProactiveExpressionTag[];\n  directions: ProactiveDirection[];\n  actions: RelationshipAction[];\n  emotions: RelationshipEmotion[];\n  minRelationshipPoints: number;\n  weight: number;\n};\n\nexport type SelectMisakiPhotoInput = {\n  currentTime: string;\n  reply: string;\n  decision: ProactiveDecisionContext;\n  recentPhotoIds?: string[];\n};\n\nconst PHOTO_ATTACH_RATE = 0.34;\nconst ALL_DIRECTIONS: ProactiveDirection[] = [\"MISAKI\", \"USER\", \"US\", \"MISAKI_TO_USER\", \"MISAKI_TO_US\"];\nconst ALL_ACTIONS: RelationshipAction[] = [\"NORMAL\", \"WAIT\", \"TEASE\", \"SULK\", \"CHASE\", \"PULL\", \"RECONNECT\"];\nconst ALL_EMOTIONS: RelationshipEmotion[] = [\"neutral\", \"happy\", \"lonely\", \"sulky\", \"concerned\", \"affectionate\"];\n\nconst PHOTOS: MisakiPhoto[] = [\n  {\n    id: \"morning-01\",\n    src: \"/misaki-morning.webp\",\n    times: [\"morning\"],\n    tags: [\"soft\", \"cheerful\", \"casual\", \"check_in\"],\n    directions: ALL_DIRECTIONS,\n    actions: ALL_ACTIONS,\n    emotions: ALL_EMOTIONS,\n    minRelationshipPoints: 0,\n    weight: 5,\n  },\n  {\n    id: \"day-01\",\n    src: \"/misaki-day-intro.webp\",\n    times: [\"day\"],\n    tags: [\"cheerful\", \"casual\", \"soft\", \"playful\", \"encouraging\", \"check_in\"],\n    directions: ALL_DIRECTIONS,\n    actions: ALL_ACTIONS,\n    emotions: ALL_EMOTIONS,\n    minRelationshipPoints: 0,\n    weight: 5,\n  },\n  {\n    id: \"evening-01\",\n    src: \"/misaki-evening.webp\",\n    times: [\"evening\"],\n    tags: [\"calm\", \"soft\", \"romantic\", \"affectionate\", \"relax\", \"miss_you\"],\n    directions: ALL_DIRECTIONS,\n    actions: ALL_ACTIONS,\n    emotions: ALL_EMOTIONS,\n    minRelationshipPoints: 10,\n    weight: 5,\n  },\n  {\n    id: \"night-01\",\n    src: \"/misaki-night.webp\",\n    times: [\"night\"],\n    tags: [\"calm\", \"romantic\", \"sleepy\", \"soft\", \"affectionate\", \"miss_you\", \"relax\"],\n    directions: ALL_DIRECTIONS,\n    actions: ALL_ACTIONS,\n    emotions: ALL_EMOTIONS,\n    minRelationshipPoints: 20,\n    weight: 5,\n  },\n];\n\nfunction hashText(text: string) {\n  let hash = 2166136261;\n  for (let i = 0; i < text.length; i += 1) {\n    hash ^= text.charCodeAt(i);\n    hash = Math.imul(hash, 16777619);\n  }\n  return hash >>> 0;\n}\n\nfunction getTimeBucket(currentTime: string): Exclude<MisakiPhotoTime, \"any\"> {\n  const match = currentTime.match(/(\\d{1,2}):(\\d{2})/);\n  const hour = Math.max(0, Math.min(23, Number(match?.[1] ?? 18)));\n  if (hour >= 5 && hour < 10) return \"morning\";\n  if (hour >= 10 && hour < 17) return \"day\";\n  if (hour >= 17 && hour < 21) return \"evening\";\n  return \"night\";\n}\n\nfunction scorePhoto(photo: MisakiPhoto, tags: ProactiveExpressionTag[]) {\n  return tags.reduce(\n    (score, tag) => score + (photo.tags.includes(tag) ? 3 : 0),\n    0\n  );\n}\n\nfunction weightedPick(photos: MisakiPhoto[], seed: number): MisakiPhoto | null {\n  if (!photos.length) return null;\n  const total = photos.reduce((sum, photo) => sum + Math.max(1, photo.weight), 0);\n  let target = seed % total;\n  for (const photo of photos) {\n    const weight = Math.max(1, photo.weight);\n    if (target < weight) return photo;\n    target -= weight;\n  }\n  return photos[0] ?? null;\n}\n\nexport function selectMisakiProactivePhoto(input: SelectMisakiPhotoInput): MisakiPhoto | null {\n  const { currentTime, reply, decision, recentPhotoIds = [] } = input;\n  if (!decision.shouldSend || !reply.trim()) return null;\n\n  const seed = hashText(\n    `${currentTime}|${decision.direction}|${decision.action}|${decision.emotion}|${decision.relationshipPoints}|${decision.tags.join(\",\")}|${reply}`\n  );\n\n  if (seed % 10000 >= Math.floor(PHOTO_ATTACH_RATE * 10000)) return null;\n\n  const timeBucket = getTimeBucket(currentTime);\n  let candidates = PHOTOS.filter((photo) =>\n    decision.relationshipPoints >= photo.minRelationshipPoints &&\n    (photo.times.includes(timeBucket) || photo.times.includes(\"any\")) &&\n    photo.directions.includes(decision.direction) &&\n    photo.actions.includes(decision.action) &&\n    photo.emotions.includes(decision.emotion)\n  );\n\n  if (!candidates.length) return null;\n\n  const scored = candidates.map((photo) => ({\n    photo,\n    score: scorePhoto(photo, decision.tags),\n  }));\n  const bestScore = Math.max(...scored.map((item) => item.score));\n\n  if (bestScore > 0) {\n    candidates = scored\n      .filter((item) => item.score === bestScore)\n      .map((item) => item.photo);\n  }\n\n  const withoutRecent = candidates.filter((photo) => !recentPhotoIds.includes(photo.id));\n  if (withoutRecent.length) candidates = withoutRecent;\n\n  return weightedPick(\n    candidates,\n    hashText(`${seed}|${decision.tags.join(\"|\")}|${timeBucket}|${decision.direction}`)\n  );\n}\n\nexport function getMisakiPhotoCatalog() {\n  return PHOTOS;\n}\n",
+        "sha256": "3b56600a9396a56d3db508dad623f9658d16d3e5ec16b054dad5a78666ba4c9d"
+      }
+    }
+  ],
+  "file_count": 2,
+  "reported_file_count": 2,
+  "commits": [
+    {
+      "sha": "b8f53f1a1f83e839a4c4f2710e84a7acd2153d30",
+      "message": "Derive proactive expression tags from decision context\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/b8f53f1a1f83e839a4c4f2710e84a7acd2153d30"
+    },
+    {
+      "sha": "9d2d6257e845b61f8e3b8b68db63eabf56bafc86",
+      "message": "Use derived proactive tags for body clock photo matching\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/9d2d6257e845b61f8e3b8b68db63eabf56bafc86"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "ALL_ACTIONS",
+    "ALL_DIRECTIONS",
+    "ALL_EMOTIONS",
+    "PHOTOS",
+    "PHOTO_ATTACH_RATE",
+    "a",
+    "action",
+    "bestScore",
+    "buildProactiveDecisionContext",
+    "candidates",
+    "clamp",
+    "createProactiveDecisionGuide",
+    "currentAction",
+    "currentDirection",
+    "currentEmotion",
+    "currentTimeBand",
+    "deriveProactiveTags",
+    "direction",
+    "e",
+    "emotion",
+    "getMisakiPhotoCatalog",
+    "getTimeBucket",
+    "h",
+    "hash",
+    "hashText",
+    "hour",
+    "hours",
+    "i",
+    "inferMood",
+    "match",
+    "mood",
+    "moodMatched",
+    "normalized",
+    "photo",
+    "r",
+    "row",
+    "scorePhoto",
+    "scored",
+    "seed",
+    "selectMisakiProactivePhoto",
+    "tags",
+    "target",
+    "text",
+    "timeBand",
+    "timeBucket",
+    "total",
+    "weight",
+    "weightedPick",
+    "withoutRecent"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "自発メッセージの表現タグを感情・行動判断から派生させる",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/12"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "32b3b75c09ed650799b26877808a27666e94d785e5fe660f318ebc9188a3139b",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": []
+}

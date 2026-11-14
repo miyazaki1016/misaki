@@ -1,0 +1,20 @@
+{
+  "id": "branch-39bf13fb306b830b",
+  "title": "docs/owner-triage-36prs-20261104",
+  "head": "aed0b7249c69eb057c2e761014cd386cc9fdea1f",
+  "head_ref": "docs/owner-triage-36prs-20261104",
+  "linked_prs": [
+    157
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "8dfd8b7de39b9f921a98ec2714a665518ca9ba0221c04eaa7f2b5171186ed0af",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

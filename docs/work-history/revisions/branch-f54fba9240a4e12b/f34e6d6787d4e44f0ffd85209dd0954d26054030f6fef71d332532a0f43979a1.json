@@ -1,0 +1,49 @@
+{
+  "id": "branch-f54fba9240a4e12b",
+  "title": "feat/inventory-delta-candidates-20261101",
+  "head": "b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28",
+  "head_ref": "feat/inventory-delta-candidates-20261101",
+  "linked_prs": [
+    116
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/development-inventory.yml",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28/.github/workflows/development-inventory.yml"
+    },
+    {
+      "path": "scripts/development_inventory.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28/scripts/development_inventory.py"
+    },
+    {
+      "path": "scripts/development_inventory_delta.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28/scripts/development_inventory_delta.py"
+    },
+    {
+      "path": "tests/test_development_inventory_delta.py",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28/tests/test_development_inventory_delta.py"
+    }
+  ],
+  "commits": "b76e9ff9bdc1cc9ee92eed8d8e85cb3837910a28 Keep snapshot generation compatible with existing offline fixtures\n90d9a2afaa2f140ea3732d9bf9a22209ac46e794 Run read-only inventory delta candidate generator daily\ncdfc614c598b55fc859e2c809e01c60cc7f2ed82 Allow offline delta unit tests without GitHub environment\ndb09c13e4a0e2ea1d4eed453b4c836c3a43c519a Add offline regression tests for inventory change candidates\n7f874923879bb8bad6030adc2be92c420d6ebd05 Generate read-only ledger update candidates from prior successful inventory\n7046f449fa5140e942c0b746fb1f4f110f931bd6 Include stable branch PR and issue snapshots in inventory artifacts",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "9e020720f8b344fc32af93a3844513c25553d965951848434a210fdf8e864943",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}

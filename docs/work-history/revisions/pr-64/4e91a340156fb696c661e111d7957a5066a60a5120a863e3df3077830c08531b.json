@@ -1,0 +1,294 @@
+{
+  "id": "pr-64",
+  "number": 64,
+  "title": "Do not let expired anonymous roots block relationship processing",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "## Summary\n- Treat an expired anonymous relationship checkpoint as non-importable instead of throwing during permanent processing.\n- Keep invalid/unverifiable *live* roots fail-closed.\n- Add a regression test proving an expired checkpoint performs no import/model/write and returns cleanly.\n\n## Why\nProduction investigation found a permanent user's oldest `chat_turn_completed` repeatedly failed before `relationship_analyzer` because an expired `misaki_temporary_roots` row was still present. Oldest-first recovery then kept retrying that poison turn and blocked later turns.\n\n## Scope\nNo Relationship semantics, ordering, START_AT, Evidence/Episode/Pattern rules, or DB data are changed. No Production rows are manually modified.",
+  "snapshot_head": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+  "snapshot_consistent": true,
+  "head": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+  "base": "3b06b33582c6651240f59acd5a4108c5cf39b34d",
+  "base_ref": "main",
+  "head_ref": "fix/expired-temporary-relationship-import",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-10-05T23:38:17Z",
+  "merge_commit_sha": "b44c185497d3cc719e67c07c9ae1cde5e0daf61f",
+  "updated_at": "2026-10-05T23:38:17Z",
+  "code_facts": [
+    {
+      "file": "lib/relationship-runtime-v1.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (Date.parse(root.expires_at) <= Date.now()) return;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "file": "lib/relationship-runtime-v1.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!verified) throw new Error(\"relationship_import_root_invalid\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts"
+    },
+    {
+      "file": "tests/relationship-runtime-v1.test.cjs",
+      "kind": "関数・クラス定義",
+      "expression": "function harness({ failure = false, outside = false, importRace = false, expiredRoot = false, permanent } = {}) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs"
+    },
+    {
+      "file": "tests/relationship-runtime-v1.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('expired anonymous checkpoint is ignored and cannot poison permanent relationship processing', async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs"
+    },
+    {
+      "file": "tests/relationship-runtime-v1.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(h.imports, 0); assert.equal(h.models, 0); assert.equal(h.writes, 0);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "lib/relationship-runtime-v1.ts",
+      "status": "modified",
+      "additions": 4,
+      "deletions": 1,
+      "patch": "diff --git a/lib/relationship-runtime-v1.ts b/lib/relationship-runtime-v1.ts\nindex ff85ba4..a5d2299 100644\n--- a/lib/relationship-runtime-v1.ts\n+++ b/lib/relationship-runtime-v1.ts\n@@ -95,8 +95,11 @@ export async function importPermanentRelationship(userId: string, requestId: str\n   const { data: root, error } = await db.from(\"misaki_temporary_roots\").select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n   if (error) throw new Error(\"relationship_import_root_read_failed\");\n   if (!root) return;\n+  // An expired anonymous checkpoint is no longer importable and must not poison\n+  // permanent Relationship processing. Invalid/unverifiable live roots still fail closed.\n+  if (Date.parse(root.expires_at) <= Date.now()) return;\n   const verified = openTemporaryState(root.token);\n-  if (!verified || Date.parse(root.expires_at) <= Date.now()) throw new Error(\"relationship_import_root_expired\");\n+  if (!verified) throw new Error(\"relationship_import_root_invalid\");\n   let snapshot = verified.state.relationshipEngine;\n   if (!snapshot) return;\n   // Once auth is permanent the temporary writer rejects writes. Finish the frozen\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts",
+      "source": {
+        "path": "lib/relationship-runtime-v1.ts",
+        "coverage": "全文",
+        "text": "import { createServerSupabase, loadTemporaryRoot, editTemporaryRoot, openTemporaryState, type RootState } from \"./canonical-state\";\nimport { createLegacyRelationshipActingState } from \"./relationship-acting-guide\";\nimport { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from \"./relationship-engine-v1\";\nimport { analyzeRelationshipEvidence, criticalCandidates, validateCriticalEvent } from \"./relationship-analyzer-v1\";\nimport { CanonicalRelationshipStore, processRelationshipTurn } from \"./relationship-processing-v1\";\nimport { createGeminiTelemetrySink } from \"./gemini-usage-telemetry-server\";\n\n// Local deduplication is an optimization; DB leases serialize distributed workers.\nconst running = new Map<string, Promise<void>>();\nexport function enqueueTemporaryTurn(root: RootState, turn: Turn): Snapshot | undefined {\n  if (!engineEnabled()) return root.relationshipEngine;\n  const snapshot = root.relationshipEngine ?? { state: createLegacyRelationshipActingState(root.relationshipPoints), version: 0, episodes: [], appliedPatterns: [], processed: [], pending: [], criticalEvents: [] };\n  return snapshot.processed.includes(turn.requestId) || snapshot.pending.some(t => t.requestId === turn.requestId)\n    ? snapshot : { ...snapshot, pending: [...snapshot.pending, turn] };\n}\n\nasync function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snapshot) => Promise<void>, check?: () => Promise<void>, telemetryUserId: string | null = null) {\n  let snapshot = root.relationshipEngine!;\n  for (const turn of snapshot.pending) {\n    const history = root.history as any[];\n    if (!history?.some(t => t.requestId === turn.requestId && t.role === \"user\" && t.text === turn.message) ||\n      !history.some(t => t.requestId === turn.requestId && t.role === \"misaki\" && t.text === turn.reply)) throw new Error(\"temporary_canonical_turn_required\");\n    // Pending turn remains encrypted/durable if validation or analysis fails.\n    for (const type of criticalCandidates(turn.message)) {\n      const events = snapshot.criticalEvents ?? [];\n      if (events.some(e => e.request_id === turn.requestId && e.event_type === type)) continue;\n      await check?.();\n      const confirmed = await validateCriticalEvent(turn, type, events, createGeminiTelemetrySink(\"critical_validator\", telemetryUserId, turn.requestId));\n      await check?.();\n      if (confirmed) {\n        snapshot = { ...snapshot, state: { ...snapshot.state,\n          relationshipStatus: type === \"romantic_acceptance\" ? \"romantic_partner\" : type === \"relationship_end\" ? \"none\" : snapshot.state.relationshipStatus },\n          version: snapshot.version + 1, criticalEvents: [...events, { request_id: turn.requestId, event_type: type }] };\n      }\n    }\n    await check?.();\n    const evidence = await analyzeRelationshipEvidence(turn, createGeminiTelemetrySink(\"relationship_analyzer\", telemetryUserId, turn.requestId));\n    await check?.();\n    snapshot = applyTemporaryEvidence(snapshot, turn, evidence);\n    if (save) await save(snapshot);\n  }\n  return snapshot;\n}\n\nasync function runAnonymous(userId: string) {\n  let root = await loadTemporaryRoot(userId, null);\n  if (!root.relationshipEngine) return;\n  await analyzeTemporarySnapshot(root, async snapshot => {\n    await editTemporaryRoot(userId, { ...root, relationshipEngine: snapshot }, \"relationship-analysis\");\n    root = await loadTemporaryRoot(userId, null);\n  }, undefined, userId);\n}\n\nasync function runPermanent(userId: string) {\n  // Import and ordinary processing share the claimed per-user lease.\n  const store = new CanonicalRelationshipStore(createServerSupabase());\n  // Scan saved canonical turns chronologically; one failed predecessor stops later application.\n  const turns = await store.rows(\"misaki_relationship_events\", userId, q => q.eq(\"event_type\", \"chat_turn_completed\").order(\"id\", { ascending: true }));\n  const ledgers = await store.rows(\"misaki_relationship_processing\", userId, q => q.eq(\"processing_version\", PROCESSING_VERSION));\n  // Do not analyze pre-cutover history with a new model/version.\n  const boundary = process.env.MISAKI_RELATIONSHIP_ENGINE_START_AT;\n  if (!boundary || !Number.isFinite(Date.parse(boundary))) throw new Error(\"relationship_start_boundary_required\");\n  let count = 0;\n  for (const turn of turns) {\n    if (Date.parse(turn.created_at) < Date.parse(boundary)) continue;\n    if (ledgers.some(l => l.request_id === turn.request_id && l.status === \"applied\")) continue;\n    if (++count > 3) break;\n    const result = await processRelationshipTurn(store, userId, turn.request_id,\n      t => analyzeRelationshipEvidence(t, createGeminiTelemetrySink(\"relationship_analyzer\", userId, t.requestId)),\n      (t, type, events) => validateCriticalEvent(t, type, events, createGeminiTelemetrySink(\"critical_validator\", userId, t.requestId)),\n      (check, token) => importPermanentRelationship(userId, turn.request_id, token, check));\n    if (result.status === \"deferred\") break;\n  }\n}\n\n/** Called via Next after(): never changes an already-successful chat/quota receipt. */\nexport async function resumeRelationshipProcessing(userId: string, anonymous: boolean) {\n  if (!engineEnabled()) return;\n  const key = `${userId}:${anonymous}`;\n  if (running.has(key)) return running.get(key);\n  const task = (anonymous ? runAnonymous(userId) : runPermanent(userId))\n    .catch(() => { console.error(\"RELATIONSHIP V1 PROCESSING RETRY REQUIRED\"); })\n    .finally(() => running.delete(key));\n  running.set(key, task);\n  return task;\n}\n\nexport async function importPermanentRelationship(userId: string, requestId: string, token: string, check: () => Promise<void>) {\n  if (!engineEnabled()) return;\n  await check();\n  const db = createServerSupabase();\n  const { data: imported, error: importError } = await db.from(\"misaki_relationship_temporary_v1_imports\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();\n  if (importError) throw new Error(\"relationship_import_read_failed\");\n  if (imported) return;\n  const { data: root, error } = await db.from(\"misaki_temporary_roots\").select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n  if (error) throw new Error(\"relationship_import_root_read_failed\");\n  if (!root) return;\n  // An expired anonymous checkpoint is no longer importable and must not poison\n  // permanent Relationship processing. Invalid/unverifiable live roots still fail closed.\n  if (Date.parse(root.expires_at) <= Date.now()) return;\n  const verified = openTemporaryState(root.token);\n  if (!verified) throw new Error(\"relationship_import_root_invalid\");\n  let snapshot = verified.state.relationshipEngine;\n  if (!snapshot) return;\n  // Once auth is permanent the temporary writer rejects writes. Finish the frozen\n  // verified trajectory in memory and materialize atomically through the import RPC.\n  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);\n  await check();\n  const { error: rpcError } = await db.rpc(\"import_misaki_temporary_relationship_v2\", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,\n    ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? \"none\",\n    p_engine_version: PROCESSING_VERSION, p_payload: snapshot });\n  if (rpcError) throw new Error(`relationship_import_failed:${rpcError.code ?? \"\"}:${rpcError.message ?? \"\"}`);\n}\n\nexport function pendingRelationshipGuide(root: RootState) {\n  return root.relationshipCriticalPending || root.relationshipEngine?.pending.some(t => criticalCandidates(t.message).length)\n    ? \"【未解決の明示的関係イベント】直近の関係変更は検証待ち。成立・継続・復縁を断定せず、現在のユーザーの境界を優先してください。\" : \"\";\n}\n",
+        "sha256": "6898317deb3378b9b5554a62c559b1a6475366354ed74bce3f355edba0a8b9b3"
+      }
+    },
+    {
+      "path": "tests/relationship-runtime-v1.test.cjs",
+      "status": "modified",
+      "additions": 7,
+      "deletions": 2,
+      "patch": "diff --git a/tests/relationship-runtime-v1.test.cjs b/tests/relationship-runtime-v1.test.cjs\nindex 7a29927..b31ecaa 100644\n--- a/tests/relationship-runtime-v1.test.cjs\n+++ b/tests/relationship-runtime-v1.test.cjs\n@@ -6,7 +6,7 @@ const vm = require('node:vm');\n const ts = require('typescript');\n const rootPath = path.resolve(__dirname, '..');\n \n-function harness({ failure = false, outside = false, importRace = false, permanent } = {}) {\n+function harness({ failure = false, outside = false, importRace = false, expiredRoot = false, permanent } = {}) {\n   const turn = { requestId: 'turn-3', message: '美咲、体調は大丈夫？', reply: 'ありがとう', savedAt: '2026-10-03T00:00:00Z' };\n   let root; let models = 0; let writes = 0; let imports = 0; let failed = failure; let attempts = 0;\n   const evidence = { type: 'care', axis: 'affection', polarity: 1, strength: 70, confidence: .95, interpretation: 'direct', subject: 'user_to_misaki', supportingTurn: '体調は大丈夫' };\n@@ -17,7 +17,7 @@ function harness({ failure = false, outside = false, importRace = false, permane\n     openTemporaryState: () => ({ state: structuredClone(root) }),\n     createServerSupabase: () => ({\n       from(table) { const q = { select() { return q; }, eq() { return q; }, async maybeSingle() {\n-        return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: '2026-10-05T00:00:00Z' }, error: null };\n+        return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: expiredRoot ? '2020-01-01T00:00:00Z' : '2099-10-05T00:00:00Z' }, error: null };\n       } }; return q; },\n       async rpc(name, args) { if (importRace) { assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_lease_token, 'live'); return { error: { code: 'P0001', message: 'relationship_processing_lease_required' } }; } assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_request_id, 'turn-3'); assert.equal(args.p_processing_version, 'relationship-v1.1'); assert.equal(args.p_lease_token, 'live'); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },\n     }),\n@@ -76,6 +76,11 @@ test('permanence imports newest verified frozen root once, including pending ana\n   const h = harness(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);\n   await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);\n });\n+test('expired anonymous checkpoint is ignored and cannot poison permanent relationship processing', async () => {\n+  const h = harness({ expiredRoot: true });\n+  await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {});\n+  assert.equal(h.imports, 0); assert.equal(h.models, 0); assert.equal(h.writes, 0);\n+});\n test('permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root', async () => {\n   const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}));\n   assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1);\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs",
+      "source": {
+        "path": "tests/relationship-runtime-v1.test.cjs",
+        "coverage": "全文",
+        "text": "const test = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst rootPath = path.resolve(__dirname, '..');\n\nfunction harness({ failure = false, outside = false, importRace = false, expiredRoot = false, permanent } = {}) {\n  const turn = { requestId: 'turn-3', message: '美咲、体調は大丈夫？', reply: 'ありがとう', savedAt: '2026-10-03T00:00:00Z' };\n  let root; let models = 0; let writes = 0; let imports = 0; let failed = failure; let attempts = 0;\n  const evidence = { type: 'care', axis: 'affection', polarity: 1, strength: 70, confidence: .95, interpretation: 'direct', subject: 'user_to_misaki', supportingTurn: '体調は大丈夫' };\n  const cache = new Map();\n  const canonical = {\n    async loadTemporaryRoot(user) { if (user !== 'owner') throw Error('wrong_owner'); return structuredClone(root); },\n    async editTemporaryRoot(user, state) { assert.equal(user, 'owner'); assert.equal(state.temporaryRevision, root.temporaryRevision); root = { ...state, temporaryRevision: String(Number(root.temporaryRevision) + 1) }; writes++; },\n    openTemporaryState: () => ({ state: structuredClone(root) }),\n    createServerSupabase: () => ({\n      from(table) { const q = { select() { return q; }, eq() { return q; }, async maybeSingle() {\n        return { data: table === 'misaki_relationship_temporary_v1_imports' ? (imports ? { user_id: 'owner' } : null) : { token: 'verified-root', revision: root.temporaryRevision, expires_at: expiredRoot ? '2020-01-01T00:00:00Z' : '2099-10-05T00:00:00Z' }, error: null };\n      } }; return q; },\n      async rpc(name, args) { if (importRace) { assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_lease_token, 'live'); return { error: { code: 'P0001', message: 'relationship_processing_lease_required' } }; } assert.equal(name, 'import_misaki_temporary_relationship_v2'); assert.equal(args.p_source_revision, root.temporaryRevision); assert.equal(args.p_request_id, 'turn-3'); assert.equal(args.p_processing_version, 'relationship-v1.1'); assert.equal(args.p_lease_token, 'live'); assert.equal(args.p_affection, 1); assert.equal(args.p_payload.pending.length, 0); imports++; return { error: null }; },\n    }),\n  };\n  const context = vm.createContext({ process: { env: { MISAKI_RELATIONSHIP_ENGINE_VERSION: 'relationship-v1.1', MISAKI_RELATIONSHIP_ENGINE_START_AT: '2026-10-03T00:00:00Z' } }, console: { error() {} }, Date, JSON, Map, Set, Object, Number, Promise });\n  function load(file) {\n    if (cache.has(file)) return cache.get(file);\n    const code = ts.transpileModule(fs.readFileSync(path.join(rootPath, file), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;\n    const module = { exports: {} }; cache.set(file, module.exports);\n    const req = name => {\n      if (name === 'node:crypto') return require(name);\n      if (name === './canonical-state') return canonical;\n      if (name === './gemini-usage-telemetry-server') return { createGeminiTelemetrySink: () => () => {} };\n      if (permanent && name === './relationship-processing-v1') return {\n        CanonicalRelationshipStore: class { async rows(table) { return table === 'misaki_relationship_processing' ? [] : [turn, { ...turn, requestId: 'later' }].map(t => ({ request_id: t.requestId, created_at: t.savedAt })); } },\n        async processRelationshipTurn() { attempts++; if (permanent === 'failure') throw Error('DB failure'); return { status: 'deferred', reason: permanent }; },\n      };\n      if (name.startsWith('./relationship-analyzer-v1')) return {\n        criticalCandidates: () => [], validateCriticalEvent: async () => false,\n        analyzeRelationshipEvidence: async () => { models++; if (failed) throw Error('timeout'); return [evidence]; },\n      };\n      if (name.startsWith('.')) return load(path.posix.normalize(path.posix.join(path.posix.dirname(file), name.replace(/\\.ts$/, ''))) + '.ts');\n      throw Error(name);\n    };\n    vm.runInContext('(function(require,module,exports){' + code + '\\n})', context)(req, module, module.exports);\n    cache.set(file, module.exports); return module.exports;\n  }\n  const engine = load('lib/relationship-engine-v1.ts');\n  root = { history: outside ? [] : [{ role: 'user', text: turn.message, requestId: turn.requestId }, { role: 'misaki', text: turn.reply, requestId: turn.requestId }], memory: [], todayMemory: { date: '', items: [] }, relationshipPoints: 160, temporaryRevision: '1', relationshipEngine: {\n    state: load('lib/relationship-acting-guide.ts').createLegacyRelationshipActingState(160), version: 0,\n    episodes: [1, 2].map(day => engine.episodeFor(evidence, { ...turn, requestId: String(day), savedAt: `2026-10-0${day}T00:00:00Z` })),\n    appliedPatterns: [], processed: [], pending: [turn],\n  } };\n  return { runtime: load('lib/relationship-runtime-v1.ts'), clearFailure() { failed = false; }, get root() { return root; }, get models() { return models; }, get writes() { return writes; }, get imports() { return imports; }, get attempts() { return attempts; } };\n}\n\ntest('anonymous saved root analysis uses encrypted CAS writer and replay cannot grow twice', async () => {\n  const h = harness(); await h.runtime.resumeRelationshipProcessing('owner', true);\n  assert.equal(h.root.relationshipEngine.state.affection, 1); assert.equal(h.writes, 1); assert.equal(h.imports, 0);\n  await h.runtime.resumeRelationshipProcessing('owner', true); assert.equal(h.models, 1); assert.equal(h.writes, 1);\n});\ntest('anonymous failed analysis preserves encrypted pending turn then safely resumes', async () => {\n  const h = harness({ failure: true }); await h.runtime.resumeRelationshipProcessing('owner', true);\n  assert.equal(h.root.relationshipEngine.pending.length, 1); assert.equal(h.writes, 0);\n  h.clearFailure(); await h.runtime.resumeRelationshipProcessing('owner', true);\n  assert.equal(h.root.relationshipEngine.state.affection, 1); assert.equal(h.root.relationshipEngine.pending.length, 0);\n});\ntest('anonymous checkpoint boundary rejects missing canonical supporting pair before model/write', async () => {\n  const h = harness({ outside: true }); await h.runtime.resumeRelationshipProcessing('owner', true);\n  assert.equal(h.models, 0); assert.equal(h.writes, 0); assert.equal(h.root.relationshipEngine.pending.length, 1);\n});\ntest('another anonymous owner cannot consume this root', async () => {\n  const h = harness(); await h.runtime.resumeRelationshipProcessing('another-user', true); assert.equal(h.models, 0); assert.equal(h.writes, 0);\n});\ntest('permanence imports newest verified frozen root once, including pending analysis, without anonymous writer', async () => {\n  const h = harness(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.writes, 0);\n  await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1); assert.equal(h.models, 1);\n});\ntest('expired anonymous checkpoint is ignored and cannot poison permanent relationship processing', async () => {\n  const h = harness({ expiredRoot: true });\n  await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {});\n  assert.equal(h.imports, 0); assert.equal(h.models, 0); assert.equal(h.writes, 0);\n});\ntest('permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root', async () => {\n  const h = harness({ failure: true }); await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}));\n  assert.equal(h.imports, 0); h.clearFailure(); await h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {}); assert.equal(h.imports, 1);\n});\n\nfor (const reason of ['lease_busy', 'out_of_order', 'lease_lost', 'failure']) {\n  test(`permanent after-save runner stops on ${reason} and preserves successful chat`, async () => {\n    const h = harness({ permanent: reason });\n    await h.runtime.resumeRelationshipProcessing('owner', false);\n    assert.equal(h.attempts, 1); assert.equal(h.models, 0); assert.equal(h.imports, 0);\n  });\n}\ntest('permanence import rechecks ownership before model and atomic materialization', async () => {\n  const h = harness(); let checks = 0;\n  await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { if (++checks === 3) throw Error('lease_lost'); }));\n  assert.equal(h.models, 1); assert.equal(h.imports, 0); assert.equal(h.writes, 0);\n});\n\ntest('TOCTOU: permanent import is rejected by DB after application guard succeeds', async () => {\n  const h = harness({ importRace: true }); let checks = 0;\n  await assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { checks++; }), /relationship_processing_lease_required/);\n  assert.ok(checks >= 4); assert.equal(h.imports, 0); assert.equal(h.writes, 0);\n});\n",
+        "sha256": "869b0e4b316c045bb000c6e227daf49c5b07488a55eaa302a98907d336d6ca1a"
+      }
+    }
+  ],
+  "file_count": 2,
+  "reported_file_count": 2,
+  "commits": [
+    {
+      "sha": "830b5595d1f827b8619a6b59005922cb7d71e68b",
+      "message": "Skip expired anonymous relationship imports\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/830b5595d1f827b8619a6b59005922cb7d71e68b"
+    },
+    {
+      "sha": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+      "message": "Cover expired temporary relationship checkpoint\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/63cf82a53600b0518c1d88e61df4b09665026e2d"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "63cf82a53600b0518c1d88e61df4b09665026e2d",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/37389415691",
+      "id": 37389415691,
+      "updated_at": "2026-10-05T23:37:11Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "analyzeTemporarySnapshot",
+    "assert",
+    "attempts",
+    "boundary",
+    "cache",
+    "canonical",
+    "checks",
+    "code",
+    "confirmed",
+    "context",
+    "count",
+    "db",
+    "engine",
+    "enqueueTemporaryTurn",
+    "events",
+    "evidence",
+    "failed",
+    "fs",
+    "h",
+    "harness",
+    "history",
+    "importPermanentRelationship",
+    "imports",
+    "key",
+    "ledgers",
+    "load",
+    "models",
+    "module",
+    "path",
+    "pendingRelationshipGuide",
+    "q",
+    "reason",
+    "req",
+    "result",
+    "resumeRelationshipProcessing",
+    "root",
+    "rootPath",
+    "runAnonymous",
+    "runPermanent",
+    "running",
+    "snapshot",
+    "store",
+    "task",
+    "test",
+    "ts",
+    "turn",
+    "turns",
+    "type",
+    "verified",
+    "vm",
+    "writes"
+  ],
+  "related_sources": [],
+  "curated": {
+    "summary": "期限切れ匿名ルートで関係性処理が止まる問題を防止",
+    "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+    "evidence": [
+      "https://github.com/miyazaki1016/misaki/pull/64"
+    ]
+  },
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "3a54f689179a44c3264f78bce2db2a72d3438c2e298d7e2a5f87b019afd01c6b",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-09T09:02:40.107460+00:00",
+  "decisions": [
+    {
+      "kind": "test",
+      "title": "anonymous saved root analysis uses encrypted CAS writer and replay cannot grow twice",
+      "condition": "anonymous saved root analysis uses encrypted CAS writer and replay cannot grow twice",
+      "behavior": "if (!engineEnabled()) return; ／ if (running.has(key)) return running.get(key); ／ return task;",
+      "verification": "テストの期待値: assert.equal(h.root.relationshipEngine.state.affection, 1) ／ assert.equal(h.writes, 1) ／ assert.equal(h.imports, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L77",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L57"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "anonymous failed analysis preserves encrypted pending turn then safely resumes",
+      "condition": "anonymous failed analysis preserves encrypted pending turn then safely resumes",
+      "behavior": "if (!engineEnabled()) return; ／ if (running.has(key)) return running.get(key); ／ return task;",
+      "verification": "テストの期待値: assert.equal(h.root.relationshipEngine.pending.length, 1) ／ assert.equal(h.writes, 0) ／ assert.equal(h.root.relationshipEngine.state.affection, 1) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L77",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L62"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "anonymous checkpoint boundary rejects missing canonical supporting pair before model/write",
+      "condition": "anonymous checkpoint boundary rejects missing canonical supporting pair before model/write",
+      "behavior": "if (!engineEnabled()) return; ／ if (running.has(key)) return running.get(key); ／ return task;",
+      "verification": "テストの期待値: assert.equal(h.models, 0) ／ assert.equal(h.writes, 0) ／ assert.equal(h.root.relationshipEngine.pending.length, 1) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L77",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L68"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "another anonymous owner cannot consume this root",
+      "condition": "another anonymous owner cannot consume this root",
+      "behavior": "if (!engineEnabled()) return; ／ if (running.has(key)) return running.get(key); ／ return task;",
+      "verification": "テストの期待値: assert.equal(h.models, 0) ／ assert.equal(h.writes, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L77",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L72"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "permanence imports newest verified frozen root once, including pending analysis, without anonymous writer",
+      "condition": "permanence imports newest verified frozen root once, including pending analysis, without anonymous writer",
+      "behavior": "if (!engineEnabled()) return; ／ if (importError) throw new Error(\"relationship_import_read_failed\"); ／ if (imported) return; ／ if (error) throw new Error(\"relationship_import_root_read_failed\"); ／ if (!root) return; ／ if (Date.parse(root.expires_at) <= Date.now()) return; ／ if (!verified) throw new Error(\"relationship_import_root_invalid\"); ／ if (!snapshot) return;",
+      "verification": "テストの期待値: assert.equal(h.imports, 1) ／ assert.equal(h.writes, 0) ／ assert.equal(h.imports, 1) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L88",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L75"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "expired anonymous checkpoint is ignored and cannot poison permanent relationship processing",
+      "condition": "expired anonymous checkpoint is ignored and cannot poison permanent relationship processing",
+      "behavior": "if (!engineEnabled()) return; ／ if (importError) throw new Error(\"relationship_import_read_failed\"); ／ if (imported) return; ／ if (error) throw new Error(\"relationship_import_root_read_failed\"); ／ if (!root) return; ／ if (Date.parse(root.expires_at) <= Date.now()) return; ／ if (!verified) throw new Error(\"relationship_import_root_invalid\"); ／ if (!snapshot) return;",
+      "verification": "テストの期待値: assert.equal(h.imports, 0) ／ assert.equal(h.models, 0) ／ assert.equal(h.writes, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L88",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L79"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root",
+      "condition": "permanence analyzer failure cannot import an incomplete snapshot; retry uses latest verified root",
+      "behavior": "if (!engineEnabled()) return; ／ if (importError) throw new Error(\"relationship_import_read_failed\"); ／ if (imported) return; ／ if (error) throw new Error(\"relationship_import_root_read_failed\"); ／ if (!root) return; ／ if (Date.parse(root.expires_at) <= Date.now()) return; ／ if (!verified) throw new Error(\"relationship_import_root_invalid\"); ／ if (!snapshot) return;",
+      "verification": "テストの期待値: assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => {})) ／ assert.equal(h.imports, 0) ／ assert.equal(h.imports, 1) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L88",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L84"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "permanence import rechecks ownership before model and atomic materialization",
+      "condition": "permanence import rechecks ownership before model and atomic materialization",
+      "behavior": "if (!engineEnabled()) return; ／ if (importError) throw new Error(\"relationship_import_read_failed\"); ／ if (imported) return; ／ if (error) throw new Error(\"relationship_import_root_read_failed\"); ／ if (!root) return; ／ if (Date.parse(root.expires_at) <= Date.now()) return; ／ if (!verified) throw new Error(\"relationship_import_root_invalid\"); ／ if (!snapshot) return;",
+      "verification": "テストの期待値: assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { if (++checks === 3) throw Error('lease_lost') ／ assert.equal(h.models, 1) ／ assert.equal(h.imports, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L88",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L96"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "TOCTOU: permanent import is rejected by DB after application guard succeeds",
+      "condition": "TOCTOU: permanent import is rejected by DB after application guard succeeds",
+      "behavior": "if (!engineEnabled()) return; ／ if (importError) throw new Error(\"relationship_import_read_failed\"); ／ if (imported) return; ／ if (error) throw new Error(\"relationship_import_root_read_failed\"); ／ if (!root) return; ／ if (Date.parse(root.expires_at) <= Date.now()) return; ／ if (!verified) throw new Error(\"relationship_import_root_invalid\"); ／ if (!snapshot) return;",
+      "verification": "テストの期待値: assert.rejects(h.runtime.importPermanentRelationship('owner', 'turn-3', 'live', async () => { checks++ ／ assert.ok(checks >= 4) ／ assert.equal(h.imports, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/lib/relationship-runtime-v1.ts#L88",
+        "https://github.com/miyazaki1016/misaki/blob/63cf82a53600b0518c1d88e61df4b09665026e2d/tests/relationship-runtime-v1.test.cjs#L102"
+      ]
+    }
+  ]
+}

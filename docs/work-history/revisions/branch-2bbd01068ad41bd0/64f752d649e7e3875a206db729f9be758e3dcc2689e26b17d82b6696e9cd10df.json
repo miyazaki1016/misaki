@@ -1,0 +1,42 @@
+{
+  "id": "branch-2bbd01068ad41bd0",
+  "title": "docs/preflight-autonomous-wait-20261110",
+  "head": "e52257dee648a0b25104c5b8bd7fab79f4cc87ef",
+  "head_ref": "docs/preflight-autonomous-wait-20261110",
+  "linked_prs": [
+    179
+  ],
+  "files": [
+    {
+      "path": "AGENTS.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e52257dee648a0b25104c5b8bd7fab79f4cc87ef/AGENTS.md"
+    },
+    {
+      "path": "docs/IMPLEMENTATION_OVERVIEW.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e52257dee648a0b25104c5b8bd7fab79f4cc87ef/docs/IMPLEMENTATION_OVERVIEW.md"
+    },
+    {
+      "path": "docs/WORK_HISTORY_PREFLIGHT.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/e52257dee648a0b25104c5b8bd7fab79f4cc87ef/docs/WORK_HISTORY_PREFLIGHT.md"
+    }
+  ],
+  "commits": "e52257dee648a0b25104c5b8bd7fab79f4cc87ef docs: continue preflight polling without repeated user prompts",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "168de4e9610baa80f1f3e4c7bf6849bbf62f48df69afdddca60ccca11f84216f",
+  "collected_at": "2026-11-14T00:17:41.049806+00:00"
+}
