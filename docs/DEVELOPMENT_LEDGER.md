@@ -170,7 +170,7 @@
 | #63 | Fix mobile PWA section horizontal clipping | merged | `f65c3b2e56478634861e27193fbb5913ebfb84cb` | 2026-10-04T07:03:50Z |
 | #64 | Do not let expired anonymous roots block relationship processing | merged | `63cf82a53600b0518c1d88e61df4b09665026e2d` | 2026-10-05T23:38:17Z |
 | #65 | Retry transient Relationship Analyzer failures | merged | `90ac90bba86f716ccf46e50542097d1b81e23702` | 2026-10-05T23:52:24Z |
-| #66 | Forget Control v1: canonical忘却と確認付き再学習 | open | `84d147ba5b46698d3b46fb727a9859f87f79f3d2` | 2026-10-06T21:21:23Z |
+| #66 | Forget Control v1: canonical忘却と確認付き再学習 | open | `b29e209b75ae714cedb6b5c7af9d33f3efed5686` | 2026-11-12T08:16:55Z |
 | #67 | Relationship Identity v1: canonical persistence, continuity and migration audit | open | `9cbe2146d4a9ad09edd16100c27d950e95a8bcc4` | 2026-10-11T16:44:42Z |
 | #68 | ci: manual-only isolated Gemini A/B dispatcher (no app changes) | merged | `7b8edbc79c9f1f798e3936504eb3f09b2d7bd9bd` | 2026-10-08T02:42:12Z |
 | #69 | ci: add optional 20-pair isolated Gemini A/B run | merged | `f3b98d03475fdcc012a07de669cc628911e32239` | 2026-10-08T02:50:26Z |
@@ -280,4 +280,10 @@
 | #182 | feat(history): iPhone履歴読み込みのDB段階別計測 (#181) | open | `47801ceae351b67dda19c35f48b8a37d742f1f62` | 2026-11-10T17:10:21Z |
 | #183 | feat(history): 中断した親目的と再開候補を既存台帳で追跡する | merged | `7c1b6217bdc87411f0e3bbfed143d905590c708e` | 2026-11-10T17:39:03Z |
 | #186 | feat(history): 作業の再開待ちと復帰記録を引き継ぎに表示する | merged | `c4fd15dacfbbc8378b6451f3667f63db5dcaca98` | 2026-11-12T06:52:07Z |
+| #190 | P0 期限切れ匿名rootの安全な物理削除 | open | `054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2` | 2026-11-12T08:20:31Z |
+| #191 | P0 匿名会話履歴の推論入力に24時間期限を適用 | open | `accf2ef33c01e0a45ee96bea543fde01350e87f2` | 2026-11-12T08:27:19Z |
+| #192 | 美咲エンジン総点検とP0の検証結果を開発台帳に記録 | open | `2ca81a00aad79adad61c9c734ca487f9f7ff0e8e` | 2026-11-12T23:51:27Z |
+| #193 | P0 統合 — 匿名個別記憶の24時間期限と感情v2の再開 | open | `51172011f7fac44950a6aa68494771ecdfe2bd76` | 2026-11-12T23:49:30Z |
+| #194 | test: add bounded synthetic context A/B quality evaluation (#184) | open | `8d7b732fb19ef45c8148c135fffb94451e9bd9ea` | 2026-11-13T02:01:26Z |
+| #196 | 美咲の開発履歴で実装判断と検証根拠を検索できるようにする | merged | `251b93ccdbe49657907dd453f8b4530bb4471697` | 2026-11-14T00:17:27Z |
 <!-- INVENTORY_FACTS_END -->
