@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-11-09",
+  "reviewed_at": "2026-11-13",
   "prs": {
     "1": {
       "summary": "匿名会話と記憶をメール確認前に同じユーザーへ保存する",
@@ -459,10 +459,12 @@
       ]
     },
     "66": {
-      "summary": "正本記憶の忘却と確認付き再学習を設計・実装する案",
-      "conclusion": "日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。",
+      "summary": "忘却と確認付き再学習の既存実装を現行mainへ追随",
+      "conclusion": "Draftの最新HEADでローカル408テストとGitHub統合CIに成功。実モデル・隔離Supabase・実機・main・本番は未確認。",
       "evidence": [
-        "https://github.com/miyazaki1016/misaki/pull/66"
+        "https://github.com/miyazaki1016/misaki/pull/66",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43181660671",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
       ]
     },
     "67": {
@@ -1165,6 +1167,38 @@
         "https://github.com/miyazaki1016/emergencyalert/pull/164",
         "https://github.com/miyazaki1016/emergencyalert/actions/runs/42746003789",
         "https://github.com/miyazaki1016/emergencyalert/compare/7e61e6c7fc653735dcc327fa2e1ade34beb4dab1...56fe1fc85725c7f88931e5e77ed353a540a2e5eb"
+      ]
+    },
+    "190": {
+      "summary": "期限切れ匿名rootの単件削除と同一IDへの復活防止",
+      "conclusion": "Draftの最新HEADでPGlite・匿名復旧回帰とGitHub統合CIに成功。receipt・メール保存済みデータ・バックアップ・起動運用は未完了。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/190",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43182149490",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818554346"
+      ]
+    },
+    "191": {
+      "summary": "匿名履歴の推論入力を発言単位の24時間に制限",
+      "conclusion": "Draftの最新HEADで通常チャット・Body Clockの隔離試験と統合CIに成功。個別記憶・関係性派生・登録移行・本番・実機は未完了。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/191",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43183072388",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6818678069"
+      ]
+    },
+    "193": {
+      "summary": "P0統合の最終受入で匿名の再接続と感情v2回収を検証",
+      "conclusion": "ローカル415件と最新HEADのGitHub統合CI・照合CI成功。実Auth、実機・実モデル、別表現の再抽出、Body Clock実競合、本番は未確認。 416件成功、型検査・ビルド・統合CI成功。合成モデルが期限切れ事実を言い換えると新規記憶として保存されることを隔離再現。NO-GO。感情回収は専用定期POSTの設定が必要。 2026-11-13再受入：有効なユーザー発言の出所と最短期限を保存。前回の言い換えを隔離回帰で拒否。420件成功、型検査・ビルド・照合CI成功。実環境受入を条件にGO。",
+      "evidence": [
+        "https://github.com/miyazaki1016/misaki/pull/193",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43212257045",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43212257100",
+        "https://github.com/miyazaki1016/misaki/issues/102#issuecomment-6822772795",
+        "https://github.com/miyazaki1016/misaki/commit/5c77d9f09f63791635597b7e87da717f9a7e4255",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43323186421",
+        "https://github.com/miyazaki1016/misaki/commit/51172011f7fac44950a6aa68494771ecdfe2bd76",
+        "https://github.com/miyazaki1016/misaki/actions/runs/43332076768"
       ]
     }
   }
