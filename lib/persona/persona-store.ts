@@ -13,6 +13,7 @@ import {
 } from "../relationship-time";
 import { createRelationshipEmotionGuide } from "../relationship-emotion";
 import { createRelationshipActionGuide } from "../relationship-action";
+import { createForgetJudge, maskForgetRows, type ForgetControl } from "../../supabase/functions/_shared/forget-control";
 
 type PromptModuleRow = {
   module_key: string;
@@ -156,7 +157,8 @@ async function loadActiveGlobalModules(
 
 async function loadUserRelationshipTraits(
   supabase: SupabaseClient,
-  userId: string
+  userId: string,
+  controls: ForgetControl[] = []
 ) {
   const {
     data,
@@ -192,13 +194,14 @@ async function loadUserRelationshipTraits(
     return "";
   }
 
+  const filtered = await maskForgetRows(data.map(trait => ({ ...trait, text: trait.content })), controls, createForgetJudge(process.env.GEMINI_API_KEY!), "derived");
   return `
 【このユーザーとの関係で育った特徴】
 
-${data
+${filtered
   .map(
     (trait) =>
-      `・${trait.content}`
+      `・${trait.text}`
   )
   .join("\n")}
 
@@ -232,7 +235,8 @@ export async function loadPersonaPrompt(
   supabase: SupabaseClient,
   userId: string,
   channel: PersonaChannel,
-  relationshipTimeContext: RelationshipTimeContext | null = null
+  relationshipTimeContext: RelationshipTimeContext | null = null,
+  forgetControls: ForgetControl[] = []
 ): Promise<LoadedPersonaPrompt> {
   try {
     const [
@@ -246,7 +250,8 @@ export async function loadPersonaPrompt(
         ),
         loadUserRelationshipTraits(
           supabase,
-          userId
+          userId,
+          forgetControls
         ),
         Promise.resolve(
           createRelationshipContinuityGuide(

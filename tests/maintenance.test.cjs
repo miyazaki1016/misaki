@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
-const { harness } = require('./server-canonical.test.cjs');
+const { harness } = require('./helpers/canonical-harness.cjs');
 
 for (const anonymous of [false, true]) for (const premium of [false, true]) {
   test(`maintenance OFF -> ON -> OFF preserves ${anonymous ? 'anonymous' : 'permanent'} ${premium ? 'Premium' : 'Free'} chat`, async () => {

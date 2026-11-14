@@ -12,7 +12,7 @@ export async function openTemporaryReceipt(token: unknown, serviceKey: string) {
     const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: bytes.subarray(0, 12), tagLength: 128 }, key, ciphertext);
     const payload = JSON.parse(new TextDecoder().decode(plain));
     if (!Number.isFinite(payload.expires) || payload.expires <= Date.now()) return null;
-    return payload.state as { history: unknown; memory: unknown; todayMemory: { date: string; items: string[] }; relationshipPoints: number };
+    return payload.state as { forgetControls?: import("../_shared/forget-control.ts").ForgetControl[]; history: unknown; memory: unknown; todayMemory: { date: string; items: string[] }; relationshipPoints: number };
   } catch {
     return null;
   }
