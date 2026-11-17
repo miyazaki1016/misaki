@@ -1,4 +1,4 @@
-import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionRecord } from "./conversation-lab-decision";
+import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionRecord } from "./conversation-lab-decision.ts";
 
 export type LabVariant = {
   rules: ConversationDecisionRules;
