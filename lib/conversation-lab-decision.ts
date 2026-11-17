@@ -1,6 +1,9 @@
 /**
  * Conversation Lab decision model (pure, no network or production writes).
  * Misaki selects materials; Gemini is responsible only for wording.
+ * Exactly one reason is recorded per candidate, in this precedence:
+ * cancelled > expired > previously-used > below-threshold > duplicate > limit.
+ * Candidate identity (kind:id) must be unique within each input snapshot.
  */
 export type CandidateKind = "conversation" | "memory" | "personal-life" | "external-event" | "emotion" | "relationship" | "body-clock";
 export type ConversationCandidate = {
@@ -31,6 +34,14 @@ export function selectConversationMaterials(
 ): { selected: ConversationCandidate[]; decisions: DecisionRecord[] } {
   if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) {
     throw new Error("Invalid conversation decision rules");
+  }
+  const identities = new Set<string>();
+  for (const candidate of candidates) {
+    if (!Number.isFinite(candidate.priority)) throw new Error("Invalid candidate priority");
+    if (!candidate.id || !candidate.id.trim()) throw new Error("Invalid candidate identity");
+    const identity = candidate.kind + ":" + candidate.id;
+    if (identities.has(identity)) throw new Error("Duplicate candidate identity");
+    identities.add(identity);
   }
   const seen = new Set<string>();
   const decisions: DecisionRecord[] = [];
