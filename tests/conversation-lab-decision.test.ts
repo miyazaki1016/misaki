@@ -39,3 +39,19 @@ test("rejects duplicate identities and non-finite priorities before sorting", ()
     { id: "inf", kind: "memory", text: "bad", priority: Infinity },
   ], rules), /Invalid candidate priority/);
 });
+
+test("records exactly one exclusion reason using documented precedence", () => {
+  const now = new Date("2026-11-17T00:00:00Z");
+  const rules = { minimumPriority: 5, maximumSelected: 0, suppressPreviouslyUsed: true };
+  const candidates = [
+    { id: "cancelled", kind: "memory" as const, text: "x", priority: 1, cancelled: true, alreadyUsed: true, expiresAt: "2020-01-01T00:00:00Z" },
+    { id: "expired", kind: "memory" as const, text: "x", priority: 1, alreadyUsed: true, expiresAt: "2020-01-01T00:00:00Z" },
+    { id: "used", kind: "memory" as const, text: "x", priority: 1, alreadyUsed: true },
+    { id: "low", kind: "memory" as const, text: "x", priority: 1 },
+    { id: "limited", kind: "memory" as const, text: "x", priority: 10 },
+  ];
+  const result = selectConversationMaterials(candidates, rules, now);
+  assert.deepEqual(result.decisions.map(d => d.reason), ["limit", "cancelled", "expired", "previously-used", "below-threshold"]);
+  assert.equal(result.decisions.length, candidates.length);
+  assert.equal(result.selected.length, 0);
+});
