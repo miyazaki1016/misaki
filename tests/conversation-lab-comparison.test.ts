@@ -15,3 +15,33 @@ test("compares the same snapshot without mutating it", () => {
   assert.deepEqual(result.changedReasons, [{ id: "external-event:rain", from: "below-threshold", to: "selected" }]);
   assert.equal(snapshot[0].text, "rain");
 });
+
+
+test("shows selected-material removal when sandbox selection limit is tightened", () => {
+  const snapshot = [
+    { id: "first", kind: "conversation" as const, text: "first", priority: 9 },
+    { id: "second", kind: "memory" as const, text: "second", priority: 8 },
+  ];
+  const original = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };
+  const experimental = { ...original, maximumSelected: 1 };
+  const diff = compareConversationDecisions(snapshot, original, experimental, new Date("2026-11-17T00:00:00Z"));
+  assert.deepEqual(diff.addedIds, []);
+  assert.deepEqual(diff.removedIds, ["memory:second"]);
+  assert.deepEqual(diff.changedReasons, [{ id: "memory:second", from: "selected", to: "limit" }]);
+  assert.equal(diff.original.selected.length, 2);
+  assert.equal(diff.experimental.selected.length, 1);
+});
+
+test("never selects cancelled or expired events in either variant", () => {
+  const snapshot = [
+    { id: "cancelled", kind: "external-event" as const, text: "cancelled", priority: 100, cancelled: true },
+    { id: "expired", kind: "external-event" as const, text: "expired", priority: 99, expiresAt: "2026-11-16T00:00:00Z" },
+    { id: "current", kind: "personal-life" as const, text: "current", priority: 5 },
+  ];
+  const a = { minimumPriority: 6, maximumSelected: 5, suppressPreviouslyUsed: true };
+  const b = { ...a, minimumPriority: 0 };
+  const diff = compareConversationDecisions(snapshot, a, b, new Date("2026-11-17T00:00:00Z"));
+  assert.deepEqual(diff.addedIds, ["personal-life:current"]);
+  assert.deepEqual(diff.experimental.selected.map(c => c.id), ["current"]);
+  assert.deepEqual(diff.experimental.decisions.map(d => d.reason), ["cancelled", "expired", "selected"]);
+});
