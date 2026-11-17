@@ -70,3 +70,12 @@ test("compares suppression of previously used materials without changing product
   assert.deepEqual(diff.changedReasons, [{ id: "conversation:used", from: "previously-used", to: "selected" }]);
   assert.equal(snapshot[0].alreadyUsed, true);
 });
+
+test("rejects ambiguous duplicate identities before computing A/B reason maps", () => {
+  const snapshot = [
+    { id: "same", kind: "memory" as const, text: "first", priority: 9 },
+    { id: "same", kind: "memory" as const, text: "second", priority: 8 },
+  ];
+  const rules = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };
+  assert.throws(() => compareConversationDecisions(snapshot, rules, rules), /Duplicate candidate identity/);
+});
