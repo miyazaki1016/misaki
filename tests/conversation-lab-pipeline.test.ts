@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { prepareScopedConversationHandoff } from "../lib/conversation-lab-pipeline.ts";
+import { prepareScopedConversationHandoff, buildScopedConversationAudit } from "../lib/conversation-lab-pipeline.ts";
 import type { ScopedConversationCandidate } from "../lib/conversation-lab-scope.ts";
 
 const candidate = (id: string, ownerUserId: string, visible: string[]): ScopedConversationCandidate => ({
@@ -31,4 +31,20 @@ test("fails closed when owner scope is absent", () => {
     { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },
     { selectionRulesVersion: "v1", snapshotId: "s1" },
   ), /Missing lab scope/);
+});
+
+test("audit envelope preserves scope and rejection reasons without candidate text", () => {
+  const scope = { ownerUserId: "user-a", characterId: "misaki" };
+  const result = prepareScopedConversationHandoff([
+    candidate("allowed", "user-a", ["misaki"]),
+    candidate("denied", "user-b", ["misaki"]),
+  ], scope,
+  { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },
+  { selectionRulesVersion: "v1", snapshotId: "s1" });
+  const audit = buildScopedConversationAudit(result, scope);
+  assert.deepEqual(audit.scope, scope);
+  assert.deepEqual(audit.scopeRejections, [{ candidateId: "memory:denied", reason: "different-user" }]);
+  assert.equal(JSON.stringify(audit).includes("PRIVATE-"), false);
+  assert.equal(JSON.stringify(audit.selection).includes("PRIVATE-"), false);
+  assert.throws(() => buildScopedConversationAudit(result, { ownerUserId: "", characterId: "misaki" }), /Missing lab scope/);
 });
