@@ -19,7 +19,7 @@ export type ConversationLabScope = Readonly<{
   ownerUserId: string;
   characterId: string;
 }>;
-export type ScopeRejection = "different-user" | "not-visible-to-character";
+export type ScopeRejection = "different-user" | "not-visible-to-character" | "malformed";
 export type ScopeDecision = {
   candidateId: string;
   allowed: boolean;
@@ -33,7 +33,23 @@ export function filterConversationLabScope(
   const candidates: ConversationCandidate[] = [];
   const decisions: ScopeDecision[] = [];
   for (const item of source) {
-    const candidateId = item.candidate.kind + ":" + item.candidate.id;
+    const raw = item as Partial<ScopedConversationCandidate>;
+    const candidateId = typeof raw.candidate?.kind === "string" && typeof raw.candidate?.id === "string" && raw.candidate.id.trim()
+      ? raw.candidate.kind + ":" + raw.candidate.id : "malformed";
+    const visibility = raw.visibility;
+    const valid = typeof raw.ownerUserId === "string" && !!raw.ownerUserId.trim() &&
+      typeof raw.candidate?.id === "string" && !!raw.candidate.id.trim() &&
+      typeof raw.candidate?.kind === "string" &&
+      Array.isArray(visibility?.participatingCharacterIds) &&
+      Array.isArray(visibility?.witnessingCharacterIds) &&
+      Array.isArray(visibility?.explicitlySharedWithCharacterIds) &&
+      [visibility?.participatingCharacterIds, visibility?.witnessingCharacterIds, visibility?.explicitlySharedWithCharacterIds].every(
+        entries => entries?.every(id => typeof id === "string" && !!id.trim())
+      );
+    if (!valid) {
+      decisions.push({ candidateId, allowed: false, reason: "malformed" });
+      continue;
+    }
     const sameUser = item.ownerUserId === scope.ownerUserId;
     const visible = item.visibility.participatingCharacterIds.includes(scope.characterId) ||
       item.visibility.witnessingCharacterIds.includes(scope.characterId) ||
