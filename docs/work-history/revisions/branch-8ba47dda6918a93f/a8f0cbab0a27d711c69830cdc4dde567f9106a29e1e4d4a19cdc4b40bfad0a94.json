@@ -1,0 +1,91 @@
+{
+  "id": "branch-8ba47dda6918a93f",
+  "title": "feat/life-context-engine-198",
+  "head": "d7458f8054c37a0db4548e6d89d4398a8e684423",
+  "head_ref": "feat/life-context-engine-198",
+  "linked_prs": [
+    199
+  ],
+  "files": [
+    {
+      "path": "lib/conversation-lab-comparison.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-comparison.ts"
+    },
+    {
+      "path": "lib/conversation-lab-decision.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-decision.ts"
+    },
+    {
+      "path": "lib/conversation-lab-handoff.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "path": "lib/conversation-lab-pipeline.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "path": "lib/conversation-lab-scope.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-scope.ts"
+    },
+    {
+      "path": "tests/conversation-lab-comparison.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-decision.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-handoff.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-pipeline.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "path": "tests/conversation-lab-scope.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-scope.test.ts"
+    }
+  ],
+  "commits": "d7458f8054c37a0db4548e6d89d4398a8e684423 test(conversation-lab): preserve malformed rejection in audit evidence\nd318a0a259bd04b479286a9dbf1e5d089eec0ad5 test(conversation-lab): isolate malformed visibility entries\n32827a362ae4fe3c76005c734fbe6845efd33718 fix(conversation-lab): retain malformed scope rejections in audit pipeline\n22236f987dd108c5a4adcd7ed4b427d9c76fa998 fix(conversation-lab): propagate malformed scope rejection\n4349573946e8935a901bbf23e544604d53ec4d0a fix(conversation-lab): reject malformed scope entries per item\n54dfa35b0916c3c11deacb98b79bd4200ffd8715 test(conversation-lab): audit scope and exclusions without text\nc626c5c4aac64991eb27d42a4793890f38282c37 feat(conversation-lab): bind scope rejections to in-memory audit envelope\ncf91ea43132f78c61b6d915f8b3992d926cda1ae feat(conversation-lab): enforce scope gate in sandbox handoff pipeline\n66cb419abcc59f40be75d53367f181ebcf3127f2 feat(conversation-lab): enforce scope gate in sandbox handoff pipeline\nb4a613642340e2c6e9464feca1c4790f32ce54a0 feat(conversation-lab): pure fail-closed user and character scope gate\ne0efc41feb0cacea23efabb7e29c5c04421bc324 feat(conversation-lab): pure fail-closed user and character scope gate\nf55873de78258befa2210246f39bd168c1d7b217 test(conversation-lab): reject duplicate A/B snapshot identities\n3cd2dd8c50afc1117a03abc853bdb4ff8bed258c test(conversation-lab): lock exclusion precedence and one-reason invariant\n909f0f71a200474f0ff2373937350b58828ac231 test(conversation-lab): enforce unique snapshot identities and finite priorities\n7fb1294a19937a247d49fc580ff4c2d735a7cf77 fix(conversation-lab): reject ambiguous snapshots and invalid priorities\n8768119cd9b6985049df48717b963c6de5841037 feat(conversation-lab): versioned read-only Gemini handoff contract\n6ffe21031d98ba3d82a36580ee9b4edec8ec723d feat(conversation-lab): versioned read-only Gemini handoff contract\n1bec8e8d7b1e0d170e1f85d376ab928b56077440 test(conversation-lab): verify material identity and reuse rule A/B\n1256d55fa6d2c2341034ea3079a6e7c92c4a0f9b test(conversation-lab): cover sandbox limits and cancelled/expired material\n99776514ed82213f6c936a776a47dc0d87f93635 fix(conversation-lab): use resolvable TS module import in Node tests\nfc4ce38f559545df77e923087f8bfa4ae19db945 feat(conversation-lab): add read-only A/B decision diff\n42430644342c1cbb58b583fbc398dbd274fe31e4 feat(conversation-lab): add read-only A/B decision diff\nccc924d3ac720e0f2bb710aecdf9e0305926912b feat(conversation-lab): add pure material selection with auditable decisions\n68a496dd0e805a37f0d70606cf05ed0cd5ceda0f feat(conversation-lab): add pure material selection with auditable decisions",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "21a298b769e67eb669e50912143a69ef62f49dbea314bc861c12b73ee64f7d0a",
+  "collected_at": "2026-11-18T08:32:22.915817+00:00"
+}

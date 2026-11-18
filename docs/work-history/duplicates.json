@@ -379,6 +379,26 @@
     "branch-fc35db20bd870b9a",
     "pr-88"
   ],
+  "lib/conversation-lab-comparison.ts": [
+    "branch-8ba47dda6918a93f",
+    "pr-199"
+  ],
+  "lib/conversation-lab-decision.ts": [
+    "branch-8ba47dda6918a93f",
+    "pr-199"
+  ],
+  "lib/conversation-lab-handoff.ts": [
+    "branch-8ba47dda6918a93f",
+    "pr-199"
+  ],
+  "lib/conversation-lab-pipeline.ts": [
+    "branch-8ba47dda6918a93f",
+    "pr-199"
+  ],
+  "lib/conversation-lab-scope.ts": [
+    "branch-8ba47dda6918a93f",
+    "pr-199"
+  ],
   "lib/conversation-lab/evaluation.ts": [
     "branch-ae082efda294b17a",
     "pr-86"

@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-17T09:12:41.047013+00:00
+更新 (UTC): 2026-11-18T08:32:22.915817+00:00
 
 ## 全案件
 
@@ -125,6 +125,7 @@
 | [work/ab-quality-diagnostics-workflow](cases/branch-88129d40b3c5ce99.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/anonymous-session-cache-reset](cases/branch-8876346d043651ec.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/drop-ungrounded-relationship-evidence](cases/branch-88e2b40f5b6d498e.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [feat/life-context-engine-198](cases/branch-8ba47dda6918a93f.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/gemini-unit-cost-telemetry](cases/branch-8c1c252f0c53fa36.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/remove-false-busy-wait](cases/branch-8f7424f62a838c0f.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/context-ab-quality-budget-guard-184](cases/branch-8fb3e7f76aab269c.md) | 記憶・会話・開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -313,6 +314,7 @@
 | [P0 統合 — 匿名個別記憶の24時間期限と感情v2の再開](cases/pr-193.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [test: add bounded synthetic context A/B quality evaluation (#184)](cases/pr-194.md) | その他の開発：変更対象ファイルに関する開発。具体的な目的は原文・差分を確認 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [美咲の開発履歴で実装判断と検証根拠を検索できるようにする](cases/pr-196.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階）](cases/pr-199.md) | 記憶・会話：会話や記憶・関係性を扱う処理の変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [直近の実装・修正総覧を更新する](cases/pr-21.md) | その他の開発：直近の実装・修正総覧を更新する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -463,6 +465,11 @@
 - lib/conversation-engine/memory.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
 - lib/conversation-engine/relationship-context.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
 - lib/conversation-engine/retry-guides.ts：[branch-fc35db20bd870b9a](cases/branch-fc35db20bd870b9a.md), [pr-88](cases/pr-88.md)
+- lib/conversation-lab-comparison.ts：[branch-8ba47dda6918a93f](cases/branch-8ba47dda6918a93f.md), [pr-199](cases/pr-199.md)
+- lib/conversation-lab-decision.ts：[branch-8ba47dda6918a93f](cases/branch-8ba47dda6918a93f.md), [pr-199](cases/pr-199.md)
+- lib/conversation-lab-handoff.ts：[branch-8ba47dda6918a93f](cases/branch-8ba47dda6918a93f.md), [pr-199](cases/pr-199.md)
+- lib/conversation-lab-pipeline.ts：[branch-8ba47dda6918a93f](cases/branch-8ba47dda6918a93f.md), [pr-199](cases/pr-199.md)
+- lib/conversation-lab-scope.ts：[branch-8ba47dda6918a93f](cases/branch-8ba47dda6918a93f.md), [pr-199](cases/pr-199.md)
 - lib/conversation-lab/evaluation.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - lib/conversation-lab/github-one-shot-claim.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - lib/conversation-lab/live-smoke-probe.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
