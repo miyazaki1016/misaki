@@ -13,12 +13,12 @@ export function prepareScopedConversationHandoff(
   rules: Readonly<ConversationDecisionRules>,
   metadata: Readonly<{ selectionRulesVersion: string; snapshotId: string; experimentId?: string }>,
   now: Date = new Date(),
-): { handoff: ConversationSelectionHandoff; scopeRejections: { candidateId: string; reason: "different-user" | "not-visible-to-character" }[] } {
+): { handoff: ConversationSelectionHandoff; scopeRejections: { candidateId: string; reason: "different-user" | "not-visible-to-character" | "malformed" }[] } {
   const scoped = filterConversationLabScope(source, scope);
   const handoff = buildConversationSelectionHandoff(scoped.candidates, rules, metadata, now);
   return {
     handoff,
-    scopeRejections: scoped.decisions.filter((decision): decision is typeof decision & { reason: "different-user" | "not-visible-to-character" } => !decision.allowed) .map(({ candidateId, reason }) => ({ candidateId, reason })),
+    scopeRejections: scoped.decisions.filter((decision): decision is typeof decision & { reason: "different-user" | "not-visible-to-character" | "malformed" } => !decision.allowed) .map(({ candidateId, reason }) => ({ candidateId, reason })),
   };
 }
 
