@@ -48,3 +48,16 @@ test("audit envelope preserves scope and rejection reasons without candidate tex
   assert.equal(JSON.stringify(audit.selection).includes("PRIVATE-"), false);
   assert.throws(() => buildScopedConversationAudit(result, { ownerUserId: "", characterId: "misaki" }), /Missing lab scope/);
 });
+
+test("retains malformed rejection in audit rather than silently dropping it", () => {
+  const scope = { ownerUserId: "user-a", characterId: "misaki" };
+  const malformed = { ...candidate("bad", "user-a", ["misaki"]), visibility: undefined } as unknown as ScopedConversationCandidate;
+  const result = prepareScopedConversationHandoff(
+    [candidate("good", "user-a", ["misaki"]), malformed], scope,
+    { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },
+    { selectionRulesVersion: "v1", snapshotId: "s2" },
+  );
+  assert.deepEqual(result.handoff.selected.map(x => x.id), ["good"]);
+  assert.deepEqual(result.scopeRejections, [{ candidateId: "memory:bad", reason: "malformed" }]);
+  assert.deepEqual(buildScopedConversationAudit(result, scope).scopeRejections, result.scopeRejections);
+});
