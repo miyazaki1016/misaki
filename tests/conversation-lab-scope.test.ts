@@ -28,3 +28,11 @@ test("fails closed when scope is missing and does not modify source", () => {
   result.candidates[0].text = "changed";
   assert.equal(source[0].candidate.text, "SENSITIVE TEST MATERIAL a");
 });
+
+test("rejects malformed visibility per item while retaining valid materials", () => {
+  const broken = { ...item("broken", "u1", visibility(["misaki"])), visibility: undefined } as unknown as ScopedConversationCandidate;
+  const source = [broken, item("valid", "u1", visibility(["misaki"]))];
+  const result = filterConversationLabScope(source, { ownerUserId: "u1", characterId: "misaki" });
+  assert.deepEqual(result.candidates.map(c => c.id), ["valid"]);
+  assert.deepEqual(result.decisions.map(d => d.reason), ["malformed", "in-scope"]);
+});
