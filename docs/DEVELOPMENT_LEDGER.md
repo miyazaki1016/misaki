@@ -299,4 +299,5 @@ PR #193 のDB変更5本が未適用。旧RPC撤去と登録確認時の期限切
 | #203 | fix: preserve existing anonymous email checkpoints (#201) | merged | `f816d9b6fb3089ea3107756a8ec882e3fcc62ffa` | 2026-11-19T06:51:20Z |
 | #205 | 美咲LPの見出し・会話例・FAQを更新 (#204) | merged | `1c3cc6efc58d1cf2241df26c0a9891ee062967e9` | 2026-11-19T07:04:18Z |
 | #206 | チャットの履歴表示を高速化 (#181) | merged | `9362f082e4fa907b4e9b1902179f98e3e7ffebc2` | 2026-11-19T07:18:56Z |
+| #208 | 履歴取得中にチャットのローディングを表示 (#207) | merged | `5272ad1a0c9ddfef04a948280dd3967b650d2c4c` | 2026-11-19T07:40:29Z |
 <!-- INVENTORY_FACTS_END -->
