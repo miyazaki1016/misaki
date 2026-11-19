@@ -760,6 +760,13 @@ export default function ChatPage() {
     window.addEventListener("misaki-root-state", receive);
     window.addEventListener("misaki-history-state", receiveHistory);
     window.addEventListener("misaki-usage-state", receiveUsage);
+    // Only choose the placeholder here. The server supplies all displayed messages.
+    try {
+      const cachedHistory = localStorage.getItem(STORAGE_KEY);
+      setHasPriorHistory(Boolean((cachedHistory && cachedHistory !== "[]") || sessionStorage.getItem("misaki-pending-chat-turn")));
+    } catch {
+      setHasPriorHistory(true);
+    }
     async function load() {
       // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
       // Timings only: never log tokens, history, user IDs or temporary state.
@@ -777,8 +784,6 @@ export default function ChatPage() {
         previousAt = now;
       };
       try {
-        const cachedHistory = localStorage.getItem(STORAGE_KEY);
-        setHasPriorHistory(Boolean((cachedHistory && cachedHistory !== "[]") || sessionStorage.getItem("misaki-pending-chat-turn")));
         // A full remount ends the previous page's in-flight UI send marker.
         sessionStorage.removeItem("misaki-chat-sending");
         // Do not display unverified caches or persist an empty error-state over them.
