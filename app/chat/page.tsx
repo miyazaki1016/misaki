@@ -2012,29 +2012,6 @@ export default function ChatPage() {
           </div>
         )}
 
-        {messages.length ===
-          0 &&
-          loaded &&
-          !historyLoading &&
-          !loading && (
-            <div
-              className="emptyConversation"
-            >
-              <img
-                src="/icon-192.png"
-                alt=""
-              />
-
-              <p>
-                なんでもない話でいいよ。
-              </p>
-
-              <span>
-                Misaki
-              </span>
-            </div>
-          )}
-
         {messages.map(
           (
             item,
@@ -2981,29 +2958,6 @@ export default function ChatPage() {
           .historyLoadingSpinner { animation: none; }
         }
 
-        .emptyConversation img {
-          width:
-            69px;
-          height:
-            69px;
-          margin:
-            0 auto;
-          border:
-            3px solid
-            white;
-          border-radius:
-            50%;
-          box-shadow:
-            0 9px
-            25px
-            rgba(
-              92,
-              61,
-              72,
-              0.12
-            );
-        }
-
         .emptyConversation p {
           margin:
             17px
@@ -3021,24 +2975,6 @@ export default function ChatPage() {
             0.03em;
         }
 
-        .emptyConversation span {
-          display:
-            inline-block;
-          margin-top:
-            7px;
-          color:
-            #ff6680;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
-          font-size:
-            17px;
-          transform:
-            rotate(
-              -4deg
-            );
-        }
         .sendError {
           align-self:
             center;

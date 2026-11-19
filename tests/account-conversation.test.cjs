@@ -289,7 +289,7 @@ function allElements(tree, predicate) {
   if (!tree || typeof tree !== 'object') return [];
   return [...(predicate(tree) ? [tree] : []), ...[tree.props?.children].flat(Infinity).flatMap(x => allElements(x, predicate))];
 }
-test('initial history shows a loading status until an empty conversation is confirmed', async () => {
+test('initial history shows a loading status then leaves an empty conversation blank', async () => {
   const h = harness();
   let finish;
   h.fetch = async () => new Promise(resolve => { finish = resolve; });
@@ -302,7 +302,7 @@ test('initial history shows a loading status until an empty conversation is conf
   finish(Response.json({ history: [], memory: [], relationshipPoints: 0 }));
   await flush();
   assert.equal(loading().length, 0);
-  assert.equal(greeting().length, 1);
+  assert.equal(greeting().length, 0);
   h.unmount();
 });
 
