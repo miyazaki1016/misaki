@@ -1,0 +1,44 @@
+{
+  "id": "branch-df9c3db950211b06",
+  "title": "fix/chat-history-loading-207",
+  "head": "5272ad1a0c9ddfef04a948280dd3967b650d2c4c",
+  "head_ref": "fix/chat-history-loading-207",
+  "linked_prs": [
+    208
+  ],
+  "files": [
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5272ad1a0c9ddfef04a948280dd3967b650d2c4c/app/chat/page.tsx"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5272ad1a0c9ddfef04a948280dd3967b650d2c4c/tests/account-conversation.test.cjs"
+    },
+    {
+      "path": "tests/recovery-session.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/5272ad1a0c9ddfef04a948280dd3967b650d2c4c/tests/recovery-session.test.cjs"
+    }
+  ],
+  "commits": "5272ad1a0c9ddfef04a948280dd3967b650d2c4c Leave the conversation area blank when history is empty\nf7535689ce8723d7e8cea8c9b21da4e2948dac32 Verify recovery does not mark history loaded on failure\n2e01c0f0ac4457f99cccac5dbb6e7b8f2f0d4700 Show loading feedback while restoring chat history (#207)",
+  "topics": [
+    "記憶・会話",
+    "開発管理",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "0137399fa2c864580e07ea31b3a760e8e2556c7c1dea4551760ee2e628048488",
+  "collected_at": "2026-11-19T08:16:57.265369+00:00"
+}

@@ -1,14 +1,30 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T07:58:22.216382+00:00",
+  "generated_at": "2026-11-19T08:16:57.265369+00:00",
   "coverage": {
-    "prs": 192,
-    "pr_cases": 192,
-    "branches": 215,
+    "prs": 193,
+    "pr_cases": 193,
+    "branches": 216,
     "errors": [],
     "api_calls": 10
   },
   "cases": [
+    {
+      "id": "pr-213",
+      "title": "チャット上部の運転向け注意書きを削除",
+      "summary": "会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "チャット上部の運転向け注意書きを削除 会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更  {} Closes #212\n\nチャット上部の「運転中の画面操作はしないでね。 安全な場所に停車してから話そう。」の行を削除する。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-23\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/23\",\"reason\":\"旧ブラウザ自発メッセージ経路の削除とは別案件。今回取り除く対象は固定の運転注意欄のみ。\",\"decision\":\"distinct\"},{\"id\":\"pr-151\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\",\"reason\":\"履歴のスクロール追従を扱った既存処理は維持し、独立した静的な注意欄だけを削除する。\",\"decision\":\"distinct\"},{\"id\":\"pr-208\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/208\",\"reason\":\"会話の読み込み中表示とテストを維持する。注意書き専用のセクションはその分岐の外側にある。\",\"decision\":\"distinct\"}]}\n--> ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MEMORY_KEY MISAKI_TODAY_MEMORY_KEY RELATIONSHIP_KEY STORAGE_KEY accessToken active applyRoot attempt authDuration beginIndependentConversation cachedHistory checkpoint createEmptyTodayMemory duration expectedOwner expiresAt freeLimitReached freeRemaining getFirstRpcRow getJapanCurrentTime getJapanDateKey history initializeAccount isPremium isPremiumActive key load loadDailyUsage loadEntitlement now nowMs pending premium previousAt receive receiveHistory receiveUsage requestDuration response result serverTiming startedAt state summary timingEnabled timings today urlDiagnostics usage usageCountToday user [] app/chat/page.tsx app/globals.css "
+    },
     {
       "id": "pr-211",
       "title": "初回のチャットに美咲の歓迎表示を復元",
@@ -5331,6 +5347,22 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/relationship-analyzer-bounded-retry ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-79d346175e1f882e",
+      "title": "fix/remove-driving-banner",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/remove-driving-banner ブランチ差分を収録  {}   [] app/chat/page.tsx app/globals.css "
     },
     {
       "id": "branch-637f3c0ed7eca805",

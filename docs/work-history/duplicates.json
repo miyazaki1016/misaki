@@ -176,6 +176,7 @@
     "branch-1a583769a497875d",
     "branch-25687bc1ec63df34",
     "branch-637f3c0ed7eca805",
+    "branch-79d346175e1f882e",
     "branch-7e7349e1c0857db1",
     "branch-b9ec7a2266a17fe2",
     "branch-c9e11b1515cb305d",
@@ -192,6 +193,7 @@
     "pr-208",
     "pr-209",
     "pr-211",
+    "pr-213",
     "pr-23",
     "pr-29",
     "pr-30",
@@ -214,6 +216,11 @@
     "branch-8fb3e7f76aab269c",
     "branch-f2dba8e26e4c9402",
     "pr-78"
+  ],
+  "app/globals.css": [
+    "branch-79d346175e1f882e",
+    "pr-213",
+    "pr-41"
   ],
   "app/page.tsx": [
     "branch-2db397ec82c28320",
