@@ -1,12 +1,12 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-18T08:32:22.915817+00:00",
+  "generated_at": "2026-11-19T05:38:50.786032+00:00",
   "coverage": {
     "prs": 185,
     "pr_cases": 185,
     "branches": 208,
     "errors": [],
-    "api_calls": 9
+    "api_calls": 17
   },
   "cases": [
     {
@@ -58,8 +58,8 @@
       "id": "pr-193",
       "title": "P0 統合 — 匿名個別記憶の24時間期限と感情v2の再開",
       "summary": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
-      "state": "open",
-      "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
       "topics": [
         "記憶・会話",
         "開発管理",
@@ -90,8 +90,8 @@
       "id": "pr-191",
       "title": "P0 匿名会話履歴の推論入力に24時間期限を適用",
       "summary": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
-      "state": "open",
-      "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
       "topics": [
         "記憶・会話",
         "開発管理",
@@ -107,8 +107,8 @@
       "id": "pr-190",
       "title": "P0 期限切れ匿名rootの安全な物理削除",
       "summary": "認証・アクセス制御に関する変更",
-      "state": "open",
-      "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
       "topics": [
         "認証・安全性"
       ],
@@ -1843,8 +1843,8 @@
       "id": "pr-66",
       "title": "Forget Control v1: canonical忘却と確認付き再学習",
       "summary": "正本記憶の忘却と確認付き再学習を設計・実装する案",
-      "state": "open",
-      "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
       "topics": [
         "記憶・会話",
         "開発管理",
@@ -5833,7 +5833,7 @@
       "remaining": "原本の受入条件・未解決事項を照合",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
-      "search_text": "work/anonymous-expired-root-purge ブランチ差分を収録  {}   [] lib/canonical-state.ts package-lock.json package.json supabase/migrations/20261112081000_purge_expired_anonymous_root.sql tests/anonymous-root-purge.test.cjs tests/recovery-admission.test.cjs tests/sql/anonymous-root-purge-assertions.sql tests/sql/anonymous-root-purge.sql "
+      "search_text": "work/anonymous-expired-root-purge ブランチ差分を収録  {}   []  "
     },
     {
       "id": "branch-1d18194bd4fc9125",
@@ -5842,15 +5842,13 @@
       "state": "ブランチ差分（PR関連あり）",
       "main_status": "未確認",
       "topics": [
-        "記憶・会話",
-        "開発管理",
-        "画面・表示"
+        "開発管理"
       ],
       "conclusion": "未確認",
       "remaining": "原本の受入条件・未解決事項を照合",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
-      "search_text": "work/anonymous-history-24h ブランチ差分を収録  {}   [] app/api/chat/route.ts supabase/functions/_shared/anonymous-history-expiry.ts supabase/functions/body-clock/conversation-root.ts tests/anonymous-history-expiry.test.ts tests/body-clock-canonical.test.cjs tests/temporary-continuity.test.cjs "
+      "search_text": "work/anonymous-history-24h ブランチ差分を収録  {}   []  "
     },
     {
       "id": "branch-8fb3e7f76aab269c",
@@ -5909,15 +5907,13 @@
       "state": "ブランチ差分（PR関連あり）",
       "main_status": "未確認",
       "topics": [
-        "記憶・会話",
-        "開発管理",
-        "画面・表示"
+        "その他の開発"
       ],
       "conclusion": "未確認",
       "remaining": "原本の受入条件・未解決事項を照合",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
-      "search_text": "work/forget-control-v1 ブランチ差分を収録  {}   [] app/api/chat/route.ts app/api/persona/evolution/analyze/route.ts app/api/persona/history/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/canonical-state.ts lib/persona/evolution-runner.ts lib/persona/persona-store.ts package-lock.json package.json supabase/functions/_shared/forget-control.ts supabase/functions/body-clock/conversation-root.ts supabase/functions/body-clock/index.ts supabase/functions/body-clock/persona-store.ts supabase/functions/body-clock/temporary-state.ts supabase/migrations/20261006200002_forget_control_v1.sql tests/account-conversation.test.cjs tests/body-clock-canonical.test.cjs tests/forget-batch-evaluate.ts tests/forget-batch.test.ts tests/forget-call-count.test.cjs tests/forget-control.test.ts tests/forget-database.test.cjs tests/forget-fixture.cjs tests/forget-integration.test.cjs tests/helpers/canonical-harness.cjs tests/helpers/forget-batch-evaluation.ts tests/helpers/forget-batch-fixtures.ts tests/helpers/forget-batch-runner.ts tests/maintenance.test.cjs tests/reports/forget-batch-evaluation.md tests/reports/forget-batch-scripted.json tests/server-canonical.test.cjs tests/temporary-continuity.test.cjs "
+      "search_text": "work/forget-control-v1 ブランチ差分を収録  {}   []  "
     },
     {
       "id": "branch-8c1c252f0c53fa36",
@@ -5941,15 +5937,13 @@
       "state": "ブランチ差分（PR関連あり）",
       "main_status": "未確認",
       "topics": [
-        "記憶・会話",
-        "開発管理",
-        "画面・表示"
+        "その他の開発"
       ],
       "conclusion": "未確認",
       "remaining": "原本の受入条件・未解決事項を照合",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
-      "search_text": "work/p0-engine-integration ブランチ差分を収録  {}   [] app/api/chat/route.ts app/api/cron/emotion-recovery/route.ts app/api/persona/evolution/analyze/route.ts app/api/persona/history/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/anonymous-memory-evidence.ts lib/canonical-state.ts lib/persona/evolution-runner.ts lib/persona/persona-store.ts lib/relationship-emotion-store.ts lib/relationship-runtime-v1.ts package-lock.json package.json supabase/functions/_shared/anonymous-history-expiry.ts supabase/functions/_shared/anonymous-memory-expiry.ts supabase/functions/_shared/forget-control.ts supabase/functions/body-clock/conversation-root.ts supabase/functions/body-clock/index.ts supabase/functions/body-clock/persona-store.ts supabase/functions/body-clock/temporary-state.ts supabase/migrations/20261006200002_forget_control_v1.sql supabase/migrations/20261112081000_purge_expired_anonymous_root.sql supabase/migrations/20261112082000_relationship_emotion_resume.sql supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql supabase/migrations/20261112084000_relationship_emotion_recovery.sql tests/account-conversation.test.cjs tests/anonymous-history-expiry.test.ts tests/anonymous-root-purge.test.cjs tests/body-clock-canonical.test.cjs tests/forget-batch-evaluate.ts tests/forget-batch.test.ts tests/forget-call-count.test.cjs tests/forget-control.test.ts tests/forget-database.test.cjs tests/forget-fixture.cjs tests/forget-integration.test.cjs tests/helpers/canonical-harness.cjs tests/helpers/forget-batch-evaluation.ts tests/helpers/forget-batch-fixtures.ts tests/helpers/forget-batch-runner.ts tests/maintenance.test.cjs tests/recovery-admission.test.cjs tests/relationship-runtime-v1.test.cjs tests/reports/forget-batch-evaluation.md tests/reports/forget-batch-scripted.json tests/server-canonical.test.cjs tests/sql/anonymous-root-purge-assertions.sql tests/sql/anonymous-root-purge.sql tests/temporary-continuity.test.cjs "
+      "search_text": "work/p0-engine-integration ブランチ差分を収録  {}   []  "
     },
     {
       "id": "branch-de9101df6719fc35",

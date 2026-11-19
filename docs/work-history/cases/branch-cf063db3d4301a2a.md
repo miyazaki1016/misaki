@@ -18,21 +18,13 @@
 
 関連PR：[#190](https://github.com/miyazaki1016/misaki/pull/190)
 
-根拠取得日時 (UTC)：2026-11-14T00:17:41.049806+00:00
+根拠取得日時 (UTC)：2026-11-19T05:38:50.786032+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [lib/canonical-state.ts](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/lib/canonical-state.ts)：同一HEADのPR案件に原文収録
-- [package-lock.json](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package-lock.json)：同一HEADのPR案件に原文収録
-- [package.json](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/package.json)：同一HEADのPR案件に原文収録
-- [supabase/migrations/20261112081000_purge_expired_anonymous_root.sql](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/supabase/migrations/20261112081000_purge_expired_anonymous_root.sql)：同一HEADのPR案件に原文収録
-- [tests/anonymous-root-purge.test.cjs](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/anonymous-root-purge.test.cjs)：同一HEADのPR案件に原文収録
-- [tests/recovery-admission.test.cjs](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/recovery-admission.test.cjs)：同一HEADのPR案件に原文収録
-- [tests/sql/anonymous-root-purge-assertions.sql](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge-assertions.sql)：同一HEADのPR案件に原文収録
-- [tests/sql/anonymous-root-purge.sql](https://github.com/miyazaki1016/misaki/blob/054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2/tests/sql/anonymous-root-purge.sql)：同一HEADのPR案件に原文収録
 
 ## 検証実行の事実
 
