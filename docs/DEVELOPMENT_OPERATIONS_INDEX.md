@@ -25,7 +25,6 @@
 | #30 | 旧schema互換の先行maintenance/drain設備を独立追加 | codex/legacy-maintenance-drain |
 | #31 | 関係時間v2: 内容理解から感情・行動・自発性まで統合 | sora/relationship-time-v2-design |
 | #60 | Document Relationship Engine v1.2 Stage and growth principles | docs/relationship-v1-2-stage-growth-principles |
-| #66 | Forget Control v1: canonical忘却と確認付き再学習 | work/forget-control-v1 |
 | #67 | Relationship Identity v1: canonical persistence, continuity and migration audit | work/relationship-identity-v1 |
 | #78 | Test isolated conversation replay adapter | work/context-no-duplicate-replies-ab |
 | #79 | docs: multi-character data scope inventory | docs/multi-character-data-scope-inventory |
@@ -40,11 +39,9 @@
 | #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | design/anonymous-per-item-24h-memory-20261030 |
 | #165 | docs: 美咲のバックアップ対象と安全な復元試験の設計 | docs/backup-restore-inventory-20261105 |
 | #182 | feat(history): iPhone履歴読み込みのDB段階別計測 (#181) | feat/history-stage-timing-20261111 |
-| #190 | P0 期限切れ匿名rootの安全な物理削除 | work/anonymous-expired-root-purge |
-| #191 | P0 匿名会話履歴の推論入力に24時間期限を適用 | work/anonymous-history-24h |
 | #192 | 美咲エンジン総点検とP0の検証結果を開発台帳に記録 | docs/engine-audit-102-20261112 |
-| #193 | P0 統合 — 匿名個別記憶の24時間期限と感情v2の再開 | work/p0-engine-integration |
 | #194 | test: add bounded synthetic context A/B quality evaluation (#184) | work/context-ab-quality-budget-guard-184 |
+| #199 | 会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階） | feat/life-context-engine-198 |
 
 全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。
 既存案件ID・判断欄は変更しません。
