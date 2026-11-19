@@ -1,15 +1,21 @@
+import { anonymousCheckpointState, anonymousInferenceState, type MemoryTimes } from "../supabase/functions/_shared/anonymous-memory-expiry";
 import { TemporaryStateUnavailableError } from "./temporary-state-error";
 import { createClient } from "@supabase/supabase-js";
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import { engineEnabled, canonicalActingState, type Snapshot } from "./relationship-engine-v1";
 import { createLegacyRelationshipActingState, type RelationshipActingState } from "./relationship-acting-guide";
 import { criticalCandidates } from "./relationship-analyzer-v1";
+import { openForgetControls, sealForgetControls, validateControls, type ForgetControl } from "../supabase/functions/_shared/forget-control";
 
 export type RootState = {
+  forgetControls?: ForgetControl[];
   history?: unknown[];
   memory: string[];
+  memoryTimes?: MemoryTimes;
+  todayMemoryTimes?: MemoryTimes;
   todayMemory: { date: string; items: string[] };
   relationshipPoints: number;
+  relationshipEvidenceAt?: number;
   updatedAt?: string | null;
   temporaryRevision?: string | null;
   relationshipEngine?: Snapshot;
@@ -92,6 +98,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
+  const forgetControls = await loadForgetControls(userId);
   let relationshipCriticalPending = relationshipImportPending;
   if (engineEnabled()) {
     const { data, error } = await db.from("misaki_relationship_critical_pending").select("request_id").eq("user_id", userId).in("status", ["pending", "processing", "failed"]);
@@ -105,6 +112,7 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
       typeof t.metadata?.message === "string" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));
   }
   return {
+    forgetControls,
     relationshipPoints: relationship.data?.intimacy_points ?? 0,
     history: conversation.data?.history ?? [],
     memory: conversation.data?.memory ?? [],
@@ -114,6 +122,16 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
     relationshipCriticalPending, relationshipImportPending,
   };
+}
+
+export async function loadForgetControls(userId: string): Promise<ForgetControl[]> {
+  const { data, error } = await createServerSupabase().from("misaki_forget_controls").select("payload").eq("user_id", userId).maybeSingle();
+  if (error) throw new Error("Forget control read failed");
+  return data ? openForgetControls(data.payload, process.env.SUPABASE_SERVICE_ROLE_KEY!, userId) : [];
+}
+
+export function forgetControlPayload(userId: string, controls: ForgetControl[] = []) {
+  return sealForgetControls(validateControls(controls), process.env.SUPABASE_SERVICE_ROLE_KEY!, userId);
 }
 
 export async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {
@@ -132,6 +150,10 @@ export async function loadTemporaryRoot(userId: string, token: unknown): Promise
     if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError("expired");
     return { ...verified.state, temporaryRevision: root.revision };
   }
+  const { data: expired, error: expiryError } = await createServerSupabase()
+    .from("misaki_expired_temporary_root_users").select("user_id").eq("user_id", userId).maybeSingle();
+  if (expiryError) throw new Error("Temporary root expiry marker read failed");
+  if (expired) throw new TemporaryStateUnavailableError("expired");
   // A valid bearer state can seed a replacement Safari anonymous auth ID.
   // Once this ID has a server root, browser snapshots cannot overwrite it.
   if (temporary) return { ...temporary.state, temporaryRevision: null };
@@ -154,10 +176,12 @@ export async function loadCompletedTurn(userId: string, requestId: string, messa
 }
 
 export async function completeCanonicalTurn(userId: string, requestId: string, message: string,
-  userMessageAt: string, result: Record<string, unknown>) {
-  const { data, error } = await createServerSupabase().rpc("complete_misaki_chat_turn", {
+  userMessageAt: string, result: Record<string, unknown>, emotionInput?: unknown) {
+  const { forgetControls, ...publicResult } = result;
+  const { data, error } = await createServerSupabase().rpc(emotionInput ? "complete_misaki_chat_turn_with_emotion" : "complete_misaki_chat_turn", {
+    ...(emotionInput ? { p_emotion_input: emotionInput } : {}),
     p_user_id: userId, p_request_id: requestId, p_message: message,
-    p_user_message_at: userMessageAt, p_result: result,
+    p_user_message_at: userMessageAt, p_result: { ...publicResult, forgetControlPayload: await forgetControlPayload(userId, (forgetControls ?? []) as ForgetControl[]) },
   });
   if (error || !data) throw new Error("Canonical turn commit failed");
   return data as Record<string, unknown>;
@@ -169,7 +193,8 @@ function temporaryResponse(token: string, message: string) {
   const temporary = openTemporaryState(token);
   if (!temporary?.result || temporary.result.originalMessage !== message) throw new Error("Temporary replay unavailable");
   const { originalMessage, ...result } = temporary.result;
-  return { ...result, temporaryState: token };
+  const active = anonymousInferenceState(temporary.state, Date.now());
+  return { ...result, memory: active.memory, misakiTodayMemory: active.todayMemory, relationshipPoints: active.relationshipPoints, temporaryState: token };
 }
 
 export async function loadCompletedTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown) {
@@ -191,7 +216,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
   const { data, error } = await createServerSupabase().rpc("complete_misaki_temporary_turn", {
     p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),
     p_parent_hash: digest(typeof parent === "string" ? parent : ""), p_token: token,
-    p_expected_revision: revision, p_state: verified.state,
+    p_expected_revision: revision, p_state: { ...anonymousCheckpointState(verified.state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, verified.state.forgetControls ?? []) },
   });
   if (error || typeof data !== "string") {
     if (error) {
@@ -205,7 +230,7 @@ export async function completeTemporaryTurn(userId: string, requestId: string, m
 export async function editTemporaryRoot(userId: string, state: RootState, purpose = "edit") {
   const token = sealTemporaryState(state, purpose);
   const { error } = await createServerSupabase().rpc("write_misaki_temporary_root", {
-    p_user_id: userId, p_token: token, p_state: state, p_expected_revision: state.temporaryRevision ?? null,
+    p_user_id: userId, p_token: token, p_state: { ...anonymousCheckpointState(state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, state.forgetControls ?? []) }, p_expected_revision: state.temporaryRevision ?? null,
   });
   if (error) throw new Error("Temporary edit commit failed");
   return token;

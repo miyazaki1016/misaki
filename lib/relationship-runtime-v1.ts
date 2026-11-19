@@ -1,3 +1,4 @@
+import { anonymousInferenceState } from "../supabase/functions/_shared/anonymous-memory-expiry";
 import { createServerSupabase, loadTemporaryRoot, editTemporaryRoot, openTemporaryState, type RootState } from "./canonical-state";
 import { createLegacyRelationshipActingState } from "./relationship-acting-guide";
 import { engineEnabled, PROCESSING_VERSION, applyTemporaryEvidence, AXES, type Snapshot, type Turn } from "./relationship-engine-v1";
@@ -44,8 +45,9 @@ async function analyzeTemporarySnapshot(root: RootState, save?: (snapshot: Snaps
 
 async function runAnonymous(userId: string) {
   let root = await loadTemporaryRoot(userId, null);
-  if (!root.relationshipEngine) return;
-  await analyzeTemporarySnapshot(root, async snapshot => {
+  const active = anonymousInferenceState(root, Date.now());
+  if (!active.relationshipEngine) return;
+  await analyzeTemporarySnapshot(active, async snapshot => {
     await editTemporaryRoot(userId, { ...root, relationshipEngine: snapshot }, "relationship-analysis");
     root = await loadTemporaryRoot(userId, null);
   }, undefined, userId);
@@ -100,11 +102,12 @@ export async function importPermanentRelationship(userId: string, requestId: str
   if (Date.parse(root.expires_at) <= Date.now()) return;
   const verified = openTemporaryState(root.token);
   if (!verified) throw new Error("relationship_import_root_invalid");
-  let snapshot = verified.state.relationshipEngine;
+  const active = anonymousInferenceState(verified.state, Date.now());
+  let snapshot = active.relationshipEngine;
   if (!snapshot) return;
   // Once auth is permanent the temporary writer rejects writes. Finish the frozen
   // verified trajectory in memory and materialize atomically through the import RPC.
-  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(verified.state, undefined, check, userId);
+  if (snapshot.pending.length) snapshot = await analyzeTemporarySnapshot(active, undefined, check, userId);
   await check();
   const { error: rpcError } = await db.rpc("import_misaki_temporary_relationship_v2", { p_user_id: userId, p_request_id: requestId, p_processing_version: PROCESSING_VERSION, p_lease_token: token, p_source_revision: root.revision,
     ...Object.fromEntries(AXES.map(axis => [`p_${axis}`, snapshot.state[axis]])), p_relationship_status: snapshot.state.relationshipStatus ?? "none",

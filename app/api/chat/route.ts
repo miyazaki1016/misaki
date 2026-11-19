@@ -1,5 +1,8 @@
+import { anonymousUserSources, evidenceMetadata, verifyAnonymousMemory } from "../../../lib/anonymous-memory-evidence";
+import { advanceAnonymousMemory, anonymousInferenceState } from "../../../supabase/functions/_shared/anonymous-memory-expiry";
 import { USER_REPLY_CONTEXT } from "../../../lib/conversation-turn-context";
 import { after } from "next/server";
+import { createForgetJudge, prepareForgetTurn, forgetContext, maskForgetRows, forgetVersion } from "../../../supabase/functions/_shared/forget-control";
 import { engineEnabled } from "../../../lib/relationship-engine-v1";
 import { enqueueTemporaryTurn, resumeRelationshipProcessing, pendingRelationshipGuide } from "../../../lib/relationship-runtime-v1";
 import { maintenanceResponse } from "../../../lib/maintenance";
@@ -35,10 +38,9 @@ import {
 import {
   loadRelationshipTimeContext,
   createRelationshipTimeGuide,
-  recordRelationshipChatTurn,
 } from "../../../lib/relationship-time";
 
-import { persistRelationshipEmotionFromSignals } from "../../../lib/relationship-emotion-store";
+import { emotionTurnInput, resumeRelationshipEmotion } from "../../../lib/relationship-emotion-store";
 import {
   previewRelationshipTurn,
   createCurrentTurnActionGuide,
@@ -1600,7 +1602,7 @@ function parseGeminiText(
 ========================================================= */
 
 function publicChatResult(result: Record<string, unknown>) {
-  const { relationshipPointDelta: _internalRelationshipPointDelta, ...publicResult } = result;
+  const { relationshipPointDelta: _internalRelationshipPointDelta, forgetControls: _controls, forgetControlPayload: _payload, forgetControlVersion: _version, ...publicResult } = result;
   return publicResult;
 }
 
@@ -1798,6 +1800,14 @@ export async function POST(
     const usageRequestId = requestId || crypto.randomUUID();
     const isAnonymous = userData.user.is_anonymous === true;
     const relationshipSupabase = isAnonymous ? null : createServerSupabase();
+    const resumeEmotion = async () => {
+      if (!relationshipSupabase) return;
+      try {
+        await resumeRelationshipEmotion(relationshipSupabase, userData.user.id);
+      } catch {
+        console.error("POST SAVE EMOTION RETRY REQUIRED");
+      }
+    };
     const userMessageAt = new Date().toISOString();
     // Validate the canonical anonymous root before serving any old replay token/receipt.
     // Expired or unverifiable roots must never revive through a replay fast path.
@@ -1806,18 +1816,28 @@ export async function POST(
     if (isAnonymous && temporary?.requestId === usageRequestId && temporary.result) {
       const { originalMessage, ...replay } = temporary.result;
       if (originalMessage !== message) return Response.json({ error: "Request ID message mismatch." }, { status: 409 });
+      const latestRoot = await loadTemporaryRoot(userData.user.id, temporaryState);
+      if (forgetVersion(latestRoot.forgetControls) !== (replay.forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
       after(() => resumeRelationshipProcessing(userData.user.id, true));
-      return Response.json(publicChatResult({ ...replay, temporaryState }));
+      const active = anonymousInferenceState(temporary.state, Date.now());
+      return Response.json(publicChatResult({ ...replay, memory: active.memory, misakiTodayMemory: active.todayMemory, relationshipPoints: active.relationshipPoints, temporaryState }));
     }
     if (!isAnonymous) {
       const completed = await loadCompletedTurn(userData.user.id, usageRequestId, message);
       if (completed) {
-        after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
+        const latestRoot = await loadCanonicalState(userData.user.id);
+        if (forgetVersion(latestRoot.forgetControls) !== ((completed as Record<string, unknown>).forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
+        after(async () => {
+          await resumeEmotion();
+          await resumeRelationshipProcessing(userData.user.id, isAnonymous);
+        });
         return Response.json(publicChatResult(completed));
       }
     } else {
       const completed = await loadCompletedTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState);
       if (completed) {
+        const latestRoot = await loadTemporaryRoot(userData.user.id, completed.temporaryState);
+        if (forgetVersion(latestRoot.forgetControls) !== ((completed as Record<string, unknown>).forgetControlVersion ?? "")) return Response.json({ error: "記憶が変更されています。画面を再読み込みしてください。" }, { status: 409 });
         after(() => resumeRelationshipProcessing(userData.user.id, isAnonymous));
         return Response.json(publicChatResult(completed));
       }
@@ -1825,30 +1845,37 @@ export async function POST(
     const rootState = isAnonymous
       ? anonymousRoot!
       : await loadCanonicalState(userData.user.id);
-    memory = rootState.memory;
-    misakiTodayMemory = rootState.todayMemory;
-    history = "history" in rootState ? rootState.history : [];
-    const canonicalRelationshipPoints = rootState.relationshipPoints;
+    const inferenceRoot = isAnonymous
+      ? anonymousInferenceState(rootState, Date.parse(userMessageAt))
+      : rootState;
+    const forgetJudge = createForgetJudge(process.env.GEMINI_API_KEY!);
+    const forgetTurn = await prepareForgetTurn(inferenceRoot, message, usageRequestId, userMessageAt,
+      `${process.env.SUPABASE_SERVICE_ROLE_KEY}:${userData.user.id}`, forgetJudge);
+    const forgetView = await forgetContext({ ...inferenceRoot, forgetControls: forgetTurn.controls }, forgetJudge);
+    memory = [...forgetView.memory, ...forgetTurn.learned];
+    misakiTodayMemory = forgetView.todayMemory;
+    history = forgetView.history;
+    const canonicalRelationshipPoints = inferenceRoot.relationshipPoints;
     const recallMode = isMemoryRecallQuestion(message);
     const modelMessage = createRecallAwareMessage(message, history, recallMode);
 
     const relationshipTimeContext = isAnonymous
-      ? rootState.temporaryRelationship
+      ? inferenceRoot.temporaryRelationship
         ? {
             exists: true,
-            elapsedSeconds: rootState.temporaryRelationship.lastInteractionAt
-              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 1000) : 0,
-            elapsedHours: rootState.temporaryRelationship.lastInteractionAt
-              ? Math.max(0, (Date.now() - Date.parse(rootState.temporaryRelationship.lastInteractionAt)) / 3600000) : 0,
+            elapsedSeconds: inferenceRoot.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(inferenceRoot.temporaryRelationship.lastInteractionAt)) / 1000) : 0,
+            elapsedHours: inferenceRoot.temporaryRelationship.lastInteractionAt
+              ? Math.max(0, (Date.now() - Date.parse(inferenceRoot.temporaryRelationship.lastInteractionAt)) / 3600000) : 0,
             timeBand: "temporary",
             intimacyLevel: canonicalRelationshipPoints >= 160 ? "very_intimate"
               : canonicalRelationshipPoints >= 80 ? "intimate"
               : canonicalRelationshipPoints >= 30 ? "growing" : "initial",
             intimacyPoints: canonicalRelationshipPoints,
-            emotionPrimary: rootState.temporaryRelationship.emotionPrimary,
-            emotionIntensity: rootState.temporaryRelationship.emotionIntensity,
-            actionState: rootState.temporaryRelationship.actionState,
-            lastInteractionAt: rootState.temporaryRelationship.lastInteractionAt,
+            emotionPrimary: inferenceRoot.temporaryRelationship.emotionPrimary,
+            emotionIntensity: inferenceRoot.temporaryRelationship.emotionIntensity,
+            actionState: inferenceRoot.temporaryRelationship.actionState,
+            lastInteractionAt: inferenceRoot.temporaryRelationship.lastInteractionAt,
             stateUpdatedAt: null,
           }
         : null
@@ -1857,8 +1884,8 @@ export async function POST(
           () => loadRelationshipTimeContext(relationshipSupabase!, false, userData.user.id)
         );
     const anonymousRelationshipEvents =
-      isAnonymous && Array.isArray(rootState.temporaryRelationship?.events)
-        ? rootState.temporaryRelationship.events.slice(-40)
+      isAnonymous && Array.isArray(inferenceRoot.temporaryRelationship?.events)
+        ? inferenceRoot.temporaryRelationship.events.slice(-40)
         : [];
     const relationshipHistory = isAnonymous
       ? {
@@ -2063,7 +2090,7 @@ export async function POST(
 
     const relationshipActingGuide =
       createRelationshipActingGuide(
-        rootState.relationshipActingState ?? (rootState.relationshipEngine ? { ...rootState.relationshipEngine.state, intimacyStage: createLegacyRelationshipActingState(safeRelationshipPoints).intimacyStage } : undefined) ?? createLegacyRelationshipActingState(
+        inferenceRoot.relationshipActingState ?? (inferenceRoot.relationshipEngine ? { ...inferenceRoot.relationshipEngine.state, intimacyStage: createLegacyRelationshipActingState(safeRelationshipPoints).intimacyStage } : undefined) ?? createLegacyRelationshipActingState(
           safeRelationshipPoints
         )
       );
@@ -2072,10 +2099,7 @@ export async function POST(
       buildUserProfile(
         [
           ...safeHistory,
-          {
-            role: "user",
-            text: message,
-          },
+          ...(forgetTurn.reply ? [] : [{ role: "user" as const, text: message }]),
         ],
         safeMemory
       );
@@ -2098,7 +2122,8 @@ export async function POST(
             supabase,
             userData.user.id,
             "chat",
-            relationshipTimeContext
+            relationshipTimeContext,
+            forgetTurn.controls
           )
       );
 
@@ -2263,11 +2288,12 @@ export async function POST(
 ${personaPrompt}
 
 ${USER_REPLY_CONTEXT}
+${forgetTurn.controls.length ? "【忘却した情報の扱い】過去に忘れてほしいと言われた情報を、履歴や推測から作り直さないでください。再記憶は本人への確認と肯定が成立した今回の情報だけに基づきます。知らない名前や事実を補完せず、制御の内部情報を会話に出さないでください。" : ""}
 
 ${relationshipGuide}
 
 ${relationshipActingGuide}
-${pendingRelationshipGuide(rootState)}
+${pendingRelationshipGuide(inferenceRoot)}
 
 ${userProfileGuide}
 
@@ -2700,10 +2726,12 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     const activeCarriedLifeFacts = selectRelevantLifeFacts(splitMemory.facts, safeCurrentTime, MAX_MEMORY);
     const activeLifeFacts = selectRelevantLifeFacts([...activeCarriedLifeFacts, ...explicitLifeFacts], safeCurrentTime, MAX_MEMORY);
     const encodedLifeMemory = activeLifeFacts.map((fact) => encodeLifeFactMemory(fact));
-    const updatedMemory = [
+    const candidateMemory = [
       ...generatedMemory.filter((item) => !item.startsWith("[life:v1]")),
       ...encodedLifeMemory,
+      ...forgetTurn.learned,
     ].slice(-MAX_MEMORY);
+    const updatedMemory = (await maskForgetRows(candidateMemory.map(text => ({ text })), forgetTurn.controls, forgetJudge, "output")).map(x => x.text);
 
     const parsedTodayItems =
       Array.isArray(
@@ -2772,8 +2800,16 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
           -MAX_TODAY_MEMORY
         ),
     };
+    updatedTodayMemory.items = (await maskForgetRows(updatedTodayMemory.items.map(text => ({ text })), forgetTurn.controls, forgetJudge, "derived")).map(x => x.text);
+    if (forgetTurn.reply) reply = forgetTurn.reply;
+    else {
+      const safeReply = await maskForgetRows([{ text: reply }], forgetTurn.controls, forgetJudge, "output");
+      if (!safeReply.length || safeReply[0].text !== reply) throw new Error("Forget reply validation failed");
+    }
 
     const generatedResult = {
+      forgetControls: forgetTurn.controls,
+      forgetControlVersion: forgetVersion(forgetTurn.controls),
       requestId: usageRequestId,
       rootUpdatedAt: rootState.updatedAt ?? null,
       reply,
@@ -2802,10 +2838,39 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
     };
     let completedResult: Record<string, unknown>;
     if (isAnonymous) {
-      completedResult = { ...generatedResult, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
+      const currentTurn = { role: "user", requestId: usageRequestId, sentAt: userMessageAt, text: message.slice(0, 2000) };
+      const evidenceNow = Date.now();
+      const rawSources = anonymousUserSources([...inferenceRoot.history, currentTurn], evidenceNow);
+      const sources = anonymousUserSources([...forgetView.history.slice(-40), currentTurn], evidenceNow);
+      for (const [id, source] of sources) {
+        if (rawSources.get(id)?.text !== source.text) sources.delete(id);
+      }
+      const candidates = [...new Set([
+        ...updatedMemory.filter(item => !forgetView.memory.includes(item)),
+        ...updatedTodayMemory.items.filter(item => !safeTodayMemory.items.includes(item)),
+      ])];
+      const evidence = await verifyAnonymousMemory(forgetTurn.reply ? [] : candidates, sources, forgetJudge);
+      // A confirmed reoffer already passed Forget Control. Keep the time of the
+      // original assertion, as well as the ID of the later confirmation.
+      if (forgetTurn.learned.length) {
+        const confirmation = rawSources.get(usageRequestId);
+        for (const control of inferenceRoot.forgetControls ?? []) {
+          const pending = control.pending;
+          if (!pending || !confirmation || !forgetTurn.learned.includes(pending.fact)) continue;
+          const source = rawSources.get(pending.sourceRequestId);
+          if (source?.text.includes(pending.fact)) {
+            evidence.set(pending.fact, [evidenceMetadata(source), evidenceMetadata(confirmation)]);
+          }
+        }
+      }
+      const now = Date.now();
+      const memorySnapshot = advanceAnonymousMemory(updatedMemory, forgetView.memory, rootState.memoryTimes, evidence, now);
+      const todaySnapshot = advanceAnonymousMemory(updatedTodayMemory.items, safeTodayMemory.items, rootState.todayMemoryTimes, evidence, now);
+      const todayMemory = { ...updatedTodayMemory, items: todaySnapshot.items };
+      completedResult = { ...generatedResult, memory: memorySnapshot.items, misakiTodayMemory: todayMemory, relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         memorySynced: false, relationshipTimeSynced: false, ephemeral: true };
-      const token = sealTemporaryState({ memory: updatedMemory, todayMemory: updatedTodayMemory,
-        relationshipEngine: enqueueTemporaryTurn(rootState, { requestId: usageRequestId, message: message.slice(0, 2000), reply: reply.slice(0, 2000), savedAt: new Date().toISOString() }),
+      const token = sealTemporaryState({ memory: memorySnapshot.items, memoryTimes: memorySnapshot.times, todayMemory, todayMemoryTimes: todaySnapshot.times, relationshipEvidenceAt: inferenceRoot.relationshipEvidenceAt ?? Date.parse(userMessageAt), forgetControls: forgetTurn.controls,
+        relationshipEngine: enqueueTemporaryTurn(inferenceRoot, { requestId: usageRequestId, message: message.slice(0, 2000), reply: reply.slice(0, 2000), savedAt: new Date().toISOString() }),
         relationshipPoints: Math.max(0, canonicalRelationshipPoints + relationshipPointDelta),
         temporaryRelationship: {
           emotionPrimary: relationshipPreview.emotion.primary,
@@ -2823,7 +2888,7 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
             },
           }].slice(-40),
         },
-        history: [...(Array.isArray(history) ? history : []),
+        history: [...(Array.isArray(rootState.history) ? rootState.history : []),
           { role: "user", text: message, sentAt: userMessageAt, requestId: usageRequestId },
           { role: "misaki", text: reply, sentAt: new Date().toISOString(), requestId: usageRequestId }].slice(-MAX_HISTORY)
           .map((item: any) => ({ ...item, text: String(item.text).slice(0, 2000) }))
@@ -2831,40 +2896,12 @@ relationshipSignals は最初の判定をやり直さず、同じ意味を保っ
       completedResult = await completeTemporaryTurn(userData.user.id, usageRequestId, message, temporaryState, token, rootState.temporaryRevision ?? null);
     } else {
       completedResult = await completeCanonicalTurn(userData.user.id, usageRequestId, message,
-        userMessageAt, generatedResult);
+        userMessageAt, generatedResult, emotionTurnInput(relationshipTimeContext, relationshipAssessment, relationshipPatterns));
     }
     chargedRequestId = null;
     chargedSupabase = null;
     after(async () => {
-      try {
-    if (!isAnonymous) {
-      await measureStage(
-        "relationship-emotion-persist",
-        () => persistRelationshipEmotionFromSignals(
-          relationshipSupabase!,
-          false,
-          relationshipTimeContext,
-          relationshipAssessment,
-          relationshipPatterns,
-          userData.user.id
-        )
-      );
-    }
-
-    if (!isAnonymous) {
-      await measureStage(
-        "relationship-turn-record",
-        () => recordRelationshipChatTurn(
-          relationshipSupabase!,
-          false,
-          new Date(requestStartedAt),
-          new Date(),
-          userData.user.id
-        )
-      );
-    }
-
-      } catch { console.error("POST SAVE LEGACY RELATIONSHIP RETRY REQUIRED", { traceId }); }
+      await measureStage("relationship-emotion-persist", resumeEmotion);
       await resumeRelationshipProcessing(userData.user.id, isAnonymous);
     });
     console.log(

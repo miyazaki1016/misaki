@@ -1,0 +1,4778 @@
+{
+  "mode": "scripted",
+  "semanticEquivalenceProven": false,
+  "measurementNote": "tokens and latency are unmeasured; scripted calls are actual resolver-port invocation counts",
+  "rows": [
+    {
+      "id": "same-name-people",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "colleague",
+              "text": "同僚の隆紀が来た",
+              "role": "user",
+              "sentAt": "2026-01-01T00:00:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "colleague",
+                "text": "同僚の隆紀が来た",
+                "role": "user",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "colleague",
+                "text": "同僚の隆紀が来た",
+                "role": "user",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "partial-name",
+      "note": "legacy scripted port matches a prefix; this is a test-double discrepancy, not measured Gemini behavior",
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "partial",
+              "text": "弟の隆紀郎が来た",
+              "sentAt": "2026-01-01T00:00:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "partial",
+                "text": "郎が来た",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "partial",
+                "text": "弟の隆紀郎が来た",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": false,
+      "classification": "batch_matches_oracle_only",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "person-and-relationship",
+      "note": "person-scope must remove the brother factual clause, preserving the unrelated colleague",
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "occupation",
+              "text": "猫が好き",
+              "sentAt": "2026-01-01T00:00:00Z"
+            },
+            {
+              "id": "other",
+              "text": "同僚の隆紀は医師",
+              "sentAt": "2026-01-01T00:00:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "occupation",
+                "text": "は教師。猫が好き",
+                "sentAt": "2026-01-01T00:00:00Z"
+              },
+              {
+                "id": "other",
+                "text": "同僚の隆紀は医師",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "occupation",
+                "text": "猫が好き",
+                "sentAt": "2026-01-01T00:00:00Z"
+              },
+              {
+                "id": "other",
+                "text": "同僚の隆紀は医師",
+                "sentAt": "2026-01-01T00:00:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": false,
+      "classification": "batch_matches_oracle_only",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "current-vs-old-conflict",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [
+            "弟の名前は健太だよ"
+          ],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [
+              "弟の名前は健太だよ"
+            ],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 7,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [
+              "弟の名前は健太だよ"
+            ],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "soft-forget",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "うん、そのことは覚えておかず、こちらから話に出さないようにするね。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、そのことは覚えておかず、こちらから話に出さないようにするね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 7,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、そのことは覚えておかず、こちらから話に出さないようにするね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "hard-delete",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "released-old-history",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "released"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "new",
+              "text": "弟は隆紀",
+              "sentAt": "2026-10-07T01:02:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "brother",
+              "text": "弟は隆紀"
+            },
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "new",
+                "text": "弟は隆紀",
+                "sentAt": "2026-10-07T01:02:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 4,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "new",
+                "text": "弟は隆紀",
+                "sentAt": "2026-10-07T01:02:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 2,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "released-future-legacy-history",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "released"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "brother",
+              "text": "弟は隆紀"
+            },
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 4,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 2,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "reoffer-confirmation",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [
+            "弟の隆紀"
+          ],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [
+              "弟の隆紀"
+            ],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 7,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [
+              "弟の隆紀"
+            ],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "前に忘れてほしいと言われたことに関係するけど、今教えてくれた情報を改めて覚えてもいい？"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "confirmation-affirmative",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "released"
+          ],
+          "pending": [],
+          "learned": [
+            "弟の隆紀"
+          ]
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "confirmation",
+              "role": "misaki",
+              "text": "改めて覚えてもいい？",
+              "requestId": "offer",
+              "sentAt": "2026-10-07T01:01:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "brother",
+              "text": "弟は隆紀"
+            },
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": [
+              "弟の隆紀"
+            ]
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "confirmation",
+                "role": "misaki",
+                "text": "改めて覚えてもいい？",
+                "requestId": "offer",
+                "sentAt": "2026-10-07T01:01:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 5,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": [
+              "弟の隆紀"
+            ]
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "confirmation",
+                "role": "misaki",
+                "text": "改めて覚えてもいい？",
+                "requestId": "offer",
+                "sentAt": "2026-10-07T01:01:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              },
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "correction",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "released"
+          ],
+          "pending": [],
+          "learned": [
+            "弟の名前は健太だよ"
+          ]
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "confirmation",
+              "role": "misaki",
+              "text": "改めて覚えてもいい？",
+              "requestId": "offer",
+              "sentAt": "2026-10-07T01:01:00Z"
+            }
+          ],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            },
+            {
+              "id": "corrected",
+              "text": "弟の名前は健太だよ"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": [
+              "弟の名前は健太だよ"
+            ]
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "confirmation",
+                "role": "misaki",
+                "text": "改めて覚えてもいい？",
+                "requestId": "offer",
+                "sentAt": "2026-10-07T01:01:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              },
+              {
+                "id": "corrected",
+                "text": "弟の名前は健太だよ"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 7,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "released"
+            ],
+            "pending": [],
+            "learned": [
+              "弟の名前は健太だよ"
+            ]
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "confirmation",
+                "role": "misaki",
+                "text": "改めて覚えてもいい？",
+                "requestId": "offer",
+                "sentAt": "2026-10-07T01:01:00Z"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              },
+              {
+                "id": "corrected",
+                "text": "弟の名前は健太だよ"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "うん、今教えてくれたこととして、改めて覚えておくね。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "target",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "multiple-forgets",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active",
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [],
+          "today": [],
+          "traits": []
+        },
+        "output": {
+          "generated-memory": [],
+          "generated-today": [],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active",
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [],
+            "today": [],
+            "traits": []
+          },
+          "output": {
+            "generated-memory": [],
+            "generated-today": [],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active",
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [],
+            "today": [],
+            "traits": []
+          },
+          "output": {
+            "generated-memory": [],
+            "generated-today": [],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "active-released-mixture",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "released",
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [
+            {
+              "id": "new",
+              "text": "弟は隆紀",
+              "sentAt": "2026-10-07T01:02:00Z"
+            }
+          ],
+          "memory": [],
+          "today": [],
+          "traits": []
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "brother",
+              "text": "弟は隆紀"
+            }
+          ],
+          "generated-today": [],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "released",
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "new",
+                "text": "弟は隆紀",
+                "sentAt": "2026-10-07T01:02:00Z"
+              }
+            ],
+            "memory": [],
+            "today": [],
+            "traits": []
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              }
+            ],
+            "generated-today": [],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 9,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "released",
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "new",
+                "text": "弟は隆紀",
+                "sentAt": "2026-10-07T01:02:00Z"
+              }
+            ],
+            "memory": [],
+            "today": [],
+            "traits": []
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "brother",
+                "text": "弟は隆紀"
+              }
+            ],
+            "generated-today": [],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "today-memory",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "persona-trait",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "ambiguous-identity",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": "input",
+        "input": null,
+        "output": null
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": "input",
+          "input": null,
+          "output": null
+        },
+        "errorCode": "ambiguous_forget_mask",
+        "metrics": {
+          "calls": 2,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": "input",
+          "input": null,
+          "output": null
+        },
+        "errorCode": "invalid_batch_decision",
+        "metrics": {
+          "calls": 2,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "ambiguous-reoffer",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "spontaneous-reply-revival",
+      "note": null,
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": "output",
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": null
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": "output",
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": null
+        },
+        "errorCode": "reply_rejected",
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": "output",
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": null
+        },
+        "errorCode": "reply_rejected",
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_match_oracle",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "batch-only-injected-miss",
+      "note": "deliberate batch false-negative, demonstrating mismatch classification",
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "old",
+                "role": "user",
+                "text": "弟の名前は隆紀",
+                "sentAt": "2026-01-01T00:00:00Z",
+                "requestId": "old"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": false,
+      "classification": "current_matches_oracle_only",
+      "review": "scripted_fixture_only"
+    },
+    {
+      "id": "both-injected-miss",
+      "note": "deliberate shared false-negative: agreement is not correctness",
+      "oracle": {
+        "state": {
+          "status": [
+            "active"
+          ],
+          "pending": [],
+          "learned": []
+        },
+        "error": null,
+        "input": {
+          "history": [],
+          "memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "traits": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ]
+        },
+        "output": {
+          "generated-memory": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "generated-today": [
+            {
+              "id": "cat",
+              "text": "猫が好き"
+            }
+          ],
+          "reply": [
+            {
+              "id": "final",
+              "text": "今はその名前を覚えていないよ。"
+            }
+          ]
+        }
+      },
+      "current": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "old",
+                "role": "user",
+                "text": "弟の名前は隆紀",
+                "sentAt": "2026-01-01T00:00:00Z",
+                "requestId": "old"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 8,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "batch": {
+        "result": {
+          "state": {
+            "status": [
+              "active"
+            ],
+            "pending": [],
+            "learned": []
+          },
+          "error": null,
+          "input": {
+            "history": [
+              {
+                "id": "old",
+                "role": "user",
+                "text": "弟の名前は隆紀",
+                "sentAt": "2026-01-01T00:00:00Z",
+                "requestId": "old"
+              }
+            ],
+            "memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "traits": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ]
+          },
+          "output": {
+            "generated-memory": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "generated-today": [
+              {
+                "id": "cat",
+                "text": "猫が好き"
+              }
+            ],
+            "reply": [
+              {
+                "id": "final",
+                "text": "今はその名前を覚えていないよ。"
+              }
+            ]
+          }
+        },
+        "errorCode": null,
+        "metrics": {
+          "calls": 3,
+          "inputTokens": null,
+          "outputTokens": null,
+          "latencyMs": null,
+          "observations": [
+            {
+              "task": "reoffer",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            },
+            {
+              "task": "mask_batch",
+              "inputTokens": null,
+              "outputTokens": null,
+              "latencyMs": null
+            }
+          ]
+        }
+      },
+      "agreement": true,
+      "classification": "both_same_oracle_mismatch",
+      "review": "scripted_fixture_only"
+    }
+  ]
+}
