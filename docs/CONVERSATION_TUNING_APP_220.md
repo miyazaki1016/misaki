@@ -12,7 +12,7 @@
 ```ts
 type Selection = {
   schemaVersion: string; selectionRulesVersion: string; snapshotId: string;
-  scope: { character: "misaki"; verified: true };
+  scope: { characterId: string; verified: true };
   intent: { act: "comfort" | "acknowledge" | "ask" | "share" | "silence"; questionAllowed: boolean };
   selected: Array<{ factRef: string; permittedText: string }>;
   constraints: { required: string[]; forbidden: string[] };
@@ -56,3 +56,12 @@ type GenerationEnvelope = {
 5. 最新HEADのCI・実機・復旧テストを確認。マージ・デプロイ・DB・実Geminiは個別承認。
 
 参照：[#220](https://github.com/miyazaki1016/misaki/issues/220)、[#219](https://github.com/miyazaki1016/misaki/pull/219)、[#199](https://github.com/miyazaki1016/misaki/pull/199)、[#194](https://github.com/miyazaki1016/misaki/pull/194)、[#100](https://github.com/miyazaki1016/misaki/pull/100)。
+
+## マルチキャラ対応の設計原則（2026-11-20追記）
+- **今は美咲のみ実装・検証、契約は複数キャラ対応**。キャラ追加や他キャラの本番有効化は別案件・別承認。
+- キャラクターの識別子は自由表示名ではなく、不変の `characterId`。すべての設定・選別snapshot・会話セッション・監査・プレビュー・版履歴に含める。所有者認証と**対象キャラへの操作権限**を別々に検証する。
+- 調律版の一意性は `(characterId, tuningVersion)`。セッション開始時に対象キャラと版を固定し、途中変更しない。A/Bの双方で同一characterId・同一snapshotを必須とする。
+- キャラごとの人格、記憶、感情、関係性、Body Clock、忘却、生成用根拠は**厳密に分離**。共有できるのは汎用UI・検証ロジック・スキーマのみ。キャラAの材料・ログ・下書き・版をキャラBへ自動継承しない。
+- 未知のcharacterId、未検証scope、異なるキャラのsnapshot、権限不明はfail closed。画面のキャラ切替時は未保存編集とプレビュー履歴を破棄または明示的に保留し、キャラ混線を防ぐ。
+- 将来のキャラ選択UIは**サーバーが認可したキャラ一覧**から表示する。現時点では美咲以外を選択可能にしない。管理者認証だけで全キャラへの書込権限を与えない。
+- 現在の `lib/conversation-tuning-preview.ts` の単一キャラfixtureは移行対象。#199のhandoff契約を確定した後、characterIdを含む検証へ移行し、異キャラA/B拒否テストを追加する。
