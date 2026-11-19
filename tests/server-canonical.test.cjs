@@ -116,6 +116,29 @@ test('both permanent devices restore same server points and memory without brows
 
 
 
+test('permanent history GET and POST load only read the visible snapshot', async () => {
+  const h = harness();
+  const tables = [];
+  const from = h.client.from;
+  h.client.from = table => {
+    tables.push(table);
+    return from.call(h.client, table);
+  };
+  const api = h.load('app/api/persona/history/route.ts');
+  const get = await api.GET(h.request());
+  assert.equal(get.status, 200);
+  assert.deepEqual(tables.sort(), ['misaki_relationship_state', 'misaki_user_conversation_state']);
+  const visible = await get.json();
+  assert.equal(visible.relationshipPoints, 79);
+  assert.deepEqual(visible.memory, ['server memory']);
+
+  tables.length = 0;
+  const post = await api.POST(h.request({ action: 'load' }));
+  assert.equal(post.status, 200);
+  assert.deepEqual(await post.json(), visible);
+  assert.deepEqual(tables.sort(), ['misaki_maintenance_control', 'misaki_relationship_state', 'misaki_user_conversation_state']);
+});
+
 test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {
   const h = harness({ initialPoints: 1 });
   const route = await h.load('app/api/chat/route.ts');
