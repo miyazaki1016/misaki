@@ -1,14 +1,30 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T06:51:34.759999+00:00",
+  "generated_at": "2026-11-19T07:04:36.964589+00:00",
   "coverage": {
-    "prs": 187,
-    "pr_cases": 187,
-    "branches": 210,
+    "prs": 188,
+    "pr_cases": 188,
+    "branches": 211,
     "errors": [],
-    "api_calls": 5
+    "api_calls": 14
   },
   "cases": [
+    {
+      "id": "pr-205",
+      "title": "美咲LPの見出し・会話例・FAQを更新 (#204)",
+      "summary": "会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "美咲LPの見出し・会話例・FAQを更新 (#204) 会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更  {} 関連 #204。既存LPの画像と導線を利用し、トップ見出し、初対面と何度か話した後の会話例、匿名記憶の24時間FAQを更新する。アプリの機能コードや本番設定の変更は含まない。\n\n照合 https://github.com/miyazaki1016/misaki/actions/runs/44476409539\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-100\",\"decision\":\"reuse\",\"reason\":\"匿名の情報単位24時間と履歴表示・想起の違いをFAQの表示に反映する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/100\"},{\"id\":\"pr-50\",\"decision\":\"distinct\",\"reason\":\"Gemini失敗の内部診断に限定した変更であり公開LPの文言や接し方の例には使用しない\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/50\"},{\"id\":\"pr-1\",\"decision\":\"reuse\",\"reason\":\"メール確認で同一利用者として移行する既存導線をFAQで説明し、認証処理に変更を加えない\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-130\",\"decision\":\"reuse\",\"reason\":\"美咲1人でラウンジから会話へ進む既存LPの導線と画像を再利用する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/130\"},{\"id\":\"pr-193\",\"decision\":\"reuse\",\"reason\":\"実装済みの匿名記憶期限、関係性、会話の成果を公開文言の根拠にする\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-203\",\"decision\":\"reuse\",\"reason\":\"本番適用済みの新規匿名記憶の期限と既存保存データ保全を前提にFAQを記載する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/203\"},{\"id\":\"pr-62\",\"decision\":\"extend\",\"reason\":\"関係が育つ既存LPの構成と無料・有料の説明を維持し、トップと会話例と期限FAQを現行仕様に合わせて更新する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/62\"},{\"id\":\"pr-63\",\"decision\":\"reuse\",\"reason\":\"既存のモバイルPWA折り返しCSSを維持し、通知の説明文だけを調整する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/63\"}]}\n--> HomePage faqs features scenes [] app/page.tsx "
+    },
     {
       "id": "pr-203",
       "title": "fix: preserve existing anonymous email checkpoints (#201)",
@@ -4454,6 +4470,21 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "feat/lounges-autoload-assets-20261029 ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md docs/LOUNGE_VIDEO_INTEGRATION_LEDGER_20261029.md public/lab/transparent-lounge/index.html public/lab/transparent-lounge/misaki-opening-vertical-21s-iphone.mp4 public/lab/transparent-lounge/misaki_lounge_12fps.webp public/lab/transparent-lounge/misaki_lounge_24fps.webp "
+    },
+    {
+      "id": "branch-52e23902d6b56398",
+      "title": "feat/misaki-lp-refresh-204",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "feat/misaki-lp-refresh-204 ブランチ差分を収録  {}   [] app/page.tsx "
     },
     {
       "id": "branch-6a84c634aa234f1c",

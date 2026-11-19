@@ -1,0 +1,20 @@
+{
+  "id": "branch-b6e8013efabfd929",
+  "title": "sora/cutover-cleanup",
+  "head": "f5424c06c92b3f51535dd44ec54ef0a25f790370",
+  "head_ref": "sora/cutover-cleanup",
+  "linked_prs": [
+    35
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "2c7bb686181f7e626e054f783f1f15a381e0384f159a14cc0420404dbacbb307",
+  "collected_at": "2026-11-19T07:04:36.964589+00:00"
+}
