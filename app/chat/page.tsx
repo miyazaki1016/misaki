@@ -209,28 +209,29 @@ export default function ChatPage() {
   const [showHistoryDiagnostics, setShowHistoryDiagnostics] = useState(false);
   const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const [recoveryStarting, setRecoveryStarting] = useState(false);
+  const [recoveryOwner, setRecoveryOwner] = useState<string | null>(null);
+  async function openRecovery(code: string, owner: string, active: () => boolean) {
+    const { data, error } = await supabase.auth.getSession();
+    if (!active() || error || !data.session?.user.is_anonymous || data.session.user.id !== owner) return;
+    if (!await checkRecoveryAdmission(fetch)) {
+      if (active()) setSendError("今は新しい会話を始められません。少し待ってからもう一度開いてね。");
+      return;
+    }
+    const { data: current, error: currentError } = await supabase.auth.getSession();
+    if (!active() || currentError || !current.session?.user.is_anonymous || current.session.user.id !== owner) return;
+    startIndependentRecovery(current.session.user, code, crypto.randomUUID());
+    window.location.assign('/chat');
+  }
   async function beginIndependentConversation() {
-    if (recoveryStarting || !recoveryCode) return;
+    if (recoveryStarting || !recoveryCode || !recoveryOwner) return;
     if (!window.confirm("古い状態を保全したまま、このタブで独立した新しい会話を始めます。古い会話や記憶は引き継ぎません。よろしいですか？")) return;
     setRecoveryStarting(true);
     try {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      if (!await checkRecoveryAdmission(fetch)) {
-        setRecoveryStarting(false);
-        setSendError("新しい会話の復旧受付を一時停止しています。既存の会話や保存情報は変更していません。");
-        return;
-      }
-      // Admission check is asynchronous; never carry an old user's decision across an account switch.
-      const { data: current, error: currentError } = await supabase.auth.getSession();
-      if (currentError || !current.session?.user.is_anonymous || current.session.user.id !== data.session?.user.id) {
-        throw new Error("Account changed during recovery admission");
-      }
-      startIndependentRecovery(current.session.user, recoveryCode, crypto.randomUUID());
-      window.location.assign('/chat'); // Full navigation creates the isolated client.
+      await openRecovery(recoveryCode, recoveryOwner, () => true);
     } catch {
-      setRecoveryStarting(false);
       setSendError("新しい会話を開始できませんでした。既存データは変更していません。");
+    } finally {
+      setRecoveryStarting(false);
     }
   }
 
@@ -331,6 +332,20 @@ export default function ChatPage() {
     useState(
       false
     );
+
+  useEffect(() => {
+    if (recoveryCode !== "TEMPORARY_STATE_EXPIRED" || !recoveryOwner || showMenu) return;
+    let active = true;
+    const timer = window.setTimeout(() => {
+      void openRecovery(recoveryCode, recoveryOwner, () => active).catch(() => {
+        if (active) setSendError("新しい会話を開始できませんでした。もう一度開いてね。");
+      });
+    }, 5000);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [recoveryCode, recoveryOwner, showMenu]);
 
   const [
     loading,
@@ -808,7 +823,10 @@ export default function ChatPage() {
         }
         if (!response.ok) {
           const result = await response.json().catch(() => null);
-          if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code);
+          if (active && temporaryStateMessage(response.status, result)) {
+            setRecoveryOwner(expectedOwner);
+            setRecoveryCode(result.code);
+          }
           throw new Error(temporaryStateMessage(response.status, result) || maintenanceMessage(response.status, result) || "美咲の状態を読み込めませんでした。");
         }
         const state = await response.json();
@@ -2064,7 +2082,7 @@ export default function ChatPage() {
             {sendError}
           </div>
         )}
-        {recoveryCode && <button type="button" disabled={recoveryStarting} onClick={beginIndependentConversation}>
+        {recoveryCode === "TEMPORARY_STATE_UNVERIFIABLE" && <button type="button" disabled={recoveryStarting} onClick={beginIndependentConversation}>
           古い状態を残して、独立した新しい会話を始める
         </button>}
       </section>
