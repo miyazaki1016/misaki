@@ -55,7 +55,9 @@ test('auth storage isolation and no signout/copy/delete recovery operation are w
  assert.ok(auth.includes('storageKey: `misaki-recovery-auth-${recoveryScope}`'));assert.ok(auth.includes('storage: window.sessionStorage'));
  assert.ok(ui.includes('onClick={beginIndependentConversation}'));assert.ok(ui.includes('window.confirm('));
  const load=ui.slice(ui.indexOf('async function load()'),ui.indexOf('void load();'));
- assert.ok(!load.includes('const cached'));assert.ok(!load.includes('finally'));assert.ok(load.includes('setLoaded(true)'));
+ assert.ok(!load.includes('const cached'));
+ assert.ok(load.split('} catch (error) {')[0].includes('setLoaded(true)'));
+ assert.ok(!load.split('} catch (error) {')[1].includes('setLoaded(true)'));
 });
 test('expired canonical root cannot replay a still-valid old browser response or receipt',async()=>{
  const h=harness({anonymous:true}),requestId=randomUUID(),message='old-replay';
