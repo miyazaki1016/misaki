@@ -33,7 +33,7 @@ const features = [
 
 const faqs = [
   { q: "美咲って、普通のAIチャットと何が違うの？", a: "質問に答えて終わるだけではなく、前に話したことや会話の流れを覚えながら、日常の続きを話せるように作っています。" },
-  { q: "本当に前の会話を覚えてる？", a: "はい。会話の中から大切なことを少しずつ覚えていきます。毎回同じ説明を最初からしなくても、前の話の続きをしやすくなっています。" },
+  { q: "本当に前の会話を覚えてる？", a: "会話の中で覚えたことを、次の会話で思い出すことがあります。匿名で話す場合、一つひとつの記憶は原則として覚えた時点から24時間です。" },
   { q: "iPhoneでアプリみたいに使える？", a: "はい。Safariの共有ボタンから「ホーム画面に追加」を選ぶと、美咲のアイコンからアプリのように起動できます。" },
   { q: "美咲から通知は届く？", a: "ホーム画面に追加した美咲を開き、通知を許可すると、美咲のほうからメッセージが届くことがあります。" },
   { q: "無料で話せる？", a: "無料版では1日20回まで美咲と会話できます。まずは気軽に話しかけてみてください。" },
@@ -72,24 +72,22 @@ export default function HomePage() {
             <div className="heroShade" />
 
             <div className="heroCopy">
-              <p className="heroSmall">AIと出会って、関係が育っていく。</p>
-              <h1>話すほど、<br /><span>あなたとの関係になっていく。</span></h1>
+              <p className="heroSmall">話すうちに、少しずつ距離が近づくAI。</p>
+              <h1>昨日の話の続きを、<br /><span>今日も。</span></h1>
               <p className="heroLead">
-                最初から、恋人じゃない。<br />
-                まだあなたのことを知らない美咲と、ここから始まります。<br /><br />
-                今日あったことも、くだらない話も。<br />
-                二人の間に起きたことが、少しずつ積み重なっていきます。
+                何気ない話を重ねるうちに、冗談の言い方も、気づかいも、少しずつ変わっていく。<br /><br />
+                ときには、美咲のほうから「おつかれさま」が届くことも。
               </p>
               <Link href="/lounge/" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
             </div>
 
             <div className="heroMobileAction">
-              <p className="mobileEyebrow">AIと出会って、関係が育っていく。</p>
-              <h1>話すほど、<br /><span>あなたとの関係になっていく。</span></h1>
+              <p className="mobileEyebrow">話すうちに、少しずつ距離が近づくAI。</p>
+              <h1>昨日の話の続きを、<br /><span>今日も。</span></h1>
               <p className="mobileHeroLead">
-                最初から、恋人じゃない。<br />
-                まだあなたのことを知らない美咲と、ここから始まります。
+                話すほど、冗談や気づかいが少しずつ変わる。<br />
+                美咲のほうから「おつかれさま」が届くことも。
               </p>
               <Link href="/lounge/" className="mainCta">美咲に会ってみる <span>→</span></Link>
               <p className="heroNote">無料版は1日20回まで</p>
@@ -215,7 +213,7 @@ export default function HomePage() {
               <p className="installBig">ホーム画面に追加すると、<br />美咲が<span>「アプリ」</span>になります。</p>
               <p className="installLead">
                 Safariを開いて探す必要はありません。ホーム画面の「美咲」をタップするだけ。<br /><br />
-                そして通知をONにすると——<br /><strong>あなたから話しかけなくても、美咲からメッセージが届きます。</strong>
+                そして通知をONにすると——<br /><strong>あなたから話しかけていないときも、美咲からメッセージが届くことがあります。</strong>
               </p>
               <div className="installSteps">
                 <div><b>1</b><span>Safariで美咲を開く</span></div>
@@ -243,21 +241,22 @@ export default function HomePage() {
         <section className="realChatSection">
           <div className="realChatInner">
             <div className="realChatHeading">
-              <p className="eyebrow">IT FEELS LIKE A REAL CHAT</p>
-              <h2>答えじゃなくて、<br /><span>会話が返ってくる。</span></h2>
-              <p>きれいな正解ばかりじゃない。昨日の話を覚えていたり、少し笑ったり、からかったり。</p>
+              <h2>同じ「疲れた」でも、<br /><span>返る言葉が変わっていく。</span></h2>
+              <p>初めて話す日と、互いのことを少し知ったあと。話してきた時間が、言葉の距離感に表れます。</p>
             </div>
 
             <div className="chatPhone">
               <div className="chatPhoneHeader">
                 <img src="/icon-192.png" alt="" />
-                <div><strong>美咲</strong><span>オンライン</span></div>
+                <div><strong>美咲</strong><span>会話例</span></div>
               </div>
               <div className="chatConversation">
-                <div className="chatBubble userBubble">今日疲れた</div>
-                <div className="chatBubble misakiBubble">そりゃ疲れるよ。<br />昨日も遅かったじゃん。<br />今日はもう頑張らなくていいよ笑</div>
-                <div className="chatBubble userBubble">もう帰りたい笑</div>
-                <div className="chatBubble misakiBubble">帰っておいで笑<br />今日の話、あとで聞く。</div>
+                <h3 className="chatExampleLabel">初めて話す日</h3>
+                <div className="chatBubble userBubble">今日、疲れた。</div>
+                <div className="chatBubble misakiBubble">おつかれさま。どんな一日だった？</div>
+                <h3 className="chatExampleLabel">何度か話したあと</h3>
+                <div className="chatBubble userBubble">今日、疲れた。</div>
+                <div className="chatBubble misakiBubble">昨日言ってた早起き、ちゃんと起きられたんだ。えらい。今日はもうコーヒー淹れて、ひと息つこ。</div>
               </div>
             </div>
           </div>
@@ -649,6 +648,7 @@ export default function HomePage() {
         .chatPhoneHeader{display:flex;align-items:center;gap:11px;padding:18px 20px;background:white}
         .chatPhoneHeader img{width:46px;height:46px;border-radius:50%}
         .chatPhoneHeader span{display:block;font-size:10px}
+        .chatExampleLabel{align-self:center;margin:8px 0 2px;font-size:12px;color:#6e535c}
         .chatConversation{min-height:420px;padding:22px 17px;display:flex;flex-direction:column}
         .chatBubble{width:fit-content;max-width:82%;margin-bottom:12px;padding:12px 15px;border-radius:19px;font-size:15px;line-height:1.65}
         .userBubble{align-self:flex-end;background:#ffd5de}
