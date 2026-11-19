@@ -1,14 +1,30 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T07:40:42.505224+00:00",
+  "generated_at": "2026-11-19T07:47:08.017941+00:00",
   "coverage": {
-    "prs": 190,
-    "pr_cases": 190,
-    "branches": 213,
+    "prs": 191,
+    "pr_cases": 191,
+    "branches": 214,
     "errors": [],
     "api_calls": 10
   },
   "cases": [
+    {
+      "id": "pr-209",
+      "title": "チャット初回ローディングのスタイルを安定化 (#207)",
+      "summary": "会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "チャット初回ローディングのスタイルを安定化 (#207) 会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更  {} 関連 #207 / #208。iPhone Safariで読み込み中の文字が残りスピナーが消える報告。ページ単体の動的CSS管理からスピナーを切り離し、チャットレイアウトの固定スタイルへ移す。読み込み状態・空欄表示・取得処理は従来どおり。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-208\",\"decision\":\"extend\",\"reason\":\"同じ履歴取得中の表示条件を維持し、スピナーのCSSだけをレイアウトに移す\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/208\"},{\"id\":\"pr-206\",\"decision\":\"reuse\",\"reason\":\"高速化した履歴APIを維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/206\"},{\"id\":\"pr-151\",\"decision\":\"reuse\",\"reason\":\"既存のスクロールと計測を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\"},{\"id\":\"pr-131\",\"decision\":\"reuse\",\"reason\":\"認証ガードと匿名復旧はそのまま使用する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"},{\"id\":\"pr-180\",\"decision\":\"reuse\",\"reason\":\"既存のiPhone診断パネルはURL指定時のみ表示する設計を維持し、取得時間や計測データには変更を加えずスピナーのCSSだけ移す\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/180\"}]}\n--> ChatLayout ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MEMORY_KEY MISAKI_TODAY_MEMORY_KEY RELATIONSHIP_KEY STORAGE_KEY accessToken active applyRoot attempt authDuration beginIndependentConversation checkpoint createEmptyTodayMemory duration expectedOwner expiresAt freeLimitReached freeRemaining getFirstRpcRow getJapanCurrentTime getJapanDateKey history initializeAccount isPremium isPremiumActive key load loadDailyUsage loadEntitlement now nowMs pending premium previousAt receive receiveHistory receiveUsage requestDuration response result serverTiming startedAt state summary the timingEnabled timings today urlDiagnostics usage usageCountToday user [] app/chat/layout.tsx app/chat/page.tsx "
+    },
     {
       "id": "pr-208",
       "title": "履歴取得中にチャットのローディングを表示 (#207)",
@@ -4855,6 +4871,22 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/chat-scroll-and-load-diagnostics-20261104 ブランチ差分を収録  {}   [] app/api/persona/history/route.ts app/chat/initial-chat-scroll.tsx app/chat/page.tsx tests/account-conversation.test.cjs tests/initial-chat-scroll.test.cjs "
+    },
+    {
+      "id": "branch-18391c76be121a3f",
+      "title": "fix/chat-spinner-layout-207",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-spinner-layout-207 ブランチ差分を収録  {}   [] app/chat/layout.tsx app/chat/page.tsx "
     },
     {
       "id": "branch-9c34b261ec31b7a0",
