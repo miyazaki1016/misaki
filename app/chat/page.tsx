@@ -356,6 +356,7 @@ export default function ChatPage() {
       ""
     );
 
+  const [hasPriorHistory, setHasPriorHistory] = useState<boolean | null>(null);
   const [historyLoading, setHistoryLoading] = useState(true);
 
   const [
@@ -759,6 +760,13 @@ export default function ChatPage() {
     window.addEventListener("misaki-root-state", receive);
     window.addEventListener("misaki-history-state", receiveHistory);
     window.addEventListener("misaki-usage-state", receiveUsage);
+    // Only choose the placeholder here. The server supplies all displayed messages.
+    try {
+      const cachedHistory = localStorage.getItem(STORAGE_KEY);
+      setHasPriorHistory(Boolean((cachedHistory && cachedHistory !== "[]") || sessionStorage.getItem("misaki-pending-chat-turn")));
+    } catch {
+      setHasPriorHistory(true);
+    }
     async function load() {
       // Enable locally with sessionStorage.setItem("misaki-history-timing", "1").
       // Timings only: never log tokens, history, user IDs or temporary state.
@@ -2005,7 +2013,14 @@ export default function ChatPage() {
       <section
         className="chat"
       >
-        {messages.length === 0 && historyLoading && (
+        {messages.length === 0 && !sendError && !loading && (historyLoading ? hasPriorHistory === false : loaded) && (
+          <div className="emptyConversation">
+            <img src="/icon-192.png" alt="" />
+            <p>なんでもない話でいいよ。</p>
+            <span>Misaki</span>
+          </div>
+        )}
+        {messages.length === 0 && historyLoading && hasPriorHistory === true && (
           <div className="emptyConversation" role="status">
             <div className="historyLoadingSpinner" aria-hidden="true" />
             <p>会話を読み込み中…</p>
@@ -2940,6 +2955,16 @@ export default function ChatPage() {
             center;
         }
 
+        .emptyConversation img {
+          width: 69px; height: 69px; margin: 0 auto;
+          border: 3px solid white; border-radius: 50%;
+          box-shadow: 0 9px 25px rgba(92, 61, 72, 0.12);
+        }
+        .emptyConversation span {
+          display: inline-block; margin-top: 7px; color: #ff6680;
+          font-family: "Bradley Hand", "Segoe Script", cursive;
+          font-size: 17px; transform: rotate(-4deg);
+        }
         .emptyConversation p {
           margin:
             17px
