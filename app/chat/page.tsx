@@ -2940,24 +2940,6 @@ export default function ChatPage() {
             center;
         }
 
-        .historyLoadingSpinner {
-          width: 42px;
-          height: 42px;
-          margin: 0 auto;
-          border: 3px solid #f4d4dd;
-          border-top-color: #dc5275;
-          border-radius: 50%;
-          animation: historyLoadingSpin 0.8s linear infinite;
-        }
-
-        @keyframes historyLoadingSpin {
-          to { transform: rotate(360deg); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .historyLoadingSpinner { animation: none; }
-        }
-
         .emptyConversation p {
           margin:
             17px
