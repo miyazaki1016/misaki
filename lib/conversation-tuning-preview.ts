@@ -67,6 +67,7 @@ export function createTuningPreviewPair(
       !Array.isArray(fixture.selectedFacts) ||
       !Array.isArray(fixture.requiredConstraints) ||
       !Array.isArray(fixture.forbiddenConstraints) ||
+      !fixture.selectedFacts.every(x => typeof x === "string" && x.length > 0) ||
       !fixture.requiredConstraints.every(x => typeof x === "string" && x.length > 0) ||
       !fixture.forbiddenConstraints.every(x => typeof x === "string" && x.length > 0) ||
       typeof fixture.questionAllowed !== "boolean") {
