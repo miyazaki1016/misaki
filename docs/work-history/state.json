@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T08:37:02.804109+00:00",
+  "generated_at": "2026-11-19T08:47:46.621307+00:00",
   "cases": {
     "pr-215": {
       "id": "pr-215",
@@ -267,6 +267,16 @@
           "event": "pull_request"
         },
         {
+          "name": "Canonical relationship integration tests",
+          "head_sha": "e4237a363590beede7f90bff766a2140d53d293f",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44488834002",
+          "id": 44488834002,
+          "updated_at": "2026-11-19T08:36:19Z",
+          "event": "pull_request"
+        },
+        {
           "name": "PR promotion classification (review only)",
           "head_sha": "e4237a363590beede7f90bff766a2140d53d293f",
           "conclusion": "success",
@@ -287,24 +297,14 @@
           "event": "pull_request"
         },
         {
-          "name": "Canonical relationship integration tests",
-          "head_sha": "e4237a363590beede7f90bff766a2140d53d293f",
-          "conclusion": "success",
-          "status": "completed",
-          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44488834002",
-          "id": 44488834002,
-          "updated_at": "2026-11-19T08:36:19Z",
-          "event": "pull_request"
-        },
-        {
           "name": "Development inventory (read-only)",
           "head_sha": "7f99715989557a0033d753264e83d10be0cd6546",
           "conclusion": null,
           "status": "in_progress",
-          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44489058716",
-          "id": 44489058716,
-          "updated_at": "2026-11-19T08:36:43Z",
-          "event": "push"
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44490605856",
+          "id": 44490605856,
+          "updated_at": "2026-11-19T08:47:32Z",
+          "event": "schedule"
         },
         {
           "name": "Ledger facts proposal PR (review required)",
@@ -314,6 +314,16 @@
           "url": "https://github.com/miyazaki1016/misaki/actions/runs/44489058668",
           "id": 44489058668,
           "updated_at": "2026-11-19T08:36:58Z",
+          "event": "push"
+        },
+        {
+          "name": "Development inventory (read-only)",
+          "head_sha": "7f99715989557a0033d753264e83d10be0cd6546",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44489058716",
+          "id": 44489058716,
+          "updated_at": "2026-11-19T08:40:09Z",
           "event": "push"
         }
       ],
@@ -386,9 +396,9 @@
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
-      "fingerprint": "3f821d92b843751178921ab1099889bf954597e16caa4fe9a4e001d993118674",
-      "ci_digest": "2efc15f0bd5a90a86f25824fd0f2b870ab261df1d76907c29ac9282b81fd7eab",
-      "collected_at": "2026-11-19T08:37:02.804109+00:00",
+      "fingerprint": "9a46e63337787ace8fbf7a35cc3e1b0385e09b1d95afd5c7a9308b06b02d9bd0",
+      "ci_digest": "41f5c0012905fc2090e1f0450b117ac9037532b6718d7f22932767cb98f23643",
+      "collected_at": "2026-11-19T08:47:46.621307+00:00",
       "decisions": [
         {
           "kind": "test",
@@ -93651,6 +93661,6 @@
     "pr_cases": 194,
     "branches": 217,
     "errors": [],
-    "api_calls": 14
+    "api_calls": 6
   }
 }
