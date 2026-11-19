@@ -1,0 +1,20 @@
+{
+  "id": "branch-cf063db3d4301a2a",
+  "title": "work/anonymous-expired-root-purge",
+  "head": "054466c7cf6b9b6e1377a4bb56ffe7ce7bb44cb2",
+  "head_ref": "work/anonymous-expired-root-purge",
+  "linked_prs": [
+    190
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "33543572251ebf02257883ff3e58ce0b4300901a145d39e2809a312e2053eb70",
+  "collected_at": "2026-11-19T07:19:10.574002+00:00"
+}

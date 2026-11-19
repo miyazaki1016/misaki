@@ -1,8 +1,438 @@
 {
   "schema_version": 3,
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T07:04:36.964589+00:00",
+  "generated_at": "2026-11-19T07:19:10.574002+00:00",
   "cases": {
+    "pr-206": {
+      "id": "pr-206",
+      "number": 206,
+      "title": "チャットの履歴表示を高速化 (#181)",
+      "topics": [
+        "開発管理",
+        "画面・表示"
+      ],
+      "purpose": "開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+      "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+      "body": "関連 #181。\n登録済み履歴は保存された会話と親密度を同じ条件で並列に取得する。会話推論に必要な忘却制御や関係性処理は従来の完全ロードで維持。POSTの認証とメンテ確認を並列化し、判定が揃ってから既存処理へ進む。履歴レスポンスと読み取りクエリの回帰を追加。iPhone実測は本番反映後。\n\n照合 https://github.com/miyazaki1016/misaki/actions/runs/44478199125\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-131\",\"decision\":\"reuse\",\"reason\":\"匿名復旧の認証と失効条件を維持し、履歴取得の短縮で復旧経路を飛ばさない\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\"},{\"id\":\"pr-44\",\"decision\":\"reuse\",\"reason\":\"履歴再取得と利用回数同期は維持し、API応答の待ち時間だけを改善する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/44\"},{\"id\":\"pr-151\",\"decision\":\"extend\",\"reason\":\"既存の計測・スクロール修正を再利用し、計測済み4.76秒の履歴取得で不要な処理を除く\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\"},{\"id\":\"pr-193\",\"decision\":\"reuse\",\"reason\":\"匿名回復・忘却・感情処理の状態は既存の完全ロードに残す\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-180\",\"decision\":\"reuse\",\"reason\":\"既存iPhone計測表示で改善前後を比較する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/180\"},{\"id\":\"pr-67\",\"decision\":\"distinct\",\"reason\":\"Identityの有効化や永続化には触れず履歴の表示専用読み取りだけ短縮する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/67\"},{\"id\":\"pr-47\",\"decision\":\"reuse\",\"reason\":\"既存の会話確定後のRelationship処理と推論入力を既存経路に維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/47\"},{\"id\":\"pr-32\",\"decision\":\"reuse\",\"reason\":\"既存正本の記憶と親密度を同じフィールドから返し匿名チェックポイントと会話確定の経路を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/32\"}]}\n-->",
+      "snapshot_head": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+      "snapshot_consistent": true,
+      "head": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+      "base": "27320e843874595c0e5b687586887ecb30ee3b93",
+      "base_ref": "main",
+      "head_ref": "fix/faster-chat-history-181",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "draft": false,
+      "merged_at": "2026-11-19T07:18:56Z",
+      "merge_commit_sha": "44ed658813154f410e35697e88e884f12f8540a1",
+      "updated_at": "2026-11-19T07:18:56Z",
+      "code_facts": [
+        {
+          "file": "app/api/persona/history/route.ts",
+          "kind": "条件分岐・閾値",
+          "expression": "if (maintenance) return maintenance;",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts"
+        },
+        {
+          "file": "lib/canonical-state.ts",
+          "kind": "関数・クラス定義",
+          "expression": "export async function loadCanonicalState(userId: string, purpose: \"conversation\" | \"history\" = \"conversation\"): Promise<RootState & { history: unknown[] }> {",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts"
+        },
+        {
+          "file": "lib/canonical-state.ts",
+          "kind": "条件分岐・閾値",
+          "expression": "if (purpose === \"conversation\" && engineEnabled()) {",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts"
+        },
+        {
+          "file": "lib/canonical-state.ts",
+          "kind": "DB・ストレージ操作の呼出し",
+          "expression": "db.from(\"misaki_relationship_state\").select(purpose === \"history\" ? \"intimacy_points\" : \"*\").eq(\"user_id\", userId).maybeSingle(),",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts"
+        },
+        {
+          "file": "lib/canonical-state.ts",
+          "kind": "条件分岐・閾値",
+          "expression": "if (purpose === \"history\") return visibleState;",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "test('permanent history GET and POST load only read the visible snapshot', async () => {",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.equal(get.status, 200);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual(tables.sort(), ['misaki_relationship_state', 'misaki_user_conversation_state']);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.equal(visible.relationshipPoints, 79);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual(visible.memory, ['server memory']);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.equal(post.status, 200);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual(await post.json(), visible);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        },
+        {
+          "file": "tests/server-canonical.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual(tables.sort(), ['misaki_maintenance_control', 'misaki_relationship_state', 'misaki_user_conversation_state']);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        }
+      ],
+      "files": [
+        {
+          "path": "app/api/persona/history/route.ts",
+          "status": "modified",
+          "additions": 8,
+          "deletions": 7,
+          "patch": "diff --git a/app/api/persona/history/route.ts b/app/api/persona/history/route.ts\nindex 6d9c2088..96434860 100644\n--- a/app/api/persona/history/route.ts\n+++ b/app/api/persona/history/route.ts\n@@ -27,7 +27,7 @@ export async function GET(request: Request) {\n     const user = await authenticate(request);\n     if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n     if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });\n-    return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { \"Cache-Control\": \"no-store\" } });\n+    return Response.json(responseState(await loadCanonicalState(user.id, \"history\")), { headers: { \"Cache-Control\": \"no-store\" } });\n   } catch (error) {\n     console.error(\"CONVERSATION STATE READ FAILED\", { code: \"STATE_READ_FAILED\" });\n     return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });\n@@ -38,11 +38,12 @@ export async function POST(request: Request) {\n   const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n   const requestStartedAt = nowMs();\n   // Anonymous \"load\" renews the root, so it is a write too.\n-  const maintenance = await maintenanceResponse();\n-  if (maintenance) return maintenance;\n   try {\n-    const user = await authenticate(request);\n-    const authenticatedAt = nowMs();\n+    const [maintenance, { user, authenticatedAt }] = await Promise.all([\n+      maintenanceResponse(),\n+      authenticate(request).then(user => ({ user, authenticatedAt: nowMs() })),\n+    ]);\n+    if (maintenance) return maintenance;\n     if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n     const body = await request.json();\n     if (body.saveAnonymous === true) {\n@@ -92,7 +93,7 @@ export async function POST(request: Request) {\n           }\n         }\n       }\n-      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);\n+      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id, \"history\");\n       return timedResponse({ ...responseState(state, !!user.is_anonymous),\n         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, \"load\") : sealTemporaryState(state, \"load\") } : {}) });\n     }\n@@ -124,7 +125,7 @@ export async function POST(request: Request) {\n       p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),\n     });\n     if (error) throw new Error(\"Conversation edit failed\");\n-    return Response.json(responseState(await loadCanonicalState(user.id)));\n+    return Response.json(responseState(await loadCanonicalState(user.id, \"history\")));\n   } catch (error) {\n     if (error instanceof TemporaryStateUnavailableError) {\n       const status = error.reason === \"expired\" ? 410 : 409;\n",
+          "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts",
+          "source": {
+            "path": "app/api/persona/history/route.ts",
+            "coverage": "全文",
+            "text": "import { anonymousCheckpointState, anonymousInferenceState } from \"../../../../supabase/functions/_shared/anonymous-memory-expiry\";\nimport { TemporaryStateUnavailableError, temporaryStateMessage } from \"../../../../lib/temporary-state-error\";\nimport { maintenanceResponse } from \"../../../../lib/maintenance\";\nimport { createClient } from \"@supabase/supabase-js\";\nimport { createServerSupabase, loadCanonicalState, openTemporaryState, sealTemporaryState, type RootState, loadTemporaryRoot, loadCompletedTemporaryTurn, editTemporaryRoot, forgetControlPayload } from \"../../../../lib/canonical-state\";\nimport { createForgetJudge, identifyForgetTargets, addForgetControls } from \"../../../../supabase/functions/_shared/forget-control\";\n\nasync function authenticate(request: Request) {\n  const token = request.headers.get(\"authorization\")?.match(/^Bearer (.+)$/)?.[1];\n  if (!token) return null;\n  const db = createClient(\"https://tzozajnwznxqgxnjikoy.supabase.co\", \"sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1\", {\n    global: { headers: { Authorization: `Bearer ${token}` } },\n    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },\n  });\n  const { data, error } = await db.auth.getUser(token);\n  return error ? null : data.user;\n}\nfunction responseState(state: RootState, ephemeral = false) {\n  const history = state.history ?? [];\n  const active = ephemeral ? anonymousInferenceState(state, Date.now()) : state;\n  return { exists: true, history, memory: active.memory, relationshipPoints: active.relationshipPoints,\n    misakiTodayMemory: active.todayMemory, ephemeral, messageCount: history.length,\n    userMessageCount: history.filter((item: any) => item?.role === \"user\").length, memoryCount: active.memory.length, updatedAt: state.updatedAt ?? null };\n}\nexport async function GET(request: Request) {\n  try {\n    const user = await authenticate(request);\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } });\n    return Response.json(responseState(await loadCanonicalState(user.id, \"history\")), { headers: { \"Cache-Control\": \"no-store\" } });\n  } catch (error) {\n    console.error(\"CONVERSATION STATE READ FAILED\", { code: \"STATE_READ_FAILED\" });\n    return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });\n  }\n}\nexport async function POST(request: Request) {\n  // Monotonic timings only; never include identifiers or conversation contents.\n  const nowMs = () => typeof performance !== \"undefined\" ? performance.now() : Date.now();\n  const requestStartedAt = nowMs();\n  // Anonymous \"load\" renews the root, so it is a write too.\n  try {\n    const [maintenance, { user, authenticatedAt }] = await Promise.all([\n      maintenanceResponse(),\n      authenticate(request).then(user => ({ user, authenticatedAt: nowMs() })),\n    ]);\n    if (maintenance) return maintenance;\n    if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 });\n    const body = await request.json();\n    if (body.saveAnonymous === true) {\n      if (!user.is_anonymous || body.expectedUserId !== user.id) {\n        return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 });\n      }\n      let state = await loadTemporaryRoot(user.id, body.temporaryState);\n      // A reply can have committed even if its transport response was lost.\n      if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);\n        }\n      }\n      const active = anonymousCheckpointState(state, Date.now());\n      const { data, error } = await createServerSupabase().rpc(\"save_misaki_temporary_state\", {\n        p_user_id: user.id, p_history: active.history, p_memory: active.memory,\n        p_today_memory: active.todayMemory, p_points: active.relationshipPoints,\n        p_relationship: active.temporaryRelationship,\n        p_expected_revision: state.temporaryRevision ?? null,\n        p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),\n      });\n      if (error) {\n        console.error(\"EMAIL CHECKPOINT ERROR\", { code: \"STATE_COMMIT_FAILED\" });\n        throw new Error(\"Email checkpoint failed\");\n      }\n      return Response.json({ synced: true, result: data });\n    }\n    if (body.action === \"load\") {\n      const loadStartedAt = nowMs();\n      const timedResponse = (payload: unknown) => Response.json(payload, {\n        headers: { \"Cache-Control\": \"no-store\", \"Server-Timing\": [\n          `auth;dur=${(authenticatedAt - requestStartedAt).toFixed(1)}`,\n          `history;dur=${(nowMs() - loadStartedAt).toFixed(1)}`,\n          `request;dur=${(nowMs() - requestStartedAt).toFixed(1)}`,\n        ].join(\", \") },\n      });\n      if (user.is_anonymous && typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") {\n        const replay = await loadCompletedTemporaryTurn(user.id, body.pending.requestId, body.pending.message, body.pending.temporaryState);\n        if (replay) {\n          const recovered = openTemporaryState(replay.temporaryState);\n          if (recovered) {\n            const latest = await loadTemporaryRoot(user.id, replay.temporaryState);\n            return timedResponse({ ...responseState(latest, true),\n              temporaryState: latest.temporaryRevision ? await editTemporaryRoot(user.id, latest, \"load\") : sealTemporaryState(latest, \"load\"), recoveredTurn: true });\n          }\n        }\n      }\n      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id, \"history\");\n      return timedResponse({ ...responseState(state, !!user.is_anonymous),\n        ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, \"load\") : sealTemporaryState(state, \"load\") } : {}) });\n    }\n    if (![\"deleteMemory\", \"clearMemory\", \"clearHistory\"].includes(body.action) ||\n      (body.action === \"deleteMemory\" && typeof body.value !== \"string\")) {\n      return Response.json({ error: \"Explicit state operation required.\" }, { status: 400 });\n    }\n    const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);\n    const requestId = typeof body.requestId === \"string\" && /^[0-9a-f-]{36}$/i.test(body.requestId) ? body.requestId : crypto.randomUUID();\n    if (body.action !== \"clearHistory\") {\n      const items = body.action === \"clearMemory\" ? state.memory : state.memory.filter(item => item === body.value);\n      const judge = createForgetJudge(process.env.GEMINI_API_KEY!);\n      let controls = state.forgetControls ?? [];\n      for (const item of items) {\n        const targets = await identifyForgetTargets(\"UI explicitly deletes all facts in this item\", [{ text: item }], judge);\n        if (!targets.length) throw new Error(\"Memory deletion target could not be safely identified\");\n        controls = await addForgetControls(controls, targets.map(t => ({ ...t, scope: \"fact\" as const })), \"hard_delete\", requestId, new Date().toISOString(), `${process.env.SUPABASE_SERVICE_ROLE_KEY}:${user.id}`);\n      }\n      state.forgetControls = controls;\n    }\n    if (user.is_anonymous) {\n      if (body.action === \"clearHistory\") state.history = [];\n      else state.memory = body.action === \"clearMemory\" ? [] : state.memory.filter(item => item !== body.value);\n      return Response.json({ ...responseState(state, true), temporaryState: await editTemporaryRoot(user.id, state) });\n    }\n    const { error } = await createServerSupabase().rpc(\"edit_misaki_conversation_state\", {\n      p_user_id: user.id, p_action: body.action, p_value: body.value ?? null,\n      p_expected_updated_at: state.updatedAt ?? null,\n      p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),\n    });\n    if (error) throw new Error(\"Conversation edit failed\");\n    return Response.json(responseState(await loadCanonicalState(user.id, \"history\")));\n  } catch (error) {\n    if (error instanceof TemporaryStateUnavailableError) {\n      const status = error.reason === \"expired\" ? 410 : 409;\n      const code = error.reason === \"expired\" ? \"TEMPORARY_STATE_EXPIRED\" : \"TEMPORARY_STATE_UNVERIFIABLE\";\n      console.error(\"CONVERSATION STATE UNAVAILABLE\", { code, status });\n      return Response.json({ code, error: temporaryStateMessage(status, { code }) },\n        { status, headers: { \"Cache-Control\": \"no-store\" } });\n    }\n    // Never log arbitrary exception payloads (may contain private data).\n    console.error(\"CONVERSATION STATE WRITE FAILED\", { code: \"STATE_OPERATION_FAILED\" });\n    return Response.json({ error: \"Conversation state could not be saved.\" }, { status: 500 });\n  }\n}\n",
+            "sha256": "94d9a4863ade26882d167c54da7688ac64c1e8734ea9d5ce0af66fb3c8328042"
+          }
+        },
+        {
+          "path": "lib/canonical-state.ts",
+          "status": "modified",
+          "additions": 14,
+          "deletions": 8,
+          "patch": "diff --git a/lib/canonical-state.ts b/lib/canonical-state.ts\nindex 37b5a987..dd456e30 100644\n--- a/lib/canonical-state.ts\n+++ b/lib/canonical-state.ts\n@@ -81,10 +81,10 @@ export function openTemporaryState(token: unknown): { state: RootState; requestI\n   return parsed && parsed.expires > Date.now() ? parsed : null;\n }\n \n-export async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {\n+export async function loadCanonicalState(userId: string, purpose: \"conversation\" | \"history\" = \"conversation\"): Promise<RootState & { history: unknown[] }> {\n   const db = createServerSupabase();\n   let relationshipImportPending = false;\n-  if (engineEnabled()) {\n+  if (purpose === \"conversation\" && engineEnabled()) {\n     // Read path never starts permanent Relationship work without ownership.\n     // The post-save worker imports the frozen anonymous trajectory under its lease.\n     const [imported, temporary] = await Promise.all([\n@@ -94,10 +94,20 @@ export async function loadCanonicalState(userId: string): Promise<RootState & {\n     relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);\n   }\n   const [relationship, conversation] = await Promise.all([\n-    db.from(\"misaki_relationship_state\").select(\"*\").eq(\"user_id\", userId).maybeSingle(),\n+    db.from(\"misaki_relationship_state\").select(purpose === \"history\" ? \"intimacy_points\" : \"*\").eq(\"user_id\", userId).maybeSingle(),\n     db.from(\"misaki_user_conversation_state\").select(\"history,memory,today_memory,updated_at\").eq(\"user_id\", userId).maybeSingle(),\n   ]);\n   if (relationship.error || conversation.error) throw new Error(\"Canonical state read failed\");\n+  const visibleState = {\n+    relationshipPoints: relationship.data?.intimacy_points ?? 0,\n+    history: conversation.data?.history ?? [],\n+    memory: conversation.data?.memory ?? [],\n+    todayMemory: conversation.data?.today_memory ?? { date: \"\", items: [] },\n+    updatedAt: conversation.data?.updated_at ?? null,\n+  };\n+  // The history response exposes only the saved snapshot, not inference state.\n+  if (purpose === \"history\") return visibleState;\n+\n   const forgetControls = await loadForgetControls(userId);\n   let relationshipCriticalPending = relationshipImportPending;\n   if (engineEnabled()) {\n@@ -112,12 +122,8 @@ export async function loadCanonicalState(userId: string): Promise<RootState & {\n       typeof t.metadata?.message === \"string\" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));\n   }\n   return {\n+    ...visibleState,\n     forgetControls,\n-    relationshipPoints: relationship.data?.intimacy_points ?? 0,\n-    history: conversation.data?.history ?? [],\n-    memory: conversation.data?.memory ?? [],\n-    todayMemory: conversation.data?.today_memory ?? { date: \"\", items: [] },\n-    updatedAt: conversation.data?.updated_at ?? null,\n     relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,\n       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,\n     relationshipCriticalPending, relationshipImportPending,\n",
+          "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts",
+          "source": {
+            "path": "lib/canonical-state.ts",
+            "coverage": "全文",
+            "text": "import { anonymousCheckpointState, anonymousInferenceState, type MemoryTimes } from \"../supabase/functions/_shared/anonymous-memory-expiry\";\nimport { TemporaryStateUnavailableError } from \"./temporary-state-error\";\nimport { createClient } from \"@supabase/supabase-js\";\nimport { createCipheriv, createDecipheriv, createHash, randomBytes } from \"node:crypto\";\nimport { engineEnabled, canonicalActingState, type Snapshot } from \"./relationship-engine-v1\";\nimport { createLegacyRelationshipActingState, type RelationshipActingState } from \"./relationship-acting-guide\";\nimport { criticalCandidates } from \"./relationship-analyzer-v1\";\nimport { openForgetControls, sealForgetControls, validateControls, type ForgetControl } from \"../supabase/functions/_shared/forget-control\";\n\nexport type RootState = {\n  forgetControls?: ForgetControl[];\n  history?: unknown[];\n  memory: string[];\n  memoryTimes?: MemoryTimes;\n  todayMemoryTimes?: MemoryTimes;\n  todayMemory: { date: string; items: string[] };\n  relationshipPoints: number;\n  relationshipEvidenceAt?: number;\n  updatedAt?: string | null;\n  temporaryRevision?: string | null;\n  relationshipEngine?: Snapshot;\n  relationshipActingState?: RelationshipActingState;\n  relationshipCriticalPending?: boolean;\n  relationshipImportPending?: boolean;\n  temporaryRelationship?: {\n    emotionPrimary: string;\n    emotionIntensity: number;\n    actionState: string;\n    lastInteractionAt: string | null;\n    signals: Array<{ name: string; strength: number; confidence: number }>;\n    events?: Array<{\n      event_type: \"emotion_action_v2_after_chat\";\n      created_at: string;\n      metadata: { signal_summary: Array<{ name: string; strength: number; confidence: number }> };\n    }>;\n  } | null;\n};\n\nexport function createServerSupabase() {\n  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;\n  if (!key) throw new Error(\"Canonical state server credentials missing\");\n  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL || \"https://tzozajnwznxqgxnjikoy.supabase.co\", key, {\n    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },\n  });\n}\n\nfunction encryptionKey() {\n  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;\n  if (!key) throw new Error(\"Temporary state server credentials missing\");\n  return createHash(\"sha256\").update(`misaki-temporary-state-v1:${key}`).digest();\n}\n\nexport function sealTemporaryState(state: RootState, requestId: string, result?: Record<string, unknown>) {\n  const iv = randomBytes(12);\n  const cipher = createCipheriv(\"aes-256-gcm\", encryptionKey(), iv);\n  const payload = Buffer.from(JSON.stringify({ state, requestId, result, expires: Date.now() + 24 * 60 * 60 * 1000 }));\n  const encrypted = Buffer.concat([cipher.update(payload), cipher.final()]);\n  return Buffer.concat([iv, cipher.getAuthTag(), encrypted]).toString(\"base64url\");\n}\n\n// Anonymous state is a server-authenticated, temporary browser-session token.\n// It is not a permanent account state and clients cannot choose its points/memory.\n// Do not bind to the anonymous auth ID: Safari's transient auth recovery replaces\n// that ID while preserving this live browser session. Permanent accounts ignore it.\nfunction inspectTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown>; expires: number } | null {\n  if (typeof token !== \"string\" || token.length > 512_000) return null;\n  try {\n    const buffer = Buffer.from(token, \"base64url\");\n    const decipher = createDecipheriv(\"aes-256-gcm\", encryptionKey(), buffer.subarray(0, 12));\n    decipher.setAuthTag(buffer.subarray(12, 28));\n    const parsed = JSON.parse(Buffer.concat([decipher.update(buffer.subarray(28)), decipher.final()]).toString());\n    if (!Number.isFinite(parsed.expires)) return null;\n    return parsed;\n  } catch {\n    return null;\n  }\n}\n\nexport function openTemporaryState(token: unknown): { state: RootState; requestId: string; result?: Record<string, unknown> } | null {\n  const parsed = inspectTemporaryState(token);\n  return parsed && parsed.expires > Date.now() ? parsed : null;\n}\n\nexport async function loadCanonicalState(userId: string, purpose: \"conversation\" | \"history\" = \"conversation\"): Promise<RootState & { history: unknown[] }> {\n  const db = createServerSupabase();\n  let relationshipImportPending = false;\n  if (purpose === \"conversation\" && engineEnabled()) {\n    // Read path never starts permanent Relationship work without ownership.\n    // The post-save worker imports the frozen anonymous trajectory under its lease.\n    const [imported, temporary] = await Promise.all([\n      db.from(\"misaki_relationship_temporary_v1_imports\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle(),\n      db.from(\"misaki_temporary_roots\").select(\"token\").eq(\"user_id\", userId).maybeSingle(),\n    ]);\n    relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);\n  }\n  const [relationship, conversation] = await Promise.all([\n    db.from(\"misaki_relationship_state\").select(purpose === \"history\" ? \"intimacy_points\" : \"*\").eq(\"user_id\", userId).maybeSingle(),\n    db.from(\"misaki_user_conversation_state\").select(\"history,memory,today_memory,updated_at\").eq(\"user_id\", userId).maybeSingle(),\n  ]);\n  if (relationship.error || conversation.error) throw new Error(\"Canonical state read failed\");\n  const visibleState = {\n    relationshipPoints: relationship.data?.intimacy_points ?? 0,\n    history: conversation.data?.history ?? [],\n    memory: conversation.data?.memory ?? [],\n    todayMemory: conversation.data?.today_memory ?? { date: \"\", items: [] },\n    updatedAt: conversation.data?.updated_at ?? null,\n  };\n  // The history response exposes only the saved snapshot, not inference state.\n  if (purpose === \"history\") return visibleState;\n\n  const forgetControls = await loadForgetControls(userId);\n  let relationshipCriticalPending = relationshipImportPending;\n  if (engineEnabled()) {\n    const { data, error } = await db.from(\"misaki_relationship_critical_pending\").select(\"request_id\").eq(\"user_id\", userId).in(\"status\", [\"pending\", \"processing\", \"failed\"]);\n    relationshipCriticalPending ||= !!error || !!data?.length;\n    // Bridge the interval after chat commit but before the after() worker creates pending rows.\n    const { data: recent, error: recentError } = await db.from(\"misaki_relationship_events\").select(\"request_id,metadata\")\n      .eq(\"user_id\", userId).eq(\"event_type\", \"chat_turn_completed\").order(\"id\", { ascending: false }).limit(3);\n    const { data: processed, error: processedError } = await db.from(\"misaki_relationship_processing\").select(\"request_id\")\n      .eq(\"user_id\", userId).eq(\"processing_version\", \"relationship-v1.1\").eq(\"status\", \"applied\");\n    relationshipCriticalPending ||= !!recentError || !!processedError || !!recent?.some(t =>\n      typeof t.metadata?.message === \"string\" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));\n  }\n  return {\n    ...visibleState,\n    forgetControls,\n    relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,\n      createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,\n    relationshipCriticalPending, relationshipImportPending,\n  };\n}\n\nexport async function loadForgetControls(userId: string): Promise<ForgetControl[]> {\n  const { data, error } = await createServerSupabase().from(\"misaki_forget_controls\").select(\"payload\").eq(\"user_id\", userId).maybeSingle();\n  if (error) throw new Error(\"Forget control read failed\");\n  return data ? openForgetControls(data.payload, process.env.SUPABASE_SERVICE_ROLE_KEY!, userId) : [];\n}\n\nexport function forgetControlPayload(userId: string, controls: ForgetControl[] = []) {\n  return sealForgetControls(validateControls(controls), process.env.SUPABASE_SERVICE_ROLE_KEY!, userId);\n}\n\nexport async function loadTemporaryRoot(userId: string, token: unknown): Promise<RootState> {\n  const temporary = openTemporaryState(token);\n  if (token && !temporary) {\n    const inspected = inspectTemporaryState(token);\n    throw new TemporaryStateUnavailableError(inspected ? \"expired\" : \"unverifiable\");\n  }\n  const { data: root, error: rootError } = await createServerSupabase().from(\"misaki_temporary_roots\")\n    .select(\"token,revision,expires_at\").eq(\"user_id\", userId).maybeSingle();\n  if (rootError) throw new Error(\"Temporary root read failed\");\n  if (root) {\n    const verified = inspectTemporaryState(root.token);\n    const expires = Date.parse(root.expires_at);\n    if (!verified || !Number.isFinite(expires)) throw new TemporaryStateUnavailableError(\"unverifiable\");\n    if (verified.expires <= Date.now() || expires <= Date.now()) throw new TemporaryStateUnavailableError(\"expired\");\n    return { ...verified.state, temporaryRevision: root.revision };\n  }\n  const { data: expired, error: expiryError } = await createServerSupabase()\n    .from(\"misaki_expired_temporary_root_users\").select(\"user_id\").eq(\"user_id\", userId).maybeSingle();\n  if (expiryError) throw new Error(\"Temporary root expiry marker read failed\");\n  if (expired) throw new TemporaryStateUnavailableError(\"expired\");\n  // A valid bearer state can seed a replacement Safari anonymous auth ID.\n  // Once this ID has a server root, browser snapshots cannot overwrite it.\n  if (temporary) return { ...temporary.state, temporaryRevision: null };\n  // Only an explicit email checkpoint is eligible for fresh-tab restoration.\n  // Ordinary anonymous chat creates no plaintext permanent conversation root.\n  const { data, error } = await createServerSupabase().from(\"misaki_relationship_events\")\n    .select(\"id\").eq(\"user_id\", userId).eq(\"event_type\", \"email_save_checkpoint\").maybeSingle();\n  if (error) throw new Error(\"Temporary checkpoint read failed\");\n  return data ? loadCanonicalState(userId) : { history: [], memory: [], todayMemory: { date: \"\", items: [] }, relationshipPoints: 0 };\n}\n\nexport async function loadCompletedTurn(userId: string, requestId: string, message: string) {\n  const { data, error } = await createServerSupabase().from(\"misaki_relationship_events\")\n    .select(\"metadata\").eq(\"user_id\", userId).eq(\"request_id\", requestId)\n    .eq(\"event_type\", \"chat_turn_completed\").maybeSingle();\n  if (error) throw new Error(\"Completed turn read failed\");\n  if (!data) return null;\n  if (data.metadata.message !== message) throw new Error(\"Request ID reused for another message\");\n  return data.metadata.result as Record<string, unknown>;\n}\n\nexport async function completeCanonicalTurn(userId: string, requestId: string, message: string,\n  userMessageAt: string, result: Record<string, unknown>, emotionInput?: unknown) {\n  const { forgetControls, ...publicResult } = result;\n  const { data, error } = await createServerSupabase().rpc(emotionInput ? \"complete_misaki_chat_turn_with_emotion\" : \"complete_misaki_chat_turn\", {\n    ...(emotionInput ? { p_emotion_input: emotionInput } : {}),\n    p_user_id: userId, p_request_id: requestId, p_message: message,\n    p_user_message_at: userMessageAt, p_result: { ...publicResult, forgetControlPayload: await forgetControlPayload(userId, (forgetControls ?? []) as ForgetControl[]) },\n  });\n  if (error || !data) throw new Error(\"Canonical turn commit failed\");\n  return data as Record<string, unknown>;\n}\n\nfunction digest(value: string) { return createHash(\"sha256\").update(value).digest(\"hex\"); }\n\nfunction temporaryResponse(token: string, message: string) {\n  const temporary = openTemporaryState(token);\n  if (!temporary?.result || temporary.result.originalMessage !== message) throw new Error(\"Temporary replay unavailable\");\n  const { originalMessage, ...result } = temporary.result;\n  const active = anonymousInferenceState(temporary.state, Date.now());\n  return { ...result, memory: active.memory, misakiTodayMemory: active.todayMemory, relationshipPoints: active.relationshipPoints, temporaryState: token };\n}\n\nexport async function loadCompletedTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown) {\n  const { data, error } = await createServerSupabase().from(\"daily_message_requests\")\n    .select(\"completed_at,temporary_result,message_hash,parent_hash\")\n    .eq(\"user_id\", userId).eq(\"request_id\", requestId).maybeSingle();\n  if (error) throw new Error(\"Temporary receipt read failed\");\n  if (!data?.completed_at) return null;\n  if (data.message_hash !== digest(message) || data.parent_hash !== digest(typeof parent === \"string\" ? parent : \"\")) {\n    throw new Error(\"Request ID reused for another temporary turn\");\n  }\n  return temporaryResponse(data.temporary_result, message);\n}\n\nexport async function completeTemporaryTurn(userId: string, requestId: string, message: string, parent: unknown,\n  token: string, revision: string | null = null) {\n  const verified = openTemporaryState(token);\n  if (!verified) throw new Error(\"Temporary commit state invalid\");\n  const { data, error } = await createServerSupabase().rpc(\"complete_misaki_temporary_turn\", {\n    p_user_id: userId, p_request_id: requestId, p_message_hash: digest(message),\n    p_parent_hash: digest(typeof parent === \"string\" ? parent : \"\"), p_token: token,\n    p_expected_revision: revision, p_state: { ...anonymousCheckpointState(verified.state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, verified.state.forgetControls ?? []) },\n  });\n  if (error || typeof data !== \"string\") {\n    if (error) {\n      console.error(\"TEMPORARY RECEIPT COMMIT ERROR\", { code: \"STATE_COMMIT_FAILED\" });\n    }\n    throw new Error(\"Temporary receipt commit failed\");\n  }\n  return temporaryResponse(data, message);\n}\n\nexport async function editTemporaryRoot(userId: string, state: RootState, purpose = \"edit\") {\n  const token = sealTemporaryState(state, purpose);\n  const { error } = await createServerSupabase().rpc(\"write_misaki_temporary_root\", {\n    p_user_id: userId, p_token: token, p_state: { ...anonymousCheckpointState(state, Date.now()), forgetControlPayload: await forgetControlPayload(userId, state.forgetControls ?? []) }, p_expected_revision: state.temporaryRevision ?? null,\n  });\n  if (error) throw new Error(\"Temporary edit commit failed\");\n  return token;\n}\n",
+            "sha256": "a7762fb0d805d3a47a2c587f6b8cd138b8764a7a6cd00c99e2839768c03a3e7d"
+          }
+        },
+        {
+          "path": "tests/server-canonical.test.cjs",
+          "status": "modified",
+          "additions": 23,
+          "deletions": 0,
+          "patch": "diff --git a/tests/server-canonical.test.cjs b/tests/server-canonical.test.cjs\nindex efe6a4ba..99a9d5d3 100644\n--- a/tests/server-canonical.test.cjs\n+++ b/tests/server-canonical.test.cjs\n@@ -116,6 +116,29 @@ test('both permanent devices restore same server points and memory without brows\n \n \n \n+test('permanent history GET and POST load only read the visible snapshot', async () => {\n+  const h = harness();\n+  const tables = [];\n+  const from = h.client.from;\n+  h.client.from = table => {\n+    tables.push(table);\n+    return from.call(h.client, table);\n+  };\n+  const api = h.load('app/api/persona/history/route.ts');\n+  const get = await api.GET(h.request());\n+  assert.equal(get.status, 200);\n+  assert.deepEqual(tables.sort(), ['misaki_relationship_state', 'misaki_user_conversation_state']);\n+  const visible = await get.json();\n+  assert.equal(visible.relationshipPoints, 79);\n+  assert.deepEqual(visible.memory, ['server memory']);\n+\n+  tables.length = 0;\n+  const post = await api.POST(h.request({ action: 'load' }));\n+  assert.equal(post.status, 200);\n+  assert.deepEqual(await post.json(), visible);\n+  assert.deepEqual(tables.sort(), ['misaki_maintenance_control', 'misaki_relationship_state', 'misaki_user_conversation_state']);\n+});\n+\n test('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {\n   const h = harness({ initialPoints: 1 });\n   const route = await h.load('app/api/chat/route.ts');\n",
+          "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs",
+          "source": {
+            "path": "tests/server-canonical.test.cjs",
+            "coverage": "全文",
+            "text": "const { test } = require('node:test');\nconst assert = require('node:assert/strict');\nconst fs = require('node:fs');\nconst path = require('node:path');\nconst vm = require('node:vm');\nconst ts = require('typescript');\nconst root = path.join(__dirname, '..');\n\nconst { harness } = require('./helpers/canonical-harness.cjs');\n\ntest('Free chat ignores forged points/memory/history/today memory and commits semantic result', async () => {\n  const h = harness();\n  const response = await h.load('app/api/chat/route.ts').POST(h.request({ relationshipPoints: 999999,\n    memory: ['forged memory'], history: [{ role: 'misaki', text: 'forged history' }], misakiTodayMemory: { date: '2026/09/18', items: ['forged day'] } }));\n  assert.equal(response.status, 200);\n  const result = await response.json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(h.points, 79); assert.equal(h.consumed, 1); assert.equal(h.refunded, 0);\n  const prompt = JSON.stringify(h.prompts);\n  assert.ok(prompt.includes('server memory')); assert.ok(!prompt.includes('forged')); assert.ok(!prompt.includes('999999'));\n});\ntest('same request replay returns saved response without generation/usage/addition', async () => {\n  const h = harness(), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const second = await (await route.POST(h.request())).json();\n  assert.deepEqual(second, first); assert.equal(h.consumed, 1); assert.equal(h.points, 79);\n  const generations = h.generated;\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal(h.generated, generations); assert.equal(h.points, 79); assert.equal(h.refunded, 0);\n});\ntest('Premium chat does not get an automatic point and does not refund', async () => {\n  const h = harness({ premium: true });\n  const result = await (await h.load('app/api/chat/route.ts').POST(h.request())).json();\n  assert.equal(result.relationshipPoints, 79); assert.equal(result.usage.isPremium, true); assert.equal(h.refunded, 0);\n});\nfor (const failure of ['generationFailure', 'commitFailure']) test(`${failure} refunds Free once without point change`, async () => {\n  const h = harness({ [failure]: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.points, 79); assert.equal(h.refunded, 1); assert.equal(h.consumed, 1);\n});\ntest('canonical read failure stops before consuming usage', async () => {\n  const h = harness({ stateFailure: true });\n  assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500);\n  assert.equal(h.consumed, 0); assert.equal(h.points, 79);\n});\ntest('anonymous successful state is sealed; modified or expired tokens cannot change root', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request({ relationshipPoints: 999, memory: ['fake'] }))).json();\n  assert.equal(first.relationshipPoints, 0); assert.equal(first.ephemeral, true);\n  const root = h.load('lib/canonical-state.ts');\n  assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0);\n  assert.equal(root.openTemporaryState(first.temporaryState.slice(0, 20) + 'AAAA' + first.temporaryState.slice(24)), null);\n  const before = h.consumed;\n  const lostResponseReplay = await (await route.POST(h.request())).json();\n  assert.equal(lostResponseReplay.temporaryState, first.temporaryState); assert.equal(h.consumed, before);\n  assert.equal((await route.POST(h.request({ message: 'different' }))).status, 500);\n  assert.equal((await route.POST(h.request({ temporaryState: 'forged' }))).status, 500);\n  assert.equal(h.consumed, before);\n  const replay = await (await route.POST(h.request({ temporaryState: first.temporaryState }))).json();\n  assert.equal(replay.relationshipPoints, 0); assert.equal(h.consumed, before);\n  const second = await (await route.POST(h.request({ temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec' }))).json();\n  assert.equal(second.relationshipPoints, 0);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState,\n    requestId: first.requestId, message: 'new turn cannot reuse billed request' }))).status, 500);\n  h.advanceClock(24 * 60 * 60 * 1000 + 1);\n  assert.equal(root.openTemporaryState(second.temporaryState), null);\n  assert.equal((await route.POST(h.request({ temporaryState: second.temporaryState }))).status, 500);\n  assert.equal(h.calls.filter(call => call.name === 'complete_misaki_chat_turn').length, 0);\n});\ntest('anonymous relationship emotion survives into the next temporary-root turn', async () => {\n  const h = harness({ anonymous: true }), route = h.load('app/api/chat/route.ts');\n  const first = await (await route.POST(h.request())).json();\n  const root = h.load('lib/canonical-state.ts');\n  const firstState = root.openTemporaryState(first.temporaryState).state;\n  assert.ok(firstState.temporaryRelationship);\n  assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral');\n  assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL');\n\n  const second = await (await route.POST(h.request({\n    temporaryState: first.temporaryState,\n    requestId: '329aae9a-4e11-4fd9-a4b2-bf5f7b7c68ec',\n    message: '次の会話'\n  }))).json();\n  const secondState = root.openTemporaryState(second.temporaryState).state;\n  assert.ok(secondState.temporaryRelationship);\n  assert.ok(secondState.temporaryRelationship.lastInteractionAt);\n  assert.equal(h.calls.filter(call => call.name === 'apply_relationship_emotion_action_v2').length, 0);\n  assert.equal(h.calls.filter(call => call.name === 'record_relationship_chat_turn').length, 0);\n});\n\ntest('email checkpoint ignores forged browser snapshot and uses verified temporary state', async () => {\n  const h = harness({ anonymous: true });\n  const crypto = h.load('lib/canonical-state.ts');\n  const token = crypto.sealTemporaryState({ memory: ['verified memory'], memoryTimes: [['verified memory', h.now()]], history: [{ role: 'user', text: 'verified', sentAt: new Date(h.now()).toISOString() }],\n    todayMemory: { date: '', items: [] }, relationshipPoints: 7 }, 'previous');\n  const api = h.load('app/api/persona/history/route.ts');\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409);\n  assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'account-a', temporaryState: token,\n    memory: ['forged'], history: [], relationshipPoints: 999 }))).status, 200);\n  const saved = h.calls.find(call => call.name === 'save_misaki_temporary_state').args;\n  assert.equal(saved.p_points, 7); assert.equal(saved.p_memory[0], 'verified memory'); assert.equal(saved.p_history[0].text, 'verified');\n});\ntest('anonymous history GET is a safe no-op during auth transition', async () => {\n  const h = harness({ anonymous: true }), api = h.load('app/api/persona/history/route.ts');\n  const response = await api.GET(h.request());\n  assert.equal(response.status, 200);\n  assert.deepEqual(await response.json(), { exists: false, ephemeral: true });\n});\ntest('both permanent devices restore same server points and memory without browser caches', async () => {\n  const h = harness(), api = h.load('app/api/persona/history/route.ts');\n  const a = await (await api.GET(h.request())).json(), b = await (await api.GET(h.request())).json();\n  assert.deepEqual(a, b); assert.equal(a.relationshipPoints, 79); assert.deepEqual(a.memory, ['server memory']);\n  assert.equal((await api.POST(h.request({ history: [], memory: ['fake'], relationshipPoints: 999 }))).status, 400);\n});\n\n\n\n\ntest('permanent history GET and POST load only read the visible snapshot', async () => {\n  const h = harness();\n  const tables = [];\n  const from = h.client.from;\n  h.client.from = table => {\n    tables.push(table);\n    return from.call(h.client, table);\n  };\n  const api = h.load('app/api/persona/history/route.ts');\n  const get = await api.GET(h.request());\n  assert.equal(get.status, 200);\n  assert.deepEqual(tables.sort(), ['misaki_relationship_state', 'misaki_user_conversation_state']);\n  const visible = await get.json();\n  assert.equal(visible.relationshipPoints, 79);\n  assert.deepEqual(visible.memory, ['server memory']);\n\n  tables.length = 0;\n  const post = await api.POST(h.request({ action: 'load' }));\n  assert.equal(post.status, 200);\n  assert.deepEqual(await post.json(), visible);\n  assert.deepEqual(tables.sort(), ['misaki_maintenance_control', 'misaki_relationship_state', 'misaki_user_conversation_state']);\n});\n\ntest('canonical permanent commit applies semantic point delta once and clamps at zero', async () => {\n  const h = harness({ initialPoints: 1 });\n  const route = await h.load('app/api/chat/route.ts');\n  h.setOpenaiPayload({ reply: '...', memory: [], misakiTodayMemory: { items: [] }, relationshipSignals: { signals: [{ name: 'hurtful', strength: 0.8, confidence: 0.9, evidence: 'x' }, { name: 'rejection', strength: 0.7, confidence: 0.9, evidence: 'x' }], relationshipFacts: {} } });\n  const requestId = crypto.randomUUID();\n  const first = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  const afterFirst = h.points;\n  const replay = await (await route.POST(h.request({ message: 'x', requestId }))).json();\n  assert.equal(afterFirst, 0);\n  assert.equal(h.points, 0);\n  assert.equal(first.relationshipPointDelta, undefined);\n  assert.equal(replay.relationshipPointDelta, undefined);\n});\n\n\ntest('anonymous browser never enters permanent history GET sync', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');\n  assert.ok(source.includes('localStorage.getItem(AUTH_KIND_KEY) === \"anonymous\"'));\n  assert.ok(source.includes('session.user.is_anonymous'));\n  assert.ok(source.includes('if (!session?.user || session.user.is_anonymous) return;'));\n});\n\ntest('Vercel runtime does not call the JR East endpoint that returns 403', () => {\n  const source = fs.readFileSync(path.join(root, 'lib/tokyo-life-events.ts'), 'utf8');\n  const guard = source.indexOf('if (process.env.VERCEL)');\n  const fetchCall = source.indexOf('await fetchText(\\n      JR_EAST_KANTO_URL', guard);\n  assert.ok(guard >= 0);\n  assert.ok(fetchCall > guard);\n  assert.ok(source.slice(guard, fetchCall).includes('return [];'));\n});\n\ntest('global metadata does not hardcode taxi-driver or lover targeting', () => {\n  const source = fs.readFileSync(path.join(root, 'app/layout.tsx'), 'utf8');\n  assert.ok(!source.includes('タクドラの彼女'));\n  assert.ok(!source.includes('東京のタクシードライバー向けAI彼女'));\n});\n\n\ntest('history sync self-disables when server confirms anonymous state', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/conversation-history-sync.tsx'), 'utf8');\n  assert.ok(source.includes('/api/persona/history?source=conversation-history-sync'));\n  assert.ok(source.includes('state?.ephemeral === true'));\n  assert.ok(source.includes('permanentlyDisabled = true'));\n});\n\n\ntest('chat timestamp display does not poll permanent history', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/chat-timestamp-display.tsx'), 'utf8');\n  assert.ok(!source.includes('POLL_MS'));\n  assert.ok(!source.includes('setInterval'));\n});\n\n\ntest('Gemini transient failures use bounded short retry without retrying ordinary 500', () => {\n  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');\n  assert.ok(source.includes('[429, 502, 503, 504].includes'));\n  assert.ok(source.includes('[2_000, 5_000]'));\n  assert.ok(source.includes('transientAttempt < transientRetryDelaysMs.length'));\n  assert.ok(!source.includes('[429, 500, 502, 503, 504].includes'));\n});\n\ntest('Gemini timeout gets one bounded retry before the normal failure/refund path', () => {\n  const source = fs.readFileSync(path.join(root, 'lib/gemini-json-generator.ts'), 'utf8');\n  assert.ok(source.includes('const timeoutRetryDelaysMs ='));\n  assert.ok(source.includes('[2_000]'));\n  assert.ok(source.includes('timeoutAttempt < timeoutRetryDelaysMs.length'));\n  assert.ok(source.includes('error.name === \"AbortError\"'));\n  const chatSource = fs.readFileSync(path.join(root, 'app/api/chat/route.ts'), 'utf8');\n  assert.ok(chatSource.includes('generateGeminiJson({'));\n  assert.ok(chatSource.includes('error.name === \"AbortError\"'));\n  assert.ok(chatSource.includes('throw new Error(\"GEMINI_TIMEOUT\")'));\n  assert.ok(chatSource.includes('throw error'));\n});\n\ntest('ordinary chat wait does not falsely claim Misaki is busy', () => {\n  const source = fs.readFileSync(path.join(root, 'app/chat/page.tsx'), 'utf8');\n  assert.ok(source.includes('美咲ちゃん、ちょっと忙しそう…🤭 少し待ってね'));\n  assert.ok(!source.includes('setWaitingOnReply(true), 1_800'));\n  assert.ok(!source.includes('window.clearTimeout(waitingTimer)'));\n});\n\nmodule.exports = { harness };\n",
+            "sha256": "5951f9acfb4be3a776548263b524b4210e51861e0d543461afc7af2192d63677"
+          }
+        }
+      ],
+      "file_count": 3,
+      "reported_file_count": 3,
+      "commits": [
+        {
+          "sha": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+          "message": "Load the chat history snapshot without inference state (#181)\n",
+          "url": "https://github.com/miyazaki1016/misaki/commit/9362f082e4fa907b4e9b1902179f98e3e7ffebc2"
+        }
+      ],
+      "comments": [],
+      "reviews": [],
+      "runs": [
+        {
+          "name": "Existing work preflight (read-only)",
+          "head_sha": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478586562",
+          "id": 44478586562,
+          "updated_at": "2026-11-19T07:18:39Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Existing work preflight (read-only)",
+          "head_sha": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+          "conclusion": "failure",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478477763",
+          "id": 44478477763,
+          "updated_at": "2026-11-19T07:17:49Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "PR promotion classification (review only)",
+          "head_sha": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478477740",
+          "id": 44478477740,
+          "updated_at": "2026-11-19T07:17:41Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Canonical relationship integration tests",
+          "head_sha": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478477778",
+          "id": 44478477778,
+          "updated_at": "2026-11-19T07:18:31Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Development inventory (read-only)",
+          "head_sha": "44ed658813154f410e35697e88e884f12f8540a1",
+          "conclusion": null,
+          "status": "in_progress",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478656310",
+          "id": 44478656310,
+          "updated_at": "2026-11-19T07:19:02Z",
+          "event": "push"
+        },
+        {
+          "name": "Ledger facts proposal PR (review required)",
+          "head_sha": "44ed658813154f410e35697e88e884f12f8540a1",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478656347",
+          "id": 44478656347,
+          "updated_at": "2026-11-19T07:19:17Z",
+          "event": "push"
+        }
+      ],
+      "symbols": [
+        "GET",
+        "POST",
+        "a",
+        "active",
+        "afterFirst",
+        "api",
+        "assert",
+        "authenticate",
+        "authenticatedAt",
+        "before",
+        "body",
+        "buffer",
+        "chatSource",
+        "cipher",
+        "code",
+        "completeCanonicalTurn",
+        "completeTemporaryTurn",
+        "controls",
+        "createServerSupabase",
+        "crypto",
+        "db",
+        "decipher",
+        "digest",
+        "editTemporaryRoot",
+        "encrypted",
+        "encryptionKey",
+        "expires",
+        "failure",
+        "fetchCall",
+        "first",
+        "firstState",
+        "forgetControlPayload",
+        "forgetControls",
+        "from",
+        "fs",
+        "generations",
+        "get",
+        "guard",
+        "h",
+        "history",
+        "inspectTemporaryState",
+        "inspected",
+        "item",
+        "items",
+        "iv",
+        "judge",
+        "key",
+        "latest",
+        "loadCanonicalState",
+        "loadCompletedTemporaryTurn",
+        "loadCompletedTurn",
+        "loadForgetControls",
+        "loadStartedAt",
+        "loadTemporaryRoot",
+        "lostResponseReplay",
+        "maintenance",
+        "nowMs",
+        "openTemporaryState",
+        "parsed",
+        "path"
+      ],
+      "related_sources": [],
+      "curated": {},
+      "implementation": "変更差分を取得。実装の受入完了は未認定",
+      "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "fingerprint": "726deff75dfa9e19a0f5567600f4744c6584e7256b26ad675ef147329aed08f1",
+      "ci_digest": "b9beadc15b26f27aaed0ececa5fe14f548b03901cc25ebbfa912fb33d9b6fc61",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00",
+      "decisions": [
+        {
+          "kind": "test",
+          "title": "Free chat ignores forged points/memory/history/today memory and commits semantic result",
+          "condition": "Free chat ignores forged points/memory/history/today memory and commits semantic result",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal(response.status, 200) ／ assert.equal(result.relationshipPoints, 79) ／ assert.equal(h.points, 79) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L11"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "same request replay returns saved response without generation/usage/addition",
+          "condition": "same request replay returns saved response without generation/usage/addition",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.deepEqual(second, first) ／ assert.equal(h.consumed, 1) ／ assert.equal(h.points, 79) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L21"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "Premium chat does not get an automatic point and does not refund",
+          "condition": "Premium chat does not get an automatic point and does not refund",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal(result.relationshipPoints, 79) ／ assert.equal(result.usage.isPremium, true) ／ assert.equal(h.refunded, 0) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L30"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "canonical read failure stops before consuming usage",
+          "condition": "canonical read failure stops before consuming usage",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal((await h.load('app/api/chat/route.ts').POST(h.request())).status, 500) ／ assert.equal(h.consumed, 0) ／ assert.equal(h.points, 79) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L40"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "anonymous successful state is sealed; modified or expired tokens cannot change root",
+          "condition": "anonymous successful state is sealed; modified or expired tokens cannot change root",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal(first.relationshipPoints, 0) ／ assert.equal(first.ephemeral, true) ／ assert.equal(root.openTemporaryState(first.temporaryState).state.relationshipPoints, 0) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L45"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "anonymous relationship emotion survives into the next temporary-root turn",
+          "condition": "anonymous relationship emotion survives into the next temporary-root turn",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.ok(firstState.temporaryRelationship) ／ assert.equal(firstState.temporaryRelationship.emotionPrimary, 'neutral') ／ assert.equal(firstState.temporaryRelationship.actionState, 'NORMAL') ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L70"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "email checkpoint ignores forged browser snapshot and uses verified temporary state",
+          "condition": "email checkpoint ignores forged browser snapshot and uses verified temporary state",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'foreign', temporaryState: token }))).status, 409) ／ assert.equal((await api.POST(h.request({ saveAnonymous: true, expectedUserId: 'account-a', temporaryState: token, ／ assert.equal(saved.p_points, 7) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L91"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "anonymous history GET is a safe no-op during auth transition",
+          "condition": "anonymous history GET is a safe no-op during auth transition",
+          "behavior": "if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } }); ／ return Response.json(responseState(await loadCanonicalState(user.id, \"history\")), { headers: { \"Cache-Control\": \"no-store\" } }); ／ return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });",
+          "verification": "テストの期待値: assert.equal(response.status, 200) ／ assert.deepEqual(await response.json(), { exists: false, ephemeral: true }) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L25",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L103"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "both permanent devices restore same server points and memory without browser caches",
+          "condition": "both permanent devices restore same server points and memory without browser caches",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.deepEqual(a, b) ／ assert.equal(a.relationshipPoints, 79) ／ assert.deepEqual(a.memory, ['server memory']) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L109"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "permanent history GET and POST load only read the visible snapshot",
+          "condition": "permanent history GET and POST load only read the visible snapshot",
+          "behavior": "if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { \"Cache-Control\": \"no-store\" } }); ／ return Response.json(responseState(await loadCanonicalState(user.id, \"history\")), { headers: { \"Cache-Control\": \"no-store\" } }); ／ return Response.json({ error: \"Conversation state could not be loaded.\" }, { status: 500 });",
+          "verification": "テストの期待値: assert.equal(get.status, 200) ／ assert.deepEqual(tables.sort(), ['misaki_relationship_state', 'misaki_user_conversation_state']) ／ assert.equal(visible.relationshipPoints, 79) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L25",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L119"
+          ]
+        },
+        {
+          "kind": "test",
+          "title": "canonical permanent commit applies semantic point delta once and clamps at zero",
+          "condition": "canonical permanent commit applies semantic point delta once and clamps at zero",
+          "behavior": "if (maintenance) return maintenance; ／ if (!user) return Response.json({ error: \"Authentication required.\" }, { status: 401 }); ／ if (body.saveAnonymous === true) { ／ if (!user.is_anonymous || body.expectedUserId !== user.id) { ／ return Response.json({ error: \"Anonymous account mismatch.\" }, { status: 409 }); ／ if (typeof body.pending?.requestId === \"string\" && typeof body.pending?.message === \"string\") { ／ if (replay) { ／ if (recovered) state = await loadTemporaryRoot(user.id, replay.temporaryState);",
+          "verification": "テストの期待値: assert.equal(afterFirst, 0) ／ assert.equal(h.points, 0) ／ assert.equal(first.relationshipPointDelta, undefined) ／ 実行証拠: 個別の実行結果は未確認",
+          "remaining": "呼び出し元・本番採用・実機を確認",
+          "links": [
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts#L36",
+            "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs#L142"
+          ]
+        }
+      ]
+    },
     "pr-205": {
       "id": "pr-205",
       "number": 205,
@@ -67,6 +497,16 @@
           "event": "pull_request"
         },
         {
+          "name": "Canonical relationship integration tests",
+          "head_sha": "1c3cc6efc58d1cf2241df26c0a9891ee062967e9",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44476604225",
+          "id": 44476604225,
+          "updated_at": "2026-11-19T07:04:09Z",
+          "event": "pull_request"
+        },
+        {
           "name": "PR promotion classification (review only)",
           "head_sha": "1c3cc6efc58d1cf2241df26c0a9891ee062967e9",
           "conclusion": "success",
@@ -87,14 +527,34 @@
           "event": "pull_request"
         },
         {
-          "name": "Canonical relationship integration tests",
-          "head_sha": "1c3cc6efc58d1cf2241df26c0a9891ee062967e9",
+          "name": "Development inventory (read-only)",
+          "head_sha": "27320e843874595c0e5b687586887ecb30ee3b93",
+          "conclusion": null,
+          "status": "in_progress",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478441076",
+          "id": 44478441076,
+          "updated_at": "2026-11-19T07:17:18Z",
+          "event": "create"
+        },
+        {
+          "name": "Existing work preflight (read-only)",
+          "head_sha": "27320e843874595c0e5b687586887ecb30ee3b93",
           "conclusion": "success",
           "status": "completed",
-          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44476604225",
-          "id": 44476604225,
-          "updated_at": "2026-11-19T07:04:09Z",
-          "event": "pull_request"
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478199125",
+          "id": 44478199125,
+          "updated_at": "2026-11-19T07:15:47Z",
+          "event": "issues"
+        },
+        {
+          "name": "Existing work preflight (read-only)",
+          "head_sha": "27320e843874595c0e5b687586887ecb30ee3b93",
+          "conclusion": "failure",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44478087387",
+          "id": 44478087387,
+          "updated_at": "2026-11-19T07:15:09Z",
+          "event": "issues"
         },
         {
           "name": "Ledger facts proposal PR (review required)",
@@ -109,11 +569,11 @@
         {
           "name": "Development inventory (read-only)",
           "head_sha": "27320e843874595c0e5b687586887ecb30ee3b93",
-          "conclusion": null,
-          "status": "in_progress",
+          "conclusion": "success",
+          "status": "completed",
           "url": "https://github.com/miyazaki1016/misaki/actions/runs/44476794800",
           "id": 44476794800,
-          "updated_at": "2026-11-19T07:04:24Z",
+          "updated_at": "2026-11-19T07:07:01Z",
           "event": "push"
         }
       ],
@@ -130,9 +590,9 @@
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
-      "fingerprint": "ed97d398d16982aebb720286aa3e47c22ac01a91b00192d53baefc838db09762",
-      "ci_digest": "b049c0a915a2ff3d82f971e3a412abb80146790a694f6fc56153cdd8247a4894",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00",
+      "fingerprint": "e6c70820178c9681ba79077281b3a338388f3c40fd5a228faddcb5a9af53a471",
+      "ci_digest": "e54d59aad7cccc99c8c91fe6566073c37e6e83cd32116cb635d7e6f70e5e847f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00",
       "decisions": []
     },
     "pr-203": {
@@ -79500,8 +79960,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "02f1513948725e1c665d83cbf48e2d968b64638e4cd757ba4ea32cf36afa8805",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2f9c16d31b36a07d9c89dd3a82bfb87e6874374adf5c04c1b0c84e5fa47c4222",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-699adc5f9e8099e3": {
       "id": "branch-699adc5f9e8099e3",
@@ -79530,8 +79990,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f129c16f8350b5582815cb4eb73dcff3260d913509579272d10b25c63305040f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "807a42f4d958f4159024444b7c0dad4e792c39c79cd41fb8821a412450b8ce03",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-dea6baa9f1465516": {
       "id": "branch-dea6baa9f1465516",
@@ -79560,8 +80020,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f2a1ddf1c344a58c45c5e1adf11dbc37242a766271d2c96c209f12a8d9741288",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "6807c7f7230445ba530877e8f0d06a146bf271257d21ef7314b52b5ee221d8c0",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-6f41a36fd2504cca": {
       "id": "branch-6f41a36fd2504cca",
@@ -79590,8 +80050,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "dc38e38190e658e76be28c2047427290d00e601290953f2c65893a98464fd8d9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9ac68735d24ca701b6a061ad04e59f839d901ece3a8b098cec97ae242bfe8893",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3859ee93cef9cfbc": {
       "id": "branch-3859ee93cef9cfbc",
@@ -79620,8 +80080,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "642dbc77009ba6578ac418becc98beada1f34c43f82c8d12e4115742af2b53cc",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "6bd2cf70d6a76b749b13e76a46e99fdb384064c35d99a0184b9e39b38bfc3efb",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-18f1db99a439fd75": {
       "id": "branch-18f1db99a439fd75",
@@ -79650,8 +80110,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9bf851071b445df9be7490459860e6f4b3af324428d3e618d6ecaf39f0f95c11",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "31ff5aa2db24ed6246c0713ea927e1a07583658f3226d913dce528ff7cce3e4f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-6e52c79b9fbe4821": {
       "id": "branch-6e52c79b9fbe4821",
@@ -79680,8 +80140,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "02eb20a450a10679be8caf15bb3a029e812b43406ba53c1a95b4a37615e45084",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d68a90691df43a1219d58034aa72c7e6a60d5425e9b41de397ba5fc918f2bb1a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-04f9df6413016d09": {
       "id": "branch-04f9df6413016d09",
@@ -79710,8 +80170,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fa772465ca8b25f1f65e627f96e8deea81da0aa990b83f5d1cb7788029fdc7b5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "19a42d74f660701234793d9d23a876ed5973f25e3ae3d5ad959000a1c4f52c55",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3f5bb45aa4923cdf": {
       "id": "branch-3f5bb45aa4923cdf",
@@ -79740,8 +80200,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e8cc2731a07fd227e8ef9017158721a10f2bb13caf7a2eefcf4338821a43538a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "cbfb7749a0057842279f99f76b1430db4d04bc8205824a413c61fa01109d6133",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-683edee46d32eacf": {
       "id": "branch-683edee46d32eacf",
@@ -79770,8 +80230,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b49a8e01e91053d0ec8266b4a0eb3b0a1a3e7ed3a84e33438d216d7b8eff6e22",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "cf12a29adec2215ec411684f23eba780b6088b491c4b23044cb9a9e4070b54d7",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1cd1a6d28d4374c1": {
       "id": "branch-1cd1a6d28d4374c1",
@@ -79800,8 +80260,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "aa23a51f88e3b063f2c4550dec6f0e2d3922f8ebc398d230a1f382cc5bff512b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0be341a9b021871dfa9a6badd44e235990b7653731a089e7b9384791778b3a78",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-eb4c5f2805c2bdfa": {
       "id": "branch-eb4c5f2805c2bdfa",
@@ -79830,8 +80290,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bdef72833b6bbe5c5bdea241acba215ea40ef039b92d6241115a75bc50f8e31e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c38ca838c2e44ec2b65449e2f0f11fc3b9439a62780e429ab27f20c3a0d538fc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-33ee0ec275f67002": {
       "id": "branch-33ee0ec275f67002",
@@ -79860,8 +80320,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a62ca90ae837163aa3a8bab50c4393b45015c9adfd993567bacdfb0a0b489bd7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "fc31dc9198dd75f6eb6bf60198be9833d92a98c74c2f8760843c7a9a75524ca3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-4a4019c0232f4f54": {
       "id": "branch-4a4019c0232f4f54",
@@ -79890,8 +80350,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0dade73f345557685fa709d9388116e585373e4b0596e5cec4f340dcdcdca700",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "21f4ca972b326f41f5a83055c023657bad71005e8370c9995ee09b048855aaec",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ce4aa0014fb13e1b": {
       "id": "branch-ce4aa0014fb13e1b",
@@ -79925,8 +80385,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "26c112e8ae7a26abf567e83a34c22062b7415e3cbbd55e1e7517609d5f605434",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "75c5da99064ba1651fccacb430557084c754f10cc16c3553aa699cbe319d8f67",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-62ca0c2fb1fd8575": {
       "id": "branch-62ca0c2fb1fd8575",
@@ -79953,8 +80413,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bad09a6dde016a43f6c21cf1f54df5ceed5b5b8eeb3e12c1ba90d8138e1e55f1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "03903b6d2d44d28805ff6300950924029a25ad1151587737d8ad11b3b1646ee9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-0632d4cc74411c0e": {
       "id": "branch-0632d4cc74411c0e",
@@ -79988,8 +80448,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "24ab39198e2ef4e6e64778381a05cb4f8c191f22883fdbb93b47e75fcb63aa82",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9c09251d620bdba3fcb8e742a5e73b21339e71138f097cf2d67152b73e6569a6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-169c5743ec9e55c9": {
       "id": "branch-169c5743ec9e55c9",
@@ -80016,8 +80476,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c37c147c087ca2eeaa8acad830595d8808022a482542bd63131dc62fd2e2b9f8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "a0580f38c66565bd0cefc8e9472b3d5ec28576b3796bcdc23dcb7dcd8bc71ff2",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d92ca54cbab20357": {
       "id": "branch-d92ca54cbab20357",
@@ -80093,8 +80553,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3c427e40b47f46cc94a3648ee2bdf886af66b21e0879b686a6f6c8063d8b49f8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b405b1d0d5a6c2b0784c0a4e34557ca20e9e64d6809fa06a8e61aa9f14ab270d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-38e6283b99123cd5": {
       "id": "branch-38e6283b99123cd5",
@@ -80135,8 +80595,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "47428b49bae7bb5b7cb94d886eb035c46fd8ff6f82e2d16e4f35ad1094319ed7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "217b364af00b4e873953a53cdaf7d5e65beda8147b46c0bbe561717c5a1b3fb5",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2f842ea0ac1d18a4": {
       "id": "branch-2f842ea0ac1d18a4",
@@ -80177,8 +80637,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5401db4a99a44830609e59c1c273b5d9e965acd20059a06624a4c88288b71972",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "88e87a9b79d40496b4b2529fd2f62bffde48b35d2d1e0334606ee9ae786a5ec7",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b23be022a75304ba": {
       "id": "branch-b23be022a75304ba",
@@ -80219,8 +80679,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "93ca5612f5608eeea1fd2cf1c2c861678135cca921c86eede1ac498e9f69d720",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "6508406a69bc397f477dbcbcdba89d7dcc0e93b28101ec8fc946e3f230206d48",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-436bd6babf91e34f": {
       "id": "branch-436bd6babf91e34f",
@@ -80268,8 +80728,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d5001583590eded8c62a461052486ddbf253dad5cc94ebb0b544696a6f1515c9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "07c963161040a98d3980dacc3f3eec5b4b230a3405efdf79df078add1a640fa9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-5fbac0e9c427777a": {
       "id": "branch-5fbac0e9c427777a",
@@ -80286,8 +80746,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9f16ae21664f924ea3049d8c44bc8ba70117003464ff39ed24f35d9167a3e38e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "dc9390ae5033c678fda7c32ba0a88735df5f07aea9c59ed18fbab16bb7b50de7",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-35677a391b35c95c": {
       "id": "branch-35677a391b35c95c",
@@ -80349,8 +80809,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "138607bf15a84403fd0dede5b4972062933f39e5bfc90fd6c1887c10b8e3ecdb",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5a6ad942a52c71d042fecdd8a6b0b93d7e8334252f644c1e5cbd72d17cec30b6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ed894c05ef854553": {
       "id": "branch-ed894c05ef854553",
@@ -80391,8 +80851,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b1c19fac6e389886e85e5971e465bf72d4a1eb02421e051518af964c9bd07468",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "3f38740867e3b5e61a9e59f3631b77c630a120d776ad7616e877a888f8c1db8c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-155e832b29009650": {
       "id": "branch-155e832b29009650",
@@ -80419,8 +80879,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5e8250d3715914c1adb2738780f26f46c2df6631b0c5b5ae8dfa172a0c945a8d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1289c7ed2f00a9a9f7fbcc485e899ec2efd7ceb5e103bfd2f8d38bfa544e6b6c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3e233e87eef83ac6": {
       "id": "branch-3e233e87eef83ac6",
@@ -80447,8 +80907,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "dfb372c750cf00fa7a96940c98fa0a8d8090963a3b593ef00b6cbb0369198478",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f700ebffdde87c03536de374cf694038d024cfb2d566d365b3e3282e82920011",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2fcb912568edd503": {
       "id": "branch-2fcb912568edd503",
@@ -80497,8 +80957,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0d664ea584d04219a983032379f61b62c2ac79373a22417deccbd4b34012d6a5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0eff6ed6fe3cb6b126339ead6355d0e6f49462592bf91a1ac146807311e726bc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-eecb7d45ce962418": {
       "id": "branch-eecb7d45ce962418",
@@ -80546,8 +81006,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "941117ae481774067a8c79958d7735c791ea96e0ce362366846ce78d35e5b444",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1c9d2a7bd8eec533abd63c078104793c35e624be8e6ecf85027c6ee31ada89da",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-6dc14770cd5818cc": {
       "id": "branch-6dc14770cd5818cc",
@@ -80564,8 +81024,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "19db380fae3568e6ee910be698f7d63f1a8c05704858995d4d1044a602e0b55d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0eba0c1c37de0365387d02f2c073f665cbc4a60d5b0a6178f22498fb77ba7de3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-5e09e6de95bfa770": {
       "id": "branch-5e09e6de95bfa770",
@@ -80592,8 +81052,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bd174e9abb32c7f176d367d522a22fa26e83ef66d5e25cb74e06732d479f1830",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c1d3003f0cc8a78978f92a3ca102be2ed7c064ac8e47c030ed9a52da0b099a1c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1a583769a497875d": {
       "id": "branch-1a583769a497875d",
@@ -80649,8 +81109,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "02c924c5ce8e8e0085e14b4fd9a10f0c0592c75a42a813a1d79cc392145776ea",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "a2b1ed1f7e319ab7edcfbe47af8383734a6b355d7c6ba03057aad606bc086f6b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c9e11b1515cb305d": {
       "id": "branch-c9e11b1515cb305d",
@@ -80849,8 +81309,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3ae637bf9296a602784ab43413bb7b38fedc9f1fc44b03cf4321778ed0865323",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ce5bd1097f53167111f09472826fef89298248e80915551e42c18f85c4a18dab",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1dd581eeab2e2c3b": {
       "id": "branch-1dd581eeab2e2c3b",
@@ -80869,8 +81329,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b2120bd4aadb6dfd7448066e88399f3ef52cda46dfcdeedae50dbb0d10cdcedc",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "118e4d4f7c9fc069dd83a8e76ca0833fdaaf2b2fa963a52f9078b94e0eb24d53",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2d46fd727138840e": {
       "id": "branch-2d46fd727138840e",
@@ -80897,8 +81357,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "27b102ea0cb51662d0f88173b04d73d5317f8e8736fc28f5e797123c89eceb4f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "144925ecbdb20461220b9b6988f9bb34ca2887e09dbf265c3445d7faa260bedc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-56aca799dd70922c": {
       "id": "branch-56aca799dd70922c",
@@ -80925,8 +81385,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bca7e0b14023d6bdfafaea267e018b5906f3692b36a798d7cbb5612fcbe411ce",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f0326f2408a49a83f3b5b66ea9381642565031db74a40c4a4ad542100ee675d9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d1c7bd152670a9a9": {
       "id": "branch-d1c7bd152670a9a9",
@@ -80953,8 +81413,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "597d3be104cfd047551c779f99e5668e5c9d12c07f92a251e4ab1c7cfb58cca5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "db089c5c2cc6a132ec3650d4aff97c14f338259f160c6ac0ac9e1f5ad8bc702c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1cc52db052a759e2": {
       "id": "branch-1cc52db052a759e2",
@@ -80995,8 +81455,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "88d7009b5d8ac1fd72f9e554adc0ab0b4c4db7ac893dd5af1879b7c0108261bb",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "489fef87bea811a8c64a0ca0991d3af78bb898224b450c36810c77dbed8938d4",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-80dd86234a2ebfbd": {
       "id": "branch-80dd86234a2ebfbd",
@@ -81030,8 +81490,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9441d8fd5aa8017f863f224cbddb90a6ff81acf1ddc0576114529ad3a36f6bc7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4cb0629b8a6adb2c255d30a1065836ba1af7d1422bf947939d87dcf8eaddbad9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bde3cb29f6100882": {
       "id": "branch-bde3cb29f6100882",
@@ -81087,8 +81547,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b951befa40b7a111b6afbe9113069b224c50ba5673cdf39446caf665968dc7a1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "817a331372f69eb4cb4132d3d47e86fef746e9c36ea9828cef451c5604e8e0c7",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-960672b5dd3f4958": {
       "id": "branch-960672b5dd3f4958",
@@ -81129,8 +81589,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c5f7d8f52f8da83df490b5333b3dcf88a38425d8a0da35edea189bbac6855e78",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8c6fdfaca0fa199945465fcc0007773650e323e905da63da8536d31572caf51e",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-122879809eace954": {
       "id": "branch-122879809eace954",
@@ -82205,8 +82665,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1f32ed9b9d6ec5d5308bfa840ecd8a68e601452cc73763a38d85fc10b75123eb",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f6d526bfd7cfcfaec279b615a43e4d7574d9c1d7edc47e2246a1f349f7d4f5db",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2d598b681827000d": {
       "id": "branch-2d598b681827000d",
@@ -82240,8 +82700,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "159cee3c72814e20efeee07925609d79c94b89498e179b2ac60247e05b7e6d03",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "15b8f023686ea1ba078c19d705453c2d207b4abafc48eac058547b3dfd9bcc1a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b1248a572f6f91ad": {
       "id": "branch-b1248a572f6f91ad",
@@ -82268,8 +82728,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b5cadf375a910b109499d88718cc7528e0e5da5713420d5d053a64c0e1a009c8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "601de13ffb7ca11ab6a26ef9aebf86154bad60d95392e0a99ab8dc50888c5947",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-77303b743008b53e": {
       "id": "branch-77303b743008b53e",
@@ -82303,8 +82763,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "de2e4f1f8fbcdc38788e041e3a0c960ad82bfaac9c5f508737a9011510ea2f93",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "3849b6d47788f15ca16f5795942622dde9c07e65ec5311de0cc225f060b4180f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b23ba909505bae4f": {
       "id": "branch-b23ba909505bae4f",
@@ -82331,8 +82791,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f0b3893e95c96d35592bc71d308f5dd1e4384a033d1cfff479edd0cbaa52c84b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "150a1ee19552e7070ec1236ca839ab8576705d765ecad3d5d2a95b5300f1de18",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3d9f51f0fd411e35": {
       "id": "branch-3d9f51f0fd411e35",
@@ -82368,8 +82828,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d683bcf3e230b1ffbbd3b44b74a710e352240a33721fddd97d0f5c71523227a4",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0710eacb6f38d9f6cf9d192a2ccfd90fc0c3157a9c4726e8651c059b4f1e5f47",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ffc3354680bad3ec": {
       "id": "branch-ffc3354680bad3ec",
@@ -82452,8 +82912,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2372207e5071fa1ed39eaa219287251acfefbe7776dc342b3a54cb3eb74a14c7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "de74d8a96523f6a466da31b03c59b2c423cb6aa071f04bb09e526c10f2cede52",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2998075cfb7f66d5": {
       "id": "branch-2998075cfb7f66d5",
@@ -82480,8 +82940,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "acaf3c3be5441e2e10ca67d55ca7a59149ef86e0fd8d31c879d338895eda5c92",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8086db344a20a60ec795e817a09728dba3118d0d6aa9356e89040fa5b59897d1",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bd3f337155aba4cf": {
       "id": "branch-bd3f337155aba4cf",
@@ -82515,8 +82975,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f6f81580f3090701900bda59cfd7efee5c1abf2b5f88cc35f47add84ba09bd1b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "cc80cabe4ef0ccfc2071521e0f01d1efb5712a64fc842d1b91fc6fdc53740b49",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-edcb044341b88c74": {
       "id": "branch-edcb044341b88c74",
@@ -82550,8 +83010,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "92f31f8b5310040b318f63c50647babc2d1784188420ea4493a240f12e46b0a5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "87e983155986d73213be3098fd12132cdad324f8e4018572ae9c79e84b6c7b46",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-440b4aa49cb369b8": {
       "id": "branch-440b4aa49cb369b8",
@@ -82585,8 +83045,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ba178c60a89a83e09c58389e572d62fa5adf36dafa1da9109fdc6d9c1715489a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b4370a008de4f474b525457e8445df5532258c329f9cc9f1dd3e0420a5b79a95",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7d60af2342a153f9": {
       "id": "branch-7d60af2342a153f9",
@@ -82613,8 +83073,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c3989677f09ba6bdf32ff8326a822ab692d03c88827ef705fc861fee22322dca",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4fa93b385891b4cfcb136124e9e68ae92f2ac85ba617faa3e84d42517062fe92",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-16d9d36ff253771f": {
       "id": "branch-16d9d36ff253771f",
@@ -82641,8 +83101,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a09eaaeb97af1891afde8512d38b10f565377bf96f68ca603323ddf6081b1aa4",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0fbfdd991a7dce7ce04e4780db34ea992e3c0ba017459db2bb1f019bf2a33c62",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-af3cb6e431dbdd62": {
       "id": "branch-af3cb6e431dbdd62",
@@ -82661,8 +83121,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "23780b7989d9d16a479fbde7d655095d084331ed18386d470db2975d5f25b9c5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "bce6efdeacd0d87c8c544bd63878ef5ff748d8fa09dc696e455345dc44bdf59c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d8a0ec81a2c989d6": {
       "id": "branch-d8a0ec81a2c989d6",
@@ -82689,8 +83149,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d9d8861aa15879ec65076a239f6a0ed486637d8d48812e15503d2df14327e38a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "6ffca068185956697de26539b6fb66c43bc5e6c2e117fb664667e02f5b84a968",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-4dffe0519007aab5": {
       "id": "branch-4dffe0519007aab5",
@@ -82724,8 +83184,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ceb952af73b3a164a2a71a379491b6e2df83b1c62c5ef4637a38c3ef33f28db5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ac6aa15e1213fbb708ff8136a30708cb09cfe075c0ae1df1ff738e4f17269b10",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7942aa21d9a9b1bd": {
       "id": "branch-7942aa21d9a9b1bd",
@@ -82759,8 +83219,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f58704fc41eaa2df289864da41c6f9eeb1e0c9f786c682f46cab9fc50d281bb4",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "294c409cae5fd40a2110ac5e19e4f09660312dffaba5c3515f461858e13e9ed9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-39bf13fb306b830b": {
       "id": "branch-39bf13fb306b830b",
@@ -82779,8 +83239,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3740bd5ce6269aaf318e00e21a61857c595d3342ecc2771a1ef2032a3e83373d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "3395e343407a2c8c4fb9ed147a9024015e884ad57d0a8d4ba4a273c4b890ca07",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-071dc68daff65278": {
       "id": "branch-071dc68daff65278",
@@ -82808,8 +83268,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "44948f84ceb8e02074fefb3a63008698b989661eb121a8d8f2ed140051890ee1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f04c051c6bc3572cbaf6d0e2a8d8f10a3497fecba4053941fc8bcd332d47ad1d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-f142e6831f9fa9f1": {
       "id": "branch-f142e6831f9fa9f1",
@@ -82843,8 +83303,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1df11cb13e42b3c4aba45353befe488770e8ce6dfa2412f822de0edd5c36c00d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "00f664e2d0e7b2b6bcd7af25ae3f62ed1030874f2891f600e1ac5e921464ac0d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2bbd01068ad41bd0": {
       "id": "branch-2bbd01068ad41bd0",
@@ -82885,8 +83345,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1d6b670828bc487360a747abc264f8217f0880f6381f27caf6e05364ccecb37a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9a97bbc07b67147193e4b47ab79d1c997589c040ff0560f6e0d90533c2e19a7f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-34299b2d46805486": {
       "id": "branch-34299b2d46805486",
@@ -82934,8 +83394,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3d27ce993db5219a5c7defc3529191d94357992f764ee4160817c766f15c807b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "12113285540ba10c04fba47549596f36b80a710c8276330999aa44923dd0d473",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e88d28aeb2418e88": {
       "id": "branch-e88d28aeb2418e88",
@@ -82976,8 +83436,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8a9fe8ac245b9efdf1c6e6a7032c76a23a352b0f688222104077a4590a833038",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5748bc40e2a25092d9f4863adbea1495ccee02b1c34a87dd31465ee6f70e6da3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-42b715df1ad8655e": {
       "id": "branch-42b715df1ad8655e",
@@ -83012,8 +83472,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5cf83399e73bfa3a1a4d400df33fab1f8ad2040afb367238008f2e16131097f8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9a0bc588c62700091857721bc994f70f0fb050ba3067f9d16a170240c9978d29",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-50cdcf6fed465317": {
       "id": "branch-50cdcf6fed465317",
@@ -83054,8 +83514,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "205a2463044af285c7d3bb43e98ec59bdff6dafcafdd81beccfafc5c7d46cc6b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c9f81e6bc2addcc31896ec66e7ab247e8bf6e983b86b606daaee1bbb40b7e8fc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bceed20172c1f87d": {
       "id": "branch-bceed20172c1f87d",
@@ -83097,8 +83557,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6fd9dda24ee98e34281c09cbb74e598c15c5086fe43e480d9c0b8da53b413774",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "cebf45df643f1f54972ff1b33569dfae608bd4d59fb60d0dd0319606eb0e817b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-fe43e3f34e45c959": {
       "id": "branch-fe43e3f34e45c959",
@@ -83133,8 +83593,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "252442be0dae2833e21a3e3bcd75837189213f7eb100d5488afc3f3270fb712d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "98bbfab7b159b4120d19bf2dba1d505ec8ca64c8409ca362e54f50c512e0f288",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e88492625bb5b983": {
       "id": "branch-e88492625bb5b983",
@@ -83175,8 +83635,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "567de375ba0ccfa0880619ef8ef4fec10ddeea435f3c706bf9d3c6c25f419ee8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8e5c8d3bfc80482765766a82bfcde68b089d5e5782e7c00166e73a521dc1f39b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-9386e47050e9d8a9": {
       "id": "branch-9386e47050e9d8a9",
@@ -83203,8 +83663,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e22a83fb3911393f4f0483d9b663f3b19051739d33a61bdf23caba84a5d22dc6",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2830b67720da47df5cd4d9e7dc504e88e529ad322a504b8fa25cd73216e52ea7",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3d3d90da69db8978": {
       "id": "branch-3d3d90da69db8978",
@@ -83231,8 +83691,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c48c5dcce5a3d67c5a5c413ec87a888fc67d63181d493920e6440e3504b0dbb7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5f69fbd103e93e6dc701aa6b6f985d026e2cec950ccc5e4279d157f8c0ad1215",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-eba30ce9ec0bfc2d": {
       "id": "branch-eba30ce9ec0bfc2d",
@@ -83259,8 +83719,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1c5b1621c96a06ac1591ae4f67920fbd53d6698cd0f7c6080de0ac676582272f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c7633a116180f464be7b74b877e56ca37fb1f19a8f60c383306550e1a9682e14",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e24f4962539bff58": {
       "id": "branch-e24f4962539bff58",
@@ -84124,8 +84584,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a9202b522bcb8515916d52eb4e777c24dc1d05ae5b06737f025d1c2fc6edac1e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "cd5c413f25b73111a9ab5351c76b1527bf8f1593061b8ce9a12a8a61a399b991",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ae082efda294b17a": {
       "id": "branch-ae082efda294b17a",
@@ -84370,8 +84830,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c50d2346259be95d512a7e25a1bd123848b02717dd9fcda858163e6c93c1931c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ce7458e1cd77e19dfe0570ee7a53bd74313fd65b44cb552fb1a75100b1e017b6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-a9c94bbd54224765": {
       "id": "branch-a9c94bbd54224765",
@@ -84588,8 +85048,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b6ee503c7d87b9138175798b2cde355a1964b4495aa7be29dbb19c8beaf9c9a1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b429629ec84e233944fd95ada448221e164cfbca3b7f51140b35c8b3e3909afa",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-fc35db20bd870b9a": {
       "id": "branch-fc35db20bd870b9a",
@@ -84815,8 +85275,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0b51e46370cb2b9c765142ba34290d10f73365628e73e027bbc0a2cfbb487ac5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ce02290d66f9caf06809226c8e37da7549c7308d61e0673c001d55b8fce23804",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-9b297aa481cc14c1": {
       "id": "branch-9b297aa481cc14c1",
@@ -84879,8 +85339,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7c98e44137b05904396f06102383215cc5d4c056a68e69cf7a8718cdcbf8763a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b763229e826675fc8f90180cd7cc4b725550e5341c14414e81f16ef2644d8651",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-01116240ec96678b": {
       "id": "branch-01116240ec96678b",
@@ -84978,8 +85438,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "570192076dbe8687d6a391faea243ded2ab0a20b091d22ab507d23c98b50cf80",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8794291479086f51ad9dd8b1f127577ce89902d54e57b7ba944fe573aa0eaf94",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-33f4a4f17ebfada9": {
       "id": "branch-33f4a4f17ebfada9",
@@ -85034,8 +85494,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3ee336eb02723de8e4bcbffc23e3c9529a24df709f7d02abb01da455b6e7ae59",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "62787ea0223545ca17562a31c590ae9e2661d26488f00cee9e28d6864bd4eda8",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-284e2dc6d0c96cbb": {
       "id": "branch-284e2dc6d0c96cbb",
@@ -85084,8 +85544,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3ec91381888696c1d4e8895f3437db81da37b9de8705ae947f85cd4e4a6c9a15",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9da004a626cf4829453805bf42678a15d746a51ac2a8c6b2eec28076c351d4ce",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ca1310f5dea43c82": {
       "id": "branch-ca1310f5dea43c82",
@@ -85119,8 +85579,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2d460f79ce28d600bb3ce665ab3d1ec5360329de7e1b16683c7b7291fda966f7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2f4e3eeaa3318bbbc4ce2d1eeafce2f4795e09bd75634af4ae6a4fa70e774533",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-25d8098e6a33cdc6": {
       "id": "branch-25d8098e6a33cdc6",
@@ -85161,8 +85621,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "686b0d634035e3b7f5dc2ed766d1214d12999adcb53a2dced4e98a621d5d95d2",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "17b0a604cc2d710f07db76fcee55db09a00ca75a62dd28643534b10507cf3ae5",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b9ec7a2266a17fe2": {
       "id": "branch-b9ec7a2266a17fe2",
@@ -85205,8 +85665,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e3fc58c030a2c1336550608481d88bc8499aae89d931f15efd910496bd4607c0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ff9ac231a211e7c359cead9f70b59a28334e676f850e033673ca700b883fa20d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b5b1d46a6468bd59": {
       "id": "branch-b5b1d46a6468bd59",
@@ -85247,8 +85707,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5192074e3f638be703e93fc50d409a1c6b6bf60da38a7ccc0f87b89cc03bfcd0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "55081e2bc60535bf6eca421e8b4bc92b6200513bcd976306a02fb1fe6374feab",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-f54fba9240a4e12b": {
       "id": "branch-f54fba9240a4e12b",
@@ -85296,8 +85756,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3af4769585fbc2225141d891a9c0fdcfa4ce063f2ffe7950ebf055c824eba7a3",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "95a005079f922d69909d2eb1819436a774c46863822d66873927047274c8cfb5",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7ea3560ec516692d": {
       "id": "branch-7ea3560ec516692d",
@@ -85331,8 +85791,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "25f664483ef526c891d047ec93b49eca65b19f8f3c2086d0f5c343c8b8301796",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e7983a221c02e352dcbd4076419a86ad65753897a7a24d778425ce6f5b67c6fb",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3ab6bf48d6ece55f": {
       "id": "branch-3ab6bf48d6ece55f",
@@ -85380,8 +85840,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1e19a3b5898ca580e0f8b34acba1e4cf000c04642c63ca277b46b848847791d0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "192477be58b9c04db2d696e09f8077da579a19d569d1c3dc46f37b7c52a363f4",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1601ee37d65ba186": {
       "id": "branch-1601ee37d65ba186",
@@ -85422,8 +85882,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "737a604d7051566f2a4740d17acb7c91d7288d4af4cd65c4f8dfa8395cb35df0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "318215ec6cdfc7778330b30e9f9ed51526d7ff7f0a05c8b42970e1bc08c8c201",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e2b97d56bae63d53": {
       "id": "branch-e2b97d56bae63d53",
@@ -85452,8 +85912,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "faa7d7b49abb638c7586e207651c8f6530dc395c645ebc0c1bbf656288f02534",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "a157bfcb656157ce63726753863cfa388f208f92beccd0e3508cf5118ef4b834",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-02f9f023f7c9991c": {
       "id": "branch-02f9f023f7c9991c",
@@ -85550,8 +86010,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "95ac48e86b27d0d8b782782560a7052da8eb704a6b9e02f6a9d77621f59055cc",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4ac35fad0171b8c9e25586c513044440c6860ffdfc6ea0dad0433473c4415e09",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ac4d9f4766a37ec1": {
       "id": "branch-ac4d9f4766a37ec1",
@@ -85585,8 +86045,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9d391f550b95bbba8e2179cd18ce37b9932db3d2d081eb2888e229d0147672e4",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "02803ce5208e2557ba3c6f9fdb949342d9f7718f1311dfce8c57b137e6280b31",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8ba47dda6918a93f": {
       "id": "branch-8ba47dda6918a93f",
@@ -85676,8 +86136,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5e5be8e30e191dafe2c5d95bdf6744de3b0a751d69169647e00ea26d0dabe978",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "071312c55fa681c4e6ed2298ca72dacf9654423f991e86bcf1d1e376b61a4776",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-0ab2785a8deb3215": {
       "id": "branch-0ab2785a8deb3215",
@@ -85719,8 +86179,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "babdc70acf13f893e31517a0f8979ee56ba728145bf16a2f4ffa567c096919b3",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "de1fc49263b3f3698f8301702fd655d017c030881b0e5e22cd69e39a3e0e63f4",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e520db4a8eac7868": {
       "id": "branch-e520db4a8eac7868",
@@ -85769,8 +86229,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fa8dd8c10887af623794a1c24d38027ddeecbaa20e5813380cdf3b0d6253473a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b39a66eb44f95f20baba5bb04ef050c06e2601436184385c912b8cf35170ef9e",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-439dfe86fa693c0a": {
       "id": "branch-439dfe86fa693c0a",
@@ -85804,8 +86264,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2645ea190b00260a4573a48992cbb9d9857b5c61fcd1cc906e07842e16bf0ea0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c05a5cb1df88d44db0f89fe106afd59b66c4eaa1023162da0f58fe1ad5875468",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-669d4b81dbb566ba": {
       "id": "branch-669d4b81dbb566ba",
@@ -85846,8 +86306,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c03232398f6a143514bdaeffc1b979272002dc71258097293687c5ab6d8ce169",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c223cf11cf1997d7d0e9f91224a59a76268b0956656ddcf9c7d95462f11e086a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-00773574df2cf2d3": {
       "id": "branch-00773574df2cf2d3",
@@ -85888,8 +86348,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2229fd70ace4b9812272b3698329278b5409202886ca018a16c5538d77e8cee6",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ca3523c3067ae1db1236988d6f1f2d2522e2dcf73aebea1bef32c9504e063968",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c1628f2ed519dfb9": {
       "id": "branch-c1628f2ed519dfb9",
@@ -85924,8 +86384,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "03dfaad06ebdbf2c960064dd30dc73acd8a8db8e20dc480a822e1b38624601f5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5fec9b84aa41fccce2522249c67018aaedbc4fb8af1b62446583f405edcb89ea",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b5a4c4bf623da36c": {
       "id": "branch-b5a4c4bf623da36c",
@@ -85959,8 +86419,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bb43bcef40e6d15f66592e2a15612aac4dc348bad23e3309b7f8c87652313bcf",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0b4986e91ad44214334bced4e229f9111eabfcc2f64334fad630976ea2c23199",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-f87ab537bd23a447": {
       "id": "branch-f87ab537bd23a447",
@@ -85994,8 +86454,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f01743dc9e72322c6fbda52e0850a59bb65c6f3141d7f7ed62664078b8afe497",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e1b38d2f4aa7d0fcd5a575daae314f337adbcb1b16aeeaab537efd43debae7e6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-9489dbe22b83fa25": {
       "id": "branch-9489dbe22b83fa25",
@@ -86058,8 +86518,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8fc696c9909e8da026ebbe31fe88b30f79964519e361da5cb59606ec28fe2b13",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2118b6a2c5034602cc0a03767c578ceee4744838c82e44e178e7cb651f235f34",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-52e23902d6b56398": {
       "id": "branch-52e23902d6b56398",
@@ -86086,8 +86546,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "104f588afcc36705faf273294f0108b7127469ef9004dedbcf5487a965e898b0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "3d209dfa4a5401c7f1561d8b27f7723e0b51ffc870287f282a9f9d2670a6ff8c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-6a84c634aa234f1c": {
       "id": "branch-6a84c634aa234f1c",
@@ -86128,8 +86588,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "840bf820527f1718e8e1aadc0c4a8d73d4703a81ee1645cbe3d0947aaf983bc1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c1d89e34216784094821935c7b5410b77ee64b5bb11dbe282631cbc0930b5361",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7ae456f5639d43f4": {
       "id": "branch-7ae456f5639d43f4",
@@ -86170,8 +86630,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2068ae283ccf7e540978e3a7f02cc0c79df9e3bd8881a803489a9618f19c7e46",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "423a0c5e21ff5e4e8f5d6cc367777075ec95ca3f7a5a92dbd6b00bedf360ed69",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-a448d35df12eb780": {
       "id": "branch-a448d35df12eb780",
@@ -86219,8 +86679,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "823f417aaf1d0d44295ffb4cee92497da41cadb01b1589963c85db85b998f85b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d8ddf7fdd37047c2974b3a01734d62af633e8121a36f492ccb7f8396bbca5619",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-f70b38dbc740ec35": {
       "id": "branch-f70b38dbc740ec35",
@@ -86268,8 +86728,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "73efd6d37bef732d25639b72a9ff8a23a7f6542f23acc77c3d872d37b8efb4e1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8adf77995dcb7bf970f5ead93366181a0e74cf2db8225d7ea01caf51f9b3a673",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-136d018fe1cd5ebc": {
       "id": "branch-136d018fe1cd5ebc",
@@ -86310,8 +86770,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7e40bb7acb194372e2db392a8a494f68dbce67aaf26d0a375032b7ae85da9b81",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "56bf04d6f0a71a968cbbc9a35ed32e176cb82a391bc340f676a5cb77c18a0cd1",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d727762241e2e4e1": {
       "id": "branch-d727762241e2e4e1",
@@ -86408,8 +86868,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "60c09a4080d8f90debf5b65080757bb1add9648c2b185620395ec00218531d65",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0c2d56fd05c23eec98e3fcbad5b4df1f82907af31a19c0c1cfc5b57c68723247",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-602fd94b750fc7fd": {
       "id": "branch-602fd94b750fc7fd",
@@ -86457,8 +86917,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0550abffd57438f48e96a6bddc38d5c247c0116b941fbea25b517e3766dd50af",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4e1923499ca9202d086894de5179860874df6ff49f8b4f41faf8dd7223c95f6d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d63cd059b3aaad0f": {
       "id": "branch-d63cd059b3aaad0f",
@@ -86513,8 +86973,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b9ed075225db10104c40d3d6bbe12cf03c275fb8c48fdbaca6aedfa9dddc89a7",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d66956c31f4d89378a7dcc8e5c57f8f37287858928b573b78308d8c6dde6b81d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-aa6ccfcaeac7df87": {
       "id": "branch-aa6ccfcaeac7df87",
@@ -86583,8 +87043,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "556f3707437a2638572f208a7548b4ec7e52d90cd2c6509d86aa85892460ba4e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f6eb035bc3c599252f83f6070c3147f005de49d6a48b21650f6bb8708b770889",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-70fc9c695854889a": {
       "id": "branch-70fc9c695854889a",
@@ -86618,8 +87078,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d755a2dab7963d35d8dab8847461c2214168e1909a49370e360f95a690aec139",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "82b8a91cdee35816754095e671f3afe9f9dc161aa20ab451cdb3f4ed33c6ee76",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e9ece79f0b44197b": {
       "id": "branch-e9ece79f0b44197b",
@@ -86653,8 +87113,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cbc734f89dceefd5c77f455145979a8070736303735536d5336ea922a9547698",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "afb7880aeccd5c96e9eb6c06d9b7705899099aa83e481bd09b655da70846fee5",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3a1e2cf011e9082f": {
       "id": "branch-3a1e2cf011e9082f",
@@ -86732,8 +87192,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ae944ac5d05ae15635421f81a61e5e71d0c74d72116a59bd1b80daa1b5bf9425",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "26c4f794d7905efcaacaf917660c4fd1fd30d0efd4064d07b5b2332af7f1ba9d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8876346d043651ec": {
       "id": "branch-8876346d043651ec",
@@ -86760,8 +87220,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3d8861be4ab15e8cd1b2f47c968be9f588381367bcf97ac431e32b452b213b53",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "7dc7b2ada2031c0811c555e0bf842771cb6811ab1fe3afee74f58819f277be90",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1b5dc9cb22951e7b": {
       "id": "branch-1b5dc9cb22951e7b",
@@ -86780,8 +87240,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4ceca57c03c19c488746db6f46f18c5612ef50dcf9f9d7866b0257b95662a806",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2d094818edf45d1603f449ed51ea6786ab69ef4f06bdf1583a1bb1949094946f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ea4df54e8d029f57": {
       "id": "branch-ea4df54e8d029f57",
@@ -86815,8 +87275,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b3bfc88a44286c8a4149c0b29b7c2e1fca371ac2407072ffd11947a931691e0c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1cd6bfcb30f6fe6eddfeb977908787dea157b61afcb9c022e790755e6560aa6b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c75612bc790b236d": {
       "id": "branch-c75612bc790b236d",
@@ -86843,8 +87303,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4748db68fd96dbfaa60e58dd6391bfc6a7a3a9d2a4e89fc61f4951df16a6dc27",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f3fe7d6ef3e7068128a17efbf9f7907da50b6137ebb7ce13417730ba2a35bf6a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7e7349e1c0857db1": {
       "id": "branch-7e7349e1c0857db1",
@@ -86886,8 +87346,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cc46edaf6c6a3507282a819ce92346a57206ac85976303800f7ef1829c56f5ca",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "22aedfcdb2edd8edafd403c364173ef6b62b4ca7253d32107e11822089121b14",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7ebc2377f6ae2086": {
       "id": "branch-7ebc2377f6ae2086",
@@ -86914,8 +87374,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9f5b600b17c138fb83c85999bf60c397d8326387706c48e1e50dfdc2765f5e2d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0cf3fd05e101024b5f3d186e7efb14ddf14285ef86b9f9d4cea02d786b5e80db",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-387e38e3f392a033": {
       "id": "branch-387e38e3f392a033",
@@ -86942,8 +87402,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a4929d4a38be9828acf38b85e5544e415717ec668c93c00b528e4bc817334e8e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b91e5dc6fddb6b6365a032cdb64c6fe3c3fd9457ad8816be3f33a3260a395b38",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bc36378a11db8be8": {
       "id": "branch-bc36378a11db8be8",
@@ -86970,8 +87430,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3113cff75f72592f9eec699dc84799deac87371374f55b444d483bb74351bfde",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "89fafc566a0026e97ff6e92a23d0bd095fa47d9b9d8d98048c055b904525103a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d4bd494d2ca8e9db": {
       "id": "branch-d4bd494d2ca8e9db",
@@ -87028,8 +87488,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "40c2a5421c99840f8fd19bcd60e8dd82b13d507ae05f903dc14ac5b9deed4c93",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9a2fe6a4d93c037e1427d172f962dc0d2a9b7907b42081132aa0522f86604371",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-9c34b261ec31b7a0": {
       "id": "branch-9c34b261ec31b7a0",
@@ -87056,8 +87516,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e934ddfe274c176d68fb81b6207d3ae8416bc5ea38a8b2bcc6224afe0b5cbe5f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e1d98a3053f325cb36ee4aa4704e8afe7442869fec0d377f54c65cbfd441786d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c03166e140979a0c": {
       "id": "branch-c03166e140979a0c",
@@ -87076,8 +87536,51 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "08adfe9e4c5550c40104820ba7a3d85b7ae060adda3d62ac4fd356890e8c274c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "fa584b8f767c6dc03c8412e96690a2508d2d5c18035c956050ccb0afd8c5e60c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
+    },
+    "branch-2fb9170c6f164861": {
+      "id": "branch-2fb9170c6f164861",
+      "title": "fix/faster-chat-history-181",
+      "head": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2",
+      "head_ref": "fix/faster-chat-history-181",
+      "linked_prs": [
+        206
+      ],
+      "files": [
+        {
+          "path": "app/api/persona/history/route.ts",
+          "source": {
+            "coverage": "同一HEADのPR案件に原文収録"
+          },
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/app/api/persona/history/route.ts"
+        },
+        {
+          "path": "lib/canonical-state.ts",
+          "source": {
+            "coverage": "同一HEADのPR案件に原文収録"
+          },
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/lib/canonical-state.ts"
+        },
+        {
+          "path": "tests/server-canonical.test.cjs",
+          "source": {
+            "coverage": "同一HEADのPR案件に原文収録"
+          },
+          "url": "https://github.com/miyazaki1016/misaki/blob/9362f082e4fa907b4e9b1902179f98e3e7ffebc2/tests/server-canonical.test.cjs"
+        }
+      ],
+      "commits": "9362f082e4fa907b4e9b1902179f98e3e7ffebc2 Load the chat history snapshot without inference state (#181)",
+      "topics": [
+        "記憶・会話",
+        "開発管理"
+      ],
+      "state": "ブランチ差分（PR関連あり）",
+      "production": "未確認",
+      "implementation": "mainとの差分を収録。差分ゼロも記録",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "fingerprint": "a5e0f375ef735d84e05d56178f89af8a32de2335f87682a4fefe37e3bd96af33",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-48ad449fb30cd746": {
       "id": "branch-48ad449fb30cd746",
@@ -87104,8 +87607,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0a0379d92cb263c7f3c52641f901ec0915d54431127c4060cc11409abca01935",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9fddff9591654a171c326ffe3d1eff599fb6c5cf7b74b6b6cb140b39346257f2",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-48dee2d1fc902874": {
       "id": "branch-48dee2d1fc902874",
@@ -87132,8 +87635,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6d445c4a0f2b586a33fcf20f90915be052cad8e714afb18da015eab4cf8c4c3f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "39f288bf3dd4d840b0ace284818d61344c2bc0df1ffebd82723af910fdf89945",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e2b90b4f0cd4a282": {
       "id": "branch-e2b90b4f0cd4a282",
@@ -87181,8 +87684,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "015c937f4bdc57aec848c84f8396fef7ce1ce56b8012a8e96fd73ebd24334712",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f901cfbc3d5b3a8807f44af164845978a0226efd1515d33711a80fa8138e809a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bbf5a2c293af40b5": {
       "id": "branch-bbf5a2c293af40b5",
@@ -87223,8 +87726,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c20c7a2756ea10bccf716cc4441558f0309611c9753a8643b7f7f3c880d0aa99",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "466672abe04e7d9939248d0127dc04db0687a14156d83feaec6e63d6e2d078ea",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-412ffa2ddbe80074": {
       "id": "branch-412ffa2ddbe80074",
@@ -87258,8 +87761,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d60bc39d7e7c65de5710cefe9f4debbacebf04e7a5bd1108bc5664176b9d62b4",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e617fc5661be0beadf6f94c12122cc37620b41cf3bcfd815b1a88410edc31af4",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-28fc3c410f8d2108": {
       "id": "branch-28fc3c410f8d2108",
@@ -87286,8 +87789,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fc726b722453a13dbaf007a14991279e456c5a882fab24609f14fb88b06f0d31",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "548e609f0538ab1a939a18ba9bcc5901930c50cd0a03196334dd9b852bf8c189",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d5f02538fc12def5": {
       "id": "branch-d5f02538fc12def5",
@@ -87321,8 +87824,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "91ed88f6a376d5576712e440a6bf264b53c35360b0af0f53d3093b33c0591916",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e70927801b2ad467026404dbad29dd73dee28b4683c32a6bd4bd013e3ec99202",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b34c306bc7fd0b72": {
       "id": "branch-b34c306bc7fd0b72",
@@ -87357,8 +87860,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e83ebe7f9a3b689bedcdc416aa4481e272ebec3a90f01d0d87fd18809fd9bf3a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0bec6d1227aea548a2688589f79296ec3a7f7a399fe8b00edbafb35cc3d4de1b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-4fd3d1bdc2b892c1": {
       "id": "branch-4fd3d1bdc2b892c1",
@@ -87399,8 +87902,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ffe397217b2582c875805a3df2517acfb959971b39e958f3e9dc2c19589ba960",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d3d4799ba63458917a7d02cef99bb77a71f5e331b422cfe592751b6ef7f822da",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b30df8ff98a54148": {
       "id": "branch-b30df8ff98a54148",
@@ -87427,8 +87930,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ed557229e199fe28d569f84863945c77831cdb6865513e057804a86433abd838",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "bb918eae6db5295de40999aa5f7bbddee1ef58e73c3590917c95339d8d6ca731",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-70e44503429abc0f": {
       "id": "branch-70e44503429abc0f",
@@ -87506,8 +88009,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "51f2c25ba4e5aa8267aca16fc012c07b0815ae21c99c7ad8d65218d79a970c38",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b05d0b5984a32ae7476d70b2ca497ff27b0f6ca9457e912dea7bd43652573386",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-bda2266ea4ea3de8": {
       "id": "branch-bda2266ea4ea3de8",
@@ -87534,8 +88037,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1e6c83557958aaf2c20783eb900b5126ab41900e6f1e74fae66eb29604c7048a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "227e0d4345a778fff1d0c3df8f6ec5b195b3b001d2eeba402e3a97f2df4873ca",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-08e76fdd73cd4686": {
       "id": "branch-08e76fdd73cd4686",
@@ -87569,8 +88072,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "11b86de3b96699c682da7db96d3da4bc5d81ff87d93da783847c5e87b01742fd",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "55857301b03b399b037237c8994beaa7c9828fd9e43ccd460c4d6ef1dec95a3f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-cf3fed7f263eaf9b": {
       "id": "branch-cf3fed7f263eaf9b",
@@ -87604,8 +88107,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c0eb934b34971e8ce081efb140719c30086b19721de7e96badba0f198e6c8361",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b2a23e0ef3bbbb65bedd96c311a95f04abc8fe484f21bdf548f7ec4f9cbb9638",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-fd3715b29c8dd1a1": {
       "id": "branch-fd3715b29c8dd1a1",
@@ -87622,8 +88125,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6e841b0c86b8e83e6a9c6f44deeb35c5ef3fc1b2468df008da6c910c54fbf06e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1d27bca6080527d632df26fe409bea66d336894fd9909933b18bf848ed2af822",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-369bfac30b1ea0ed": {
       "id": "branch-369bfac30b1ea0ed",
@@ -87650,8 +88153,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0468df955c1309a3c8b8d794fee0e6f47064fdc4c0475c19a3a9bc446a71d9fd",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "f0ecc38b0be39046f523be36807242df9e58b5a7831233b723b0348e23d8e2ee",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d0d7c835a1dbc03b": {
       "id": "branch-d0d7c835a1dbc03b",
@@ -87685,8 +88188,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d0ed8a97c4b22155b0084976cc47ec76e5d1cb2405680bed803f4724ef73b305",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "97e8c5f04eaf370da26cdcad36883f4a59493592b355d0c35d055ba5c8ff9f65",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e06b8cf63a4b31eb": {
       "id": "branch-e06b8cf63a4b31eb",
@@ -87720,8 +88223,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f3fa70097fcf5335b4ec2f0802da52d71c254207639e6317b8c23b0bff6ef6ae",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c5faa801e828f9b3c9756393c4b1c125b4f54660f1f966844387bf776bff629d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7e57fa94e13bd2cd": {
       "id": "branch-7e57fa94e13bd2cd",
@@ -87762,8 +88265,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3ac56b3cedbba579ad769ff746852985eef04fab41c6b1d98f24e90dc5f0ddae",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8137ea00aaeeb91f88905eb02cf13be2ba9cb1814835fca69d1ed21a4e0a6b24",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e21cbc0c26553034": {
       "id": "branch-e21cbc0c26553034",
@@ -87804,8 +88307,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "26dafbde378c47659de509209cb5451fbba7a68520a4f8bad58f68c50d49ad4c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "687a0891059502b7af7ec8563fe1147e0b6e0d8ed9e7b8338e8487ffa1dfce6d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8317c1821e24026d": {
       "id": "branch-8317c1821e24026d",
@@ -87833,8 +88336,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a03b9b9a07657e7768f1324eb19838305ef03ab080510bd2d486e01d3593b92d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0fdf9446341d806fad710bfb245bc5635448e2e99931ba0faa2304518400f1f6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7f356df67d09c22d": {
       "id": "branch-7f356df67d09c22d",
@@ -87862,8 +88365,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2fa5ff00e774933882545c7fdc1bece51ed8f7c6365c149d5c816491affd056d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e9fa7f55a2b78ea85a5c63b7d69a9f9e9a2fa3327ed0487f59575a8961831503",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-70d16bafe238aa7a": {
       "id": "branch-70d16bafe238aa7a",
@@ -87891,8 +88394,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1333990cac93f678dcd3dcbe7bc571f47554f4259d04840156e89f5d9f346583",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "32000964224b09377875198898f96ad39f4fa4730fdf75ca148c62872bd73de0",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d1691037dd1d0dbb": {
       "id": "branch-d1691037dd1d0dbb",
@@ -87911,8 +88414,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "629ceca4dae3888944d3a37758ffe0b70ed399681f4b1038d95a913f57da098c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b891451a3c60732fcd58d3209c674e87f651dacee070be4a4077f8efa8a405bf",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-637f3c0ed7eca805": {
       "id": "branch-637f3c0ed7eca805",
@@ -87940,8 +88443,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f4e1f99aeee108ce1ec64b966d1b1572580bc4816c41b3f283e1fa352922c4eb",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "867d305e09a3bc9dc9eaafe8ff88b4752f866225f2196494a1b966bd9e4565b6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7a839c530ad00ad2": {
       "id": "branch-7a839c530ad00ad2",
@@ -87958,8 +88461,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a7b1437bf054dc34930a2fbd557825c772aa53c2b44bb6cd3cea25c5dd5aa223",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "56244b2167e235137a9cb73a187877fd25fa78874e54b54122a8f257857d09a3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2db397ec82c28320": {
       "id": "branch-2db397ec82c28320",
@@ -88023,8 +88526,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a656414540974f06bdb57d2e4904f1273303c818c24e2582b671de5053e83716",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b3f71ae960dd8e8e881da5d5399105d52d0d147a7d6e454416300f99b6c8445c",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-992ef09e7aa2e87b": {
       "id": "branch-992ef09e7aa2e87b",
@@ -88051,8 +88554,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "419a82ca562b4c48aa7a0039653c1116f48fe8abb8f84c3c78ead7fafd7d9d8f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2567cad4763c3b40790ddfcf520fad660546214cb324f0a80b7fc653a772f54f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c8b5b69bea16cfe8": {
       "id": "branch-c8b5b69bea16cfe8",
@@ -88079,8 +88582,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "afe1ea768767a3a2c3f48a3b1a28fc3e2a2c2e00831410edbdd3e6e3fe18faba",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "907c1212fad10ca06ac8043c7adb1661b98cbbc1c67a6eb4b913af6d15c62a9d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-80302ec778694c1b": {
       "id": "branch-80302ec778694c1b",
@@ -88107,8 +88610,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "96a07aa0427fdcdca3162bfdbf737eb0b13c9ee58fb79cec2cc952a2cdc3b67e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "c6f79c9f60484c0a6074e0522fad21f8e4f8ed48810b5b5e2a3c0ab403dd97ca",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d62bb5c53690d8c6": {
       "id": "branch-d62bb5c53690d8c6",
@@ -88135,8 +88638,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e85cee04da80f4b4b49000c0ae861726fc048e3b4c1170a905cdb8375481c76a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "02c92126a0b6f91826b44f7066431162b0a70df46dcf956da75c843e93dbd6ea",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-75d1d4d76110cc04": {
       "id": "branch-75d1d4d76110cc04",
@@ -88163,8 +88666,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ac31fa9273a345501e21d0f82d4a384dfaca83a7aecc13096c1b86d85acca95f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "34489bd78cff0cb76742377c3241b979e6e68fed9dab78d18cde4ef55d3051ba",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-49565aee7bcfca71": {
       "id": "branch-49565aee7bcfca71",
@@ -88205,8 +88708,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4a8d94b0488f996f9599934bdec2b3afa360833e4238a13b88a4c4017337813d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d4d106b342b5bf581fa52501ec83da8f462fcba8b84f8c2d99db16327995c031",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d524b642d12d5b63": {
       "id": "branch-d524b642d12d5b63",
@@ -88225,8 +88728,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "eafef79efbbf2aed98ed13433f4eba0e2cf8561ea60ae1c1198583c1f91eff19",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "005425bbf2f10fbc20a458262eadf0fb6055ac979bdf094f11952ffb11028598",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e0c872b4def93261": {
       "id": "branch-e0c872b4def93261",
@@ -88257,8 +88760,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7d19f75f6d1cd9a8fb881730a7f4c4461ba61db39e0718ea061b6aaae0475e55",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "be0788b0178586a1a8820a3a723c446a4c84997c7e74a1604e3b63a639d9eac1",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b6e8013efabfd929": {
       "id": "branch-b6e8013efabfd929",
@@ -88277,8 +88780,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2c7bb686181f7e626e054f783f1f15a381e0384f159a14cc0420404dbacbb307",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1ce37f8382786dc2e22cd541cd2845c86128a562c36ac6a7669feeac14a352cc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-88e2b40f5b6d498e": {
       "id": "branch-88e2b40f5b6d498e",
@@ -88297,8 +88800,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "146f3ef5b548c156bae35212a0560c4f7ab60a92276d27ea45129ba89073377e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0809c58b0338ad208e7a3ddd090c0860652fae7412e14e516a7a0079ac88f480",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b368fa9f8b5f424e": {
       "id": "branch-b368fa9f8b5f424e",
@@ -88317,8 +88820,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "60e520d1759a2161f50bb20bdd6ebb166f64fc9e89e0e71a5a52bc1fd72c4a1c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "bd7a2965884df045fdff8bb0a3fae95fa4b5a655a0663ef2c51a0fa26e4212f0",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-05b52c58efea561d": {
       "id": "branch-05b52c58efea561d",
@@ -88337,8 +88840,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8aedf773b2e66dc605912657eb8ad9cdd5b469e95da3af4b004c5f1163fe6d6c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "69df774ea2f3d022000ff7eb3918ed7b9cc03a63487568b5be0d48ef3cba9c77",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d5fcd15a8069a6ce": {
       "id": "branch-d5fcd15a8069a6ce",
@@ -88357,8 +88860,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4e5986851af6584897c710b8fa6eef492634ed30a5cbfbf38a5ea3a77955e8a0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "3c677c32f20e20b02b46a864a3360dd03a0c5fba75639b7733afe6ef50cb6564",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-526516b414e5cd8c": {
       "id": "branch-526516b414e5cd8c",
@@ -88377,8 +88880,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e50eb2af02307bfa90d9d7d983844959a872cdb9e17cf141f9cba32efac45e58",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "567ffb91b216f5cd2336e27374f6bf5c48e7b852f9aaeea4c286eb9c78fafb25",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-67bcc30f23d44955": {
       "id": "branch-67bcc30f23d44955",
@@ -88397,8 +88900,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "687def2fd4e11b5a8625d57e7269fc34a65569c4a3ce7f80f398e5db7a969383",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5a1df42dd8b39b78948b43261bacba7f062e997664e7d25abd48c4bf09f79dab",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-16f9e4998a78f826": {
       "id": "branch-16f9e4998a78f826",
@@ -88417,8 +88920,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a3ff49e9374aecce4f3712aca7a10808281fea100622c61e0b74a4cddbef59c9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0be127894062583015c798a49da8669d8fe71e6ca359b578a3ae1f6e5aea6462",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-341ed7b9d23957ad": {
       "id": "branch-341ed7b9d23957ad",
@@ -88437,8 +88940,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8a821312d28754334cd7044fb2a6c65c54128dd376dab520d31ade17eb4f35b1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4c4a5c370ddaf836c81b1f62fb85e314debb89385f61cc7d035b68028b9fe240",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-a2e2cb00c027b06e": {
       "id": "branch-a2e2cb00c027b06e",
@@ -88457,8 +88960,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fe204ede58707d3bff23edf3ccab701d8260207b1d8396b9d637c1bae9b5c9ae",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4504e390abcec0b45950564452f4b1e94e9eff8aa701956695d93e5d7006b8e3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e0256d3e5c5f68da": {
       "id": "branch-e0256d3e5c5f68da",
@@ -88477,8 +88980,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7eb6ad4c10544d2a3253236bb22ee6848aaa62e22ef39f69776f4b3861f0da58",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "19dbc8f2e5bc299b56f6abc2ffdc920b7d54f8375417c7aeff25bef1931eb620",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-75cad6b9a274a9b7": {
       "id": "branch-75cad6b9a274a9b7",
@@ -88497,8 +89000,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fce25815e51b6908f500add2a07813cc2612459f2d16302d7a046b2976723e99",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5c8259406e4af8f2758768f3c3573c8ed556eb9ef9b2893e9bbdf065b4be29a2",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-561d4f92479230e8": {
       "id": "branch-561d4f92479230e8",
@@ -88517,8 +89020,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "046080636fd22dd255dad1467164d2c106c122458670947290ab2ea4aadc406c",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "dcf2eedc1d3eed54f372f1bc430e48228bb56bf56a2ec4bc1cde92d18e9d48e2",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3734c87bc188f992": {
       "id": "branch-3734c87bc188f992",
@@ -88537,8 +89040,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "47ee8dc75be53090e2f4b81c3b967adb14464ef74b6c25d71ccdc0d5bbaa0ab1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "42285510b931284cdbf3b8220545ddfe0ac75584bcaa782112dcbea788a217a5",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2eaeac14b9a0f1a9": {
       "id": "branch-2eaeac14b9a0f1a9",
@@ -88557,8 +89060,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ccafbe59aeb51e7c201fb9e08561fdd0d129802195f4bbab46a8ce96d7ab873e",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "5b1bed192910e8f18d682932cde028a1c530cea7dcf5e908391554d77a80bb55",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-06072ef2ebbe1f87": {
       "id": "branch-06072ef2ebbe1f87",
@@ -88577,8 +89080,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "721c1eaaaf1d7c3c9c27d96516081e41801ec2b520c9ba3e6c9d6532115f21a9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "4271969fadcd320972f871ade4686d9267eca89242c8e15d08fb95535d79fa4f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-affe9c1706156567": {
       "id": "branch-affe9c1706156567",
@@ -88597,8 +89100,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "45fb44b9da850d300a0bbda41694c6b0707a18fc6263ae2303aa5d66e9b91bf9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "abb276e61de3f1a5872f26fac99ed5ab40f5e4c593b56630e8767a3c37c43f0f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c1db5c41a90d509f": {
       "id": "branch-c1db5c41a90d509f",
@@ -88615,8 +89118,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "381e48a2e1feba0dd1e79c36db3792dce572ec6f5f570237d14a42242ac216a6",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "52dc93685aaf999d9f60a48323a9a5507672ad9773a5f2a1b4b08601708433fa",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-c1c09c8589ffaf5e": {
       "id": "branch-c1c09c8589ffaf5e",
@@ -89057,8 +89560,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b5509ec0d246261f0500c3bbd747de3f80974edd135262f4cc3474a5970de17f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "660190e4d641750ed999b0b63f3bbe59a57a35fcd974143c5c814562739660aa",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8f7424f62a838c0f": {
       "id": "branch-8f7424f62a838c0f",
@@ -89077,8 +89580,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7cd7184af912f6b2b51cc5cc7728bfe165e7b02a93ec772ffdfcca422ad4e700",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "292dc304e00db2d8500a54d94b0f647efeb6f3eb316dcb178ff912906b0d2f3d",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-a8fc0e1f175ee465": {
       "id": "branch-a8fc0e1f175ee465",
@@ -89097,8 +89600,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "60553a329a78ce4127fc5bcdd8518c3fe70f68a1dc0c7c50ea272408506f16df",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "6aaf39c10ace7fa24643a396cb809e3fbeed56062f940fd986b697fa41e06088",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-60ede8a4a21cc685": {
       "id": "branch-60ede8a4a21cc685",
@@ -89117,8 +89620,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1ccb042ba8283ebc7e34772a05bb46a415ac53a4fd9d75434fbe2cc48ce348b9",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "b5c39491786e88152ee1bd53a582f306e4207e8a2b0ae99c4054dcf634fa0087",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-02d4eb506c006982": {
       "id": "branch-02d4eb506c006982",
@@ -89137,8 +89640,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cfa58bf7f5dafec8346b793eeefa20fdc8a860b76c2b6720d42aec68b078cf60",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8d18b657345836bfce88ea92f788369441082b9685afe4ffb422a2ae6abfdd61",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b4b9b56366106e55": {
       "id": "branch-b4b9b56366106e55",
@@ -89157,8 +89660,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a95770410c41af211cad656a0e2aa3d0f8c1084ad8f1d66c4deec2d302a74837",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "53b5f6ae1784213f2d9a953d012f8c293ea9990a5de90d47da4e31f087178e50",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2163060a0d173d3c": {
       "id": "branch-2163060a0d173d3c",
@@ -89178,8 +89681,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a9ac67369466c385cd03d705655e319550643545582848634e0cf4433575883a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "1283f7b5364bead583324e8c3a6875a578bec65dfe37622b21345ef9352b83b9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7b4c2cf2503a3179": {
       "id": "branch-7b4c2cf2503a3179",
@@ -89227,8 +89730,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "10534cf4973d86508995953a67c25b21ac143054777fd01f3b862b33aac6d5b2",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "386ec1b074e7d38fa9659796cc2a2710600f4693345396f4a98e46aa2209ed99",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8547cbc49c3543e0": {
       "id": "branch-8547cbc49c3543e0",
@@ -89262,8 +89765,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d20f4660e1990de797cef88f6656b6a6a784851edb57a0ea88bc276790523d18",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e7e2834162409a81d4c3f45bf6301b5be0725c471d2d930310fc5e84d5e802cf",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-d9e736cfde461ee6": {
       "id": "branch-d9e736cfde461ee6",
@@ -89290,8 +89793,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "872cd5ee8c935cbdbe6eed837104e7ee5f1bbaa0300c3400a2e9a80d126ee4e8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "de94ab79e526badfb73009c675199c9f3deb4acecaaab50bd6319f9b45e36d48",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-0000ff4995ce3709": {
       "id": "branch-0000ff4995ce3709",
@@ -89318,8 +89821,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "51d9a210262e35eb2667f7a9397c95b3bd47c67ceb6fc0019b46a45af0b4642d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "0e4823f45ea0f4f1514f65dc1a6253711b8e3308657625d97ddf9d5d294ca9b2",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-dcbc9ec1b1644742": {
       "id": "branch-dcbc9ec1b1644742",
@@ -89346,8 +89849,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "29d6f6881533addc1efcf237b6b60ad309ac8d958cd1da859941bff120659ca8",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "406b56c92f345729806c36f8c5a90bf723505ba5013856f493bb5672dbdb2b9b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-2481cf5a1a0046dd": {
       "id": "branch-2481cf5a1a0046dd",
@@ -89374,8 +89877,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "792e35757867bbf21e19bc09e07e3f14775461047664ee9f2d9b6421119b6595",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "ac2aa7941d81e8f1ad9364e12efcd2ccc1f18f700ed75241c553a0e3798aec0b",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3ae954825dd91f9b": {
       "id": "branch-3ae954825dd91f9b",
@@ -89402,8 +89905,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b07a4200c303f4ca10e25429010396cb7ee1ab961d0e7809c6b97540584b470f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "283b0d55d19bdf0d54d6ec74541b41d2256caac876b47e759026299d77b03300",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-e9e79d99992248f2": {
       "id": "branch-e9e79d99992248f2",
@@ -89430,8 +89933,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cde55ce10dc4f4fe23a22db92559273ef455b14e8da45f32e0ca20be1622d0c5",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "92177cb23a7673a764ec8c03f9607e5cc8e573f992e5c301f4005d43a887bb17",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-88129d40b3c5ce99": {
       "id": "branch-88129d40b3c5ce99",
@@ -89458,8 +89961,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1bd435756c0cdfb0a9ea30b12c7c47eebe6b870bb23f21ce32c2b958869b7bf0",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "785015bac54a532e62ac4563ebca2814621d5b88a128f0e8f12d4cbc21a4ecb3",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3640cbc8888b9b2a": {
       "id": "branch-3640cbc8888b9b2a",
@@ -89486,8 +89989,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ec7cb7f9e71d985c1c54233106e7ec453d5b4312247d13eb6a95be659487347a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "691d4a346f1466dd1ffdbe5e746f983d99e7a53940de578f1187a5dc907e1ccf",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-9fb70e0aed49a8ec": {
       "id": "branch-9fb70e0aed49a8ec",
@@ -89514,8 +90017,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "364b09dd9db3bdf38493cb2b80daa4d0f7489711f9745f89a8ede23f5decc663",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e2dc31e2c188eac5bcd80be49b535ec7246dbc4e810675809eed030d785ad4d9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-cf063db3d4301a2a": {
       "id": "branch-cf063db3d4301a2a",
@@ -89534,8 +90037,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d8c39cfacd669ab597ccc8cb73e6dff73220b5392b170ec726691eae154dfa1d",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "33543572251ebf02257883ff3e58ce0b4300901a145d39e2809a312e2053eb70",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-1d18194bd4fc9125": {
       "id": "branch-1d18194bd4fc9125",
@@ -89554,8 +90057,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fafad45957c4d80c1418be405bf785724230a96c6df00d201ca15264eb47d25f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "a8144a3fd4e28ed99848c4afa562150ab9d88da54139702fbe9418c7674eaccc",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8fb3e7f76aab269c": {
       "id": "branch-8fb3e7f76aab269c",
@@ -90130,8 +90633,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "549056ed4ce1ebd35c874066c36c24d04c08a24c8f3a51b7933fe18b552fd4ea",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "92f558242267590bab56e2f87b7ce1778232ef73930f86e6e028feface63f7cd",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-f2dba8e26e4c9402": {
       "id": "branch-f2dba8e26e4c9402",
@@ -90706,8 +91209,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5c07b717012f0fa372931847ab652048cf24deff11f014d5fec191a6bce8476a",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "e58047061be20b27eb5a840b75dc54647f540f7188ba5c1a725394b5e912fc45",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-5b98ae5ac6b68600": {
       "id": "branch-5b98ae5ac6b68600",
@@ -91021,8 +91524,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6d8d04eb0d149e9309116f76093e2145ee0809123b7ff8bbdd9841ae670aab85",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8a785cd756768549eba8324e2d5b7d2f0a7e70498b9f36e9f8fdd63b882f0135",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-b5de3976fb8764e4": {
       "id": "branch-b5de3976fb8764e4",
@@ -91041,8 +91544,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f85fb22bb143aabe8b336b3bfd3fc64e70e9929c7cc0769522147e8c93089c90",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "7d800c086b31fa2e3f321f09d9fac2df8023a5bb859460ae4a41b0084515a929",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-8c1c252f0c53fa36": {
       "id": "branch-8c1c252f0c53fa36",
@@ -91174,8 +91677,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "38be8a75790b3d2b9895b98b3ba8d0a113fe73513e9b699c591528221b4f2a87",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "09bf4096271c7ec1147d0c21d8d92cd8d7b5f17ec60d6244a7c72cf2e3cf905a",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-df145aa691117ae1": {
       "id": "branch-df145aa691117ae1",
@@ -91194,8 +91697,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ddeae65a45e82fb9d4c38da9efdcb524b48e6a7f0eb29d8a5e7f05aaa10c0b55",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "8037839e2a44ab7e2e9a4e6af04dad8b5717b6a3d59fc8ea165c961ad2bfae8f",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-de9101df6719fc35": {
       "id": "branch-de9101df6719fc35",
@@ -91222,8 +91725,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "24f34881d4511ae289f14e56b0f37a3d8df2fcdd961310dea97c11c0c007d60b",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "2d9c9baf38bcbc0e640efe263b6869d1d9fb72cceb97c935288781cc4324dbc6",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-ada5f51a1e7f1672": {
       "id": "branch-ada5f51a1e7f1672",
@@ -91242,8 +91745,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f4d7b6d364e3c1ea9eb21e225c874c85507d6c7f8e44c6c885a0f436dba59a23",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "992aed2d423dd16fc3a4f42b0f7daf67f653c42aa0a343ecd74bcc9d25b7f5fd",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-3d254ed3e3aa160f": {
       "id": "branch-3d254ed3e3aa160f",
@@ -91262,8 +91765,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0bcbe4a2eaf080140ffd1979c1db01542ce5959f47015590ee872a63249003f1",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "7682ca40fd6ebe9236e2182f6d3c54c0d493191a96cdec667243522a36720a76",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-0b40fb0e2197e346": {
       "id": "branch-0b40fb0e2197e346",
@@ -91282,8 +91785,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "87926c8ba6308164b3f9d81a9d918dee30738700de07e973282e1ad084bd139f",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "d35d32b2eaea19af5222af071a8bcb348386918cc7da7a39d7424b4003742593",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-a5961576a6beffe1": {
       "id": "branch-a5961576a6beffe1",
@@ -91465,8 +91968,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f3b64719997eb32ae9b98deed13e608b9d6e2979eb24a2c7b63f3f3c32412bff",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "aaac52da98942bc3496bd364bdb706f7a214d8a50b8abeabe102b03586a74ec9",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     },
     "branch-7cd7466c64076bce": {
       "id": "branch-7cd7466c64076bce",
@@ -91485,15 +91988,15 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5c775b4f8ce0d1ae2a01feb69a577ba2be9768bada6b91b1f97eea0039272086",
-      "collected_at": "2026-11-19T07:04:36.964589+00:00"
+      "fingerprint": "9c7adc5518a544def3b03569b62f61a4e1251601a316bd515961b48c17e4a3c8",
+      "collected_at": "2026-11-19T07:19:10.574002+00:00"
     }
   },
   "coverage": {
-    "prs": 188,
-    "pr_cases": 188,
-    "branches": 211,
+    "prs": 189,
+    "pr_cases": 189,
+    "branches": 212,
     "errors": [],
-    "api_calls": 14
+    "api_calls": 10
   }
 }

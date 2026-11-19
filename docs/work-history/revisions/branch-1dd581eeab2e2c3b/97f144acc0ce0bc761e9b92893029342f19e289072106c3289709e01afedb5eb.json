@@ -1,0 +1,20 @@
+{
+  "id": "branch-1dd581eeab2e2c3b",
+  "title": "codex/server-canonical-foundation",
+  "head": "685fbb7baee4a542555f939fabaecd674658c148",
+  "head_ref": "codex/server-canonical-foundation",
+  "linked_prs": [
+    29
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "118e4d4f7c9fc069dd83a8e76ca0833fdaaf2b2fa963a52f9078b94e0eb24d53",
+  "collected_at": "2026-11-19T07:19:10.574002+00:00"
+}
