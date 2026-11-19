@@ -356,6 +356,8 @@ export default function ChatPage() {
       ""
     );
 
+  const [historyLoading, setHistoryLoading] = useState(true);
+
   const [
     loaded,
     setLoaded,
@@ -824,6 +826,8 @@ export default function ChatPage() {
         }
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
+      } finally {
+        if (active) setHistoryLoading(false);
       }
     }
     void load();
@@ -2001,26 +2005,12 @@ export default function ChatPage() {
       <section
         className="chat"
       >
-        {messages.length ===
-          0 &&
-          !loading && (
-            <div
-              className="emptyConversation"
-            >
-              <img
-                src="/icon-192.png"
-                alt=""
-              />
-
-              <p>
-                なんでもない話でいいよ。
-              </p>
-
-              <span>
-                Misaki
-              </span>
-            </div>
-          )}
+        {messages.length === 0 && historyLoading && (
+          <div className="emptyConversation" role="status">
+            <div className="historyLoadingSpinner" aria-hidden="true" />
+            <p>会話を読み込み中…</p>
+          </div>
+        )}
 
         {messages.map(
           (
@@ -2950,27 +2940,22 @@ export default function ChatPage() {
             center;
         }
 
-        .emptyConversation img {
-          width:
-            69px;
-          height:
-            69px;
-          margin:
-            0 auto;
-          border:
-            3px solid
-            white;
-          border-radius:
-            50%;
-          box-shadow:
-            0 9px
-            25px
-            rgba(
-              92,
-              61,
-              72,
-              0.12
-            );
+        .historyLoadingSpinner {
+          width: 42px;
+          height: 42px;
+          margin: 0 auto;
+          border: 3px solid #f4d4dd;
+          border-top-color: #dc5275;
+          border-radius: 50%;
+          animation: historyLoadingSpin 0.8s linear infinite;
+        }
+
+        @keyframes historyLoadingSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .historyLoadingSpinner { animation: none; }
         }
 
         .emptyConversation p {
@@ -2990,24 +2975,6 @@ export default function ChatPage() {
             0.03em;
         }
 
-        .emptyConversation span {
-          display:
-            inline-block;
-          margin-top:
-            7px;
-          color:
-            #ff6680;
-          font-family:
-            "Bradley Hand",
-            "Segoe Script",
-            cursive;
-          font-size:
-            17px;
-          transform:
-            rotate(
-              -4deg
-            );
-        }
         .sendError {
           align-self:
             center;
