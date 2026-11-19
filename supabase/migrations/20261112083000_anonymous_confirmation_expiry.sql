@@ -64,7 +64,9 @@ declare
 begin
   select metadata->'anonymousExpiry' into v_times from public.misaki_relationship_events
   where user_id = new.id and event_type = 'email_save_checkpoint';
-  if not found then return new; end if;
+  -- Legacy checkpoints predate expiry metadata. Preserve the saved snapshot
+  -- when confirming a registration that was pending before this migration.
+  if not found or v_times is null then return new; end if;
 
   select coalesce((select jsonb_agg(item order by ord)
       from jsonb_array_elements(c.history) with ordinality h(item,ord)
