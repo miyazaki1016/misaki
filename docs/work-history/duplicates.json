@@ -1082,5 +1082,10 @@
   "supabase/migrations/20261112081000_purge_expired_anonymous_root.sql": [
     "pr-190",
     "pr-193"
+  ],
+  "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql": [
+    "branch-d0d7c835a1dbc03b",
+    "pr-193",
+    "pr-203"
   ]
 }

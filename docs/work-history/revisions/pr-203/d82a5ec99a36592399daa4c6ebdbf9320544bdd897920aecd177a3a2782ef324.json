@@ -1,0 +1,211 @@
+{
+  "id": "pr-203",
+  "number": 203,
+  "title": "fix: preserve existing anonymous email checkpoints (#201)",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "関連 #201。承認済みの旧匿名チェックポイントの保全を、未適用の登録確認migrationに追加。期限情報が存在するチェックポイントは従来の24時間再判定を継続する。既存のPGliteハーネスに旧データの登録確認回帰を追加し、対象12件成功。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-193\",\"decision\":\"extend\",\"reason\":\"既存の登録確認時期限再判定を保持し、期限メタデータがない既存確認待ちだけを保全する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-1\",\"decision\":\"reuse\",\"reason\":\"同一IDのメール確認移行と既存チェックポイントを再利用する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-101\",\"decision\":\"reuse\",\"reason\":\"既存の出典と期限の設計を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/101\"},{\"id\":\"pr-191\",\"decision\":\"reuse\",\"reason\":\"既存の発言時刻に基づく期限再判定を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/191\"},{\"id\":\"pr-190\",\"decision\":\"distinct\",\"reason\":\"明示的な期限切れrootの物理削除とは別のメール確認互換性を扱う\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/190\"},{\"id\":\"pr-66\",\"decision\":\"reuse\",\"reason\":\"既存の忘却・再学習の保存と検証基盤を保持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/66\"}]}\n-->",
+  "snapshot_head": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+  "snapshot_consistent": true,
+  "head": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+  "base": "e8d94c422fb8fc1bd5e3f942c3017b9b31e792ec",
+  "base_ref": "main",
+  "head_ref": "fix/legacy-anonymous-confirmation-201",
+  "state": "merged",
+  "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+  "draft": false,
+  "merged_at": "2026-11-19T06:51:19Z",
+  "merge_commit_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+  "updated_at": "2026-11-19T06:51:20Z",
+  "code_facts": [
+    {
+      "file": "tests/forget-database.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+    },
+    {
+      "file": "tests/forget-database.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(await state(id), before);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+    },
+    {
+      "file": "tests/forget-database.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual((await relationship()).rows, previousRelationship);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+    },
+    {
+      "file": "tests/forget-database.test.cjs",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual((await events()).rows, previousEvents);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+    }
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 1,
+      "patch": "diff --git a/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql b/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\nindex be3d5d5a..dd9d83f3 100644\n--- a/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\n+++ b/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\n@@ -64,7 +64,9 @@ declare\n begin\n   select metadata->'anonymousExpiry' into v_times from public.misaki_relationship_events\n   where user_id = new.id and event_type = 'email_save_checkpoint';\n-  if not found then return new; end if;\n+  -- Legacy checkpoints predate expiry metadata. Preserve the saved snapshot\n+  -- when confirming a registration that was pending before this migration.\n+  if not found or v_times is null then return new; end if;\n \n   select coalesce((select jsonb_agg(item order by ord)\n       from jsonb_array_elements(c.history) with ordinality h(item,ord)\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+      "source": {
+        "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+        "coverage": "全文",
+        "text": "-- Recheck anonymous checkpoint ages at the auth transition, which can occur\n-- long after the user requested a confirmation email.\nalter function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  rename to save_misaki_temporary_state_unstamped;\n\ncreate function public.save_misaki_temporary_state(\n  p_user_id uuid, p_history jsonb, p_memory jsonb, p_today_memory jsonb,\n  p_points integer, p_relationship jsonb, p_expected_revision uuid, p_forget_payload text\n) returns jsonb language plpgsql security invoker set search_path = '' as $$\ndeclare v_result jsonb;\nbegin\n  v_result := public.save_misaki_temporary_state_unstamped(p_user_id,p_history,p_memory,\n    p_today_memory,p_points,p_relationship - 'anonymousExpiry',p_expected_revision,p_forget_payload);\n  update public.misaki_relationship_events\n  set metadata = metadata || jsonb_build_object('anonymousExpiry',p_relationship->'anonymousExpiry')\n  where user_id = p_user_id and event_type = 'email_save_checkpoint';\n  return v_result;\nend;\n$$;\n\nrevoke all on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  from public,anon,authenticated;\ngrant execute on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  to service_role;\n\ncreate function public.filter_misaki_anonymous_checkpoint_items(p_items jsonb, p_times jsonb, p_now_ms numeric)\nreturns jsonb language sql immutable set search_path = '' as $$\n  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb)\n  from jsonb_array_elements(coalesce(p_items,'[]'::jsonb)) with ordinality a(item, ord)\n  where exists (\n    select 1 from jsonb_array_elements(case when jsonb_typeof(p_times)='array' then p_times else '[]'::jsonb end) t\n    where t->0 = item\n      and case when jsonb_typeof(t->1)='number' then\n        (t->>1)::numeric > p_now_ms - 86400000 and (t->>1)::numeric <= p_now_ms\n      else false end\n  );\n$$;\nrevoke all on function public.filter_misaki_anonymous_checkpoint_items(jsonb,jsonb,numeric) from public,anon,authenticated;\n\ncreate function public.is_misaki_fresh_checkpoint_message(p_sent_at text, p_now timestamptz)\nreturns boolean language plpgsql stable set search_path = '' as $$\ndeclare v_sent_at timestamptz;\nbegin\n  if p_sent_at is null or p_sent_at !~ '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$' then\n    return false;\n  end if;\n  v_sent_at := p_sent_at::timestamptz;\n  return v_sent_at > p_now - interval '24 hours' and v_sent_at <= p_now;\nexception when invalid_datetime_format or datetime_field_overflow then\n  return false;\nend;\n$$;\nrevoke all on function public.is_misaki_fresh_checkpoint_message(text,timestamptz) from public,anon,authenticated;\n\ncreate function public.expire_misaki_anonymous_checkpoint_on_confirmation()\nreturns trigger language plpgsql security definer set search_path = '' as $$\ndeclare\n  v_times jsonb;\n  v_now timestamptz := clock_timestamp();\n  v_now_ms numeric := extract(epoch from v_now)*1000;\n  v_history jsonb;\n  v_memory jsonb;\n  v_today jsonb;\nbegin\n  select metadata->'anonymousExpiry' into v_times from public.misaki_relationship_events\n  where user_id = new.id and event_type = 'email_save_checkpoint';\n  -- Legacy checkpoints predate expiry metadata. Preserve the saved snapshot\n  -- when confirming a registration that was pending before this migration.\n  if not found or v_times is null then return new; end if;\n\n  select coalesce((select jsonb_agg(item order by ord)\n      from jsonb_array_elements(c.history) with ordinality h(item,ord)\n      where public.is_misaki_fresh_checkpoint_message(item->>'sentAt',v_now)), '[]'::jsonb),\n    public.filter_misaki_anonymous_checkpoint_items(c.memory,v_times->'memory',v_now_ms),\n    jsonb_set(c.today_memory,'{items}',\n      public.filter_misaki_anonymous_checkpoint_items(c.today_memory->'items',v_times->'today',v_now_ms))\n  into v_history,v_memory,v_today\n  from public.misaki_user_conversation_state c where c.user_id=new.id;\n\n  if found then\n    update public.misaki_user_conversation_state set history=v_history,memory=v_memory,today_memory=v_today,\n      message_count=jsonb_array_length(v_history),\n      user_message_count=(select count(*) from jsonb_array_elements(v_history) h where h->>'role'='user'),\n      updated_at=v_now where user_id=new.id;\n    update public.background_push_state set recent_history=v_history,long_term_memory=v_memory,\n      today_memory=v_today,updated_at=v_now where user_id=new.id;\n  end if;\n\n  if not coalesce((v_times->>'relationship')::numeric > v_now_ms-86400000\n    and (v_times->>'relationship')::numeric <= v_now_ms,false) then\n    update public.misaki_relationship_state set intimacy_points=0,intimacy_level='initial',\n      emotion_state=jsonb_build_object('primary','neutral','intensity',0),\n      action_state='NORMAL',last_interaction_at=null,state_updated_at=v_now where user_id=new.id;\n    delete from public.misaki_relationship_events where user_id=new.id and event_type='temporary_relationship_checkpoint';\n  end if;\n\n  update public.misaki_relationship_events set metadata=metadata-'anonymousExpiry'\n  where user_id=new.id and event_type='email_save_checkpoint';\n  return new;\nend;\n$$;\n\nrevoke all on function public.expire_misaki_anonymous_checkpoint_on_confirmation() from public,anon,authenticated;\ncreate trigger misaki_expire_anonymous_checkpoint_on_confirmation\nafter update of is_anonymous on auth.users for each row\nwhen (old.is_anonymous and not new.is_anonymous)\nexecute function public.expire_misaki_anonymous_checkpoint_on_confirmation();\n",
+        "sha256": "d1b48763b97ed20d7872dee8a9342d1d191d50291a4e555b1fac221db95ad4a1"
+      }
+    },
+    {
+      "path": "tests/forget-database.test.cjs",
+      "status": "modified",
+      "additions": 19,
+      "deletions": 0,
+      "patch": "diff --git a/tests/forget-database.test.cjs b/tests/forget-database.test.cjs\nindex bb21ee9e..cd126a8c 100644\n--- a/tests/forget-database.test.cjs\n+++ b/tests/forget-database.test.cjs\n@@ -229,3 +229,22 @@ test('delayed email confirmation rechecks anonymous expiry before permanent read\n   await db.query('update auth.users set is_anonymous=false where id=$1',[registered]);\n   assert.deepEqual((await state(registered)).memory, ['safe memory']);\n }));\n+\n+test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {\n+  const id = await seed(true);\n+  const history = [{ role: 'user', text: 'legacy chat', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() }];\n+  const memory = ['legacy memory'];\n+  const today = { date: 'test', items: ['legacy summary'] };\n+  await db.query('select save_misaki_temporary_state_unstamped($1,$2::jsonb,$3::jsonb,$4::jsonb,40,$5::jsonb,null,$6)',\n+    [id, JSON.stringify(history), JSON.stringify(memory), JSON.stringify(today),\n+      JSON.stringify({ emotionPrimary: 'happy' }), payload]);\n+  const before = await state(id);\n+  const relationship = () => db.query('select * from misaki_relationship_state where user_id=$1', [id]);\n+  const events = () => db.query('select * from misaki_relationship_events where user_id=$1 order by id', [id]);\n+  const previousRelationship = (await relationship()).rows;\n+  const previousEvents = (await events()).rows;\n+  await db.query('update auth.users set is_anonymous=false where id=$1', [id]);\n+  assert.deepEqual(await state(id), before);\n+  assert.deepEqual((await relationship()).rows, previousRelationship);\n+  assert.deepEqual((await events()).rows, previousEvents);\n+}));\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs",
+      "source": {
+        "path": "tests/forget-database.test.cjs",
+        "coverage": "先頭18000文字・原本リンク参照",
+        "text": "const {test,before,after}=require('node:test');\nconst assert=require('node:assert/strict');\nconst fs=require('node:fs');\nconst path=require('node:path');\nconst {randomUUID}=require('node:crypto');\nconst {PGlite}=require('@electric-sql/pglite');\nconst root=path.join(__dirname,'..');let db;\nconst read=p=>fs.readFileSync(path.join(root,p),'utf8');\nbefore(async()=>{\n db=new PGlite();\n await db.exec(`\n create role anon;create role authenticated;create role service_role bypassrls;\n create schema auth;create schema misaki_operations;\n create table auth.users(id uuid primary key,is_anonymous boolean default false);\n create function auth.uid() returns uuid language sql as $$select (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid$$;\n `);\n await db.exec(`\n create function misaki_operations.guard_root_write() returns trigger language plpgsql as $$begin\n if current_setting('misaki.freeze',true)='on' then raise exception 'writes frozen';end if;return null;end$$;\n create table public.misaki_user_conversation_state(user_id uuid primary key,history jsonb default '[]',memory jsonb default '[]',today_memory jsonb default '{\"date\":\"\",\"items\":[]}',message_count int default 0,user_message_count int default 0,updated_at timestamptz default clock_timestamp());\n create table public.misaki_relationship_state(user_id uuid primary key,intimacy_points int default 0,intimacy_level text,intimacy_migrated_at timestamptz,state_updated_at timestamptz,last_user_message_at timestamptz,last_misaki_message_at timestamptz,last_interaction_at timestamptz,silence_started_at timestamptz,emotion_state jsonb,action_state text);\n create table public.background_push_state(user_id uuid primary key,recent_history jsonb,long_term_memory jsonb,today_memory jsonb,updated_at timestamptz);\n create table public.misaki_relationship_events(id bigserial primary key,user_id uuid,event_type text,request_id uuid,before_state jsonb,after_state jsonb,reason text,metadata jsonb,created_at timestamptz default clock_timestamp());\n create unique index completed_request on public.misaki_relationship_events(user_id,request_id) where event_type='chat_turn_completed';\n create unique index email_checkpoint on public.misaki_relationship_events(user_id) where event_type='email_save_checkpoint';\n create table public.daily_message_requests(request_id uuid primary key,user_id uuid,allowed boolean,processed boolean,refunded_at timestamptz,completed_at timestamptz,temporary_result text,message_hash text,parent_hash text,usage_date date,is_premium boolean,message_count int,remaining int);\n create table public.daily_message_usage(user_id uuid,usage_date date,message_count int,updated_at timestamptz,primary key(user_id,usage_date));\n create table public.misaki_temporary_roots(user_id uuid primary key,token text,revision uuid,expires_at timestamptz);\n create function public.edit_misaki_conversation_state(uuid,text,text default null) returns jsonb language sql as $$select '{}'::jsonb$$;\n create function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb default null,uuid default null) returns jsonb language sql as $$select '{}'::jsonb$$;\n `);\n const base=read('supabase/migrations/20260918073918_canonical_misaki_root_state.sql');\n // Execute the actual existing temporary receipt writer and completed-turn refund guard.\n await db.exec(base.slice(base.indexOf('create function public.complete_misaki_temporary_turn'),base.indexOf('-- Refreshable pre-confirmation')));\n await db.exec(read('supabase/migrations/20260918081000_refund_failed_chat_usage.sql'));\n await db.exec(base.slice(base.indexOf('create function public.guard_misaki_completed_turn_refund'),base.indexOf('-- All temporary writers')));\n const migration=fs.readdirSync(path.join(root,'supabase/migrations')).find(x=>x.endsWith('_forget_control_v1.sql'));\n await db.exec(read('supabase/migrations/'+migration));\n await db.exec(\"create function auth.role() returns text language sql as $$select 'service_role'::text$$\");\n await db.exec(read('supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql'));\n await db.exec(read('supabase/migrations/20261112082000_relationship_emotion_resume.sql'));\n await db.exec(read('supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql'));\n await db.exec(read('supabase/migrations/20261112084000_relationship_emotion_recovery.sql'));\n await db.exec('grant usage on schema public,auth,misaki_operations to service_role,authenticated;grant select,insert,update on all tables in schema public to service_role;grant select on auth.users to service_role;grant usage,select on all sequences in schema public to service_role;');\n});\nafter(async()=>{if(db)await db.close();});\nasync function isolated(fn){await db.exec('begin');try{await fn();}finally{await db.exec('rollback');}}\nconst payload='encrypted-owner-bound-fixture'.repeat(3);\nasync function seed(anonymous=false){const id=randomUUID();await db.query('insert into auth.users values($1,$2)',[id,anonymous]);await db.query('insert into background_push_state(user_id)values($1)',[id]);return id;}\nasync function state(id){return (await db.query('select * from misaki_user_conversation_state where user_id=$1',[id])).rows[0];}\nasync function controls(id){return (await db.query('select * from misaki_forget_controls where user_id=$1',[id])).rows;}\nasync function complete(id,r,message='hello',extra={}){\n await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)on conflict do nothing\",[r,id]);\n const s=await state(id);\n const result={reply:'safe reply',memory:['safe memory'],misakiTodayMemory:{date:'today',items:[]},relationshipPointDelta:0,rootUpdatedAt:s?.updated_at??null,forgetControlPayload:payload,...extra};\n return (await db.query('select complete_misaki_chat_turn($1,$2,$3,clock_timestamp(),$4::jsonb)result',[id,r,message,JSON.stringify(result)])).rows[0].result;\n}\ntest('migration: RLS/service-only surface, retired overloads and maintenance freeze',()=>isolated(async()=>{\n const privileges=(await db.query(`select has_table_privilege('authenticated','misaki_forget_controls','select') as readable,\n has_function_privilege('authenticated','edit_misaki_conversation_state(uuid,text,text,timestamptz,text)','execute') as editable,\n has_function_privilege('service_role','complete_misaki_chat_turn(uuid,uuid,text,timestamptz,jsonb)','execute') as service,\n to_regprocedure('save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid)') as retired`)).rows[0];\n assert.equal(privileges.readable,false);assert.equal(privileges.editable,false);assert.equal(privileges.service,true);assert.equal(privileges.retired,null);\n const id=await seed();await db.exec(\"savepoint frozen;select set_config('misaki.freeze','on',true)\");await assert.rejects(db.query('select persist_misaki_forget_controls($1,$2)',[id,payload]),/frozen/);await db.exec('rollback to frozen');assert.deepEqual(await controls(id),[]);\n}));\ntest('UI edit transaction commits memory removal/control together and preserves history/Relationship State',()=>isolated(async()=>{\n const id=await seed();await complete(id,randomUUID(),'弟は隆紀');const before=await state(id),relationship=await db.query('select * from misaki_relationship_state where user_id=$1',[id]);\n await db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',before.updated_at,payload]);\n const s=await state(id);assert.deepEqual(s.memory,[]);assert.deepEqual(s.history,before.history);assert.equal((await controls(id)).length,1);\n assert.deepEqual((await db.query('select * from misaki_relationship_state where user_id=$1',[id])).rows,relationship.rows);\n const snapshot=(await db.query('select long_term_memory from background_push_state where user_id=$1',[id])).rows[0];assert.deepEqual(snapshot.long_term_memory,[]);\n}));\ntest('UI invalid control or stale revision rolls back removal and control; double deletion stays one canonical row',()=>isolated(async()=>{\n const id=await seed();await complete(id,randomUUID());const before=await state(id);const original=(await controls(id))[0].payload;\n for(const args of [[before.updated_at,null],['2000-01-01T00:00:00Z',payload]]){\n  await db.exec('savepoint edit');await assert.rejects(db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',...args]));await db.exec('rollback to edit');assert.deepEqual((await state(id)).memory,before.memory);assert.equal((await controls(id))[0].payload,original);\n }\n for(let i=0;i<2;i++) await db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',(await state(id)).updated_at,payload]);\n assert.equal((await controls(id)).length,1);assert.deepEqual((await state(id)).memory,[]);\n}));\ntest('Soft Forget commit is atomic with chat receipt, quota proof and Body Clock snapshot; retry is idempotent',()=>isolated(async()=>{\n const id=await seed(),r=randomUUID(),a=await complete(id,r,'忘れて');const b=await complete(id,r,'忘れて');assert.deepEqual(a,b);assert.equal(a.forgetControlPayload,undefined);\n assert.equal((await controls(id)).length,1);assert.equal((await state(id)).history.length,2);\n assert.equal((await db.query(\"select count(*)::int n from misaki_relationship_events where user_id=$1 and event_type='chat_turn_completed'\",[id])).rows[0].n,1);\n}));\n// The real chat route produces the payload; the real migration RPC commits it.\n// Read DB columns directly, without passing through forgetContext/response masking.\nfor (const {invalidPayload,keepUnrelated} of [{invalidPayload:false,keepUnrelated:false},{invalidPayload:false,keepUnrelated:true},{invalidPayload:true,keepUnrelated:true}]) test(`Soft Forget real route -> RPC: ${invalidPayload?'failed write preserves both originals':keepUnrelated?'target removed, unrelated fact survives':'singleton canonical memory becomes empty; history survives'}`,()=>isolated(async()=>{\n const {harness}=require('./helpers/canonical-harness.cjs'),{judge}=require('./forget-fixture.cjs');\n const id=await seed(),h=harness();h.user.id=id;h.setSemanticJudge(judge);\n const remaining=keepUnrelated?['猫が好き']:[],original=['弟の名前は隆紀',...remaining];\n await complete(id,randomUUID(),'弟の名前は隆紀',{memory:original});\n Object.assign(h.rootState,await state(id));\n // Supabase returns timestamptz as a string; JS Date would truncate PG microseconds.\n h.rootState.updated_at=(await db.query('select updated_at::text value from misaki_user_conversation_state where user_id=$1',[id])).rows[0].value;\n const before=await state(id),oldPayload=(await controls(id))[0].payload;\n // The pre-existing SQL fixture ciphertext is replaced by a genuinely sealed empty vector.\n const shared=h.load('supabase/functions/_shared/forget-control.ts');\n const empty=await shared.sealForgetControls([],'server-only-test-key',id);\n await db.query('update misaki_forget_controls set payload=$2 where user_id=$1',[id,empty]);h.forgetPayloads.set(id,empty);\n h.setOpenaiPayload({reply:'うん、わかったよ。',memory:original,misakiTodayMemory:{items:[]}});\n const mockRpc=h.client.rpc.bind(h.client);let rpcError;\n h.client.rpc=async(name,args)=>{\n  if(name!=='complete_misaki_chat_turn_with_emotion') {\n   if(name==='consume_daily_message')await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[args.p_request_id,id]);\n   return mockRpc(name,args);\n  }\n  assert.deepEqual(Array.from(args.p_result.memory),remaining);\n  await db.exec('savepoint route_commit');\n  try {\n   const result={...args.p_result,...(invalidPayload?{forgetControlPayload:null}:{})};\n   const data=(await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,$4,$5::jsonb,$6::jsonb)result',[id,args.p_request_id,args.p_message,args.p_user_message_at,JSON.stringify(result),JSON.stringify(args.p_emotion_input)])).rows[0].result;\n   return {data,error:null};\n  } catch(error) {rpcError=error.message;await db.exec('rollback to route_commit');return {data:null,error:{message:error.message}};}\n };\n const requestId=randomUUID(),response=await h.load('app/api/chat/route.ts').POST(h.request({message:'隆紀のことは忘れて',requestId}));\n assert.equal(response.status,invalidPayload?500:200,rpcError??JSON.stringify(await response.json()));\n const stored=await state(id),encrypted=(await controls(id))[0].payload;\n if(invalidPayload){assert.match(rpcError,/forget payload/);assert.deepEqual(stored,before);assert.equal(encrypted,empty);}\n else {\n  assert.deepEqual(stored.memory,remaining);assert.ok(!JSON.stringify(stored.memory).includes('隆紀'));\n  assert.deepEqual(stored.history.slice(0,before.history.length),before.history);\n  assert.ok(stored.history.some(row=>row.text==='弟の名前は隆紀'));\n  const vector=await shared.openForgetControls(encrypted,'server-only-test-key',id);\n  assert.equal(vector.length,1);assert.equal(vector[0].mode,'soft_forget');assert.equal(vector[0].status,'active');assert.equal(vector[0].sourceRequestId,requestId);\n  const snapshot=(await db.query('select long_term_memory from background_push_state where user_id=$1',[id])).rows[0];assert.deepEqual(snapshot.long_term_memory,remaining);\n  const receipt=(await db.query(\"select metadata from misaki_relationship_events where user_id=$1 and request_id=$2 and event_type='chat_turn_completed'\",[id,requestId])).rows[0];\n  assert.ok(receipt);assert.notEqual(encrypted,oldPayload);\n }\n}));\ntest('failed control commit leaves no successful chat; Free refund works once; successful request cannot refund',()=>isolated(async()=>{\n const id=await seed(),r=randomUUID();await db.query('insert into daily_message_usage values($1,current_date,1,clock_timestamp())',[id]);\n await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[r,id]);\n await db.exec('savepoint failed');await assert.rejects(complete(id,r,'忘れて',{forgetControlPayload:null}),/forget payload/);await db.exec('rollback to failed');assert.deepEqual(await controls(id),[]);assert.equal(await state(id),undefined);\n await db.query(\"select set_config('request.jwt.claims',$1,true)\",[JSON.stringify({sub:id})]);let refund=(await db.query('select * from refund_daily_message($1)',[r])).rows[0];assert.equal(refund.refunded,true);refund=(await db.query('select * from refund_daily_message($1)',[r])).rows[0];assert.equal(refund.refunded,false);\n const good=randomUUID();await complete(id,good);await db.exec('savepoint refund');await assert.rejects(db.query('select * from refund_daily_message($1)',[good]),/completed chat turn cannot be refunded/);await db.exec('rollback to refund');\n}));\ntest('anonymous root checkpoint refresh and receipt retry preserve latest controls once; permanent reimport rejected',()=>isolated(async()=>{\n const id=await seed(true),r=randomUUID();await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[r,id]);\n const initial={history:[{role:'user',text:'弟は隆紀'}],memory:['弟は隆紀'],todayMemory:{date:'today',items:[]},relationshipPoints:0,forgetControlPayload:payload};\n const args=[id,r,'message-hash','parent-hash','encrypted-root-token',null,JSON.stringify(initial)];await db.query('select complete_misaki_temporary_turn($1,$2,$3,$4,$5,$6,$7::jsonb)',args);\n let rev=(await db.query('select revision from misaki_temporary_roots where user_id=$1',[id])).rows[0].revision;\n await db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,$5,$6::jsonb,$7,$8)',[id,JSON.stringify(initial.history),JSON.stringify(initial.memory),JSON.stringify(initial.todayMemory),0,null,rev,payload]);\n const latest={...initial,memory:[],history:[...initial.history,{role:'user',text:'忘れて'}],forgetControlPayload:payload+'updated'};\n await db.query('select write_misaki_temporary_root($1,$2,$3::jsonb,$4)',[id,'new-encrypted-root',JSON.stringify(latest),rev]);\n assert.deepEqual((await state(id)).memory,[]);assert.equal((await state(id)).history.length,2);assert.equal((await controls(id))[0].payload,payload+'updated');\n // Old receipt retries do not reapply old checkpoint/control.\n await db.query('select complete_misaki_temporary_turn($1,$2,$3,$4,$5,$6,$7::jsonb)',args);assert.equal((await controls(id))[0].payload,payload+'updated');\n await db.query('update auth.users set is_anonymous=false where id=$1',[id]);rev=(await db.query('select revision from misaki_temporary_roots where user_id=$1',[id])).rows[0].revision;\n await db.exec('savepoint imported');await assert.rejects(db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,$5,$6::jsonb,$7,$8)',[id,'[]','[]','{}',0,null,rev,payload]),/anonymous account required/);await db.exec('rollback to imported');assert.equal((await controls(id)).length,1);\n}));\n\ntest('canonical save invalidates the pre-generation CAS, but queued emotion safely resumes in order', () => isolated(async () => {\n  const id = await seed();\n  const stale = '2026-01-01T00:00:00Z';\n  await db.query('insert into misaki_relationship_state(user_id,state_updated_at) values($1,$2)', [id, stale]);\n  const first = randomUUID();\n  const second = randomUUID();\n  const enqueue = async request => {\n    const before = await state(id);\n    await db.query('insert into daily_message_requests(request_id,user_id,allowed,processed) values($1,$2,true,true) on conflict do nothing', [request,id]);\n    const result = { reply: 'fixture reply', memory: [], misakiTodayMemory: { date: '', items: [] },\n      rootUpdatedAt: before?.updated_at ?? null, forgetControlPayload: payload };\n    await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,clock_timestamp(),$4::jsonb,$5::jsonb)',\n      [id,request,'fixture',JSON.stringify(result),'{\"elapsedHours\":9}']);\n  };\n  await enqueue(first);\n  const legacy = await db.query(\"select apply_relationship_emotion_action_v2('happy',30,'",
+        "sha256": "ef022ee1dae85bc000e9a3ff6f12b792afa531c02b6ef6ee1b17c02f7b11a249"
+      }
+    }
+  ],
+  "file_count": 2,
+  "reported_file_count": 2,
+  "commits": [
+    {
+      "sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "message": "fix: preserve pending legacy anonymous checkpoints (#201)\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa"
+    }
+  ],
+  "comments": [],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004570",
+      "id": 44475004570,
+      "updated_at": "2026-11-19T06:49:47Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004594",
+      "id": 44475004594,
+      "updated_at": "2026-11-19T06:49:56Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004556",
+      "id": 44475004556,
+      "updated_at": "2026-11-19T06:50:42Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Development inventory (read-only)",
+      "head_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+      "conclusion": null,
+      "status": "in_progress",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475221824",
+      "id": 44475221824,
+      "updated_at": "2026-11-19T06:51:26Z",
+      "event": "push"
+    },
+    {
+      "name": "Ledger facts proposal PR (review required)",
+      "head_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+      "conclusion": null,
+      "status": "in_progress",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475221852",
+      "id": 44475221852,
+      "updated_at": "2026-11-19T06:51:26Z",
+      "event": "push"
+    }
+  ],
+  "symbols": [
+    "args",
+    "assert",
+    "auth",
+    "b",
+    "base",
+    "before",
+    "complete",
+    "controls",
+    "data",
+    "db",
+    "empty",
+    "enqueue",
+    "events",
+    "first",
+    "fs",
+    "good",
+    "history",
+    "i",
+    "id",
+    "initial",
+    "isolated",
+    "latest",
+    "legacy",
+    "memory",
+    "migration",
+    "misaki_operations",
+    "mockRpc",
+    "original",
+    "path",
+    "payload",
+    "previousEvents",
+    "previousRelationship",
+    "privileges",
+    "public",
+    "read",
+    "receipt",
+    "refund",
+    "relationship",
+    "remaining",
+    "requestId",
+    "result",
+    "rev",
+    "root",
+    "rpcError",
+    "s",
+    "second",
+    "seed",
+    "shared",
+    "snapshot",
+    "stale",
+    "state",
+    "stored",
+    "today",
+    "vector"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "80961a1d7060b6e31bd159f0b408ef43883004619285ea06b98e20f5379de1a5",
+  "ci_digest": "1de21fc0db32ac25319aa8f4426804c9b4807f602a664272935561196d430063",
+  "collected_at": "2026-11-19T06:51:34.759999+00:00",
+  "decisions": []
+}

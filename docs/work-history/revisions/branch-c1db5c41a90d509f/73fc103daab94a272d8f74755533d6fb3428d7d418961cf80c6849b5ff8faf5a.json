@@ -1,0 +1,18 @@
+{
+  "id": "branch-c1db5c41a90d509f",
+  "title": "sora/relationship-processing-error-diagnostics",
+  "head": "867e227b7d2efb31c214d248e94b26e390e9f845",
+  "head_ref": "sora/relationship-processing-error-diagnostics",
+  "linked_prs": [],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "PR未関連のブランチ差分",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "fab0a52f47aaeb6ce23ead5d5e53b1cb8ad427fc16052f7c47d4ee9857e747a0",
+  "collected_at": "2026-11-19T06:51:34.759999+00:00"
+}

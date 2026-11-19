@@ -1,8 +1,219 @@
 {
   "schema_version": 3,
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T05:53:51.095379+00:00",
+  "generated_at": "2026-11-19T06:51:34.759999+00:00",
   "cases": {
+    "pr-203": {
+      "id": "pr-203",
+      "number": 203,
+      "title": "fix: preserve existing anonymous email checkpoints (#201)",
+      "topics": [
+        "その他の開発"
+      ],
+      "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+      "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+      "body": "関連 #201。承認済みの旧匿名チェックポイントの保全を、未適用の登録確認migrationに追加。期限情報が存在するチェックポイントは従来の24時間再判定を継続する。既存のPGliteハーネスに旧データの登録確認回帰を追加し、対象12件成功。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-193\",\"decision\":\"extend\",\"reason\":\"既存の登録確認時期限再判定を保持し、期限メタデータがない既存確認待ちだけを保全する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-1\",\"decision\":\"reuse\",\"reason\":\"同一IDのメール確認移行と既存チェックポイントを再利用する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-101\",\"decision\":\"reuse\",\"reason\":\"既存の出典と期限の設計を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/101\"},{\"id\":\"pr-191\",\"decision\":\"reuse\",\"reason\":\"既存の発言時刻に基づく期限再判定を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/191\"},{\"id\":\"pr-190\",\"decision\":\"distinct\",\"reason\":\"明示的な期限切れrootの物理削除とは別のメール確認互換性を扱う\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/190\"},{\"id\":\"pr-66\",\"decision\":\"reuse\",\"reason\":\"既存の忘却・再学習の保存と検証基盤を保持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/66\"}]}\n-->",
+      "snapshot_head": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "snapshot_consistent": true,
+      "head": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "base": "e8d94c422fb8fc1bd5e3f942c3017b9b31e792ec",
+      "base_ref": "main",
+      "head_ref": "fix/legacy-anonymous-confirmation-201",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "draft": false,
+      "merged_at": "2026-11-19T06:51:19Z",
+      "merge_commit_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+      "updated_at": "2026-11-19T06:51:20Z",
+      "code_facts": [
+        {
+          "file": "tests/forget-database.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+        },
+        {
+          "file": "tests/forget-database.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual(await state(id), before);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+        },
+        {
+          "file": "tests/forget-database.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual((await relationship()).rows, previousRelationship);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+        },
+        {
+          "file": "tests/forget-database.test.cjs",
+          "kind": "テストの期待値・条件",
+          "expression": "assert.deepEqual((await events()).rows, previousEvents);",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+        }
+      ],
+      "files": [
+        {
+          "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+          "status": "modified",
+          "additions": 3,
+          "deletions": 1,
+          "patch": "diff --git a/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql b/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\nindex be3d5d5a..dd9d83f3 100644\n--- a/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\n+++ b/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql\n@@ -64,7 +64,9 @@ declare\n begin\n   select metadata->'anonymousExpiry' into v_times from public.misaki_relationship_events\n   where user_id = new.id and event_type = 'email_save_checkpoint';\n-  if not found then return new; end if;\n+  -- Legacy checkpoints predate expiry metadata. Preserve the saved snapshot\n+  -- when confirming a registration that was pending before this migration.\n+  if not found or v_times is null then return new; end if;\n \n   select coalesce((select jsonb_agg(item order by ord)\n       from jsonb_array_elements(c.history) with ordinality h(item,ord)\n",
+          "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+          "source": {
+            "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+            "coverage": "全文",
+            "text": "-- Recheck anonymous checkpoint ages at the auth transition, which can occur\n-- long after the user requested a confirmation email.\nalter function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  rename to save_misaki_temporary_state_unstamped;\n\ncreate function public.save_misaki_temporary_state(\n  p_user_id uuid, p_history jsonb, p_memory jsonb, p_today_memory jsonb,\n  p_points integer, p_relationship jsonb, p_expected_revision uuid, p_forget_payload text\n) returns jsonb language plpgsql security invoker set search_path = '' as $$\ndeclare v_result jsonb;\nbegin\n  v_result := public.save_misaki_temporary_state_unstamped(p_user_id,p_history,p_memory,\n    p_today_memory,p_points,p_relationship - 'anonymousExpiry',p_expected_revision,p_forget_payload);\n  update public.misaki_relationship_events\n  set metadata = metadata || jsonb_build_object('anonymousExpiry',p_relationship->'anonymousExpiry')\n  where user_id = p_user_id and event_type = 'email_save_checkpoint';\n  return v_result;\nend;\n$$;\n\nrevoke all on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  from public,anon,authenticated;\ngrant execute on function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid,text)\n  to service_role;\n\ncreate function public.filter_misaki_anonymous_checkpoint_items(p_items jsonb, p_times jsonb, p_now_ms numeric)\nreturns jsonb language sql immutable set search_path = '' as $$\n  select coalesce(jsonb_agg(item order by ord), '[]'::jsonb)\n  from jsonb_array_elements(coalesce(p_items,'[]'::jsonb)) with ordinality a(item, ord)\n  where exists (\n    select 1 from jsonb_array_elements(case when jsonb_typeof(p_times)='array' then p_times else '[]'::jsonb end) t\n    where t->0 = item\n      and case when jsonb_typeof(t->1)='number' then\n        (t->>1)::numeric > p_now_ms - 86400000 and (t->>1)::numeric <= p_now_ms\n      else false end\n  );\n$$;\nrevoke all on function public.filter_misaki_anonymous_checkpoint_items(jsonb,jsonb,numeric) from public,anon,authenticated;\n\ncreate function public.is_misaki_fresh_checkpoint_message(p_sent_at text, p_now timestamptz)\nreturns boolean language plpgsql stable set search_path = '' as $$\ndeclare v_sent_at timestamptz;\nbegin\n  if p_sent_at is null or p_sent_at !~ '^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{3})?Z$' then\n    return false;\n  end if;\n  v_sent_at := p_sent_at::timestamptz;\n  return v_sent_at > p_now - interval '24 hours' and v_sent_at <= p_now;\nexception when invalid_datetime_format or datetime_field_overflow then\n  return false;\nend;\n$$;\nrevoke all on function public.is_misaki_fresh_checkpoint_message(text,timestamptz) from public,anon,authenticated;\n\ncreate function public.expire_misaki_anonymous_checkpoint_on_confirmation()\nreturns trigger language plpgsql security definer set search_path = '' as $$\ndeclare\n  v_times jsonb;\n  v_now timestamptz := clock_timestamp();\n  v_now_ms numeric := extract(epoch from v_now)*1000;\n  v_history jsonb;\n  v_memory jsonb;\n  v_today jsonb;\nbegin\n  select metadata->'anonymousExpiry' into v_times from public.misaki_relationship_events\n  where user_id = new.id and event_type = 'email_save_checkpoint';\n  -- Legacy checkpoints predate expiry metadata. Preserve the saved snapshot\n  -- when confirming a registration that was pending before this migration.\n  if not found or v_times is null then return new; end if;\n\n  select coalesce((select jsonb_agg(item order by ord)\n      from jsonb_array_elements(c.history) with ordinality h(item,ord)\n      where public.is_misaki_fresh_checkpoint_message(item->>'sentAt',v_now)), '[]'::jsonb),\n    public.filter_misaki_anonymous_checkpoint_items(c.memory,v_times->'memory',v_now_ms),\n    jsonb_set(c.today_memory,'{items}',\n      public.filter_misaki_anonymous_checkpoint_items(c.today_memory->'items',v_times->'today',v_now_ms))\n  into v_history,v_memory,v_today\n  from public.misaki_user_conversation_state c where c.user_id=new.id;\n\n  if found then\n    update public.misaki_user_conversation_state set history=v_history,memory=v_memory,today_memory=v_today,\n      message_count=jsonb_array_length(v_history),\n      user_message_count=(select count(*) from jsonb_array_elements(v_history) h where h->>'role'='user'),\n      updated_at=v_now where user_id=new.id;\n    update public.background_push_state set recent_history=v_history,long_term_memory=v_memory,\n      today_memory=v_today,updated_at=v_now where user_id=new.id;\n  end if;\n\n  if not coalesce((v_times->>'relationship')::numeric > v_now_ms-86400000\n    and (v_times->>'relationship')::numeric <= v_now_ms,false) then\n    update public.misaki_relationship_state set intimacy_points=0,intimacy_level='initial',\n      emotion_state=jsonb_build_object('primary','neutral','intensity',0),\n      action_state='NORMAL',last_interaction_at=null,state_updated_at=v_now where user_id=new.id;\n    delete from public.misaki_relationship_events where user_id=new.id and event_type='temporary_relationship_checkpoint';\n  end if;\n\n  update public.misaki_relationship_events set metadata=metadata-'anonymousExpiry'\n  where user_id=new.id and event_type='email_save_checkpoint';\n  return new;\nend;\n$$;\n\nrevoke all on function public.expire_misaki_anonymous_checkpoint_on_confirmation() from public,anon,authenticated;\ncreate trigger misaki_expire_anonymous_checkpoint_on_confirmation\nafter update of is_anonymous on auth.users for each row\nwhen (old.is_anonymous and not new.is_anonymous)\nexecute function public.expire_misaki_anonymous_checkpoint_on_confirmation();\n",
+            "sha256": "d1b48763b97ed20d7872dee8a9342d1d191d50291a4e555b1fac221db95ad4a1"
+          }
+        },
+        {
+          "path": "tests/forget-database.test.cjs",
+          "status": "modified",
+          "additions": 19,
+          "deletions": 0,
+          "patch": "diff --git a/tests/forget-database.test.cjs b/tests/forget-database.test.cjs\nindex bb21ee9e..cd126a8c 100644\n--- a/tests/forget-database.test.cjs\n+++ b/tests/forget-database.test.cjs\n@@ -229,3 +229,22 @@ test('delayed email confirmation rechecks anonymous expiry before permanent read\n   await db.query('update auth.users set is_anonymous=false where id=$1',[registered]);\n   assert.deepEqual((await state(registered)).memory, ['safe memory']);\n }));\n+\n+test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {\n+  const id = await seed(true);\n+  const history = [{ role: 'user', text: 'legacy chat', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() }];\n+  const memory = ['legacy memory'];\n+  const today = { date: 'test', items: ['legacy summary'] };\n+  await db.query('select save_misaki_temporary_state_unstamped($1,$2::jsonb,$3::jsonb,$4::jsonb,40,$5::jsonb,null,$6)',\n+    [id, JSON.stringify(history), JSON.stringify(memory), JSON.stringify(today),\n+      JSON.stringify({ emotionPrimary: 'happy' }), payload]);\n+  const before = await state(id);\n+  const relationship = () => db.query('select * from misaki_relationship_state where user_id=$1', [id]);\n+  const events = () => db.query('select * from misaki_relationship_events where user_id=$1 order by id', [id]);\n+  const previousRelationship = (await relationship()).rows;\n+  const previousEvents = (await events()).rows;\n+  await db.query('update auth.users set is_anonymous=false where id=$1', [id]);\n+  assert.deepEqual(await state(id), before);\n+  assert.deepEqual((await relationship()).rows, previousRelationship);\n+  assert.deepEqual((await events()).rows, previousEvents);\n+}));\n",
+          "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs",
+          "source": {
+            "path": "tests/forget-database.test.cjs",
+            "coverage": "先頭18000文字・原本リンク参照",
+            "text": "const {test,before,after}=require('node:test');\nconst assert=require('node:assert/strict');\nconst fs=require('node:fs');\nconst path=require('node:path');\nconst {randomUUID}=require('node:crypto');\nconst {PGlite}=require('@electric-sql/pglite');\nconst root=path.join(__dirname,'..');let db;\nconst read=p=>fs.readFileSync(path.join(root,p),'utf8');\nbefore(async()=>{\n db=new PGlite();\n await db.exec(`\n create role anon;create role authenticated;create role service_role bypassrls;\n create schema auth;create schema misaki_operations;\n create table auth.users(id uuid primary key,is_anonymous boolean default false);\n create function auth.uid() returns uuid language sql as $$select (nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')::uuid$$;\n `);\n await db.exec(`\n create function misaki_operations.guard_root_write() returns trigger language plpgsql as $$begin\n if current_setting('misaki.freeze',true)='on' then raise exception 'writes frozen';end if;return null;end$$;\n create table public.misaki_user_conversation_state(user_id uuid primary key,history jsonb default '[]',memory jsonb default '[]',today_memory jsonb default '{\"date\":\"\",\"items\":[]}',message_count int default 0,user_message_count int default 0,updated_at timestamptz default clock_timestamp());\n create table public.misaki_relationship_state(user_id uuid primary key,intimacy_points int default 0,intimacy_level text,intimacy_migrated_at timestamptz,state_updated_at timestamptz,last_user_message_at timestamptz,last_misaki_message_at timestamptz,last_interaction_at timestamptz,silence_started_at timestamptz,emotion_state jsonb,action_state text);\n create table public.background_push_state(user_id uuid primary key,recent_history jsonb,long_term_memory jsonb,today_memory jsonb,updated_at timestamptz);\n create table public.misaki_relationship_events(id bigserial primary key,user_id uuid,event_type text,request_id uuid,before_state jsonb,after_state jsonb,reason text,metadata jsonb,created_at timestamptz default clock_timestamp());\n create unique index completed_request on public.misaki_relationship_events(user_id,request_id) where event_type='chat_turn_completed';\n create unique index email_checkpoint on public.misaki_relationship_events(user_id) where event_type='email_save_checkpoint';\n create table public.daily_message_requests(request_id uuid primary key,user_id uuid,allowed boolean,processed boolean,refunded_at timestamptz,completed_at timestamptz,temporary_result text,message_hash text,parent_hash text,usage_date date,is_premium boolean,message_count int,remaining int);\n create table public.daily_message_usage(user_id uuid,usage_date date,message_count int,updated_at timestamptz,primary key(user_id,usage_date));\n create table public.misaki_temporary_roots(user_id uuid primary key,token text,revision uuid,expires_at timestamptz);\n create function public.edit_misaki_conversation_state(uuid,text,text default null) returns jsonb language sql as $$select '{}'::jsonb$$;\n create function public.save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb default null,uuid default null) returns jsonb language sql as $$select '{}'::jsonb$$;\n `);\n const base=read('supabase/migrations/20260918073918_canonical_misaki_root_state.sql');\n // Execute the actual existing temporary receipt writer and completed-turn refund guard.\n await db.exec(base.slice(base.indexOf('create function public.complete_misaki_temporary_turn'),base.indexOf('-- Refreshable pre-confirmation')));\n await db.exec(read('supabase/migrations/20260918081000_refund_failed_chat_usage.sql'));\n await db.exec(base.slice(base.indexOf('create function public.guard_misaki_completed_turn_refund'),base.indexOf('-- All temporary writers')));\n const migration=fs.readdirSync(path.join(root,'supabase/migrations')).find(x=>x.endsWith('_forget_control_v1.sql'));\n await db.exec(read('supabase/migrations/'+migration));\n await db.exec(\"create function auth.role() returns text language sql as $$select 'service_role'::text$$\");\n await db.exec(read('supabase/migrations/20260926003000_relationship_emotion_action_v2_rpc.sql'));\n await db.exec(read('supabase/migrations/20261112082000_relationship_emotion_resume.sql'));\n await db.exec(read('supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql'));\n await db.exec(read('supabase/migrations/20261112084000_relationship_emotion_recovery.sql'));\n await db.exec('grant usage on schema public,auth,misaki_operations to service_role,authenticated;grant select,insert,update on all tables in schema public to service_role;grant select on auth.users to service_role;grant usage,select on all sequences in schema public to service_role;');\n});\nafter(async()=>{if(db)await db.close();});\nasync function isolated(fn){await db.exec('begin');try{await fn();}finally{await db.exec('rollback');}}\nconst payload='encrypted-owner-bound-fixture'.repeat(3);\nasync function seed(anonymous=false){const id=randomUUID();await db.query('insert into auth.users values($1,$2)',[id,anonymous]);await db.query('insert into background_push_state(user_id)values($1)',[id]);return id;}\nasync function state(id){return (await db.query('select * from misaki_user_conversation_state where user_id=$1',[id])).rows[0];}\nasync function controls(id){return (await db.query('select * from misaki_forget_controls where user_id=$1',[id])).rows;}\nasync function complete(id,r,message='hello',extra={}){\n await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)on conflict do nothing\",[r,id]);\n const s=await state(id);\n const result={reply:'safe reply',memory:['safe memory'],misakiTodayMemory:{date:'today',items:[]},relationshipPointDelta:0,rootUpdatedAt:s?.updated_at??null,forgetControlPayload:payload,...extra};\n return (await db.query('select complete_misaki_chat_turn($1,$2,$3,clock_timestamp(),$4::jsonb)result',[id,r,message,JSON.stringify(result)])).rows[0].result;\n}\ntest('migration: RLS/service-only surface, retired overloads and maintenance freeze',()=>isolated(async()=>{\n const privileges=(await db.query(`select has_table_privilege('authenticated','misaki_forget_controls','select') as readable,\n has_function_privilege('authenticated','edit_misaki_conversation_state(uuid,text,text,timestamptz,text)','execute') as editable,\n has_function_privilege('service_role','complete_misaki_chat_turn(uuid,uuid,text,timestamptz,jsonb)','execute') as service,\n to_regprocedure('save_misaki_temporary_state(uuid,jsonb,jsonb,jsonb,integer,jsonb,uuid)') as retired`)).rows[0];\n assert.equal(privileges.readable,false);assert.equal(privileges.editable,false);assert.equal(privileges.service,true);assert.equal(privileges.retired,null);\n const id=await seed();await db.exec(\"savepoint frozen;select set_config('misaki.freeze','on',true)\");await assert.rejects(db.query('select persist_misaki_forget_controls($1,$2)',[id,payload]),/frozen/);await db.exec('rollback to frozen');assert.deepEqual(await controls(id),[]);\n}));\ntest('UI edit transaction commits memory removal/control together and preserves history/Relationship State',()=>isolated(async()=>{\n const id=await seed();await complete(id,randomUUID(),'弟は隆紀');const before=await state(id),relationship=await db.query('select * from misaki_relationship_state where user_id=$1',[id]);\n await db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',before.updated_at,payload]);\n const s=await state(id);assert.deepEqual(s.memory,[]);assert.deepEqual(s.history,before.history);assert.equal((await controls(id)).length,1);\n assert.deepEqual((await db.query('select * from misaki_relationship_state where user_id=$1',[id])).rows,relationship.rows);\n const snapshot=(await db.query('select long_term_memory from background_push_state where user_id=$1',[id])).rows[0];assert.deepEqual(snapshot.long_term_memory,[]);\n}));\ntest('UI invalid control or stale revision rolls back removal and control; double deletion stays one canonical row',()=>isolated(async()=>{\n const id=await seed();await complete(id,randomUUID());const before=await state(id);const original=(await controls(id))[0].payload;\n for(const args of [[before.updated_at,null],['2000-01-01T00:00:00Z',payload]]){\n  await db.exec('savepoint edit');await assert.rejects(db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',...args]));await db.exec('rollback to edit');assert.deepEqual((await state(id)).memory,before.memory);assert.equal((await controls(id))[0].payload,original);\n }\n for(let i=0;i<2;i++) await db.query('select edit_misaki_conversation_state($1,$2,$3,$4,$5)',[id,'deleteMemory','safe memory',(await state(id)).updated_at,payload]);\n assert.equal((await controls(id)).length,1);assert.deepEqual((await state(id)).memory,[]);\n}));\ntest('Soft Forget commit is atomic with chat receipt, quota proof and Body Clock snapshot; retry is idempotent',()=>isolated(async()=>{\n const id=await seed(),r=randomUUID(),a=await complete(id,r,'忘れて');const b=await complete(id,r,'忘れて');assert.deepEqual(a,b);assert.equal(a.forgetControlPayload,undefined);\n assert.equal((await controls(id)).length,1);assert.equal((await state(id)).history.length,2);\n assert.equal((await db.query(\"select count(*)::int n from misaki_relationship_events where user_id=$1 and event_type='chat_turn_completed'\",[id])).rows[0].n,1);\n}));\n// The real chat route produces the payload; the real migration RPC commits it.\n// Read DB columns directly, without passing through forgetContext/response masking.\nfor (const {invalidPayload,keepUnrelated} of [{invalidPayload:false,keepUnrelated:false},{invalidPayload:false,keepUnrelated:true},{invalidPayload:true,keepUnrelated:true}]) test(`Soft Forget real route -> RPC: ${invalidPayload?'failed write preserves both originals':keepUnrelated?'target removed, unrelated fact survives':'singleton canonical memory becomes empty; history survives'}`,()=>isolated(async()=>{\n const {harness}=require('./helpers/canonical-harness.cjs'),{judge}=require('./forget-fixture.cjs');\n const id=await seed(),h=harness();h.user.id=id;h.setSemanticJudge(judge);\n const remaining=keepUnrelated?['猫が好き']:[],original=['弟の名前は隆紀',...remaining];\n await complete(id,randomUUID(),'弟の名前は隆紀',{memory:original});\n Object.assign(h.rootState,await state(id));\n // Supabase returns timestamptz as a string; JS Date would truncate PG microseconds.\n h.rootState.updated_at=(await db.query('select updated_at::text value from misaki_user_conversation_state where user_id=$1',[id])).rows[0].value;\n const before=await state(id),oldPayload=(await controls(id))[0].payload;\n // The pre-existing SQL fixture ciphertext is replaced by a genuinely sealed empty vector.\n const shared=h.load('supabase/functions/_shared/forget-control.ts');\n const empty=await shared.sealForgetControls([],'server-only-test-key',id);\n await db.query('update misaki_forget_controls set payload=$2 where user_id=$1',[id,empty]);h.forgetPayloads.set(id,empty);\n h.setOpenaiPayload({reply:'うん、わかったよ。',memory:original,misakiTodayMemory:{items:[]}});\n const mockRpc=h.client.rpc.bind(h.client);let rpcError;\n h.client.rpc=async(name,args)=>{\n  if(name!=='complete_misaki_chat_turn_with_emotion') {\n   if(name==='consume_daily_message')await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[args.p_request_id,id]);\n   return mockRpc(name,args);\n  }\n  assert.deepEqual(Array.from(args.p_result.memory),remaining);\n  await db.exec('savepoint route_commit');\n  try {\n   const result={...args.p_result,...(invalidPayload?{forgetControlPayload:null}:{})};\n   const data=(await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,$4,$5::jsonb,$6::jsonb)result',[id,args.p_request_id,args.p_message,args.p_user_message_at,JSON.stringify(result),JSON.stringify(args.p_emotion_input)])).rows[0].result;\n   return {data,error:null};\n  } catch(error) {rpcError=error.message;await db.exec('rollback to route_commit');return {data:null,error:{message:error.message}};}\n };\n const requestId=randomUUID(),response=await h.load('app/api/chat/route.ts').POST(h.request({message:'隆紀のことは忘れて',requestId}));\n assert.equal(response.status,invalidPayload?500:200,rpcError??JSON.stringify(await response.json()));\n const stored=await state(id),encrypted=(await controls(id))[0].payload;\n if(invalidPayload){assert.match(rpcError,/forget payload/);assert.deepEqual(stored,before);assert.equal(encrypted,empty);}\n else {\n  assert.deepEqual(stored.memory,remaining);assert.ok(!JSON.stringify(stored.memory).includes('隆紀'));\n  assert.deepEqual(stored.history.slice(0,before.history.length),before.history);\n  assert.ok(stored.history.some(row=>row.text==='弟の名前は隆紀'));\n  const vector=await shared.openForgetControls(encrypted,'server-only-test-key',id);\n  assert.equal(vector.length,1);assert.equal(vector[0].mode,'soft_forget');assert.equal(vector[0].status,'active');assert.equal(vector[0].sourceRequestId,requestId);\n  const snapshot=(await db.query('select long_term_memory from background_push_state where user_id=$1',[id])).rows[0];assert.deepEqual(snapshot.long_term_memory,remaining);\n  const receipt=(await db.query(\"select metadata from misaki_relationship_events where user_id=$1 and request_id=$2 and event_type='chat_turn_completed'\",[id,requestId])).rows[0];\n  assert.ok(receipt);assert.notEqual(encrypted,oldPayload);\n }\n}));\ntest('failed control commit leaves no successful chat; Free refund works once; successful request cannot refund',()=>isolated(async()=>{\n const id=await seed(),r=randomUUID();await db.query('insert into daily_message_usage values($1,current_date,1,clock_timestamp())',[id]);\n await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[r,id]);\n await db.exec('savepoint failed');await assert.rejects(complete(id,r,'忘れて',{forgetControlPayload:null}),/forget payload/);await db.exec('rollback to failed');assert.deepEqual(await controls(id),[]);assert.equal(await state(id),undefined);\n await db.query(\"select set_config('request.jwt.claims',$1,true)\",[JSON.stringify({sub:id})]);let refund=(await db.query('select * from refund_daily_message($1)',[r])).rows[0];assert.equal(refund.refunded,true);refund=(await db.query('select * from refund_daily_message($1)',[r])).rows[0];assert.equal(refund.refunded,false);\n const good=randomUUID();await complete(id,good);await db.exec('savepoint refund');await assert.rejects(db.query('select * from refund_daily_message($1)',[good]),/completed chat turn cannot be refunded/);await db.exec('rollback to refund');\n}));\ntest('anonymous root checkpoint refresh and receipt retry preserve latest controls once; permanent reimport rejected',()=>isolated(async()=>{\n const id=await seed(true),r=randomUUID();await db.query(\"insert into daily_message_requests(request_id,user_id,allowed,processed,is_premium,usage_date)values($1,$2,true,true,false,current_date)\",[r,id]);\n const initial={history:[{role:'user',text:'弟は隆紀'}],memory:['弟は隆紀'],todayMemory:{date:'today',items:[]},relationshipPoints:0,forgetControlPayload:payload};\n const args=[id,r,'message-hash','parent-hash','encrypted-root-token',null,JSON.stringify(initial)];await db.query('select complete_misaki_temporary_turn($1,$2,$3,$4,$5,$6,$7::jsonb)',args);\n let rev=(await db.query('select revision from misaki_temporary_roots where user_id=$1',[id])).rows[0].revision;\n await db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,$5,$6::jsonb,$7,$8)',[id,JSON.stringify(initial.history),JSON.stringify(initial.memory),JSON.stringify(initial.todayMemory),0,null,rev,payload]);\n const latest={...initial,memory:[],history:[...initial.history,{role:'user',text:'忘れて'}],forgetControlPayload:payload+'updated'};\n await db.query('select write_misaki_temporary_root($1,$2,$3::jsonb,$4)',[id,'new-encrypted-root',JSON.stringify(latest),rev]);\n assert.deepEqual((await state(id)).memory,[]);assert.equal((await state(id)).history.length,2);assert.equal((await controls(id))[0].payload,payload+'updated');\n // Old receipt retries do not reapply old checkpoint/control.\n await db.query('select complete_misaki_temporary_turn($1,$2,$3,$4,$5,$6,$7::jsonb)',args);assert.equal((await controls(id))[0].payload,payload+'updated');\n await db.query('update auth.users set is_anonymous=false where id=$1',[id]);rev=(await db.query('select revision from misaki_temporary_roots where user_id=$1',[id])).rows[0].revision;\n await db.exec('savepoint imported');await assert.rejects(db.query('select save_misaki_temporary_state($1,$2::jsonb,$3::jsonb,$4::jsonb,$5,$6::jsonb,$7,$8)',[id,'[]','[]','{}',0,null,rev,payload]),/anonymous account required/);await db.exec('rollback to imported');assert.equal((await controls(id)).length,1);\n}));\n\ntest('canonical save invalidates the pre-generation CAS, but queued emotion safely resumes in order', () => isolated(async () => {\n  const id = await seed();\n  const stale = '2026-01-01T00:00:00Z';\n  await db.query('insert into misaki_relationship_state(user_id,state_updated_at) values($1,$2)', [id, stale]);\n  const first = randomUUID();\n  const second = randomUUID();\n  const enqueue = async request => {\n    const before = await state(id);\n    await db.query('insert into daily_message_requests(request_id,user_id,allowed,processed) values($1,$2,true,true) on conflict do nothing', [request,id]);\n    const result = { reply: 'fixture reply', memory: [], misakiTodayMemory: { date: '', items: [] },\n      rootUpdatedAt: before?.updated_at ?? null, forgetControlPayload: payload };\n    await db.query('select complete_misaki_chat_turn_with_emotion($1,$2,$3,clock_timestamp(),$4::jsonb,$5::jsonb)',\n      [id,request,'fixture',JSON.stringify(result),'{\"elapsedHours\":9}']);\n  };\n  await enqueue(first);\n  const legacy = await db.query(\"select apply_relationship_emotion_action_v2('happy',30,'",
+            "sha256": "ef022ee1dae85bc000e9a3ff6f12b792afa531c02b6ef6ee1b17c02f7b11a249"
+          }
+        }
+      ],
+      "file_count": 2,
+      "reported_file_count": 2,
+      "commits": [
+        {
+          "sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+          "message": "fix: preserve pending legacy anonymous checkpoints (#201)\n",
+          "url": "https://github.com/miyazaki1016/misaki/commit/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa"
+        }
+      ],
+      "comments": [],
+      "reviews": [],
+      "runs": [
+        {
+          "name": "PR promotion classification (review only)",
+          "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004570",
+          "id": 44475004570,
+          "updated_at": "2026-11-19T06:49:47Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Existing work preflight (read-only)",
+          "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004594",
+          "id": 44475004594,
+          "updated_at": "2026-11-19T06:49:56Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Canonical relationship integration tests",
+          "head_sha": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+          "conclusion": "success",
+          "status": "completed",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475004556",
+          "id": 44475004556,
+          "updated_at": "2026-11-19T06:50:42Z",
+          "event": "pull_request"
+        },
+        {
+          "name": "Development inventory (read-only)",
+          "head_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+          "conclusion": null,
+          "status": "in_progress",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475221824",
+          "id": 44475221824,
+          "updated_at": "2026-11-19T06:51:26Z",
+          "event": "push"
+        },
+        {
+          "name": "Ledger facts proposal PR (review required)",
+          "head_sha": "d8adfe8679a04ae44ec084484abd57f28ae1cc17",
+          "conclusion": null,
+          "status": "in_progress",
+          "url": "https://github.com/miyazaki1016/misaki/actions/runs/44475221852",
+          "id": 44475221852,
+          "updated_at": "2026-11-19T06:51:26Z",
+          "event": "push"
+        }
+      ],
+      "symbols": [
+        "args",
+        "assert",
+        "auth",
+        "b",
+        "base",
+        "before",
+        "complete",
+        "controls",
+        "data",
+        "db",
+        "empty",
+        "enqueue",
+        "events",
+        "first",
+        "fs",
+        "good",
+        "history",
+        "i",
+        "id",
+        "initial",
+        "isolated",
+        "latest",
+        "legacy",
+        "memory",
+        "migration",
+        "misaki_operations",
+        "mockRpc",
+        "original",
+        "path",
+        "payload",
+        "previousEvents",
+        "previousRelationship",
+        "privileges",
+        "public",
+        "read",
+        "receipt",
+        "refund",
+        "relationship",
+        "remaining",
+        "requestId",
+        "result",
+        "rev",
+        "root",
+        "rpcError",
+        "s",
+        "second",
+        "seed",
+        "shared",
+        "snapshot",
+        "stale",
+        "state",
+        "stored",
+        "today",
+        "vector"
+      ],
+      "related_sources": [],
+      "curated": {},
+      "implementation": "変更差分を取得。実装の受入完了は未認定",
+      "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "fingerprint": "80961a1d7060b6e31bd159f0b408ef43883004619285ea06b98e20f5379de1a5",
+      "ci_digest": "1de21fc0db32ac25319aa8f4426804c9b4807f602a664272935561196d430063",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00",
+      "decisions": []
+    },
     "pr-202": {
       "id": "pr-202",
       "number": 202,
@@ -79117,8 +79328,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1e1a8f50a3e8a2ffc8633cc635aa37d2b1e618a1d18dde752a2f3958b46a97fc",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "76f822e834b1405b17c2e362ff6dfa554e50e6b223ad09f5f182b2cc31f9dbaa",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-699adc5f9e8099e3": {
       "id": "branch-699adc5f9e8099e3",
@@ -79147,8 +79358,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c5d41e4e130a915cd8ebe79486daf6a5e964c54b51456530bbcbcf9c86ccf8b6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "dbf688180907649d6b8a8115e38d1208e88f3bcebddbf5bb38ea8994712e5ac9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-dea6baa9f1465516": {
       "id": "branch-dea6baa9f1465516",
@@ -79177,8 +79388,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ecafdb1542f83a6d7455bafcf9047fa672037e9aa8071994e9e10934ec41d2de",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f3382ddc6e92ee668676cad7779b7b919300f5df3c2c721e472f0c3afb579d75",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-6f41a36fd2504cca": {
       "id": "branch-6f41a36fd2504cca",
@@ -79207,8 +79418,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a19017412dd00234a543c709e51e86037fd9482f3d455497455ba367dbdd6029",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "324b17e085fcc314c1850780b925d10c108a46611cba0a3c2c2f10b2ac977d43",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3859ee93cef9cfbc": {
       "id": "branch-3859ee93cef9cfbc",
@@ -79237,8 +79448,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "16a21b34f17ba6bc03d4cf1055ced7af4573d51e44d59fca0b10943b1bbe8872",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c0720cc7b980a363f9af54bd623c54b834517f65a18ed88a0b9e551998ea8cd0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-18f1db99a439fd75": {
       "id": "branch-18f1db99a439fd75",
@@ -79267,8 +79478,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bb84f570d1f3005e01f5f56009bc909b1ad525c8544906601e58ac46452ef166",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "8d6d2a647ccd176981d62c42fed495f9e28b7c66f0bd49ee2ff12c707fd63b4e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-6e52c79b9fbe4821": {
       "id": "branch-6e52c79b9fbe4821",
@@ -79297,8 +79508,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "34c2b9be9cb159851466baf0e0526572bcdc27432b2dc5dac31c5be01328e09e",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fbcc274b82519abadb05fab7e68cfe0fa1d1f9068707bd5806e06d498b278a27",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-04f9df6413016d09": {
       "id": "branch-04f9df6413016d09",
@@ -79327,8 +79538,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "011507c531797a8e1e641f0a5a6ff9bc0ebb5ba8226c3f21e29e90641280daaa",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "76e658fd75f2a6d22b8629deef43ed38d0f42ea4148f4abf913d368e1b6cdc36",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3f5bb45aa4923cdf": {
       "id": "branch-3f5bb45aa4923cdf",
@@ -79357,8 +79568,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f8139b1db45e3a4491895ede570ac776f67b29fb9a199d00ed8c861739277429",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "3e0b10c9dde1e965d6d72c59c353a6359ca8f6c212ec23879245e73b3c6329d2",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-683edee46d32eacf": {
       "id": "branch-683edee46d32eacf",
@@ -79387,8 +79598,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d272535eb6272a493090b162b65b8f7940d26ce7a704b8e0f91766b65142a8c2",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "1b0fbba18a42d7ff6dcf832dd13a0cf2859bf3bcfdb3b3c5cdc012896f7a1371",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1cd1a6d28d4374c1": {
       "id": "branch-1cd1a6d28d4374c1",
@@ -79417,8 +79628,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7bed79197dfe9638f5661354b06f2423856859f8d2f0f62240e8dd79209b2350",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "01a97c40bce8dc3fbeb2fee0b4f58ca1d850a55278b779a49bfd594ee89ad280",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-eb4c5f2805c2bdfa": {
       "id": "branch-eb4c5f2805c2bdfa",
@@ -79447,8 +79658,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "48966aaa5bc63864b90dda0277effc1d43541d5da3e895cef4c8c7ad4f224bde",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "5203f3c949dcdd9b41a3c4c1efabeb77a1be783d3b0c68a7ce7ecbf5a5c41193",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-33ee0ec275f67002": {
       "id": "branch-33ee0ec275f67002",
@@ -79477,8 +79688,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f3c2b67d45140a890dc2dcd896a5fbcfc1e067703bfc16f9bd5052528cb3c3ac",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "410c2a6787364fecfb3e4cbe2bbdacaad354c22e3c60e166faafd5742e020fea",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-4a4019c0232f4f54": {
       "id": "branch-4a4019c0232f4f54",
@@ -79507,8 +79718,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d2ea38da13ab1aaec7e69d82868a2f4a49ca4546f04f80fec9ecf051ede55972",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "7a770c565a3054ba9c3b1fbf83e5cfb593df8232a25634fd24bb39a146232781",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ce4aa0014fb13e1b": {
       "id": "branch-ce4aa0014fb13e1b",
@@ -79542,8 +79753,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "18d2a3bd7b3c8fbc24c7d6bfd503206caafe7a3566caf1db1283b39c651c9c79",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f4bc0fcea34018a689139edcebf132cd4611417a221dfeaddade100feaeefb35",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-62ca0c2fb1fd8575": {
       "id": "branch-62ca0c2fb1fd8575",
@@ -79570,8 +79781,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c9b083b13c5ac43fe6af614e387aba541852143447f73c45c3471f34d0d5081d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "15107a38277957bba68d01e502d01e2e88f7380628acb6d502e9cb27a0e6958a",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-0632d4cc74411c0e": {
       "id": "branch-0632d4cc74411c0e",
@@ -79605,8 +79816,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "82c338c58ade266b15168c95dcce115542c0bcbbf16ccfa9a2fe5e4e0ff61526",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e52abdd2031866e0d2882381b905ed6afe1f3374d927c4332651a8cd981fd6ef",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-169c5743ec9e55c9": {
       "id": "branch-169c5743ec9e55c9",
@@ -79633,8 +79844,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1c17c9cdc4795603319431416b363f051c1fbc7a222ca9aa3e61e03ca4a7db7f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4e911a00f1533fabc35f92cefc9d9646afc6ecac2dbb37374cb1d0e6f860d4d1",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d92ca54cbab20357": {
       "id": "branch-d92ca54cbab20357",
@@ -79710,8 +79921,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "73c8b34c0c3c297fdc71bf5fa7e269d17c70e20a1fe648fe98cbf659c7068441",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "de3f8c05bed734c45ace0998be356baf3fd9291141a88d1aad6343448ec80212",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-38e6283b99123cd5": {
       "id": "branch-38e6283b99123cd5",
@@ -79752,8 +79963,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9bf125c08fb11975dd403275814d583c8b6d1b70d81416d89c7d7eaf0e9d0871",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "313e81d8c1ff3a45a237ef63c30d0ebe2bfc5a2773b67e6762b0d5065cbebb70",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2f842ea0ac1d18a4": {
       "id": "branch-2f842ea0ac1d18a4",
@@ -79794,8 +80005,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cfb4557725fa2e05f68b6d9b3eb65a37a7b1d655634432d9ce7511d760a52288",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c5d5751b01020719743b68fb5df659be362868b009aa6681d04fecd5df4eafc3",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b23be022a75304ba": {
       "id": "branch-b23be022a75304ba",
@@ -79836,8 +80047,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1a245f48ad77d4c4a867a043dff8f6ce441ea10203caf614c11b1cbe991f6b65",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e12e7978b5928b652b65aa3f5a7c2be42471a9ed327b334d8d826789fb2ed18d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-436bd6babf91e34f": {
       "id": "branch-436bd6babf91e34f",
@@ -79885,8 +80096,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b4c27c7da3c7a8dd704285a5c29300264a3ed42c0e8461cd558e57d6c1de7844",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "29e1fd383679c675a0c41882a5fa239db2b0b470423b1bf1829bf125f2d73748",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-5fbac0e9c427777a": {
       "id": "branch-5fbac0e9c427777a",
@@ -79903,8 +80114,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1bf8586f03686a3ec92551792b55ac9e00d7f88c635bc70301801839eb170c26",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "32c568f7feda2f0a0a25fe8f2415869efe990c6dc45eccd2c7bc975aaa15f80f",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-35677a391b35c95c": {
       "id": "branch-35677a391b35c95c",
@@ -79966,8 +80177,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b6d0ef6396b49ac089841745197f238eb39515ac045214b204ed39e130b81698",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b38c0990eff80be42f90ad05a382944daa299b773a75d76512976fe4314fb8ea",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ed894c05ef854553": {
       "id": "branch-ed894c05ef854553",
@@ -80008,8 +80219,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0d90b105db9a0fe81085d95f5ab173e23abe0a447502fdb4981cd50f554e2b18",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6835bb989f36dd8f71368dab0203d05193c8c874b160a08c0afd6700f0ae3661",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-155e832b29009650": {
       "id": "branch-155e832b29009650",
@@ -80036,8 +80247,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b3529246e7283a992311781a93e0b7636e3aabe0e0ec2a41a945325a04f9a4b3",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f626aded6eee35804c639322605b4f359b5ee2a0a7582ac33a39310966e61eb3",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3e233e87eef83ac6": {
       "id": "branch-3e233e87eef83ac6",
@@ -80064,8 +80275,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0298c85412b26b5ed8467eedba3d0b769647c6c2c372bc4b22cf82b7cc67899c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c782963c4c51781edb71e62d73fb4a2b3d0882c54a4d163af49eea5bad3c5735",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2fcb912568edd503": {
       "id": "branch-2fcb912568edd503",
@@ -80114,8 +80325,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fce55e6b99d67d76cfcd794523b2cf86104f320ab2c52bb8d403dd1e3baff990",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b46b8b1fdadf55d3b95c720e7a17ee3f53bf517b2155bf49e8ea461286ff8e79",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-eecb7d45ce962418": {
       "id": "branch-eecb7d45ce962418",
@@ -80163,8 +80374,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b3407db6357ecd2c21b87ed94f3096077da06e4948aad2c5a9513ce290a1815a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "931e4d6521d401ac40c4a5a8fcbb0ccb1c2e815792f50383e9c34a6009cb45ae",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-6dc14770cd5818cc": {
       "id": "branch-6dc14770cd5818cc",
@@ -80181,8 +80392,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b392b54fd5b20ee7a7f365059bf3454b20ae84181a704c5392cd4d33feedab05",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "84710f8ec74e91d10647b0b596c920324848017719f6340c12ccc85455137862",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-5e09e6de95bfa770": {
       "id": "branch-5e09e6de95bfa770",
@@ -80209,8 +80420,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a4a9603d8a2144017a4d9c02899460b6425e07e704bde27f30e9e874858c8980",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "479bd5db1965e1fa47308c5f37a1d10717c371e3cbbd539e9b819f2f5bd06609",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1a583769a497875d": {
       "id": "branch-1a583769a497875d",
@@ -80266,8 +80477,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "747f95018a55d732bbb420f5504cde9633dd27bfe41c20698716e397691a5b0c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a1a7691789907b837dff26dbcb6ef15c1d6ae3a90c140a0f7602b997363fe89d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c9e11b1515cb305d": {
       "id": "branch-c9e11b1515cb305d",
@@ -80466,8 +80677,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cddc18279c9ecb40c0aed8fccf49ad84732668dcd323e83923e1e012bc5803ef",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b8b5c1f8738e1655a94d8f1af537a4efc242d84894c12b7205916a97292f56c4",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1dd581eeab2e2c3b": {
       "id": "branch-1dd581eeab2e2c3b",
@@ -80486,8 +80697,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ef775f07dfd2c58b4dbffeb4362a3c45171665c5365662063bd27020f568741f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2163319904bdea18700a2356259316a729ed82d1881bb5feca7c10cea16456eb",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2d46fd727138840e": {
       "id": "branch-2d46fd727138840e",
@@ -80514,8 +80725,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "66f11bbc6efb7db3f0e045dc45df5d1b243fed40db464a96f25630056d2047d6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2c75444257de1a7e7055b45d66edf9877969a42d1d30f8bd0e1fad6853bb4135",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-56aca799dd70922c": {
       "id": "branch-56aca799dd70922c",
@@ -80542,8 +80753,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7c52db31fd37514b91d68da86b1b273f40609e02e6a853f39b1c94e9b25b4e00",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "3dde75d29004094e486bbfc77b05788d3622398a3e9c99d47c87c686dd9e9681",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d1c7bd152670a9a9": {
       "id": "branch-d1c7bd152670a9a9",
@@ -80570,8 +80781,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6871ad7bd7adb933e5c5cfb7036a05ba2ae4438012d2f8688137791712bdf1ec",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "56d929f38df29d1207aa4da4a71c9dc9a589da1c4587f404aead4009317e1412",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1cc52db052a759e2": {
       "id": "branch-1cc52db052a759e2",
@@ -80612,8 +80823,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d267ae006bfa8ac15d60ac179353d5d5821a188a581b032ddf60b14957b42aea",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a35f17bf00a6bf13c20642d98e7e1f84aa7d911a0a041891f4e2474f78d38104",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-80dd86234a2ebfbd": {
       "id": "branch-80dd86234a2ebfbd",
@@ -80647,8 +80858,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "661b271b54efb6a97c7fff76dbdc10fa0530d1279b1c30d1170b7e442e6d4ee2",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4571d3b19989765d8264718b494c416c57f801be8426255a145a91e1a2b2154c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bde3cb29f6100882": {
       "id": "branch-bde3cb29f6100882",
@@ -80704,8 +80915,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0542e8caa36c776294310063023d23cd3822e65a1c31be14a25e66f048efdeea",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "7a7996580b9dd4e1da243b57cfa0991457508e80935e80630ece2fbba5357f85",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-960672b5dd3f4958": {
       "id": "branch-960672b5dd3f4958",
@@ -80746,8 +80957,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "042ce084440bfb28f80074ca5e995410578eead362869ad81ba8bfaeda368589",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "aaa556a308acc569b806cd948e23669f46637e6dd24590d97b87e6e58b42528d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-122879809eace954": {
       "id": "branch-122879809eace954",
@@ -81822,8 +82033,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "78ba31dea2db24f18dc3aeb81aa2bc7a1319ecbbb6299c2a5df0d1b8a40ecec7",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "144a31e662643751abf782fd2efc2ecaae5cfb01234e6774c27bc332d7c4a12a",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2d598b681827000d": {
       "id": "branch-2d598b681827000d",
@@ -81857,8 +82068,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c03d44ed486bc6f44dd44c74a7a8eafc13bdde0a34e0d872dfff959d4a4a26ea",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "8a6d335370c081d1b5e459009c40531492814d332cd2e638d347f3b9dab3109e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b1248a572f6f91ad": {
       "id": "branch-b1248a572f6f91ad",
@@ -81885,8 +82096,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "582ca2a90582dc631c3cbce548b5c52efee91bb35d4af020d01c12e01d54ea91",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b070f83064233e8af18bdef8643f67db056a1045f0dbc72856840e143c24aec3",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-77303b743008b53e": {
       "id": "branch-77303b743008b53e",
@@ -81920,8 +82131,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "10a3b929a17fdffcdc6f986d00f199d4207e7f2d6f536945cfa9107141938102",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "dbe039da62c82f089a9c5294474e10c25fde0f98cad17ab869da9244102a5c59",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b23ba909505bae4f": {
       "id": "branch-b23ba909505bae4f",
@@ -81948,8 +82159,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ee49db30ec7992339904f23d5abc3c2a61ed2dc1f2439bc495f86b9c13a82a30",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c19e531e34296df92459d5ab20d192f6858245413e799cfa1d0bdb8d0b2ef436",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3d9f51f0fd411e35": {
       "id": "branch-3d9f51f0fd411e35",
@@ -81985,8 +82196,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e977f745c3a2e6ba7a61bd71f1e96cb4824d5cea43214e14d60255fe4e30404d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "1b998caf0002b22d62d60c62d12b0167ac4845a7f56b45eed3bc82f01f443402",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ffc3354680bad3ec": {
       "id": "branch-ffc3354680bad3ec",
@@ -82069,8 +82280,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "534f2dbcdf0bb50ec4b0096ec4c1e9fae3013808e23706869764c1a377cda59a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "aee658422f06a0f19b90f71a26819f73883344dce56ad4d7478fb4bd5f7f7ead",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2998075cfb7f66d5": {
       "id": "branch-2998075cfb7f66d5",
@@ -82097,8 +82308,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7806740ce4ddfab33b75ee3417ef771bd604424a38d5acf1af5f4d8f78aa9299",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cee9b361280db76f1cf42264440531eefb1cf738a225926cbcba002a50c05c35",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bd3f337155aba4cf": {
       "id": "branch-bd3f337155aba4cf",
@@ -82132,8 +82343,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e479715dba2f80d83497aa1388e324975ef03b5b9036de2ff7be00e9c36e67bf",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cbb04e92ae10394a0480d1ff384b55198449575f298fb07885810eb2c0c75bda",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-edcb044341b88c74": {
       "id": "branch-edcb044341b88c74",
@@ -82167,8 +82378,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c03674eba90a6b8e0682f5689e6501fef6205dec256ef113d4479eb0728bee9f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6f7b2a05f6839824b358dcc354a194eb00c6a90797f02691a20db330ae28fbf7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-440b4aa49cb369b8": {
       "id": "branch-440b4aa49cb369b8",
@@ -82202,8 +82413,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7e589c33e51744dd30358700fbc4ba7c3bb8855c4ce5e950a58f56dfade2ae21",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9ca3cf38ccde0a019cb7c8c019351115f0720302c2f52eddc0b4d397aef14e62",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7d60af2342a153f9": {
       "id": "branch-7d60af2342a153f9",
@@ -82230,8 +82441,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "115555a4f9fcf7a64fcc8e15d1b9736706b08be711a6f1f960c6ba42ea2e33f9",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ff4bcae86574797a8688ebd3b72cf34ad313d614f853c37906b4189ef484d31b",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-16d9d36ff253771f": {
       "id": "branch-16d9d36ff253771f",
@@ -82258,8 +82469,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5135dc2de83dc44eaeaf4419dde6a65be5cabe2017cf72ebef3ecf39f161d248",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4098e3ff37b00ab678d87ad109e52097ec27a8e423ef2973e4375e1d8206d1da",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-af3cb6e431dbdd62": {
       "id": "branch-af3cb6e431dbdd62",
@@ -82278,8 +82489,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f1a30dd377a6d934cb45f89012e20afbfeae1eb993c08964ed1f4e45be75bbbe",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6f1902c4dc3994550cca2dac1228f4592b28e4e19fa787750fa0cbe8d7fbd8d8",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d8a0ec81a2c989d6": {
       "id": "branch-d8a0ec81a2c989d6",
@@ -82306,8 +82517,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6ee7f075044f5cb1ad8bd4d91180fa64c5e418e76689c2eb3a012adbccc21f16",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cd6ad6fd98ac7a77d1b3038cd090048e77c42a62092921c6016ea8b25189497a",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-4dffe0519007aab5": {
       "id": "branch-4dffe0519007aab5",
@@ -82341,8 +82552,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5d23ff96799ea2cfae014ba446d60e8ae8fd92c344a1db5476d1ed0ad948217a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "eacdc09e5a4cb1ede228287048dd49ee4c373d4ea79de42001a11c6fceba90d0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7942aa21d9a9b1bd": {
       "id": "branch-7942aa21d9a9b1bd",
@@ -82376,8 +82587,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3550ea506b7af9b6686199de53b474d09c09d352755765dfef3868f8ac507cb5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6038f52d21116ced47ff1ee3dc10df6bd07cc82204ed544af248514a4ac9167d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-39bf13fb306b830b": {
       "id": "branch-39bf13fb306b830b",
@@ -82396,8 +82607,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9897da117590fc7a6fe19300c8ba825edde2de4ec6f7fe25e54cb83df3b50525",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "01a927b2571145b290db32dc1ff21d17d20ab5c3d26ef4a6dff1705951b8a566",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-071dc68daff65278": {
       "id": "branch-071dc68daff65278",
@@ -82425,8 +82636,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5f3f508a967cc03a26af6b8ef70a89cf54ff61124631465d9991a68280c18471",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6dbbfc98d2601cdaa37b374fa6e1f32e296bc75235ed23e1b468678aee2bbea0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-f142e6831f9fa9f1": {
       "id": "branch-f142e6831f9fa9f1",
@@ -82460,8 +82671,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "92c3419d56d94e70760d8f348e9167999cf48a8c42202f8999483c94c6d6d32f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4aa8722dc730de5193a8a39ba3eee9fdf8642c8a170200938d1bd9729bd505b1",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2bbd01068ad41bd0": {
       "id": "branch-2bbd01068ad41bd0",
@@ -82502,8 +82713,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "385491c9d1a966baf69c92eda342bd48e17e822fc37d9163fd3a6d47f3a41f4c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9688f649eb24e7acf7195b037ea5bb8c1c43feea276380bb252b6370fae0ac59",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-34299b2d46805486": {
       "id": "branch-34299b2d46805486",
@@ -82551,8 +82762,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fab65af38d7fc7334bc8242fc8c8cbab1a11c63a3470f169154409de5d7cd217",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6a6b459b54c288587f5ff097a0e6f02316b21e77cde27d274ebaec7ce7fc24fb",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e88d28aeb2418e88": {
       "id": "branch-e88d28aeb2418e88",
@@ -82593,8 +82804,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "69e3d6e1e0f639c43dc684ea3efe30c35b786ca0f5890647ec9fe7edb1665511",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c2bd7cc016f7d2cf2c712c1806fbe5d9daf91d67f9d4270539fce1e9219137aa",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-42b715df1ad8655e": {
       "id": "branch-42b715df1ad8655e",
@@ -82629,8 +82840,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a0f80e50dd755fa07896a338ef8f79434173937bd3d5faff51a6ea2874087d06",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e116dcab0984d7628ae33b9695c63637f477944644a042407032231a81bb8e69",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-50cdcf6fed465317": {
       "id": "branch-50cdcf6fed465317",
@@ -82671,8 +82882,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "592a28fc8482bc46f7f0eba4d8d32c8d376fdee11d428813df74bf074f64787c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "bc771a6a7787499de27743b4d2c8227f188c6db22b3afc0bbbb8646454418724",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bceed20172c1f87d": {
       "id": "branch-bceed20172c1f87d",
@@ -82714,8 +82925,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fc483bd1a22e645034ab5275831146606e294bfc6e31a4d4f7035dd499f575a4",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "1d09316788250a939d71ccfebbf233d57aceffbeb07b63ca589ae6a262953b40",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-fe43e3f34e45c959": {
       "id": "branch-fe43e3f34e45c959",
@@ -82750,8 +82961,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7bbdf5755cc28b741b317c2e2daa702ceb41563b8e9618651a2c1976e08a7aa7",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b97f2d48c64b36941278d3477edaa8ecdcfeb01217e9cb810dfa3f297b5b5ec6",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e88492625bb5b983": {
       "id": "branch-e88492625bb5b983",
@@ -82792,8 +83003,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "26f33cca0969ec0f4212fb2f28bc1b6a3685aeb675fa34c9791797bc8910b434",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9d80808e3c7f357beb9631f7e724315fea40e58ade31bff3b2629199c09653f2",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-9386e47050e9d8a9": {
       "id": "branch-9386e47050e9d8a9",
@@ -82820,8 +83031,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "42815dbb79117c83c4408ff8829ab94536682b8e6b9aea77a3bafb9ad9af21f9",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "027fce0992661995f7bdd396453fca85a9be3c9dd2e4cd80c2454fe81e274fb0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3d3d90da69db8978": {
       "id": "branch-3d3d90da69db8978",
@@ -82848,8 +83059,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "512a6b95fd7d836e8e0d4430d0a532536f9d1660f7ec31455a162ea26c906948",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9d859116e1cd24d2a59a5543bf2854aa54f6059c189e84355363cde5ce61a1ca",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-eba30ce9ec0bfc2d": {
       "id": "branch-eba30ce9ec0bfc2d",
@@ -82876,8 +83087,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7203970a3ab464497f6c2d098943916f0c89e44cddb09b1cb9bb01740a746d04",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e2aae88544ff35698690268fca606fd443135b67dc7fdcd5d968c80e0cc4d1cf",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e24f4962539bff58": {
       "id": "branch-e24f4962539bff58",
@@ -83741,8 +83952,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5a3f7cb28d997ce1edb8f99ccf783e8fabbbcdc41af68e0081a06cf0dc473358",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "63859b1aad6bac19464eb40326d1c8f9190c72b61c6bc86afd3ac2630fffe5d8",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ae082efda294b17a": {
       "id": "branch-ae082efda294b17a",
@@ -83987,8 +84198,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fec73ce8d7962cc75c370dbab48f66caf3d7b0c91e29a80df1ed0eb099b8912b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fd14e3ae95ce4857a4d01e029cb6fe2b0a8e42a5011cba06d4ed2eaa06ab33dc",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-a9c94bbd54224765": {
       "id": "branch-a9c94bbd54224765",
@@ -84205,8 +84416,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "920d0ed4654112e876863928741a695824627ca2b619475ef9bd35270c3d9e90",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b9048dce0858f90d177f42129c0aa0c945facc8df419f63f9cb6b29710c56767",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-fc35db20bd870b9a": {
       "id": "branch-fc35db20bd870b9a",
@@ -84432,8 +84643,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7e172a6819c244b9440a7c39eab13d15fc96844120e6c7f6ed0a10b57729b9b8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "df6eb191d092ed207300490d6e6511bb14139bf5ef380deda145f5b5f4a84681",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-9b297aa481cc14c1": {
       "id": "branch-9b297aa481cc14c1",
@@ -84496,8 +84707,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "67d8ed9b4bf93e5f18c3551ae90db3bd2920e1f48926c60d0cac7923a778ef95",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "41522bd4ecfd515e1f7b74f1dbb3009ac65f5297f11eb165d3a1d7411de15a08",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-01116240ec96678b": {
       "id": "branch-01116240ec96678b",
@@ -84595,8 +84806,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "52c0133cffa227f55748998f0b3e4ebda03ca89778a7fa19354e16477ef7eca3",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2a8d5c42a7f89c12a5246b8114d075a129dc8bbc019fc8ba333854c4222aefb4",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-33f4a4f17ebfada9": {
       "id": "branch-33f4a4f17ebfada9",
@@ -84651,8 +84862,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c98b819d40f080daa6e476c261ff37b53f70e4fa245288ba978174cac7b25f2f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "539fc285f7bbe1f1df7731d14fef9adc5d9c6aef4a3965e02319a900572b18b1",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-284e2dc6d0c96cbb": {
       "id": "branch-284e2dc6d0c96cbb",
@@ -84701,8 +84912,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8307f13bb085f5b2b39e866560ee8b757cb9ce2c3999dfcfd17f68179638d2ce",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b7c554250ee2fc7f34146456fe6b5bf89d4a30e8d05fdd3fd8fa1ea078c02fde",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ca1310f5dea43c82": {
       "id": "branch-ca1310f5dea43c82",
@@ -84736,8 +84947,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d382e7d9368908c7ab43b5fc7317f338b9c7d791518cea31393bd2f37a8a8e83",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0c8731eb6551b4965a915b25a7a958211ed9f7d183c00e0cc4e27d944b4a87d9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-25d8098e6a33cdc6": {
       "id": "branch-25d8098e6a33cdc6",
@@ -84778,8 +84989,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c88da42eab74d54fb7bcc77b1fb5dd48b93d807c6500caff83535a00067fa4e5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0f3e2191c9615a1ab9d78edb3155c87cdf0f80b4e26f61daed80ab871e65dfb5",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b9ec7a2266a17fe2": {
       "id": "branch-b9ec7a2266a17fe2",
@@ -84822,8 +85033,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "68fcc1bdf7a4037456aa3228c3ec8fdcaf0c1952b6aa147e051f6c0f338488a1",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4f361c0898f9645bf5890a134bceccaf690a563cb3c54922e0f3803c2ff54c48",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b5b1d46a6468bd59": {
       "id": "branch-b5b1d46a6468bd59",
@@ -84864,8 +85075,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9cbac48e20802ad4ce070ceb189cd4e5ee4af10c8c7984e70209050e3e038065",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4070fc62db859f01339a84f7373fe4a9056707ae5756406e10736956d154ea71",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-f54fba9240a4e12b": {
       "id": "branch-f54fba9240a4e12b",
@@ -84913,8 +85124,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0ed70d435c552579e77057beb2a74c7c5d1743bdfdb23f894231a8f3fcde90fc",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "acdefd14054f2260141bcb10afd3eff8004e6c452529876645c0c783a346b01f",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7ea3560ec516692d": {
       "id": "branch-7ea3560ec516692d",
@@ -84948,8 +85159,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "40308d4abd01b403732f71ec3abadbcc77379474ee60448986ea8132dce72dc7",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e16397ce25c85f05bbc0e2a78b9aa52c9c260869b8c35651d2131c351095dcce",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3ab6bf48d6ece55f": {
       "id": "branch-3ab6bf48d6ece55f",
@@ -84997,8 +85208,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c4e248638eaeadf6213b49a17a871bf4ccaef510fef725f70b8ecec406869ab9",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b33658cf324c4fc10179f39e7563ce45b053da93caa14dd247df3ad946e99fad",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1601ee37d65ba186": {
       "id": "branch-1601ee37d65ba186",
@@ -85039,8 +85250,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2176ffb28fbbe43dd02db1e56c81d2f31c32dfa0c63b3b2cc0d89f200cde022e",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "d1148bbe4b7feb937610f805bac3019543dc9c2a44184a4d95942def28973d10",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e2b97d56bae63d53": {
       "id": "branch-e2b97d56bae63d53",
@@ -85069,8 +85280,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "937400903c82987c818d4c9c6692ac3dd33d42becb8a7bb69bab97d923176e65",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "789de72329e5666782979d7c8d0336a2ff547bb8987de9d9a5b298a87b66745a",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-02f9f023f7c9991c": {
       "id": "branch-02f9f023f7c9991c",
@@ -85167,8 +85378,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d66c99045956fc9b1ea969d19a0d30c85cd07934286f7ce2da484d823d52cb1c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "490078ec4fc14ceb41adcdb7f2b9b26c3c1eb4dd0577a4d5d1333c9d99c43cd0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ac4d9f4766a37ec1": {
       "id": "branch-ac4d9f4766a37ec1",
@@ -85202,8 +85413,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "39c610b7f92c7bd45e00284a3471db51156986c266d861b7f8cf6256d3f4cad0",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "35df445ba407c409b9ca919632e2b5984c3e7ec7ee75c6cee8deb22c3c452d0c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8ba47dda6918a93f": {
       "id": "branch-8ba47dda6918a93f",
@@ -85293,8 +85504,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "16feb183692850fb5d608f9ca82c94e8e769aeaa147f09768a937ac0a457ddb4",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a4324f8ece40a69391c9533a6bc0eed0c745a80f6b1e7d331e195cb5e70fb260",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-0ab2785a8deb3215": {
       "id": "branch-0ab2785a8deb3215",
@@ -85336,8 +85547,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "da3f0b3d8d3a7a31891f38807d6bf953f1a189b5bf4732bf9edaea1b5d37434b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "16a85b2f661546315f7b6cdb20a41e85bb6539e6d19492685334ed387d681e19",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e520db4a8eac7868": {
       "id": "branch-e520db4a8eac7868",
@@ -85386,8 +85597,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cad50fd69b594e3b573f7eb1e6ee72121d4aabebc3981cbbaae3f205e28244b0",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "7043253cc2d539eb9eff9430220da6d72c6481388e44c42e8bf22d88c5c7e413",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-439dfe86fa693c0a": {
       "id": "branch-439dfe86fa693c0a",
@@ -85421,8 +85632,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a092bb033317f2bd90df194aea99778629d2de81f23c1517089cd6606b8891bb",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4a777929a6ecd7296da72b6f5b894466a1bac627dff4c419badfbc777818b0cd",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-669d4b81dbb566ba": {
       "id": "branch-669d4b81dbb566ba",
@@ -85463,8 +85674,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7dd48fbf4f3258677bfc05d72d87dfcd1cebd176e9666c3a90346a1ec523f9ec",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ee3ef94cb42e23b7829ddbe1b4cfe3526d1b454501135d948949f8fd4a1b25d4",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-00773574df2cf2d3": {
       "id": "branch-00773574df2cf2d3",
@@ -85505,8 +85716,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "935c5a733e459e54547d0b9fb74d798ef4706d74e02a8707604e9dc2b45aa173",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6810d1247570753d41308d990a249fa4e1547d5679fd68495b749632d750663b",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c1628f2ed519dfb9": {
       "id": "branch-c1628f2ed519dfb9",
@@ -85541,8 +85752,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9467c24facebb9b5f5208a3640f003bd627ab0c84bffbb622fa46ffb32b03815",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2d07b1b90d18524a7f0275c77bd6bb849e23e61d96a995820968f74a3828ae73",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b5a4c4bf623da36c": {
       "id": "branch-b5a4c4bf623da36c",
@@ -85576,8 +85787,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "70d4381f21578ff954a48ca68b5f13f02b57935e6d4cf177ae5147e8d5be0a4b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a9a0f7a132773ef6c5c5f03ee36c91992aa34ec655cd6d5488b647de704d5e24",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-f87ab537bd23a447": {
       "id": "branch-f87ab537bd23a447",
@@ -85611,8 +85822,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "cec04f2448a55c1d853decef970747423480ddb9c7b69c41a983b225b7020439",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "48e34124d7d2465485d80034f382782f6371362f0e5afd8d07e60c4780c06880",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-9489dbe22b83fa25": {
       "id": "branch-9489dbe22b83fa25",
@@ -85675,8 +85886,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1447b9b8ebc2b7e65cc973885bd71d997e8d04e90fdabe5fbf36ee0a39c5ceb8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "14fb1f8d7744f23cf6e59410732683295ad9c2dcfd934555af5746a66ca6c972",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-6a84c634aa234f1c": {
       "id": "branch-6a84c634aa234f1c",
@@ -85717,8 +85928,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d5c243930026219025509ed7710ae613d81dc5b6f85067e88d2f4879855fec49",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cd032724c152ceaa8a0df0531d1ca76edfc3cee3018fe0e899b5bec7cf3abfcf",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7ae456f5639d43f4": {
       "id": "branch-7ae456f5639d43f4",
@@ -85759,8 +85970,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "53c2e328d3ffc7a969e5960f8e4fd8b06ab35ac6db18bafff0e4e36885cd247b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ee4f0f336c1282a58264845311541c71876500f52190ef5f4d8cdda48a06bb3d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-a448d35df12eb780": {
       "id": "branch-a448d35df12eb780",
@@ -85808,8 +86019,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b9aa343292cf6b64b28573ff12e9ece70fbf25bc496b2ddbe6d810e72bb34a26",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "3776fe8316779da9cd1e3b1ae94d6d8d78f17ef6a0ab3d554612814e72bdb46f",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-f70b38dbc740ec35": {
       "id": "branch-f70b38dbc740ec35",
@@ -85857,8 +86068,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4ce2f97252684a76a87c3fe00e869dc3503d973fa9b2a7b2540a9044374c75a6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9803f4cda687d2f80c0ce1b9f3b7f08ead617e92fa5b50ff5a190333696e6343",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-136d018fe1cd5ebc": {
       "id": "branch-136d018fe1cd5ebc",
@@ -85899,8 +86110,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "eb1fa9cede7c5fa0e90dcd786bdad08b53adbdad6c979fe96c062a47807c242a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "847a89fd30b2baddcff4578cb657e399d027aa2d9b0921f466461c2fa23b6bff",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d727762241e2e4e1": {
       "id": "branch-d727762241e2e4e1",
@@ -85997,8 +86208,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6ca0cb6ceb36a896d0f35ed2c4edacd26a109ee3699c50361a8ad8b9ac359160",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "8322824c68f5d1a8eacfa351362ac24a4aecf7ff773d69e25fc90f504c0d3ca9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-602fd94b750fc7fd": {
       "id": "branch-602fd94b750fc7fd",
@@ -86046,8 +86257,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ad48495937d837e7221287e3dbb03097f56eebf9ead10da5fdbce3208e79e99b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f0e829d14d64dd049bc0ffcb426e55972947d6f90360aeb82f9405b046536f52",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d63cd059b3aaad0f": {
       "id": "branch-d63cd059b3aaad0f",
@@ -86102,8 +86313,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1678edbc3857d0ee6c873f57243d5a36dc154fa561dfe242f619aea6fc6777ee",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4fb7d08d65e811921da01d84f64c9854c8d65bb93ab3bcd869b046c71cac6558",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-aa6ccfcaeac7df87": {
       "id": "branch-aa6ccfcaeac7df87",
@@ -86172,8 +86383,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ed59a4b2c544142cbfd47a797b3177e9feecbf5d764d6b5b4737d0cc906459db",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "96d08af51eb30d555880580eb39eb4705cc7b39ee964d37bc214b81f0222dd82",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-70fc9c695854889a": {
       "id": "branch-70fc9c695854889a",
@@ -86207,8 +86418,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d09e6b3043de96b1d3adb6015f9013f5669d23bdb157bb41eb2e3957f93b8f54",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0c434847a9771dbd0cf2fe490ba774ca29db3f5084a92bab6147cd1a6689fbbe",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e9ece79f0b44197b": {
       "id": "branch-e9ece79f0b44197b",
@@ -86242,8 +86453,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3f77540d3d7a1ebbb7f5775b08b10def1cf55136aa1e5c0cf2ff43846f4c9610",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a906dcbffc057e8ad8ed8f9b954d58d1d2ea23034e9c66dbe2af45f14580e841",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3a1e2cf011e9082f": {
       "id": "branch-3a1e2cf011e9082f",
@@ -86321,8 +86532,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d31e6ec026a6eaacef8856e80f368f9b1a35ad0548d171d72ad9ab26d68eaaf5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "5ece86d156a52fc40490aa542d06010e5b82fecb97b7e33527450acf075867b9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8876346d043651ec": {
       "id": "branch-8876346d043651ec",
@@ -86349,8 +86560,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8d09e48c41633d62ae3d2e815045603b66f8c2566ec7d37d4230fedfa23a82d9",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "37131eb927f609721ee9fd67beed3bc790aea6033c6fd2c3cc88b3dea0082a71",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1b5dc9cb22951e7b": {
       "id": "branch-1b5dc9cb22951e7b",
@@ -86369,8 +86580,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7822e0643b5ab25bf6bce6bd77c284293ab4bc053d6fdabd8461bd8a12fb1b44",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b5f4c35dbca799a06f6f039d443e52910fa22c278a476c7392c448512b37eba6",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ea4df54e8d029f57": {
       "id": "branch-ea4df54e8d029f57",
@@ -86404,8 +86615,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c2c168149042016dc77bd644e365e838edf6b25fe775268ba8b4095914722493",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "970630edffafb31da530440f595d7a32eb085f6d6eaa3fec8780c2b05c64a3b2",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c75612bc790b236d": {
       "id": "branch-c75612bc790b236d",
@@ -86432,8 +86643,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8aed74b64641b75108555f1b251673ae4c4afe19bb20fc65c793478d507c1b8b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b887f47e6da0a4c87d243dfc984a4ef58396ab36fa3a22b182a0b648c989fd91",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7e7349e1c0857db1": {
       "id": "branch-7e7349e1c0857db1",
@@ -86475,8 +86686,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "87979597e7d72eadce1d3678626a1b5c90b5306345047f861464f5f6d01b5d2e",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "25b348a13bbcf871f80d627787f6491b8cc1ae0b26bc90888d376a46c5089ee7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7ebc2377f6ae2086": {
       "id": "branch-7ebc2377f6ae2086",
@@ -86503,8 +86714,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e5cf8f47d0a904e243f34b1f3b65a480e3dad8273100c0bcdc9056d5036ad875",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9c9db7044d9ab795dc8782bbb255bf5639a153c6670cd8c2004297145f78fc55",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-387e38e3f392a033": {
       "id": "branch-387e38e3f392a033",
@@ -86531,8 +86742,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "445970166474b655e12de7662e42eb17b39a7d153310cd1edeb005214735f705",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "25886dba4d36f4f14504132f4b744f4075da613d0555c690386b45e4c81f1208",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bc36378a11db8be8": {
       "id": "branch-bc36378a11db8be8",
@@ -86559,8 +86770,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4901b654e8ceee26fd187b560c52196e001139313ddcbb2b19990a8bbf4eb570",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "1a7b5287916ddeca74816a369a66a1685310aaead615bff1d1f133f1cd64c481",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d4bd494d2ca8e9db": {
       "id": "branch-d4bd494d2ca8e9db",
@@ -86617,8 +86828,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1e7d68d6451b67858ce477586c1b7bfa86edde6a5d0a61bb3c87e97e01ae74a6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ef1465974760bd4a145775d4340cfaa6eec9eccbf8dbc7c020385d1fe31807de",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-9c34b261ec31b7a0": {
       "id": "branch-9c34b261ec31b7a0",
@@ -86645,8 +86856,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "860d5ba1211797eee168e08afa9d18b136ffde53b8b836e2fb4d63964e2bdb03",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "104cbc45049c3caea2353254806e2c5387373c544c50d6abe4a4876720f93e09",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c03166e140979a0c": {
       "id": "branch-c03166e140979a0c",
@@ -86665,8 +86876,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "86b55708aae9d3174d76758cc7dd8486b3f24d9a971b16723ce06c661b48e238",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cabe0fba6099c2ccb246a353c317839d77c76d65b3a82b50e78bbe6b2515db01",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-48ad449fb30cd746": {
       "id": "branch-48ad449fb30cd746",
@@ -86693,8 +86904,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2f499dd783917b481ce95d4c19e4aae5c943bc95f17f9b1b1fea7ab345cc906b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "24e3b0d82402dc703e1571782a718b6f6869f10b7400233cf93f385da5c1224d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-48dee2d1fc902874": {
       "id": "branch-48dee2d1fc902874",
@@ -86721,8 +86932,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "0fbb7533c238741875c4f92eca959f299f3068e3e44ee2bdb1a9f6de285e520f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a897f75aa70bc2fb79541fef4af9d0670f5b53f5fd0adccc190c9c3540d36f16",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e2b90b4f0cd4a282": {
       "id": "branch-e2b90b4f0cd4a282",
@@ -86770,8 +86981,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "850fde4525128753e3064e936308abc5e772ca8ddde305a7668684ff16b2bae5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "dd0f9c790547edd3270311e6bdbd263ef9d83c1c2d8503235e2b3087152b3ebf",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bbf5a2c293af40b5": {
       "id": "branch-bbf5a2c293af40b5",
@@ -86812,8 +87023,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "97539d02e189049fac33b9f20a260820b9178d41d04b9c46588dfe30630cb587",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6b2d46c9d342100ec85f1fa348809b2758119abbf832dc330998a74aa2e418cc",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-412ffa2ddbe80074": {
       "id": "branch-412ffa2ddbe80074",
@@ -86847,8 +87058,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "f3fe104582aad3389badad7b9d393fc083116f3434784a7834231ed69d5aff3f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "14a90350123c0bda4eb13c43f8e9b4b090a196c52164e46ae19949627864322c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-28fc3c410f8d2108": {
       "id": "branch-28fc3c410f8d2108",
@@ -86875,8 +87086,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8810f565ba7f854e23bea833d1f9953a9d69dd012fa8031ec2339d3ecca7e4e5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ce36c8033a202f3826c5d405b6de8526a2df4ce952f6f71d9ec24131af3aeec0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d5f02538fc12def5": {
       "id": "branch-d5f02538fc12def5",
@@ -86910,8 +87121,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8168f7f8a8fc9d578ae8798408221abbbef01a512efd920217208d1c18562c78",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4817857887757833b7c34d2ab94c3f8426a29b72250295d5bc349f9e6538e1d3",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b34c306bc7fd0b72": {
       "id": "branch-b34c306bc7fd0b72",
@@ -86946,8 +87157,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2702122e49d8ded38c3b95c905e803657071a4764458586ee58dca1fae796df8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2a910407424cea489261498ec7c79abacef48d1b26cafdbd75e31ad2dd815458",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-4fd3d1bdc2b892c1": {
       "id": "branch-4fd3d1bdc2b892c1",
@@ -86988,8 +87199,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "15870b4908556a2d9c1db6fa51b1c964f7d0d490847606c95ca20e4ec61f8e21",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "343fb7260430e6478d3ad2d3dc5431f2e8e99182818fe4ef8784ce7035e4957d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b30df8ff98a54148": {
       "id": "branch-b30df8ff98a54148",
@@ -87016,8 +87227,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "316bcac530ad011c9e1ad9d7e2662a79245eec722feac62b137d3b834de90c83",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "19e404d3196c73e3ce8a8c90437904e1b0936210aed3dcd4d25caf59de56715d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-70e44503429abc0f": {
       "id": "branch-70e44503429abc0f",
@@ -87095,8 +87306,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "522b68893a73c87f5836ed2f3036e3c2aec213f86fe3f859ee1ac3e6936de78c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "cdb8233599d928e324e097b5875c7400276589e3d7afa200fa9021aa777a4678",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-bda2266ea4ea3de8": {
       "id": "branch-bda2266ea4ea3de8",
@@ -87123,8 +87334,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1289444d98c713bd0718599b95c9c8fb3860bc018b7038a455a65cbf48824333",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2c4534aa47282bdaf6761acdb96d02cdb19c7ff66e56354c32f66bf90fb0ce4e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-08e76fdd73cd4686": {
       "id": "branch-08e76fdd73cd4686",
@@ -87158,8 +87369,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "462b176121a0471f38afd73c318cbf90fa5887076f6b5ad62ba3a2f2d24f16b5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0a0c09a1a632e3d5c370879eb66ee119e3226d2dd4e8aa3e212ce1cb95fa8662",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-cf3fed7f263eaf9b": {
       "id": "branch-cf3fed7f263eaf9b",
@@ -87193,8 +87404,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "bd418cd9c64e8694119260289ccd8f8b7aeaabc3f9063bfa9f570bedb85f467a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "180c838feb07d276869b2db34e264bdf3132d79921804d83159c4d6899b9a111",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-fd3715b29c8dd1a1": {
       "id": "branch-fd3715b29c8dd1a1",
@@ -87211,8 +87422,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "254898001dae7c88f3b3105d887bb5cac397f3184f65c545bd4720bd19d8b391",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f88fb20de9ea1d966613d3895445c3d4472832d61c26c79fee4f57b758222483",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-369bfac30b1ea0ed": {
       "id": "branch-369bfac30b1ea0ed",
@@ -87239,8 +87450,43 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4675d2095b1e0337fdf57b71da824567214f8693e42c5f4a2a751bc406f1f5c7",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "669a7ee1a838e1f4b0f031fdca700c029215090dd39e92c66e15ce46706a6f8e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
+    },
+    "branch-d0d7c835a1dbc03b": {
+      "id": "branch-d0d7c835a1dbc03b",
+      "title": "fix/legacy-anonymous-confirmation-201",
+      "head": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa",
+      "head_ref": "fix/legacy-anonymous-confirmation-201",
+      "linked_prs": [
+        203
+      ],
+      "files": [
+        {
+          "path": "supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql",
+          "source": {
+            "coverage": "同一HEADのPR案件に原文収録"
+          },
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql"
+        },
+        {
+          "path": "tests/forget-database.test.cjs",
+          "source": {
+            "coverage": "同一HEADのPR案件に原文収録"
+          },
+          "url": "https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs"
+        }
+      ],
+      "commits": "f816d9b6fb3089ea3107756a8ec882e3fcc62ffa fix: preserve pending legacy anonymous checkpoints (#201)",
+      "topics": [
+        "その他の開発"
+      ],
+      "state": "ブランチ差分（PR関連あり）",
+      "production": "未確認",
+      "implementation": "mainとの差分を収録。差分ゼロも記録",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "fingerprint": "c8100aa3264107c5e49915254f463ea8c6d30344808fb94e211800fba5bb2322",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e06b8cf63a4b31eb": {
       "id": "branch-e06b8cf63a4b31eb",
@@ -87274,8 +87520,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "88801b7ea3b8a9773e4e47d4c9c99dc077dcde4ac73fb54eb2c3b8829e45b9e8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0c0a98177c0d843a5ffbfe7764d9fddd8d6d8edf355bd6c99490328cb233af0d",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7e57fa94e13bd2cd": {
       "id": "branch-7e57fa94e13bd2cd",
@@ -87316,8 +87562,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9f6f1da8b9d5dfb4ff8e47157ac2c72f4e2ac5fec1cfd3ec30d3b6de37c7f02b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "5a5bec19b523448bf08c4e77cd10aad8c52e4af9c4c588f18a506f7114ad3bcf",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e21cbc0c26553034": {
       "id": "branch-e21cbc0c26553034",
@@ -87358,8 +87604,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2e2b28a887b8440c9e37be03a706e81c301c6753c7d7b85eeb7bc0d59ecdf1fc",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "660255da14ebf176393039f9989c82b9f46bcaa4762b67d49e40b74ae9dda6ea",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8317c1821e24026d": {
       "id": "branch-8317c1821e24026d",
@@ -87387,8 +87633,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5865f8a37f1b95bd40ffac513af94a8527965dbbf202db273049e7166c4d3bbe",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e3db4c1e4e838a0319e482fa3e093cf6b54cf009d42d6ad48e263343457da80f",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7f356df67d09c22d": {
       "id": "branch-7f356df67d09c22d",
@@ -87416,8 +87662,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "263c138a127907191586afd401682eff8f3f8142b6f40738cd38a4bda7e60904",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "986be2d9f8cf59d064340e7cce1ec21d279f2aa58ac4e09728ddbf8fe27e6930",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-70d16bafe238aa7a": {
       "id": "branch-70d16bafe238aa7a",
@@ -87445,8 +87691,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c2153e80d616deebeeb9f788041a462a6a75e1226b3a64f60f5c3ab77d192a6d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fc90bbf21b60165f6bf8219e03f7dd447063f2cab89a44154ae8fa10ca66e524",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d1691037dd1d0dbb": {
       "id": "branch-d1691037dd1d0dbb",
@@ -87465,8 +87711,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5dfbca198ee138dc605be21fb0e44920e349f841032e9e28f2171a36395854d6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "d94e3d9ac8c22eba9afea4a72a36334fd73f4fd18f067c12c0c4cbd1b1f5fbdf",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-637f3c0ed7eca805": {
       "id": "branch-637f3c0ed7eca805",
@@ -87494,8 +87740,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "6dfedbd53f682cda14ff404aee812008ccb9bff364d71e3c808eaf49a7acb7d0",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c774dd3ca392aeb67b88d8505830ff3022458cf24e343cb3537da933c9e586e7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7a839c530ad00ad2": {
       "id": "branch-7a839c530ad00ad2",
@@ -87512,8 +87758,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5aab4bda2d0dafdbd2651908981fd213e47f51a620064170b6b7879d9143f3fd",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ace66694365ab218c69847324039904f3b0a31d031e83e16992bb88517584905",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2db397ec82c28320": {
       "id": "branch-2db397ec82c28320",
@@ -87577,8 +87823,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b7a13f97a8c56c4b143b5bfa323920f5338cb2b2e7e8efb46c9fa6a4857475b4",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "159e7c98acbc7bb99a310710ac96f757b5000e412cf995733117dfe06a0f11c3",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-992ef09e7aa2e87b": {
       "id": "branch-992ef09e7aa2e87b",
@@ -87605,8 +87851,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "7b726b986e17a374f3cd9ae5f1b2afdc411af723c8f27855b897706da6d3c379",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "11dfa0b043d67f92f9ddfe077805efbbfe305bec8b5f37531d5458f9d90cdc68",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c8b5b69bea16cfe8": {
       "id": "branch-c8b5b69bea16cfe8",
@@ -87633,8 +87879,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2cb59e5ff0f28d5ec8ca63675ecf3806ee16c8a52cb29c8a3de2ded2af02416f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "972686c5eb2029ab998916f010af3c02babc5db6e8c1c3042ab70a339b20b817",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-80302ec778694c1b": {
       "id": "branch-80302ec778694c1b",
@@ -87661,8 +87907,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "50d6196af742584ce598024d105dd922252f3d64773a16a7063830dd95096ec0",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f16831f03fcbd3ac64ae5c038e9417778a2ddc85484d159a931eaec9f8c045bb",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d62bb5c53690d8c6": {
       "id": "branch-d62bb5c53690d8c6",
@@ -87689,8 +87935,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ba70808043045778a51549ccfe98d82ff4a3eeada4c5db12fbcf072079a25d7a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "30698c16e46b152af7b994698b464a98f9efae918c428a6a7184210f63f09a59",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-75d1d4d76110cc04": {
       "id": "branch-75d1d4d76110cc04",
@@ -87717,8 +87963,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b49d87a8fb4c7c07baa4df009f56e9824eb1161988b32cb18f1655755c6baad2",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "bb4ec936ef14e594a265e827e209e259c5118e087a85613d7df2bc98488ffa8a",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-49565aee7bcfca71": {
       "id": "branch-49565aee7bcfca71",
@@ -87759,8 +88005,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2cecad582b31242d8b0937d117cf1242a49236feaceea620cb234f711d8e10de",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0540993f825d2b33ad017c0f121521b829087f99759004e2ce37e2799c40860b",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d524b642d12d5b63": {
       "id": "branch-d524b642d12d5b63",
@@ -87779,8 +88025,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1dbe6f8af42293512ef14b9985a84720e1065859334218b3b93a030c14f7c240",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fc8f5ee25b304d041e28d07e29c8be50730416634c70be9db09eb7532eedd936",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e0c872b4def93261": {
       "id": "branch-e0c872b4def93261",
@@ -87811,8 +88057,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d8e6b4d6b0ec33a78bf9783541b9cc159572be1ab5644ebabb24ca00d3944e08",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c6bb9ed7827a3c7ae39ba1d7b50075aa004c36022569b50254d60c8bc1057fab",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b6e8013efabfd929": {
       "id": "branch-b6e8013efabfd929",
@@ -87831,8 +88077,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c50b9350c71aa7d313c04cd3b2a53b3dd265255a941068d3848f1f329c5d3d91",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e0c42d7103a6ab6e913ddcfc5bfe9606f57dbd01c7732b83ddcfeaed35ecfc71",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-88e2b40f5b6d498e": {
       "id": "branch-88e2b40f5b6d498e",
@@ -87851,8 +88097,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "b827ec408566b6871336c72a107c974e4236d42377b2027e1d2fa9fd38f3fbf6",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f57dba5a5945ab8b511949e52d0255e34b1e364d5388f3eb99716d997035b829",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b368fa9f8b5f424e": {
       "id": "branch-b368fa9f8b5f424e",
@@ -87871,8 +88117,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "627f3480c25b0258e594b5465ecae6ddb11cf7aff3d0eb8b6f9e410ad9188cbe",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "d01b9446e9439da1a9b848f24ee23250a8296b19f090564a7db8a3656e65809e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-05b52c58efea561d": {
       "id": "branch-05b52c58efea561d",
@@ -87891,8 +88137,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d63653d6e9bc5096419efe6a568cf0bdc6c505b99d0ee8a1f0a393026b2596b9",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "63c4f338750e9dda8530dce96a139734ec02a3fd3c1b433323f66feba58ccac7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d5fcd15a8069a6ce": {
       "id": "branch-d5fcd15a8069a6ce",
@@ -87911,8 +88157,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "464030ad4312fb53d0c4067b74451a9fadb0e8c368c363ae311bb15018de06ef",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9b78c7cecb788c4ab7266553c5c9afba5c529a27d751201c0c22cf8f980946c9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-526516b414e5cd8c": {
       "id": "branch-526516b414e5cd8c",
@@ -87931,8 +88177,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "27e0c2b8a744cd8cdf1dbc920d864913396f0abe827f24f44e23740ab2edd9d5",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "384716896978b2fb828dda40124a8f1d812ae58729da1dc9d16dbde466097f39",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-67bcc30f23d44955": {
       "id": "branch-67bcc30f23d44955",
@@ -87951,8 +88197,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8f74b50d21ec59cd8c05feda898aa6a9e74491adb95468c748d41161de407e4f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9c349433a6de8268085f624dc21ed2a3db41f32751c5ab361d5a2f724dcfe44e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-16f9e4998a78f826": {
       "id": "branch-16f9e4998a78f826",
@@ -87971,8 +88217,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "74ee032a6ad8f6a1f245ea3873f86609a6f046c2fd242ae9a62118d66d3706ab",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "1cf22674a4a85f322a4889051101aa79ab24061a01e92e210ae48d0f005ee516",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-341ed7b9d23957ad": {
       "id": "branch-341ed7b9d23957ad",
@@ -87991,8 +88237,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "02c220e6d3c2e8256161e5444f2851e29ca0b15667d19df0e1308b31def2fe29",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b166040fbac47031f77af954296fd91fe8e49ec672c717773678258c66f40a24",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-a2e2cb00c027b06e": {
       "id": "branch-a2e2cb00c027b06e",
@@ -88011,8 +88257,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "038fd9a96e80dd4b4c04a70fd048d8e92ad2fc0b3fbe8b796d70c85ee2ccd685",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b9d4e557efc54ad472b75cee58e7d6eebb4b13832e87dc6ae4ad6757becf211c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e0256d3e5c5f68da": {
       "id": "branch-e0256d3e5c5f68da",
@@ -88031,8 +88277,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "99a298cea763eb300ecfed17c7809c1cd15a46d2cbd4b638a6542918618a9ebb",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b0e9e6e73229daed78aadf0db387922a175d32f75ab7bdde01010cc368c24e1c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-75cad6b9a274a9b7": {
       "id": "branch-75cad6b9a274a9b7",
@@ -88051,8 +88297,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "19e4f94eb9accacf2ec792fa789bdbb00f8c1a79c50d024869782c56314510bd",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "dba2f4fc6470f88b52ba002007310710d173aa3912f258721362d1043f1bbbb7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-561d4f92479230e8": {
       "id": "branch-561d4f92479230e8",
@@ -88071,8 +88317,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e72ff030175e32292d391c4e6cebe037c17d096ad72b269735a6bf0c57e5b440",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "96a22de640d51e30fc934679d680933faedd47a262faf9df71e4cf291455b076",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3734c87bc188f992": {
       "id": "branch-3734c87bc188f992",
@@ -88091,8 +88337,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a2b73723056e6c68ef1207ed6f8ab9369a938a60ae70be376c2108e8ab46fe81",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "e74e692fea763916c1e333629ccf2fe7551667211b25c59db96ed6550cfbccef",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2eaeac14b9a0f1a9": {
       "id": "branch-2eaeac14b9a0f1a9",
@@ -88111,8 +88357,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "11c0d002fa71c30ddbfb6fbbb64939537ca176a60fb7835d6538ed90dbc60273",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "95d97dd45c519e9c7478523e0185230adc023f5fcd18a7d9f8360549b0eb7bbe",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-06072ef2ebbe1f87": {
       "id": "branch-06072ef2ebbe1f87",
@@ -88131,8 +88377,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "d706921a82c8e195f6ba00dd9ef3fc4714f1df31eb06712ed84b21d83ad71a75",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "f810bdb0b3e3bd029aca8bf5b4529ec84414ec9ac92de62c22b484d346b8a85c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-affe9c1706156567": {
       "id": "branch-affe9c1706156567",
@@ -88151,8 +88397,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "9b47d61c554bd1d7b3da9cae08c72df87868379d8b243a10d4eb770da307f5a0",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c7450f8fca90f9d7288ae7f372ebf1f19ba6811c572ff122dc41730804bc4d7e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c1db5c41a90d509f": {
       "id": "branch-c1db5c41a90d509f",
@@ -88169,8 +88415,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "01d76da864f7da004c283d2b93c95b7505f1730ce6ac8a92c5f136ede5500dec",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fab0a52f47aaeb6ce23ead5d5e53b1cb8ad427fc16052f7c47d4ee9857e747a0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-c1c09c8589ffaf5e": {
       "id": "branch-c1c09c8589ffaf5e",
@@ -88611,8 +88857,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "01c48fe3f26fca8f6de1d4b81b7c50191f8f53992b0a8f3ce105d9fb980e7ce8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "67b1ca1ec47660b276aca06181472cca61a99a77734899a73e239d8bf71646e0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8f7424f62a838c0f": {
       "id": "branch-8f7424f62a838c0f",
@@ -88631,8 +88877,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "4cd34d41c03c49bd2e2778d659738250bce39353185e96ce5d1055f840922b24",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "6c56b0c2fb29bc066905469633ab62949dbf6dc3a1b2416b8214b0f0ee16bd49",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-a8fc0e1f175ee465": {
       "id": "branch-a8fc0e1f175ee465",
@@ -88651,8 +88897,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2341275f1116329f72a71af2fb2b17f2f0855d2d448284f171c9b035d376939a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "14e0ef9496cc7c40308143c9a07f29e4fb97fbd4ea1995addafb18ab80f073c2",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-60ede8a4a21cc685": {
       "id": "branch-60ede8a4a21cc685",
@@ -88671,8 +88917,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "251af9db82a933cc486e48f95e855ae4d4cf8ca8e04c2ec6f1609cdd94d2a606",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "30a17007611ed22e768f790a6077c634be782b5d65caae61d8436d1437e20362",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-02d4eb506c006982": {
       "id": "branch-02d4eb506c006982",
@@ -88691,8 +88937,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a14c7310acd1f932136dfc090acd073810142531c06399f4a5bdaba4f867453f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "5f2880b953cb0edaa35e9a3c03b985313eb7d7c6b902b25e481510be5f922cba",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b4b9b56366106e55": {
       "id": "branch-b4b9b56366106e55",
@@ -88711,8 +88957,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "3001abb15437ce3bb6dfe78c0f62fe15d2708cd8a8fb3333505e9cf153b59168",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "dabc4ee180b3df0d9722867eef2fd0b540fdc46087ac65c0baa00a82a8ae97c9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2163060a0d173d3c": {
       "id": "branch-2163060a0d173d3c",
@@ -88732,8 +88978,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "2f6bcbf3ef18f1977ea5e7a7ba99296cfa667d269157adb92205a5dffe45982f",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "71bb4e3b9a439460c36c3bee431ba31ed8de73715240190a1db00d3d36cb694c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7b4c2cf2503a3179": {
       "id": "branch-7b4c2cf2503a3179",
@@ -88781,8 +89027,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "74f0c10e7b800065c0fc1c83a86c7b0170848338b2b1c903573a250f44668ed7",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4834e0a1d11e4e04cbaec55d7582280826e177440eec9b0b81a601a9f8bb45a5",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8547cbc49c3543e0": {
       "id": "branch-8547cbc49c3543e0",
@@ -88816,8 +89062,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "ec459dc9b6677980147c10b290c34e91f00544be7b28885e6a607cc2c730860b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "4864c1fcda3b292dc75e8cd3a903398e51080cd66efe4d4ea6b7d346bcbf1034",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-d9e736cfde461ee6": {
       "id": "branch-d9e736cfde461ee6",
@@ -88844,8 +89090,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "c33ccd58623d4d6b858e819c7a7bb0a8bcfe3c8de3cd598ec3a03e5a551a2fc1",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "9cb3d040188ae4396f59ea1ba0539378641f988d26aa6c9a202f8d32476bb489",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-0000ff4995ce3709": {
       "id": "branch-0000ff4995ce3709",
@@ -88872,8 +89118,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "dfaace281ede87de88f2b30754852038b1119a949df475ba54f6733bf2b2e85d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "2912e86a2127b1cf5ee131af13888212e6e5f3ffc8030e76536b2f04343a31f5",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-dcbc9ec1b1644742": {
       "id": "branch-dcbc9ec1b1644742",
@@ -88900,8 +89146,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5e864887c01cf8eacfaf95b0527f3254235b89cc8ea9b88ebfcf815aa1739a0d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "a6e755aea18e0c779296d146f76648d8939e78ed0180456e07b483388f884826",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-2481cf5a1a0046dd": {
       "id": "branch-2481cf5a1a0046dd",
@@ -88928,8 +89174,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "8786225eb035fe096179ee58c4af88000755ee2d367df4dd1559dd5dd24c2b1b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "53a500281450984ffb27e12c27a690574520cba8a235cdfeaf11190b6978f94c",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3ae954825dd91f9b": {
       "id": "branch-3ae954825dd91f9b",
@@ -88956,8 +89202,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "08d294e562f8d2caba1e1887c30b0c7d8934b8c8c40b1cadec649e7b3e73523b",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "c0d38901fdb91be3da0370b4b567b4b03ab9296fc7e60ce93af163f72774d157",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-e9e79d99992248f2": {
       "id": "branch-e9e79d99992248f2",
@@ -88984,8 +89230,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1dba7c81c11ac8e725126a1fcea1b1a90d6fc0158ecfa141a1bae4c17336bc9d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "7f34b231f80174556b1994f510f7256e8e85eaec05cd5c221382a43112d660a2",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-88129d40b3c5ce99": {
       "id": "branch-88129d40b3c5ce99",
@@ -89012,8 +89258,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fb7e026c15f0029944ca1f4e23bb8e5f4cf1cf71b15336fbe053c5cc53de7904",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "b11f83c5f0879311f4d624c76ce8cf734fd98bb59bb3aee62207d400e99e69c5",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3640cbc8888b9b2a": {
       "id": "branch-3640cbc8888b9b2a",
@@ -89040,8 +89286,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "dd44020967adbee82c8cacadd60a866106104362b029f0b1a4383b140ae2526c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "fed36dcd9a82b8a164ad202720ee72e6366a29dde0d23442ec5a68451c5ffd1e",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-9fb70e0aed49a8ec": {
       "id": "branch-9fb70e0aed49a8ec",
@@ -89068,8 +89314,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "71f17d1583c0f3174038d68db9a5fd90e365d1476bd16aeb56f3ca67cb5052b8",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "335a0cb7b2d6a8291499aedac7bf14684294b29f80397d518b6dda073a26f8f7",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-cf063db3d4301a2a": {
       "id": "branch-cf063db3d4301a2a",
@@ -89088,8 +89334,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "26616ae95e61f471142fe8dd5654d1f47ee249fdddafb5114e1d9095ee196465",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "61e2861c931186582a2f79f3d7cfb935a52d658eff1d7323c9cadbd9223e46db",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-1d18194bd4fc9125": {
       "id": "branch-1d18194bd4fc9125",
@@ -89108,8 +89354,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "31faae37e98b61877d7fe54d628a0a20e70cc21eb543f954430467a88c1a8767",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "688eb264cb9cab83215a98930b12e517bd2f1b0bd29a56748189452acc432bb0",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8fb3e7f76aab269c": {
       "id": "branch-8fb3e7f76aab269c",
@@ -89684,8 +89930,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "47e445684d328d834e02cb22102172bb0759f5cb17ba6b36c786023828e5729c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "978d0622fd7eb74ae69ec4301b3a2551021fb22c514954e5aaa544f139b3aac6",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-f2dba8e26e4c9402": {
       "id": "branch-f2dba8e26e4c9402",
@@ -90260,8 +90506,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "5d0967050f1641aaad08821f58b818923739c1659cad6846dda1478e6d790751",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ef826146d8bd4139f43b6a7e9c5169f6c585d6675528e10558456b5efdd60a26",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-5b98ae5ac6b68600": {
       "id": "branch-5b98ae5ac6b68600",
@@ -90575,8 +90821,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "383ac8ac9a4a9f5c637a16324d534225ad0499615525e1c66d187c9aff3bcd56",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "3aeaef3bd09f1d0e099d7f7d50dc952f88ef6740dc526b952e12cfcf964212cd",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-b5de3976fb8764e4": {
       "id": "branch-b5de3976fb8764e4",
@@ -90595,8 +90841,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "80a40c577f060134edf9c8ddf7b7fe751cabf9b566df7e9670ab12d034b24b0d",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "0d7da6c5226f04b351cbba3d99bb1937929afe37b8c1b9f4d1caf056cbb6de98",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-8c1c252f0c53fa36": {
       "id": "branch-8c1c252f0c53fa36",
@@ -90728,8 +90974,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "50772ac053bca35225c8dd2627907bdb6c07050b33647b93f532b83a0e499180",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "63dbe1829bcc6ae5079dc300cbedb50fe1a20b6d6bef4818f17d9e075bec02a9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-df145aa691117ae1": {
       "id": "branch-df145aa691117ae1",
@@ -90748,8 +90994,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "fcd3364c5deb27644569551b42c163a99aab46fbddd2207d55d4f1debc7a2735",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "20256056c7048ad1df0cc2f9eae8ad04c27528e445dc9b7357b1a10dd4897154",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-de9101df6719fc35": {
       "id": "branch-de9101df6719fc35",
@@ -90776,8 +91022,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "87a0fc11b1fb9f0863f21ffb1eef7a9037792e779d2f63ace3de7aa8e54ced4c",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "ee5b3a93c7c7f3692bcef60cad3df3c740c5efc2e32522b236fef62ce3217bec",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-ada5f51a1e7f1672": {
       "id": "branch-ada5f51a1e7f1672",
@@ -90796,8 +91042,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "a0b7c66e3006f6c2f1928d841c26496ebd6473b8999133916b9d29ddef1bd668",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "38979e429eb3ef3746011ae809c4c1c4109f61e77eb29056943ae8e51af8af61",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-3d254ed3e3aa160f": {
       "id": "branch-3d254ed3e3aa160f",
@@ -90816,8 +91062,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "1167e360d08d069c2d7d636f91d37fb7b0f4b3e74b230af8ed504faef436bf47",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "5bb7b793fe3d983354866f218e7794e15229384945c968d6fd84bc763fa5e806",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-0b40fb0e2197e346": {
       "id": "branch-0b40fb0e2197e346",
@@ -90836,8 +91082,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "521d96fa8d643c0a52592e333d0db3f914529edee19d61af66179af750c78634",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "30cd679314210d43d3ad99d7ff80879ece6fa87b136742e40db4644658a0be78",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-a5961576a6beffe1": {
       "id": "branch-a5961576a6beffe1",
@@ -91019,8 +91265,8 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "21328b77148e606880ade770e114c93cd641ca9599d9f3eb868deb5dd6cda3ab",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "7ed58ac006bd6eccb07a46636bfe2e11c62f4b7b269064ce8e90aa928edaa8d9",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     },
     "branch-7cd7466c64076bce": {
       "id": "branch-7cd7466c64076bce",
@@ -91039,15 +91285,15 @@
       "production": "未確認",
       "implementation": "mainとの差分を収録。差分ゼロも記録",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "fingerprint": "e99f30083a614d34f661e5375acdd65e1f44aec97420615fd4307a4db269534a",
-      "collected_at": "2026-11-19T05:53:51.095379+00:00"
+      "fingerprint": "8ed5426514ac998ed6085fb8dddaaff8f0aed21bd779abf8254ceb5103d90c34",
+      "collected_at": "2026-11-19T06:51:34.759999+00:00"
     }
   },
   "coverage": {
-    "prs": 186,
-    "pr_cases": 186,
-    "branches": 209,
+    "prs": 187,
+    "pr_cases": 187,
+    "branches": 210,
     "errors": [],
-    "api_calls": 13
+    "api_calls": 5
   }
 }

@@ -1,14 +1,29 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T05:53:51.095379+00:00",
+  "generated_at": "2026-11-19T06:51:34.759999+00:00",
   "coverage": {
-    "prs": 186,
-    "pr_cases": 186,
-    "branches": 209,
+    "prs": 187,
+    "pr_cases": 187,
+    "branches": 210,
     "errors": [],
-    "api_calls": 13
+    "api_calls": 5
   },
   "cases": [
+    {
+      "id": "pr-203",
+      "title": "fix: preserve existing anonymous email checkpoints (#201)",
+      "summary": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "fix: preserve existing anonymous email checkpoints (#201) 変更対象ファイルに関する開発。具体的な目的は原文・差分を確認  {} 関連 #201。承認済みの旧匿名チェックポイントの保全を、未適用の登録確認migrationに追加。期限情報が存在するチェックポイントは従来の24時間再判定を継続する。既存のPGliteハーネスに旧データの登録確認回帰を追加し、対象12件成功。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-193\",\"decision\":\"extend\",\"reason\":\"既存の登録確認時期限再判定を保持し、期限メタデータがない既存確認待ちだけを保全する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-1\",\"decision\":\"reuse\",\"reason\":\"同一IDのメール確認移行と既存チェックポイントを再利用する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-101\",\"decision\":\"reuse\",\"reason\":\"既存の出典と期限の設計を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/101\"},{\"id\":\"pr-191\",\"decision\":\"reuse\",\"reason\":\"既存の発言時刻に基づく期限再判定を維持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/191\"},{\"id\":\"pr-190\",\"decision\":\"distinct\",\"reason\":\"明示的な期限切れrootの物理削除とは別のメール確認互換性を扱う\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/190\"},{\"id\":\"pr-66\",\"decision\":\"reuse\",\"reason\":\"既存の忘却・再学習の保存と検証基盤を保持する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/66\"}]}\n--> args assert auth b base before complete controls data db empty enqueue events first fs good history i id initial isolated latest legacy memory migration misaki_operations mockRpc original path payload previousEvents previousRelationship privileges public read receipt refund relationship remaining requestId result rev root rpcError s second seed shared snapshot stale state stored today vector [{\"file\": \"tests/forget-database.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs\"}, {\"file\": \"tests/forget-database.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.deepEqual(await state(id), before);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs\"}, {\"file\": \"tests/forget-database.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.deepEqual((await relationship()).rows, previousRelationship);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs\"}, {\"file\": \"tests/forget-database.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.deepEqual((await events()).rows, previousEvents);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/f816d9b6fb3089ea3107756a8ec882e3fcc62ffa/tests/forget-database.test.cjs\"}] supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql tests/forget-database.test.cjs "
+    },
     {
       "id": "pr-202",
       "title": "docs: 全エンジンの本番照合結果と再開地点を記録 (#201)",
@@ -5032,6 +5047,21 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/ledger-yaml-repair-20261104 ブランチ差分を収録  {}   [] .github/workflows/ledger-facts-proposal.yml "
+    },
+    {
+      "id": "branch-d0d7c835a1dbc03b",
+      "title": "fix/legacy-anonymous-confirmation-201",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/legacy-anonymous-confirmation-201 ブランチ差分を収録  {}   [] supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql tests/forget-database.test.cjs "
     },
     {
       "id": "branch-e06b8cf63a4b31eb",

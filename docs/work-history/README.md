@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-19T05:53:51.095379+00:00
+更新 (UTC): 2026-11-19T06:51:34.759999+00:00
 
 ## 全案件
 
@@ -176,6 +176,7 @@
 | [automation/ledger-facts-41477941977](cases/branch-ce4aa0014fb13e1b.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/anonymous-expired-root-purge](cases/branch-cf063db3d4301a2a.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/ledger-rerun-branch-collision](cases/branch-cf3fed7f263eaf9b.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [fix/legacy-anonymous-confirmation-201](cases/branch-d0d7c835a1dbc03b.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/relationship-analyzer-bounded-retry](cases/branch-d1691037dd1d0dbb.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/audit-overview-against-source](cases/branch-d1c7bd152670a9a9.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/chat-scroll-and-load-diagnostics-20261104](cases/branch-d4bd494d2ca8e9db.md) | 記憶・会話・開発管理・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -319,6 +320,7 @@
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [docs: 全エンジンの本番照合結果と再開地点を記録 (#201)](cases/pr-202.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [fix: preserve existing anonymous email checkpoints (#201)](cases/pr-203.md) | その他の開発：変更対象ファイルに関する開発。具体的な目的は原文・差分を確認 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [直近の実装・修正総覧を更新する](cases/pr-21.md) | その他の開発：直近の実装・修正総覧を更新する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [総覧を最新mainソースと再照合する](cases/pr-22.md) | その他の開発：総覧を最新mainソースと再照合する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧ブラウザ自発メッセージ経路を削除する](cases/pr-23.md) | 記憶・会話・画面・表示：旧ブラウザ自発メッセージ経路を削除する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -599,6 +601,7 @@
 - supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 - supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql：[branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-67](cases/pr-67.md)
 - supabase/migrations/20261112081000_purge_expired_anonymous_root.sql：[pr-190](cases/pr-190.md), [pr-193](cases/pr-193.md)
+- supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql：[branch-d0d7c835a1dbc03b](cases/branch-d0d7c835a1dbc03b.md), [pr-193](cases/pr-193.md), [pr-203](cases/pr-203.md)
 
 ## 更新と制約
 
