@@ -22,11 +22,24 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
   const sessionStorage = storage(sessionInitial);
   const states = [], effects = [], cleanups = [], calls = [], listeners = [];
   let cursor = 0, mounted = false, currentUser = user;
+  let effectIndex = 0;
+  const dependencies = [], updateCleanups = [];
+  const effect = (fn, deps) => {
+    const index = effectIndex++;
+    const before = dependencies[index];
+    dependencies[index] = deps;
+    if (!mounted || (deps && before && deps.some((v, i) => v !== before[i]))) {
+      effects.push(() => {
+        updateCleanups[index]?.();
+        updateCleanups[index] = fn();
+      });
+    }
+  };
   const react = { useState: value => {
     const i = cursor++;
     if (!(i in states)) states[i] = value;
     return [states[i], next => { states[i] = typeof next === 'function' ? next(states[i]) : next; }];
-  }, useEffect: fn => { if (!mounted) effects.push(fn); }, useLayoutEffect: fn => { if (!mounted) effects.push(fn); } };
+  }, useEffect: effect, useLayoutEffect: effect };
   const client = { auth: {
     getSession: async () => ({ data: { session: currentUser ? { user: currentUser, access_token: 'token' } : null }, error: null }),
     getUser: async () => ({ data: { user: currentUser }, error: null }),
@@ -79,9 +92,10 @@ function harness(user = { id: 'a', is_anonymous: true }, initial = {}, sessionIn
   const h = { window: context.window, localStorage, sessionStorage, states, calls, client, load,
     fetch: async () => Response.json({ exists: true, history, memory: ['remember'] }),
     setUser: u => { currentUser = u; }, emit: (event, u) => listeners.forEach(fn => fn(event, u ? { user: u } : null)),
-    render(file, props = {}) { cursor = 0; const tree = load(file).default(props); mounted = true; return tree; },
+    render(file, props = {}) { cursor = 0; effectIndex = 0; const tree = load(file).default(props); mounted = true; return tree; },
     async mount(file, props) { const tree = this.render(file, props); effects.splice(0).forEach(fn => { const cleanup = fn(); if (cleanup) cleanups.push(cleanup); }); await flush(); return tree; },
-    unmount() { cleanups.forEach(fn => fn()); } };
+    commit() { effects.splice(0).forEach(fn => fn()); },
+    unmount() { updateCleanups.forEach(fn => fn?.()); cleanups.forEach(fn => fn()); } };
   return h;
 }
 function find(tree, text) {
@@ -307,7 +321,7 @@ for (const returning of [true, false]) test('welcome and history loading, return
   h.unmount();
 });
 
-for (const [status, code, text] of [[410,'TEMPORARY_STATE_EXPIRED','有効期限'],[409,'TEMPORARY_STATE_UNVERIFIABLE','検証できません']]) {
+for (const [status, code, text] of [[409,'TEMPORARY_STATE_UNVERIFIABLE','検証できません']]) {
  test(`actual chat UI ${status}: shows reason, requires confirmation, preserves old cache and disables send`, async () => {
   const h=harness();h.fetch=async url=>String(url).endsWith('/admission') ? Response.json({accepting:true}) : Response.json({code},{status});
   h.window.location.assign=url=>h.calls.push({navigate:url});h.window.confirm=()=>false;
@@ -324,11 +338,31 @@ for (const [status, code, text] of [[410,'TEMPORARY_STATE_EXPIRED','有効期限
   assert.equal(h.localStorage.getItem('misaki-chat-history'),before);assert.ok(!h.calls.includes('signOut'));h.unmount();
  });
 }
-test('actual chat UI: account changed to registered while error displayed cannot trigger anonymous recovery',async()=>{
- const h=harness();h.fetch=async()=>Response.json({code:'TEMPORARY_STATE_EXPIRED'},{status:410});h.window.confirm=()=>true;
- await h.mount('app/chat/page.tsx');h.setUser({id:'registered',is_anonymous:false});
- await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
- assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.ok(!h.calls.includes('signOut'));h.unmount();
+for (const scenario of ['welcome', 'menu', 'account switch', 'unmount']) test('expired chat timer: ' + scenario, async () => {
+  const h = harness();
+  let timeout;
+  h.window.setTimeout = (fn, delay) => { if (delay === 5000) timeout = fn; return 1; };
+  h.window.clearTimeout = () => {};
+  h.window.location.assign = url => h.calls.push({ navigate: url });
+  h.fetch = async url => String(url).endsWith('/admission') ? Response.json({ accepting: true })
+    : Response.json({ code: 'TEMPORARY_STATE_EXPIRED' }, { status: 410 });
+  const page = 'app/chat/page.tsx';
+  await h.mount(page);
+  const tree = h.render(page); h.commit();
+  assert.ok(allElements(tree, x => x.props?.className === 'sendError')[0].props.children.includes('右上のメニュー'));
+  assert.equal(find(tree, '古い状態を残して、独立した新しい会話を始める'), null);
+  assert.equal(typeof timeout, 'function');
+  assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'), null);
+  if (scenario === 'menu') {
+    allElements(tree, x => x.props?.className === 'menuButton')[0].props.onClick();
+    h.render(page); h.commit();
+  }
+  if (scenario === 'unmount') h.unmount();
+  if (scenario === 'account switch') h.setUser({ id: 'other', is_anonymous: true });
+  timeout(); await flush();
+  assert.equal(Boolean(h.sessionStorage.getItem('misaki-active-recovery-scope-v1')), scenario === 'welcome');
+  assert.deepEqual(h.calls.filter(x => x.navigate), scenario === 'welcome' ? [{navigate:'/chat'}] : []);
+  assert.equal(h.localStorage.getItem('misaki-chat-history'), JSON.stringify(history));
 });
 test('actual chat UI: valid state enables chat without recovery button',async()=>{
  const h=harness();h.fetch=async()=>Response.json({history, memory:[],relationshipPoints:0});await h.mount('app/chat/page.tsx');
@@ -346,11 +380,11 @@ for (const accepting of [false, null, 'network-failure']) test(`actual chat UI a
  const oldLocal=h.localStorage.getItem('misaki-chat-history');
  await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
  assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.equal(h.localStorage.getItem('misaki-chat-history'),oldLocal);
- assert.equal(h.calls.filter(x=>x.navigate).length,0);assert.ok(h.states.some(x=>typeof x==='string'&&x.includes('復旧受付を一時停止')));h.unmount();
+ assert.equal(h.calls.filter(x=>x.navigate).length,0);assert.ok(h.states.some(x=>typeof x==='string'&&x.includes('少し待って')));h.unmount();
 });
 test('account switch while waiting for admission cannot start an independent recovery',async()=>{
  const h=harness();h.window.confirm=()=>true;
- h.fetch=async url=>{if(String(url).endsWith('/admission')){h.setUser({id:'registered-other',is_anonymous:false});return Response.json({accepting:true})}return Response.json({code:'TEMPORARY_STATE_EXPIRED'},{status:410})};
+ h.fetch=async url=>{if(String(url).endsWith('/admission')){h.setUser({id:'registered-other',is_anonymous:false});return Response.json({accepting:true})}return Response.json({code:'TEMPORARY_STATE_UNVERIFIABLE'},{status:409})};
  await h.mount('app/chat/page.tsx');await find(h.render('app/chat/page.tsx'),'古い状態を残して、独立した新しい会話を始める').props.onClick();
  assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'),null);assert.ok(!h.calls.includes('signOut'));h.unmount();
 });

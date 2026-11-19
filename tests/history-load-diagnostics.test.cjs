@@ -39,7 +39,7 @@ test('no auth token returns 401 without generation',async()=>{
 });
 test('UI only accepts matching status and fixed code, never arbitrary server text',()=>{
  const h=harness(),{temporaryStateMessage:message}=h.load('lib/temporary-state-error.ts');
- assert.match(message(410,{code:'TEMPORARY_STATE_EXPIRED'}),/期限/);
+ assert.match(message(410,{code:'TEMPORARY_STATE_EXPIRED'}),/右上のメニューからログインしてね/);
  assert.match(message(409,{code:'TEMPORARY_STATE_UNVERIFIABLE'}),/検証/);
  assert.equal(message(500,{code:'TEMPORARY_STATE_EXPIRED',error:'private'}),null);
  assert.equal(message(410,{error:'private'}),null);
