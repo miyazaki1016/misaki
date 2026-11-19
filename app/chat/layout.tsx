@@ -18,6 +18,24 @@ export default function ChatLayout({ children }: { children: ReactNode }) {
       <FloatingMenuButton />
 
       <style>{`
+        .shell .chat .historyLoadingSpinner {
+          width: 42px;
+          height: 42px;
+          margin: 0 auto;
+          border: 3px solid #f4d4dd;
+          border-top-color: #dc5275;
+          border-radius: 50%;
+          animation: misakiHistoryLoadingSpin 0.8s linear infinite;
+        }
+
+        @keyframes misakiHistoryLoadingSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .shell .chat .historyLoadingSpinner { animation: none; }
+        }
+
         .shell .chat [data-misaki-proactive-photo="true"] {
           margin-left: 45px !important;
         }
