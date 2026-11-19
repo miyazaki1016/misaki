@@ -229,3 +229,22 @@ test('delayed email confirmation rechecks anonymous expiry before permanent read
   await db.query('update auth.users set is_anonymous=false where id=$1',[registered]);
   assert.deepEqual((await state(registered)).memory, ['safe memory']);
 }));
+
+test('email confirmation preserves the legacy checkpoint without expiry metadata', () => isolated(async () => {
+  const id = await seed(true);
+  const history = [{ role: 'user', text: 'legacy chat', sentAt: new Date(Date.now() - 25 * 3600000).toISOString() }];
+  const memory = ['legacy memory'];
+  const today = { date: 'test', items: ['legacy summary'] };
+  await db.query('select save_misaki_temporary_state_unstamped($1,$2::jsonb,$3::jsonb,$4::jsonb,40,$5::jsonb,null,$6)',
+    [id, JSON.stringify(history), JSON.stringify(memory), JSON.stringify(today),
+      JSON.stringify({ emotionPrimary: 'happy' }), payload]);
+  const before = await state(id);
+  const relationship = () => db.query('select * from misaki_relationship_state where user_id=$1', [id]);
+  const events = () => db.query('select * from misaki_relationship_events where user_id=$1 order by id', [id]);
+  const previousRelationship = (await relationship()).rows;
+  const previousEvents = (await events()).rows;
+  await db.query('update auth.users set is_anonymous=false where id=$1', [id]);
+  assert.deepEqual(await state(id), before);
+  assert.deepEqual((await relationship()).rows, previousRelationship);
+  assert.deepEqual((await events()).rows, previousEvents);
+}));
