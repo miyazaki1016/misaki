@@ -356,6 +356,8 @@ export default function ChatPage() {
       ""
     );
 
+  const [historyLoading, setHistoryLoading] = useState(true);
+
   const [
     loaded,
     setLoaded,
@@ -824,6 +826,8 @@ export default function ChatPage() {
         }
       } catch (error) {
         if (active) setSendError(error instanceof Error ? error.message : "状態を読み込めませんでした。");
+      } finally {
+        if (active) setHistoryLoading(false);
       }
     }
     void load();
@@ -2001,8 +2005,17 @@ export default function ChatPage() {
       <section
         className="chat"
       >
+        {messages.length === 0 && historyLoading && (
+          <div className="emptyConversation" role="status">
+            <div className="historyLoadingSpinner" aria-hidden="true" />
+            <p>会話を読み込み中…</p>
+          </div>
+        )}
+
         {messages.length ===
           0 &&
+          loaded &&
+          !historyLoading &&
           !loading && (
             <div
               className="emptyConversation"
@@ -2948,6 +2961,24 @@ export default function ChatPage() {
             90px;
           text-align:
             center;
+        }
+
+        .historyLoadingSpinner {
+          width: 42px;
+          height: 42px;
+          margin: 0 auto;
+          border: 3px solid #f4d4dd;
+          border-top-color: #dc5275;
+          border-radius: 50%;
+          animation: historyLoadingSpin 0.8s linear infinite;
+        }
+
+        @keyframes historyLoadingSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .historyLoadingSpinner { animation: none; }
         }
 
         .emptyConversation img {

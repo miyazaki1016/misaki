@@ -289,12 +289,30 @@ function allElements(tree, predicate) {
   if (!tree || typeof tree !== 'object') return [];
   return [...(predicate(tree) ? [tree] : []), ...[tree.props?.children].flat(Infinity).flatMap(x => allElements(x, predicate))];
 }
+test('initial history shows a loading status until an empty conversation is confirmed', async () => {
+  const h = harness();
+  let finish;
+  h.fetch = async () => new Promise(resolve => { finish = resolve; });
+  await h.mount('app/chat/page.tsx');
+  const render = () => h.render('app/chat/page.tsx');
+  const loading = () => allElements(render(), x => x.props?.className === 'historyLoadingSpinner');
+  const greeting = () => allElements(render(), x => x.type === 'p' && x.props.children === 'なんでもない話でいいよ。');
+  assert.equal(loading().length, 1);
+  assert.equal(greeting().length, 0);
+  finish(Response.json({ history: [], memory: [], relationshipPoints: 0 }));
+  await flush();
+  assert.equal(loading().length, 0);
+  assert.equal(greeting().length, 1);
+  h.unmount();
+});
+
 for (const [status, code, text] of [[410,'TEMPORARY_STATE_EXPIRED','有効期限'],[409,'TEMPORARY_STATE_UNVERIFIABLE','検証できません']]) {
  test(`actual chat UI ${status}: shows reason, requires confirmation, preserves old cache and disables send`, async () => {
   const h=harness();h.fetch=async url=>String(url).endsWith('/admission') ? Response.json({accepting:true}) : Response.json({code},{status});
   h.window.location.assign=url=>h.calls.push({navigate:url});h.window.confirm=()=>false;
   const before=h.localStorage.getItem('misaki-chat-history');
   await h.mount('app/chat/page.tsx');let tree=h.render('app/chat/page.tsx');
+  assert.equal(allElements(tree,x=>x.props?.className==='historyLoadingSpinner').length,0);
   const errors=allElements(tree,x=>x.props?.className==='sendError');assert.ok(errors.some(x=>x.props.children.includes(text)));
   const input=allElements(tree,x=>x.type==='input'&&x.props.placeholder?.includes('美咲に'))[0];assert.equal(input.props.disabled,true);
   let button=find(tree,'古い状態を残して、独立した新しい会話を始める');assert.ok(button);
