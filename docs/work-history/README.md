@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-19T05:38:50.786032+00:00
+更新 (UTC): 2026-11-19T05:53:51.095379+00:00
 
 ## 全案件
 
@@ -147,6 +147,7 @@
 | [experiment/conversation-lab-offline-v1-20261015](cases/branch-ae082efda294b17a.md) | 記憶・会話・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/misaki-memory-public-final-20261030](cases/branch-af3cb6e431dbdd62.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/relationship-evidence-validation-diagnostics](cases/branch-affe9c1706156567.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [docs/engine-production-audit-201](cases/branch-b1248a572f6f91ad.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/fix-inventory-overview-status-20261101](cases/branch-b23ba909505bae4f.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/inventory-exact-patch-evidence](cases/branch-b23be022a75304ba.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/inventory-triage-output-newlines-20261101](cases/branch-b30df8ff98a54148.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -317,6 +318,7 @@
 | [会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階）](cases/pr-199.md) | 記憶・会話：会話や記憶・関係性を扱う処理の変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [旧Safariに残った所有者不明の会話キャッシュを破棄する](cases/pr-2.md) | 記憶・会話：旧Safariに残った所有者不明の会話キャッシュを破棄する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える](cases/pr-20.md) | 記憶・会話：ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [docs: 全エンジンの本番照合結果と再開地点を記録 (#201)](cases/pr-202.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [直近の実装・修正総覧を更新する](cases/pr-21.md) | その他の開発：直近の実装・修正総覧を更新する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [総覧を最新mainソースと再照合する](cases/pr-22.md) | その他の開発：総覧を最新mainソースと再照合する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧ブラウザ自発メッセージ経路を削除する](cases/pr-23.md) | 記憶・会話・画面・表示：旧ブラウザ自発メッセージ経路を削除する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |

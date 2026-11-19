@@ -1,14 +1,29 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T05:38:50.786032+00:00",
+  "generated_at": "2026-11-19T05:53:51.095379+00:00",
   "coverage": {
-    "prs": 185,
-    "pr_cases": 185,
-    "branches": 208,
+    "prs": 186,
+    "pr_cases": 186,
+    "branches": 209,
     "errors": [],
-    "api_calls": 17
+    "api_calls": 13
   },
   "cases": [
+    {
+      "id": "pr-202",
+      "title": "docs: 全エンジンの本番照合結果と再開地点を記録 (#201)",
+      "summary": "開発資産の把握・引継ぎ・レビューを支援する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "docs: 全エンジンの本番照合結果と再開地点を記録 (#201) 開発資産の把握・引継ぎ・レビューを支援する変更  {} 関連 #201、親 #102、P0 #200。\n\n開発台帳へ現行mainとVercelの一致、Supabase側の未適用5本、最新mainのローカル回帰420/420・型・ビルド、本番切替の未解決条件を記録する。変更対象は台帳のみ。\n\n## 着手前照合\nhttps://github.com/miyazaki1016/misaki/actions/runs/44467555727\n\n## 再利用判断\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-193\",\"decision\":\"extend\",\"reason\":\"固定24時間の根拠発言検証と感情v2の原子的な処理待ち・CAS・冪等性を再利用し、隔離検証に残る実Gemini、Auth、Body Clock同時実行、定期回収を確認する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/193\"},{\"id\":\"pr-101\",\"decision\":\"reuse\",\"reason\":\"10月30日の公開監査と出典・期限・記憶・関係性の段階案を棚卸しの起点にし、美咲以外4人の設定拡張は今回に含めず実装と本番は現行コードで照合する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/101\"},{\"id\":\"pr-1\",\"decision\":\"extend\",\"reason\":\"メール送信前に同じ匿名IDで保存する既存経路と再送・所有者分離の検証を再利用し、後続の固定24時間期限を含む実メール確認・同一ID移行を検証する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\"},{\"id\":\"pr-192\",\"decision\":\"extend\",\"reason\":\"親102に紐付く既存P0隔離検証と台帳形式を維持し、今回確認した現行SHA・本番DB未適用・再開条件を同じ台帳へ追記する\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/192\"},{\"id\":\"pr-183\",\"decision\":\"reuse\",\"reason\":\"中断・再開を追跡する既存の正本と証拠形式を利用し、親102の完成判定や状態機構を変更しない\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/183\"},{\"id\":\"pr-104\",\"decision\":\"reuse\",\"reason\":\"過去の棚卸しと同様に読み取り結果の根拠リンクを台帳に載せ、マイグレーション適用実績にはしない\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/104\"}]}\n--> expired [] docs/DEVELOPMENT_LEDGER.md # 美咲 自動棚卸し用の運用索引\n\n> **人が更新する案件の状態・担当・次の一手は [開発台帳](DEVELOPMENT_LEDGER.md) に集約。** この索引は既存の自動棚卸しが参照する案件ID・照合名・パスと、GitHubから取得した事実を保持する。\n\n| ID | 照合名 | 照合用の所在 |\n| --- | --- | --- |\n| M-01 | ラウンジ→オープニング→チャット | `docs/DEVELOPMENT_LEDGER.md` / `experiment/transparent-lounge-20261027` |\n| M-02 | 旧会話入力・性能計測 | `docs/audits/CHAT_METRICS_PATH_20261101.md` |\n| M-03 | 会話コンテキスト圧縮・旧migration | `docs/audits/LEGACY_CODE_DIFF_20261101.md` |\n| M-04 | 外部AIレビュー用Preview | `docs/audits/FEATURE_RECONCILIATION_20261101.md` |\n| M-05 | 旧監査証拠 | `docs/audits/LEGACY_AUDIT_FOLLOWUP_20261101.md` |\n| M-06 | 旧Safari・関係性診断ブランチ2件 | `docs/audits/BRANCH_TRIAGE_20261101.md` |\n\n自動取得は確認候補。案件の進捗・本番状態を自動確定しない。旧運用手順と状態は[整理前の運用索引](https://github.com/miyazaki1016/misaki/blob/fc1424ec1649fd73b1c6e89d2122cd7df5c13038/docs/DEVELOPMENT_OPERATIONS_INDEX.md)で確認できる。\n\n<!-- OPERATIONS_INVENTORY_START -->\n## GitHub Open PR一覧（2026-11-05取得スナップショット）\n\n> PRの状態のみ。開発完了・本番反映の認定ではありません。最新の状態は [GitHub Open PR](https://github.com/miyazaki1016/misaki/pulls) と Actions で再確認してください。自動棚卸しが次回更新する場合があります。\n\n| Open PR | タイトル | Head branch |\n|---|---|---|\n| #30 | 旧schema互換の先行maintenance/drain設備を独立追加 | `codex/legacy-maintenance-drain` |\n| #31 | 関係時間v2: 内容理解から感情・行動・自発性まで統合 | `sora/relationship-time-v2-design` |\n| #60 | Document Relationship Engine v1.2 Stage and growth principles | `docs/relationship-v1-2-stage-growth-principles` |\n| #66 | Forget Control v1: canonical忘却と確認付き再学習 | `work/forget-control-v1` |\n| #67 | Relationship Identity v1: canonical persistence, continuity and migration audit | `work/relationship-identity-v1` |\n| #78 | Test isolated conversation replay adapter | `work/context-no-duplicate-replies-ab` |\n| #79 | docs: multi-character data scope inventory | `docs/multi-character-data-scope-inventory` |\n| #80 | docs: audit multi-character RPC callers | `docs/multi-character-rpc-caller-audit` |\n| #81 | docs: reconcile production source-of-truth and management drift | `docs/production-source-of-truth-reconciliation` |\n| #83 | test: compare canonical relationship acting instructions | `test/relationship-acting-state-comparison` |\n| #84 | docs: 5軸成長速度とRelationship Engine思想の照合を総覧へ追記 | `docs/relationship-five-axis-design-review-20261015` |\n| #85 | experiment: 5軸の中間成長を表現するInterpreter比較案（本番未接続） | `experiment/interpreter-gradual-acting-20261015` |\n| #86 | experiment: offline multi-turn conversation lab foundation (no Gemini/DB) | `experiment/conversation-lab-offline-v1-20261015` |\n| #87 | design: shared Misaki conversation engine for production and tuning lab | `design/shared-conversation-engine-contract-20261015` |\n| #88 | refactor: pure conversation history adapter (first shared engine seam) | `experiment/shared-conversation-history-v1-20261015` |\n| #100 | 設計: 匿名の情報別24時間記憶とGemini軽量化の安全な実装順序 | `design/anonymous-per-item-24h-memory-20261030` |\n| #146 | docs: review GitHub facts in development ledger and operations index | `automation/ledger-facts-41483251398-1` |\n| #151 | WIP: チャット初期スクロールの追従制御（読み込み遅延調査・検証は未完了） | `fix/chat-scroll-and-load-diagnostics-20261104` |\n\n全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。\n既存案件ID・判断欄は変更しません。\n\n<!-- OPERATIONS_INVENTORY_END -->\n "
+    },
     {
       "id": "pr-199",
       "title": "会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階）",
@@ -3531,6 +3546,21 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "docs/engine-audit-102-20261112 ブランチ差分を収録  {}   [] docs/DEVELOPMENT_LEDGER.md docs/work-history/curated.json "
+    },
+    {
+      "id": "branch-b1248a572f6f91ad",
+      "title": "docs/engine-production-audit-201",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "docs/engine-production-audit-201 ブランチ差分を収録  {}   [] docs/DEVELOPMENT_LEDGER.md "
     },
     {
       "id": "branch-77303b743008b53e",
