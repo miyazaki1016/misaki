@@ -1,14 +1,31 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T08:16:57.265369+00:00",
+  "generated_at": "2026-11-19T08:37:02.804109+00:00",
   "coverage": {
-    "prs": 193,
-    "pr_cases": 193,
-    "branches": 216,
+    "prs": 194,
+    "pr_cases": 194,
+    "branches": 217,
     "errors": [],
-    "api_calls": 10
+    "api_calls": 14
   },
   "cases": [
+    {
+      "id": "pr-215",
+      "title": "期限切れの匿名チャットから5秒後に新しい会話へ移動",
+      "summary": "会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "開発管理",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "期限切れの匿名チャットから5秒後に新しい会話へ移動 会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 API rejects foreign user and checkpoints verified temporary state API rejects foreign user and checkpoints verified temporary state if (active) setShowHistoryDiagnostics(urlDiagnostics); ／ if (!timingEnabled) return; ／ if (timingEnabled) { ／ if (duration) timings.historyServerLoadMs = Math.round(Number(duration)); ／ if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration)); ／ if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration)); ／ if (!response.ok) { ／ if (active && temporaryStateMessage(response.status, result)) { {} Closes #214\n\n匿名チャットの期限切れ案内を短くし、ボタンを外して5秒後に独立した新しいチャットへ移動する。右上メニューでログインする操作を妨げない。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-131\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/131\",\"reason\":\"既存のタブ専用復旧と受付・本人確認を再利用し、410の開始をタイマーに変える。409は従来の確認操作を維持。\",\"decision\":\"extend\"},{\"id\":\"pr-1\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/1\",\"reason\":\"メール登録導線と本人確認を維持する。メニューの操作中は移動せず、待機中に所有者が変わったら中止する。\",\"decision\":\"reuse\"},{\"id\":\"pr-99\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/99\",\"reason\":\"初回ラウンジのアイコンと正常匿名会話の継続は別経路であり、期限切れの画面だけを変更する。\",\"decision\":\"distinct\"}]}\n--> ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MEMORY_KEY MISAKI_TODAY_MEMORY_KEY RELATIONSHIP_KEY STORAGE_KEY TemporaryStateUnavailableError accepting accessToken active additional anonymous applyRoot assert attempt authDuration before beginIndependentConversation body cache cachedHistory canonical chat checkpoint child cleanup client code context createEmptyTodayMemory cursor data dependencies duration effect effectIndex emails expectedOwner expiresAt failedEmail find first flush freeLimitReached freeRemaining fs getFirstRpcRow getJapanCurrentTime getJapanDateKey h harness history i index initial initializeAccount isPremium isPremiumActive [{\"file\": \"app/chat/page.tsx\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function openRecovery(code: string, owner: string, active: () => boolean) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!active() || error || !data.session?.user.is_anonymous || data.session.user.id !== owner) return;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!await checkRecoveryAdmission(fetch)) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (active()) setSendError(\\\"今は新しい会話を始められません。少し待ってからもう一度開いてね。\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!active() || currentError || !current.session?.user.is_anonymous || current.session.user.id !== owner) return;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (recoveryStarting || !recoveryCode || !recoveryOwner) return;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (recoveryCode !== \\\"TEMPORARY_STATE_EXPIRED\\\" || !recoveryOwner || showMenu) return;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (active) setSendError(\\\"新しい会話を開始できませんでした。もう一度開いてね。\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"app/chat/page.tsx\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (active && temporaryStateMessage(response.status, result)) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/app/chat/page.tsx\"}, {\"file\": \"lib/temporary-state-error.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (status === 410 && code === 'TEMPORARY_STATE_EXPIRED') return '会話を覚えておくには、右上のメニューからログインしてね。';\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/lib/temporary-state-error.ts\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!mounted || (deps && before && deps.some((v, i) => v !== before[i]))) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"for (const scenario of ['welcome', 'menu', 'account switch', 'unmount']) test('expired chat timer: ' + scenario, async () => {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"h.window.setTimeout = (fn, delay) => { if (delay === 5000) timeout = fn; return 1; };\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.ok(allElements(tree, x => x.props?.className === 'sendError')[0].props.children.includes('右上のメニュー'));\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(find(tree, '古い状態を残して、独立した新しい会話を始める'), null);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(typeof timeout, 'function');\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(h.sessionStorage.getItem('misaki-active-recovery-scope-v1'), null);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (scenario === 'menu') {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (scenario === 'unmount') h.unmount();\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (scenario === 'account switch') h.setUser({ id: 'other', is_anonymous: true });\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(Boolean(h.sessionStorage.getItem('misaki-active-recovery-scope-v1')), scenario === 'welcome');\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.deepEqual(h.calls.filter(x => x.navigate), scenario === 'welcome' ? [{navigate:'/chat'}] : []);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/history-load-diagnostics.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.match(message(410,{code:'TEMPORARY_STATE_EXPIRED'}),/右上のメニューからログインしてね/);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/e4237a363590beede7f90bff766a2140d53d293f/tests/history-load-diagnostics.test.cjs\"}] app/chat/page.tsx lib/temporary-state-error.ts tests/account-conversation.test.cjs tests/history-load-diagnostics.test.cjs "
+    },
     {
       "id": "pr-213",
       "title": "チャット上部の運転向け注意書きを削除",
@@ -4949,6 +4966,23 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/expired-temporary-relationship-import ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-2a59b8d0ebd1a336",
+      "title": "fix/expired-welcome",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/expired-welcome ブランチ差分を収録  {}   [] app/chat/page.tsx lib/temporary-state-error.ts tests/account-conversation.test.cjs tests/history-load-diagnostics.test.cjs "
     },
     {
       "id": "branch-2fb9170c6f164861",
