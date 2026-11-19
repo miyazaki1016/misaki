@@ -1,14 +1,29 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T08:47:46.621307+00:00",
+  "generated_at": "2026-11-19T08:52:57.311795+00:00",
   "coverage": {
-    "prs": 194,
-    "pr_cases": 194,
-    "branches": 217,
+    "prs": 195,
+    "pr_cases": 195,
+    "branches": 218,
     "errors": [],
     "api_calls": 6
   },
   "cases": [
+    {
+      "id": "pr-217",
+      "title": "ラウンジの案内文を変更",
+      "summary": "ラウンジ・映像・画面演出に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "ラウンジ・画面"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "ラウンジの案内文を変更 ラウンジ・映像・画面演出に関する変更  {} Closes #216\n\nラウンジ下部の「初回はムービーのあとに会話が始まります。スキップもできます。」の一行を「会いたい女の子をタップしてね」に変更する。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-140\",\"decision\":\"reuse\",\"reason\":\"既存のラウンジとチャットへの導線を使い、今回の差分を案内文一行の置換に限定する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/140\"},{\"id\":\"pr-130\",\"decision\":\"reuse\",\"reason\":\"既存のラウンジとチャットへの導線を使い、今回の差分を案内文一行の置換に限定する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/130\"}]}\n-->  [] public/lounge/index.html "
+    },
     {
       "id": "pr-215",
       "title": "期限切れの匿名チャットから5秒後に新しい会話へ移動",
@@ -5303,6 +5318,21 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/lounge-js-syntax-tap-20261030 ブランチ差分を収録  {}   [] docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md public/lab/transparent-lounge-shortcuts/index.html public/lab/transparent-lounge-vertical/index.html "
+    },
+    {
+      "id": "branch-57af258408067461",
+      "title": "fix/lounge-tap-hint",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "ラウンジ・画面"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/lounge-tap-hint ブランチ差分を収録  {}   [] public/lounge/index.html "
     },
     {
       "id": "branch-e21cbc0c26553034",

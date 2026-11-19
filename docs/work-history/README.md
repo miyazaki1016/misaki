@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-19T08:47:46.621307+00:00
+更新 (UTC): 2026-11-19T08:52:57.311795+00:00
 
 ## 全案件
 
@@ -91,6 +91,7 @@
 | [feat/misaki-lp-refresh-204](cases/branch-52e23902d6b56398.md) | 画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/profile-aware-life-events](cases/branch-561d4f92479230e8.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [design/shared-conversation-engine-contract-20261015](cases/branch-56aca799dd70922c.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [fix/lounge-tap-hint](cases/branch-57af258408067461.md) | ラウンジ・画面：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/conversation-context-compression-spike](cases/branch-5b98ae5ac6b68600.md) | 記憶・会話・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [cleanup/legacy-proactive-tags](cases/branch-5e09e6de95bfa770.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/inventory-index-proposal](cases/branch-5fbac0e9c427777a.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -336,6 +337,7 @@
 | [初回のチャットに美咲の歓迎表示を復元](cases/pr-211.md) | 記憶・会話・画面・表示：会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [チャット上部の運転向け注意書きを削除](cases/pr-213.md) | 記憶・会話・画面・表示：会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [期限切れの匿名チャットから5秒後に新しい会話へ移動](cases/pr-215.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [ラウンジの案内文を変更](cases/pr-217.md) | ラウンジ・画面：ラウンジ・映像・画面演出に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [総覧を最新mainソースと再照合する](cases/pr-22.md) | その他の開発：総覧を最新mainソースと再照合する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧ブラウザ自発メッセージ経路を削除する](cases/pr-23.md) | 記憶・会話・画面・表示：旧ブラウザ自発メッセージ経路を削除する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [匿名セッションの一時切断で会話を消さない](cases/pr-24.md) | 記憶・会話：匿名セッションの一時切断で会話を消さない | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -541,7 +543,7 @@
 - public/lab/transparent-lounge/misaki_lounge_12fps.webp：[branch-9489dbe22b83fa25](cases/branch-9489dbe22b83fa25.md), [pr-89](cases/pr-89.md)
 - public/lab/transparent-lounge/misaki_lounge_24fps.webp：[branch-9489dbe22b83fa25](cases/branch-9489dbe22b83fa25.md), [pr-89](cases/pr-89.md)
 - public/lounge/entry.js：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [pr-130](cases/pr-130.md)
-- public/lounge/index.html：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [pr-130](cases/pr-130.md), [pr-140](cases/pr-140.md)
+- public/lounge/index.html：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [branch-57af258408067461](cases/branch-57af258408067461.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [pr-130](cases/pr-130.md), [pr-140](cases/pr-140.md), [pr-217](cases/pr-217.md)
 - scripts/check_approval_dashboard.py：[branch-02f9f023f7c9991c](cases/branch-02f9f023f7c9991c.md), [branch-284e2dc6d0c96cbb](cases/branch-284e2dc6d0c96cbb.md), [branch-602fd94b750fc7fd](cases/branch-602fd94b750fc7fd.md), [branch-6a84c634aa234f1c](cases/branch-6a84c634aa234f1c.md), [branch-d727762241e2e4e1](cases/branch-d727762241e2e4e1.md), [branch-ea4df54e8d029f57](cases/branch-ea4df54e8d029f57.md), [pr-153](cases/pr-153.md), [pr-155](cases/pr-155.md), [pr-156](cases/pr-156.md), [pr-158](cases/pr-158.md), [pr-160](cases/pr-160.md), [pr-167](cases/pr-167.md)
 - scripts/context-ab-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/context-ab-quality-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-194](cases/pr-194.md), [pr-78](cases/pr-78.md)

@@ -1,0 +1,20 @@
+{
+  "id": "branch-1d18194bd4fc9125",
+  "title": "work/anonymous-history-24h",
+  "head": "accf2ef33c01e0a45ee96bea543fde01350e87f2",
+  "head_ref": "work/anonymous-history-24h",
+  "linked_prs": [
+    191
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "7353da373f66823f6b51d12f70b7f6a2bfb4b487c6314fc840a54c921e6ac448",
+  "collected_at": "2026-11-19T08:52:57.311795+00:00"
+}
