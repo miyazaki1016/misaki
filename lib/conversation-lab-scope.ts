@@ -40,6 +40,7 @@ export function filterConversationLabScope(
     const valid = typeof raw.ownerUserId === "string" && !!raw.ownerUserId.trim() &&
       typeof raw.candidate?.id === "string" && !!raw.candidate.id.trim() &&
       typeof raw.candidate?.kind === "string" &&
+      typeof raw.candidate?.priority === "number" && Number.isFinite(raw.candidate.priority) &&
       Array.isArray(visibility?.participatingCharacterIds) &&
       Array.isArray(visibility?.witnessingCharacterIds) &&
       Array.isArray(visibility?.explicitlySharedWithCharacterIds) &&
