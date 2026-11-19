@@ -289,20 +289,21 @@ function allElements(tree, predicate) {
   if (!tree || typeof tree !== 'object') return [];
   return [...(predicate(tree) ? [tree] : []), ...[tree.props?.children].flat(Infinity).flatMap(x => allElements(x, predicate))];
 }
-test('initial history shows a loading status then leaves an empty conversation blank', async () => {
+for (const returning of [true, false]) test('welcome and history loading, returning=' + returning, async () => {
   const h = harness();
+  if (!returning) h.localStorage.removeItem('misaki-chat-history');
   let finish;
   h.fetch = async () => new Promise(resolve => { finish = resolve; });
   await h.mount('app/chat/page.tsx');
   const render = () => h.render('app/chat/page.tsx');
   const loading = () => allElements(render(), x => x.props?.className === 'historyLoadingSpinner');
   const greeting = () => allElements(render(), x => x.type === 'p' && x.props.children === 'なんでもない話でいいよ。');
-  assert.equal(loading().length, 1);
-  assert.equal(greeting().length, 0);
+  assert.equal(loading().length, Number(returning));
+  assert.equal(greeting().length, Number(!returning));
   finish(Response.json({ history: [], memory: [], relationshipPoints: 0 }));
   await flush();
   assert.equal(loading().length, 0);
-  assert.equal(greeting().length, 0);
+  assert.equal(greeting().length, 1);
   h.unmount();
 });
 
