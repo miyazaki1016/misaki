@@ -27,7 +27,7 @@ export async function GET(request: Request) {
     const user = await authenticate(request);
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     if (user.is_anonymous) return Response.json({ exists: false, ephemeral: true }, { headers: { "Cache-Control": "no-store" } });
-    return Response.json(responseState(await loadCanonicalState(user.id)), { headers: { "Cache-Control": "no-store" } });
+    return Response.json(responseState(await loadCanonicalState(user.id, "history")), { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("CONVERSATION STATE READ FAILED", { code: "STATE_READ_FAILED" });
     return Response.json({ error: "Conversation state could not be loaded." }, { status: 500 });
@@ -38,11 +38,12 @@ export async function POST(request: Request) {
   const nowMs = () => typeof performance !== "undefined" ? performance.now() : Date.now();
   const requestStartedAt = nowMs();
   // Anonymous "load" renews the root, so it is a write too.
-  const maintenance = await maintenanceResponse();
-  if (maintenance) return maintenance;
   try {
-    const user = await authenticate(request);
-    const authenticatedAt = nowMs();
+    const [maintenance, { user, authenticatedAt }] = await Promise.all([
+      maintenanceResponse(),
+      authenticate(request).then(user => ({ user, authenticatedAt: nowMs() })),
+    ]);
+    if (maintenance) return maintenance;
     if (!user) return Response.json({ error: "Authentication required." }, { status: 401 });
     const body = await request.json();
     if (body.saveAnonymous === true) {
@@ -92,7 +93,7 @@ export async function POST(request: Request) {
           }
         }
       }
-      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id);
+      const state = user.is_anonymous ? await loadTemporaryRoot(user.id, body.temporaryState) : await loadCanonicalState(user.id, "history");
       return timedResponse({ ...responseState(state, !!user.is_anonymous),
         ...(user.is_anonymous ? { temporaryState: state.temporaryRevision ? await editTemporaryRoot(user.id, state, "load") : sealTemporaryState(state, "load") } : {}) });
     }
@@ -124,7 +125,7 @@ export async function POST(request: Request) {
       p_forget_payload: await forgetControlPayload(user.id, state.forgetControls ?? []),
     });
     if (error) throw new Error("Conversation edit failed");
-    return Response.json(responseState(await loadCanonicalState(user.id)));
+    return Response.json(responseState(await loadCanonicalState(user.id, "history")));
   } catch (error) {
     if (error instanceof TemporaryStateUnavailableError) {
       const status = error.reason === "expired" ? 410 : 409;

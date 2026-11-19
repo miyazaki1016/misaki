@@ -81,10 +81,10 @@ export function openTemporaryState(token: unknown): { state: RootState; requestI
   return parsed && parsed.expires > Date.now() ? parsed : null;
 }
 
-export async function loadCanonicalState(userId: string): Promise<RootState & { history: unknown[] }> {
+export async function loadCanonicalState(userId: string, purpose: "conversation" | "history" = "conversation"): Promise<RootState & { history: unknown[] }> {
   const db = createServerSupabase();
   let relationshipImportPending = false;
-  if (engineEnabled()) {
+  if (purpose === "conversation" && engineEnabled()) {
     // Read path never starts permanent Relationship work without ownership.
     // The post-save worker imports the frozen anonymous trajectory under its lease.
     const [imported, temporary] = await Promise.all([
@@ -94,10 +94,20 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
     relationshipImportPending = !!imported.error || !!temporary.error || (!imported.data && !!openTemporaryState(temporary.data?.token)?.state.relationshipEngine);
   }
   const [relationship, conversation] = await Promise.all([
-    db.from("misaki_relationship_state").select("*").eq("user_id", userId).maybeSingle(),
+    db.from("misaki_relationship_state").select(purpose === "history" ? "intimacy_points" : "*").eq("user_id", userId).maybeSingle(),
     db.from("misaki_user_conversation_state").select("history,memory,today_memory,updated_at").eq("user_id", userId).maybeSingle(),
   ]);
   if (relationship.error || conversation.error) throw new Error("Canonical state read failed");
+  const visibleState = {
+    relationshipPoints: relationship.data?.intimacy_points ?? 0,
+    history: conversation.data?.history ?? [],
+    memory: conversation.data?.memory ?? [],
+    todayMemory: conversation.data?.today_memory ?? { date: "", items: [] },
+    updatedAt: conversation.data?.updated_at ?? null,
+  };
+  // The history response exposes only the saved snapshot, not inference state.
+  if (purpose === "history") return visibleState;
+
   const forgetControls = await loadForgetControls(userId);
   let relationshipCriticalPending = relationshipImportPending;
   if (engineEnabled()) {
@@ -112,12 +122,8 @@ export async function loadCanonicalState(userId: string): Promise<RootState & { 
       typeof t.metadata?.message === "string" && criticalCandidates(t.metadata.message).length && !processed?.some(p => p.request_id === t.request_id));
   }
   return {
+    ...visibleState,
     forgetControls,
-    relationshipPoints: relationship.data?.intimacy_points ?? 0,
-    history: conversation.data?.history ?? [],
-    memory: conversation.data?.memory ?? [],
-    todayMemory: conversation.data?.today_memory ?? { date: "", items: [] },
-    updatedAt: conversation.data?.updated_at ?? null,
     relationshipActingState: engineEnabled() && relationship.data ? canonicalActingState(relationship.data,
       createLegacyRelationshipActingState(relationship.data.intimacy_points).intimacyStage) : undefined,
     relationshipCriticalPending, relationshipImportPending,
