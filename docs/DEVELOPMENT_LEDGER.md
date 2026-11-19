@@ -62,6 +62,14 @@
 }
 -->
 
+## 全エンジン統合・本番受入（2026-11-19）
+
+[Issue #201 の確認記録](https://github.com/miyazaki1016/misaki/issues/201#issuecomment-7001008277)から再開する。親 [#102](https://github.com/miyazaki1016/misaki/issues/102)、P0 [#200](https://github.com/miyazaki1016/misaki/issues/200)。
+
+確認時点のmainとVercel本番は `0ee6f9f049a31f91156b0de34545470557244117`。[本番 READY](https://vercel.com/kishibojim/misaki/5Zpay79JVidarHBgn8wkXoxWfDC4)。ローカル回帰420/420、型検査、ビルド成功。同SHAのGitHub回帰CIは未確認。着手前照合は[成功](https://github.com/miyazaki1016/misaki/actions/runs/44467555727)。
+
+PR #193 のDB変更5本が未適用。旧RPC撤去と登録確認時の期限切れデータ処理があるため、同等スキーマでの移行試験、Next・Edgeの協調切替、既存データと忘却状態の保全方法の確認から再開する。Body Clock v11と5分cronは稼働、感情回収は専用シークレットと定期起動が未設定。実Gemini、実Auth、Body Clock同時実行、感情回収、Safariの受入は未完了。親の完成条件は継続。
+
 ## 再開時に見る案件
 
 | 案件 | 確認すること | 根拠・入口 |
