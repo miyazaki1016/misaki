@@ -1,0 +1,20 @@
+{
+  "id": "branch-b5de3976fb8764e4",
+  "title": "work/forget-control-v1",
+  "head": "b29e209b75ae714cedb6b5c7af9d33f3efed5686",
+  "head_ref": "work/forget-control-v1",
+  "linked_prs": [
+    66
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "28e1be205702596a81a6756bc9180cfc4593c410f09554e1fea1afba4f5ec231",
+  "collected_at": "2026-11-19T07:58:22.216382+00:00"
+}

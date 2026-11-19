@@ -1,0 +1,20 @@
+{
+  "id": "branch-67bcc30f23d44955",
+  "title": "sora/history-edge-trace",
+  "head": "e3a08db0c3dc97b297130a224919e73a69974c60",
+  "head_ref": "sora/history-edge-trace",
+  "linked_prs": [
+    38
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "c5c4e315f197a117c4056d5d7a9c35235125289c43b9a4ef61c0cd805f544867",
+  "collected_at": "2026-11-19T07:58:22.216382+00:00"
+}

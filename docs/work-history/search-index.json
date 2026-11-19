@@ -1,14 +1,30 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-19T07:47:08.017941+00:00",
+  "generated_at": "2026-11-19T07:58:22.216382+00:00",
   "coverage": {
-    "prs": 191,
-    "pr_cases": 191,
-    "branches": 214,
+    "prs": 192,
+    "pr_cases": 192,
+    "branches": 215,
     "errors": [],
     "api_calls": 10
   },
   "cases": [
+    {
+      "id": "pr-211",
+      "title": "初回のチャットに美咲の歓迎表示を復元",
+      "summary": "会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更",
+      "state": "merged",
+      "main_status": "mainに祖先コミットとして存在（機能受入・本番は別）",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+      "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+      "production": "未確認（main統合／Vercelプレビューから推定しない）",
+      "search_text": "初回のチャットに美咲の歓迎表示を復元 会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更 API rejects foreign user and checkpoints verified temporary state API rejects foreign user and checkpoints verified temporary state if (active) setShowHistoryDiagnostics(urlDiagnostics); ／ if (!timingEnabled) return; ／ if (timingEnabled) { ／ if (duration) timings.historyServerLoadMs = Math.round(Number(duration)); ／ if (authDuration) timings.historyServerAuthMs = Math.round(Number(authDuration)); ／ if (requestDuration) timings.historyServerRequestMs = Math.round(Number(requestDuration)); ／ if (!response.ok) { ／ if (active && temporaryStateMessage(response.status, result)) setRecoveryCode(result.code); {} Closes #210\n\n初めてチャットを開く利用者には美咲の写真・「なんでもない話でいいよ。」・Misakiを最初から表示する。既存会話の履歴読み込みには #207 #209 のスピナーを再利用する。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-209\",\"decision\":\"extend\",\"reason\":\"共有レイアウトに移したスピナーと静止表示を再利用し、初回利用者の歓迎表示だけを復元する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/209\"},{\"id\":\"pr-151\",\"decision\":\"reuse\",\"reason\":\"初期スクロールの追従制御は既存挙動を維持し、歓迎表示の分岐のみに限定する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/151\"},{\"id\":\"pr-208\",\"decision\":\"extend\",\"reason\":\"履歴取得状態とテストを再利用し、初回の歓迎と再訪の取得中を別々に検証する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/208\"}]}\n--> ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MEMORY_KEY MISAKI_TODAY_MEMORY_KEY RELATIONSHIP_KEY STORAGE_KEY accessToken active additional allElements applyRoot assert attempt authDuration beginIndependentConversation body cache cachedHistory chat checkpoint child cleanup client context createEmptyTodayMemory cursor duration emails expectedOwner expiresAt failedEmail find finish first flush freeLimitReached freeRemaining fs getFirstRpcRow getJapanCurrentTime getJapanDateKey greeting h harness history i initializeAccount isPremium isPremiumActive key load loadDailyUsage loadEntitlement loading localStorage map match module [{\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"for (const returning of [true, false]) test('welcome and history loading, returning=' + returning, async () => {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!returning) h.localStorage.removeItem('misaki-chat-history');\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(loading().length, Number(returning));\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(greeting().length, Number(!returning));\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs\"}, {\"file\": \"tests/account-conversation.test.cjs\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(greeting().length, 1);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs\"}] app/chat/page.tsx tests/account-conversation.test.cjs "
+    },
     {
       "id": "pr-209",
       "title": "チャット初回ローディングのスタイルを安定化 (#207)",
@@ -4933,6 +4949,22 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/faster-chat-history-181 ブランチ差分を収録  {}   [] app/api/persona/history/route.ts lib/canonical-state.ts tests/server-canonical.test.cjs "
+    },
+    {
+      "id": "branch-25687bc1ec63df34",
+      "title": "fix/first-chat-welcome",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/first-chat-welcome ブランチ差分を収録  {}   [] app/chat/page.tsx tests/account-conversation.test.cjs "
     },
     {
       "id": "branch-48ad449fb30cd746",
