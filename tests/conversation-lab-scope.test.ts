@@ -36,3 +36,14 @@ test("rejects malformed visibility per item while retaining valid materials", ()
   assert.deepEqual(result.candidates.map(c => c.id), ["valid"]);
   assert.deepEqual(result.decisions.map(d => d.reason), ["malformed", "in-scope"]);
 });
+
+test("rejects non-finite priorities individually without dropping valid character-scoped materials", () => {
+  const invalid = [NaN, Infinity, -Infinity].map((priority, index) => ({
+    ...item("invalid-" + index, "u1", visibility(["misaki"])),
+    candidate: { ...item("invalid-" + index, "u1", visibility(["misaki"])).candidate, priority },
+  }));
+  const source = [item("valid", "u1", visibility(["misaki"])), ...invalid];
+  const result = filterConversationLabScope(source, { ownerUserId: "u1", characterId: "misaki" });
+  assert.deepEqual(result.candidates.map(c => c.id), ["valid"]);
+  assert.deepEqual(result.decisions.map(d => d.reason), ["in-scope", "malformed", "malformed", "malformed"]);
+});
