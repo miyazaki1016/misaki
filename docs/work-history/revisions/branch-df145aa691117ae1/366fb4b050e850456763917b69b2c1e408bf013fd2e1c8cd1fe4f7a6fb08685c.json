@@ -1,0 +1,20 @@
+{
+  "id": "branch-df145aa691117ae1",
+  "title": "work/p0-engine-integration",
+  "head": "51172011f7fac44950a6aa68494771ecdfe2bd76",
+  "head_ref": "work/p0-engine-integration",
+  "linked_prs": [
+    193
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "b2bde618828b9de81192c1808e34740047f32094fb0b59b0affcf77a04cb6ae3",
+  "collected_at": "2026-11-19T07:40:42.505224+00:00"
+}

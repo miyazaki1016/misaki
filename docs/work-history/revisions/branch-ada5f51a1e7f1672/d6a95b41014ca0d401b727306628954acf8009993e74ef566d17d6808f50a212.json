@@ -1,0 +1,20 @@
+{
+  "id": "branch-ada5f51a1e7f1672",
+  "title": "work/relationship-analyzer-diagnostics",
+  "head": "42177230a0a3c8926689499ffb19de4f1044d8d7",
+  "head_ref": "work/relationship-analyzer-diagnostics",
+  "linked_prs": [
+    50
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "14878da583894a85eff262d3a7a8acaf27a05b741175ca996ccbe8adb1891633",
+  "collected_at": "2026-11-19T07:40:42.505224+00:00"
+}
