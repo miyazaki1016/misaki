@@ -9,10 +9,12 @@ export type TuningSettings = Readonly<{
 }>;
 export type TuningDraft = Readonly<{
   tuningVersion: string;
+  characterId: string;
   scope: "preview";
   settings: TuningSettings;
 }>;
 export type PreviewFixture = Readonly<{
+  characterId: string;
   snapshotId: string;
   selectionRulesVersion: string;
   promptVersion: string;
@@ -41,6 +43,7 @@ function score(value: unknown): number {
 }
 export function validateTuningDraft(value: unknown): TuningDraft {
   if (!isRecord(value) || value.scope !== "preview" ||
+      typeof value.characterId !== "string" || !/^[a-zA-Z0-9._-]{1,128}$/.test(value.characterId) ||
       typeof value.tuningVersion !== "string" || !/^[a-zA-Z0-9._-]{1,64}$/.test(value.tuningVersion) ||
       !isRecord(value.settings)) {
     throw new Error("Invalid preview tuning draft");
@@ -51,6 +54,7 @@ export function validateTuningDraft(value: unknown): TuningDraft {
   }
   return Object.freeze({
     tuningVersion: value.tuningVersion,
+    characterId: value.characterId,
     scope: "preview" as const,
     settings: Object.freeze({
       warmth: score(s.warmth), humor: score(s.humor),
@@ -62,7 +66,8 @@ export function validateTuningDraft(value: unknown): TuningDraft {
 export function createTuningPreviewPair(
   fixture: PreviewFixture, baseline: unknown, candidate: unknown,
 ): PreviewPair {
-  if (!fixture.snapshotId || !fixture.selectionRulesVersion || !fixture.promptVersion ||
+  if (typeof fixture.characterId !== "string" || !/^[a-zA-Z0-9._-]{1,128}$/.test(fixture.characterId) ||
+      !fixture.snapshotId || !fixture.selectionRulesVersion || !fixture.promptVersion ||
       !fixture.model || !fixture.userInput ||
       !Array.isArray(fixture.selectedFacts) ||
       !Array.isArray(fixture.requiredConstraints) ||
@@ -75,6 +80,9 @@ export function createTuningPreviewPair(
   }
   const a = validateTuningDraft(baseline);
   const b = validateTuningDraft(candidate);
+  if (a.characterId !== fixture.characterId || b.characterId !== fixture.characterId) {
+    throw new Error("Cross-character preview scope rejected");
+  }
   if (a.tuningVersion === b.tuningVersion && JSON.stringify(a.settings) !== JSON.stringify(b.settings)) {
     throw new Error("Conflicting settings for one tuning version");
   }
