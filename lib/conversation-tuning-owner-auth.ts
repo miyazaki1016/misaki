@@ -19,7 +19,7 @@ export async function verifyTuningOwnerBearer(
   const anonKey = env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     "sb_publishable_ZEYZ3tc1RLE7EuClbUP4vA_ISHWfKr1";
   // An unconfigured owner is NOT public access.
-  if (!ownerId || !/^[0-9a-f]{8}-[0-9a-f-]{28,36}$/i.test(ownerId)) {
+  if (!ownerId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(ownerId)) {
     return { ok: false, status: 503 };
   }
   const match = /^Bearer ([^\s]+)$/.exec(authorization ?? "");
