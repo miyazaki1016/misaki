@@ -18,7 +18,7 @@ const dimensions = [
   { key: "questionTone", title: "質問の表現", description: "質問するかどうかは材料選別側が決定" },
 ] as const;
 const fixture = {
-  snapshotId: "synthetic-220-1", selectionRulesVersion: "synthetic-1",
+  characterId: "synthetic-misaki", snapshotId: "synthetic-220-1", selectionRulesVersion: "synthetic-1",
   promptVersion: "synthetic-1", model: "not-connected",
   userInput: "今日は疲れちゃった",
   selectedFacts: [] as string[], requiredConstraints: ["新しい事実を作らない"],
@@ -34,8 +34,8 @@ export default function ConversationTuningPreview() {
   const preview = useMemo(() => {
     try {
       return createTuningPreviewPair(fixture,
-        { scope: "preview", tuningVersion: "baseline-1", settings: initial },
-        { scope: "preview", tuningVersion: "draft-" + version, settings });
+        { scope: "preview", characterId: fixture.characterId, tuningVersion: "baseline-1", settings: initial },
+        { scope: "preview", characterId: fixture.characterId, tuningVersion: "draft-" + version, settings });
     } catch (e) {
       return null;
     }
