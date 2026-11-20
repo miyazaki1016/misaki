@@ -49,6 +49,26 @@
 | [#221](https://github.com/miyazaki1016/misaki/pull/221) | `f5e6e95c1d` | [success](https://github.com/miyazaki1016/misaki/actions/runs/44604877918)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44604877811)・[failure](https://github.com/miyazaki1016/misaki/actions/runs/44604877965)。失敗箇所は npm test |
 | [#219](https://github.com/miyazaki1016/misaki/pull/219) | `957d449ce5` | [success](https://github.com/miyazaki1016/misaki/actions/runs/44498676101)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44498676147)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44498676075)。この文書更新前 |
 
-上記4PRのインライン未解決スレッドは取得結果0件。本文コメントの監査指摘は責務表で追跡する。#199の既存合成fixture 21件を記載HEADのソースでローカル再実行し、21件成功。新契約、アダプタ接続、実Geminiの横断テストは未実施。
+上表は初回確認時の証拠。修正後の確認は後述。上記4PRのインライン未解決スレッドは取得結果0件。本文コメントの監査指摘は責務表で追跡する。#199の既存合成fixture 21件を記載HEADのソースでローカル再実行し、21件成功。新契約、アダプタ接続、実Geminiの横断テストは未実施。
 
 担当間で次に合わせる項目は、正本のキャラID、サーバー内handoffの証明、snapshotのTTL確定、版の互換表、監査の保持期間、調律の限定範囲と失効時処理、独立ガードの判定と安全な停止。各担当はこのDraft PRで確認結果を共有する。マージ、DB、既存認証・設定、本番配線・デプロイ、実Geminiは別途承認が必要。
+
+## 担当回答を反映した統合契約
+
+[#199の契約案](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026000340)・[#220の受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026015649)・[#194の受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474)・[Museの追加監査](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026059874)
+
+| 境界 | 統合方針 | 残る実装判断 |
+| --- | --- | --- |
+| キャラとセッション | サーバーの登録済み不変IDを使用。認証済み所有者と対象キャラをセッションに固定し、キャラを変えるときは新規セッションを作る。共有エンジンのユーザー依存キャッシュと派生状態にも owner／character を必須キーとし、セッションや版に依存する値はその次元も含める | 美咲の登録IDと認可正本を確認 |
+| 材料の出所 | 各アダプタが信頼済みの正本レコード・版・根拠・可視性・失効状態から候補を生成。#199の認証済みサーバー入口で照合し、純粋フィルタへの入力や自己申告フラグを認可証明に使わない。下流は検証済みサーバー経路だけを受理 | アダプタ別の証拠取得と、入口の強制方法 |
+| snapshot | サーバー発行の推測困難なIDを owner／character／session／turn と不変の材料マニフェスト（生成時刻、期限、元データ版、schema／選別版）に束縛。同一ターン限りかつ使用する材料の最短期限以内。Gemini呼び出し直前とユーザー送信直前に忘却・権限変更・共有撤回・イベント取消を再確認。失効時は再取得・再選別するか停止。実験用は本番に転用不可 | 保管方式、具体的TTL、実験保持期限 |
+| #199→#220→#194 | 既存の `selected` とバージョン情報を基礎に、scope・期限・意図・質問可否・ID付き必須／禁止制約を検証済み受け渡しに追加。既存の `decisions` と意図の理由・根拠は監査側で参照。空の採用材料は許容し、沈黙は明示した意図として表現し、Gemini呼び出し・定型文送信とも行わない | フィールド名と型、意図の列挙、互換表。現行 #199 の schema v1 は選別基礎型であり、拡張契約の対応版は未登録 |
+| 版互換 | schemaVersion は構造、selectionRulesVersion は選別、tuningVersion は実効スタイル、promptVersion は構成を個別管理。明示対応版だけを許可し、不明な制約、版不一致、必須項目欠落は拒否。破壊的変更は新schemaと送受双方の契約テストを要する。ターンにはモデル・variantと各版も記録 | #199／#220／#194の対応版一覧と移行猶予 |
+| 調律と復元 | readPreview／editDraft／publish／rollbackを対象キャラごとに認可。共通デフォルトとキャラ別上書きは解決済みのキャラ別実効版として扱い、新規セッションでキャラと版を原子的に固定。最終正常版は同一キャラ・範囲で承認済みかつ適用後の確認を通過し失効していない版を指す。通常の適用・復元は新規セッションから | 正常判定の観察期間と閾値、旧版セッション継続・保存期間、緊急失効の権限・中断処理・再開時の再束縛 |
+| 独立ガード | #194は制約IDと原文または構造化値を保持。ガードが受渡し側の必須／禁止制約集合とプロンプト／強制経路での実効制約を照合する。質問不可は生成後の送信経路でも強制。Workが実装統合を担当し、判定基準の変更は版管理しMuseのレビュー対象とする。ターン監査にガード版、項目別合否、理由、再生成回数、定型文発動有無を記録 | 合否基準の詳細、再生成の上限値、意図別に許可する定型文と版。上限に達したら許可済み定型文を使うか送信停止 |
+
+mainでは [会話APIのBearer認証](https://github.com/miyazaki1016/misaki/blob/main/app/api/chat/route.ts)、[美咲専用の人格版取得](https://github.com/miyazaki1016/misaki/blob/main/lib/persona/persona-store.ts)、[ユーザー単位の記憶・関係性読込](https://github.com/miyazaki1016/misaki/blob/main/lib/canonical-state.ts) を確認。#221の [所有者認証](https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/lib/conversation-tuning-owner-auth.ts) もユーザー本人の検証まで。これらからマルチキャラの正式ID値やキャラ別操作権限の正本は確認できず、未決のまま扱う。
+
+初回の合成契約テストは同一ユーザー・2キャラのキャッシュ分離、同一IDでの別セッション再利用拒否、生成中の失効、制約IDが同じでも値を弱めた場合の拒否、沈黙時のモデル呼び出し0件、質問不可時の送信拒否、共通デフォルト変更時の既存セッション維持、未確認版への復元拒否を含める。
+
+#221のUUID修正後の最新HEAD `74780ba010` は [統合テスト](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)・[分類](https://github.com/miyazaki1016/misaki/actions/runs/44644915059)・[着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44644915033) が成功。#194は引き続きCI未確認。費用ガードはモデル別単価と未知モデル拒否、思考トークンの事前予約、日本語入力の保守的な見積りを実送信前の必須条件とする。
