@@ -11,7 +11,7 @@ export const runtime = "nodejs";
  */
 export async function GET(request: NextRequest) {
   const result = await verifyTuningOwnerBearer(request.headers.get("authorization"));
-  if (!result.ok) {
+  if (result.ok === false) {
     return NextResponse.json({ authorized: false }, {
       status: result.status,
       headers: { "Cache-Control": "no-store" },
