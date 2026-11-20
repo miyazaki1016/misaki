@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-19T08:52:57.311795+00:00
+更新 (UTC): 2026-11-20T08:32:22.395107+00:00
 
 ## 全案件
 
@@ -96,9 +96,11 @@
 | [cleanup/legacy-proactive-tags](cases/branch-5e09e6de95bfa770.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/inventory-index-proposal](cases/branch-5fbac0e9c427777a.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/sola-handoff-queue-20261105](cases/branch-602fd94b750fc7fd.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [docs/conversation-maturity-218](cases/branch-60c7da8bc8d7b0d2.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/remove-relationship-temporary-diagnostics](cases/branch-60ede8a4a21cc685.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41480641519-1](cases/branch-62ca0c2fb1fd8575.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [fix/safari-load-failed-message](cases/branch-637f3c0ed7eca805.md) | 記憶・会話・画面・表示：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [feature/conversation-tuning-220](cases/branch-66447993dde0631a.md) | 記憶・会話・認証・安全性：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/lounge-muse-v3-official-20261030](cases/branch-669d4b81dbb566ba.md) | ラウンジ・画面：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [sora/history-edge-trace](cases/branch-67bcc30f23d44955.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [automation/ledger-facts-41390103549](cases/branch-683edee46d32eacf.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -338,7 +340,9 @@
 | [チャット上部の運転向け注意書きを削除](cases/pr-213.md) | 記憶・会話・画面・表示：会話や記憶・関係性を扱う処理の変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [期限切れの匿名チャットから5秒後に新しい会話へ移動](cases/pr-215.md) | 記憶・会話・開発管理・画面・表示：会話や記憶・関係性を扱う処理の変更／開発資産の把握・引継ぎ・レビューを支援する変更／画面表示や操作に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [ラウンジの案内文を変更](cases/pr-217.md) | ラウンジ・画面：ラウンジ・映像・画面演出に関する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [Draft: 美咲の会話成熟化3ブロック統合レビュー（#218）](cases/pr-219.md) | 記憶・会話：会話や記憶・関係性を扱う処理の変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [総覧を最新mainソースと再照合する](cases/pr-22.md) | その他の開発：総覧を最新mainソースと再照合する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [[Draft] #220 会話チューニングアプリ：プレビュー・最小契約・安全な反映設計](cases/pr-221.md) | 記憶・会話・認証・安全性：会話や記憶・関係性を扱う処理の変更／認証・アクセス制御に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [旧ブラウザ自発メッセージ経路を削除する](cases/pr-23.md) | 記憶・会話・画面・表示：旧ブラウザ自発メッセージ経路を削除する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [匿名セッションの一時切断で会話を消さない](cases/pr-24.md) | 記憶・会話：匿名セッションの一時切断で会話を消さない | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [Gemini返答待ちにタイムアウトと診断ログを追加する](cases/pr-25.md) | 記憶・会話：Gemini返答待ちにタイムアウトと診断ログを追加する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -434,6 +438,7 @@
 - app/api/chat-proxy/route.ts：[branch-387e38e3f392a033](cases/branch-387e38e3f392a033.md), [branch-48dee2d1fc902874](cases/branch-48dee2d1fc902874.md), [branch-70d16bafe238aa7a](cases/branch-70d16bafe238aa7a.md), [branch-7ebc2377f6ae2086](cases/branch-7ebc2377f6ae2086.md), [branch-7f356df67d09c22d](cases/branch-7f356df67d09c22d.md), [branch-992ef09e7aa2e87b](cases/branch-992ef09e7aa2e87b.md), [branch-bc36378a11db8be8](cases/branch-bc36378a11db8be8.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [pr-10](cases/pr-10.md), [pr-29](cases/pr-29.md), [pr-3](cases/pr-3.md), [pr-30](cases/pr-30.md), [pr-5](cases/pr-5.md), [pr-6](cases/pr-6.md), [pr-7](cases/pr-7.md), [pr-8](cases/pr-8.md), [pr-9](cases/pr-9.md)
 - app/api/chat/route.ts：[branch-48ad449fb30cd746](cases/branch-48ad449fb30cd746.md), [branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [branch-7e7349e1c0857db1](cases/branch-7e7349e1c0857db1.md), [branch-80302ec778694c1b](cases/branch-80302ec778694c1b.md), [branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [branch-c8b5b69bea16cfe8](cases/branch-c8b5b69bea16cfe8.md), [branch-c9e11b1515cb305d](cases/branch-c9e11b1515cb305d.md), [branch-e2b90b4f0cd4a282](cases/branch-e2b90b4f0cd4a282.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-140](cases/pr-140.md), [pr-19](cases/pr-19.md), [pr-191](cases/pr-191.md), [pr-193](cases/pr-193.md), [pr-20](cases/pr-20.md), [pr-25](cases/pr-25.md), [pr-26](cases/pr-26.md), [pr-27](cases/pr-27.md), [pr-29](cases/pr-29.md), [pr-30](cases/pr-30.md), [pr-31](cases/pr-31.md), [pr-32](cases/pr-32.md), [pr-34](cases/pr-34.md), [pr-40](cases/pr-40.md), [pr-43](cases/pr-43.md), [pr-45](cases/pr-45.md), [pr-47](cases/pr-47.md), [pr-61](cases/pr-61.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md), [pr-78](cases/pr-78.md)
 - app/api/conversation-review/smoke/route.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
+- app/api/conversation-tuning/access/route.ts：[branch-66447993dde0631a](cases/branch-66447993dde0631a.md), [pr-221](cases/pr-221.md)
 - app/api/dev/relationship-naturalness/route.ts：[branch-c1c09c8589ffaf5e](cases/branch-c1c09c8589ffaf5e.md), [pr-31](cases/pr-31.md)
 - app/api/experiments/blind-quality/route.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/api/experiments/replay-ab/route.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
@@ -454,6 +459,7 @@
 - app/experiments/replay-self-check/page.tsx：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - app/globals.css：[branch-79d346175e1f882e](cases/branch-79d346175e1f882e.md), [pr-213](cases/pr-213.md), [pr-41](cases/pr-41.md)
 - app/page.tsx：[branch-2db397ec82c28320](cases/branch-2db397ec82c28320.md), [branch-52e23902d6b56398](cases/branch-52e23902d6b56398.md), [pr-130](cases/pr-130.md), [pr-205](cases/pr-205.md), [pr-62](cases/pr-62.md), [pr-63](cases/pr-63.md)
+- components/ConversationTuningPreview.tsx：[branch-66447993dde0631a](cases/branch-66447993dde0631a.md), [pr-221](cases/pr-221.md)
 - lib/canonical-state.ts：[branch-2fb9170c6f164861](cases/branch-2fb9170c6f164861.md), [branch-5b98ae5ac6b68600](cases/branch-5b98ae5ac6b68600.md), [branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-a5961576a6beffe1](cases/branch-a5961576a6beffe1.md), [branch-b9ec7a2266a17fe2](cases/branch-b9ec7a2266a17fe2.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-131](cases/pr-131.md), [pr-182](cases/pr-182.md), [pr-190](cases/pr-190.md), [pr-193](cases/pr-193.md), [pr-206](cases/pr-206.md), [pr-29](cases/pr-29.md), [pr-32](cases/pr-32.md), [pr-47](cases/pr-47.md), [pr-66](cases/pr-66.md), [pr-67](cases/pr-67.md)
 - lib/chat-recall.ts：[pr-29](cases/pr-29.md), [pr-45](cases/pr-45.md)
 - lib/context-ab-approved-replay.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
@@ -500,6 +506,8 @@
 - lib/conversation-lab/recorded-reply-import.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - lib/conversation-lab/runner.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
 - lib/conversation-lab/scenarios.ts：[branch-ae082efda294b17a](cases/branch-ae082efda294b17a.md), [pr-86](cases/pr-86.md)
+- lib/conversation-tuning-owner-auth.ts：[branch-66447993dde0631a](cases/branch-66447993dde0631a.md), [pr-221](cases/pr-221.md)
+- lib/conversation-tuning-preview.ts：[branch-66447993dde0631a](cases/branch-66447993dde0631a.md), [pr-221](cases/pr-221.md)
 - lib/conversation-turn-context.ts：[branch-70e44503429abc0f](cases/branch-70e44503429abc0f.md), [pr-140](cases/pr-140.md)
 - lib/device-conversation.ts：[branch-3a1e2cf011e9082f](cases/branch-3a1e2cf011e9082f.md), [pr-1](cases/pr-1.md), [pr-131](cases/pr-131.md), [pr-29](cases/pr-29.md)
 - lib/gemini-json-generator.ts：[branch-8c1c252f0c53fa36](cases/branch-8c1c252f0c53fa36.md), [pr-45](cases/pr-45.md), [pr-48](cases/pr-48.md), [pr-61](cases/pr-61.md)

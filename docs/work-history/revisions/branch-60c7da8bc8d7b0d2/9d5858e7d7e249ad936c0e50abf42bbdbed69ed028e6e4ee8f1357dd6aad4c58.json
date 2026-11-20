@@ -1,0 +1,28 @@
+{
+  "id": "branch-60c7da8bc8d7b0d2",
+  "title": "docs/conversation-maturity-218",
+  "head": "9a7d03cc63124b53acc36f23cf6a67cb23875c58",
+  "head_ref": "docs/conversation-maturity-218",
+  "linked_prs": [
+    219
+  ],
+  "files": [
+    {
+      "path": "docs/CONVERSATION_MATURITY_REVIEW_218.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/9a7d03cc63124b53acc36f23cf6a67cb23875c58/docs/CONVERSATION_MATURITY_REVIEW_218.md"
+    }
+  ],
+  "commits": "9a7d03cc63124b53acc36f23cf6a67cb23875c58 docs: record tuning session pinning contract test\n8380fcccd203a8e71f2b7cf0e1628d26990dfce6 docs: record conversation revocation contract test\n35ed3b3cb89b60020b7d31c703fa05ed9a787571 docs: record synthetic verification results for conversation integration\n1c47841cf77d4562f53c898649c93084c49c4968 docs: reconcile conversation contract and audit review\n34f5790f2eb295b2360a162c0672f968850d5ec6 docs: align conversation integration contract for issue 218\n957d449ce56fa28700cd5e06014cf12f568dc1ee docs: start three-block conversation maturity review for issue 218",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "987a203bfe7ddb8f5104ad35b4445b0470c69a83315135ed10fc45285bb5d04a",
+  "collected_at": "2026-11-20T08:32:22.395107+00:00"
+}

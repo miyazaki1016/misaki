@@ -18,23 +18,23 @@
 
 関連PR：[#199](https://github.com/miyazaki1016/misaki/pull/199)
 
-根拠取得日時 (UTC)：2026-11-19T08:52:57.311795+00:00
+根拠取得日時 (UTC)：2026-11-20T08:32:22.395107+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [lib/conversation-lab-comparison.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-comparison.ts)：同一HEADのPR案件に原文収録
-- [lib/conversation-lab-decision.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-decision.ts)：同一HEADのPR案件に原文収録
-- [lib/conversation-lab-handoff.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-handoff.ts)：同一HEADのPR案件に原文収録
-- [lib/conversation-lab-pipeline.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-pipeline.ts)：同一HEADのPR案件に原文収録
-- [lib/conversation-lab-scope.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/lib/conversation-lab-scope.ts)：同一HEADのPR案件に原文収録
-- [tests/conversation-lab-comparison.test.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-comparison.test.ts)：同一HEADのPR案件に原文収録
-- [tests/conversation-lab-decision.test.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-decision.test.ts)：同一HEADのPR案件に原文収録
-- [tests/conversation-lab-handoff.test.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-handoff.test.ts)：同一HEADのPR案件に原文収録
-- [tests/conversation-lab-pipeline.test.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-pipeline.test.ts)：同一HEADのPR案件に原文収録
-- [tests/conversation-lab-scope.test.ts](https://github.com/miyazaki1016/misaki/blob/d7458f8054c37a0db4548e6d89d4398a8e684423/tests/conversation-lab-scope.test.ts)：同一HEADのPR案件に原文収録
+- [lib/conversation-lab-comparison.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts)：同一HEADのPR案件に原文収録
+- [lib/conversation-lab-decision.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts)：同一HEADのPR案件に原文収録
+- [lib/conversation-lab-handoff.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts)：同一HEADのPR案件に原文収録
+- [lib/conversation-lab-pipeline.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts)：同一HEADのPR案件に原文収録
+- [lib/conversation-lab-scope.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts)：同一HEADのPR案件に原文収録
+- [tests/conversation-lab-comparison.test.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts)：同一HEADのPR案件に原文収録
+- [tests/conversation-lab-decision.test.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts)：同一HEADのPR案件に原文収録
+- [tests/conversation-lab-handoff.test.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts)：同一HEADのPR案件に原文収録
+- [tests/conversation-lab-pipeline.test.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts)：同一HEADのPR案件に原文収録
+- [tests/conversation-lab-scope.test.ts](https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts)：同一HEADのPR案件に原文収録
 
 ## 検証実行の事実
 

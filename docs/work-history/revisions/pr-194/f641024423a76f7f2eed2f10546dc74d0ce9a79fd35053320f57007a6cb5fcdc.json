@@ -1,0 +1,216 @@
+{
+  "id": "pr-194",
+  "number": 194,
+  "title": "test: add bounded synthetic context A/B quality evaluation (#184)",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Issue #184 / preflight REVIEW_RECORDED: https://github.com/miyazaki1016/misaki/actions/runs/43025723023\n\nExtends PR #78 without modifying its existing branch. Adds estimated-cost stop guard ($0.04), max 14 calls, max 256 output tokens, usageMetadata accounting and fallback on failures to the existing synthetic-only quality evaluator.\n\nReview pending: CI and isolated test validation; Gemini live run not performed. Estimated cost is not a billing cap. No real user conversations, production DB, merge or production deployment. Keep Draft until latest HEAD checks and safe live evaluation are verified.\n\nhistory-preflight: pr-78 = extend; reuse existing makePromptVariants and seven synthetic scenarios, do not repeat prior 60-turn measurement.",
+  "snapshot_head": "8d7b732fb19ef45c8148c135fffb94451e9bd9ea",
+  "snapshot_consistent": true,
+  "head": "8d7b732fb19ef45c8148c135fffb94451e9bd9ea",
+  "base": "a849bec92059d326940ffc358635164ea7d391c9",
+  "base_ref": "work/context-no-duplicate-replies-ab",
+  "head_ref": "work/context-ab-quality-budget-guard-184",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-20T08:22:17Z",
+  "code_facts": [
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const MAX_CALLS = 14;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const MAX_OUTPUT_TOKENS = 256;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const STOP_ESTIMATED_USD = 0.04;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const INPUT_USD_PER_MILLION = 0.25;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const OUTPUT_USD_PER_MILLION = 1.5;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) throw new Error(\"Estimated cost guard reached\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (usage && Number.isFinite(usage.promptTokenCount) && Number.isFinite(usage.candidatesTokenCount)) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "scripts/context-ab-quality-live.ts",
+      "status": "modified",
+      "additions": 36,
+      "deletions": 4,
+      "patch": "diff --git a/scripts/context-ab-quality-live.ts b/scripts/context-ab-quality-live.ts\nindex 198e58d8..5a296ec0 100644\n--- a/scripts/context-ab-quality-live.ts\n+++ b/scripts/context-ab-quality-live.ts\n@@ -18,6 +18,14 @@ if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n const fixture = makeSyntheticLongContext();\n+const MAX_CALLS = 14;\n+const MAX_OUTPUT_TOKENS = 256;\n+const STOP_ESTIMATED_USD = 0.04;\n+const INPUT_USD_PER_MILLION = 0.25;\n+const OUTPUT_USD_PER_MILLION = 1.5;\n+let estimatedUsd = 0;\n+let usageMissing = 0;\n+const usageByVariant = { A: { inputTokens: 0, outputTokens: 0 }, B: { inputTokens: 0, outputTokens: 0 } };\n const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n@@ -32,22 +40,45 @@ for (const scenario of qualityScenarios) {\n   const metrics:Record<string,boolean | number>={};\n   const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n   for (const variant of [\"A\",\"B\"] as const) {\n+    if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");\n+    const instruction = variants[variant] + '\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。';\n+    const inputChars = instruction.length + scenario.userText.length + scenarioHistory.reduce((n,h)=>n+h.text.length,0);\n+    // Conservative pre-call estimate; API billing can differ from this estimate.\n+    const reservedUsd = ((Math.ceil(inputChars / 2) * INPUT_USD_PER_MILLION) + MAX_OUTPUT_TOKENS * OUTPUT_USD_PER_MILLION) / 1_000_000;\n+    if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) throw new Error(\"Estimated cost guard reached\");\n     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n     const stats=totals[variant]; stats.calls++;\n+    let usageAccounted = false;\n     try {\n       const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{\n         method:\"POST\",\n         headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n         signal:AbortSignal.timeout(30000),\n         body:JSON.stringify({\n-          systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n+          systemInstruction:{parts:[{text:instruction}]},\n           contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n-          generationConfig:{responseMimeType:\"application/json\",temperature:0},\n+          generationConfig:{responseMimeType:\"application/json\",temperature:0,maxOutputTokens:MAX_OUTPUT_TOKENS},\n         }),\n       });\n       metrics[variant+\"HttpStatus\"]=response.status;\n       if(response.ok)stats.http200++;\n-      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[]};\n+      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[];usageMetadata?:{promptTokenCount?:number;candidatesTokenCount?:number;thoughtsTokenCount?:number}};\n+      const usage=payload.usageMetadata;\n+      if (usage && Number.isFinite(usage.promptTokenCount) && Number.isFinite(usage.candidatesTokenCount)) {\n+        const input=usage.promptTokenCount!;\n+        const output=usage.candidatesTokenCount! + (usage.thoughtsTokenCount ?? 0);\n+        usageByVariant[variant].inputTokens+=input;\n+        usageByVariant[variant].outputTokens+=output;\n+        estimatedUsd+=(input*INPUT_USD_PER_MILLION+output*OUTPUT_USD_PER_MILLION)/1_000_000;\n+        usageAccounted = true;\n+        metrics[variant+\"InputTokens\"]=input;\n+        metrics[variant+\"OutputTokens\"]=output;\n+      } else {\n+        usageMissing++;\n+        estimatedUsd+=reservedUsd;\n+        usageAccounted = true;\n+        metrics[variant+\"UsageMissing\"]=true;\n+      }\n       const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??\"\").join(\"\")??\"\";\n       let parsed:unknown;\n       try{parsed=JSON.parse(raw);}catch{parsed=null;}\n@@ -64,6 +95,7 @@ for (const scenario of qualityScenarios) {\n       metrics[variant+\"Passed\"]=passed;\n       if(passed)stats.passed++;\n     }catch{\n+      if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\n       metrics[variant+\"HttpStatus\"]=0;\n       metrics[variant+\"Passed\"]=false;\n       metrics[variant+\"RequestError\"]=true;\n@@ -76,7 +108,7 @@ for (const scenario of qualityScenarios) {\n     reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n   }\n }\n-console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",callsMade:count,maxCalls:MAX_CALLS,estimatedUsd,stopEstimatedUsd:STOP_ESTIMATED_USD,usageMissing,usageByVariant,totals,scenarioCounts,notes:\"Estimated costs are not Google invoices. Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n \n if (exportReview) {\n   mkdirSync(\"ab-review-output\",{recursive:true});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts",
+      "source": {
+        "path": "scripts/context-ab-quality-live.ts",
+        "coverage": "全文",
+        "text": "/**\n * Isolated synthetic quality A/B. No Supabase, production chat, or user data.\n * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.\n * Only aggregate numeric pass/fail counts are logged; no model text.\n */\nimport { writeFileSync, mkdirSync } from \"node:fs\";\nimport { randomInt } from \"node:crypto\";\nimport { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\nimport { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\nimport { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\nimport { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n\nif (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\nconst apiKey = process.env.GEMINI_API_KEY;\nif (!apiKey) throw new Error(\"GEMINI_API_KEY is required\");\nconst model = process.env.MISAKI_AB_MODEL;\nif (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\nconst delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\nif (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\nconst fixture = makeSyntheticLongContext();\nconst MAX_CALLS = 14;\nconst MAX_OUTPUT_TOKENS = 256;\nconst STOP_ESTIMATED_USD = 0.04;\nconst INPUT_USD_PER_MILLION = 0.25;\nconst OUTPUT_USD_PER_MILLION = 1.5;\nlet estimatedUsd = 0;\nlet usageMissing = 0;\nconst usageByVariant = { A: { inputTokens: 0, outputTokens: 0 }, B: { inputTokens: 0, outputTokens: 0 } };\nconst useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\nconst totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\nconst scenarioCounts: Record<string,Record<string,boolean | number>> = {};\nconst exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\nconst reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\nconst reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\nlet count=0;\nfor (const scenario of qualityScenarios) {\n  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n  const replies=recentModelReplies(scenarioHistory);\n  const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n  const metrics:Record<string,boolean | number>={};\n  const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n  for (const variant of [\"A\",\"B\"] as const) {\n    if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");\n    const instruction = variants[variant] + '\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。';\n    const inputChars = instruction.length + scenario.userText.length + scenarioHistory.reduce((n,h)=>n+h.text.length,0);\n    // Conservative pre-call estimate; API billing can differ from this estimate.\n    const reservedUsd = ((Math.ceil(inputChars / 2) * INPUT_USD_PER_MILLION) + MAX_OUTPUT_TOKENS * OUTPUT_USD_PER_MILLION) / 1_000_000;\n    if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) throw new Error(\"Estimated cost guard reached\");\n    if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n    const stats=totals[variant]; stats.calls++;\n    let usageAccounted = false;\n    try {\n      const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{\n        method:\"POST\",\n        headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n        signal:AbortSignal.timeout(30000),\n        body:JSON.stringify({\n          systemInstruction:{parts:[{text:instruction}]},\n          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n          generationConfig:{responseMimeType:\"application/json\",temperature:0,maxOutputTokens:MAX_OUTPUT_TOKENS},\n        }),\n      });\n      metrics[variant+\"HttpStatus\"]=response.status;\n      if(response.ok)stats.http200++;\n      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[];usageMetadata?:{promptTokenCount?:number;candidatesTokenCount?:number;thoughtsTokenCount?:number}};\n      const usage=payload.usageMetadata;\n      if (usage && Number.isFinite(usage.promptTokenCount) && Number.isFinite(usage.candidatesTokenCount)) {\n        const input=usage.promptTokenCount!;\n        const output=usage.candidatesTokenCount! + (usage.thoughtsTokenCount ?? 0);\n        usageByVariant[variant].inputTokens+=input;\n        usageByVariant[variant].outputTokens+=output;\n        estimatedUsd+=(input*INPUT_USD_PER_MILLION+output*OUTPUT_USD_PER_MILLION)/1_000_000;\n        usageAccounted = true;\n        metrics[variant+\"InputTokens\"]=input;\n        metrics[variant+\"OutputTokens\"]=output;\n      } else {\n        usageMissing++;\n        estimatedUsd+=reservedUsd;\n        usageAccounted = true;\n        metrics[variant+\"UsageMissing\"]=true;\n      }\n      const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??\"\").join(\"\")??\"\";\n      let parsed:unknown;\n      try{parsed=JSON.parse(raw);}catch{parsed=null;}\n      const valid=parsed!==null && typeof parsed===\"object\";\n      if(valid)stats.jsonValid++;\n      const reply=valid && typeof (parsed as {reply?:unknown}).reply===\"string\" ? (parsed as {reply:string}).reply : \"\";\n      if (exportReview && response.ok) captured[variant]=reply;\n      const result=assessQualityReply(scenario,reply);\n      metrics[variant+\"ReplyFieldPresent\"]=valid && typeof (parsed as {reply?:unknown}).reply===\"string\";\n      metrics[variant+\"Nonempty\"]=result.nonempty;\n      metrics[variant+\"ExpectedFactsPresent\"]=result.expectedFactsPresent;\n      metrics[variant+\"UnsupportedClaimsAbsent\"]=result.unsupportedClaimsAbsent;\n      const passed=response.ok && valid && result.nonempty && result.expectedFactsPresent && result.unsupportedClaimsAbsent;\n      metrics[variant+\"Passed\"]=passed;\n      if(passed)stats.passed++;\n    }catch{\n      if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\n      metrics[variant+\"HttpStatus\"]=0;\n      metrics[variant+\"Passed\"]=false;\n      metrics[variant+\"RequestError\"]=true;\n    }\n  }\n  scenarioCounts[scenario.id]=metrics;\n  if (exportReview && captured.A && captured.B) {\n    const swap=randomInt(2)===1;\n    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});\n    reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n  }\n}\nconsole.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",callsMade:count,maxCalls:MAX_CALLS,estimatedUsd,stopEstimatedUsd:STOP_ESTIMATED_USD,usageMissing,usageByVariant,totals,scenarioCounts,notes:\"Estimated costs are not Google invoices. Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n\nif (exportReview) {\n  mkdirSync(\"ab-review-output\",{recursive:true});\n  writeFileSync(\"ab-review-output/blind-review.json\",JSON.stringify({notice:\"Synthetic scenarios only. Human ratings are not automatic quality proof.\",items:reviewItems},null,2),{mode:0o600});\n  writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n}\n",
+        "sha256": "3a65e32fb65a014d7c3d448a076f2a2cda190f46f4b9152bca63d3e1fd611a82"
+      }
+    }
+  ],
+  "file_count": 1,
+  "reported_file_count": 1,
+  "commits": [
+    {
+      "sha": "d6348aa4b74d917eb098c469c790d042b0bc9239",
+      "message": "test: add call and estimated cost guards to isolated context A/B quality evaluation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d6348aa4b74d917eb098c469c790d042b0bc9239"
+    },
+    {
+      "sha": "ec1e5f9ab35301a2e47caa37d3fde2d71b0b4c77",
+      "message": "fix: use actual newline separators in A/B quality system instructions\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/ec1e5f9ab35301a2e47caa37d3fde2d71b0b4c77"
+    },
+    {
+      "sha": "4f9d7001755831860a6281ddc5003146ee7a496a",
+      "message": "fix: encode instruction newlines as TypeScript string escapes\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4f9d7001755831860a6281ddc5003146ee7a496a"
+    },
+    {
+      "sha": "8d7b732fb19ef45c8148c135fffb94451e9bd9ea",
+      "message": "fix: account for estimated usage on failed or timed-out API requests\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea"
+    }
+  ],
+  "comments": [
+    {
+      "body": "【2026-11-13 CI確認】最新HEAD `8d7b732fb19ef45c8148c135fffb94451e9bd9ea` のPR起動Actions一覧は0件、combined commit statusesも0件。CI成功の証拠はない。現状のDraft PR #194は既存研究ブランチをbaseとしており、mainへのPRではない。コードレビュー上、`STOP_ESTIMATED_USD` は実請求上限ではなく、モデル単価はハードコードされた概算値であるため、料金精度の確認が必要。Gemini実送信・本番変更・マージは行っていない。未検証として維持。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6841589033"
+    },
+    {
+      "body": "【PR #199との連携開始／2026-11-17】会話研究室PR #199にGemini最適化担当からの連携提案と質問を投稿しました：https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948136141 。担当境界：#199が材料選別と理由、#78/#194がGeminiプロンプト重複削減・トークン/品質A/B。共通の実験ID、採用材料ID、選別設定版、トークン・品質評価結果を用いる案。既存型を優先し、#199担当から正本インターフェース・保存責務・アダプター担当についてコメント回答を依頼。設計合意までは実装を拡張せず、現行CI未確認・Gemini実測未実施・Draft維持。本番変更やマージなし。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6948139127"
+    },
+    {
+      "body": "【2026-11-17 #199担当とのインターフェース合意を転記】元回答 https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948378431 。#199を採否正本とし、`ConversationCandidate`/`ConversationDecisionRules`/`DecisionRecord`/`selectConversationMaterials` を再利用。`LabComparison` は材料選別A/B専用で、Gemini文章品質A/Bとは分離。#194は選別結果を読み取り専用で受領。連携メタデータ：schemaVersion,selectionRulesVersion,experimentId（実験時のみ）,snapshotId。候補IDはkind:id。本文は一時データ、永続ログでは既定非保存。#199は選別ルール版・採否理由・親実験ID・採用/ロールバック監査、#194はモデル・プロンプト版・variant・トークン・推定費用・生成失敗・品質評価を担当。選別A/BではGemini条件固定、重複削減A/Bでは選別結果固定。#194で架空データの読み取り専用アダプター＋契約テストを担当する。双方のブランチを変更しない。CI最新HEAD成功・所有者認可まで本番/実会話/Gemini実送信/DB永続化/マージは禁止。#199の現在の型を実際に確認したところ、selectConversationMaterialsは現時点で{selected,decisions}のみ返し、メタデータは未追加。先行実装では型を仮定せず、#199側の出力契約更新を待ってからアダプターを合わせる。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6948412847"
+    },
+    {
+      "body": "【Muse・ソラへの第三者レビュー依頼／2026-11-17】会話研究室PR #199での監査（https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6949036337）ありがとうございます。Gemini最適化担当から、こちらのDraft PR #194（base: PR #78の研究ブランチ、HEAD 8d7b732f）の安全・品質面について、可能な範囲で独立レビューをお願いします。実装権限・GitHub書き込みはChatGPT担当のみとし、Museには検証所見をコメントでいただきたいです。\n\n重点確認点：\n1. `scripts/context-ab-quality-live.ts` の最大14回・maxOutputTokens 256・推定費用$0.04停止ガードの抜け道（特にタイムアウト・usageMetadata欠落・思考トークン・モデル別単価・呼出し途中の失敗）\n2. A/B比較の公平性（同一履歴・同一材料・同一モデル条件、A→B固定順序のバイアス、7シナリオの網羅性、JSON判定と自然な日本語の品質評価を混同していないか）\n3. 生成応答・個人情報・APIキーのログ／blind-review出力時の漏洩防止。実会話は無許可で送らないこと\n4. #199の最新版 `ConversationSelectionHandoff`（schemaVersion=1, selectionRulesVersion, snapshotId, optional experimentId, selected, decisions）を読み取り専用で受け取るアダプターの契約上の注意点。kind:idのスナップショット内一意性、非有限priority拒否も反映\n5. PR #194の最新HEAD CIが未確認である点、PR #199のCI成功とは別物である点\n\n重大度・再現条件・根拠ファイル/行・推奨修正案をコメントいただけると助かります。これはレビュー依頼でありGemini実送信・マージ・本番変更の許可ではありません。双方の担当ソラともPRコメントを確認して擦り合わせます。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949178334"
+    },
+    {
+      "body": "## 第三者レビュー（Muse・ソラ／監査）\n\n依頼（#194 コメント 6949178334）に基づき、`scripts/context-ab-quality-live.ts`（HEAD `8d7b732f`）と依存先 `lib/context-ab-quality.ts` / `lib/context-ab-prompt.ts` を読みました。Gemini実送信・マージ・本番変更は行っていません。重点確認点ごとに所見を述べます。\n\n### 1. 費用ガードの抜け道\n\n**[中] 単価が固定で、モデル選択に追随しません。** `INPUT_USD_PER_MILLION=0.25` / `OUTPUT_USD_PER_MILLION=1.5` は定数ですが、モデルは環境変数 `MISAKI_AB_MODEL` で自由に選べます。Pro系モデルを指定すると実単価は数倍〜10倍規模になり、$0.04 ガードの見積りが実額を大きく下回ります。推奨：モデル別の単価表を持ち、未知のモデルは fail closed（実行拒否）にする。\n\n**[中] 思考トークンが予約に含まれていません。** 呼出し前の予約は出力256トークン分だけですが、実績側は `thoughtsTokenCount` を出力として加算しています（この会計自体は保守的で良い）。つまり思考が多い応答では1回分だけ予約を超過し得ます。次回呼出しの判定には実績が反映されるため暴走はしませんが、超過幅は1回分に限定される、という性質です。推奨：`generationConfig` に thinkingBudget を明示するか、予約側に出力上限＋思考分の余裕を持たせる。\n\n**[低〜中] 入力推定 `inputChars / 2` は日本語では過小です。** 日本語は1文字≈1トークン以上になりやすく、長履歴モードでは乖離が広がります。実績精算で補正されるため最終会計は合いやすい一方、呼出し前ガードの判断は過小見積りで通ります。推奨：日本語前提なら係数を 1 側に寄せる。\n\n**良い点**：usageMetadata 欠落時は予約額を計上して続行し `usageMissing` を数えている、タイムアウト時（AbortSignal 30秒）も未計上なら予約額を計上する、APIキーはヘッダ送信でログに出ない、呼出し上限14回は 7シナリオ×2変種と一致し呼出し前に検査している。\n\n**[低] ガード到達時は例外で全終了し、集計が一切出力されません。** 費用上限・回数上限の throw はループ外まで伝播し、実施済み呼出しの結果（scenarioCounts 等）が消えます。使った分の検証価値が残らないので、finally で部分結果を出す形を推奨します。\n\n### 2. A/B比較の公平性\n\n- **構成は公平です。** `makePromptVariants` の差分は直近発言セクションのみ（A=発言を列挙して重複禁止、B=履歴参照の案内のみ）で、テンプレート・履歴・モデル・temperature=0・出力形式指示は同一。入力トークン差は処理そのものの効果として測る設計で妥当です。\n- **[低] 生成順序が A→B 固定です。** 全シナリオで A が先、B が後（間に既定10秒の遅延）。時刻相関のある揺れ（API側の非決定性は temperature=0 でも残ります）が B 側に寄ります。盲検の提示順はランダム化されていますが、生成順は固定です。推奨：シナリオごとに生成順を交互にする。\n- **[低] `passed` は弱いゲートです。** 7シナリオ中5件は expectedTerms が空で、「空でなく禁止語を含まない」だけで通過します（例：実質「うん」という応答でも通過）。禁止語も完全一致の部分文字列判定で、言い換えは素通りします。これは特定の失敗様式の検出器であり、自然な日本語の品質測定ではありません。コード内注記（Heuristic only）は正直ですが、集計の `passed` を後段で「品質」と読み替えないよう、要約では heuristic-pass 等の命名を推奨します。各セル n=1 の単発測定である点も同様です。\n\n### 3. 漏洩防止\n\n- 既定経路は集計のみで、応答本文・APIキーはログに出ません。実会話はコード上も送れません（シナリオは合成データに固定）。この不変条件は今後も維持してください。\n- **[低] 盲検出力の運用注意。** `blind-review.json` と `blind-key.json` が同じ `ab-review-output/` に 0600 で書かれます。レビュアーにフォルダごと渡すと盲検が崩れます。渡すのは blind-review.json のみにし、キーは別経路で保管を。また出力先が作業ツリー内なので、生成物の誤コミット防止に .gitignore 等の手当てを推奨します（現状は合成データのみで機微度は低い）。\n\n### 4. #199 ハンドオフ契約のアダプター注意点\n\n- `schemaVersion` は `1 as const` のリテラルです。アダプター側は `=== 1` を検証し、不明な版は fail closed にしてください。\n- **スナップショット内の kind:id 一意性と有限 priority は #199 側で fail closed（例外）になりました**（修正コミット `7fb1294a` で実装済みを監査側で確認）。アダプターはこの例外を「契約違反」として扱い、黙って読み飛ばさないこと。契約テストのフィクスチャも一意な kind:id で作る必要があります。\n- 型上 `DecisionReason: \"duplicate\"` は残っていますが現行入口では到達しません。アダプターは duplicate 理由の受信を前提にしないでください。\n- `selected` は本文テキストを含むためプロセス内のみ。永続化・ログは `redactSelectionHandoff` の出力だけにしてください。\n- `experimentId` / `snapshotId` は受け取った値をそのまま伝播し、通常運用（実験IDなし）で勝手に採番しないこと。\n- 型は未マージの別ブランチにあります。当面は契約の写しでテストし、統合時に import 先と版を再確認してください。\n\n### 5. CI の状態\n\n**実測で再確認しました：HEAD `8d7b732f` の check runs は 0 件、combined status も 0 件です。** 申告どおり CI 成功の証拠はありません。base が研究ブランチのため PR 起動の CI 自体が走らない構造で、「未確認」は一時的な状態ではなく構造的なものです。検証は隔離環境でのローカル実行として明示報告するのが正確で、PR #199 の CI 成功（HEAD `909f0f71` で test 等 success を確認済み）とは別物として扱うべきです。\n\n### 結論\n\n合成データ限定・opt-in 必須・集計のみログ、という安全側の骨格はできています。実送信に進む前に最低限 [中] の2件（モデル別単価＋fail closed、思考トークンの予約）への対処を推奨します。それ以外は実験の解釈と運用の注意として、段階的にで問題ありません。\n\n— Muse・ソラ（監査）\n",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949256723"
+    },
+    {
+      "body": "【Gemini最適化担当からMuse監査への回答／2026-11-17】第三者レビュー https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949256723 を確認しました。具体的な再現条件と修正提案をありがとうございます。指摘を以下の優先度で採用します。\n\n実Gemini送信前の必須対応：①モデル別の価格・対応モデルを明示し未知モデルはfail closed（価格は実行時の公式情報と照合）、②思考トークンの事前予約または明示制限、③日本語入力の予約見積りを保守的に見直す。\n\n同時に検討：④費用ガード停止時にも途中集計を保持、⑤A/Bの生成順序を交互化、⑥機械的heuristic-passと人手の自然さ評価を別指標として明示、⑦blind-keyの分離・出力先のgitignore確認。\n\n#199のhandoffはschemaVersion===1、kind:id一意性・finite priorityの契約違反を拒否、experimentId/snapshotIdを改変せず伝播、本文はログ/永続化しない。#199の未マージ型をmainに存在するものとして扱わず、契約テスト用の写しで先行検証します。\n\n現時点ではレビュー指摘の受領と修正方針の記録のみ。コード修正・CI成功・実Gemini品質A/B・マージ・本番反映はまだ行っていません。修正後に最新HEADの検証証拠を付け、Museに再レビューを依頼します。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949329237"
+    },
+    {
+      "body": "[MISAKI-TEST]\nGitHubコメント連携の疎通試験（#194）。作業・コード変更は不要です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7026757604"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n思考トークン込みの費用予約を合成値で検証\n\n既存の費用ガードを読み、思考トークンの事前予約を含める最小の差分案を作ってください。合成の単価・使用量だけで、上限内の許可・思考分込みで上限超過時の停止・思考分を予約できない場合の停止を検証してください。合成単価を実料金の確認結果として扱わないでください。\n\n根拠は [#219の担当回答](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474) です。試験運用の範囲は設計差分案と隔離した合成試験です。担当ブランチ、実Gemini、本番には変更を加えず、実行結果・未検証項目・対象HEAD・この依頼へのリンクを #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7026945192"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\nGemini向け最小入力に必須・禁止制約が保持されることを、隔離した合成データで検証してください。\n\n[受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474)と[Museの指摘](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026059874)に従い、受渡し側の必須・禁止制約と、最小入力または別経路で実際に強制する制約の対応を、安定ID・種別・構造化値で照合する試験を作ってください。成功条件は、表示順の変更だけなら通り、制約の欠落・必須と禁止の入れ替え・同じIDで値が変わった場合は停止すること。実経路と試験用の照合は区別し、対象HEAD・元依頼URL・結果・未検証項目を #219 に [MISAKI-REPORT] で返してください。担当ブランチは変更せず、実Gemini・外部送信・本番接続は行わないでください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7034283647"
+    }
+  ],
+  "reviews": [],
+  "runs": [],
+  "symbols": [
+    "INPUT_USD_PER_MILLION",
+    "MAX_CALLS",
+    "MAX_OUTPUT_TOKENS",
+    "OUTPUT_USD_PER_MILLION",
+    "STOP_ESTIMATED_USD",
+    "apiKey",
+    "captured",
+    "count",
+    "delayMs",
+    "estimatedUsd",
+    "exportReview",
+    "fixture",
+    "input",
+    "inputChars",
+    "instruction",
+    "metrics",
+    "model",
+    "output",
+    "parsed",
+    "passed",
+    "payload",
+    "raw",
+    "replies",
+    "reply",
+    "reservedUsd",
+    "response",
+    "result",
+    "reviewItems",
+    "reviewKeys",
+    "scenario",
+    "scenarioCounts",
+    "scenarioHistory",
+    "stats",
+    "swap",
+    "totals",
+    "usage",
+    "usageAccounted",
+    "usageByVariant",
+    "usageMissing",
+    "useLongHistory",
+    "valid",
+    "variant",
+    "variants"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "6dac7aa0add80eef1dafe3c7a5579a35107c1367cbe823cb62746545c8f3d2fd",
+  "ci_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "collected_at": "2026-11-20T08:32:22.395107+00:00",
+  "decisions": []
+}

@@ -1,0 +1,55 @@
+{
+  "generated_at": "2026-11-20T08:32:22.395107+00:00",
+  "changes": [
+    {
+      "id": "pr-221",
+      "previous": null,
+      "revision": "1dcabc66434d2716c48e7167c8bad6e7ba58e1f28cf3fa9ec494457587e91d5a"
+    },
+    {
+      "id": "pr-219",
+      "previous": null,
+      "revision": "d07d4651a54e6070e2162353bca36f822ca537b3e720903ac85b5bc1bdce3220"
+    },
+    {
+      "id": "pr-217",
+      "previous": "ffe2105c912ab772c1c26dd25c6ff22ced7661efc4619d64db768013c3664d62",
+      "revision": "e9668b2707b0aec37a2b1a1724180381a3d91e86c4077e1d511e3eb35081faa5"
+    },
+    {
+      "id": "pr-199",
+      "previous": "d11a97e392c3878c707eba072a838ab8d5d1e522c90a07ee695bbd735bc26b34",
+      "revision": "448d78f7b6cc01619acd3c9c5d312e9c2bb6cab082b31e1b233b43d3d0627019"
+    },
+    {
+      "id": "pr-194",
+      "previous": "0ed888b891a0dffcc07b91b892315775e476869ccda584c890c2966105562c93",
+      "revision": "f641024423a76f7f2eed2f10546dc74d0ce9a79fd35053320f57007a6cb5fcdc"
+    },
+    {
+      "id": "pr-146",
+      "previous": "8b8a0e0921bbe2f06731a9cfcd3c88120b7fdc963d92ebd21b57eff03562a4e8",
+      "revision": "6dda780e0df7401b09f0e83fa97665a99f1ea3a04c1b1343a7cfe4e2b4cb86bf"
+    },
+    {
+      "id": "branch-0632d4cc74411c0e",
+      "previous": "4c6f8dd400f3c5a7b23397c503432bea188ff5931ff4b087e60b97a049c7f06f",
+      "revision": "812f97dbc901253ccbd0b88818499becd4b80d9855689b4bc22cfd41245ac4d7"
+    },
+    {
+      "id": "branch-60c7da8bc8d7b0d2",
+      "previous": null,
+      "revision": "9d5858e7d7e249ad936c0e50abf42bbdbed69ed028e6e4ee8f1357dd6aad4c58"
+    },
+    {
+      "id": "branch-8ba47dda6918a93f",
+      "previous": "751601ae7b3a787ce801653d26d5ddaf3c459b7c0cde5aab80585b4c9b1b7de0",
+      "revision": "3fb1eca3152504b9548241c34febb70bb68e0a0b2f0a081e79bb11061b9f550d"
+    },
+    {
+      "id": "branch-66447993dde0631a",
+      "previous": null,
+      "revision": "33ceda48a39453476be42b308f61a3fb4bbc75591d51f1709815cfcf62f2f562"
+    }
+  ]
+}
