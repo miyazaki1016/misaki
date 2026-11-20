@@ -72,3 +72,13 @@ mainでは [会話APIのBearer認証](https://github.com/miyazaki1016/misaki/blo
 初回の合成契約テストは同一ユーザー・2キャラのキャッシュ分離、同一IDでの別セッション再利用拒否、生成中の失効、制約IDが同じでも値を弱めた場合の拒否、沈黙時のモデル呼び出し0件、質問不可時の送信拒否、共通デフォルト変更時の既存セッション維持、未確認版への復元拒否を含める。
 
 #221のUUID修正後の最新HEAD `74780ba010` は [統合テスト](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)・[分類](https://github.com/miyazaki1016/misaki/actions/runs/44644915059)・[着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44644915033) が成功。#194は引き続きCI未確認。費用ガードはモデル別単価と未知モデル拒否、思考トークンの事前予約、日本語入力の保守的な見積りを実送信前の必須条件とする。
+
+## 2026-11-20 担当報告の照合
+
+| 担当 | 確認できた範囲 | 残る受入条件 |
+| --- | --- | --- |
+| [#199 材料選別](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026969479) | 合成候補で期限前の採用、期限と同時刻の除外、最新の可視性で再選別したときの共有撤回の反映。対象HEAD `071270a157` の[既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44640044171) 成功 | 選別済みsnapshotを同一ターンに束縛し、生成中に共有が撤回された場合は送信前に止める横断ケースが未検証 |
+| [#221 調律](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7027192722) | 合成プレビューは同一fixtureに対する異なる調律版を保持。対象HEAD `74780ba010` の[既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107) 成功 | 版Bの適用後も既存セッションがAを使い、新規セッションがBを使う経路は未実装・未検証 |
+| [#194 Gemini最適化](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7027228664) | 費用予約の差分案で、思考分を含む上限内／超過／予約不可の合成3ケースが期待どおり | 差分の適用、料金の確認、実Geminiは未実施。統合側で現行HEAD `8d7b732fb1` のActionsを照会した結果は0件 |
+
+次の検証は、#199の合成例を用いて生成と送信の間の共有撤回を再現し、旧snapshotからの送信が0件になる期待値を確認する。結果は設計上の契約試験として扱う。TTL秒数、正式キャラID、互換表、本番配線は引き続き未決。
