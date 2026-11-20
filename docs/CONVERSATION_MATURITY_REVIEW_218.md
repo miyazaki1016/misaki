@@ -81,4 +81,4 @@ mainでは [会話APIのBearer認証](https://github.com/miyazaki1016/misaki/blo
 | [#221 調律](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7027192722) | 合成プレビューは同一fixtureに対する異なる調律版を保持。対象HEAD `74780ba010` の[既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107) 成功 | 版Bの適用後も既存セッションがAを使い、新規セッションがBを使う経路は未実装・未検証 |
 | [#194 Gemini最適化](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7027228664) | 費用予約の差分案で、思考分を含む上限内／超過／予約不可の合成3ケースが期待どおり | 差分の適用、料金の確認、実Geminiは未実施。統合側で現行HEAD `8d7b732fb1` のActionsを照会した結果は0件 |
 
-次の検証は、#199の合成例を用いて生成と送信の間の共有撤回を再現し、旧snapshotからの送信が0件になる期待値を確認する。結果は設計上の契約試験として扱う。TTL秒数、正式キャラID、互換表、本番配線は引き続き未決。
+[#199の追加契約試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7032710702)は、対象HEADの選別関数と試験用ガードを用い、生成中の共有許可継続で送信1件、共有撤回で旧snapshotからの送信0件を確認した。実経路での同時更新・送信境界、照合元の正本、TTL秒数、正式キャラID、互換表、本番配線は未決。次の合成検証は、既存セッションが固定済みの調律版を保持し、新規セッションが新しい承認版を選ぶ契約とする。
