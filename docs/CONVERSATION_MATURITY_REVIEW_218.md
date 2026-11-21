@@ -103,6 +103,7 @@ mainでは [会話APIのBearer認証](https://github.com/miyazaki1016/misaki/blo
   - [#221の公開切替とセッション作成の競合報告](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7051348211)を[元依頼](https://github.com/miyazaki1016/misaki/pull/221#issuecomment-7051325691)および[対象HEADの既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)と照合。メモリ内で順序を制御し、固定が先なら版A・設定A、公開切替が先なら版B・設定B。版と設定を別々に読む対照では、間の切替により版A・設定Bが混在した。担当のローカル隔離実行は、この3件と既存プレビュー4件の計7件成功。実ストアの原子性、保存先、digest形式、旧版保持期間、緊急失効後の再開条件は未検証または未決。
   - [#221の通常復元試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7054184729)を[元依頼](https://github.com/miyazaki1016/misaki/pull/221#issuecomment-7054162177)および[対象HEADの既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)と照合。適用後未確認の版Bへの復元を拒否し、承認版ポインタはCを維持。確認済みで失効していない版Aへ復元すると、新規セッションはAを固定し、既存セッションはCとその設定を保持した。担当のローカル隔離実行は追加2件と既存プレビュー4件の計6件成功。復元判定とストアは試験用。実ストアでの更新・競合・認可・監査、観察期間・閾値、緊急失効後の再開条件は未検証または未決。
   - [#221の共通デフォルト切替試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7061991045)を[元依頼](https://github.com/miyazaki1016/misaki/pull/221#issuecomment-7061971459)および[対象HEADの既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)と照合。担当の隔離実行は既存4件と追加3件の計7件成功。試験用の設定解決では、切替後も既存セッションは版Aと全設定を保持し、新規セッションは版Bを固定した。新規セッションは親しみやすさ35→65、自発性40→55、質問口調25→15を継承し、キャラ別に明示したユーモア0と長さshortを維持。誤って既存ターンが公開ポインタを読み直す対照では、設定が版Bに変わる差を検出した。設定解決と版固定はメモリ内の試験用で、追加3件は既存CIの対象外。実ストアでの原子性・認可・監査、正式な版キーと保存先は未検証または未決。
+  - [#221の調律A/Bでの制約保持試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7064066010)を[元依頼](https://github.com/miyazaki1016/misaki/pull/221#issuecomment-7064044903)と[対象HEADの既存CI](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)に照合。版と質問口調を変えても、共有入力の質問不可・許可材料・必須／禁止制約は同一。質問可否が欠ける入力は既存プレビュー入口で拒否され、元入力を後から変更してもプレビューの共有入力は維持された。担当の隔離試験は既存4件と追加3件の計7件成功。追加3件は既存CIとは別のローカル実行で、実経路の質問判定・送信前強制は未検証。
 - #194は必須・禁止制約を構造化したまま保持し、実際に生成・強制する制約を独立に照合する。文字列化後の保持、上流での重複ID拒否、3担当の合成試験をCIに組み込むことは追加受入条件の提案。
   - [#194の文字列化後の制約照合報告](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7050074348)を[元依頼](https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7050050268)および[#194対象HEAD](https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea)と照合。既存の本文生成器で最小本文Bを生成し、合成制約を含む最終JSONを読み戻して受渡し元のID・種別・構造化値と比較。全件一致（順序変更あり）では検査した文字列がメモリ内スタブに1件届き、1件欠落・同じIDと種別で値変更では各0件。担当のローカル隔離試験3件が成功した。JSON形式・ガード・スタブは試験用で、#194の対象HEADのPR起動Actionsとcombined statusは取得0件。実際の送信経路、生成後の独立ガード、正式形式・版互換は未検証または未決。
   - [#194の版互換の隔離試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7062578318)を[元依頼](https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7062559556)および[対象HEADのChecks](https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/checks)と照合。明示登録した構造・選別・調律・プロンプトの版の組み合わせでは、既存本文生成器とメモリ内送信スタブが各1回。未知schemaと、個別には既知でも組み合わせが未登録の調律版・プロンプト版では各0回で、`unknown-schema` と `incompatible-versions` を区別した。拒否時は入力版の置換や再試行もなし。担当の隔離試験3件成功。互換表と照合は試験用で、正式な対応版一覧・移行猶予・実経路での強制は未決または未検証。対象HEADのPR起動Actionsとcombined statusは取得0件で、#194のCI合格は未確認。
@@ -127,3 +128,12 @@ TTL、正式キャラID、版互換表、保存期間、ガード判定基準の
 | 通常応答・質問不可（対照） | 1件 | 1件 | C | A |
 
 2ケースが成功。復元直後とターン完了後の固定レコード・handoffは一致し、試験用監査記録に固定版C、設定のdigest、意図、質問可否が残った。応答の対照ではモデルスタブへの入力にCの設定を使用。ストア、digestの形式、ガード、監査記録は試験用で、実経路での強制は未検証。緊急失効の権限・適用範囲・停止時点・通知や定型文・再開条件は未決のまま扱う。
+
+## 調律A/Bから送信前までの横断隔離試験
+
+[#221のプレビュー](https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/lib/conversation-tuning-preview.ts)と[#194の本文生成器](https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/lib/context-ab-prompt.ts)を再利用。合成fixtureを共有し、調律版A/Bと質問口調15/85だけを変え、本文は両方とも同じプロンプトvariantに固定した。試験用の本文から読み戻した質問可否・許可材料・必須／禁止制約は両方で一致した。
+
+- 質問不可・固定の質問出力は A/B とも送信0件。
+- 質問可・同じ質問出力と、質問不可・平叙文の対照では A/B ともメモリ内送信1件ずつ。
+
+Node.js v24.22.3 のローカル隔離実行で3件成功。出力・質問判定・送信はスタブで、疑問符で終わる合成文だけを判定した。実経路での生成、質問判定基準、再生成・定型文の扱いは未検証または未決。
