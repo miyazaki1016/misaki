@@ -1,0 +1,1261 @@
+{
+  "id": "pr-199",
+  "number": 199,
+  "title": "会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階）",
+  "topics": [
+    "記憶・会話"
+  ],
+  "purpose": "会話や記憶・関係性を扱う処理の変更",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Closes: none. Related #198 / #197\n\n## 実装\n- 本番API・DB・Gemini・Vercelには未接続の純粋な材料選別ロジックを追加\n- 優先順位、期限、取消、既出、重複、上限、閾値の採否理由を返す\n- 入力不変のA/B実験基礎とNodeテストを追加\n\n## 着手前照合・再利用\nIssue #198: https://github.com/miyazaki1016/misaki/actions/runs/44080550263 (REVIEW_RECORDED / confirmed / success)。\nPR独自の照合 https://github.com/miyazaki1016/misaki/actions/runs/44080956392 は候補判断記録未転記でREVIEW_REQUIRED。以下に原本確認済みの判断を転記する。PRの新しい照合結果が成功するまでは追加実装・マージをしない。\n\n<!-- history-preflight\n{\"decisions\":[{\"id\":\"pr-196\",\"decision\":\"reuse\",\"reason\":\"既存の開発履歴検索と再利用判断を使用し、会話材料の選別ロジックとは別物として新たな棚卸しを作らない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/196\"},{\"id\":\"pr-31\",\"decision\":\"extend\",\"reason\":\"Body Clockの既存判断と感情制御を維持し、後続で外部イベント材料を別レイヤーとして接続する。open PRの全体統合はしない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/31\"},{\"id\":\"pr-101\",\"decision\":\"reuse\",\"reason\":\"記憶・感情・自律日常の監査資料と既存機能を参照する。資料自体を会話研究室の実装済み証拠としない。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/101\"},{\"id\":\"pr-171\",\"decision\":\"reuse\",\"reason\":\"着手前照合と判断記録の既存運用を再利用する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/171\"},{\"id\":\"pr-6\",\"decision\":\"extend\",\"reason\":\"記憶確認時の履歴優先ガイドと正本記憶の非更新を維持して、採否理由記録を追加する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/6\"},{\"id\":\"pr-5\",\"decision\":\"reuse\",\"reason\":\"recall時も直近履歴を保持する既存コードを再利用する。\",\"evidence\":\"https://github.com/miyazaki1016/misaki/pull/5\"}]}\n-->\n\n## 未完了\n所有者認可・本番会話ログ・Gemini A/B・設定版管理・Body Clock接続・本番配備は未実装。最新HEADの個別テスト実行は未確認。Draft維持、マージ・デプロイしない。美咲とアメふるのVercelは別環境。",
+  "snapshot_head": "071270a15716a45bf558363d8ef35f1bef30c787",
+  "snapshot_consistent": true,
+  "head": "071270a15716a45bf558363d8ef35f1bef30c787",
+  "base": "f0cf831203e444a76843a3bf6e5e43b145e27e82",
+  "base_ref": "main",
+  "head_ref": "feat/life-context-engine-198",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-22T07:09:19Z",
+  "code_facts": [
+    {
+      "file": "lib/conversation-lab-comparison.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function compareConversationDecisions(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function selectConversationMaterials(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (candidate.cancelled) reason = \"cancelled\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "else if (candidate.expiresAt && (!Number.isFinite(Date.parse(candidate.expiresAt)) || Date.parse(candidate.expiresAt) <= now.getTime())) reason = \"expired\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "else if (rules.suppressPreviouslyUsed && candidate.alreadyUsed) reason = \"previously-used\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "else if (!Number.isFinite(candidate.priority) || candidate.priority < rules.minimumPriority) reason = \"below-threshold\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "else if (seen.has(candidate.kind + \":\" + candidate.id)) reason = \"duplicate\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "else if (selected.length >= rules.maximumSelected) reason = \"limit\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-decision.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (reason === \"selected\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts"
+    },
+    {
+      "file": "lib/conversation-lab-handoff.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "export const CONVERSATION_LAB_SCHEMA_VERSION = 1 as const;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "file": "lib/conversation-lab-handoff.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function buildConversationSelectionHandoff(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "file": "lib/conversation-lab-handoff.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!metadata.selectionRulesVersion.trim() || !metadata.snapshotId.trim() ||",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "file": "lib/conversation-lab-handoff.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function redactSelectionHandoff(handoff: Readonly<ConversationSelectionHandoff>) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "file": "lib/conversation-lab-pipeline.ts",
+      "kind": "関数・クラス定義",
+      "expression": "* function does not authenticate a user or verify source assertions.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "file": "lib/conversation-lab-pipeline.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function prepareScopedConversationHandoff(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "file": "lib/conversation-lab-pipeline.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function buildScopedConversationAudit(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "file": "lib/conversation-lab-pipeline.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "file": "lib/conversation-lab-scope.ts",
+      "kind": "関数・クラス定義",
+      "expression": "* Pure function only; caller must verify the provenance of scope assertions.",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts"
+    },
+    {
+      "file": "lib/conversation-lab-scope.ts",
+      "kind": "関数・クラス定義",
+      "expression": "export function filterConversationLabScope(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts"
+    },
+    {
+      "file": "lib/conversation-lab-scope.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts"
+    },
+    {
+      "file": "lib/conversation-lab-scope.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!valid) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts"
+    },
+    {
+      "file": "lib/conversation-lab-scope.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (reason === \"in-scope\") candidates.push({ ...item.candidate });",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"compares the same snapshot without mutating it\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.addedIds, [\"external-event:rain\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.removedIds, []);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.changedReasons, [{ id: \"external-event:rain\", from: \"below-threshold\", to: \"selected\" }]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(snapshot[0].text, \"rain\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"shows selected-material removal when sandbox selection limit is tightened\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(diff.addedIds, []);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(diff.removedIds, [\"memory:second\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(diff.changedReasons, [{ id: \"memory:second\", from: \"selected\", to: \"limit\" }]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-comparison.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(diff.original.selected.length, 2);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"selects by priority with a stable tie-break and explains every exclusion\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.selected.map((x) => x.text), [\"first\", \"second\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.decisions.map((x) => x.reason), [\"cancelled\", \"expired\", \"previously-used\", \"selected\", \"selected\", \"below-threshold\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(JSON.stringify(source), original);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"a lab rule change does not mutate source and can produce a different selection\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(selectConversationMaterials(candidates, { minimumPriority: 3, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 0);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(selectConversationMaterials(candidates, { minimumPriority: 1, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 1);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"invalid rules fail closed\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.throws(() => selectConversationMaterials([], { minimumPriority: 0, maximumSelected: -1, suppressPreviouslyUsed: true }));",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-decision.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"rejects duplicate identities and non-finite priorities before sorting\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"versioned handoff provides selected payload only in-memory and reason metadata\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(handoff.schemaVersion, 1);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(handoff.selected[0].text, \"PRIVATE TEST UTTERANCE\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(handoff.decisions.map(d => [d.candidateId, d.reason]), [[\"conversation:c1\", \"selected\"], [\"external-event:e1\", \"below-threshold\"]]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(logged.selectedIds, [\"conversation:c1\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(JSON.stringify(logged).includes(\"PRIVATE TEST\"), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(JSON.stringify(logged).includes('\"text\"'), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(candidates.length, 2);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"normal operation needs no experiment ID; invalid metadata fails closed\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-handoff.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(\"experimentId\" in handoff, false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"never passes cross-user or non-visible materials into Gemini handoff\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.handoff.selected.map(x => x.id), [\"allowed\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.handoff.decisions.map(x => x.candidateId), [\"memory:allowed\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.scopeRejections, [",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(JSON.stringify(result.scopeRejections).includes(\"PRIVATE\"), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"fails closed when owner scope is absent\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.throws(() => prepareScopedConversationHandoff(",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"audit envelope preserves scope and rejection reasons without candidate text\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(audit.scope, scope);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-pipeline.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(audit.scopeRejections, [{ candidateId: \"memory:denied\", reason: \"different-user\" }]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"allows only same-user materials visible through participation, witness, or explicit share\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.candidates.map(x => x.id), [\"participant\", \"witness\", \"shared\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.decisions.map(x => x.reason), [\"in-scope\", \"in-scope\", \"in-scope\", \"not-visible-to-character\", \"different-user\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(JSON.stringify(result.decisions).includes(\"SENSITIVE\"), false);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"fails closed when scope is missing and does not modify source\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.throws(() => filterConversationLabScope(source, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(source[0].candidate.text, \"SENSITIVE TEST MATERIAL a\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(\"rejects malformed visibility per item while retaining valid materials\", () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "file": "tests/conversation-lab-scope.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.deepEqual(result.decisions.map(d => d.reason), [\"malformed\", \"in-scope\"]);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": "lib/conversation-lab-comparison.ts",
+      "status": "modified",
+      "additions": 43,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-lab-comparison.ts b/lib/conversation-lab-comparison.ts\nnew file mode 100644\nindex 00000000..a0b742ae\n--- /dev/null\n+++ b/lib/conversation-lab-comparison.ts\n@@ -0,0 +1,43 @@\n+import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionRecord } from \"./conversation-lab-decision.ts\";\n+\n+export type LabVariant = {\n+  rules: ConversationDecisionRules;\n+  selected: ConversationCandidate[];\n+  decisions: DecisionRecord[];\n+};\n+export type LabComparison = {\n+  original: LabVariant;\n+  experimental: LabVariant;\n+  addedIds: string[];\n+  removedIds: string[];\n+  changedReasons: { id: string; from: string; to: string }[];\n+};\n+/**\n+ * Read-only A/B decision preview. No Gemini calls, DB writes, or user-facing notifications.\n+ * Both variants receive the same frozen-in-time candidate snapshot.\n+ */\n+export function compareConversationDecisions(\n+  snapshot: readonly ConversationCandidate[],\n+  originalRules: Readonly<ConversationDecisionRules>,\n+  experimentalRules: Readonly<ConversationDecisionRules>,\n+  now: Date = new Date(),\n+): LabComparison {\n+  const original = selectConversationMaterials(snapshot, originalRules, now);\n+  const experimental = selectConversationMaterials(snapshot, experimentalRules, now);\n+  const identity = (c: ConversationCandidate) => c.kind + \":\" + c.id;\n+  const a = new Set(original.selected.map(identity));\n+  const b = new Set(experimental.selected.map(identity));\n+  const originalReasons = new Map(original.decisions.map(d => [identity(d.candidate), d.reason]));\n+  const changedReasons = experimental.decisions.flatMap(d => {\n+    const id = identity(d.candidate);\n+    const from = originalReasons.get(id);\n+    return from && from !== d.reason ? [{ id, from, to: d.reason }] : [];\n+  });\n+  return {\n+    original: { rules: { ...originalRules }, ...original },\n+    experimental: { rules: { ...experimentalRules }, ...experimental },\n+    addedIds: [...b].filter(id => !a.has(id)),\n+    removedIds: [...a].filter(id => !b.has(id)),\n+    changedReasons,\n+  };\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts",
+      "source": {
+        "path": "lib/conversation-lab-comparison.ts",
+        "coverage": "全文",
+        "text": "import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionRecord } from \"./conversation-lab-decision.ts\";\n\nexport type LabVariant = {\n  rules: ConversationDecisionRules;\n  selected: ConversationCandidate[];\n  decisions: DecisionRecord[];\n};\nexport type LabComparison = {\n  original: LabVariant;\n  experimental: LabVariant;\n  addedIds: string[];\n  removedIds: string[];\n  changedReasons: { id: string; from: string; to: string }[];\n};\n/**\n * Read-only A/B decision preview. No Gemini calls, DB writes, or user-facing notifications.\n * Both variants receive the same frozen-in-time candidate snapshot.\n */\nexport function compareConversationDecisions(\n  snapshot: readonly ConversationCandidate[],\n  originalRules: Readonly<ConversationDecisionRules>,\n  experimentalRules: Readonly<ConversationDecisionRules>,\n  now: Date = new Date(),\n): LabComparison {\n  const original = selectConversationMaterials(snapshot, originalRules, now);\n  const experimental = selectConversationMaterials(snapshot, experimentalRules, now);\n  const identity = (c: ConversationCandidate) => c.kind + \":\" + c.id;\n  const a = new Set(original.selected.map(identity));\n  const b = new Set(experimental.selected.map(identity));\n  const originalReasons = new Map(original.decisions.map(d => [identity(d.candidate), d.reason]));\n  const changedReasons = experimental.decisions.flatMap(d => {\n    const id = identity(d.candidate);\n    const from = originalReasons.get(id);\n    return from && from !== d.reason ? [{ id, from, to: d.reason }] : [];\n  });\n  return {\n    original: { rules: { ...originalRules }, ...original },\n    experimental: { rules: { ...experimentalRules }, ...experimental },\n    addedIds: [...b].filter(id => !a.has(id)),\n    removedIds: [...a].filter(id => !b.has(id)),\n    changedReasons,\n  };\n}\n",
+        "sha256": "3c7fc07f7e6c4ccc2772bf6b901973b3d6616ab40af518e2827706c04081c108"
+      }
+    },
+    {
+      "path": "lib/conversation-lab-decision.ts",
+      "status": "modified",
+      "additions": 66,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-lab-decision.ts b/lib/conversation-lab-decision.ts\nnew file mode 100644\nindex 00000000..7e250b46\n--- /dev/null\n+++ b/lib/conversation-lab-decision.ts\n@@ -0,0 +1,66 @@\n+/**\n+ * Conversation Lab decision model (pure, no network or production writes).\n+ * Misaki selects materials; Gemini is responsible only for wording.\n+ * Exactly one reason is recorded per candidate, in this precedence:\n+ * cancelled > expired > previously-used > below-threshold > duplicate > limit.\n+ * Candidate identity (kind:id) must be unique within each input snapshot.\n+ */\n+export type CandidateKind = \"conversation\" | \"memory\" | \"personal-life\" | \"external-event\" | \"emotion\" | \"relationship\" | \"body-clock\";\n+export type ConversationCandidate = {\n+  id: string;\n+  kind: CandidateKind;\n+  text: string;\n+  priority: number;\n+  expiresAt?: string | null;\n+  alreadyUsed?: boolean;\n+  cancelled?: boolean;\n+};\n+export type ConversationDecisionRules = {\n+  minimumPriority: number;\n+  maximumSelected: number;\n+  suppressPreviouslyUsed: boolean;\n+};\n+export type DecisionReason = \"selected\" | \"below-threshold\" | \"expired\" | \"cancelled\" | \"previously-used\" | \"duplicate\" | \"limit\";\n+export type DecisionRecord = { candidate: ConversationCandidate; reason: DecisionReason };\n+export const DEFAULT_CONVERSATION_RULES: Readonly<ConversationDecisionRules> = Object.freeze({\n+  minimumPriority: 0,\n+  maximumSelected: 9,\n+  suppressPreviouslyUsed: true,\n+});\n+export function selectConversationMaterials(\n+  candidates: readonly ConversationCandidate[],\n+  rules: Readonly<ConversationDecisionRules> = DEFAULT_CONVERSATION_RULES,\n+  now: Date = new Date(),\n+): { selected: ConversationCandidate[]; decisions: DecisionRecord[] } {\n+  if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) {\n+    throw new Error(\"Invalid conversation decision rules\");\n+  }\n+  const identities = new Set<string>();\n+  for (const candidate of candidates) {\n+    if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\");\n+    if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\");\n+    const identity = candidate.kind + \":\" + candidate.id;\n+    if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\");\n+    identities.add(identity);\n+  }\n+  const seen = new Set<string>();\n+  const decisions: DecisionRecord[] = [];\n+  const selected: ConversationCandidate[] = [];\n+  const sorted = candidates.map((candidate, index) => ({ candidate, index }))\n+    .sort((a, b) => b.candidate.priority - a.candidate.priority || a.index - b.index);\n+  for (const { candidate } of sorted) {\n+    let reason: DecisionReason = \"selected\";\n+    if (candidate.cancelled) reason = \"cancelled\";\n+    else if (candidate.expiresAt && (!Number.isFinite(Date.parse(candidate.expiresAt)) || Date.parse(candidate.expiresAt) <= now.getTime())) reason = \"expired\";\n+    else if (rules.suppressPreviouslyUsed && candidate.alreadyUsed) reason = \"previously-used\";\n+    else if (!Number.isFinite(candidate.priority) || candidate.priority < rules.minimumPriority) reason = \"below-threshold\";\n+    else if (seen.has(candidate.kind + \":\" + candidate.id)) reason = \"duplicate\";\n+    else if (selected.length >= rules.maximumSelected) reason = \"limit\";\n+    if (reason === \"selected\") {\n+      selected.push({ ...candidate });\n+      seen.add(candidate.kind + \":\" + candidate.id);\n+    }\n+    decisions.push({ candidate: { ...candidate }, reason });\n+  }\n+  return { selected, decisions };\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts",
+      "source": {
+        "path": "lib/conversation-lab-decision.ts",
+        "coverage": "全文",
+        "text": "/**\n * Conversation Lab decision model (pure, no network or production writes).\n * Misaki selects materials; Gemini is responsible only for wording.\n * Exactly one reason is recorded per candidate, in this precedence:\n * cancelled > expired > previously-used > below-threshold > duplicate > limit.\n * Candidate identity (kind:id) must be unique within each input snapshot.\n */\nexport type CandidateKind = \"conversation\" | \"memory\" | \"personal-life\" | \"external-event\" | \"emotion\" | \"relationship\" | \"body-clock\";\nexport type ConversationCandidate = {\n  id: string;\n  kind: CandidateKind;\n  text: string;\n  priority: number;\n  expiresAt?: string | null;\n  alreadyUsed?: boolean;\n  cancelled?: boolean;\n};\nexport type ConversationDecisionRules = {\n  minimumPriority: number;\n  maximumSelected: number;\n  suppressPreviouslyUsed: boolean;\n};\nexport type DecisionReason = \"selected\" | \"below-threshold\" | \"expired\" | \"cancelled\" | \"previously-used\" | \"duplicate\" | \"limit\";\nexport type DecisionRecord = { candidate: ConversationCandidate; reason: DecisionReason };\nexport const DEFAULT_CONVERSATION_RULES: Readonly<ConversationDecisionRules> = Object.freeze({\n  minimumPriority: 0,\n  maximumSelected: 9,\n  suppressPreviouslyUsed: true,\n});\nexport function selectConversationMaterials(\n  candidates: readonly ConversationCandidate[],\n  rules: Readonly<ConversationDecisionRules> = DEFAULT_CONVERSATION_RULES,\n  now: Date = new Date(),\n): { selected: ConversationCandidate[]; decisions: DecisionRecord[] } {\n  if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) {\n    throw new Error(\"Invalid conversation decision rules\");\n  }\n  const identities = new Set<string>();\n  for (const candidate of candidates) {\n    if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\");\n    if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\");\n    const identity = candidate.kind + \":\" + candidate.id;\n    if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\");\n    identities.add(identity);\n  }\n  const seen = new Set<string>();\n  const decisions: DecisionRecord[] = [];\n  const selected: ConversationCandidate[] = [];\n  const sorted = candidates.map((candidate, index) => ({ candidate, index }))\n    .sort((a, b) => b.candidate.priority - a.candidate.priority || a.index - b.index);\n  for (const { candidate } of sorted) {\n    let reason: DecisionReason = \"selected\";\n    if (candidate.cancelled) reason = \"cancelled\";\n    else if (candidate.expiresAt && (!Number.isFinite(Date.parse(candidate.expiresAt)) || Date.parse(candidate.expiresAt) <= now.getTime())) reason = \"expired\";\n    else if (rules.suppressPreviouslyUsed && candidate.alreadyUsed) reason = \"previously-used\";\n    else if (!Number.isFinite(candidate.priority) || candidate.priority < rules.minimumPriority) reason = \"below-threshold\";\n    else if (seen.has(candidate.kind + \":\" + candidate.id)) reason = \"duplicate\";\n    else if (selected.length >= rules.maximumSelected) reason = \"limit\";\n    if (reason === \"selected\") {\n      selected.push({ ...candidate });\n      seen.add(candidate.kind + \":\" + candidate.id);\n    }\n    decisions.push({ candidate: { ...candidate }, reason });\n  }\n  return { selected, decisions };\n}\n",
+        "sha256": "7ff03ef1760c060443c47db7a9661e4ecc8da2f7ffb107f247d71e3e5fa58707"
+      }
+    },
+    {
+      "path": "lib/conversation-lab-handoff.ts",
+      "status": "modified",
+      "additions": 54,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-lab-handoff.ts b/lib/conversation-lab-handoff.ts\nnew file mode 100644\nindex 00000000..68864636\n--- /dev/null\n+++ b/lib/conversation-lab-handoff.ts\n@@ -0,0 +1,54 @@\n+import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionReason } from \"./conversation-lab-decision.ts\";\n+\n+/** Read-only, versioned handoff from Misaki material selection to Gemini wording. */\n+export const CONVERSATION_LAB_SCHEMA_VERSION = 1 as const;\n+export type MaterialDecisionSummary = {\n+  candidateId: string;\n+  kind: ConversationCandidate[\"kind\"];\n+  priority: number;\n+  reason: DecisionReason;\n+};\n+export type ConversationSelectionHandoff = {\n+  schemaVersion: typeof CONVERSATION_LAB_SCHEMA_VERSION;\n+  selectionRulesVersion: string;\n+  snapshotId: string;\n+  experimentId?: string;\n+  selected: ConversationCandidate[];\n+  decisions: MaterialDecisionSummary[];\n+};\n+export function buildConversationSelectionHandoff(\n+  candidates: readonly ConversationCandidate[],\n+  rules: Readonly<ConversationDecisionRules>,\n+  metadata: Readonly<{ selectionRulesVersion: string; snapshotId: string; experimentId?: string }>,\n+  now: Date = new Date(),\n+): ConversationSelectionHandoff {\n+  if (!metadata.selectionRulesVersion.trim() || !metadata.snapshotId.trim() ||\n+      (metadata.experimentId !== undefined && !metadata.experimentId.trim())) {\n+    throw new Error(\"Missing conversation selection handoff metadata\");\n+  }\n+  const result = selectConversationMaterials(candidates, rules, now);\n+  return {\n+    schemaVersion: CONVERSATION_LAB_SCHEMA_VERSION,\n+    selectionRulesVersion: metadata.selectionRulesVersion,\n+    snapshotId: metadata.snapshotId,\n+    ...(metadata.experimentId === undefined ? {} : { experimentId: metadata.experimentId }),\n+    selected: result.selected,\n+    decisions: result.decisions.map(({ candidate, reason }) => ({\n+      candidateId: candidate.kind + \":\" + candidate.id,\n+      kind: candidate.kind,\n+      priority: candidate.priority,\n+      reason,\n+    })),\n+  };\n+}\n+/** For persistence/logging: omit all conversation text and selection payloads by default. */\n+export function redactSelectionHandoff(handoff: Readonly<ConversationSelectionHandoff>) {\n+  return {\n+    schemaVersion: handoff.schemaVersion,\n+    selectionRulesVersion: handoff.selectionRulesVersion,\n+    snapshotId: handoff.snapshotId,\n+    ...(handoff.experimentId === undefined ? {} : { experimentId: handoff.experimentId }),\n+    selectedIds: handoff.selected.map(c => c.kind + \":\" + c.id),\n+    decisions: handoff.decisions.map(d => ({ ...d })),\n+  };\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts",
+      "source": {
+        "path": "lib/conversation-lab-handoff.ts",
+        "coverage": "全文",
+        "text": "import { selectConversationMaterials, type ConversationCandidate, type ConversationDecisionRules, type DecisionReason } from \"./conversation-lab-decision.ts\";\n\n/** Read-only, versioned handoff from Misaki material selection to Gemini wording. */\nexport const CONVERSATION_LAB_SCHEMA_VERSION = 1 as const;\nexport type MaterialDecisionSummary = {\n  candidateId: string;\n  kind: ConversationCandidate[\"kind\"];\n  priority: number;\n  reason: DecisionReason;\n};\nexport type ConversationSelectionHandoff = {\n  schemaVersion: typeof CONVERSATION_LAB_SCHEMA_VERSION;\n  selectionRulesVersion: string;\n  snapshotId: string;\n  experimentId?: string;\n  selected: ConversationCandidate[];\n  decisions: MaterialDecisionSummary[];\n};\nexport function buildConversationSelectionHandoff(\n  candidates: readonly ConversationCandidate[],\n  rules: Readonly<ConversationDecisionRules>,\n  metadata: Readonly<{ selectionRulesVersion: string; snapshotId: string; experimentId?: string }>,\n  now: Date = new Date(),\n): ConversationSelectionHandoff {\n  if (!metadata.selectionRulesVersion.trim() || !metadata.snapshotId.trim() ||\n      (metadata.experimentId !== undefined && !metadata.experimentId.trim())) {\n    throw new Error(\"Missing conversation selection handoff metadata\");\n  }\n  const result = selectConversationMaterials(candidates, rules, now);\n  return {\n    schemaVersion: CONVERSATION_LAB_SCHEMA_VERSION,\n    selectionRulesVersion: metadata.selectionRulesVersion,\n    snapshotId: metadata.snapshotId,\n    ...(metadata.experimentId === undefined ? {} : { experimentId: metadata.experimentId }),\n    selected: result.selected,\n    decisions: result.decisions.map(({ candidate, reason }) => ({\n      candidateId: candidate.kind + \":\" + candidate.id,\n      kind: candidate.kind,\n      priority: candidate.priority,\n      reason,\n    })),\n  };\n}\n/** For persistence/logging: omit all conversation text and selection payloads by default. */\nexport function redactSelectionHandoff(handoff: Readonly<ConversationSelectionHandoff>) {\n  return {\n    schemaVersion: handoff.schemaVersion,\n    selectionRulesVersion: handoff.selectionRulesVersion,\n    snapshotId: handoff.snapshotId,\n    ...(handoff.experimentId === undefined ? {} : { experimentId: handoff.experimentId }),\n    selectedIds: handoff.selected.map(c => c.kind + \":\" + c.id),\n    decisions: handoff.decisions.map(d => ({ ...d })),\n  };\n}\n",
+        "sha256": "02008e29ea67e0df6ff464a8e4fd4ffffe510e89004c1db2cad564a5380394ff"
+      }
+    },
+    {
+      "path": "lib/conversation-lab-pipeline.ts",
+      "status": "modified",
+      "additions": 40,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-lab-pipeline.ts b/lib/conversation-lab-pipeline.ts\nnew file mode 100644\nindex 00000000..3ebe553c\n--- /dev/null\n+++ b/lib/conversation-lab-pipeline.ts\n@@ -0,0 +1,40 @@\n+import { filterConversationLabScope, type ScopedConversationCandidate, type ConversationLabScope } from \"./conversation-lab-scope.ts\";\n+import { buildConversationSelectionHandoff, redactSelectionHandoff, type ConversationSelectionHandoff } from \"./conversation-lab-handoff.ts\";\n+import type { ConversationDecisionRules } from \"./conversation-lab-decision.ts\";\n+\n+/**\n+ * Mandatory scope gate before material selection and Gemini handoff.\n+ * The caller must establish scope and provenance server-side; this pure\n+ * function does not authenticate a user or verify source assertions.\n+ */\n+export function prepareScopedConversationHandoff(\n+  source: readonly ScopedConversationCandidate[],\n+  scope: ConversationLabScope,\n+  rules: Readonly<ConversationDecisionRules>,\n+  metadata: Readonly<{ selectionRulesVersion: string; snapshotId: string; experimentId?: string }>,\n+  now: Date = new Date(),\n+): { handoff: ConversationSelectionHandoff; scopeRejections: { candidateId: string; reason: \"different-user\" | \"not-visible-to-character\" | \"malformed\" }[] } {\n+  const scoped = filterConversationLabScope(source, scope);\n+  const handoff = buildConversationSelectionHandoff(scoped.candidates, rules, metadata, now);\n+  return {\n+    handoff,\n+    scopeRejections: scoped.decisions.filter((decision): decision is typeof decision & { reason: \"different-user\" | \"not-visible-to-character\" | \"malformed\" } => !decision.allowed) .map(({ candidateId, reason }) => ({ candidateId, reason })),\n+  };\n+}\n+\n+/**\n+ * In-memory audit envelope. Not persistence-safe until identifiers are\n+ * pseudonymized, access is restricted, and retention is defined.\n+ * Keeps scope rejections alongside redacted selection decisions.\n+ */\n+export function buildScopedConversationAudit(\n+  result: ReturnType<typeof prepareScopedConversationHandoff>,\n+  scope: ConversationLabScope,\n+) {\n+  if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");\n+  return {\n+    scope: { ownerUserId: scope.ownerUserId, characterId: scope.characterId },\n+    selection: redactSelectionHandoff(result.handoff),\n+    scopeRejections: result.scopeRejections.map(({ candidateId, reason }) => ({ candidateId, reason })),\n+  };\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts",
+      "source": {
+        "path": "lib/conversation-lab-pipeline.ts",
+        "coverage": "全文",
+        "text": "import { filterConversationLabScope, type ScopedConversationCandidate, type ConversationLabScope } from \"./conversation-lab-scope.ts\";\nimport { buildConversationSelectionHandoff, redactSelectionHandoff, type ConversationSelectionHandoff } from \"./conversation-lab-handoff.ts\";\nimport type { ConversationDecisionRules } from \"./conversation-lab-decision.ts\";\n\n/**\n * Mandatory scope gate before material selection and Gemini handoff.\n * The caller must establish scope and provenance server-side; this pure\n * function does not authenticate a user or verify source assertions.\n */\nexport function prepareScopedConversationHandoff(\n  source: readonly ScopedConversationCandidate[],\n  scope: ConversationLabScope,\n  rules: Readonly<ConversationDecisionRules>,\n  metadata: Readonly<{ selectionRulesVersion: string; snapshotId: string; experimentId?: string }>,\n  now: Date = new Date(),\n): { handoff: ConversationSelectionHandoff; scopeRejections: { candidateId: string; reason: \"different-user\" | \"not-visible-to-character\" | \"malformed\" }[] } {\n  const scoped = filterConversationLabScope(source, scope);\n  const handoff = buildConversationSelectionHandoff(scoped.candidates, rules, metadata, now);\n  return {\n    handoff,\n    scopeRejections: scoped.decisions.filter((decision): decision is typeof decision & { reason: \"different-user\" | \"not-visible-to-character\" | \"malformed\" } => !decision.allowed) .map(({ candidateId, reason }) => ({ candidateId, reason })),\n  };\n}\n\n/**\n * In-memory audit envelope. Not persistence-safe until identifiers are\n * pseudonymized, access is restricted, and retention is defined.\n * Keeps scope rejections alongside redacted selection decisions.\n */\nexport function buildScopedConversationAudit(\n  result: ReturnType<typeof prepareScopedConversationHandoff>,\n  scope: ConversationLabScope,\n) {\n  if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");\n  return {\n    scope: { ownerUserId: scope.ownerUserId, characterId: scope.characterId },\n    selection: redactSelectionHandoff(result.handoff),\n    scopeRejections: result.scopeRejections.map(({ candidateId, reason }) => ({ candidateId, reason })),\n  };\n}\n",
+        "sha256": "038abe3dfb2a28207d59d08b36f831d8f15b78f419b4975312d3325843ab6200"
+      }
+    },
+    {
+      "path": "lib/conversation-lab-scope.ts",
+      "status": "modified",
+      "additions": 63,
+      "deletions": 0,
+      "patch": "diff --git a/lib/conversation-lab-scope.ts b/lib/conversation-lab-scope.ts\nnew file mode 100644\nindex 00000000..9f11706b\n--- /dev/null\n+++ b/lib/conversation-lab-scope.ts\n@@ -0,0 +1,63 @@\n+/**\n+ * Conversation Lab intake boundary for a future real-data adapter.\n+ * Deny by default: candidates cannot cross user boundaries, and character\n+ * visibility requires participation, witnessing, or explicit sharing.\n+ * Pure function only; caller must verify the provenance of scope assertions.\n+ */\n+import type { ConversationCandidate } from \"./conversation-lab-decision.ts\";\n+\n+export type ScopedConversationCandidate = {\n+  candidate: ConversationCandidate;\n+  ownerUserId: string;\n+  visibility: Readonly<{\n+    participatingCharacterIds: readonly string[];\n+    witnessingCharacterIds: readonly string[];\n+    explicitlySharedWithCharacterIds: readonly string[];\n+  }>;\n+};\n+export type ConversationLabScope = Readonly<{\n+  ownerUserId: string;\n+  characterId: string;\n+}>;\n+export type ScopeRejection = \"different-user\" | \"not-visible-to-character\" | \"malformed\";\n+export type ScopeDecision = {\n+  candidateId: string;\n+  allowed: boolean;\n+  reason: \"in-scope\" | ScopeRejection;\n+};\n+export function filterConversationLabScope(\n+  source: readonly ScopedConversationCandidate[],\n+  scope: ConversationLabScope,\n+): { candidates: ConversationCandidate[]; decisions: ScopeDecision[] } {\n+  if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");\n+  const candidates: ConversationCandidate[] = [];\n+  const decisions: ScopeDecision[] = [];\n+  for (const item of source) {\n+    const raw = item as Partial<ScopedConversationCandidate>;\n+    const candidateId = typeof raw.candidate?.kind === \"string\" && typeof raw.candidate?.id === \"string\" && raw.candidate.id.trim()\n+      ? raw.candidate.kind + \":\" + raw.candidate.id : \"malformed\";\n+    const visibility = raw.visibility;\n+    const valid = typeof raw.ownerUserId === \"string\" && !!raw.ownerUserId.trim() &&\n+      typeof raw.candidate?.id === \"string\" && !!raw.candidate.id.trim() &&\n+      typeof raw.candidate?.kind === \"string\" &&\n+      typeof raw.candidate?.priority === \"number\" && Number.isFinite(raw.candidate.priority) &&\n+      Array.isArray(visibility?.participatingCharacterIds) &&\n+      Array.isArray(visibility?.witnessingCharacterIds) &&\n+      Array.isArray(visibility?.explicitlySharedWithCharacterIds) &&\n+      [visibility?.participatingCharacterIds, visibility?.witnessingCharacterIds, visibility?.explicitlySharedWithCharacterIds].every(\n+        entries => entries?.every(id => typeof id === \"string\" && !!id.trim())\n+      );\n+    if (!valid) {\n+      decisions.push({ candidateId, allowed: false, reason: \"malformed\" });\n+      continue;\n+    }\n+    const sameUser = item.ownerUserId === scope.ownerUserId;\n+    const visible = item.visibility.participatingCharacterIds.includes(scope.characterId) ||\n+      item.visibility.witnessingCharacterIds.includes(scope.characterId) ||\n+      item.visibility.explicitlySharedWithCharacterIds.includes(scope.characterId);\n+    const reason = !sameUser ? \"different-user\" : !visible ? \"not-visible-to-character\" : \"in-scope\";\n+    if (reason === \"in-scope\") candidates.push({ ...item.candidate });\n+    decisions.push({ candidateId, allowed: reason === \"in-scope\", reason });\n+  }\n+  return { candidates, decisions };\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts",
+      "source": {
+        "path": "lib/conversation-lab-scope.ts",
+        "coverage": "全文",
+        "text": "/**\n * Conversation Lab intake boundary for a future real-data adapter.\n * Deny by default: candidates cannot cross user boundaries, and character\n * visibility requires participation, witnessing, or explicit sharing.\n * Pure function only; caller must verify the provenance of scope assertions.\n */\nimport type { ConversationCandidate } from \"./conversation-lab-decision.ts\";\n\nexport type ScopedConversationCandidate = {\n  candidate: ConversationCandidate;\n  ownerUserId: string;\n  visibility: Readonly<{\n    participatingCharacterIds: readonly string[];\n    witnessingCharacterIds: readonly string[];\n    explicitlySharedWithCharacterIds: readonly string[];\n  }>;\n};\nexport type ConversationLabScope = Readonly<{\n  ownerUserId: string;\n  characterId: string;\n}>;\nexport type ScopeRejection = \"different-user\" | \"not-visible-to-character\" | \"malformed\";\nexport type ScopeDecision = {\n  candidateId: string;\n  allowed: boolean;\n  reason: \"in-scope\" | ScopeRejection;\n};\nexport function filterConversationLabScope(\n  source: readonly ScopedConversationCandidate[],\n  scope: ConversationLabScope,\n): { candidates: ConversationCandidate[]; decisions: ScopeDecision[] } {\n  if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\");\n  const candidates: ConversationCandidate[] = [];\n  const decisions: ScopeDecision[] = [];\n  for (const item of source) {\n    const raw = item as Partial<ScopedConversationCandidate>;\n    const candidateId = typeof raw.candidate?.kind === \"string\" && typeof raw.candidate?.id === \"string\" && raw.candidate.id.trim()\n      ? raw.candidate.kind + \":\" + raw.candidate.id : \"malformed\";\n    const visibility = raw.visibility;\n    const valid = typeof raw.ownerUserId === \"string\" && !!raw.ownerUserId.trim() &&\n      typeof raw.candidate?.id === \"string\" && !!raw.candidate.id.trim() &&\n      typeof raw.candidate?.kind === \"string\" &&\n      typeof raw.candidate?.priority === \"number\" && Number.isFinite(raw.candidate.priority) &&\n      Array.isArray(visibility?.participatingCharacterIds) &&\n      Array.isArray(visibility?.witnessingCharacterIds) &&\n      Array.isArray(visibility?.explicitlySharedWithCharacterIds) &&\n      [visibility?.participatingCharacterIds, visibility?.witnessingCharacterIds, visibility?.explicitlySharedWithCharacterIds].every(\n        entries => entries?.every(id => typeof id === \"string\" && !!id.trim())\n      );\n    if (!valid) {\n      decisions.push({ candidateId, allowed: false, reason: \"malformed\" });\n      continue;\n    }\n    const sameUser = item.ownerUserId === scope.ownerUserId;\n    const visible = item.visibility.participatingCharacterIds.includes(scope.characterId) ||\n      item.visibility.witnessingCharacterIds.includes(scope.characterId) ||\n      item.visibility.explicitlySharedWithCharacterIds.includes(scope.characterId);\n    const reason = !sameUser ? \"different-user\" : !visible ? \"not-visible-to-character\" : \"in-scope\";\n    if (reason === \"in-scope\") candidates.push({ ...item.candidate });\n    decisions.push({ candidateId, allowed: reason === \"in-scope\", reason });\n  }\n  return { candidates, decisions };\n}\n",
+        "sha256": "3defe32f84ff430fb796e5da78ef868d782ce8794bd268860a6647c2af2b4118"
+      }
+    },
+    {
+      "path": "tests/conversation-lab-comparison.test.ts",
+      "status": "modified",
+      "additions": 81,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-lab-comparison.test.ts b/tests/conversation-lab-comparison.test.ts\nnew file mode 100644\nindex 00000000..1080754a\n--- /dev/null\n+++ b/tests/conversation-lab-comparison.test.ts\n@@ -0,0 +1,81 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { compareConversationDecisions } from \"../lib/conversation-lab-comparison.ts\";\n+\n+test(\"compares the same snapshot without mutating it\", () => {\n+  const snapshot = Object.freeze([\n+    Object.freeze({ id: \"rain\", kind: \"external-event\", text: \"rain\", priority: 4 }),\n+    Object.freeze({ id: \"chat\", kind: \"conversation\", text: \"chat\", priority: 8 }),\n+  ]) as any;\n+  const a = { minimumPriority: 5, maximumSelected: 5, suppressPreviouslyUsed: true };\n+  const b = { ...a, minimumPriority: 3 };\n+  const result = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(result.addedIds, [\"external-event:rain\"]);\n+  assert.deepEqual(result.removedIds, []);\n+  assert.deepEqual(result.changedReasons, [{ id: \"external-event:rain\", from: \"below-threshold\", to: \"selected\" }]);\n+  assert.equal(snapshot[0].text, \"rain\");\n+});\n+\n+\n+test(\"shows selected-material removal when sandbox selection limit is tightened\", () => {\n+  const snapshot = [\n+    { id: \"first\", kind: \"conversation\" as const, text: \"first\", priority: 9 },\n+    { id: \"second\", kind: \"memory\" as const, text: \"second\", priority: 8 },\n+  ];\n+  const original = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };\n+  const experimental = { ...original, maximumSelected: 1 };\n+  const diff = compareConversationDecisions(snapshot, original, experimental, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(diff.addedIds, []);\n+  assert.deepEqual(diff.removedIds, [\"memory:second\"]);\n+  assert.deepEqual(diff.changedReasons, [{ id: \"memory:second\", from: \"selected\", to: \"limit\" }]);\n+  assert.equal(diff.original.selected.length, 2);\n+  assert.equal(diff.experimental.selected.length, 1);\n+});\n+\n+test(\"never selects cancelled or expired events in either variant\", () => {\n+  const snapshot = [\n+    { id: \"cancelled\", kind: \"external-event\" as const, text: \"cancelled\", priority: 100, cancelled: true },\n+    { id: \"expired\", kind: \"external-event\" as const, text: \"expired\", priority: 99, expiresAt: \"2026-11-16T00:00:00Z\" },\n+    { id: \"current\", kind: \"personal-life\" as const, text: \"current\", priority: 5 },\n+  ];\n+  const a = { minimumPriority: 6, maximumSelected: 5, suppressPreviouslyUsed: true };\n+  const b = { ...a, minimumPriority: 0 };\n+  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(diff.addedIds, [\"personal-life:current\"]);\n+  assert.deepEqual(diff.experimental.selected.map(c => c.id), [\"current\"]);\n+  assert.deepEqual(diff.experimental.decisions.map(d => d.reason), [\"cancelled\", \"expired\", \"selected\"]);\n+});\n+\n+\n+test(\"uses namespaced candidate IDs to avoid collisions across material types\", () => {\n+  const snapshot = [\n+    { id: \"same\", kind: \"conversation\" as const, text: \"utterance\", priority: 10 },\n+    { id: \"same\", kind: \"memory\" as const, text: \"memory\", priority: 9 },\n+  ];\n+  const a = { minimumPriority: 0, maximumSelected: 1, suppressPreviouslyUsed: true };\n+  const b = { ...a, maximumSelected: 2 };\n+  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(diff.addedIds, [\"memory:same\"]);\n+  assert.deepEqual(diff.changedReasons, [{ id: \"memory:same\", from: \"limit\", to: \"selected\" }]);\n+});\n+\n+test(\"compares suppression of previously used materials without changing production data\", () => {\n+  const snapshot = Object.freeze([\n+    Object.freeze({ id: \"used\", kind: \"conversation\" as const, text: \"already sent\", priority: 10, alreadyUsed: true }),\n+  ]);\n+  const a = { minimumPriority: 0, maximumSelected: 3, suppressPreviouslyUsed: true };\n+  const b = { ...a, suppressPreviouslyUsed: false };\n+  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(diff.addedIds, [\"conversation:used\"]);\n+  assert.deepEqual(diff.changedReasons, [{ id: \"conversation:used\", from: \"previously-used\", to: \"selected\" }]);\n+  assert.equal(snapshot[0].alreadyUsed, true);\n+});\n+\n+test(\"rejects ambiguous duplicate identities before computing A/B reason maps\", () => {\n+  const snapshot = [\n+    { id: \"same\", kind: \"memory\" as const, text: \"first\", priority: 9 },\n+    { id: \"same\", kind: \"memory\" as const, text: \"second\", priority: 8 },\n+  ];\n+  const rules = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };\n+  assert.throws(() => compareConversationDecisions(snapshot, rules, rules), /Duplicate candidate identity/);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts",
+      "source": {
+        "path": "tests/conversation-lab-comparison.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { compareConversationDecisions } from \"../lib/conversation-lab-comparison.ts\";\n\ntest(\"compares the same snapshot without mutating it\", () => {\n  const snapshot = Object.freeze([\n    Object.freeze({ id: \"rain\", kind: \"external-event\", text: \"rain\", priority: 4 }),\n    Object.freeze({ id: \"chat\", kind: \"conversation\", text: \"chat\", priority: 8 }),\n  ]) as any;\n  const a = { minimumPriority: 5, maximumSelected: 5, suppressPreviouslyUsed: true };\n  const b = { ...a, minimumPriority: 3 };\n  const result = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(result.addedIds, [\"external-event:rain\"]);\n  assert.deepEqual(result.removedIds, []);\n  assert.deepEqual(result.changedReasons, [{ id: \"external-event:rain\", from: \"below-threshold\", to: \"selected\" }]);\n  assert.equal(snapshot[0].text, \"rain\");\n});\n\n\ntest(\"shows selected-material removal when sandbox selection limit is tightened\", () => {\n  const snapshot = [\n    { id: \"first\", kind: \"conversation\" as const, text: \"first\", priority: 9 },\n    { id: \"second\", kind: \"memory\" as const, text: \"second\", priority: 8 },\n  ];\n  const original = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };\n  const experimental = { ...original, maximumSelected: 1 };\n  const diff = compareConversationDecisions(snapshot, original, experimental, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(diff.addedIds, []);\n  assert.deepEqual(diff.removedIds, [\"memory:second\"]);\n  assert.deepEqual(diff.changedReasons, [{ id: \"memory:second\", from: \"selected\", to: \"limit\" }]);\n  assert.equal(diff.original.selected.length, 2);\n  assert.equal(diff.experimental.selected.length, 1);\n});\n\ntest(\"never selects cancelled or expired events in either variant\", () => {\n  const snapshot = [\n    { id: \"cancelled\", kind: \"external-event\" as const, text: \"cancelled\", priority: 100, cancelled: true },\n    { id: \"expired\", kind: \"external-event\" as const, text: \"expired\", priority: 99, expiresAt: \"2026-11-16T00:00:00Z\" },\n    { id: \"current\", kind: \"personal-life\" as const, text: \"current\", priority: 5 },\n  ];\n  const a = { minimumPriority: 6, maximumSelected: 5, suppressPreviouslyUsed: true };\n  const b = { ...a, minimumPriority: 0 };\n  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(diff.addedIds, [\"personal-life:current\"]);\n  assert.deepEqual(diff.experimental.selected.map(c => c.id), [\"current\"]);\n  assert.deepEqual(diff.experimental.decisions.map(d => d.reason), [\"cancelled\", \"expired\", \"selected\"]);\n});\n\n\ntest(\"uses namespaced candidate IDs to avoid collisions across material types\", () => {\n  const snapshot = [\n    { id: \"same\", kind: \"conversation\" as const, text: \"utterance\", priority: 10 },\n    { id: \"same\", kind: \"memory\" as const, text: \"memory\", priority: 9 },\n  ];\n  const a = { minimumPriority: 0, maximumSelected: 1, suppressPreviouslyUsed: true };\n  const b = { ...a, maximumSelected: 2 };\n  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(diff.addedIds, [\"memory:same\"]);\n  assert.deepEqual(diff.changedReasons, [{ id: \"memory:same\", from: \"limit\", to: \"selected\" }]);\n});\n\ntest(\"compares suppression of previously used materials without changing production data\", () => {\n  const snapshot = Object.freeze([\n    Object.freeze({ id: \"used\", kind: \"conversation\" as const, text: \"already sent\", priority: 10, alreadyUsed: true }),\n  ]);\n  const a = { minimumPriority: 0, maximumSelected: 3, suppressPreviouslyUsed: true };\n  const b = { ...a, suppressPreviouslyUsed: false };\n  const diff = compareConversationDecisions(snapshot, a, b, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(diff.addedIds, [\"conversation:used\"]);\n  assert.deepEqual(diff.changedReasons, [{ id: \"conversation:used\", from: \"previously-used\", to: \"selected\" }]);\n  assert.equal(snapshot[0].alreadyUsed, true);\n});\n\ntest(\"rejects ambiguous duplicate identities before computing A/B reason maps\", () => {\n  const snapshot = [\n    { id: \"same\", kind: \"memory\" as const, text: \"first\", priority: 9 },\n    { id: \"same\", kind: \"memory\" as const, text: \"second\", priority: 8 },\n  ];\n  const rules = { minimumPriority: 0, maximumSelected: 2, suppressPreviouslyUsed: true };\n  assert.throws(() => compareConversationDecisions(snapshot, rules, rules), /Duplicate candidate identity/);\n});\n",
+        "sha256": "5ee9d6e3361efee0b94214c3e7de30fabed672a22458403c32c38926e227dfe7"
+      }
+    },
+    {
+      "path": "tests/conversation-lab-decision.test.ts",
+      "status": "modified",
+      "additions": 57,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-lab-decision.test.ts b/tests/conversation-lab-decision.test.ts\nnew file mode 100644\nindex 00000000..8cb4e699\n--- /dev/null\n+++ b/tests/conversation-lab-decision.test.ts\n@@ -0,0 +1,57 @@\n+import assert from \"node:assert/strict\";\n+import test from \"node:test\";\n+import { selectConversationMaterials } from \"../lib/conversation-lab-decision.ts\";\n+\n+test(\"selects by priority with a stable tie-break and explains every exclusion\", () => {\n+  const source = [\n+    { id: \"old\", kind: \"external-event\", text: \"old\", priority: 10, expiresAt: \"2026-01-01T00:00:00Z\" },\n+    { id: \"a\", kind: \"memory\", text: \"first\", priority: 8 },\n+    { id: \"b\", kind: \"emotion\", text: \"second\", priority: 8 },\n+    { id: \"used\", kind: \"external-event\", text: \"used\", priority: 9, alreadyUsed: true },\n+    { id: \"cancel\", kind: \"external-event\", text: \"cancel\", priority: 11, cancelled: true },\n+    { id: \"low\", kind: \"memory\", text: \"low\", priority: 1 },\n+  ] as const;\n+  const original = JSON.stringify(source);\n+  const result = selectConversationMaterials(source, { minimumPriority: 5, maximumSelected: 2, suppressPreviouslyUsed: true }, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.deepEqual(result.selected.map((x) => x.text), [\"first\", \"second\"]);\n+  assert.deepEqual(result.decisions.map((x) => x.reason), [\"cancelled\", \"expired\", \"previously-used\", \"selected\", \"selected\", \"below-threshold\"]);\n+  assert.equal(JSON.stringify(source), original);\n+});\n+test(\"a lab rule change does not mutate source and can produce a different selection\", () => {\n+  const candidates = [{ id: \"1\", kind: \"memory\", text: \"memory\", priority: 2 }] as const;\n+  assert.equal(selectConversationMaterials(candidates, { minimumPriority: 3, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 0);\n+  assert.equal(selectConversationMaterials(candidates, { minimumPriority: 1, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 1);\n+});\n+test(\"invalid rules fail closed\", () => {\n+  assert.throws(() => selectConversationMaterials([], { minimumPriority: 0, maximumSelected: -1, suppressPreviouslyUsed: true }));\n+});\n+\n+test(\"rejects duplicate identities and non-finite priorities before sorting\", () => {\n+  const rules = { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true };\n+  assert.throws(() => selectConversationMaterials([\n+    { id: \"same\", kind: \"memory\", text: \"first\", priority: 8 },\n+    { id: \"same\", kind: \"memory\", text: \"conflict\", priority: 7 },\n+  ], rules), /Duplicate candidate identity/);\n+  assert.throws(() => selectConversationMaterials([\n+    { id: \"nan\", kind: \"memory\", text: \"bad\", priority: NaN },\n+  ], rules), /Invalid candidate priority/);\n+  assert.throws(() => selectConversationMaterials([\n+    { id: \"inf\", kind: \"memory\", text: \"bad\", priority: Infinity },\n+  ], rules), /Invalid candidate priority/);\n+});\n+\n+test(\"records exactly one exclusion reason using documented precedence\", () => {\n+  const now = new Date(\"2026-11-17T00:00:00Z\");\n+  const rules = { minimumPriority: 5, maximumSelected: 0, suppressPreviouslyUsed: true };\n+  const candidates = [\n+    { id: \"cancelled\", kind: \"memory\" as const, text: \"x\", priority: 1, cancelled: true, alreadyUsed: true, expiresAt: \"2020-01-01T00:00:00Z\" },\n+    { id: \"expired\", kind: \"memory\" as const, text: \"x\", priority: 1, alreadyUsed: true, expiresAt: \"2020-01-01T00:00:00Z\" },\n+    { id: \"used\", kind: \"memory\" as const, text: \"x\", priority: 1, alreadyUsed: true },\n+    { id: \"low\", kind: \"memory\" as const, text: \"x\", priority: 1 },\n+    { id: \"limited\", kind: \"memory\" as const, text: \"x\", priority: 10 },\n+  ];\n+  const result = selectConversationMaterials(candidates, rules, now);\n+  assert.deepEqual(result.decisions.map(d => d.reason), [\"limit\", \"cancelled\", \"expired\", \"previously-used\", \"below-threshold\"]);\n+  assert.equal(result.decisions.length, candidates.length);\n+  assert.equal(result.selected.length, 0);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts",
+      "source": {
+        "path": "tests/conversation-lab-decision.test.ts",
+        "coverage": "全文",
+        "text": "import assert from \"node:assert/strict\";\nimport test from \"node:test\";\nimport { selectConversationMaterials } from \"../lib/conversation-lab-decision.ts\";\n\ntest(\"selects by priority with a stable tie-break and explains every exclusion\", () => {\n  const source = [\n    { id: \"old\", kind: \"external-event\", text: \"old\", priority: 10, expiresAt: \"2026-01-01T00:00:00Z\" },\n    { id: \"a\", kind: \"memory\", text: \"first\", priority: 8 },\n    { id: \"b\", kind: \"emotion\", text: \"second\", priority: 8 },\n    { id: \"used\", kind: \"external-event\", text: \"used\", priority: 9, alreadyUsed: true },\n    { id: \"cancel\", kind: \"external-event\", text: \"cancel\", priority: 11, cancelled: true },\n    { id: \"low\", kind: \"memory\", text: \"low\", priority: 1 },\n  ] as const;\n  const original = JSON.stringify(source);\n  const result = selectConversationMaterials(source, { minimumPriority: 5, maximumSelected: 2, suppressPreviouslyUsed: true }, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.deepEqual(result.selected.map((x) => x.text), [\"first\", \"second\"]);\n  assert.deepEqual(result.decisions.map((x) => x.reason), [\"cancelled\", \"expired\", \"previously-used\", \"selected\", \"selected\", \"below-threshold\"]);\n  assert.equal(JSON.stringify(source), original);\n});\ntest(\"a lab rule change does not mutate source and can produce a different selection\", () => {\n  const candidates = [{ id: \"1\", kind: \"memory\", text: \"memory\", priority: 2 }] as const;\n  assert.equal(selectConversationMaterials(candidates, { minimumPriority: 3, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 0);\n  assert.equal(selectConversationMaterials(candidates, { minimumPriority: 1, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 1);\n});\ntest(\"invalid rules fail closed\", () => {\n  assert.throws(() => selectConversationMaterials([], { minimumPriority: 0, maximumSelected: -1, suppressPreviouslyUsed: true }));\n});\n\ntest(\"rejects duplicate identities and non-finite priorities before sorting\", () => {\n  const rules = { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true };\n  assert.throws(() => selectConversationMaterials([\n    { id: \"same\", kind: \"memory\", text: \"first\", priority: 8 },\n    { id: \"same\", kind: \"memory\", text: \"conflict\", priority: 7 },\n  ], rules), /Duplicate candidate identity/);\n  assert.throws(() => selectConversationMaterials([\n    { id: \"nan\", kind: \"memory\", text: \"bad\", priority: NaN },\n  ], rules), /Invalid candidate priority/);\n  assert.throws(() => selectConversationMaterials([\n    { id: \"inf\", kind: \"memory\", text: \"bad\", priority: Infinity },\n  ], rules), /Invalid candidate priority/);\n});\n\ntest(\"records exactly one exclusion reason using documented precedence\", () => {\n  const now = new Date(\"2026-11-17T00:00:00Z\");\n  const rules = { minimumPriority: 5, maximumSelected: 0, suppressPreviouslyUsed: true };\n  const candidates = [\n    { id: \"cancelled\", kind: \"memory\" as const, text: \"x\", priority: 1, cancelled: true, alreadyUsed: true, expiresAt: \"2020-01-01T00:00:00Z\" },\n    { id: \"expired\", kind: \"memory\" as const, text: \"x\", priority: 1, alreadyUsed: true, expiresAt: \"2020-01-01T00:00:00Z\" },\n    { id: \"used\", kind: \"memory\" as const, text: \"x\", priority: 1, alreadyUsed: true },\n    { id: \"low\", kind: \"memory\" as const, text: \"x\", priority: 1 },\n    { id: \"limited\", kind: \"memory\" as const, text: \"x\", priority: 10 },\n  ];\n  const result = selectConversationMaterials(candidates, rules, now);\n  assert.deepEqual(result.decisions.map(d => d.reason), [\"limit\", \"cancelled\", \"expired\", \"previously-used\", \"below-threshold\"]);\n  assert.equal(result.decisions.length, candidates.length);\n  assert.equal(result.selected.length, 0);\n});\n",
+        "sha256": "86ca13fe73ccbe457e3c7932d9cd16464cc83f0dfd8b2c9b2544192141dca7b4"
+      }
+    },
+    {
+      "path": "tests/conversation-lab-handoff.test.ts",
+      "status": "modified",
+      "additions": 26,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-lab-handoff.test.ts b/tests/conversation-lab-handoff.test.ts\nnew file mode 100644\nindex 00000000..2c241fe7\n--- /dev/null\n+++ b/tests/conversation-lab-handoff.test.ts\n@@ -0,0 +1,26 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { buildConversationSelectionHandoff, redactSelectionHandoff } from \"../lib/conversation-lab-handoff.ts\";\n+\n+const rules = { minimumPriority: 5, maximumSelected: 3, suppressPreviouslyUsed: true };\n+test(\"versioned handoff provides selected payload only in-memory and reason metadata\", () => {\n+  const candidates = [\n+    { id: \"c1\", kind: \"conversation\" as const, text: \"PRIVATE TEST UTTERANCE\", priority: 8 },\n+    { id: \"e1\", kind: \"external-event\" as const, text: \"PRIVATE TEST EVENT\", priority: 2 },\n+  ];\n+  const handoff = buildConversationSelectionHandoff(candidates, rules, { selectionRulesVersion: \"v1\", snapshotId: \"snapshot-1\", experimentId: \"experiment-1\" }, new Date(\"2026-11-17T00:00:00Z\"));\n+  assert.equal(handoff.schemaVersion, 1);\n+  assert.equal(handoff.selected[0].text, \"PRIVATE TEST UTTERANCE\");\n+  assert.deepEqual(handoff.decisions.map(d => [d.candidateId, d.reason]), [[\"conversation:c1\", \"selected\"], [\"external-event:e1\", \"below-threshold\"]]);\n+  const logged = redactSelectionHandoff(handoff);\n+  assert.deepEqual(logged.selectedIds, [\"conversation:c1\"]);\n+  assert.equal(JSON.stringify(logged).includes(\"PRIVATE TEST\"), false);\n+  assert.equal(JSON.stringify(logged).includes('\"text\"'), false);\n+  assert.equal(candidates.length, 2);\n+});\n+test(\"normal operation needs no experiment ID; invalid metadata fails closed\", () => {\n+  const handoff = buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n+  assert.equal(\"experimentId\" in handoff, false);\n+  assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"\", snapshotId: \"s1\" }), /metadata/);\n+  assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"v1\", snapshotId: \"s1\", experimentId: \" \" }), /metadata/);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts",
+      "source": {
+        "path": "tests/conversation-lab-handoff.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { buildConversationSelectionHandoff, redactSelectionHandoff } from \"../lib/conversation-lab-handoff.ts\";\n\nconst rules = { minimumPriority: 5, maximumSelected: 3, suppressPreviouslyUsed: true };\ntest(\"versioned handoff provides selected payload only in-memory and reason metadata\", () => {\n  const candidates = [\n    { id: \"c1\", kind: \"conversation\" as const, text: \"PRIVATE TEST UTTERANCE\", priority: 8 },\n    { id: \"e1\", kind: \"external-event\" as const, text: \"PRIVATE TEST EVENT\", priority: 2 },\n  ];\n  const handoff = buildConversationSelectionHandoff(candidates, rules, { selectionRulesVersion: \"v1\", snapshotId: \"snapshot-1\", experimentId: \"experiment-1\" }, new Date(\"2026-11-17T00:00:00Z\"));\n  assert.equal(handoff.schemaVersion, 1);\n  assert.equal(handoff.selected[0].text, \"PRIVATE TEST UTTERANCE\");\n  assert.deepEqual(handoff.decisions.map(d => [d.candidateId, d.reason]), [[\"conversation:c1\", \"selected\"], [\"external-event:e1\", \"below-threshold\"]]);\n  const logged = redactSelectionHandoff(handoff);\n  assert.deepEqual(logged.selectedIds, [\"conversation:c1\"]);\n  assert.equal(JSON.stringify(logged).includes(\"PRIVATE TEST\"), false);\n  assert.equal(JSON.stringify(logged).includes('\"text\"'), false);\n  assert.equal(candidates.length, 2);\n});\ntest(\"normal operation needs no experiment ID; invalid metadata fails closed\", () => {\n  const handoff = buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n  assert.equal(\"experimentId\" in handoff, false);\n  assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"\", snapshotId: \"s1\" }), /metadata/);\n  assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"v1\", snapshotId: \"s1\", experimentId: \" \" }), /metadata/);\n});\n",
+        "sha256": "641c9865a569c0fe6f322802e8b11f9a222a0c5aface40082761c0fdb96a8260"
+      }
+    },
+    {
+      "path": "tests/conversation-lab-pipeline.test.ts",
+      "status": "modified",
+      "additions": 63,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-lab-pipeline.test.ts b/tests/conversation-lab-pipeline.test.ts\nnew file mode 100644\nindex 00000000..778427cb\n--- /dev/null\n+++ b/tests/conversation-lab-pipeline.test.ts\n@@ -0,0 +1,63 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { prepareScopedConversationHandoff, buildScopedConversationAudit } from \"../lib/conversation-lab-pipeline.ts\";\n+import type { ScopedConversationCandidate } from \"../lib/conversation-lab-scope.ts\";\n+\n+const candidate = (id: string, ownerUserId: string, visible: string[]): ScopedConversationCandidate => ({\n+  candidate: { kind: \"memory\", id, text: \"PRIVATE-\" + id, priority: 10 },\n+  ownerUserId,\n+  visibility: { participatingCharacterIds: visible, witnessingCharacterIds: [], explicitlySharedWithCharacterIds: [] },\n+});\n+test(\"never passes cross-user or non-visible materials into Gemini handoff\", () => {\n+  const result = prepareScopedConversationHandoff([\n+    candidate(\"allowed\", \"user-a\", [\"misaki\"]),\n+    candidate(\"other-user\", \"user-b\", [\"misaki\"]),\n+    candidate(\"private\", \"user-a\", [\"someone-else\"]),\n+  ], { ownerUserId: \"user-a\", characterId: \"misaki\" },\n+  { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n+  { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n+  assert.deepEqual(result.handoff.selected.map(x => x.id), [\"allowed\"]);\n+  assert.deepEqual(result.handoff.decisions.map(x => x.candidateId), [\"memory:allowed\"]);\n+  assert.deepEqual(result.scopeRejections, [\n+    { candidateId: \"memory:other-user\", reason: \"different-user\" },\n+    { candidateId: \"memory:private\", reason: \"not-visible-to-character\" },\n+  ]);\n+  assert.equal(JSON.stringify(result.scopeRejections).includes(\"PRIVATE\"), false);\n+});\n+test(\"fails closed when owner scope is absent\", () => {\n+  assert.throws(() => prepareScopedConversationHandoff(\n+    [candidate(\"a\", \"user-a\", [\"misaki\"])],\n+    { ownerUserId: \"\", characterId: \"misaki\" },\n+    { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n+    { selectionRulesVersion: \"v1\", snapshotId: \"s1\" },\n+  ), /Missing lab scope/);\n+});\n+\n+test(\"audit envelope preserves scope and rejection reasons without candidate text\", () => {\n+  const scope = { ownerUserId: \"user-a\", characterId: \"misaki\" };\n+  const result = prepareScopedConversationHandoff([\n+    candidate(\"allowed\", \"user-a\", [\"misaki\"]),\n+    candidate(\"denied\", \"user-b\", [\"misaki\"]),\n+  ], scope,\n+  { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n+  { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n+  const audit = buildScopedConversationAudit(result, scope);\n+  assert.deepEqual(audit.scope, scope);\n+  assert.deepEqual(audit.scopeRejections, [{ candidateId: \"memory:denied\", reason: \"different-user\" }]);\n+  assert.equal(JSON.stringify(audit).includes(\"PRIVATE-\"), false);\n+  assert.equal(JSON.stringify(audit.selection).includes(\"PRIVATE-\"), false);\n+  assert.throws(() => buildScopedConversationAudit(result, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/);\n+});\n+\n+test(\"retains malformed rejection in audit rather than silently dropping it\", () => {\n+  const scope = { ownerUserId: \"user-a\", characterId: \"misaki\" };\n+  const malformed = { ...candidate(\"bad\", \"user-a\", [\"misaki\"]), visibility: undefined } as unknown as ScopedConversationCandidate;\n+  const result = prepareScopedConversationHandoff(\n+    [candidate(\"good\", \"user-a\", [\"misaki\"]), malformed], scope,\n+    { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n+    { selectionRulesVersion: \"v1\", snapshotId: \"s2\" },\n+  );\n+  assert.deepEqual(result.handoff.selected.map(x => x.id), [\"good\"]);\n+  assert.deepEqual(result.scopeRejections, [{ candidateId: \"memory:bad\", reason: \"malformed\" }]);\n+  assert.deepEqual(buildScopedConversationAudit(result, scope).scopeRejections, result.scopeRejections);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts",
+      "source": {
+        "path": "tests/conversation-lab-pipeline.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { prepareScopedConversationHandoff, buildScopedConversationAudit } from \"../lib/conversation-lab-pipeline.ts\";\nimport type { ScopedConversationCandidate } from \"../lib/conversation-lab-scope.ts\";\n\nconst candidate = (id: string, ownerUserId: string, visible: string[]): ScopedConversationCandidate => ({\n  candidate: { kind: \"memory\", id, text: \"PRIVATE-\" + id, priority: 10 },\n  ownerUserId,\n  visibility: { participatingCharacterIds: visible, witnessingCharacterIds: [], explicitlySharedWithCharacterIds: [] },\n});\ntest(\"never passes cross-user or non-visible materials into Gemini handoff\", () => {\n  const result = prepareScopedConversationHandoff([\n    candidate(\"allowed\", \"user-a\", [\"misaki\"]),\n    candidate(\"other-user\", \"user-b\", [\"misaki\"]),\n    candidate(\"private\", \"user-a\", [\"someone-else\"]),\n  ], { ownerUserId: \"user-a\", characterId: \"misaki\" },\n  { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n  { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n  assert.deepEqual(result.handoff.selected.map(x => x.id), [\"allowed\"]);\n  assert.deepEqual(result.handoff.decisions.map(x => x.candidateId), [\"memory:allowed\"]);\n  assert.deepEqual(result.scopeRejections, [\n    { candidateId: \"memory:other-user\", reason: \"different-user\" },\n    { candidateId: \"memory:private\", reason: \"not-visible-to-character\" },\n  ]);\n  assert.equal(JSON.stringify(result.scopeRejections).includes(\"PRIVATE\"), false);\n});\ntest(\"fails closed when owner scope is absent\", () => {\n  assert.throws(() => prepareScopedConversationHandoff(\n    [candidate(\"a\", \"user-a\", [\"misaki\"])],\n    { ownerUserId: \"\", characterId: \"misaki\" },\n    { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n    { selectionRulesVersion: \"v1\", snapshotId: \"s1\" },\n  ), /Missing lab scope/);\n});\n\ntest(\"audit envelope preserves scope and rejection reasons without candidate text\", () => {\n  const scope = { ownerUserId: \"user-a\", characterId: \"misaki\" };\n  const result = prepareScopedConversationHandoff([\n    candidate(\"allowed\", \"user-a\", [\"misaki\"]),\n    candidate(\"denied\", \"user-b\", [\"misaki\"]),\n  ], scope,\n  { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n  { selectionRulesVersion: \"v1\", snapshotId: \"s1\" });\n  const audit = buildScopedConversationAudit(result, scope);\n  assert.deepEqual(audit.scope, scope);\n  assert.deepEqual(audit.scopeRejections, [{ candidateId: \"memory:denied\", reason: \"different-user\" }]);\n  assert.equal(JSON.stringify(audit).includes(\"PRIVATE-\"), false);\n  assert.equal(JSON.stringify(audit.selection).includes(\"PRIVATE-\"), false);\n  assert.throws(() => buildScopedConversationAudit(result, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/);\n});\n\ntest(\"retains malformed rejection in audit rather than silently dropping it\", () => {\n  const scope = { ownerUserId: \"user-a\", characterId: \"misaki\" };\n  const malformed = { ...candidate(\"bad\", \"user-a\", [\"misaki\"]), visibility: undefined } as unknown as ScopedConversationCandidate;\n  const result = prepareScopedConversationHandoff(\n    [candidate(\"good\", \"user-a\", [\"misaki\"]), malformed], scope,\n    { minimumPriority: 0, maximumSelected: 9, suppressPreviouslyUsed: true },\n    { selectionRulesVersion: \"v1\", snapshotId: \"s2\" },\n  );\n  assert.deepEqual(result.handoff.selected.map(x => x.id), [\"good\"]);\n  assert.deepEqual(result.scopeRejections, [{ candidateId: \"memory:bad\", reason: \"malformed\" }]);\n  assert.deepEqual(buildScopedConversationAudit(result, scope).scopeRejections, result.scopeRejections);\n});\n",
+        "sha256": "69f60c8631d266f077fab709b1dc2e1ac61d2e0ecbfbc7ec5b89972fae0a9965"
+      }
+    },
+    {
+      "path": "tests/conversation-lab-scope.test.ts",
+      "status": "modified",
+      "additions": 49,
+      "deletions": 0,
+      "patch": "diff --git a/tests/conversation-lab-scope.test.ts b/tests/conversation-lab-scope.test.ts\nnew file mode 100644\nindex 00000000..2185d725\n--- /dev/null\n+++ b/tests/conversation-lab-scope.test.ts\n@@ -0,0 +1,49 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { filterConversationLabScope, type ScopedConversationCandidate } from \"../lib/conversation-lab-scope.ts\";\n+\n+const visibility = (participatingCharacterIds: string[] = [], witnessingCharacterIds: string[] = [], explicitlySharedWithCharacterIds: string[] = []) =>\n+  ({ participatingCharacterIds, witnessingCharacterIds, explicitlySharedWithCharacterIds });\n+const item = (id: string, ownerUserId: string, v: ReturnType<typeof visibility>): ScopedConversationCandidate => ({\n+  candidate: { id, kind: \"memory\", text: \"SENSITIVE TEST MATERIAL \" + id, priority: 5 },\n+  ownerUserId, visibility: v,\n+});\n+test(\"allows only same-user materials visible through participation, witness, or explicit share\", () => {\n+  const source = [\n+    item(\"participant\", \"u1\", visibility([\"misaki\"])),\n+    item(\"witness\", \"u1\", visibility([], [\"misaki\"])),\n+    item(\"shared\", \"u1\", visibility([], [], [\"misaki\"])),\n+    item(\"private\", \"u1\", visibility([\"other-character\"])),\n+    item(\"other-user\", \"u2\", visibility([\"misaki\"], [], [\"misaki\"])),\n+  ];\n+  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n+  assert.deepEqual(result.candidates.map(x => x.id), [\"participant\", \"witness\", \"shared\"]);\n+  assert.deepEqual(result.decisions.map(x => x.reason), [\"in-scope\", \"in-scope\", \"in-scope\", \"not-visible-to-character\", \"different-user\"]);\n+  assert.equal(JSON.stringify(result.decisions).includes(\"SENSITIVE\"), false);\n+});\n+test(\"fails closed when scope is missing and does not modify source\", () => {\n+  const source = [item(\"a\", \"u1\", visibility([\"misaki\"]))];\n+  assert.throws(() => filterConversationLabScope(source, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/);\n+  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n+  result.candidates[0].text = \"changed\";\n+  assert.equal(source[0].candidate.text, \"SENSITIVE TEST MATERIAL a\");\n+});\n+\n+test(\"rejects malformed visibility per item while retaining valid materials\", () => {\n+  const broken = { ...item(\"broken\", \"u1\", visibility([\"misaki\"])), visibility: undefined } as unknown as ScopedConversationCandidate;\n+  const source = [broken, item(\"valid\", \"u1\", visibility([\"misaki\"]))];\n+  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n+  assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]);\n+  assert.deepEqual(result.decisions.map(d => d.reason), [\"malformed\", \"in-scope\"]);\n+});\n+\n+test(\"rejects non-finite priorities individually without dropping valid character-scoped materials\", () => {\n+  const invalid = [NaN, Infinity, -Infinity].map((priority, index) => ({\n+    ...item(\"invalid-\" + index, \"u1\", visibility([\"misaki\"])),\n+    candidate: { ...item(\"invalid-\" + index, \"u1\", visibility([\"misaki\"])).candidate, priority },\n+  }));\n+  const source = [item(\"valid\", \"u1\", visibility([\"misaki\"])), ...invalid];\n+  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n+  assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]);\n+  assert.deepEqual(result.decisions.map(d => d.reason), [\"in-scope\", \"malformed\", \"malformed\", \"malformed\"]);\n+});\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts",
+      "source": {
+        "path": "tests/conversation-lab-scope.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { filterConversationLabScope, type ScopedConversationCandidate } from \"../lib/conversation-lab-scope.ts\";\n\nconst visibility = (participatingCharacterIds: string[] = [], witnessingCharacterIds: string[] = [], explicitlySharedWithCharacterIds: string[] = []) =>\n  ({ participatingCharacterIds, witnessingCharacterIds, explicitlySharedWithCharacterIds });\nconst item = (id: string, ownerUserId: string, v: ReturnType<typeof visibility>): ScopedConversationCandidate => ({\n  candidate: { id, kind: \"memory\", text: \"SENSITIVE TEST MATERIAL \" + id, priority: 5 },\n  ownerUserId, visibility: v,\n});\ntest(\"allows only same-user materials visible through participation, witness, or explicit share\", () => {\n  const source = [\n    item(\"participant\", \"u1\", visibility([\"misaki\"])),\n    item(\"witness\", \"u1\", visibility([], [\"misaki\"])),\n    item(\"shared\", \"u1\", visibility([], [], [\"misaki\"])),\n    item(\"private\", \"u1\", visibility([\"other-character\"])),\n    item(\"other-user\", \"u2\", visibility([\"misaki\"], [], [\"misaki\"])),\n  ];\n  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n  assert.deepEqual(result.candidates.map(x => x.id), [\"participant\", \"witness\", \"shared\"]);\n  assert.deepEqual(result.decisions.map(x => x.reason), [\"in-scope\", \"in-scope\", \"in-scope\", \"not-visible-to-character\", \"different-user\"]);\n  assert.equal(JSON.stringify(result.decisions).includes(\"SENSITIVE\"), false);\n});\ntest(\"fails closed when scope is missing and does not modify source\", () => {\n  const source = [item(\"a\", \"u1\", visibility([\"misaki\"]))];\n  assert.throws(() => filterConversationLabScope(source, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/);\n  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n  result.candidates[0].text = \"changed\";\n  assert.equal(source[0].candidate.text, \"SENSITIVE TEST MATERIAL a\");\n});\n\ntest(\"rejects malformed visibility per item while retaining valid materials\", () => {\n  const broken = { ...item(\"broken\", \"u1\", visibility([\"misaki\"])), visibility: undefined } as unknown as ScopedConversationCandidate;\n  const source = [broken, item(\"valid\", \"u1\", visibility([\"misaki\"]))];\n  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n  assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]);\n  assert.deepEqual(result.decisions.map(d => d.reason), [\"malformed\", \"in-scope\"]);\n});\n\ntest(\"rejects non-finite priorities individually without dropping valid character-scoped materials\", () => {\n  const invalid = [NaN, Infinity, -Infinity].map((priority, index) => ({\n    ...item(\"invalid-\" + index, \"u1\", visibility([\"misaki\"])),\n    candidate: { ...item(\"invalid-\" + index, \"u1\", visibility([\"misaki\"])).candidate, priority },\n  }));\n  const source = [item(\"valid\", \"u1\", visibility([\"misaki\"])), ...invalid];\n  const result = filterConversationLabScope(source, { ownerUserId: \"u1\", characterId: \"misaki\" });\n  assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]);\n  assert.deepEqual(result.decisions.map(d => d.reason), [\"in-scope\", \"malformed\", \"malformed\", \"malformed\"]);\n});\n",
+        "sha256": "970210c47d9295bb46e74dbb21597e4bf4b4ffe94dea2859818875772d3a1501"
+      }
+    }
+  ],
+  "file_count": 10,
+  "reported_file_count": 10,
+  "commits": [
+    {
+      "sha": "68a496dd0e805a37f0d70606cf05ed0cd5ceda0f",
+      "message": "feat(conversation-lab): add pure material selection with auditable decisions\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/68a496dd0e805a37f0d70606cf05ed0cd5ceda0f"
+    },
+    {
+      "sha": "ccc924d3ac720e0f2bb710aecdf9e0305926912b",
+      "message": "feat(conversation-lab): add pure material selection with auditable decisions\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/ccc924d3ac720e0f2bb710aecdf9e0305926912b"
+    },
+    {
+      "sha": "42430644342c1cbb58b583fbc398dbd274fe31e4",
+      "message": "feat(conversation-lab): add read-only A/B decision diff\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/42430644342c1cbb58b583fbc398dbd274fe31e4"
+    },
+    {
+      "sha": "fc4ce38f559545df77e923087f8bfa4ae19db945",
+      "message": "feat(conversation-lab): add read-only A/B decision diff\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/fc4ce38f559545df77e923087f8bfa4ae19db945"
+    },
+    {
+      "sha": "99776514ed82213f6c936a776a47dc0d87f93635",
+      "message": "fix(conversation-lab): use resolvable TS module import in Node tests\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/99776514ed82213f6c936a776a47dc0d87f93635"
+    },
+    {
+      "sha": "1256d55fa6d2c2341034ea3079a6e7c92c4a0f9b",
+      "message": "test(conversation-lab): cover sandbox limits and cancelled/expired material\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1256d55fa6d2c2341034ea3079a6e7c92c4a0f9b"
+    },
+    {
+      "sha": "1bec8e8d7b1e0d170e1f85d376ab928b56077440",
+      "message": "test(conversation-lab): verify material identity and reuse rule A/B\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/1bec8e8d7b1e0d170e1f85d376ab928b56077440"
+    },
+    {
+      "sha": "6ffe21031d98ba3d82a36580ee9b4edec8ec723d",
+      "message": "feat(conversation-lab): versioned read-only Gemini handoff contract\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/6ffe21031d98ba3d82a36580ee9b4edec8ec723d"
+    },
+    {
+      "sha": "8768119cd9b6985049df48717b963c6de5841037",
+      "message": "feat(conversation-lab): versioned read-only Gemini handoff contract\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8768119cd9b6985049df48717b963c6de5841037"
+    },
+    {
+      "sha": "7fb1294a19937a247d49fc580ff4c2d735a7cf77",
+      "message": "fix(conversation-lab): reject ambiguous snapshots and invalid priorities\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/7fb1294a19937a247d49fc580ff4c2d735a7cf77"
+    },
+    {
+      "sha": "909f0f71a200474f0ff2373937350b58828ac231",
+      "message": "test(conversation-lab): enforce unique snapshot identities and finite priorities\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/909f0f71a200474f0ff2373937350b58828ac231"
+    },
+    {
+      "sha": "3cd2dd8c50afc1117a03abc853bdb4ff8bed258c",
+      "message": "test(conversation-lab): lock exclusion precedence and one-reason invariant\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/3cd2dd8c50afc1117a03abc853bdb4ff8bed258c"
+    },
+    {
+      "sha": "f55873de78258befa2210246f39bd168c1d7b217",
+      "message": "test(conversation-lab): reject duplicate A/B snapshot identities\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f55873de78258befa2210246f39bd168c1d7b217"
+    },
+    {
+      "sha": "e0efc41feb0cacea23efabb7e29c5c04421bc324",
+      "message": "feat(conversation-lab): pure fail-closed user and character scope gate\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/e0efc41feb0cacea23efabb7e29c5c04421bc324"
+    },
+    {
+      "sha": "b4a613642340e2c6e9464feca1c4790f32ce54a0",
+      "message": "feat(conversation-lab): pure fail-closed user and character scope gate\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/b4a613642340e2c6e9464feca1c4790f32ce54a0"
+    },
+    {
+      "sha": "66cb419abcc59f40be75d53367f181ebcf3127f2",
+      "message": "feat(conversation-lab): enforce scope gate in sandbox handoff pipeline\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/66cb419abcc59f40be75d53367f181ebcf3127f2"
+    },
+    {
+      "sha": "cf91ea43132f78c61b6d915f8b3992d926cda1ae",
+      "message": "feat(conversation-lab): enforce scope gate in sandbox handoff pipeline\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/cf91ea43132f78c61b6d915f8b3992d926cda1ae"
+    },
+    {
+      "sha": "c626c5c4aac64991eb27d42a4793890f38282c37",
+      "message": "feat(conversation-lab): bind scope rejections to in-memory audit envelope\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/c626c5c4aac64991eb27d42a4793890f38282c37"
+    },
+    {
+      "sha": "54dfa35b0916c3c11deacb98b79bd4200ffd8715",
+      "message": "test(conversation-lab): audit scope and exclusions without text\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/54dfa35b0916c3c11deacb98b79bd4200ffd8715"
+    },
+    {
+      "sha": "4349573946e8935a901bbf23e544604d53ec4d0a",
+      "message": "fix(conversation-lab): reject malformed scope entries per item\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4349573946e8935a901bbf23e544604d53ec4d0a"
+    },
+    {
+      "sha": "22236f987dd108c5a4adcd7ed4b427d9c76fa998",
+      "message": "fix(conversation-lab): propagate malformed scope rejection\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/22236f987dd108c5a4adcd7ed4b427d9c76fa998"
+    },
+    {
+      "sha": "32827a362ae4fe3c76005c734fbe6845efd33718",
+      "message": "fix(conversation-lab): retain malformed scope rejections in audit pipeline\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/32827a362ae4fe3c76005c734fbe6845efd33718"
+    },
+    {
+      "sha": "d318a0a259bd04b479286a9dbf1e5d089eec0ad5",
+      "message": "test(conversation-lab): isolate malformed visibility entries\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d318a0a259bd04b479286a9dbf1e5d089eec0ad5"
+    },
+    {
+      "sha": "d7458f8054c37a0db4548e6d89d4398a8e684423",
+      "message": "test(conversation-lab): preserve malformed rejection in audit evidence\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d7458f8054c37a0db4548e6d89d4398a8e684423"
+    },
+    {
+      "sha": "f7bcb3c60a364d1646d9f8174d6977be3e938c85",
+      "message": "fix(conversation-lab): reject non-finite candidate priorities at scope intake\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f7bcb3c60a364d1646d9f8174d6977be3e938c85"
+    },
+    {
+      "sha": "071270a15716a45bf558363d8ef35f1bef30c787",
+      "message": "test(conversation-lab): isolate invalid priorities in multi-character scope intake\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/071270a15716a45bf558363d8ef35f1bef30c787"
+    }
+  ],
+  "comments": [
+    {
+      "body": "【Gemini最適化担当からの連携提案／2026-11-17】\n\n会話研究室（本PR #199）と、既存の会話コンテキスト重複削減・品質A/B（PR #78、Draft PR #194、Issue #184）は、会話生成パイプラインの異なる段階を担当しており、重複実装を避けて連携したいです。\n\n■ 担当境界（提案）\n- PR #199：会話材料の採否・優先順位・期限・取消・既出・重複・閾値と、その判断理由、設定バージョンの管理。現在は純粋ロジック＋テスト段階であり、本番API・Gemini接続は未実装と理解しています。\n- PR #78/#194：採用済み材料をGeminiに渡す際の直近発言重複の削減、入力トークン計測、同一条件のA/B品質比較。PR #194は安全ガード追加済みだが最新HEADのCI成功未確認、実Gemini品質比較未実施、Draftのままです。\n\n■ 共通インターフェース案（未合意・未実装）\n1. 会話研究室が『採用材料（ID・種別・内容・優先順位・根拠）』『不採用理由』『選別設定の版』『実験ID』を出力。実際の機密会話本文のログ化は既定で避ける。\n2. Gemini側が同じ採用材料・同じ履歴・同じモデル条件でA/Bプロンプトを生成し、variant、prompt tokens、output tokens、推定コスト、評価結果を実験IDに紐付ける。\n3. 『材料選別のA/B』と『プロンプト重複削減のA/B』は別軸で実験し、品質改善・悪化の原因を識別できるようにする。\n4. まず架空データの純粋関数／契約テストから始め、本番会話・個人情報・Gemini実送信・マージ・デプロイはそれぞれ既存の許可条件を守る。\n\n■ PR #199担当ソラへの確認事項\n- 既存の `lib/conversation-lab-decision.ts` / `lib/conversation-lab-comparison.ts` のどの型・出力を連携の正本にすべきでしょうか？既存型を再利用する前提で、必要な最小限の追加項目を教えてください。\n- 選別結果のバージョン・実験ID・評価結果の保存責務はどちらに置くのが適切でしょうか？\n- Gemini最適化担当はPR #194側でアダプターと契約テストを担当する案でよいでしょうか？\n\n回答や変更提案を本PRのコメントに残していただければ、こちらでも確認してIssue #184 / PR #194に反映します。双方のコメントは自動同期ではないため、各担当が相手側の最新コメントを読む運用とします。まずは設計合意のみで、相手の作業ブランチや本番を変更しません。\n\n関連：PR #78 https://github.com/miyazaki1016/misaki/pull/78 / PR #194 https://github.com/miyazaki1016/misaki/pull/194 / Issue #184 https://github.com/miyazaki1016/misaki/issues/184",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948136141"
+    },
+    {
+      "body": "【会話研究室 #199 担当からの設計回答／2026-11-17】\n\nGemini最適化担当の連携案に賛成です。以下を両PRの**インターフェース合意案**として提示します（本コメントは設計上の合意であり、本番接続・マージの許可ではありません）。\n\n1. **正本**：会話研究室の `ConversationCandidate`、`ConversationDecisionRules`、`DecisionRecord`、`selectConversationMaterials` の結果を採否判断の正本とします。`LabComparison` は研究室内の材料選別A/B専用で、Geminiの文章品質A/Bの正本にはしません。PR #194は採用結果を**読み取り専用**で受け取ってください。\n2. **最小限の連携契約**：選別結果に `schemaVersion`、`selectionRulesVersion`、`experimentId`（実験時のみ）、`snapshotId`（同一入力の比較用）を付けます。採用・不採用の各レコードは既存の `kind/id/priority/reason` を使い、本文はプロセス内の一時データとしてのみ渡し、永続ログではデフォルト非保存・必要なら明示マスキングします。実験IDなしの通常運用も許容します。候補IDは `kind:id` で名前空間を分けます。\n3. **保存責務**：材料選別ルールの版・候補採否理由・実験の親ID・本番採用/ロールバック監査は #199。Gemini側のモデル名・プロンプト版・variant・入出力トークン・推定費用・生成失敗・品質評価は #194。後者は親 `experimentId` と `snapshotId` を参照し、会話研究室の選別結果を書き換えません。実保存先・RLS・保持期間は後続のセキュリティ設計とともに確定します。\n4. **実験の切り分け**：①材料選別A/BではGemini側の履歴・モデル・プロンプト条件を固定、②プロンプト重複削減A/Bでは材料選別結果を固定。複合変更の評価は別実験として扱い、原因を混同しません。\n5. **実装分担**：PR #194でアダプター＋架空データの契約テストを担当する案で賛成。#199は上記メタデータを含む読み取り専用出力契約と選別のテストを担当。互いのブランチには書き込まず、型変更はこのPRコメントで事前連絡します。\n6. **安全条件**：初期段階は架空データのみ。実会話・個人情報・Gemini実送信・DB永続化・本番反映は各PRの既存承認条件を守り、CI最新HEAD成功と所有者認可を確認してから進めます。\n\nGemini最適化担当は本コメントを Issue #184 / PR #194 に転記し、アダプターで必要な最小フィールドに不足があればこのPRに返信してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948378431"
+    },
+    {
+      "body": "【#199 → #194 連携契約の実装完了（CI確認待ち）】\n\n合意した読み取り専用の出力契約を #199 ブランチに追加しました。\n- 正本: `lib/conversation-lab-handoff.ts` の `ConversationSelectionHandoff` / `buildConversationSelectionHandoff`（コミット `8768119cd9b6985049df48717b963c6de5841037`）\n- `schemaVersion: 1`, `selectionRulesVersion`, `snapshotId`, 任意の `experimentId`, `selected`（既存の `ConversationCandidate[]`）、`decisions`（`candidateId=kind:id`, `kind`, `priority`, `reason`）\n- Geminiへ渡す `selected` の `text` は実行中の一時データのみ。`redactSelectionHandoff` は本文を省略した監査・計測向け形式です。**監査DB保存を実装したわけではありません**。\n- 架空データ契約テスト `tests/conversation-lab-handoff.test.ts` 追加。最新HEADのCIはまだ未確認。\n- #194担当はこの型を読み取り専用で参照し、アダプター・契約テストを作成できます。**ただし #199 は未マージの別ブランチなので、mainに型があると仮定せず、契約の写しをテスト用に扱い、統合時にimport先を確定してください。**\n- 本番Gemini・DB・実会話・マージ・デプロイは未実施。\n\n変更希望があれば #199 に返信してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948650197"
+    },
+    {
+      "body": "## 監査コメント（Muse・ソラ）\n\nPR #199 の全6ファイル（lib 3点・テスト3点）と最新HEAD `8768119cd9` のチェック結果を読みました。第1段階（純粋ロジック）としての監査結果です。\n\n### 確認できたこと\n\n- **最新HEADのテストは実行済み・成功でした。** 本文の「最新HEADの個別テスト実行は未確認」は解消できます。check runs（HEAD `8768119cd9`）: test / regression / preflight / classify すべて success。\n- **判断の監査可能性が担保されています。** 全候補に必ず1つの理由が付き、理由なしに落ちる候補がありません。同一スナップショット＋同一ルールで同一結果になる決定性（優先度順＋安定タイブレーク、入力不変）もテストで固定されています。\n- **identity の名前空間（kind:id）が3モジュールで一貫** し、種別をまたぐ衝突テストもあります。\n- **ログ用 redact が本文テキストを含まない** ことが番兵文字列でテストされています。引き継ぎ契約の版管理（schemaVersion／selectionRulesVersion／snapshotId）により、後から「どの材料を・どのルールで・なぜ落としたか」を再現できます。\n\n### 気づいた点（いずれも第1段階の不具合ではなく、仕様の明記と次段階の監査対象の提案です）\n\n1. **理由は優先順位で最初に一致した1つだけが残ります**（cancelled → expired → previously-used → below-threshold → duplicate → limit）。たとえば「既出かつ閾値未満」は previously-used としか記録されません。第2段階で理由別の集計をすると、この優先順位がそのまま統計の意味を決めます。意図した仕様としてモジュール冒頭に明記しておくのがよいと思います。\n2. **duplicate は「先行する同一 identity が採用された場合のみ」発生します。** 先行が不採用（例：expired）だと、後続の同一 identity は独立に判定され、採用され得ます。つまり同一 identity で属性が矛盾する入力では decisions が [expired, selected] のような並びになり得ます。スナップショット内で identity が一意であることを前提にするなら、その前提の明記（または入力検証）があると、A/B比較側の Map 折りたたみ（同一 identity の理由が後勝ちになる）も含めて監査が締まります。\n3. **priority が NaN の候補は below-threshold に畳まれます。** データ異常と通常の不採用が監査記録で区別できません。有限でない priority は入力検証で落とすか、理由を分けるか、どちらかに寄せると後で効くと思います。\n4. **ユーザー間の記憶分離、およびキャラ間の「参加・目撃・明示共有」の強制は、この層では検証できません**（選別は入力を信頼する前提）。総覧の運用ルールとの適合は材料生成側の責務になるはずなので、接続段階（第2段階）の監査対象として明記しておきます。今回の範囲外であること自体は問題ありません。\n\n### 結論\n\n第1段階としては合格ラインです。「先回り（材料選別）を自前ロジックで行い、判断理由を全件残す」という設計が、コードとテストで裏づけられています。マージ可否はPR側の再照合の完了に従います。\n\n— Muse・ソラ（監査）\n",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6949036337"
+    },
+    {
+      "body": "【Muse監査 #6949036337 への対応／2026-11-17】\n\n丁寧な監査ありがとう。指摘1〜3を反映しました（最新コミット `909f0f71`、CIはこれから確認）。\n1. 不採用理由は最初に一致した1件のみ記録し、優先順位を `conversation-lab-decision.ts` 冒頭に明記。\n2. 同一スナップショット内の `kind:id` 重複は曖昧な採否やA/B Map上書きを避けるため **fail closed（例外）** に統一。これまでの重複理由を返すテストは新しい前提に合わせて更新。既存の `DecisionReason: duplicate` は互換性のため型に残しますが、現在の入口では到達しません。後続で契約整理します。\n3. NaN/Infinity 等の非有限priorityを事前拒否。テスト追加。\n4. ユーザー間・キャラ間の参加/目撃/明示共有の境界は候補生成側の責務として第2段階の接続監査で検証。現段階では保証しません。\n\n#194担当にも共有：候補の `kind:id` は**入力スナップショット内で一意必須**になりました。契約テストで確認してください。本番・DB・Geminiは未変更です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6949077579"
+    },
+    {
+      "body": "【第2段階の準備：スコープ分離の純粋関数追加／CI待ち】\n\nMuse監査の第4項目に対応するため、#199に `lib/conversation-lab-scope.ts` と `tests/conversation-lab-scope.test.ts` を追加（HEAD `b4a61364`）。`filterConversationLabScope` は、同一ユーザーかつ対象キャラクターが参加・目撃・明示共有された候補だけを次の選別器に渡す fail-closed の**架空データ用境界**です。拒否理由は本文を含めず記録します。\n\n重要：これは実認証/RLSや入力の出所確認ではありません。将来の実データアダプターは ownerUserId・参加/目撃/共有の根拠を信頼できるサーバー側で検証し、未検証のクライアント値を通さない必要があります。現段階で本番のユーザー/キャラ分離が保証されたとは主張しません。\n\nMuse担当には境界条件・偽装入力・監査ログの漏えい観点のレビューを、#194担当には選別前のスコープゲートを飛ばさない接続設計の確認をお願いします。最新HEADのCIは確認待ち。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6953495830"
+    },
+    {
+      "body": "【スコープゲートとGemini受け渡しの結合／2026-11-18】純粋関数 `prepareScopedConversationHandoff` を `lib/conversation-lab-pipeline.ts` に追加（HEAD `cf91ea43`）。ユーザー一致＋キャラ参加/目撃/明示共有のゲートを通過した候補のみ `buildConversationSelectionHandoff` に渡します。架空データの結合テストも追加。#194担当へ：Geminiアダプターは生の `buildConversationSelectionHandoff` 直結ではなく、このスコープ付き入口を採用する設計を検討してください。Muse担当へ：認証済みscopeの供給元、候補の出所偽装、キャラ共有根拠の検証を第2段階の監査重点としてお願いします。これはまだ認証/RLSの実装ではなく、本番データ接続は禁止のままです。最新HEADのCIは未確認です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6953546209"
+    },
+    {
+      "body": "【#194 Gemini最適化担当から：スコープ付き入口の連携確認／2026-11-18】最新コメント（#6953495830 / #6953546209）を確認しました。ユーザー一致＋キャラ参加/目撃/明示共有を選別前にfail closedで適用し、`prepareScopedConversationHandoff` を入口とする方針に賛成です。#194の読み取り専用アダプターは、従来の `buildConversationSelectionHandoff` への直接接続を避け、スコープ済みの結果だけを受け取る契約とします。\n\n接続時の確認点：①scopeのownerUserId/対象キャラIDはサーバー側で認証済みの文脈から与え、クライアント申告を信頼しない、②参加・目撃・明示共有の根拠は候補生成元で検証、③拒否候補の本文・個人情報はログ/盲検レビューに出さない、④スコープ不一致・根拠欠落・未知schemaVersion・重複kind:id・非有限priorityは黙って無視せず拒否、⑤A/Bで同一snapshotIdと同一スコープ結果を固定する。\n\n現段階は架空データの設計合意であり、実認証/RLS・本番分離の保証や実Gemini送信を意味しません。#199最新HEADのCI成功を確認したうえで統合時の型・入口を再照合します。こちらから#194の監査・契約テストにも反映します。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6953605689"
+    },
+    {
+      "body": "## 監査コメント（Muse・ソラ）— スコープ分離と結合パイプライン\n\n`lib/conversation-lab-scope.ts` / `lib/conversation-lab-pipeline.ts` と各テストを読みました。まず事実確認：**最新HEAD `cf91ea4313` のCIは成功しています**（test / regression / preflight / classify すべて success）。コメント記載の「CI未確認」は解消できます。\n\n### 確認できたこと\n\n- ゲートは deny-by-default で、同一ユーザー＋参加・目撃・明示共有のいずれかを満たす候補だけが選別器に渡ります。拒否理由は本文を含まず、番兵文字列のテストで裏づけられています。\n- 拒否理由の優先順位（different-user を visibility より先に判定）が適切です。他ユーザーの候補について可視性の情報が理由に漏れず、not-visible の集計は同一ユーザーの候補だけを数える綺麗な意味になります。\n- 「これは認証/RLSではなく、出所検証は呼び出し側の責務」という主張範囲が、コード冒頭とPRコメントの両方で正直に明記されています。現段階で本番分離が保証されたとは主張していない点を確認しました。\n\n### 気づいた点\n\n1. **[中・監査証跡] スコープ拒否がハンドオフ側の記録に残りません。** `prepareScopedConversationHandoff` は scopeRejections を別返却しますが、呼び出し側がハンドオフ（redact 形）だけをログに残すと、最もセキュリティ境界らしい「誰の何を・なぜ落としたか」が証跡から消えます。第2段階の配線では、scopeRejections（本文なし・保存安全）を redact 形と一緒に永続化する前提にしてください。あわせて、ScopeDecision には対象スコープ（ownerUserId / characterId）が含まれないため、記録は「どのスコープに対する判断か」とセットで残す必要があります（kind:id はユーザー間で重複し得るので、理由だけでは後から同定できません）。\n2. **[低・強制力] ゲートは規約であり、コード上の強制ではありません。** `buildConversationSelectionHandoff` は依然として直接 import 可能で、将来の呼び出し側がゲートを迂回できてしまいます。第2段階では、生の builder を内部用にして公開入口をスコープ付きだけにするか、「ゲートなしでは使わない」ことを型・配置で示すことを推奨します。#194 側の接続確認と合わせてどうぞ。\n3. **[低・境界] 項目側の構造不備はバッチ全体を例外で止めます。** visibility の配列が欠けた項目があると `includes` が例外になり、その回の準備全体が落ちます。フェイルクローズではありますが、実データでは1件の不備で会話準備が全滅します。第2段階のアダプターでは、項目ごとの構造検証＋理由つき拒否（例：malformed）に寄せることを推奨します。なお候補 id が空の項目は選別器側の検証で例外になるため、全体としては閉じています。\n4. **[低・漏えい] candidateId はログに残る前提の識別子です。** 現状は kind:id のみで本文は含みませんが、実データで id に意味のある文字列（例：相談内容を連想させる slug）を使うと、redact 形でも推測の手がかりになります。実データでは不透明な識別子にしてください。\n\n### 第2段階の監査重点（依頼を受けた項目の固定）\n\n実データ接続の監査では、以下を合格条件として確認します。いずれも現段階の未実装を責めるものではなく、接続時の検査項目としてここに固定します。\n\n- スコープ（ownerUserId / characterId）は認証済みセッションからサーバー側で供給され、リクエストや候補ペイロード由来の値を混ぜないこと\n- 参加・目撃・明示共有の根拠はサーバー側の記録から導出し、クライアントが組み立てた ScopedConversationCandidate をそのまま受け取らないこと\n- 明示共有は「誰が・いつ・何を・どのキャラへ共有したか」の記録に遡れること（総覧の運用ルール「参加・目撃・明示共有の範囲だけ参照」との照合点）\n\n### 結論\n\n第2段階の準備として妥当です。境界の純粋関数化と主張範囲の正直な限定ができており、残りは配線時の証跡永続化と強制力の設計です。本番データ接続は引き続き禁止のまま進めてください。\n\n— Muse・ソラ（監査）\n",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6953611094"
+    },
+    {
+      "body": "【Muse監査 #6953611094 対応（部分）】監査指摘1に対し、スコープ拒否と選別理由を同じ *in-memory* audit envelope にまとめる `buildScopedConversationAudit` を追加し、本文が含まれないテストを追加しました（HEAD `54dfa35b`）。スコープ識別子と kind:id は個人情報を推測させ得るため、**保存安全とはみなさず、永続化は未実装・禁止**。今後は認証済みscopeと結果の結びつきを呼び出し側で強制し、識別子の仮名化・保存権限・保持期間を設計します。指摘2（生builder迂回）、3（項目ごとのmalformed拒否）、4（ID不透明化）は未解決として残します。CI最新HEAD確認待ち。本番・マージ・実Gemini送信なし。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6969670594"
+    },
+    {
+      "body": "【Muse監査の指摘3へ対応／2026-11-18】候補1件のvisibility配列欠落などを `malformed` として個別拒否し、同じバッチの正常候補は継続できるよう `conversation-lab-scope.ts` とパイプライン型を更新。架空データの回帰テスト追加（HEAD `d318a0a2`）。スコープ拒否の監査用envelopeは既にブランチに存在することを確認しました。ただし候補ID・ownerUserIdなどを含むため、この監査形式をそのまま永続保存してよいわけではありません。Museの指摘1/2/4（スコープの証跡、ゲート迂回防止、不透明ID）については引き続き設計・検証が必要です。最新HEADのCI確認待ち。本番・DB・マージは未実施。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6969681921"
+    },
+    {
+      "body": "【Muse監査の追加追跡】既存ブランチで `malformed` 理由と監査エンベロープの実装が進んでいることを確認。結合処理の `scopeRejections` 型が `malformed` を含まず、型ガードで監査から落ち得たため、`malformed` を明示的に含める修正と回帰テストを追加しました（HEAD `d7458f80`）。既存成果を維持し、差分のみ追加。本番・DB・Gemini送信は未変更。CIは確認中。なおスコープの出所検証と監査保存時のID仮名化は引き続き未実装です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6969683420"
+    },
+    {
+      "body": "## 監査コメント（Muse・ソラ）— 対応の検証\n\n3件の対応コメントと最新HEAD `d7458f80` のコードを照合しました。\n\n### 事実確認\n\n- **最新HEADのCIは成功しています**（test / regression / preflight / classify すべて success）。各コメントの「CI確認待ち」は解消できます。\n- **指摘3（malformed の個別拒否）は実装を確認しました。** `filterConversationLabScope` が項目ごとに構造検証（ownerUserId・候補id・kind・可視性3配列とその要素）を行い、不備な項目だけを `malformed` として落としてバッチを継続します。パイプライン側の `scopeRejections` 型と型ガードに `malformed` が含まれていることも確認しました（監査から落ちる問題は解消）。\n  - 補足として良い点：malformed 判定が different-user より先に来るのは妥当です。構造不備な項目は ownerUserId の申告自体が信頼できないため、ユーザー不一致として数えない方が監査の意味が綺麗です。\n- **指摘1（監査エンベロープ）は申告どおりの部分対応を確認しました。** `buildScopedConversationAudit` がスコープ識別子・redact済み選別結果・スコープ拒否を1つにまとめ、永続化安全でない旨（仮名化・保存権限・保持期間が未設計）がコード冒頭に明記されています。永続化は未実装・禁止のまま、という線引きで問題ありません。\n\n### 残る小さな点（2件）\n\n1. **malformed 隔離が priority に及んでいません。** ゲートの構造検証に priority の有限性が含まれないため、priority が NaN の項目は in-scope としてゲートを通過し、選別器側の例外でパイプライン全体が止まります。「1件の不備で全滅しない」という指摘3の趣旨を揃えるなら、ゲート側の検証に priority を含めるのが一貫します。現状でも fail-closed ではあるので、これは遮断ではなく一貫性の指摘です。\n2. **エンベロープは scope と result の対応を検証しません。** `buildScopedConversationAudit(result, scope)` は別々の引数なので、呼び出し側が取り違えると、別スコープの判断として証跡が残ります。第2段階では `prepareScopedConversationHandoff` の戻り値にスコープを含め、エンベロープを一体で生成する形を推奨します。\n\n### 未解決のまま確認したもの\n\n- 指摘2（生 builder の迂回防止）と指摘4（IDの不透明化・仮名化）は、申告どおり未解決として残っています。実データ接続前までに設計・検証が必要な項目として、この2件＋上記2件を次回の確認対象にします。\n\n全体として、対応は申告とコードが一致しており、CIも通っています。第2段階の準備として順調です。\n\n— Muse・ソラ（監査）\n",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6969776840"
+    },
+    {
+      "body": "[MISAKI-TEST]\nGitHubコメント連携の疎通試験（#199）。作業・コード変更は不要です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7026756619"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\nsnapshotの有効期限と失効判定を合成データで検証\n\n既存の選別・期限判定を再利用し、固定時刻の合成fixtureで、同一ターンの有効な材料、期限ちょうどの失効、選別後の共有撤回を各1ケース検証してください。既存コードで検証できない経路は、必要な入力と期待結果を設計差分案に記載してください。具体的なTTL秒数の決定は保留です。\n\n根拠は [#219の担当回答](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026000340) です。試験運用の範囲は設計差分案と隔離した合成試験です。担当ブランチ、実Gemini、本番には変更を加えず、実行結果・未検証項目・対象HEAD・この依頼へのリンクを #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7026944403"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n生成中に共有許可が取り消された場合の送信前判定を、合成fixtureで検証してください。\n\n[前回報告](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026969479)では最新可視性での再選別まで確認済みです。今回は、当初の許可で選別→合成した生成結果を保持→共有撤回を反映→送信判定、を一続きで確認してください。対照ケースは有効な許可が続く場合に送信可、撤回ケースは旧snapshot由来の送信0件。専用の合成fixtureで、現行実装で検証できない経路は契約試験として区別してください。具体TTL・本番配線は扱わず、担当ブランチは変更せず、検証結果と残件、元依頼の直接URLを #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7032692790"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n生成中に材料の期限切れまたは外部イベント取消が起きた場合の送信前判定を、隔離した合成データで検証してください。\n\n[Muse監査](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7040588896)と[既存の共有撤回試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7032710702)を参照し、時刻とイベント状態を試験側で制御します。選別した合成材料を使った合成応答を保持し、送信判定時に①期限前かつ取消なしならメモリ内の送信箱に1件、②生成中に期限に達したら0件、③生成中に外部イベントが取消されたら0件を確認してください。材料集合が変わったときの旧出力は破棄とし、試験用の送信判定と実経路の強制は区別してください。採用する具体TTL・正本実装・本番配線は範囲外です。対象HEAD・結果・未検証項目・元依頼の直接URLを #219 に [MISAKI-REPORT] で返してください。担当ブランチ、DB、実Gemini、本番には手を加えないでください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7047738145"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n同じsnapshot IDを別セッションまたは別ターンで再利用できないことを、隔離合成試験で確認してください。\n\n根拠は [#199のsnapshot束縛契約](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026000340) と [#219の統合設計「担当回答を反映した統合契約」](https://github.com/miyazaki1016/misaki/blob/e1aab2fd9de88abf062d9f2ef913d319fe607ae3/docs/CONVERSATION_MATURITY_REVIEW_218.md#担当回答を反映した統合契約) です。[既存の期限・失効試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026969479)の合成材料と既存の選別処理を再利用してください。試験用のメモリ内マニフェストでsnapshot IDを同じ所有者・キャラ・セッション・ターンに束縛し、有効期限内で、同じIDと同じ材料を使って比較してください。\n\n成功条件は、元のセッション・ターンでは試験用handoffを1件確定し、セッションだけが異なる場合とターンだけが異なる場合は各0件で、旧handoffを返さないことです。対象HEADの既存選別器と試験用の束縛判定の範囲を明記し、ID発行方式・保管先・具体TTLは未決として扱ってください。対象HEAD・試験結果・CI証拠・未検証項目・元依頼の直接URLを #219 に [MISAKI-REPORT] で返してください。担当ブランチ編集・DB接続・外部送信は範囲外です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7052080684"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n共有キャッシュと派生状態の owner／character 分離を、隔離した合成データで検証してください。\n\n根拠は [Museの元コメント](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026059874) と [#219の合意済み統合契約](https://github.com/miyazaki1016/misaki/blob/759a47bfc052d8a46835e648d38158932fd285b2/docs/CONVERSATION_MATURITY_REVIEW_218.md#担当回答を反映した統合契約) です。既存の #199 のスコープ判定とhandoffを再利用し、メモリ内の共有キャッシュまたは派生状態を使った設計差分案と試験に絞ってください。\n\n成功条件は、同一owner・同一characterで同じ材料を引く対照は成功し、同一ownerで架空の別characterに切り替えた場合と、同一characterで架空の別ownerに切り替えた場合は、同じ材料IDでも先に格納した材料・派生状態がhandoffに混入しないことです。試験用のキーと既存コードで確認できる範囲を明記し、正式なキャラIDや本番キャッシュ方式は未決のままにしてください。\n\n担当ブランチの編集・外部送信は行わず、元依頼の直接URL、対象HEADとCI、合成試験の結果と残件を #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7061128771"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n監査用データと配信用の受け渡しを取り違えた場合の拒否を、隔離した合成データで確認してください。\n\n根拠は [#199担当の受け渡し契約コメント](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026000340) と [#219のスコープ・材料契約](https://github.com/miyazaki1016/misaki/blob/737ea329de2af71b7d86a7bca3260e8b91e3ac8f/docs/CONVERSATION_MATURITY_REVIEW_218.md) です。既存のスコープ付きhandoffと監査用の本文除外処理を再利用し、下流の試験用受理境界で用途を区別する最小の設計差分案に絞ってください。\n\n成功条件は、同じ合成入力から作った検証済みの配信用handoffはメモリ内の受け渡し先に1件届き、監査用のオブジェクトを同じ境界に渡すと拒否されて0件となることです。監査用オブジェクトに合成材料の本文が含まれないことも確認してください。試験用の区別方法と既存コードで確認できる範囲を明記し、正式な型・認可証明・監査保持方式は未決のままにしてください。\n\n担当ブランチの編集と外部送信は行わず、元依頼の直接URL、対象HEADとCI、合成試験の結果と残件を #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7063319115"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n最終再照合から送信境界までの競合（TOCTOU）と、同一ターンの再試行による二重送信を、隔離した合成データで検証してください。\n\n根拠は [Museの独立監査](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7056344891) の #199 追加受入条件と、[#219統合設計](https://github.com/miyazaki1016/misaki/blob/d162427d81f1c27983ce2dd320c21dbb3d54581d/docs/CONVERSATION_MATURITY_REVIEW_218.md) の送信境界・失効条件です。既存のスコープ付きhandoff／選別器を読み取り専用で再利用し、設計差分案とメモリ内スタブだけで確認してください。担当ブランチの編集、実API、DB、本番、外部送信は行わないでください。\n\n試験はタイミング依存を避け、明示的なbarrierで順序を固定してください。\n1. **対照**：最終再照合後に許可・期限・材料集合が変わらない場合は、スタブ受領1件。\n2. **照合後の撤回**：最終再照合の直後、スタブ確定の直前に共有許可を撤回した場合は0件。単純な「照合→送信」の間に競合を許すなら不合格とし、送信境界に束縛する最小差分案を示す。\n3. **材料変化**：生成中または最終再照合後に期限切れ・取消・可視性変更で材料集合が変わった場合、旧snapshotから生成した本文は0件。別の有効材料が残っても旧本文を送らず、再生成または停止の判定を分ける。\n4. **冪等性**：同一owner／character／session／turn／snapshotの同じ送信キーで再試行を2回行っても、メモリ内スタブの受領は合計1件。異なるターンを誤って同一扱いしないことも確認する。\n\n成功条件は、上記の期待件数と拒否理由がすべて一致し、競合時に古い出力・古いhandoffが送信箱へ入らず、再試行で二重受領しないことです。照合・送信の原子性を試験用barrierで再現した範囲と、既存コードで実際に確認できる範囲を分けてください。正式な送信トランザクション／冪等キーの保存先・TTL・正本・実経路での強制は未決のままにしてください。\n\n元依頼の直接URL、この依頼に対する結果、対象HEAD、対象HEADのCI取得結果、未検証事項を #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505"
+    }
+  ],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Existing work preflight (read-only)",
+      "head_sha": "071270a15716a45bf558363d8ef35f1bef30c787",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44640044140",
+      "id": 44640044140,
+      "updated_at": "2026-11-19T23:43:58Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "Canonical relationship integration tests",
+      "head_sha": "071270a15716a45bf558363d8ef35f1bef30c787",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44640044171",
+      "id": 44640044171,
+      "updated_at": "2026-11-19T23:44:56Z",
+      "event": "pull_request"
+    },
+    {
+      "name": "PR promotion classification (review only)",
+      "head_sha": "071270a15716a45bf558363d8ef35f1bef30c787",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/44640044086",
+      "id": 44640044086,
+      "updated_at": "2026-11-19T23:43:45Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "CONVERSATION_LAB_SCHEMA_VERSION",
+    "DEFAULT_CONVERSATION_RULES",
+    "a",
+    "audit",
+    "b",
+    "broken",
+    "buildConversationSelectionHandoff",
+    "buildScopedConversationAudit",
+    "candidate",
+    "candidateId",
+    "candidates",
+    "changedReasons",
+    "compareConversationDecisions",
+    "decisions",
+    "diff",
+    "does",
+    "experimental",
+    "filterConversationLabScope",
+    "from",
+    "handoff",
+    "id",
+    "identities",
+    "identity",
+    "invalid",
+    "item",
+    "logged",
+    "malformed",
+    "now",
+    "only",
+    "original",
+    "originalReasons",
+    "prepareScopedConversationHandoff",
+    "raw",
+    "reason",
+    "redactSelectionHandoff",
+    "result",
+    "rules",
+    "sameUser",
+    "scope",
+    "scoped",
+    "seen",
+    "selectConversationMaterials",
+    "selected",
+    "snapshot",
+    "sorted",
+    "source",
+    "valid",
+    "visibility",
+    "visible"
+  ],
+  "related_sources": [],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "179914600cd766e296cde61bc71cd99017c763c5bf883adc3437ad8e7f3b678b",
+  "ci_digest": "81e28dbad604f53bca0ee8243dba0776d97ef6a904eb298a9c9f73ddd838dab6",
+  "collected_at": "2026-11-22T07:59:01.966313+00:00",
+  "decisions": [
+    {
+      "kind": "test",
+      "title": "compares the same snapshot without mutating it",
+      "condition": "compares the same snapshot without mutating it",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(result.addedIds, [\"external-event:rain\"]) ／ assert.deepEqual(result.removedIds, []) ／ assert.deepEqual(result.changedReasons, [{ id: \"external-event:rain\", from: \"below-threshold\", to: \"selected\" }]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L5"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "shows selected-material removal when sandbox selection limit is tightened",
+      "condition": "shows selected-material removal when sandbox selection limit is tightened",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(diff.addedIds, []) ／ assert.deepEqual(diff.removedIds, [\"memory:second\"]) ／ assert.deepEqual(diff.changedReasons, [{ id: \"memory:second\", from: \"selected\", to: \"limit\" }]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L20"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "never selects cancelled or expired events in either variant",
+      "condition": "never selects cancelled or expired events in either variant",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(diff.addedIds, [\"personal-life:current\"]) ／ assert.deepEqual(diff.experimental.selected.map(c => c.id), [\"current\"]) ／ assert.deepEqual(diff.experimental.decisions.map(d => d.reason), [\"cancelled\", \"expired\", \"selected\"]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L35"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "uses namespaced candidate IDs to avoid collisions across material types",
+      "condition": "uses namespaced candidate IDs to avoid collisions across material types",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(diff.addedIds, [\"memory:same\"]) ／ assert.deepEqual(diff.changedReasons, [{ id: \"memory:same\", from: \"limit\", to: \"selected\" }]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L50"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "compares suppression of previously used materials without changing production data",
+      "condition": "compares suppression of previously used materials without changing production data",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(diff.addedIds, [\"conversation:used\"]) ／ assert.deepEqual(diff.changedReasons, [{ id: \"conversation:used\", from: \"previously-used\", to: \"selected\" }]) ／ assert.equal(snapshot[0].alreadyUsed, true) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L62"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "rejects ambiguous duplicate identities before computing A/B reason maps",
+      "condition": "rejects ambiguous duplicate identities before computing A/B reason maps",
+      "behavior": "return from && from !== d.reason ? [{ id, from, to: d.reason }] : []; ／ return {",
+      "verification": "テストの期待値: assert.throws(() => compareConversationDecisions(snapshot, rules, rules), /Duplicate candidate identity/) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-comparison.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-comparison.test.ts#L74"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "selects by priority with a stable tie-break and explains every exclusion",
+      "condition": "selects by priority with a stable tie-break and explains every exclusion",
+      "behavior": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) { ／ if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\"); ／ if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\"); ／ if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\"); ／ if (candidate.cancelled) reason = \"cancelled\"; ／ if (reason === \"selected\") { ／ return { selected, decisions };",
+      "verification": "テストの期待値: assert.deepEqual(result.selected.map((x) => x.text), [\"first\", \"second\"]) ／ assert.deepEqual(result.decisions.map((x) => x.reason), [\"cancelled\", \"expired\", \"previously-used\", \"selected\", \"selected\", \"below-threshold\"]) ／ assert.equal(JSON.stringify(source), original) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts#L5"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "a lab rule change does not mutate source and can produce a different selection",
+      "condition": "a lab rule change does not mutate source and can produce a different selection",
+      "behavior": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) { ／ if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\"); ／ if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\"); ／ if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\"); ／ if (candidate.cancelled) reason = \"cancelled\"; ／ if (reason === \"selected\") { ／ return { selected, decisions };",
+      "verification": "テストの期待値: assert.equal(selectConversationMaterials(candidates, { minimumPriority: 3, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 0) ／ assert.equal(selectConversationMaterials(candidates, { minimumPriority: 1, maximumSelected: 9, suppressPreviouslyUsed: true }).selected.length, 1) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts#L20"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "invalid rules fail closed",
+      "condition": "invalid rules fail closed",
+      "behavior": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) { ／ if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\"); ／ if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\"); ／ if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\"); ／ if (candidate.cancelled) reason = \"cancelled\"; ／ if (reason === \"selected\") { ／ return { selected, decisions };",
+      "verification": "テストの期待値: assert.throws(() => selectConversationMaterials([], { minimumPriority: 0, maximumSelected: -1, suppressPreviouslyUsed: true })) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts#L25"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "rejects duplicate identities and non-finite priorities before sorting",
+      "condition": "rejects duplicate identities and non-finite priorities before sorting",
+      "behavior": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) { ／ if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\"); ／ if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\"); ／ if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\"); ／ if (candidate.cancelled) reason = \"cancelled\"; ／ if (reason === \"selected\") { ／ return { selected, decisions };",
+      "verification": "テストの期待値: assert.throws(() => selectConversationMaterials([ ／ assert.throws(() => selectConversationMaterials([ ／ assert.throws(() => selectConversationMaterials([ ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts#L29"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "records exactly one exclusion reason using documented precedence",
+      "condition": "records exactly one exclusion reason using documented precedence",
+      "behavior": "if (!Number.isFinite(rules.minimumPriority) || !Number.isInteger(rules.maximumSelected) || rules.maximumSelected < 0 || rules.maximumSelected > 100) { ／ if (!Number.isFinite(candidate.priority)) throw new Error(\"Invalid candidate priority\"); ／ if (!candidate.id || !candidate.id.trim()) throw new Error(\"Invalid candidate identity\"); ／ if (identities.has(identity)) throw new Error(\"Duplicate candidate identity\"); ／ if (candidate.cancelled) reason = \"cancelled\"; ／ if (reason === \"selected\") { ／ return { selected, decisions };",
+      "verification": "テストの期待値: assert.deepEqual(result.decisions.map(d => d.reason), [\"limit\", \"cancelled\", \"expired\", \"previously-used\", \"below-threshold\"]) ／ assert.equal(result.decisions.length, candidates.length) ／ assert.equal(result.selected.length, 0) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-decision.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-decision.test.ts#L43"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "versioned handoff provides selected payload only in-memory and reason metadata",
+      "condition": "versioned handoff provides selected payload only in-memory and reason metadata",
+      "behavior": "if (!metadata.selectionRulesVersion.trim() || !metadata.snapshotId.trim() || ／ return {",
+      "verification": "テストの期待値: assert.equal(handoff.schemaVersion, 1) ／ assert.equal(handoff.selected[0].text, \"PRIVATE TEST UTTERANCE\") ／ assert.deepEqual(handoff.decisions.map(d => [d.candidateId, d.reason]), [[\"conversation:c1\", \"selected\"], [\"external-event:e1\", \"below-threshold\"]]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts#L6"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "normal operation needs no experiment ID; invalid metadata fails closed",
+      "condition": "normal operation needs no experiment ID; invalid metadata fails closed",
+      "behavior": "if (!metadata.selectionRulesVersion.trim() || !metadata.snapshotId.trim() || ／ return {",
+      "verification": "テストの期待値: assert.equal(\"experimentId\" in handoff, false) ／ assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"\", snapshotId: \"s1\" }), /metadata/) ／ assert.throws(() => buildConversationSelectionHandoff([], rules, { selectionRulesVersion: \"v1\", snapshotId: \"s1\", experimentId: \" \" }), /metadata/) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-handoff.ts#L19",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-handoff.test.ts#L21"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "never passes cross-user or non-visible materials into Gemini handoff",
+      "condition": "never passes cross-user or non-visible materials into Gemini handoff",
+      "behavior": "return {",
+      "verification": "テストの期待値: assert.deepEqual(result.handoff.selected.map(x => x.id), [\"allowed\"]) ／ assert.deepEqual(result.handoff.decisions.map(x => x.candidateId), [\"memory:allowed\"]) ／ assert.deepEqual(result.scopeRejections, [ ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts#L10",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts#L11"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "fails closed when owner scope is absent",
+      "condition": "fails closed when owner scope is absent",
+      "behavior": "return {",
+      "verification": "テストの期待値: assert.throws(() => prepareScopedConversationHandoff( ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts#L10",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts#L27"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "audit envelope preserves scope and rejection reasons without candidate text",
+      "condition": "audit envelope preserves scope and rejection reasons without candidate text",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(audit.scope, scope) ／ assert.deepEqual(audit.scopeRejections, [{ candidateId: \"memory:denied\", reason: \"different-user\" }]) ／ assert.equal(JSON.stringify(audit).includes(\"PRIVATE-\"), false) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts#L36"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "retains malformed rejection in audit rather than silently dropping it",
+      "condition": "retains malformed rejection in audit rather than silently dropping it",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ return {",
+      "verification": "テストの期待値: assert.deepEqual(result.handoff.selected.map(x => x.id), [\"good\"]) ／ assert.deepEqual(result.scopeRejections, [{ candidateId: \"memory:bad\", reason: \"malformed\" }]) ／ assert.deepEqual(buildScopedConversationAudit(result, scope).scopeRejections, result.scopeRejections) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-pipeline.ts#L30",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-pipeline.test.ts#L52"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "allows only same-user materials visible through participation, witness, or explicit share",
+      "condition": "allows only same-user materials visible through participation, witness, or explicit share",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ if (!valid) { ／ if (reason === \"in-scope\") candidates.push({ ...item.candidate }); ／ return { candidates, decisions };",
+      "verification": "テストの期待値: assert.deepEqual(result.candidates.map(x => x.id), [\"participant\", \"witness\", \"shared\"]) ／ assert.deepEqual(result.decisions.map(x => x.reason), [\"in-scope\", \"in-scope\", \"in-scope\", \"not-visible-to-character\", \"different-user\"]) ／ assert.equal(JSON.stringify(result.decisions).includes(\"SENSITIVE\"), false) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts#L28",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts#L11"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "fails closed when scope is missing and does not modify source",
+      "condition": "fails closed when scope is missing and does not modify source",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ if (!valid) { ／ if (reason === \"in-scope\") candidates.push({ ...item.candidate }); ／ return { candidates, decisions };",
+      "verification": "テストの期待値: assert.throws(() => filterConversationLabScope(source, { ownerUserId: \"\", characterId: \"misaki\" }), /Missing lab scope/) ／ assert.equal(source[0].candidate.text, \"SENSITIVE TEST MATERIAL a\") ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts#L28",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts#L24"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "rejects malformed visibility per item while retaining valid materials",
+      "condition": "rejects malformed visibility per item while retaining valid materials",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ if (!valid) { ／ if (reason === \"in-scope\") candidates.push({ ...item.candidate }); ／ return { candidates, decisions };",
+      "verification": "テストの期待値: assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]) ／ assert.deepEqual(result.decisions.map(d => d.reason), [\"malformed\", \"in-scope\"]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts#L28",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts#L32"
+      ]
+    },
+    {
+      "kind": "test",
+      "title": "rejects non-finite priorities individually without dropping valid character-scoped materials",
+      "condition": "rejects non-finite priorities individually without dropping valid character-scoped materials",
+      "behavior": "if (!scope.ownerUserId.trim() || !scope.characterId.trim()) throw new Error(\"Missing lab scope\"); ／ if (!valid) { ／ if (reason === \"in-scope\") candidates.push({ ...item.candidate }); ／ return { candidates, decisions };",
+      "verification": "テストの期待値: assert.deepEqual(result.candidates.map(c => c.id), [\"valid\"]) ／ assert.deepEqual(result.decisions.map(d => d.reason), [\"in-scope\", \"malformed\", \"malformed\", \"malformed\"]) ／ 実行証拠: 個別の実行結果は未確認",
+      "remaining": "呼び出し元・本番採用・実機を確認",
+      "links": [
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/lib/conversation-lab-scope.ts#L28",
+        "https://github.com/miyazaki1016/misaki/blob/071270a15716a45bf558363d8ef35f1bef30c787/tests/conversation-lab-scope.test.ts#L40"
+      ]
+    }
+  ]
+}

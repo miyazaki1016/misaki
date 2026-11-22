@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-11-22T07:59:01.966313+00:00",
+  "changes": [
+    {
+      "id": "pr-221",
+      "previous": "562d3ddd614890647f1b6bfb4186331a8c5bc7f64b57cf86504062a0a6105e70",
+      "revision": "f7122de7b33d022b058b093e3dd2f0e703d240b4114e4b56022f7cbc3fb554d3"
+    },
+    {
+      "id": "pr-219",
+      "previous": "01036213c71b3a6d4c5462c4f42c861f8e43d7f927e24b0a93617df2c460c474",
+      "revision": "8e4cb72309d4c9432622cfc020fb1a9b2277ecb843170fb3b22051f097428b43"
+    },
+    {
+      "id": "pr-199",
+      "previous": "07c4c95b370f9b2eefe281a34349bf085b48db22f3385a698c92ae871c43e90e",
+      "revision": "c9340601a21a2df741d7a03d0b6e5a97886460408eba8cf0de0257948a49f308"
+    },
+    {
+      "id": "pr-194",
+      "previous": "1aa76fe6721074fdba60edfddafd6079b408cfaac2cbab89bc3b49e1bd4a7b2a",
+      "revision": "ab251a35809f8950b4871faa1d78cdc88e171bcf389c0123742d6a65d8a5e664"
+    },
+    {
+      "id": "branch-60c7da8bc8d7b0d2",
+      "previous": "0e458b02c2a6ebded7f5fb0e9810008538f110da00d1f70de664cddad3eb44d8",
+      "revision": "64e182930f225b3d18ab06c397ef3d9b067712086f2267a0b8a720ef15478a1e"
+    }
+  ]
+}
