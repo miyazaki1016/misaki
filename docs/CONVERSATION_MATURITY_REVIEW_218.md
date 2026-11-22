@@ -241,3 +241,28 @@ Node.js v24.22.3 のローカル隔離実行で3件成功。出力・質問判�
 先行の [Muse独立監査依頼](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) は対象 `0cd039a958911594de8a1a927041425078ae0a7c` のまま未回答。今回、後続commit `6524c90f` で追加した送信境界の5ケース参照モデルだけを対象に、[独立監査の追補依頼](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) を投稿した。旧依頼に含まれない新しい対象commitの追加節に範囲を限定している。監査回答は設計意見として扱い、実装・本番変更の承認には使わない。
 
 #194のCI、正式なモデル別価格・思考トークン予約、日本語入力見積り、正式なschema／版互換表、TTL、正式characterId、保存期間、独立ガードの判定基準、実際の送信境界、実Gemini、認証・DB・会話API接続、Body Clock同時実行、感情の定期回収、iPhone Safariの本番受入は引き続き未確認または未決。設計・合成試験・CI・main統合・本番・実機の段階を混同しない。
+
+
+## 2026-11-22 22:35 JST 統合担当フォロー：#199担当依頼の6時間超過
+
+この節の変更前スナップショットは Draft PR #219、branch `docs/conversation-maturity-218`、HEAD `549609ac0a08cc02773f4b06852de6bf15ad88ae`。base は `main` / `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。変更前の最新文書blobは `00df14bea52a33f9488f3336612f4d705342b1c7`。本追記は既存の19:06 JST記録を保持し、経過した依頼期限と現在の証拠だけを追加する。
+
+### 担当依頼の期限確認
+
+- #199の [TOCTOU・同一turn二重送信依頼](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505) は 2026-11-22 07:09:19Z 投稿。2026-11-22 13:35:58Z（22:35:58 JST）の再確認時点で 6時間26分39秒経過。
+- #219の全会話コメントを再取得し、元依頼の直接URLが一致する実作業 [MISAKI-REPORT] は未着。疎通受領の [MISAKI-TEST] は完了に数えない。
+- #199は既存7依頼中6件が報告済み、最新1件が未報告。#221は7/7、#194は5/5で元依頼URLが一致する実作業報告を確認。
+- 6時間超過のため、所有者へ今回一度だけ通知する。担当依頼の再投稿、完了扱い、新規担当依頼は行わない。次回以降は新しい根拠・状況変化がない限り同じ通知を繰り返さない。
+
+### 現在の原本・CI
+
+| 対象 | 最新HEAD | CI確認 |
+| --- | --- | --- |
+| [#219](https://github.com/miyazaki1016/misaki/pull/219) | `549609ac0a08cc02773f4b06852de6bf15ad88ae` | [着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/45011766342)、[統合テスト](https://github.com/miyazaki1016/misaki/actions/runs/45011766355)、[分類](https://github.com/miyazaki1016/misaki/actions/runs/45011766343) はすべて success |
+| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `071270a15716a45bf558363d8ef35f1bef30c787` | [着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44640044140)、[統合テスト](https://github.com/miyazaki1016/misaki/actions/runs/44640044171)、[分類](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) はすべて success |
+| [#221](https://github.com/miyazaki1016/misaki/pull/221) | `74780ba0100d629ec7046a097deaecb430b35a30` | [着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44644915033)、[統合テスト](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)、[分類](https://github.com/miyazaki1016/misaki/actions/runs/44644915059) はすべて success |
+| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `8d7b732fb19ef45c8148c135fffb94451e9bd9ea` | PR起動Actions 0件、combined status 0件。CI未確認 |
+
+#219の正式レビュー投稿・inline review thread は0件。会話コメント上のMuse監査依頼 [#7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と追補 [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) は未回答。新しい `[MUSE-REVIEW]` はなく、同一対象・観点への監査依頼を重ねない。
+
+Issue #218 の既存照合 [run 44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) と Issue #220 の既存照合 [run 44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) は、各Issue本文と `history-preflight` 判断記録が一致するため再利用。最新mainの `AGENTS.md` はPR branchと同一blob（`b1170ad6e6940bea05ef46449ee1edde17bfb3ff`）で、`IMPLEMENTATION_OVERVIEW.md`・`DEVELOPMENT_LEDGER.md`・`WORK_RESUME.md` を照合。親Issue [#102](https://github.com/miyazaki1016/misaki/issues/102) と `work-resume:v1` は active のまま。設計・隔離試験・CI・main統合・本番・実機の判定を混同しない。
