@@ -42,9 +42,9 @@
 
 ## 原本照合と検証
 
-2026-11-22にGitHub原本から取得した各PRの現行HEAD・base・main比較・PR起動Actions。比較基準のmainは `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。
+2026-11-22の変更前原本照合スナップショット。各PRのbase・HEAD・main比較・PR起動Actionsを記録する。比較基準のmainは `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。#219の行は本書更新前のHEAD・CIであり、更新後のHEADとCIは今回の変更コミットのActionsで別途確認する。
 
-| PR | base branch | HEAD | mainとの比較 | 最新HEADのActions／状態 |
+| PR | base branch | 変更前HEAD | mainとの比較 | 変更前HEADのActions／状態 |
 | --- | --- | --- | --- | --- |
 | [#219](https://github.com/miyazaki1016/misaki/pull/219) | `main` | [`0cd039a958911594de8a1a927041425078ae0a7c`](https://github.com/miyazaki1016/misaki/commit/0cd039a958911594de8a1a927041425078ae0a7c) | 25 ahead / 0 behind | preflight [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957766)・統合 [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957789)・分類 [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957763) |
 | [#199](https://github.com/miyazaki1016/misaki/pull/199) | `main` | [`071270a15716a45bf558363d8ef35f1bef30c787`](https://github.com/miyazaki1016/misaki/commit/071270a15716a45bf558363d8ef35f1bef30c787) | 26 ahead / 26 behind | preflight [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044140)・統合 [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044171)・分類 [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) |
