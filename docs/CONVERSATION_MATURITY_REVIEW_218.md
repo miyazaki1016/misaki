@@ -198,3 +198,46 @@ Node.js v24.22.3 のローカル隔離実行で3件成功。出力・質問判�
 5ケース成功、失敗0。これは統合側の参照契約モデルであり、#199の実コード・DBトランザクション・キュー・ネットワーク送信は実行していない。実経路のTOCTOU原子性、正本の許可版照合、同一turnの永続冪等性は引き続き未検証で、#199担当の報告待ち。今回の合成試験を実経路の受入・本番承認に読み替えない。
 
 #194は同HEADのActionsがないためCI未確認のまま。実Gemini、実価格・モデル仕様、認証、DB、会話API接続、Body Clock同時実行、感情の定期回収、iPhone Safariの本番受入は、設計・合成試験・CI・main統合とは別の未完了段階として維持する。
+
+
+## 2026-11-22 19:06 JST 統合担当フォロー：最新原本・担当依頼・監査追補
+
+この節の変更前スナップショットは Draft PR #219、branch `docs/conversation-maturity-218`、HEAD `6524c90f6913c84a5b20056d251b777e99d4c7dc`。base は `main` / `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。main との比較は 28 ahead / 0 behind。直前の変更は本書のみで、担当ブランチには変更なし。
+
+### 最新HEADのCI（変更前スナップショット）
+
+| 対象HEAD | Actions | 結果 |
+| --- | --- | --- |
+| `6524c90f6913c84a5b20056d251b777e99d4c7dc` | [着手前照合 #45001654776](https://github.com/miyazaki1016/misaki/actions/runs/45001654776) | success |
+| 同上 | [Canonical relationship integration tests #45001654753](https://github.com/miyazaki1016/misaki/actions/runs/45001654753) | success |
+| 同上 | [PR promotion classification #45001654751](https://github.com/miyazaki1016/misaki/actions/runs/45001654751) | success |
+
+3 run はすべて上記の同一HEADを対象にした。#219はDraftのまま。formal review submissions と inline review threads は0件で、会話コメントと正式レビューを区別する。
+
+### 担当PRの最新HEAD・CI
+
+| 対象 | branch / HEAD | mainとの比較 | 最新HEADのActions |
+| --- | --- | --- | --- |
+| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `feat/life-context-engine-198` / `071270a15716a45bf558363d8ef35f1bef30c787` | 26 ahead / 26 behind | [preflight success](https://github.com/miyazaki1016/misaki/actions/runs/44640044140) · [integration success](https://github.com/miyazaki1016/misaki/actions/runs/44640044171) · [classification success](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) |
+| [#221](https://github.com/miyazaki1016/misaki/pull/221)（Issue #220のDraft PR） | `feature/conversation-tuning-220` / `74780ba0100d629ec7046a097deaecb430b35a30` | 16 ahead / 0 behind | [preflight success](https://github.com/miyazaki1016/misaki/actions/runs/44644915033) · [integration success](https://github.com/miyazaki1016/misaki/actions/runs/44644915107) · [classification success](https://github.com/miyazaki1016/misaki/actions/runs/44644915059) |
+| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `work/context-ab-quality-budget-guard-184` / `8d7b732fb19ef45c8148c135fffb94451e9bd9ea`（base は研究ブランチ） | main比較 215 ahead / 147 behind。PR base比較ではない | PR起動Actions 0件、combined status 0件。CI未確認 |
+
+#199 は main から26コミット遅れているため、担当ブランチの更新・統合を本PRで代行しない。#194 はPR自体のbaseが研究ブランチであり、main比較値をPRのbase比較や統合可能性と読み替えない。
+
+### Issue照合と親目的
+
+- [Issue #218の既存着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) は `REVIEW_RECORDED` / `publication_status=confirmed` / preflight success。Issue本文の既存判断とPR #219の `history-preflight` 判断を照合し、今回のPR固有の最新HEADについては上表のrun 45001654776を確認した。
+- [Issue #220の既存着手前照合](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) は同じく `REVIEW_RECORDED` / confirmed / success。#221自身の最新HEAD照合はrun 44644915033で確認した。
+- 親 [Issue #102](https://github.com/miyazaki1016/misaki/issues/102) はOPEN。mainの [DEVELOPMENT_LEDGER.md](https://github.com/miyazaki1016/misaki/blob/main/docs/DEVELOPMENT_LEDGER.md) の `work-resume:v1` は active で、匿名root期限・忘却の再浮上・感情v2 CAS等の総点検は未完了。#218の設計レビューを理由に親を完了扱いしない。
+
+### 担当依頼・報告の再照合
+
+- #199 の [MISAKI-REQUEST](https://github.com/miyazaki1016/misaki/pull/199) は7件。最初の6件は元コメントURLと一致する実作業 [MISAKI-REPORT](https://github.com/miyazaki1016/misaki/pull/219) を確認。最新の [TOCTOU・同一turn二重送信依頼](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505) は2026-11-22 07:09:19Z投稿で、2026-11-22 10:06Z時点の経過は約2時間57分。対応する実作業報告はまだなく、6時間未満のため一度限りの通知条件には未到達。再投稿・完了扱い・別依頼の追加はしない。
+- #221 の既存依頼7件はすべて元依頼URLが一致する実作業報告あり。#194 の既存依頼5件もすべて報告あり。
+- #219の2026-11-21 21:30Zの3件は `[MISAKI-REPORT] [MISAKI-TEST]` の疎通受領のみで、実作業報告に数えない。担当の報告だけを理由に新規依頼を作らない。
+
+### Muse独立監査の追補
+
+先行の [Muse独立監査依頼](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) は対象 `0cd039a958911594de8a1a927041425078ae0a7c` のまま未回答。今回、後続commit `6524c90f` で追加した送信境界の5ケース参照モデルだけを対象に、[独立監査の追補依頼](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) を投稿した。旧依頼に含まれない新しい対象commitの追加節に範囲を限定している。監査回答は設計意見として扱い、実装・本番変更の承認には使わない。
+
+#194のCI、正式なモデル別価格・思考トークン予約、日本語入力見積り、正式なschema／版互換表、TTL、正式characterId、保存期間、独立ガードの判定基準、実際の送信境界、実Gemini、認証・DB・会話API接続、Body Clock同時実行、感情の定期回収、iPhone Safariの本番受入は引き続き未確認または未決。設計・合成試験・CI・main統合・本番・実機の段階を混同しない。
