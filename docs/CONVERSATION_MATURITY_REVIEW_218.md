@@ -266,3 +266,41 @@ Node.js v24.22.3 のローカル隔離実行で3件成功。出力・質問判�
 #219の正式レビュー投稿・inline review thread は0件。会話コメント上のMuse監査依頼 [#7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と追補 [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) は未回答。新しい `[MUSE-REVIEW]` はなく、同一対象・観点への監査依頼を重ねない。
 
 Issue #218 の既存照合 [run 44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) と Issue #220 の既存照合 [run 44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) は、各Issue本文と `history-preflight` 判断記録が一致するため再利用。最新mainの `AGENTS.md` はPR branchと同一blob（`b1170ad6e6940bea05ef46449ee1edde17bfb3ff`）で、`IMPLEMENTATION_OVERVIEW.md`・`DEVELOPMENT_LEDGER.md`・`WORK_RESUME.md` を照合。親Issue [#102](https://github.com/miyazaki1016/misaki/issues/102) と `work-resume:v1` は active のまま。設計・隔離試験・CI・main統合・本番・実機の判定を混同しない。
+
+
+## 2026-11-23 05:50 JST 統合フォロー：最新HEAD・担当報告・監査待ち
+
+変更前の原本は Draft PR #219、branch `docs/conversation-maturity-218`、HEAD `2b83a2aae764fb5f92460d1dab7f3c6339862e76`、base `main` / `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。main 比較は 30 ahead / 0 behind、変更ファイルは本書のみ（268 additions / 0 deletions）。変更前の本書 blob は `a7688cc98896468496a10e083d25a39d46b23557`。PR は OPEN / Draft のまま。
+
+### 最新HEADのCI
+
+- [Existing work preflight #45028542765](https://github.com/miyazaki1016/misaki/actions/runs/45028542765)：preflight success、regression success。publish-issue-result は skipped。
+- [Canonical relationship integration tests #45028542764](https://github.com/miyazaki1016/misaki/actions/runs/45028542764)：success。
+- [PR promotion classification #45028542773](https://github.com/miyazaki1016/misaki/actions/runs/45028542773)：success。
+
+3 run は同一HEAD `2b83a2aae764fb5f92460d1dab7f3c6339862e76` を対象とする。以前の別HEADに対するpreflight失敗は現HEADのrunで解消を確認した。#194自身のCI未確認を、#219のCI成功で代替しない。
+
+### 担当依頼・実作業報告の再照合
+
+- #199 の [MISAKI-REQUEST](https://github.com/miyazaki1016/misaki/pull/199) は7件中6件に、元依頼の直接URLが一致する実作業 [MISAKI-REPORT](https://github.com/miyazaki1016/misaki/pull/219) がある。未報告は [TOCTOU・同一turn二重送信依頼](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505) のみ。6時間超過時の一度限りの所有者通知は前節で記録済みのため繰り返さず、再投稿・完了扱いもしない。
+- #221 の既存依頼7件はすべて直接URL一致の実作業報告あり。#194 の既存依頼5件もすべて同様に報告あり。
+- #219の後続 [MISAKI-TEST](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069522048) ほか3件は疎通受領のみで、作業報告に数えない。最後の実作業報告は [#194モデル別単価の合成試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7065061500)。未報告依頼があるため新規担当依頼は出さない。
+
+### Muse監査・正式レビュー
+
+- [独立監査依頼 #7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と [送信境界参照契約の追補 #7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) は回答待ち。新しい `[MUSE-REVIEW]` はないため、同一対象・観点への依頼を重ねない。
+- 先行する [Muse監査回答 #7056344891](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7056344891) は文書に反映済み。通常復元と沈黙ターンの横断隔離試験は2ケース成功として記録済み。
+- 正式レビュー投稿とinline review thread はともに0件。会話コメント上の監査依頼と正式レビューを区別する。
+
+### Issue・main文書との照合
+
+- [Issue #218の既存preflight](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) は `REVIEW_RECORDED / confirmed / success`。Issue本文と判断記録の一致を再確認し再利用。
+- [Issue #220の既存preflight](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) も `REVIEW_RECORDED / confirmed / success`。Issue本文と判断記録の一致を再確認し再利用。
+- mainの [IMPLEMENTATION_OVERVIEW.md](https://github.com/miyazaki1016/misaki/blob/main/docs/IMPLEMENTATION_OVERVIEW.md) blob `d0857ac5a3946cdc0a8a3fabd5f511dc320261f2`、[DEVELOPMENT_LEDGER.md](https://github.com/miyazaki1016/misaki/blob/main/docs/DEVELOPMENT_LEDGER.md) blob `260995855357ef253e4be913978346074fe0a9f6`、[WORK_RESUME.md](https://github.com/miyazaki1016/misaki/blob/main/docs/WORK_RESUME.md) blob `36dcc1b271d51c865d9721d1f9de95ca47990b7e` を照合。mainと本branchの `AGENTS.md` は同一blob `b1170ad6e6940bea05ef46449ee1edde17bfb3ff`。
+- 親 [Issue #102](https://github.com/miyazaki1016/misaki/issues/102) はOPEN、`work-resume:v1` はactive。匿名rootの保持・削除契約、忘却情報の再浮上防止、感情v2のCAS競合・冪等性が親の次の点検順であり、本PRの設計レビューを親の完了とは扱わない。
+
+### 未決のまま維持する判断
+
+Issue #222の実態監査にある関係性3系統（ポイント制・5軸v1.1・感情／行動v2）は、現行コード上で単一の正本・矛盾時の優先順位が宣言されていない。どれかを正本に選ぶ、合成する、または用途別に併存させる判断は未合意のまま。#219の材料契約で同一の「関係性」材料として扱う前に、所有者の仕様判断が必要である。v1.1の本番有効状態、Body Clockとチャットの生活文脈、正式characterId、DBドリフト、`consume_daily_message` の定義、#194のCI、実Gemini・認証・本番・実機受入も未確認または未決。
+
+今回、新しい契約差分はなく、既存文書に記録済みの隔離合成試験を再利用した。新しいfixtureの追加・担当ブランチ変更・実API／DB／本番接続は行っていない。設計、隔離試験、CI、main統合、本番、実機を別段階として維持する。
