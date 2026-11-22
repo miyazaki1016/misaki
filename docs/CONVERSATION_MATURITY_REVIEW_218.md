@@ -9,7 +9,7 @@
 | --- | --- | --- |
 | 各エンジン | 正本を保持し、認可済み候補をアダプタで提供。[既存調査](https://github.com/miyazaki1016/misaki/issues/197)・[Life Contextの要求](https://github.com/miyazaki1016/misaki/issues/198)・[監査計画](https://github.com/miyazaki1016/misaki/pull/101)を利用 | 種別ごとに出所、期限、取消、禁止条件を宣言。根拠を取得できないエンジンは材料ゼロ |
 | #199 材料選別 | スコープ付き入口、採否理由、メモリ内監査、選別A/Bを再利用 | サーバー側の認証・出所保証、入口迂回防止、キャラ正本ID、発話意図と理由、snapshot期限・バージョン互換、監査ID仮名化 |
-| #220／#221 会話調律 | 設定検証、スライダー部品、所有者判定の読み取り専用APIを再利用。表現の設定と版管理を担当 | 対象キャラと操作別認可、永続化方式、限定適用と復旧、会話APIの版固定。UI配線と最新HEADのテスト失敗を担当側で確認 |
+| #220／#221 会話調律 | 設定検証、スライダー部品、所有者判定の読み取り専用APIを再利用。表現の設定と版管理を担当 | 対象キャラと操作別認可、永続化方式、限定適用と復旧、会話APIの版固定。現HEADのプレビューUIは未ルーティング・メモリ内のみ。実ストア、会話API接続、設定digest照合は未確認 |
 | #194 Gemini最適化 | #78由来の合成A/Bと費用ガードを再利用。選別済みの意図・事実・制約・表現設定をGemini向けに最小化 | 制約保持、モデル別価格、思考トークン予約、日本語入力の保守的な見積り、必要CI |
 | Work統合 | 接続順、境界テスト、証拠管理。独立出力ガードの統合責任を担当 | ガード実装、フォールバック文面の許可条件、担当横断テストと各HEADのCI |
 | Muse監査 | スコープ、来歴、制約保持、復旧、独立ガード・品質評価をレビュー | 仮名化方式・保持期間・削除権限と、費用・検証指摘の解消確認 |
@@ -42,14 +42,20 @@
 
 ## 原本照合と検証
 
-| PR | HEAD | 取得したActions |
-| --- | --- | --- |
-| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `071270a157` | [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044140)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44640044171)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) |
-| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `8d7b732fb1` | 取得されたrunなし、未完了 |
-| [#221](https://github.com/miyazaki1016/misaki/pull/221) | `f5e6e95c1d` | [success](https://github.com/miyazaki1016/misaki/actions/runs/44604877918)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44604877811)・[failure](https://github.com/miyazaki1016/misaki/actions/runs/44604877965)。失敗箇所は npm test |
-| [#219](https://github.com/miyazaki1016/misaki/pull/219) | `957d449ce5` | [success](https://github.com/miyazaki1016/misaki/actions/runs/44498676101)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44498676147)・[success](https://github.com/miyazaki1016/misaki/actions/runs/44498676075)。この文書更新前 |
+2026-11-22にGitHub原本から取得した各PRの現行HEAD・base・main比較・PR起動Actions。比較基準のmainは `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。
 
-上表は初回確認時の証拠。修正後の確認は後述。上記4PRのインライン未解決スレッドは取得結果0件。本文コメントの監査指摘は責務表で追跡する。#199の既存合成fixture 21件を記載HEADのソースでローカル再実行し、21件成功。新契約、アダプタ接続、実Geminiの横断テストは未実施。
+| PR | base branch | HEAD | mainとの比較 | 最新HEADのActions／状態 |
+| --- | --- | --- | --- | --- |
+| [#219](https://github.com/miyazaki1016/misaki/pull/219) | `main` | [`0cd039a958911594de8a1a927041425078ae0a7c`](https://github.com/miyazaki1016/misaki/commit/0cd039a958911594de8a1a927041425078ae0a7c) | 25 ahead / 0 behind | preflight [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957766)・統合 [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957789)・分類 [success](https://github.com/miyazaki1016/misaki/actions/runs/44940957763) |
+| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `main` | [`071270a15716a45bf558363d8ef35f1bef30c787`](https://github.com/miyazaki1016/misaki/commit/071270a15716a45bf558363d8ef35f1bef30c787) | 26 ahead / 26 behind | preflight [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044140)・統合 [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044171)・分類 [success](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) |
+| [#221](https://github.com/miyazaki1016/misaki/pull/221) | `main` | [`74780ba0100d629ec7046a097deaecb430b35a30`](https://github.com/miyazaki1016/misaki/commit/74780ba0100d629ec7046a097deaecb430b35a30) | 16 ahead / 0 behind | preflight [success](https://github.com/miyazaki1016/misaki/actions/runs/44644915033)・統合 [success](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)・分類 [success](https://github.com/miyazaki1016/misaki/actions/runs/44644915059) |
+| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `work/context-no-duplicate-replies-ab` | [`8d7b732fb19ef45c8148c135fffb94451e9bd9ea`](https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea) | 215 ahead / 147 behind | PR起動Actions 0件・check runs 0件・commit status contexts 0件（state=pending）。CI未確認 |
+
+mainとの比較は全PRで同じmain HEADに対する値。#194はPR自体のbaseが研究ブランチであり、main比較はPRのbase比較や統合可能性を示さない。#199はmainから26コミット遅れており、担当ブランチの更新・統合は別担当の作業として扱う。
+
+4PRのPR review submissionsとinline review threadsは各0件。Conversation commentsは #219=45件、#199=20件、#221=9件、#194=12件で、通常コメントとレビュー承認を区別する。Issue #218の既存着手前照合 [run 44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) は現行本文・判断記録に一致し、REVIEW_RECORDED／confirmed／success。Issue #220の既存照合 [run 44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) も本文・判断記録に一致し、同じく合格。#219自身は上表の最新HEAD preflightで再確認済み。
+
+#199の既存合成fixture 21件は記載HEADのソースでローカル再実行し21件成功。追加の合成契約試験は後続節に記録し、担当のローカル隔離実行と既存HEAD CIを混同しない。実アダプタ接続、実経路の独立送信前ガード、実Geminiの横断テストは未実施。
 
 担当間で次に合わせる項目は、正本のキャラID、サーバー内handoffの証明、snapshotのTTL確定、版の互換表、監査の保持期間、調律の限定範囲と失効時処理、独立ガードの判定と安全な停止。各担当はこのDraft PRで確認結果を共有する。マージ、DB、既存認証・設定、本番配線・デプロイ、実Geminiは別途承認が必要。
 
