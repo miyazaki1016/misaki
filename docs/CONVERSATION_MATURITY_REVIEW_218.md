@@ -160,3 +160,41 @@ Node.js v24.22.3 のローカル隔離実行で3件成功。出力・質問判�
 | 3ブロック接続 | #199の選別、#220の調律アプリ、#194の評価スクリプトはmainに存在せず、#219のsnapshot／handoff／独立ガードも現行会話経路には未接続。既存の返答チェックは独立したfail-closed送信ゲートと同等ではない | Draft上の契約・隔離試験を本番経路の実装証拠に読み替えない。独立ガードの実装・接続は未完了 |
 
 この追記は現行実装の観測と未決事項の記録であり、関係性の正本選択、環境設定の有効化、DBドリフト解消、キャラ分離の本番実装、3ブロックの接続を承認するものではありません。production／DBの読み取り確認は今回の範囲外です。
+
+## 2026-11-22 統合フォロー：送信境界の参照契約と最新原本照合
+
+変更前の原本は Draft PR #219、branch `docs/conversation-maturity-218`、HEAD `d162427d81f1c27983ce2dd320c21dbb3d54581d`。比較基準の main は `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。この追記は本節の直前までの記録を保持し、担当PRのコード・ブランチは変更しない。
+
+### 担当依頼と報告の突合
+
+- #199 の既存 [MISAKI-REQUEST](https://github.com/miyazaki1016/misaki/pull/199) 7件のうち、最初の6件は各元コメントURLが一致する [MISAKI-REPORT](https://github.com/miyazaki1016/misaki/pull/219) を確認。新しい [TOCTOU・二重送信防止依頼](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505) は 2026-11-22 07:09:19Z 投稿で、対応する実作業報告はまだない。6時間未満のため督促対象ではない。報告まで新規担当依頼を追加しない。
+- #221 の既存依頼7件は、すべて元依頼の直接URLが一致する実作業報告を確認。#194 の既存依頼5件も同様にすべて報告あり。受領のみの [MISAKI-TEST] は作業報告に数えない。
+- #219 の 2026-11-21 21:30Z の新着3コメントは各担当の疎通試験受領 [MISAKI-TEST] であり、作業完了や新しい依頼根拠には転用しない。
+- Museの [独立監査依頼](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) は未回答。対象コミット `0cd039a958911594de8a1a927041425078ae0a7c` から現HEADまでの差分は2コミットで、実質内容は #220/#221 の状態と原本照合表の更新、および変更前スナップショットの明示。別の同一観点の依頼は重ねない。
+
+### 最新HEAD・CIの原本照合（変更前）
+
+| 対象 | base / HEAD | main `3ab124c0d5a20a6015840b2627a63c21b3e1f701` との比較 | 対象HEADのPR Actions |
+| --- | --- | --- | --- |
+| [#219](https://github.com/miyazaki1016/misaki/pull/219) | `main` / [`d162427d81f1c27983ce2dd320c21dbb3d54581d`](https://github.com/miyazaki1016/misaki/commit/d162427d81f1c27983ce2dd320c21dbb3d54581d) | 27 ahead / 0 behind | [preflight success](https://github.com/miyazaki1016/misaki/actions/runs/44966347202) · [統合テスト success](https://github.com/miyazaki1016/misaki/actions/runs/44966347199) · [分類 success](https://github.com/miyazaki1016/misaki/actions/runs/44966347205) |
+| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `main` / [`071270a15716a45bf558363d8ef35f1bef30c787`](https://github.com/miyazaki1016/misaki/commit/071270a15716a45bf558363d8ef35f1bef30c787) | 26 ahead / 26 behind | [preflight success](https://github.com/miyazaki1016/misaki/actions/runs/44640044140) · [統合テスト success](https://github.com/miyazaki1016/misaki/actions/runs/44640044171) · [分類 success](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) |
+| [#221](https://github.com/miyazaki1016/misaki/pull/221) | `main` / [`74780ba0100d629ec7046a097deaecb430b35a30`](https://github.com/miyazaki1016/misaki/commit/74780ba0100d629ec7046a097deaecb430b35a30) | 16 ahead / 0 behind | [preflight success](https://github.com/miyazaki1016/misaki/actions/runs/44644915033) · [統合テスト success](https://github.com/miyazaki1016/misaki/actions/runs/44644915107) · [分類 success](https://github.com/miyazaki1016/misaki/actions/runs/44644915059) |
+| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `work/context-no-duplicate-replies-ab` / [`8d7b732fb19ef45c8148c135fffb94451e9bd9ea`](https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea) | 215 ahead / 147 behind（main比較。PR base比較ではない） | PR起動run 0件・combined status 0件。CI合格は未確認 |
+
+#219の既存Issue照合は [#218 run 44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705)、[アプリ担当 #220 run 44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) がいずれも本文・判断記録に一致する既存合格として再利用。#102はOPEN・未完了で、台帳の親チェックポイントもactive。会話3ブロックの設計レビューを理由に親のエンジン総点検を完了扱いしない。
+
+### #199の送信境界・冪等性：統合側の隔離参照契約
+
+根拠は [Muse監査の追加受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7056344891) と [#199の未報告依頼](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505)。外部送信のない合成値だけで、送信境界の意味論を持つ参照モデルを隔離実行した。owner・character・session・turn、材料manifest、許可版を合成値で束縛し、最終送信境界で許可版と冪等キーを照合する。
+
+| ケース | 期待 | 結果 |
+| --- | --- | --- |
+| 許可版が変わらない対照 | 1回送信 | 1回 |
+| 最終再照合後・送信境界前に共有を撤回 | 古い許可版を拒否、0回 | `stale-permission`、0回 |
+| 同一turnの送信再試行 | 重複を拒否し総数1回 | 1回目 `sent`、2回目 `duplicate-turn`、総数1回 |
+| 送信境界が撤回より先に確定する順序 | 線形化順序に従い1回 | 1回 |
+| 撤回が送信境界より先に確定する順序 | 線形化順序に従い0回 | 0回 |
+
+5ケース成功、失敗0。これは統合側の参照契約モデルであり、#199の実コード・DBトランザクション・キュー・ネットワーク送信は実行していない。実経路のTOCTOU原子性、正本の許可版照合、同一turnの永続冪等性は引き続き未検証で、#199担当の報告待ち。今回の合成試験を実経路の受入・本番承認に読み替えない。
+
+#194は同HEADのActionsがないためCI未確認のまま。実Gemini、実価格・モデル仕様、認証、DB、会話API接続、Body Clock同時実行、感情の定期回収、iPhone Safariの本番受入は、設計・合成試験・CI・main統合とは別の未完了段階として維持する。
