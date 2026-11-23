@@ -350,3 +350,43 @@ Issue #222の実態監査にある関係性3系統（ポイント制・5軸v1.1�
 - 送信境界の隔離参照契約5ケースは既存節に記録済みで、新しい反例・合意・実作業報告はないため重複fixtureは追加しない。#199に未報告依頼が残るため新規担当依頼も出さない。Muse監査依頼 [#7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と追補 [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) は回答待ちで、同一対象への依頼を重ねない。
 
 この記録は原本照合・既存証拠の整理であり、未合意仕様の決定、担当ブランチ変更、実経路接続、本番承認を意味しない。
+
+## 2026-11-24 07:38 JST 統合担当フォロー：最新HEAD・関連CI・監査待ちの原本再照合
+
+変更前スナップショットは Draft PR #219、branch `docs/conversation-maturity-218`、HEAD `4f42ece4e7c8136dfdad027e0c7776fb35462f47`、base `main` / `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。main比較は33 ahead / 0 behind。変更前の統合設計文書は352行、blob `655b6a7b3e3fddae86f14e1787734c5fd10b86d8`。PRの変更対象は本書1ファイルのみ。既存本文を保持し、本節だけを追記する。
+
+### 最新HEADのCI（原本）
+
+| 対象 | HEAD | 最新HEADに紐づく証拠 | 判定 |
+| --- | --- | --- | --- |
+| [#219](https://github.com/miyazaki1016/misaki/pull/219) | `4f42ece4e7c8136dfdad027e0c7776fb35462f47` | [preflight #45118578502](https://github.com/miyazaki1016/misaki/actions/runs/45118578502)：preflight / regression success、publish-issue-result skipped。 [integration #45118578513](https://github.com/miyazaki1016/misaki/actions/runs/45118578513)：test success。 [classification #45118578510](https://github.com/miyazaki1016/misaki/actions/runs/45118578510)：classify success。 | 3 workflow run completed / success。publish skipは失敗ではない |
+| [#199](https://github.com/miyazaki1016/misaki/pull/199) | `071270a15716a45bf558363d8ef35f1bef30c787` | [preflight #44640044140](https://github.com/miyazaki1016/misaki/actions/runs/44640044140)、[integration #44640044171](https://github.com/miyazaki1016/misaki/actions/runs/44640044171)、[classification #44640044086](https://github.com/miyazaki1016/misaki/actions/runs/44640044086) | 3 workflow run completed / success。main比較26 ahead / 26 behind。担当ブランチは更新しない |
+| [#221（Issue #220担当）](https://github.com/miyazaki1016/misaki/pull/221) | `74780ba0100d629ec7046a097deaecb430b35a30` | [preflight #44644915033](https://github.com/miyazaki1016/misaki/actions/runs/44644915033)、[integration #44644915107](https://github.com/miyazaki1016/misaki/actions/runs/44644915107)、[classification #44644915059](https://github.com/miyazaki1016/misaki/actions/runs/44644915059) | workflow runは3件ともcompleted / success。ただしpreflight内のregression job/check-runはAPI上status=in_progress・conclusion=success・completed_atありという不整合を再確認。統合テストrun自体はsuccess。個別check-runの完了表示まで正常とは断定しない |
+| [#194](https://github.com/miyazaki1016/misaki/pull/194) | `8d7b732fb19ef45c8148c135fffb94451e9bd9ea` | [対象HEADのChecks](https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/checks) | PR起動workflow run 0件、check-runs 0件、combined status 0件。CI未確認。PR baseは研究ブランチ `work/context-no-duplicate-replies-ab` で、main比較とPR base比較を混同しない |
+
+#219のcheck-runsはpreflight / regression / test / classifyがsuccess、publish-issue-resultはskipped。#199もpreflight / regression / test / classifyがsuccess。#221のworkflow全体successと個別regression check-runの不整合は別々に記録する。#194のCI未確認を他PRの成功で代替しない。
+
+### PR本文の履歴記載と現在値の区別
+
+PR #219本文の「Work統合レビュー（2026-11-20）」には、#221のnpm test失敗が記載されている。これは当時の旧HEAD `f5e6e95` に対する履歴であり、現在の#221 HEAD `74780ba0` の [integration run #44644915107](https://github.com/miyazaki1016/misaki/actions/runs/44644915107) はsuccess。PR本文は変更せず、現在値は本節と最新のCI原本で判定する。
+
+### コメント・担当依頼・Muse監査
+
+- #219の会話コメントは46件、最新は [Muse監査追補依頼 #7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211)。今回の新着 `[MISAKI-REPORT]` / `[MUSE-REVIEW]` はない。正式レビュー投稿・inline review threadも0件。
+- #199は既存7依頼中6件に元依頼URL一致の実作業報告あり。未報告は [TOCTOU・同一turn二重送信依頼 #7075745505](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505)。6時間超過時の一度限りの所有者通知は既記録のため繰り返さず、再投稿・完了扱いもしない。
+- #221の7依頼、#194の5依頼はすべて元依頼URL一致の実作業報告あり。疎通試験タグ付きの受領コメントは作業完了に数えない。
+- 先行のMuse監査依頼 [#7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と送信境界参照契約の追補 [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) はともに未回答。対象・観点の重複投稿はしない。Museの返答先は同じ#219とし、回答は `[MUSE-REVIEW]` で始める。
+
+### 既存照合・main文書・親目的
+
+- Issue #218の [既存preflight #44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) は `REVIEW_RECORDED` / `publication_status=confirmed` / preflight success。現在のIssue本文と判断記録の内容が一致するため再利用。
+- Issue #220の [既存preflight #44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) も同じく `REVIEW_RECORDED` / confirmed / success。本文と判断記録の一致を確認し再利用。
+- mainは `3ab124c0d5a20a6015840b2627a63c21b3e1f701`。mainの `AGENTS.md` はblob `b1170ad6e6940bea05ef46449ee1edde17bfb3ff`。 `IMPLEMENTATION_OVERVIEW.md` は `d0857ac5a3946cdc0a8a3fabd5f511dc320261f2`、`DEVELOPMENT_LEDGER.md` は `260995855357ef253e4be913978346074fe0a9f6`、`WORK_RESUME.md` は `36dcc1b271d51c865d9721d1f9de95ca47990b7e`。
+- 親 [Issue #102](https://github.com/miyazaki1016/misaki/issues/102) はOPEN、台帳の `work-resume:v1` はactive。匿名rootの保持・削除、忘却情報の再浮上防止、感情v2のCAS競合・冪等性は親の未完了項目として維持する。
+- Issue #222の実態監査で判明した関係性3系統の正本・優先順位、v1.1の本番有効状態、Body Clockとチャットの生活文脈、正式characterId、DBドリフト、`consume_daily_message` の定義は既存節のとおり未決・未確認。仕様選択・本番DB確認を推測で補わない。
+
+### 今回の判断
+
+新しい合意済み入力・反例・担当実作業報告はなく、既存の送信境界5ケースを再利用し、fixtureの重複追加はしない。#199に未報告依頼が残るため新規担当依頼も出さない。Muse監査依頼が回答待ちのため同じ対象への監査依頼を重ねない。今回、新しい合成試験は実行していない。
+
+本追記は原本照合とCI証拠の整理のみ。口調調律・材料選別・Gemini最適化の担当ブランチ、既存チャット、DB、認証、設定、本番接続、実Gemini、マージ、デプロイは変更しない。
