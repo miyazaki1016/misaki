@@ -336,3 +336,17 @@ Issue #222の実態監査にある関係性3系統（ポイント制・5軸v1.1�
 ### 今回の判断
 
 送信境界の参照契約5ケースは既存文書に記録済みで、今回新しい合意済み入力・反例・担当実作業報告はないため、fixtureの重複追加はしない。#199に未報告依頼が1件あるため、新規担当依頼も出さない。関係性3系統の正本・優先順位、v1.1の本番有効状態、Body Clockとチャットの生活文脈、正式characterId、DBドリフトと `consume_daily_message`、#194のCI、実Gemini・認証・DB・本番・実機受入は未確認または未決のまま維持する。設計・隔離試験・CI・main統合・本番・実機を混同しない。
+
+## 2026-11-23 14:29 JST 統合担当フォロー：前回追記後のHEAD・CI原本照合
+
+前節の12:23 JST記録は変更前HEAD 1ea2c26a2197e1956f0b26d6c1dfaf640ce76763 のスナップショットであるため、その後の追記コミットと変更後CIを別記する。変更前にDraft・対象branch・最新文書を再取得し、既存本文は変更せず本節のみを追加した。
+
+- PRは OPEN / Draft、branch docs/conversation-maturity-218、変更前HEAD 32b0693133e550f4139b798f97fee040a2267850、base main / 3ab124c0d5a20a6015840b2627a63c21b3e1f701。main比較は32 ahead / 0 behind、変更対象は本書1ファイル（338 additions / 0 deletions）。変更前blob 0f1112f39c28eb82410186c0d3dd84bfb7de06dd。
+- 変更前HEADのCIは同一SHAに対してすべて completed / success：[着手前照合 #45106054713](https://github.com/miyazaki1016/misaki/actions/runs/45106054713)、[Canonical relationship integration tests #45106054627](https://github.com/miyazaki1016/misaki/actions/runs/45106054627)、[PR promotion classification #45106054696](https://github.com/miyazaki1016/misaki/actions/runs/45106054696)。
+- #219の会話コメントは46件、最新は [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211)。新しい実作業 [MISAKI-REPORT] と [MUSE-REVIEW] はない。#199の7依頼中6件、#221は7/7件、#194は5/5件が元依頼URL一致の実作業報告あり。未報告は [#199 TOCTOU・同一turn二重送信依頼 #7075745505](https://github.com/miyazaki1016/misaki/pull/199#issuecomment-7075745505)。6時間超過時の一度限りの所有者通知は既記録のため繰り返さず、再投稿・完了扱いもしない。
+- #199と#221の最新HEAD CIは各3系統 completed / success。#194は対象HEAD 8d7b732fb19ef45c8148c135fffb94451e9bd9ea のPR起動Actions 0件・combined status 0件でCI未確認。#194の未確認を#219の成功で代替しない。
+- Issue #218の既存preflight [#44497001705](https://github.com/miyazaki1016/misaki/actions/runs/44497001705) は REVIEW_RECORDED / confirmed / success、Issue #220の既存preflight [#44506179084](https://github.com/miyazaki1016/misaki/actions/runs/44506179084) も同じ状態。各Issue本文・判断記録は変更されていないため再利用。mainと対象branchの AGENTS.md は同一blob b1170ad6e6940bea05ef46449ee1edde17bfb3ff。main文書は IMPLEMENTATION_OVERVIEW d0857ac5a3946cdc0a8a3fabd5f511dc320261f2、DEVELOPMENT_LEDGER 260995855357ef253e4be913978346074fe0a9f6、WORK_RESUME 36dcc1b271d51c865d9721d1f9de95ca47990b7e。親Issue #102はOPEN、work-resume:v1 はactive。
+- Issue #222の訂正（RPC 24件中23件はmigration／SQLに存在し、consume_daily_message の定義だけ所在未確認）は既存の実態表に反映済み。関係性3系統の正本・優先順位、v1.1の本番有効状態、Body Clockとチャットの生活文脈、正式characterId、DBドリフト、#194のCI、実Gemini・認証・本番・実機受入は未決・未確認のまま。
+- 送信境界の隔離参照契約5ケースは既存節に記録済みで、新しい反例・合意・実作業報告はないため重複fixtureは追加しない。#199に未報告依頼が残るため新規担当依頼も出さない。Muse監査依頼 [#7069531837](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7069531837) と追補 [#7077682211](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7077682211) は回答待ちで、同一対象への依頼を重ねない。
+
+この記録は原本照合・既存証拠の整理であり、未合意仕様の決定、担当ブランチ変更、実経路接続、本番承認を意味しない。
