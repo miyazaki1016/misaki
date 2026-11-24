@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -60,7 +60,7 @@ PR #8 の実機確認を受けた仕上げです。
 
 ```text
 diff --git a/app/api/chat-proxy/route.ts b/app/api/chat-proxy/route.ts
-index 2edb037..87fd79d 100644
+index 2edb037e..87fd79d7 100644
 --- a/app/api/chat-proxy/route.ts
 +++ b/app/api/chat-proxy/route.ts
 @@ -53,6 +53,14 @@ function isMemoryRecallQuestion(message: unknown) {

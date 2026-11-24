@@ -1,0 +1,29 @@
+{
+  "id": "branch-9c34b261ec31b7a0",
+  "title": "fix/chat-turn-dedupe",
+  "head": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5",
+  "head_ref": "fix/chat-turn-dedupe",
+  "linked_prs": [
+    18
+  ],
+  "files": [
+    {
+      "path": "supabase/migrations/20260918014700_prevent_duplicate_chat_turn_sync.sql",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/017b94c1cf2c3f7d8340a3a59f572d1a012de5e5/supabase/migrations/20260918014700_prevent_duplicate_chat_turn_sync.sql"
+    }
+  ],
+  "commits": "017b94c1cf2c3f7d8340a3a59f572d1a012de5e5 Prevent duplicate chat turn during conversation sync",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "a80317e25a80dd2ab23e03dd0dca063519867d94b4d2635b504553e76b843a78",
+  "collected_at": "2026-11-24T08:48:49.983562+00:00",
+  "archived": true
+}

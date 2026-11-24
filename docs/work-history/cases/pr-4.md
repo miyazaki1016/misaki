@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -64,7 +64,7 @@ AUTH_KIND_KEY、AnonymousSessionGuard、BROWSER_SESSION_KEY、LEGACY_OWNERLESS_C
 
 ```text
 diff --git a/app/chat/anonymous-session-guard.tsx b/app/chat/anonymous-session-guard.tsx
-index 3cb5bb4..aad1c16 100644
+index 3cb5bb48..aad1c165 100644
 --- a/app/chat/anonymous-session-guard.tsx
 +++ b/app/chat/anonymous-session-guard.tsx
 @@ -6,6 +6,9 @@ import { bindDeviceUser, clearMisakiDeviceData, DEVICE_USER_KEY, EMAIL_SAVE_USER

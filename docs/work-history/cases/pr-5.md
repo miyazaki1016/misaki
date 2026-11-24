@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -62,7 +62,7 @@ MAX_MEMORY、PARSE_ERROR_MESSAGE、POST、SUPABASE_PUBLISHABLE_KEY、SUPABASE_UR
 
 ```text
 diff --git a/app/api/chat-proxy/route.ts b/app/api/chat-proxy/route.ts
-index 62c6b14..09a6358 100644
+index 62c6b14a..09a63584 100644
 --- a/app/api/chat-proxy/route.ts
 +++ b/app/api/chat-proxy/route.ts
 @@ -106,13 +106,12 @@ export async function POST(request: Request) {

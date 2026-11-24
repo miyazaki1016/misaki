@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -67,7 +67,7 @@ MAX_MEMORY、PARSE_ERROR_MESSAGE、POST、SUPABASE_PUBLISHABLE_KEY、SUPABASE_UR
 
 ```text
 diff --git a/app/api/chat-proxy/route.ts b/app/api/chat-proxy/route.ts
-index d3dfe70..62c6b14 100644
+index d3dfe70c..62c6b14a 100644
 --- a/app/api/chat-proxy/route.ts
 +++ b/app/api/chat-proxy/route.ts
 @@ -6,6 +6,8 @@ const SUPABASE_URL = "https://tzozajnwznxqgxnjikoy.supabase.co";

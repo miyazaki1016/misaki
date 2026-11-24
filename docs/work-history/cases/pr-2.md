@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -67,7 +67,7 @@ Safariなど旧ビルド由来で `misaki-chat-history` / memory が残ってい
 
 ```text
 diff --git a/app/chat/anonymous-session-guard.tsx b/app/chat/anonymous-session-guard.tsx
-index 22b105a..3cb5bb4 100644
+index 22b105ae..3cb5bb48 100644
 --- a/app/chat/anonymous-session-guard.tsx
 +++ b/app/chat/anonymous-session-guard.tsx
 @@ -18,11 +18,19 @@ export default function AnonymousSessionGuard({ children }: { children: ReactNod
@@ -98,7 +98,7 @@ index 22b105a..3cb5bb4 100644
 
 ```text
 diff --git a/tests/account-conversation.test.cjs b/tests/account-conversation.test.cjs
-index 82cda9c..b8895a8 100644
+index 82cda9cb..b8895a8b 100644
 --- a/tests/account-conversation.test.cjs
 +++ b/tests/account-conversation.test.cjs
 @@ -116,6 +116,15 @@ test('ordinary expired anonymous browser session still clears all misaki caches'

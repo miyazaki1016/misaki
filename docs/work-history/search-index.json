@@ -1,12 +1,12 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-24T08:48:49.983562+00:00",
+  "generated_at": "2026-11-24T10:54:36.101084+00:00",
   "coverage": {
     "prs": 198,
     "pr_cases": 198,
-    "branches": 221,
+    "branches": 193,
     "errors": [],
-    "api_calls": 9
+    "api_calls": 121
   },
   "cases": [
     {
@@ -2667,7 +2667,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "初対面から関係を育てる設定に切り替える 初対面から関係を育てる設定に切り替える  {\"summary\": \"初対面から関係を育てる設定に切り替える\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/27\"]} 初期状態から「すでに恋人」と固定していたため、はじめまして直後でも「ずっと前から大好き」など関係履歴を先取りする返答が出ていました。\n\n変更:\n- 固定人格から「最初から恋人」を削除\n- 関係性は会話・記憶・relationshipPointsで育てる\n- relationshipPointsは親しさの目安で、交際事実そのものではないと明記\n- 初期段階では強い愛情表現・過去からの恋愛関係・嫉妬/強い甘えを抑える\n- 30/80/160ポイントで距離感は深めるが、恋人関係を名乗るには会話/記憶の根拠を要求\n- fallback persona と Body Clock fallback も同じ思想に統一\n- active persona DB module も migration で更新\n\nProduction DBのactive persona moduleには同じ変更を先行反映済み。 ANTI_AI_CARE CONVERSATION_STYLE CORE_IDENTITY GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MEMORY_PROFILE_RULES MISAKI_LATITUDE MISAKI_LONGITUDE NAME_USAGE PROACTIVE_STYLE RELATIONSHIP_EXPRESSION SUPABASE_PUBLISHABLE_KEY SUPABASE_URL USER_GROUNDING activityGroups attempt buildActivityEvidence consistency consumeDailyMessageWithRetry containsAny createActivityGroundingGuide createAuthenticatedSupabase createFallbackPersonaPrompt createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current data dateKey dayLabel dayType findDayTypeProblems findUnsupportedActivityGroups getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getTokyoWeather hasRecentMisakiWeatherContext hash hashText hour humidity humidityFeel i isWeatherText lines match maxAttempts mood moods numberOrNull pastMarkers problems refundDailyMessage [] app/api/chat/route.ts lib/persona/fallback-persona.ts supabase/functions/body-clock/fallback-persona.ts supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql "
+      "search_text": "初対面から関係を育てる設定に切り替える 初対面から関係を育てる設定に切り替える  {\"summary\": \"初対面から関係を育てる設定に切り替える\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/27\"]} 初期状態から「すでに恋人」と固定していたため、はじめまして直後でも「ずっと前から大好き」など関係履歴を先取りする返答が出ていました。\n\n変更:\n- 固定人格から「最初から恋人」を削除\n- 関係性は会話・記憶・relationshipPointsで育てる\n- relationshipPointsは親しさの目安で、交際事実そのものではないと明記\n- 初期段階では強い愛情表現・過去からの恋愛関係・嫉妬/強い甘えを抑える\n- 30/80/160ポイントで距離感は深めるが、恋人関係を名乗るには会話/記憶の根拠を要求\n- fallback persona と Body Clock fallback も同じ思想に統一\n- active persona DB module も migration で更新\n\nProduction DBのactive persona moduleには同じ変更を先行反映済み。 ANTI_AI_CARE CONVERSATION_STYLE CORE_IDENTITY GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MEMORY_PROFILE_RULES MISAKI_LATITUDE MISAKI_LONGITUDE NAME_USAGE POST PROACTIVE_STYLE RELATIONSHIP_EXPRESSION SUPABASE_PUBLISHABLE_KEY SUPABASE_URL USER_GROUNDING accessToken activityEvidence activityGroundingGuide activityGroups apiKey attempt authorization baseSystemPrompt buildActivityEvidence chargedRequestId chargedSupabase cleanFinalReply cleaned consistency consumeDailyMessageWithRetry containsAny contents controller createActivityGroundingGuide createAuthenticatedSupabase createFallbackPersonaPrompt createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate data dateKey dayLabel dayType elapsedMs finalProblems findDayTypeProblems findUnsupportedActivityGroups firstProblems generateReply getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType [] app/api/chat/route.ts lib/persona/fallback-persona.ts supabase/functions/body-clock/fallback-persona.ts supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql "
     },
     {
       "id": "pr-26",
@@ -2682,7 +2682,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "チャット応答の工程別タイミングを計測する チャット応答の工程別タイミングを計測する  {\"summary\": \"チャット応答の工程別タイミングを計測する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/26\"]} 実機で「・・・」が長く続くケースのボトルネックを切り分けるため、チャット処理の主要工程ごとに所要時間を記録します。\n\n変更:\n- Geminiタイムアウトを20秒→30秒へ延長\n- request-json / auth-get-user / usage-consume / persona-load / weather / life-events を工程別に計測\n- Gemini初回/再生成は既存ログに traceId を付与\n- リクエスト全体時間を CHAT TOTAL で記録\n- 入力本文・会話本文はログしない\n\n狙い:\n次回の遅延時に、認証/RPC/Persona/外部情報/Gemini/再生成のどこで時間を使っているかを比較できるようにする。 GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE POST SUPABASE_PUBLISHABLE_KEY SUPABASE_URL activityGroups attempt buildActivityEvidence chargedRequestId chargedSupabase consistency consumeDailyMessageWithRetry containsAny createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current data dateKey dayLabel dayType findDayTypeProblems findUnsupportedActivityGroups getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getTokyoWeather hasRecentMisakiWeatherContext hash hashText hour humidity humidityFeel i isWeatherText lines loadedPersona match maxAttempts measureStage mood moods numberOrNull parseGeminiText pastMarkers personaPrompt problems refundDailyMessage refunded requestStartedAt [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const GEMINI_TIMEOUT_MS = 30_000;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/ead9d6283b68579f6014e07bef46add2a41fb791/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function measureStage<T>(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/ead9d6283b68579f6014e07bef46add2a41fb791/app/api/chat/route.ts\"}] app/api/chat/route.ts "
+      "search_text": "チャット応答の工程別タイミングを計測する チャット応答の工程別タイミングを計測する  {\"summary\": \"チャット応答の工程別タイミングを計測する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/26\"]} 実機で「・・・」が長く続くケースのボトルネックを切り分けるため、チャット処理の主要工程ごとに所要時間を記録します。\n\n変更:\n- Geminiタイムアウトを20秒→30秒へ延長\n- request-json / auth-get-user / usage-consume / persona-load / weather / life-events を工程別に計測\n- Gemini初回/再生成は既存ログに traceId を付与\n- リクエスト全体時間を CHAT TOTAL で記録\n- 入力本文・会話本文はログしない\n\n狙い:\n次回の遅延時に、認証/RPC/Persona/外部情報/Gemini/再生成のどこで時間を使っているかを比較できるようにする。 GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE POST SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken activityEvidence activityGroundingGuide activityGroups apiKey attempt authorization baseSystemPrompt buildActivityEvidence chargedRequestId chargedSupabase cleanFinalReply cleaned consistency consumeDailyMessageWithRetry containsAny contents controller createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate data dateKey dayLabel dayType elapsedMs finalProblems findDayTypeProblems findUnsupportedActivityGroups firstProblems generateReply getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getReplyProblems getTokyoWeather hasRecentMisakiWeatherContext hasSupplementaryUnicode hash hashText hour humidity humidityFeel [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const GEMINI_TIMEOUT_MS = 30_000;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/ead9d6283b68579f6014e07bef46add2a41fb791/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function measureStage<T>(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/ead9d6283b68579f6014e07bef46add2a41fb791/app/api/chat/route.ts\"}] app/api/chat/route.ts "
     },
     {
       "id": "pr-25",
@@ -2697,7 +2697,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "Gemini返答待ちにタイムアウトと診断ログを追加する Gemini返答待ちにタイムアウトと診断ログを追加する  {\"summary\": \"Gemini返答待ちにタイムアウトと診断ログを追加する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/25\"]} 匿名実機テストで、特定入力時に送信はサーバーまで到達して利用回数も消費される一方、Gemini返答待ちのまま「・・・」が続き、最終的に返答が出ないケースが再現しました。\n\n変更:\n- Gemini generateContent fetch に20秒の明示タイムアウトを追加\n- タイムアウト時は例外として既存の catch に戻し、既存の refund_daily_message で利用回数を返却\n- 初回/意味的リトライ、HTTP status、所要時間をログ\n- 入力本文はログせず、messageLength / codePointLength / supplementary Unicode 有無のみ記録\n- 特定の絵文字を原因と断定せず、次回実機再現時に比較できる情報だけ残す\n\nこれにより、外部APIがハングしてもVercel側の長いタイムアウトまで待たず、クライアントへエラーを返して入力中表示を終了できます。 GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE SUPABASE_PUBLISHABLE_KEY SUPABASE_URL activityGroups attempt buildActivityEvidence consistency consumeDailyMessageWithRetry containsAny controller createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current data dateKey dayLabel dayType elapsedMs findDayTypeProblems findUnsupportedActivityGroups getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getTokyoWeather hasRecentMisakiWeatherContext hasSupplementaryUnicode hash hashText hour humidity humidityFeel i isWeatherText lines match maxAttempts mood moods numberOrNull parsed pastMarkers problems refundDailyMessage response retryable seed smallThing smallThings [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const GEMINI_TIMEOUT_MS = 20_000;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \".test(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"HTTP要求\", \"expression\": \"await fetch(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!response.ok) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}] app/api/chat/route.ts "
+      "search_text": "Gemini返答待ちにタイムアウトと診断ログを追加する Gemini返答待ちにタイムアウトと診断ログを追加する  {\"summary\": \"Gemini返答待ちにタイムアウトと診断ログを追加する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/25\"]} 匿名実機テストで、特定入力時に送信はサーバーまで到達して利用回数も消費される一方、Gemini返答待ちのまま「・・・」が続き、最終的に返答が出ないケースが再現しました。\n\n変更:\n- Gemini generateContent fetch に20秒の明示タイムアウトを追加\n- タイムアウト時は例外として既存の catch に戻し、既存の refund_daily_message で利用回数を返却\n- 初回/意味的リトライ、HTTP status、所要時間をログ\n- 入力本文はログせず、messageLength / codePointLength / supplementary Unicode 有無のみ記録\n- 特定の絵文字を原因と断定せず、次回実機再現時に比較できる情報だけ残す\n\nこれにより、外部APIがハングしてもVercel側の長いタイムアウトまで待たず、クライアントへエラーを返して入力中表示を終了できます。 GEMINI_TIMEOUT_MS MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE POST SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken activityEvidence activityGroundingGuide activityGroups apiKey attempt authorization baseSystemPrompt buildActivityEvidence chargedRequestId chargedSupabase cleanFinalReply cleaned consistency consumeDailyMessageWithRetry containsAny contents controller createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate data dateKey dayLabel dayType elapsedMs finalProblems findDayTypeProblems findUnsupportedActivityGroups firstProblems generateReply getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getReplyProblems getTokyoWeather hasRecentMisakiWeatherContext hasSupplementaryUnicode hash hashText hour humidity humidityFeel [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const GEMINI_TIMEOUT_MS = 20_000;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \".test(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"HTTP要求\", \"expression\": \"await fetch(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!response.ok) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/469578ea12663c594a32c62a05263b23e7190891/app/api/chat/route.ts\"}] app/api/chat/route.ts "
     },
     {
       "id": "pr-24",
@@ -2728,7 +2728,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "旧ブラウザ自発メッセージ経路を削除する 旧ブラウザ自発メッセージ経路を削除する  {\"summary\": \"旧ブラウザ自発メッセージ経路を削除する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/23\"]} Body Clockへ一本化済みで実利用されていない旧自発経路を削除します。\n\n変更:\n- app/chat/page.tsx の dormant な sendProactiveMessage() を削除\n- 旧45分系ブラウザスケジューラ定数・ローカル状態を削除\n- app/api/proactive/route.ts を削除\n- lib/proactive-photo.ts の旧互換写真selectorを削除\n- 実装総覧を現状に更新\n\n確認:\n- page.tsx に旧関数/定数/API参照が残っていないことを確認\n- active Body Clock の buildProactiveDecisionContext / selectMisakiProactivePhoto は維持\n- ProactivePhotoDisplay は chat layout から引き続き有効 ChatPage FREE_DAILY_LIMIT GET INITIAL_MESSAGES MAX_DELAY_MINUTES MAX_HISTORY MAX_MEMORY MAX_MESSAGES MAX_PER_RUN MAX_PROACTIVE_PER_DAY MAX_TODAY_MEMORY MEMORY_KEY MIN_DELAY_MINUTES MISAKI_LATITUDE MISAKI_LONGITUDE MISAKI_TODAY_MEMORY_KEY PHOTOS PHOTO_ATTACH_RATE POST PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS PROACTIVE_TAGS RELATIONSHIP_KEY STORAGE_KEY SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken active activityEvidence activityGroundingGuide activityGroups allowed apiKey appendConversation attachThreshold attempt auth authorization buildActivityEvidence candidates concernPatterns consistencyGuide contents contradictions conversationState createActivityGroundingGuide createAuthenticatedSupabase createEmptyTodayMemory createMisakiLife createProactiveTheme createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide cronSecret current currentDate [] app/api/body-clock/route.ts app/api/proactive/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/proactive-photo.ts "
+      "search_text": "旧ブラウザ自発メッセージ経路を削除する 旧ブラウザ自発メッセージ経路を削除する  {\"summary\": \"旧ブラウザ自発メッセージ経路を削除する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/23\"]} Body Clockへ一本化済みで実利用されていない旧自発経路を削除します。\n\n変更:\n- app/chat/page.tsx の dormant な sendProactiveMessage() を削除\n- 旧45分系ブラウザスケジューラ定数・ローカル状態を削除\n- app/api/proactive/route.ts を削除\n- lib/proactive-photo.ts の旧互換写真selectorを削除\n- 実装総覧を現状に更新\n\n確認:\n- page.tsx に旧関数/定数/API参照が残っていないことを確認\n- active Body Clock の buildProactiveDecisionContext / selectMisakiProactivePhoto は維持\n- ProactivePhotoDisplay は chat layout から引き続き有効 ChatPage FREE_DAILY_LIMIT GET INITIAL_MESSAGES MAX_DELAY_MINUTES MAX_HISTORY MAX_MEMORY MAX_MESSAGES MAX_PER_RUN MAX_PROACTIVE_PER_DAY MAX_TODAY_MEMORY MEMORY_KEY MIN_DELAY_MINUTES MISAKI_LATITUDE MISAKI_LONGITUDE MISAKI_TODAY_MEMORY_KEY PHOTOS PHOTO_ATTACH_RATE POST PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS PROACTIVE_TAGS RELATIONSHIP_KEY STORAGE_KEY SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken active activityEvidence activityGroundingGuide activityGroups allowed apiKey appendConversation applyApiUsage applyTodayMemory attachThreshold attempt auth authorization buildActivityEvidence candidates concernPatterns confirmed consistencyGuide contents contradictions conversationState createActivityGroundingGuide createAuthenticatedSupabase createEmptyTodayMemory createMisakiLife createProactiveTheme createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide [] app/api/body-clock/route.ts app/api/proactive/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/proactive-photo.ts "
     },
     {
       "id": "pr-22",
@@ -2773,7 +2773,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える  {\"summary\": \"ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/20\"]} ## 変更内容\n- ユーザーが今日仕事か休みかを、会話・履歴・記憶に根拠がある場合だけ使うよう明示\n- 根拠なしの「今日も仕事頑張ってね」「お仕事お疲れ様」等を抑制\n- 美咲の仕事日は通常の日中勤務として扱い、朝に「あと少しで仕事終わる」など夜勤明け風の発言を禁止\n- 朝の仕事日では「これから仕事」「出勤前」「準備中」程度に制限\n- 朝の夜勤明け風発言を返信検証でも検出\n\n## 非変更範囲\n- 感情・行動エンジン\n- Body Clock\n- 利用回数\n- 履歴同期\n MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE SUPABASE_PUBLISHABLE_KEY SUPABASE_URL activityGroups attempt buildActivityEvidence consistency consumeDailyMessageWithRetry containsAny createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current data dateKey dayLabel dayType findDayTypeProblems findUnsupportedActivityGroups getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getReplyProblems getTokyoWeather hasRecentMisakiWeatherContext hash hashText hour humidity humidityFeel i isWeatherText lines match maxAttempts mood moods numberOrNull pastMarkers problems refundDailyMessage response retryable seed smallThing smallThings temperature text timeBand url [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/6f25eba602fca1183383588ad0183d4c4a16d37c/app/api/chat/route.ts\"}] app/api/chat/route.ts "
+      "search_text": "ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える  {\"summary\": \"ユーザーの仕事推測と美咲の仕事時間帯の矛盾を抑える\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/20\"]} ## 変更内容\n- ユーザーが今日仕事か休みかを、会話・履歴・記憶に根拠がある場合だけ使うよう明示\n- 根拠なしの「今日も仕事頑張ってね」「お仕事お疲れ様」等を抑制\n- 美咲の仕事日は通常の日中勤務として扱い、朝に「あと少しで仕事終わる」など夜勤明け風の発言を禁止\n- 朝の仕事日では「これから仕事」「出勤前」「準備中」程度に制限\n- 朝の夜勤明け風発言を返信検証でも検出\n\n## 非変更範囲\n- 感情・行動エンジン\n- Body Clock\n- 利用回数\n- 履歴同期\n MAX_HISTORY MAX_MEMORY MAX_TODAY_MEMORY MISAKI_LATITUDE MISAKI_LONGITUDE POST SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken activityEvidence activityGroundingGuide activityGroups apiKey attempt authorization baseSystemPrompt buildActivityEvidence chargedRequestId chargedSupabase cleanFinalReply cleaned consistency consumeDailyMessageWithRetry containsAny contents createActivityGroundingGuide createAuthenticatedSupabase createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate data dateKey dayLabel dayType finalProblems findDayTypeProblems findUnsupportedActivityGroups firstProblems generateReply getDateKey getFirstRow getHour getHumidityFeel getMisakiDayType getReplyProblems getTokyoWeather hasRecentMisakiWeatherContext hash hashText hour humidity humidityFeel i inventedSources isWeatherText lines [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/6f25eba602fca1183383588ad0183d4c4a16d37c/app/api/chat/route.ts\"}] app/api/chat/route.ts "
     },
     {
       "id": "pr-19",
@@ -2789,7 +2789,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "チャット返答失敗時に回数を戻してエラーを表示する チャット返答失敗時に回数を戻してエラーを表示する  {\"summary\": \"チャット返答失敗時に回数を戻してエラーを表示する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/19\"]} ## 変更内容\n- 返答生成に失敗した無料チャットの利用回数を request_id 単位で一度だけ返却する RPC を追加\n- Gemini/サーバー失敗時に返却後の usage を API から返す\n- iPhone側で失敗を無言にせず、会話バブルとは別の小さなステータス表示を出す\n- 成功時や Premium では返却しない\n\n## 背景\n本番でユーザー発言だけ保存され、美咲の返答が来ないケースを確認。従来は利用回数だけ消費され、UI上も無反応に見えていました。 ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_HISTORY MAX_MEMORY MAX_MESSAGES MAX_PROACTIVE_PER_DAY MAX_TODAY_MEMORY MEMORY_KEY MISAKI_LATITUDE MISAKI_LONGITUDE MISAKI_TODAY_MEMORY_KEY POST PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS RELATIONSHIP_KEY STORAGE_KEY SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken active activityGroups attempt buildActivityEvidence chargedRequestId chargedSupabase consistency consumeDailyMessageWithRetry containsAny createActivityGroundingGuide createAuthenticatedSupabase createEmptyTodayMemory createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate data dateKey dayLabel dayType expiresAt findDayTypeProblems findUnsupportedActivityGroups freeLimitReached freeRemaining getDateKey getFirstRow getFirstRpcRow getHour getHumidityFeel getJapanCurrentTime getJapanDateKey getMisakiDayType getRandomProactiveDelayMs [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function refundDailyMessage(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (error) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function refundIfCharged() {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"SQL定義・権限\", \"expression\": \"alter table public.daily_message_requests\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"関数・クラス定義\", \"expression\": \"create or replace function public.refund_daily_message(p_request_id uuid)\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"関数・クラス定義\", \"expression\": \"revoke all on function public.refund_daily_message(uuid) from public, anon;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"SQL定義・権限\", \"expression\": \"grant execute on function public.refund_daily_message(uuid) to authenticated;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}] app/api/chat/route.ts app/chat/page.tsx supabase/migrations/20260918081000_refund_failed_chat_usage.sql "
+      "search_text": "チャット返答失敗時に回数を戻してエラーを表示する チャット返答失敗時に回数を戻してエラーを表示する  {\"summary\": \"チャット返答失敗時に回数を戻してエラーを表示する\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/19\"]} ## 変更内容\n- 返答生成に失敗した無料チャットの利用回数を request_id 単位で一度だけ返却する RPC を追加\n- Gemini/サーバー失敗時に返却後の usage を API から返す\n- iPhone側で失敗を無言にせず、会話バブルとは別の小さなステータス表示を出す\n- 成功時や Premium では返却しない\n\n## 背景\n本番でユーザー発言だけ保存され、美咲の返答が来ないケースを確認。従来は利用回数だけ消費され、UI上も無反応に見えていました。 ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_HISTORY MAX_MEMORY MAX_MESSAGES MAX_PROACTIVE_PER_DAY MAX_TODAY_MEMORY MEMORY_KEY MISAKI_LATITUDE MISAKI_LONGITUDE MISAKI_TODAY_MEMORY_KEY POST PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS RELATIONSHIP_KEY STORAGE_KEY SUPABASE_PUBLISHABLE_KEY SUPABASE_URL accessToken active activityEvidence activityGroundingGuide activityGroups apiKey applyApiUsage applyTodayMemory attempt authorization baseSystemPrompt buildActivityEvidence chargedRequestId chargedSupabase cleanFinalReply cleaned confirmed consistency consumeDailyMessageWithRetry containsAny contents createActivityGroundingGuide createAuthenticatedSupabase createEmptyTodayMemory createMisakiLife createRelationshipGuide createTimeGuide createTodayMemoryGuide createWeatherGuide current currentDate currentTime data dateKey dayLabel dayType deleteMemory errorMessage [{\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function refundDailyMessage(\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (error) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"関数・クラス定義\", \"expression\": \"async function refundIfCharged() {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"app/api/chat/route.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/app/api/chat/route.ts\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"SQL定義・権限\", \"expression\": \"alter table public.daily_message_requests\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"関数・クラス定義\", \"expression\": \"create or replace function public.refund_daily_message(p_request_id uuid)\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"関数・クラス定義\", \"expression\": \"revoke all on function public.refund_daily_message(uuid) from public, anon;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}, {\"file\": \"supabase/migrations/20260918081000_refund_failed_chat_usage.sql\", \"kind\": \"SQL定義・権限\", \"expression\": \"grant execute on function public.refund_daily_message(uuid) to authenticated;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/2cee1b7722cfe2e20d2b063226ba3d0b03522784/supabase/migrations/20260918081000_refund_failed_chat_usage.sql\"}] app/api/chat/route.ts app/chat/page.tsx supabase/migrations/20260918081000_refund_failed_chat_usage.sql "
     },
     {
       "id": "pr-18",
@@ -2911,7 +2911,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "Safariで通信例外を美咲の発言として表示しない Safariで通信例外を美咲の発言として表示しない  {\"summary\": \"Safariで通信例外を美咲の発言として表示しない\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/11\"]} ## 変更内容\n- `sendMessage()` の通信例外を美咲の吹き出しとして `messages` に追加しないよう修正\n- 例外はコンソールへ記録\n\n## 非変更範囲\n- 会話・記憶・利用回数・認証ロジックは変更なし\n- 自動再送は追加なし\n- 既存の会話履歴に対する削除・リセットなし\n\n## 確認\n- `git diff --check`\n- `npm run build`（Next.js production build） ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MAX_PROACTIVE_PER_DAY MEMORY_KEY MISAKI_TODAY_MEMORY_KEY PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS RELATIONSHIP_KEY STORAGE_KEY active attempt createEmptyTodayMemory currentDate expiresAt freeLimitReached freeRemaining getFirstRpcRow getJapanCurrentTime getJapanDateKey getRandomProactiveDelayMs initializeAccount isPremium isPremiumActive limitedMessages loadDailyUsage loadEntitlement parsed parsedMemory parsedMessages parsedPoints parsedTodayMemory premium previousUserMessages safeTodayMemory savedMemory savedMessages savedRelationship savedTodayMemory today usage usageCountToday user [] app/chat/page.tsx "
+      "search_text": "Safariで通信例外を美咲の発言として表示しない Safariで通信例外を美咲の発言として表示しない  {\"summary\": \"Safariで通信例外を美咲の発言として表示しない\", \"conclusion\": \"日本語見出しは変更目的の案内。受入完了・本番反映の認定ではない。差分・検証・残課題を原本で確認。\", \"evidence\": [\"https://github.com/miyazaki1016/misaki/pull/11\"]} ## 変更内容\n- `sendMessage()` の通信例外を美咲の吹き出しとして `messages` に追加しないよう修正\n- 例外はコンソールへ記録\n\n## 非変更範囲\n- 会話・記憶・利用回数・認証ロジックは変更なし\n- 自動再送は追加なし\n- 既存の会話履歴に対する削除・リセットなし\n\n## 確認\n- `git diff --check`\n- `npm run build`（Next.js production build） ChatPage FREE_DAILY_LIMIT INITIAL_MESSAGES MAX_MESSAGES MAX_PROACTIVE_PER_DAY MEMORY_KEY MISAKI_TODAY_MEMORY_KEY PROACTIVE_CHECK_MS PROACTIVE_COOLDOWN_MS PROACTIVE_KEY PROACTIVE_MAX_DELAY_MS PROACTIVE_MIN_DELAY_MS RELATIONSHIP_KEY STORAGE_KEY accessToken active applyApiUsage applyTodayMemory attempt confirmed createEmptyTodayMemory currentDate currentTime data deleteMemory errorMessage expiresAt freeLimitReached freeRemaining getAccessToken getFirstRpcRow getJapanCurrentTime getJapanDateKey getRandomProactiveDelayMs initializeAccount isPremium isPremiumActive items limitedMessages loadDailyUsage loadEntitlement newMessages nextAttemptAt nextRelationshipPoints nextState now openPremium parsed parsedMemory parsedMessages parsedPoints parsedTodayMemory permission premium previousUserMessages requestNotificationPermission res resetChat resetMemory safeTodayMemory [] app/chat/page.tsx "
     },
     {
       "id": "pr-10",
@@ -3536,37 +3536,6 @@
       "search_text": "chore/vercel-safe-build-guard-20261102 ブランチ差分を収録  {}   []  "
     },
     {
-      "id": "branch-5e09e6de95bfa770",
-      "title": "cleanup/legacy-proactive-tags",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "cleanup/legacy-proactive-tags ブランチ差分を収録  {}   [] lib/proactive-photo.ts "
-    },
-    {
-      "id": "branch-1a583769a497875d",
-      "title": "cleanup/remove-legacy-proactive-path",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "cleanup/remove-legacy-proactive-path ブランチ差分を収録  {}   [] app/api/body-clock/route.ts app/api/proactive/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/proactive-photo.ts "
-    },
-    {
       "id": "branch-c9e11b1515cb305d",
       "title": "codex/legacy-maintenance-drain",
       "summary": "ブランチ差分を収録",
@@ -3629,21 +3598,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "design/shared-conversation-engine-contract-20261015 ブランチ差分を収録  {}   [] docs/SHARED_CONVERSATION_ENGINE_DESIGN_20261015.md "
-    },
-    {
-      "id": "branch-d1c7bd152670a9a9",
-      "title": "docs/audit-overview-against-source",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "docs/audit-overview-against-source ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
     },
     {
       "id": "branch-1cc52db052a759e2",
@@ -4162,36 +4116,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "docs/test-case-reconciliation-20261101 ブランチ差分を収録  {}   [] docs/audits/TEST_CASE_RECONCILIATION_20261101.md "
-    },
-    {
-      "id": "branch-3d3d90da69db8978",
-      "title": "docs/update-implementation-overview",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "docs/update-implementation-overview ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
-    },
-    {
-      "id": "branch-eba30ce9ec0bfc2d",
-      "title": "docs/update-overview-relationship-growth",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "docs/update-overview-relationship-growth ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
     },
     {
       "id": "branch-e24f4962539bff58",
@@ -4827,68 +4751,6 @@
       "search_text": "feature/conversation-tuning-220 ブランチ差分を収録  {}   [] app/api/conversation-tuning/access/route.ts components/ConversationTuningPreview.tsx docs/CONVERSATION_TUNING_APP_220.md lib/conversation-tuning-owner-auth.ts lib/conversation-tuning-preview.ts tests/conversation-tuning-owner-auth.test.ts tests/conversation-tuning-preview.test.ts "
     },
     {
-      "id": "branch-70fc9c695854889a",
-      "title": "feature/proactive-derived-tags",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "feature/proactive-derived-tags ブランチ差分を収録  {}   [] supabase/functions/body-clock/proactive-decision.ts supabase/functions/body-clock/proactive-photo.ts "
-    },
-    {
-      "id": "branch-e9ece79f0b44197b",
-      "title": "fix/anonymous-chat-session-drop",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/anonymous-chat-session-drop ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx tests/account-conversation.test.cjs "
-    },
-    {
-      "id": "branch-3a1e2cf011e9082f",
-      "title": "fix/anonymous-email-history",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "開発管理",
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/anonymous-email-history ブランチ差分を収録  {}   [] app/account/page.tsx app/api/persona/history/route.ts app/chat/anonymous-session-guard.tsx app/chat/conversation-history-sync.tsx app/chat/layout.tsx lib/device-conversation.ts supabase/migrations/20260917051607_save_anonymous_conversation.sql tests/account-conversation.test.cjs "
-    },
-    {
-      "id": "branch-8876346d043651ec",
-      "title": "fix/anonymous-session-cache-reset",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/anonymous-session-cache-reset ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx "
-    },
-    {
       "id": "branch-1b5dc9cb22951e7b",
       "title": "fix/anonymous-session-recovery",
       "summary": "ブランチ差分を収録",
@@ -4919,37 +4781,6 @@
       "search_text": "fix/approval-board-leaked-source-20261104 ブランチ差分を収録  {}   [] docs/approval-dashboard/index.html scripts/check_approval_dashboard.py "
     },
     {
-      "id": "branch-c75612bc790b236d",
-      "title": "fix/body-clock-claim-rpc",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/body-clock-claim-rpc ブランチ差分を収録  {}   [] supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql "
-    },
-    {
-      "id": "branch-7e7349e1c0857db1",
-      "title": "fix/chat-failure-recovery",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/chat-failure-recovery ブランチ差分を収録  {}   [] app/api/chat/route.ts app/chat/page.tsx supabase/migrations/20260918081000_refund_failed_chat_usage.sql "
-    },
-    {
       "id": "branch-df9c3db950211b06",
       "title": "fix/chat-history-loading-207",
       "summary": "ブランチ差分を収録",
@@ -4965,51 +4796,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/chat-history-loading-207 ブランチ差分を収録  {}   [] app/chat/page.tsx tests/account-conversation.test.cjs tests/recovery-session.test.cjs "
-    },
-    {
-      "id": "branch-7ebc2377f6ae2086",
-      "title": "fix/chat-network-reliability",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/chat-network-reliability ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
-      "id": "branch-387e38e3f392a033",
-      "title": "fix/chat-reliability-cleanup",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/chat-reliability-cleanup ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
-      "id": "branch-bc36378a11db8be8",
-      "title": "fix/chat-request-diagnostics",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/chat-request-diagnostics ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
     },
     {
       "id": "branch-d4bd494d2ca8e9db",
@@ -5043,21 +4829,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/chat-spinner-layout-207 ブランチ差分を収録  {}   [] app/chat/layout.tsx app/chat/page.tsx "
-    },
-    {
-      "id": "branch-9c34b261ec31b7a0",
-      "title": "fix/chat-turn-dedupe",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/chat-turn-dedupe ブランチ差分を収録  {}   [] supabase/migrations/20260918014700_prevent_duplicate_chat_turn_sync.sql "
     },
     {
       "id": "branch-c03166e140979a0c",
@@ -5122,51 +4893,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/first-chat-welcome ブランチ差分を収録  {}   [] app/chat/page.tsx tests/account-conversation.test.cjs "
-    },
-    {
-      "id": "branch-48ad449fb30cd746",
-      "title": "fix/gemini-chat-timeout",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/gemini-chat-timeout ブランチ差分を収録  {}   [] app/api/chat/route.ts "
-    },
-    {
-      "id": "branch-48dee2d1fc902874",
-      "title": "fix/gemini-json-retry",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/gemini-json-retry ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
-      "id": "branch-e2b90b4f0cd4a282",
-      "title": "fix/grow-relationship-from-first-meeting",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/grow-relationship-from-first-meeting ブランチ差分を収録  {}   [] app/api/chat/route.ts lib/persona/fallback-persona.ts supabase/functions/body-clock/fallback-persona.ts supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql "
     },
     {
       "id": "branch-bbf5a2c293af40b5",
@@ -5382,21 +5108,6 @@
       "search_text": "fix/legacy-anonymous-confirmation-201 ブランチ差分を収録  {}   [] supabase/migrations/20261112083000_anonymous_confirmation_expiry.sql tests/forget-database.test.cjs "
     },
     {
-      "id": "branch-e06b8cf63a4b31eb",
-      "title": "fix/legacy-safari-cache",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/legacy-safari-cache ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx tests/account-conversation.test.cjs "
-    },
-    {
       "id": "branch-7e57fa94e13bd2cd",
       "title": "fix/lounge-js-syntax-tap-20261030",
       "summary": "ブランチ差分を収録",
@@ -5442,54 +5153,6 @@
       "search_text": "fix/lounge-transition-flash-20261030 ブランチ差分を収録  {}   [] docs/LOUNGE_SHORTCUT_PREVIEW_20261030.md public/lab/transparent-lounge-shortcuts/index.html public/lab/transparent-lounge-vertical/index.html "
     },
     {
-      "id": "branch-8317c1821e24026d",
-      "title": "fix/preserve-active-chat-history",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/preserve-active-chat-history ブランチ差分を収録  {}   [] app/chat/conversation-history-sync.tsx "
-    },
-    {
-      "id": "branch-7f356df67d09c22d",
-      "title": "fix/recall-history-grounding",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/recall-history-grounding ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
-      "id": "branch-70d16bafe238aa7a",
-      "title": "fix/recall-keep-recent-history",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/recall-keep-recent-history ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
       "id": "branch-d1691037dd1d0dbb",
       "title": "fix/relationship-analyzer-bounded-retry",
       "summary": "ブランチ差分を収録",
@@ -5519,22 +5182,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "fix/remove-driving-banner ブランチ差分を収録  {}   [] app/chat/page.tsx app/globals.css "
-    },
-    {
-      "id": "branch-637f3c0ed7eca805",
-      "title": "fix/safari-load-failed-message",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/safari-load-failed-message ブランチ差分を収録  {}   [] app/chat/page.tsx "
     },
     {
       "id": "branch-7a839c530ad00ad2",
@@ -5569,51 +5216,6 @@
       "search_text": "fix/solo-chat-entry-20261102 ブランチ差分を収録  {}   [] app/page.tsx docs/SOLO_ENTRY_HANDOVER_20261102.md public/lounge/entry.js public/lounge/index.html tests/browser/solo-entry.cjs tests/lounge-entry.test.cjs "
     },
     {
-      "id": "branch-992ef09e7aa2e87b",
-      "title": "fix/use-chat-proxy",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/use-chat-proxy ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
-    },
-    {
-      "id": "branch-c8b5b69bea16cfe8",
-      "title": "fix/workday-grounding",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/workday-grounding ブランチ差分を収録  {}   [] app/api/chat/route.ts "
-    },
-    {
-      "id": "branch-80302ec778694c1b",
-      "title": "perf/chat-stage-timing",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "perf/chat-stage-timing ブランチ差分を収録  {}   [] app/api/chat/route.ts "
-    },
-    {
       "id": "branch-d62bb5c53690d8c6",
       "title": "preview/external-ai-review-20261028",
       "summary": "ブランチ差分を収録",
@@ -5627,36 +5229,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "preview/external-ai-review-20261028 ブランチ差分を収録  {}   [] public/lab/external-ai-review/index.html "
-    },
-    {
-      "id": "branch-75d1d4d76110cc04",
-      "title": "refine/proactive-action-tags",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "refine/proactive-action-tags ブランチ差分を収録  {}   [] supabase/functions/body-clock/proactive-decision.ts "
-    },
-    {
-      "id": "branch-49565aee7bcfca71",
-      "title": "refine/sleepy-tag",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "refine/sleepy-tag ブランチ差分を収録  {}   [] supabase/functions/body-clock/index.ts supabase/functions/body-clock/proactive-decision.ts supabase/functions/body-clock/proactive-photo.ts "
     },
     {
       "id": "branch-d524b642d12d5b63",
@@ -6444,6 +6016,434 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "work/relationship-polarity-integer ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-5e09e6de95bfa770",
+      "title": "cleanup/legacy-proactive-tags",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "cleanup/legacy-proactive-tags ブランチ差分を収録  {}   [] lib/proactive-photo.ts "
+    },
+    {
+      "id": "branch-1a583769a497875d",
+      "title": "cleanup/remove-legacy-proactive-path",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "cleanup/remove-legacy-proactive-path ブランチ差分を収録  {}   [] app/api/body-clock/route.ts app/api/proactive/route.ts app/chat/page.tsx docs/IMPLEMENTATION_OVERVIEW.md lib/proactive-photo.ts "
+    },
+    {
+      "id": "branch-d1c7bd152670a9a9",
+      "title": "docs/audit-overview-against-source",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "docs/audit-overview-against-source ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
+    },
+    {
+      "id": "branch-3d3d90da69db8978",
+      "title": "docs/update-implementation-overview",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "docs/update-implementation-overview ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
+    },
+    {
+      "id": "branch-eba30ce9ec0bfc2d",
+      "title": "docs/update-overview-relationship-growth",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "docs/update-overview-relationship-growth ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
+    },
+    {
+      "id": "branch-70fc9c695854889a",
+      "title": "feature/proactive-derived-tags",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "feature/proactive-derived-tags ブランチ差分を収録  {}   [] supabase/functions/body-clock/proactive-decision.ts supabase/functions/body-clock/proactive-photo.ts "
+    },
+    {
+      "id": "branch-e9ece79f0b44197b",
+      "title": "fix/anonymous-chat-session-drop",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/anonymous-chat-session-drop ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx tests/account-conversation.test.cjs "
+    },
+    {
+      "id": "branch-3a1e2cf011e9082f",
+      "title": "fix/anonymous-email-history",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/anonymous-email-history ブランチ差分を収録  {}   [] app/account/page.tsx app/api/persona/history/route.ts app/chat/anonymous-session-guard.tsx app/chat/conversation-history-sync.tsx app/chat/layout.tsx lib/device-conversation.ts supabase/migrations/20260917051607_save_anonymous_conversation.sql tests/account-conversation.test.cjs "
+    },
+    {
+      "id": "branch-8876346d043651ec",
+      "title": "fix/anonymous-session-cache-reset",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/anonymous-session-cache-reset ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx "
+    },
+    {
+      "id": "branch-c75612bc790b236d",
+      "title": "fix/body-clock-claim-rpc",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/body-clock-claim-rpc ブランチ差分を収録  {}   [] supabase/migrations/20260917143500_fix_body_clock_claim_rpc.sql "
+    },
+    {
+      "id": "branch-7e7349e1c0857db1",
+      "title": "fix/chat-failure-recovery",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-failure-recovery ブランチ差分を収録  {}   [] app/api/chat/route.ts app/chat/page.tsx supabase/migrations/20260918081000_refund_failed_chat_usage.sql "
+    },
+    {
+      "id": "branch-7ebc2377f6ae2086",
+      "title": "fix/chat-network-reliability",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-network-reliability ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-387e38e3f392a033",
+      "title": "fix/chat-reliability-cleanup",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-reliability-cleanup ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-bc36378a11db8be8",
+      "title": "fix/chat-request-diagnostics",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-request-diagnostics ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-9c34b261ec31b7a0",
+      "title": "fix/chat-turn-dedupe",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/chat-turn-dedupe ブランチ差分を収録  {}   [] supabase/migrations/20260918014700_prevent_duplicate_chat_turn_sync.sql "
+    },
+    {
+      "id": "branch-48ad449fb30cd746",
+      "title": "fix/gemini-chat-timeout",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/gemini-chat-timeout ブランチ差分を収録  {}   [] app/api/chat/route.ts "
+    },
+    {
+      "id": "branch-48dee2d1fc902874",
+      "title": "fix/gemini-json-retry",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/gemini-json-retry ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-e2b90b4f0cd4a282",
+      "title": "fix/grow-relationship-from-first-meeting",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/grow-relationship-from-first-meeting ブランチ差分を収録  {}   [] app/api/chat/route.ts lib/persona/fallback-persona.ts supabase/functions/body-clock/fallback-persona.ts supabase/migrations/20260918030000_grow_relationship_from_first_meeting.sql "
+    },
+    {
+      "id": "branch-e06b8cf63a4b31eb",
+      "title": "fix/legacy-safari-cache",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/legacy-safari-cache ブランチ差分を収録  {}   [] app/chat/anonymous-session-guard.tsx tests/account-conversation.test.cjs "
+    },
+    {
+      "id": "branch-8317c1821e24026d",
+      "title": "fix/preserve-active-chat-history",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/preserve-active-chat-history ブランチ差分を収録  {}   [] app/chat/conversation-history-sync.tsx "
+    },
+    {
+      "id": "branch-7f356df67d09c22d",
+      "title": "fix/recall-history-grounding",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/recall-history-grounding ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-70d16bafe238aa7a",
+      "title": "fix/recall-keep-recent-history",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/recall-keep-recent-history ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-637f3c0ed7eca805",
+      "title": "fix/safari-load-failed-message",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/safari-load-failed-message ブランチ差分を収録  {}   [] app/chat/page.tsx "
+    },
+    {
+      "id": "branch-992ef09e7aa2e87b",
+      "title": "fix/use-chat-proxy",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/use-chat-proxy ブランチ差分を収録  {}   [] app/api/chat-proxy/route.ts "
+    },
+    {
+      "id": "branch-c8b5b69bea16cfe8",
+      "title": "fix/workday-grounding",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/workday-grounding ブランチ差分を収録  {}   [] app/api/chat/route.ts "
+    },
+    {
+      "id": "branch-80302ec778694c1b",
+      "title": "perf/chat-stage-timing",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "perf/chat-stage-timing ブランチ差分を収録  {}   [] app/api/chat/route.ts "
+    },
+    {
+      "id": "branch-75d1d4d76110cc04",
+      "title": "refine/proactive-action-tags",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "refine/proactive-action-tags ブランチ差分を収録  {}   [] supabase/functions/body-clock/proactive-decision.ts "
+    },
+    {
+      "id": "branch-49565aee7bcfca71",
+      "title": "refine/sleepy-tag",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "refine/sleepy-tag ブランチ差分を収録  {}   [] supabase/functions/body-clock/index.ts supabase/functions/body-clock/proactive-decision.ts supabase/functions/body-clock/proactive-photo.ts "
     }
   ]
 }

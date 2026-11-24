@@ -18,7 +18,7 @@
 
 **次の作業：** 類似コード・既存結論を確認し、未解決条件だけを次の作業にする
 
-根拠取得日時 (UTC)：2026-11-09T09:02:40.107460+00:00
+根拠取得日時 (UTC)：2026-11-24T10:54:36.101084+00:00
 
 ## 日本語で確認した成果
 
@@ -57,7 +57,7 @@ HISTORY_DIAGNOSTIC_PREFIX、MAX_MEMORY、PARSE_ERROR_MESSAGE、POST、SUPABASE_P
 
 ```text
 diff --git a/app/api/chat-proxy/route.ts b/app/api/chat-proxy/route.ts
-index 083c551..efb7e40 100644
+index 083c5512..efb7e40c 100644
 --- a/app/api/chat-proxy/route.ts
 +++ b/app/api/chat-proxy/route.ts
 @@ -8,6 +8,7 @@ const SUPABASE_PUBLISHABLE_KEY =
