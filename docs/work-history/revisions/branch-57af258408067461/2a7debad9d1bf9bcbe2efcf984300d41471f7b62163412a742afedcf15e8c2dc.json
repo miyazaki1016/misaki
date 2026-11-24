@@ -1,0 +1,28 @@
+{
+  "id": "branch-57af258408067461",
+  "title": "fix/lounge-tap-hint",
+  "head": "a952950acc6ad9dcd4be7cced948058fadb60fac",
+  "head_ref": "fix/lounge-tap-hint",
+  "linked_prs": [
+    217
+  ],
+  "files": [
+    {
+      "path": "public/lounge/index.html",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/a952950acc6ad9dcd4be7cced948058fadb60fac/public/lounge/index.html"
+    }
+  ],
+  "commits": "a952950acc6ad9dcd4be7cced948058fadb60fac ラウンジに女の子をタップする案内を表示 #216",
+  "topics": [
+    "ラウンジ・画面"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "aad8336affcd2227a3fc59e2a08322eb31af506cf3fa40989e269e9f22b30b6a",
+  "collected_at": "2026-11-24T08:48:49.983562+00:00"
+}

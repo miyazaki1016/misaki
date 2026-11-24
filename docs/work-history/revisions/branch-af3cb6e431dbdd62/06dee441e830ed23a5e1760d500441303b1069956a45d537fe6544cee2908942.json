@@ -1,0 +1,20 @@
+{
+  "id": "branch-af3cb6e431dbdd62",
+  "title": "docs/misaki-memory-public-final-20261030",
+  "head": "a4ea7b00da0f213bb865a40044b46d6973f859dd",
+  "head_ref": "docs/misaki-memory-public-final-20261030",
+  "linked_prs": [
+    101
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "記憶・会話"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "6fc57b3da53b12ff7ff7d92d3092e2b1e97d35057d1417e095ab1ecf22e0e6c3",
+  "collected_at": "2026-11-24T08:48:49.983562+00:00"
+}

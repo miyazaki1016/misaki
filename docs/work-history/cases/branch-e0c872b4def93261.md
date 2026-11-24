@@ -18,14 +18,14 @@
 
 関連PR：[#32](https://github.com/miyazaki1016/misaki/pull/32)
 
-根拠取得日時 (UTC)：2026-11-19T08:52:57.311795+00:00
+根拠取得日時 (UTC)：2026-11-24T08:48:49.983562+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [docs/IMPLEMENTATION_OVERVIEW.md](https://github.com/miyazaki1016/misaki/blob/0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359/docs/IMPLEMENTATION_OVERVIEW.md)：先頭18000文字・原本リンク参照
+- [docs/IMPLEMENTATION_OVERVIEW.md](https://github.com/miyazaki1016/misaki/blob/0f10f0506c95fdf0aadf8d0fd7f4afa6ec14f359/docs/IMPLEMENTATION_OVERVIEW.md)：全文
 
 ## 検証実行の事実
 

@@ -16,14 +16,14 @@
 
 **次の作業：** 関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない
 
-根拠取得日時 (UTC)：2026-11-19T08:52:57.311795+00:00
+根拠取得日時 (UTC)：2026-11-24T08:48:49.983562+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [app/api/chat/route.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/app/api/chat/route.ts)：先頭18000文字・原本リンク参照
+- [app/api/chat/route.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/app/api/chat/route.ts)：全文
 - [docs/IMPLEMENTATION_OVERVIEW.md](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/docs/IMPLEMENTATION_OVERVIEW.md)：サイズ上限120KB・原本リンク参照
 - [docs/conversation-context-compression-spike.md](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/docs/conversation-context-compression-spike.md)：全文
 - [lib/canonical-state.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/lib/canonical-state.ts)：全文
@@ -34,7 +34,7 @@
 - [lib/relationship-engine-v1.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/lib/relationship-engine-v1.ts)：全文
 - [lib/relationship-identity-resolver.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/lib/relationship-identity-resolver.ts)：全文
 - [lib/relationship-runtime-v1.ts](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/lib/relationship-runtime-v1.ts)：全文
-- [package-lock.json](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/package-lock.json)：先頭18000文字・原本リンク参照
+- [package-lock.json](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/package-lock.json)：全文
 - [package.json](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/package.json)：全文
 - [supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql)：全文
 - [supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql](https://github.com/miyazaki1016/misaki/blob/10275b666387115ced06312570111b21d0276e17/supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql)：全文

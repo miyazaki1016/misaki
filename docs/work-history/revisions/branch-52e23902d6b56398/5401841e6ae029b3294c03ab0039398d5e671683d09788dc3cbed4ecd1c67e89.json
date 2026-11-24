@@ -1,0 +1,28 @@
+{
+  "id": "branch-52e23902d6b56398",
+  "title": "feat/misaki-lp-refresh-204",
+  "head": "1c3cc6efc58d1cf2241df26c0a9891ee062967e9",
+  "head_ref": "feat/misaki-lp-refresh-204",
+  "linked_prs": [
+    205
+  ],
+  "files": [
+    {
+      "path": "app/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/1c3cc6efc58d1cf2241df26c0a9891ee062967e9/app/page.tsx"
+    }
+  ],
+  "commits": "1c3cc6efc58d1cf2241df26c0a9891ee062967e9 Refresh Misaki landing page copy and conversation examples (#204)",
+  "topics": [
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "5afe2211f069c2862bd446bf5bc778cf7587c89956c25de0a240aacef8f9f09c",
+  "collected_at": "2026-11-24T08:48:49.983562+00:00"
+}

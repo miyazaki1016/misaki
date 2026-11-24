@@ -18,14 +18,15 @@
 
 関連PR：[#219](https://github.com/miyazaki1016/misaki/pull/219)
 
-根拠取得日時 (UTC)：2026-11-23T09:02:36.779731+00:00
+根拠取得日時 (UTC)：2026-11-24T08:48:49.983562+00:00
 
 
 ## 実際の変更処理（コードから抽出）
 
 差分・ソースを参照
 
-- [docs/CONVERSATION_MATURITY_REVIEW_218.md](https://github.com/miyazaki1016/misaki/blob/4f42ece4e7c8136dfdad027e0c7776fb35462f47/docs/CONVERSATION_MATURITY_REVIEW_218.md)：同一HEADのPR案件に原文収録
+- [docs/CONVERSATION_MATURITY_REVIEW_218.md](https://github.com/miyazaki1016/misaki/blob/0bc925c58abf1c678b7deaeac0509d95c33f55ab/docs/CONVERSATION_MATURITY_REVIEW_218.md)：同一HEADのPR案件に原文収録
+- [tests/relationship-source-of-truth-contract.test.cjs](https://github.com/miyazaki1016/misaki/blob/0bc925c58abf1c678b7deaeac0509d95c33f55ab/tests/relationship-source-of-truth-contract.test.cjs)：同一HEADのPR案件に原文収録
 
 ## 検証実行の事実
 
