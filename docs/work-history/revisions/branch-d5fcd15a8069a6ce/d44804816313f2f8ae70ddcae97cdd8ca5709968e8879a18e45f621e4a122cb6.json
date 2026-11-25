@@ -1,0 +1,21 @@
+{
+  "id": "branch-d5fcd15a8069a6ce",
+  "title": "sora/gemini-timeout-retry",
+  "head": "862cfa6c2ce6e45b7ccbc294270f3ba02548ed2a",
+  "head_ref": "sora/gemini-timeout-retry",
+  "linked_prs": [
+    43
+  ],
+  "files": [],
+  "commits": "",
+  "topics": [
+    "その他の開発"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "eea8eb92311e0cdc148f659a26901b2c1cc1baba8381ed10a931a90a10c44cc8",
+  "collected_at": "2026-11-25T02:31:11.968081+00:00",
+  "archived": true
+}
