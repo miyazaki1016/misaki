@@ -1,0 +1,36 @@
+{
+  "id": "branch-25687bc1ec63df34",
+  "title": "fix/first-chat-welcome",
+  "head": "763127f28480d5fdeaf13378c4768777473984df",
+  "head_ref": "fix/first-chat-welcome",
+  "linked_prs": [
+    211
+  ],
+  "files": [
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/app/chat/page.tsx"
+    },
+    {
+      "path": "tests/account-conversation.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/763127f28480d5fdeaf13378c4768777473984df/tests/account-conversation.test.cjs"
+    }
+  ],
+  "commits": "763127f28480d5fdeaf13378c4768777473984df 履歴表示の種別判定をサーバー読み込み処理から独立させる\ndd677b3b2d4ab57b902f9f9344fa2699251afdec 初回チャットの歓迎表示と履歴取得の分岐 #210\n55614093ee125d847bece38a5ae78dc8a7165217 初回チャットの歓迎表示と履歴取得の分岐 #210",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "352da4648ed8a16718a416a0bc366229a43e492f1036a2e2423d1c719c9e8623",
+  "collected_at": "2026-11-25T02:31:11.968081+00:00"
+}

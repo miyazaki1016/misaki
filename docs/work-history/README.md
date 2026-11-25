@@ -4,7 +4,7 @@
 
 実装の存在、検証の成功、main統合、本番反映を別々に扱います。未確認を完成扱いしません。
 
-更新 (UTC): 2026-11-24T10:54:36.101084+00:00
+更新 (UTC): 2026-11-25T02:31:11.968081+00:00
 
 ## 全案件
 
@@ -23,6 +23,7 @@
 | [fix/ledger-proposal-table-columns-20261101](cases/branch-08e76fdd73cd4686.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/lounge-chat-handoff-20261030](cases/branch-0ab2785a8deb3215.md) | 記憶・会話・ラウンジ・画面：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [work/relationship-error-diagnostics](cases/branch-0b40fb0e2197e346.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
+| [fix/preflight-live-recheck](cases/branch-1197d81e10313c32.md) | その他の開発：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [docs/development-registry-audit-20261020](cases/branch-122879809eace954.md) | 記憶・会話・開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [feat/pr-review-handoff-queue-20261102](cases/branch-136d018fe1cd5ebc.md) | 開発管理：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
 | [chore/restore-relationship-rpc-migration](cases/branch-155e832b29009650.md) | 記憶・会話：mainとのソース差分を収録・関連PRを照合 | 未確認 | 未確認 |
@@ -345,6 +346,7 @@
 | [総覧を最新mainソースと再照合する](cases/pr-22.md) | その他の開発：総覧を最新mainソースと再照合する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [[Draft] #220 会話チューニングアプリ：プレビュー・最小契約・安全な反映設計](cases/pr-221.md) | 記憶・会話・認証・安全性：会話や記憶・関係性を扱う処理の変更／認証・アクセス制御に関する変更 | main祖先として未確認（squash・同等実装は別途照合） | 未確認 |
 | [実装判断を着手前の自動照合に接続し履歴抽出を拡充](cases/pr-225.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
+| [着手前照合の最新原本再取得と再実行の改善](cases/pr-228.md) | 開発管理：開発資産の把握・引継ぎ・レビューを支援する変更 | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [旧ブラウザ自発メッセージ経路を削除する](cases/pr-23.md) | 記憶・会話・画面・表示：旧ブラウザ自発メッセージ経路を削除する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [匿名セッションの一時切断で会話を消さない](cases/pr-24.md) | 記憶・会話：匿名セッションの一時切断で会話を消さない | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
 | [Gemini返答待ちにタイムアウトと診断ログを追加する](cases/pr-25.md) | 記憶・会話：Gemini返答待ちにタイムアウトと診断ログを追加する | mainに祖先コミットとして存在（機能受入・本番は別） | 未確認 |
@@ -558,7 +560,7 @@
 - scripts/context-ab-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
 - scripts/context-ab-quality-live.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-194](cases/pr-194.md), [pr-78](cases/pr-78.md)
 - scripts/context-ab-smoke.ts：[branch-8fb3e7f76aab269c](cases/branch-8fb3e7f76aab269c.md), [branch-f2dba8e26e4c9402](cases/branch-f2dba8e26e4c9402.md), [pr-78](cases/pr-78.md)
-- scripts/development-preflight-publish.mjs：[branch-ffc3354680bad3ec](cases/branch-ffc3354680bad3ec.md), [pr-175](cases/pr-175.md)
+- scripts/development-preflight-publish.mjs：[branch-ffc3354680bad3ec](cases/branch-ffc3354680bad3ec.md), [pr-175](cases/pr-175.md), [pr-228](cases/pr-228.md)
 - scripts/development_branch_case_handoff.py：[branch-38e6283b99123cd5](cases/branch-38e6283b99123cd5.md), [pr-147](cases/pr-147.md)
 - scripts/development_branch_compare.py：[branch-35677a391b35c95c](cases/branch-35677a391b35c95c.md), [branch-b23be022a75304ba](cases/branch-b23be022a75304ba.md), [branch-ed894c05ef854553](cases/branch-ed894c05ef854553.md), [pr-139](cases/pr-139.md), [pr-145](cases/pr-145.md), [pr-148](cases/pr-148.md)
 - scripts/development_branch_review_queue.py：[branch-2f842ea0ac1d18a4](cases/branch-2f842ea0ac1d18a4.md), [pr-149](cases/pr-149.md)
@@ -568,7 +570,7 @@
 - scripts/development_inventory.py：[branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d92ca54cbab20357](cases/branch-d92ca54cbab20357.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-103](cases/pr-103.md), [pr-116](cases/pr-116.md), [pr-122](cases/pr-122.md)
 - scripts/development_inventory_delta.py：[branch-1601ee37d65ba186](cases/branch-1601ee37d65ba186.md), [branch-4fd3d1bdc2b892c1](cases/branch-4fd3d1bdc2b892c1.md), [branch-7ea3560ec516692d](cases/branch-7ea3560ec516692d.md), [branch-b30df8ff98a54148](cases/branch-b30df8ff98a54148.md), [branch-b34c306bc7fd0b72](cases/branch-b34c306bc7fd0b72.md), [branch-b5b1d46a6468bd59](cases/branch-b5b1d46a6468bd59.md), [branch-d5f02538fc12def5](cases/branch-d5f02538fc12def5.md), [branch-f54fba9240a4e12b](cases/branch-f54fba9240a4e12b.md), [pr-116](cases/pr-116.md), [pr-118](cases/pr-118.md), [pr-119](cases/pr-119.md), [pr-120](cases/pr-120.md), [pr-121](cases/pr-121.md), [pr-122](cases/pr-122.md), [pr-123](cases/pr-123.md), [pr-132](cases/pr-132.md)
 - scripts/development_ledger_proposal.py：[branch-08e76fdd73cd4686](cases/branch-08e76fdd73cd4686.md), [branch-3ab6bf48d6ece55f](cases/branch-3ab6bf48d6ece55f.md), [branch-7b4c2cf2503a3179](cases/branch-7b4c2cf2503a3179.md), [branch-ac4d9f4766a37ec1](cases/branch-ac4d9f4766a37ec1.md), [pr-124](cases/pr-124.md), [pr-125](cases/pr-125.md), [pr-126](cases/pr-126.md), [pr-128](cases/pr-128.md)
-- scripts/development_preflight.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-3299e830fba85cfb](cases/branch-3299e830fba85cfb.md), [pr-171](cases/pr-171.md), [pr-225](cases/pr-225.md)
+- scripts/development_preflight.py：[branch-01116240ec96678b](cases/branch-01116240ec96678b.md), [branch-3299e830fba85cfb](cases/branch-3299e830fba85cfb.md), [pr-171](cases/pr-171.md), [pr-225](cases/pr-225.md), [pr-228](cases/pr-228.md)
 - scripts/development_resume.py：[branch-33f4a4f17ebfada9](cases/branch-33f4a4f17ebfada9.md), [branch-aa6ccfcaeac7df87](cases/branch-aa6ccfcaeac7df87.md), [pr-183](cases/pr-183.md), [pr-186](cases/pr-186.md)
 - scripts/development_work_history.py：[branch-d63cd059b3aaad0f](cases/branch-d63cd059b3aaad0f.md), [pr-166](cases/pr-166.md)
 - scripts/pr_approval_routing.py：[branch-7ae456f5639d43f4](cases/branch-7ae456f5639d43f4.md), [pr-137](cases/pr-137.md)

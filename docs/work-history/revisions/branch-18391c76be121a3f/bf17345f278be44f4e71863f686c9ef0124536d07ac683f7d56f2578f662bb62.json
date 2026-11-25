@@ -1,0 +1,36 @@
+{
+  "id": "branch-18391c76be121a3f",
+  "title": "fix/chat-spinner-layout-207",
+  "head": "7c2c2e90971ffa7c17cd2ad5923a9492f6f73a77",
+  "head_ref": "fix/chat-spinner-layout-207",
+  "linked_prs": [
+    209
+  ],
+  "files": [
+    {
+      "path": "app/chat/layout.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/7c2c2e90971ffa7c17cd2ad5923a9492f6f73a77/app/chat/layout.tsx"
+    },
+    {
+      "path": "app/chat/page.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/7c2c2e90971ffa7c17cd2ad5923a9492f6f73a77/app/chat/page.tsx"
+    }
+  ],
+  "commits": "7c2c2e90971ffa7c17cd2ad5923a9492f6f73a77 Keep the history spinner CSS in the shared chat layout (#207)",
+  "topics": [
+    "記憶・会話",
+    "画面・表示"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "2c490cdef8812fa5003756e25162ac107ba36e73832b4e8c4102776711ccbd8d",
+  "collected_at": "2026-11-25T02:31:11.968081+00:00"
+}
