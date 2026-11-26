@@ -42,7 +42,6 @@
 | #192 | 美咲エンジン総点検とP0の検証結果を開発台帳に記録 | docs/engine-audit-102-20261112 |
 | #194 | test: add bounded synthetic context A/B quality evaluation (#184) | work/context-ab-quality-budget-guard-184 |
 | #199 | 会話研究室：判断材料の選別・理由記録の純粋ロジック（第1段階） | feat/life-context-engine-198 |
-| #219 | Draft: 美咲の会話成熟化3ブロック統合レビュー（#218） | docs/conversation-maturity-218 |
 | #221 | [Draft] #220 会話チューニングアプリ：プレビュー・最小契約・安全な反映設計 | feature/conversation-tuning-220 |
 
 全ブランチのmain差分と滞留候補はGitHub Actionsのdevelopment-inventory成果物を参照。
