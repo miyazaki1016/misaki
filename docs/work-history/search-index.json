@@ -1,12 +1,12 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-27T00:47:12.805808+00:00",
+  "generated_at": "2026-11-27T09:40:17.749705+00:00",
   "coverage": {
     "prs": 199,
     "pr_cases": 199,
-    "branches": 49,
+    "branches": 42,
     "errors": [],
-    "api_calls": 5
+    "api_calls": 17
   },
   "cases": [
     {
@@ -273,7 +273,7 @@
       "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
       "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
       "production": "未確認（main統合／Vercelプレビューから推定しない）",
-      "search_text": "test: add bounded synthetic context A/B quality evaluation (#184) 変更対象ファイルに関する開発。具体的な目的は原文・差分を確認  {} Issue #184 / preflight REVIEW_RECORDED: https://github.com/miyazaki1016/misaki/actions/runs/43025723023\n\nExtends PR #78 without modifying its existing branch. Adds estimated-cost stop guard ($0.04), max 14 calls, max 256 output tokens, usageMetadata accounting and fallback on failures to the existing synthetic-only quality evaluator.\n\nReview pending: CI and isolated test validation; Gemini live run not performed. Estimated cost is not a billing cap. No real user conversations, production DB, merge or production deployment. Keep Draft until latest HEAD checks and safe live evaluation are verified.\n\nhistory-preflight: pr-78 = extend; reuse existing makePromptVariants and seven synthetic scenarios, do not repeat prior 60-turn measurement. INPUT_USD_PER_MILLION MAX_CALLS MAX_OUTPUT_TOKENS OUTPUT_USD_PER_MILLION STOP_ESTIMATED_USD apiKey captured count delayMs estimatedUsd exportReview fixture input inputChars instruction metrics model output parsed passed payload raw replies reply reservedUsd response result reviewItems reviewKeys scenario scenarioCounts scenarioHistory stats swap totals usage usageAccounted usageByVariant usageMissing useLongHistory valid variant variants [{\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const MAX_CALLS = 14;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const MAX_OUTPUT_TOKENS = 256;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const STOP_ESTIMATED_USD = 0.04;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const INPUT_USD_PER_MILLION = 0.25;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const OUTPUT_USD_PER_MILLION = 1.5;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (count >= MAX_CALLS) throw new Error(\\\"Maximum Gemini call count reached\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) throw new Error(\\\"Estimated cost guard reached\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (usage && Number.isFinite(usage.promptTokenCount) && Number.isFinite(usage.candidatesTokenCount)) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/8d7b732fb19ef45c8148c135fffb94451e9bd9ea/scripts/context-ab-quality-live.ts\"}] scripts/context-ab-quality-live.ts "
+      "search_text": "test: add bounded synthetic context A/B quality evaluation (#184) 変更対象ファイルに関する開発。具体的な目的は原文・差分を確認  {} Issue #184 / preflight REVIEW_RECORDED: https://github.com/miyazaki1016/misaki/actions/runs/43025723023\n\nExtends PR #78 without modifying its existing branch. Adds estimated-cost stop guard ($0.04), max 14 calls, max 256 output tokens, usageMetadata accounting and fallback on failures to the existing synthetic-only quality evaluator.\n\nReview pending: CI and isolated test validation; Gemini live run not performed. Estimated cost is not a billing cap. No real user conversations, production DB, merge or production deployment. Keep Draft until latest HEAD checks and safe live evaluation are verified.\n\nhistory-preflight: pr-78 = extend; reuse existing makePromptVariants and seven synthetic scenarios, do not repeat prior 60-turn measurement. MAX_CALLS MAX_OUTPUT_TOKENS STOP_ESTIMATED_USD apiKey body captured count delayMs estimatedUsd expected exportReview fixture input instruction metrics model output parsed passed payload preload rates raw replies reply reservedUsd response result reviewItems reviewKeys run scenario scenarioCounts scenarioHistory standardRates stats stopReason stub summary swap totals usage usageAccounted usageByVariant usageMissing useLongHistory valid validCount variant variants [{\"file\": \".github/workflows/isolated-replay-tests.yml\", \"kind\": \"テストの期待値・条件\", \"expression\": \"run: node --test --experimental-strip-types tests/context-ab-quality-budget.test.ts\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/.github/workflows/isolated-replay-tests.yml\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const MAX_CALLS = 14;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const MAX_OUTPUT_TOKENS = 256;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"const STOP_ESTIMATED_USD = 0.04;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!rates) throw new Error(\\\"No verified standard text price for model\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (count >= MAX_CALLS) throw new Error(\\\"Maximum Gemini call count reached\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (usage && validCount(usage.promptTokenCount) && validCount(usage.candidatesTokenCount) &&\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (usageMissing || estimatedUsd >= STOP_ESTIMATED_USD) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"scripts/context-ab-quality-live.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (stopReason) process.exitCode = 1;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"import test from \\\"node:test\\\";\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"import assert from \\\"node:assert/strict\\\";\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (generationConfig.thinkingConfig.thinkingBudget !== 0 || generationConfig.maxOutputTokens !== 256) {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (process.env.PROBE === \\\"budget\\\") usage.promptTokenCount = 150000;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (process.env.PROBE === \\\"invalid\\\") usage.candidatesTokenCount = -1;\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (process.env.PROBE === \\\"timeout\\\") throw Error(\\\"synthetic timeout\\\");\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"test(`offline budget guard: ${model} / ${probe}`, () => {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(run.status, stopReason ? 1 : 0, run.stderr);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(run.stderr.split(\\\"stub-call\\\").length - 1, calls);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"条件分岐・閾値\", \"expression\": \"if (probe === \\\"unknown\\\") {\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.match(run.stderr, /No verified standard text price/);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}, {\"file\": \"tests/context-ab-quality-budget.test.ts\", \"kind\": \"テストの期待値・条件\", \"expression\": \"assert.equal(summary.stopReason, stopReason);\", \"url\": \"https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts\"}] .github/workflows/isolated-replay-tests.yml scripts/context-ab-quality-live.ts tests/context-ab-quality-budget.test.ts import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {prepareApprovedReplayFixture} from \"../lib/context-ab-approved-replay.ts\";\n\ntest(\"maps approved turns to Gemini roles without modifying the source\", () => {\n  const source = [\n    {role:\"user\",text:\"こんにちは\"},\n    {role:\"misaki\",text:\"おはよう\"},\n    {role:\"user\",text:\"今日はどう？\"},\n  ];\n  const before = JSON.stringify(source);\n  const fixture = prepareApprovedReplayFixture(source);\n  assert.deepEqual(fixture.history,[\n    {role:\"user\",parts:[{text:\"こんにちは\"}]},\n    {role:\"model\",parts:[{text:\"おはよう\"}]},\n  ]);\n  assert.equal(fixture.nextUserText,\"今日はどう？\");\n  assert.deepEqual(fixture.counts,{historyMessages:2,userMessages:1,modelMessages:1});\n  assert.equal(JSON.stringify(source),before);\n});\n\ntest(\"supports all 60 stored turns with a separate next user message\",()=>{\n  const turns=Array.from({length:60},(_,i)=>({role:i%2===0?\"user\":\"misaki\",text:`turn ${i}`}));\n  const fixture=prepareApprovedReplayFixture(turns,\"次の発言\");\n  assert.equal(fixture.history.length,60);\n  assert.equal(fixture.nextUserText,\"次の発言\");\n  assert.deepEqual(fixture.counts,{historyMessages:60,userMessages:30,modelMessages:30});\n});\n\ntest(\"rejects malformed and unknown roles\",()=>{\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"system\",text:\"x\"},{role:\"misaki\",text:\"y\"},{role:\"user\",text:\"z\"}]),/Unsupported/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"y\"},{role:\"misaki\",text:\"z\"}]),/Last turn/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"\"}],\"hi\"),/Invalid role/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"y\"}],\"\"),/Invalid next/);\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {measureBalancedABBA} from \"../lib/context-ab-balanced.ts\";\n\ntest(\"balanced order, equal inputs and numeric-only results\",async()=>{\n const seen:string[]=[];\n const snapshot={\n  systemPromptTemplate:\"美咲です。\\n{{RECENT_REPLY_SECTION}}\\nJSONで返答してください。\",\n  recentReplies:[\"前の返答\"],history:[{role:\"user\" as const,text:\"こんにちは\"}],userText:\"またね\",\n };\n const result=await measureBalancedABBA(snapshot,async request=>{\n  const variant=request.systemInstruction.includes(\"【直近の美咲の発言】\")?\"A\":\"B\";\n  seen.push(variant);\n  assert.equal(request.userText,\"またね\");\n  assert.equal(request.history[0].text,\"こんにちは\");\n  return {latencyMs:variant===\"A\"?100:200,promptTokens:variant===\"A\"?90:80,outputTokens:10,success:true,jsonValid:true,timedOut:false};\n });\n assert.deepEqual(seen,[\"A\",\"B\",\"B\",\"A\"]);\n assert.equal(result.A.runs,2);\n assert.equal(result.B.runs,2);\n assert.equal(result.A.meanLatencyMs,100);\n assert.equal(result.B.meanLatencyMs,200);\n assert.equal(result.A.meanPromptTokens,90);\n assert.equal(result.B.meanPromptTokens,80);\n assert.equal(JSON.stringify(result).includes(\"こんにちは\"),false);\n});\ntest(\"failed trials are excluded from latency means\",async()=>{\n let i=0;\n const result=await measureBalancedABBA({\n  systemPromptTemplate:\"{{RECENT_REPLY_SECTION}}\",recentReplies:[],history:[],userText:\"hello\",\n },async()=>{i++;return {latencyMs:i*100,promptTokens:null,outputTokens:null,success:i!==1,jsonValid:i!==1,timedOut:i===1};});\n assert.equal(result.A.successes,1);\n assert.equal(result.B.successes,2);\n assert.equal(result.A.meanLatencyMs,400);\n assert.equal(result.B.meanLatencyMs,250);\n});\n import assert from \"node:assert/strict\";\nimport test from \"node:test\";\nimport {qualityScenarios,assessQualityReply,summarizeBlindQuality} from \"../lib/context-ab-quality.ts\";\n\ntest(\"quality scenarios have unique IDs and deterministic checks\",()=>{\n  assert.equal(qualityScenarios.length,7);\n  assert.equal(new Set(qualityScenarios.map(s=>s.id)).size,qualityScenarios.length);\n  for(const scenario of qualityScenarios){\n    assert.ok(scenario.history.length>0);\n    assert.equal(assessQualityReply(scenario,\"\").nonempty,false);\n    for(const forbidden of scenario.forbiddenTerms){\n      assert.equal(\n        assessQualityReply(scenario,forbidden).unsupportedClaimsAbsent,\n        false,\n        `Scenario ${scenario.id} should reject forbidden text: ${forbidden}`,\n      );\n    }\n    assert.equal(assessQualityReply(scenario,\"自然な返答です\").unsupportedClaimsAbsent,true);\n    for(const expected of scenario.expectedTerms){\n      assert.equal(\n        assessQualityReply(scenario,expected).expectedFactsPresent,\n        true,\n        `Scenario ${scenario.id} should accept expected fact: ${expected}`,\n      );\n    }\n    assert.equal(assessQualityReply(scenario,\"関係ない文章\").expectedFactsPresent,scenario.expectedTerms.length===0);\n  }\n});\n\ntest(\"blind quality summary compares all five axes and detects ties\",()=>{\n  const result=summarizeBlindQuality({\n    left:{memory:2,relationship:1,continuity:2,repetition:2,naturalness:1},\n    right:{memory:1,relationship:1,continuity:1,repetition:2,naturalness:1},\n  });\n  assert.equal(result.scores.length,5);\n  assert.equal(result.leftTotal,8);\n  assert.equal(result.rightTotal,6);\n  assert.equal(result.overall,\"left\");\n  assert.deepEqual(result.scores.map(s=>s.winner),[\"left\",\"tie\",\"left\",\"tie\",\"tie\"]);\n  const tied=summarizeBlindQuality({\n    left:{memory:1,relationship:1,continuity:1,repetition:1,naturalness:1},\n    right:{memory:1,relationship:1,continuity:1,repetition:1,naturalness:1},\n  });\n  assert.equal(tied.overall,\"tie\");\n  assert.deepEqual(tied.safetyBlocker,{left:true,right:true,any:true});\n});\n\n\ntest(\"blind quality summary supports the documented five-point scale\",()=>{\n  const result=summarizeBlindQuality({\n    left:{memory:5,relationship:4,continuity:5,repetition:4,naturalness:5},\n    right:{memory:4,relationship:4,continuity:3,repetition:4,naturalness:2},\n  });\n  assert.equal(result.leftTotal,23);\n  assert.equal(result.rightTotal,17);\n  assert.equal(result.overall,\"left\");\n  assert.equal(result.scores.find(s=>s.axis===\"naturalness\")?.right,2);\n  assert.deepEqual(result.safetyBlocker,{left:false,right:true,any:true});\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {selectLastUserReplayBoundary} from \"../lib/context-ab-replay-boundary.ts\";\n\ntest(\"replays last user and excludes future model messages\",()=>{\n const fixture=selectLastUserReplayBoundary([\n  {role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"},\n  {role:\"user\",text:\"c\"},{role:\"misaki\",text:\"future reply\"},\n ]);\n assert.equal(fixture.nextUserText,\"c\");\n assert.deepEqual(fixture.history.map(t=>t.parts[0].text),[\"a\",\"b\"]);\n});\ntest(\"handles consecutive model replies\",()=>{\n const fixture=selectLastUserReplayBoundary([\n  {role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"},\n  {role:\"misaki\",text:\"c\"},{role:\"user\",text:\"d\"},\n ]);\n assert.equal(fixture.nextUserText,\"d\");\n assert.deepEqual(fixture.history.map(t=>t.role),[\"user\",\"model\",\"model\"]);\n});\ntest(\"rejects missing replay boundary\",()=>{\n assert.throws(()=>selectLastUserReplayBoundary([{role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"}]),/Not enough context/);\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {prepareApprovedReplayFixture} from \"../lib/context-ab-approved-replay.ts\";\nimport {preflightApprovedReplay,summarizeReplayPreflight} from \"../lib/context-ab-replay-preflight.ts\";\n\ntest(\"keeps consecutive Misaki messages in their original order\",()=>{\n const turns=[\n  {role:\"user\",text:\"今なにしてる？\"},\n  {role:\"misaki\",text:\"お茶を飲んでるよ\"},\n  {role:\"misaki\",text:\"そういえば、今日はどうだった？\"},\n  {role:\"user\",text:\"仕事だったよ\"},\n  {role:\"misaki\",text:\"お疲れさま\"},\n ];\n const before=JSON.stringify(turns);\n const fixture=prepareApprovedReplayFixture(turns,\"もう少し話そう\");\n assert.deepEqual(fixture.history.map(turn=>turn.parts[0].text),turns.map(turn=>turn.text));\n assert.deepEqual(fixture.history.map(turn=>turn.role),[\"user\",\"model\",\"model\",\"user\",\"model\"]);\n assert.deepEqual(fixture.counts,{historyMessages:5,userMessages:2,modelMessages:3});\n assert.equal(JSON.stringify(turns),before);\n});\ntest(\"preflight retains all 60 turns even when roles are not alternating\",()=>{\n const turns=Array.from({length:60},(_,i)=>({\n  role:i%3===0?\"user\":\"misaki\",\n  text:`synthetic turn ${i}`,\n }));\n const result=preflightApprovedReplay(turns,\"続きは？\");\n assert.equal(result.fixture.history.length,60);\n assert.deepEqual(result.fixture.history.map(x=>x.parts[0].text),turns.map(x=>x.text));\n assert.deepEqual(summarizeReplayPreflight(result),{\n  historyMessages:60,userMessages:20,modelMessages:40,\n  flaggedTurns:0,manualReviewRequired:true,eligibleForAutomaticModelSubmission:false,\n });\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {preflightApprovedReplay,summarizeReplayPreflight} from \"../lib/context-ab-replay-preflight.ts\";\n\ntest(\"preflight maps a local conversation and reports numeric-only diagnostics\",()=>{\n const source=[\n  {role:\"user\",text:\"test@example.com\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n  {role:\"user\",text:\"また話そう\"},\n ];\n const result=preflightApprovedReplay(source);\n assert.equal(result.fixture.history.length,2);\n assert.equal(result.privacy.findings.length,1);\n assert.deepEqual(summarizeReplayPreflight(result),{\n  historyMessages:2,userMessages:1,modelMessages:1,\n  flaggedTurns:1,manualReviewRequired:true,eligibleForAutomaticModelSubmission:false,\n });\n assert.ok(!JSON.stringify(summarizeReplayPreflight(result)).includes(\"test@example.com\"));\n});\ntest(\"even clean 60-turn fixtures cannot be submitted automatically\",()=>{\n const history=Array.from({length:60},(_,i)=>({role:i%2?\"misaki\":\"user\",text:`turn ${i}`}));\n const result=preflightApprovedReplay(history,\"次の発言\");\n assert.equal(result.fixture.history.length,60);\n assert.equal(result.privacy.findings.length,0);\n assert.equal(result.eligibleForAutomaticModelSubmission,false);\n});\ntest(\"the next message is screened too\",()=>{\n const result=preflightApprovedReplay([\n  {role:\"user\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n ],\"test@example.com\");\n assert.deepEqual(result.privacy.findings,[{turnIndex:2,kinds:[\"email\"]}]);\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {screenReplayPrivacy} from \"../lib/context-ab-replay-privacy.ts\";\n\ntest(\"flags common sensitive patterns without returning source text\",()=>{\n const turns=[\n  {role:\"user\",text:\"連絡先は test@example.com です\"},\n  {role:\"misaki\",text:\"https://example.com/path\"},\n  {role:\"user\",text:\"api_key=sk-example\"},\n  {role:\"misaki\",text:\"今日はどう？\"},\n ];\n const result=screenReplayPrivacy(turns);\n assert.deepEqual(result,{\n  safeForAutomaticExport:false,\n  needsHumanReview:true,\n  findings:[\n   {turnIndex:0,kinds:[\"email\"]},\n   {turnIndex:1,kinds:[\"url\"]},\n   {turnIndex:2,kinds:[\"credential_like\"]},\n  ],\n });\n assert.ok(!JSON.stringify(result).includes(\"test@example.com\"));\n});\ntest(\"zero regex findings never means export is authorized\",()=>{\n assert.deepEqual(screenReplayPrivacy([{text:\"東京都のどこかで会った\"}]),{\n  safeForAutomaticExport:false,needsHumanReview:true,findings:[],\n });\n});\ntest(\"rejects malformed input\",()=>{\n assert.throws(()=>screenReplayPrivacy({text:\"hello\"}),/local array/);\n assert.throws(()=>screenReplayPrivacy([{}]),/Invalid local turn/);\n});\n import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {preflightApprovedReplay} from \"../lib/context-ab-replay-preflight.ts\";\nimport {makeReviewedOfflineSnapshot} from \"../lib/context-ab-reviewed-snapshot.ts\";\nimport {runOfflineContextComparison} from \"../lib/context-ab-offline-harness.ts\";\n\ntest(\"approved local snapshot reaches both A and B with identical history\",async()=>{\n const turns=[\n  {role:\"user\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"元気？\"},\n  {role:\"user\",text:\"元気だよ\"},\n ];\n const snapshot=makeReviewedOfflineSnapshot({\n  preflight:preflightApprovedReplay(turns,\"続きを話そう\"),\n  systemPromptTemplate:\"Persona. {{RECENT_REPLY_SECTION}}\",\n  manuallyReviewedAndApproved:true,\n });\n assert.equal(snapshot.history.length,4);\n assert.deepEqual(snapshot.recentReplies,[\"こんにちは\",\"元気？\"]);\n const requests:{history:unknown;userText:string;systemInstruction:string}[]=[];\n const result=await runOfflineContextComparison(snapshot,async request=>{\n  requests.push({\n   history:request.history,userText:request.userText,systemInstruction:request.systemInstruction,\n  });\n  return {latencyMs:1,promptTokens:10,outputTokens:5,success:true,jsonValid:true,timedOut:false};\n },1);\n assert.equal(requests.length,2);\n assert.deepEqual(requests[0].history,requests[1].history);\n assert.equal(requests[0].userText,requests[1].userText);\n assert.notEqual(requests[0].systemInstruction,requests[1].systemInstruction);\n assert.ok(result.summary);\n});\ntest(\"unreviewed or malformed template is rejected\",()=>{\n const preflight=preflightApprovedReplay([{role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"}],\"c\");\n assert.throws(()=>makeReviewedOfflineSnapshot({\n  preflight,systemPromptTemplate:\"{{RECENT_REPLY_SECTION}}\",manuallyReviewedAndApproved:false as true,\n }),/Explicit review/);\n assert.throws(()=>makeReviewedOfflineSnapshot({\n  preflight,systemPromptTemplate:\"no placeholder\",manuallyReviewedAndApproved:true,\n }),/placeholder/);\n});\n"
     },
     {
       "id": "pr-193",
@@ -3311,36 +3311,6 @@
       "search_text": "automation/ledger-facts-41483251398-1 ブランチ差分を収録  {}   [] docs/DEVELOPMENT_LEDGER.md docs/DEVELOPMENT_OPERATIONS_INDEX.md "
     },
     {
-      "id": "branch-5fbac0e9c427777a",
-      "title": "chore/inventory-index-proposal",
-      "summary": "ブランチ差分を収録",
-      "state": "PR未関連のブランチ差分",
-      "main_status": "未確認",
-      "topics": [
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "chore/inventory-index-proposal ブランチ差分を収録  {}   []  "
-    },
-    {
-      "id": "branch-6dc14770cd5818cc",
-      "title": "chore/vercel-safe-build-guard-20261102",
-      "summary": "ブランチ差分を収録",
-      "state": "PR未関連のブランチ差分",
-      "main_status": "未確認",
-      "topics": [
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "chore/vercel-safe-build-guard-20261102 ブランチ差分を収録  {}   []  "
-    },
-    {
       "id": "branch-c9e11b1515cb305d",
       "title": "codex/legacy-maintenance-drain",
       "summary": "ブランチ差分を収録",
@@ -3403,22 +3373,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "docs/backup-restore-inventory-20261105 ブランチ差分を収録  {}   [] docs/backup/BACKUP_RESTORE_INVENTORY_20261105.md docs/backup/RESTORE_REHEARSAL_CHECKLIST_20261105.md docs/backup/SUPABASE_BACKUP_CAPABILITY_CHECK_20261105.md "
-    },
-    {
-      "id": "branch-60c7da8bc8d7b0d2",
-      "title": "docs/conversation-maturity-218",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話",
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "docs/conversation-maturity-218 ブランチ差分を収録  {}   [] docs/CONVERSATION_MATURITY_REVIEW_218.md tests/relationship-source-of-truth-contract.test.cjs tests/three-block-one-pass.test.ts tests/three-block/one-pass.ts tests/three-block/vendor/selection/lib/conversation-lab-comparison.ts tests/three-block/vendor/selection/lib/conversation-lab-decision.ts tests/three-block/vendor/selection/lib/conversation-lab-handoff.ts tests/three-block/vendor/selection/lib/conversation-lab-pipeline.ts tests/three-block/vendor/selection/lib/conversation-lab-scope.ts tests/three-block/vendor/selection/tests/conversation-lab-comparison.test.ts tests/three-block/vendor/selection/tests/conversation-lab-decision.test.ts tests/three-block/vendor/selection/tests/conversation-lab-handoff.test.ts tests/three-block/vendor/selection/tests/conversation-lab-pipeline.test.ts tests/three-block/vendor/selection/tests/conversation-lab-scope.test.ts tests/three-block/vendor/slimming/lib/context-ab-approved-replay.ts tests/three-block/vendor/slimming/lib/context-ab-balanced.ts tests/three-block/vendor/slimming/lib/context-ab-blind-quality.ts tests/three-block/vendor/slimming/lib/context-ab-offline-harness.ts tests/three-block/vendor/slimming/lib/context-ab-prompt.ts tests/three-block/vendor/slimming/lib/context-ab-quality-long-history.ts tests/three-block/vendor/slimming/lib/context-ab-quality.ts tests/three-block/vendor/slimming/lib/context-ab-replay-boundary.ts tests/three-block/vendor/slimming/lib/context-ab-replay-preflight.ts tests/three-block/vendor/slimming/lib/context-ab-replay-privacy.ts tests/three-block/vendor/slimming/lib/context-ab-results.ts tests/three-block/vendor/slimming/lib/context-ab-reviewed-snapshot.ts tests/three-block/vendor/slimming/scripts/run-synthetic-quality-checks.ts tests/three-block/vendor/slimming/tests/context-ab-approved-replay.test.ts tests/three-block/vendor/slimming/tests/context-ab-balanced.test.ts tests/three-block/vendor/slimming/tests/context-ab-blind-quality.test.ts tests/three-block/vendor/slimming/tests/context-ab-offline-harness.test.ts tests/three-block/vendor/slimming/tests/context-ab-prompt.test.ts tests/three-block/vendor/slimming/tests/context-ab-quality-long-history.test.ts tests/three-block/vendor/slimming/tests/context-ab-quality.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-boundary.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-order.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-preflight.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-privacy.test.ts tests/three-block/vendor/slimming/tests/context-ab-results.test.ts tests/three-block/vendor/slimming/tests/context-ab-reviewed-snapshot.test.ts tests/three-block/vendor/tuning/lib/conversation-tuning-preview.ts tests/three-block/vendor/tuning/tests/conversation-tuning-preview.test.ts "
     },
     {
       "id": "branch-122879809eace954",
@@ -3658,36 +3612,6 @@
       "search_text": "feature/conversation-tuning-220 ブランチ差分を収録  {}   [] app/api/conversation-tuning/access/route.ts components/ConversationTuningPreview.tsx docs/CONVERSATION_TUNING_APP_220.md lib/conversation-tuning-owner-auth.ts lib/conversation-tuning-preview.ts tests/conversation-tuning-owner-auth.test.ts tests/conversation-tuning-preview.test.ts "
     },
     {
-      "id": "branch-fd3715b29c8dd1a1",
-      "title": "fix/ledger-workflow-yaml-corruption-20261103",
-      "summary": "ブランチ差分を収録",
-      "state": "PR未関連のブランチ差分",
-      "main_status": "未確認",
-      "topics": [
-        "開発管理"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/ledger-workflow-yaml-corruption-20261103 ブランチ差分を収録  {}   []  "
-    },
-    {
-      "id": "branch-7a839c530ad00ad2",
-      "title": "fix/safari-load-failed-ui",
-      "summary": "ブランチ差分を収録",
-      "state": "PR未関連のブランチ差分",
-      "main_status": "未確認",
-      "topics": [
-        "画面・表示"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "fix/safari-load-failed-ui ブランチ差分を収録  {}   []  "
-    },
-    {
       "id": "branch-d62bb5c53690d8c6",
       "title": "preview/external-ai-review-20261028",
       "summary": "ブランチ差分を収録",
@@ -3716,21 +3640,6 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "sora/canonical-relationship-integration ブランチ差分を収録  {}   [] docs/IMPLEMENTATION_OVERVIEW.md "
-    },
-    {
-      "id": "branch-c1db5c41a90d509f",
-      "title": "sora/relationship-processing-error-diagnostics",
-      "summary": "ブランチ差分を収録",
-      "state": "PR未関連のブランチ差分",
-      "main_status": "未確認",
-      "topics": [
-        "記憶・会話"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "sora/relationship-processing-error-diagnostics ブランチ差分を収録  {}   []  "
     },
     {
       "id": "branch-c1c09c8589ffaf5e",
@@ -3764,21 +3673,6 @@
       "search_text": "test/relationship-acting-state-comparison ブランチ差分を収録  {}   [] tests/relationship-acting-state-comparison.test.ts tests/relationship-chat-wiring.test.ts "
     },
     {
-      "id": "branch-2481cf5a1a0046dd",
-      "title": "work/ab-long-fixture-dispatch",
-      "summary": "ブランチ差分を収録",
-      "state": "ブランチ差分（PR関連あり）",
-      "main_status": "未確認",
-      "topics": [
-        "その他の開発"
-      ],
-      "conclusion": "未確認",
-      "remaining": "原本の受入条件・未解決事項を照合",
-      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
-      "production": "未確認",
-      "search_text": "work/ab-long-fixture-dispatch ブランチ差分を収録  {}   [] .github/workflows/isolated-gemini-ab-manual.yml "
-    },
-    {
       "id": "branch-8fb3e7f76aab269c",
       "title": "work/context-ab-quality-budget-guard-184",
       "summary": "ブランチ差分を収録",
@@ -3793,7 +3687,7 @@
       "remaining": "原本の受入条件・未解決事項を照合",
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
-      "search_text": "work/context-ab-quality-budget-guard-184 ブランチ差分を収録  {}   [] .github/workflows/context-ab-live-manual.yml .github/workflows/context-ab-validation.yml .github/workflows/isolated-replay-tests.yml .github/workflows/manual-synthetic-quality-evaluation.yml app/api/chat/route.ts app/api/experiments/blind-quality/route.ts app/api/experiments/replay-ab/route.ts app/api/experiments/synthetic-quality-run/route.ts app/experiments/blind-quality-review/page.tsx app/experiments/replay-self-check/page.tsx docs/CONTEXT_AB_EXPERIMENT.md docs/IMPLEMENTATION_OVERVIEW.md docs/context-ab-blind-review-template.csv docs/context-ab-blind-review.md docs/context-ab-execution-gate.md docs/context-ab-real-history-quality-review.md docs/context-ab-validation-protocol.md docs/conversation-context-compression-spike.md docs/memory-certainty-design.md docs/misaki-blind-quality-evaluation-fixtures.md docs/misaki-synthetic-live-evaluation-runbook.md docs/misaki-synthetic-reference-replies-and-self-scores.md lib/canonical-state.ts lib/context-ab-approved-replay.ts lib/context-ab-balanced.ts lib/context-ab-blind-quality.ts lib/context-ab-gemini-adapter.ts lib/context-ab-long-fixture.ts lib/context-ab-offline-harness.ts lib/context-ab-prompt.ts lib/context-ab-quality-long-history.ts lib/context-ab-quality.ts lib/context-ab-replay-boundary.ts lib/context-ab-replay-preflight.ts lib/context-ab-replay-privacy.ts lib/context-ab-results.ts lib/context-ab-reviewed-snapshot.ts lib/context-overlap-analysis.ts lib/context-size-measurement.ts lib/relationship-acting-guide.ts lib/relationship-analyzer-v1.ts lib/relationship-engine-v1.ts lib/relationship-identity-resolver.ts lib/relationship-runtime-v1.ts package-lock.json package.json scripts/context-ab-live.ts scripts/context-ab-quality-live.ts scripts/context-ab-smoke.ts scripts/run-live-synthetic-quality-eval.ts scripts/run-synthetic-quality-checks.ts supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql tests/context-ab-approved-replay.test.ts tests/context-ab-balanced.test.ts tests/context-ab-blind-quality.test.ts tests/context-ab-gemini-adapter.test.ts tests/context-ab-offline-harness.test.ts tests/context-ab-prompt.test.ts tests/context-ab-quality-long-history.test.ts tests/context-ab-quality.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-results.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-overlap-analysis.test.ts tests/context-size-measurement.test.ts tests/fixtures/relationship-identity-baseline.sql tests/relationship-identity-anonymous-runtime.test.ts tests/relationship-identity-audit.test.ts tests/relationship-identity-persistence.test.ts tests/relationship-identity-resolver.test.ts tests/relationship-identity-sql.test.ts tests/relationship-identity-temporary-import.test.ts tests/relationship-mutual-acceptance.test.ts "
+      "search_text": "work/context-ab-quality-budget-guard-184 ブランチ差分を収録  {}   [] .github/workflows/context-ab-live-manual.yml .github/workflows/context-ab-validation.yml .github/workflows/isolated-replay-tests.yml .github/workflows/manual-synthetic-quality-evaluation.yml app/api/chat/route.ts app/api/experiments/blind-quality/route.ts app/api/experiments/replay-ab/route.ts app/api/experiments/synthetic-quality-run/route.ts app/experiments/blind-quality-review/page.tsx app/experiments/replay-self-check/page.tsx docs/CONTEXT_AB_EXPERIMENT.md docs/IMPLEMENTATION_OVERVIEW.md docs/context-ab-blind-review-template.csv docs/context-ab-blind-review.md docs/context-ab-execution-gate.md docs/context-ab-real-history-quality-review.md docs/context-ab-validation-protocol.md docs/conversation-context-compression-spike.md docs/memory-certainty-design.md docs/misaki-blind-quality-evaluation-fixtures.md docs/misaki-synthetic-live-evaluation-runbook.md docs/misaki-synthetic-reference-replies-and-self-scores.md lib/canonical-state.ts lib/context-ab-approved-replay.ts lib/context-ab-balanced.ts lib/context-ab-blind-quality.ts lib/context-ab-gemini-adapter.ts lib/context-ab-long-fixture.ts lib/context-ab-offline-harness.ts lib/context-ab-prompt.ts lib/context-ab-quality-long-history.ts lib/context-ab-quality.ts lib/context-ab-replay-boundary.ts lib/context-ab-replay-preflight.ts lib/context-ab-replay-privacy.ts lib/context-ab-results.ts lib/context-ab-reviewed-snapshot.ts lib/context-overlap-analysis.ts lib/context-size-measurement.ts lib/relationship-acting-guide.ts lib/relationship-analyzer-v1.ts lib/relationship-engine-v1.ts lib/relationship-identity-resolver.ts lib/relationship-runtime-v1.ts package-lock.json package.json scripts/context-ab-live.ts scripts/context-ab-quality-live.ts scripts/context-ab-smoke.ts scripts/run-live-synthetic-quality-eval.ts scripts/run-synthetic-quality-checks.ts supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql tests/context-ab-approved-replay.test.ts tests/context-ab-balanced.test.ts tests/context-ab-blind-quality.test.ts tests/context-ab-gemini-adapter.test.ts tests/context-ab-offline-harness.test.ts tests/context-ab-prompt.test.ts tests/context-ab-quality-budget.test.ts tests/context-ab-quality-long-history.test.ts tests/context-ab-quality.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-results.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-overlap-analysis.test.ts tests/context-size-measurement.test.ts tests/fixtures/relationship-identity-baseline.sql tests/relationship-identity-anonymous-runtime.test.ts tests/relationship-identity-audit.test.ts tests/relationship-identity-persistence.test.ts tests/relationship-identity-resolver.test.ts tests/relationship-identity-sql.test.ts tests/relationship-identity-temporary-import.test.ts tests/relationship-mutual-acceptance.test.ts "
     },
     {
       "id": "branch-f2dba8e26e4c9402",
@@ -3843,6 +3737,112 @@
       "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
       "production": "未確認",
       "search_text": "work/relationship-identity-v1 ブランチ差分を収録  {}   [] app/api/chat/route.ts docs/IMPLEMENTATION_OVERVIEW.md lib/canonical-state.ts lib/relationship-acting-guide.ts lib/relationship-analyzer-v1.ts lib/relationship-engine-v1.ts lib/relationship-identity-resolver.ts lib/relationship-runtime-v1.ts package-lock.json package.json supabase/migrations/20261007114143_relationship_identity_v1_canonical.sql supabase/migrations/20261007114154_relationship_identity_v1_atomic_temporary_import.sql supabase/migrations/20261007114158_relationship_identity_v1_romance_reentry_provenance.sql supabase/migrations/20261007114201_relationship_identity_v1_temporary_import_romance_provenance.sql tests/fixtures/relationship-identity-baseline.sql tests/relationship-acting-guide.test.ts tests/relationship-identity-anonymous-runtime.test.ts tests/relationship-identity-audit.test.ts tests/relationship-identity-persistence.test.ts tests/relationship-identity-resolver.test.ts tests/relationship-identity-sql.test.ts tests/relationship-identity-temporary-import.test.ts tests/relationship-mutual-acceptance.test.ts "
+    },
+    {
+      "id": "branch-5fbac0e9c427777a",
+      "title": "chore/inventory-index-proposal",
+      "summary": "ブランチ差分を収録",
+      "state": "PR未関連のブランチ差分",
+      "main_status": "未確認",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "chore/inventory-index-proposal ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-6dc14770cd5818cc",
+      "title": "chore/vercel-safe-build-guard-20261102",
+      "summary": "ブランチ差分を収録",
+      "state": "PR未関連のブランチ差分",
+      "main_status": "未確認",
+      "topics": [
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "chore/vercel-safe-build-guard-20261102 ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-60c7da8bc8d7b0d2",
+      "title": "docs/conversation-maturity-218",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話",
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "docs/conversation-maturity-218 ブランチ差分を収録  {}   [] docs/CONVERSATION_MATURITY_REVIEW_218.md tests/relationship-source-of-truth-contract.test.cjs tests/three-block-one-pass.test.ts tests/three-block/one-pass.ts tests/three-block/vendor/selection/lib/conversation-lab-comparison.ts tests/three-block/vendor/selection/lib/conversation-lab-decision.ts tests/three-block/vendor/selection/lib/conversation-lab-handoff.ts tests/three-block/vendor/selection/lib/conversation-lab-pipeline.ts tests/three-block/vendor/selection/lib/conversation-lab-scope.ts tests/three-block/vendor/selection/tests/conversation-lab-comparison.test.ts tests/three-block/vendor/selection/tests/conversation-lab-decision.test.ts tests/three-block/vendor/selection/tests/conversation-lab-handoff.test.ts tests/three-block/vendor/selection/tests/conversation-lab-pipeline.test.ts tests/three-block/vendor/selection/tests/conversation-lab-scope.test.ts tests/three-block/vendor/slimming/lib/context-ab-approved-replay.ts tests/three-block/vendor/slimming/lib/context-ab-balanced.ts tests/three-block/vendor/slimming/lib/context-ab-blind-quality.ts tests/three-block/vendor/slimming/lib/context-ab-offline-harness.ts tests/three-block/vendor/slimming/lib/context-ab-prompt.ts tests/three-block/vendor/slimming/lib/context-ab-quality-long-history.ts tests/three-block/vendor/slimming/lib/context-ab-quality.ts tests/three-block/vendor/slimming/lib/context-ab-replay-boundary.ts tests/three-block/vendor/slimming/lib/context-ab-replay-preflight.ts tests/three-block/vendor/slimming/lib/context-ab-replay-privacy.ts tests/three-block/vendor/slimming/lib/context-ab-results.ts tests/three-block/vendor/slimming/lib/context-ab-reviewed-snapshot.ts tests/three-block/vendor/slimming/scripts/run-synthetic-quality-checks.ts tests/three-block/vendor/slimming/tests/context-ab-approved-replay.test.ts tests/three-block/vendor/slimming/tests/context-ab-balanced.test.ts tests/three-block/vendor/slimming/tests/context-ab-blind-quality.test.ts tests/three-block/vendor/slimming/tests/context-ab-offline-harness.test.ts tests/three-block/vendor/slimming/tests/context-ab-prompt.test.ts tests/three-block/vendor/slimming/tests/context-ab-quality-long-history.test.ts tests/three-block/vendor/slimming/tests/context-ab-quality.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-boundary.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-order.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-preflight.test.ts tests/three-block/vendor/slimming/tests/context-ab-replay-privacy.test.ts tests/three-block/vendor/slimming/tests/context-ab-results.test.ts tests/three-block/vendor/slimming/tests/context-ab-reviewed-snapshot.test.ts tests/three-block/vendor/tuning/lib/conversation-tuning-preview.ts tests/three-block/vendor/tuning/tests/conversation-tuning-preview.test.ts "
+    },
+    {
+      "id": "branch-fd3715b29c8dd1a1",
+      "title": "fix/ledger-workflow-yaml-corruption-20261103",
+      "summary": "ブランチ差分を収録",
+      "state": "PR未関連のブランチ差分",
+      "main_status": "未確認",
+      "topics": [
+        "開発管理"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/ledger-workflow-yaml-corruption-20261103 ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-7a839c530ad00ad2",
+      "title": "fix/safari-load-failed-ui",
+      "summary": "ブランチ差分を収録",
+      "state": "PR未関連のブランチ差分",
+      "main_status": "未確認",
+      "topics": [
+        "画面・表示"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "fix/safari-load-failed-ui ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-c1db5c41a90d509f",
+      "title": "sora/relationship-processing-error-diagnostics",
+      "summary": "ブランチ差分を収録",
+      "state": "PR未関連のブランチ差分",
+      "main_status": "未確認",
+      "topics": [
+        "記憶・会話"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "sora/relationship-processing-error-diagnostics ブランチ差分を収録  {}   []  "
+    },
+    {
+      "id": "branch-2481cf5a1a0046dd",
+      "title": "work/ab-long-fixture-dispatch",
+      "summary": "ブランチ差分を収録",
+      "state": "ブランチ差分（PR関連あり）",
+      "main_status": "未確認",
+      "topics": [
+        "その他の開発"
+      ],
+      "conclusion": "未確認",
+      "remaining": "原本の受入条件・未解決事項を照合",
+      "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+      "production": "未確認",
+      "search_text": "work/ab-long-fixture-dispatch ブランチ差分を収録  {}   [] .github/workflows/isolated-gemini-ab-manual.yml "
     },
     {
       "id": "branch-ce4aa0014fb13e1b",

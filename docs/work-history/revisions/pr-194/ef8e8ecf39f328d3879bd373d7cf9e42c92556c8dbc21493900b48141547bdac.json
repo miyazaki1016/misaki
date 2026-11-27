@@ -1,0 +1,432 @@
+{
+  "id": "pr-194",
+  "number": 194,
+  "title": "test: add bounded synthetic context A/B quality evaluation (#184)",
+  "topics": [
+    "その他の開発"
+  ],
+  "purpose": "変更対象ファイルに関する開発。具体的な目的は原文・差分を確認",
+  "purpose_basis": "変更パスと表題による分類（意味の確定には原文を確認）",
+  "body": "Issue #184 / preflight REVIEW_RECORDED: https://github.com/miyazaki1016/misaki/actions/runs/43025723023\n\nExtends PR #78 without modifying its existing branch. Adds estimated-cost stop guard ($0.04), max 14 calls, max 256 output tokens, usageMetadata accounting and fallback on failures to the existing synthetic-only quality evaluator.\n\nReview pending: CI and isolated test validation; Gemini live run not performed. Estimated cost is not a billing cap. No real user conversations, production DB, merge or production deployment. Keep Draft until latest HEAD checks and safe live evaluation are verified.\n\nhistory-preflight: pr-78 = extend; reuse existing makePromptVariants and seven synthetic scenarios, do not repeat prior 60-turn measurement.",
+  "snapshot_head": "12c882ac70085c687dec82cb5d15d68d225b4ff0",
+  "snapshot_consistent": true,
+  "head": "12c882ac70085c687dec82cb5d15d68d225b4ff0",
+  "base": "a849bec92059d326940ffc358635164ea7d391c9",
+  "base_ref": "work/context-no-duplicate-replies-ab",
+  "head_ref": "work/context-ab-quality-budget-guard-184",
+  "state": "open",
+  "main_status": "main祖先として未確認（squash・同等実装は別途照合）",
+  "draft": true,
+  "merged_at": null,
+  "merge_commit_sha": null,
+  "updated_at": "2026-11-27T07:35:27Z",
+  "code_facts": [
+    {
+      "file": ".github/workflows/isolated-replay-tests.yml",
+      "kind": "テストの期待値・条件",
+      "expression": "run: node --test --experimental-strip-types tests/context-ab-quality-budget.test.ts",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/.github/workflows/isolated-replay-tests.yml"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const MAX_CALLS = 14;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const MAX_OUTPUT_TOKENS = 256;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "const STOP_ESTIMATED_USD = 0.04;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!rates) throw new Error(\"No verified standard text price for model\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (usage && validCount(usage.promptTokenCount) && validCount(usage.candidatesTokenCount) &&",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (usageMissing || estimatedUsd >= STOP_ESTIMATED_USD) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "scripts/context-ab-quality-live.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (stopReason) process.exitCode = 1;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import test from \"node:test\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "import assert from \"node:assert/strict\";",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (generationConfig.thinkingConfig.thinkingBudget !== 0 || generationConfig.maxOutputTokens !== 256) {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (process.env.PROBE === \"budget\") usage.promptTokenCount = 150000;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (process.env.PROBE === \"invalid\") usage.candidatesTokenCount = -1;",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (process.env.PROBE === \"timeout\") throw Error(\"synthetic timeout\");",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "test(`offline budget guard: ${model} / ${probe}`, () => {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(run.status, stopReason ? 1 : 0, run.stderr);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(run.stderr.split(\"stub-call\").length - 1, calls);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "条件分岐・閾値",
+      "expression": "if (probe === \"unknown\") {",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.match(run.stderr, /No verified standard text price/);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    },
+    {
+      "file": "tests/context-ab-quality-budget.test.ts",
+      "kind": "テストの期待値・条件",
+      "expression": "assert.equal(summary.stopReason, stopReason);",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts"
+    }
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/isolated-replay-tests.yml",
+      "status": "modified",
+      "additions": 3,
+      "deletions": 0,
+      "patch": "diff --git a/.github/workflows/isolated-replay-tests.yml b/.github/workflows/isolated-replay-tests.yml\nindex 6a3d2827..6d15bdd2 100644\n--- a/.github/workflows/isolated-replay-tests.yml\n+++ b/.github/workflows/isolated-replay-tests.yml\n@@ -3,6 +3,7 @@ name: Isolated Replay Tests\n on:\n   pull_request:\n     paths:\n+      - \"scripts/context-ab-quality-live.ts\"\n       - \"lib/context-ab-*.ts\"\n       - \"tests/context-ab-*.test.ts\"\n       - \".github/workflows/isolated-replay-tests.yml\"\n@@ -21,6 +22,8 @@ jobs:\n           node-version: \"22\"\n           cache: npm\n       - run: npm ci\n+      - name: Run offline cost guard tests\n+        run: node --test --experimental-strip-types tests/context-ab-quality-budget.test.ts\n       - name: Run offline replay tests only\n         run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-balanced.test.ts\n       - name: Run deterministic synthetic quality regression checks\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/.github/workflows/isolated-replay-tests.yml",
+      "source": {
+        "path": ".github/workflows/isolated-replay-tests.yml",
+        "coverage": "全文",
+        "text": "name: Isolated Replay Tests\n\non:\n  pull_request:\n    paths:\n      - \"scripts/context-ab-quality-live.ts\"\n      - \"lib/context-ab-*.ts\"\n      - \"tests/context-ab-*.test.ts\"\n      - \".github/workflows/isolated-replay-tests.yml\"\n  workflow_dispatch:\n\npermissions:\n  contents: read\n\njobs:\n  replay-tests:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: \"22\"\n          cache: npm\n      - run: npm ci\n      - name: Run offline cost guard tests\n        run: node --test --experimental-strip-types tests/context-ab-quality-budget.test.ts\n      - name: Run offline replay tests only\n        run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-balanced.test.ts\n      - name: Run deterministic synthetic quality regression checks\n        run: npm run quality:synthetic\n      - name: Test quality rubric and safety blocker\n        run: node --test --experimental-strip-types tests/context-ab-quality.test.ts\n",
+        "sha256": "7cbab69882e4a7288fb2b1b665016c9d621c34a6eea0ea8bd737f4d905be6a8e"
+      }
+    },
+    {
+      "path": "scripts/context-ab-quality-live.ts",
+      "status": "modified",
+      "additions": 63,
+      "deletions": 8,
+      "patch": "diff --git a/scripts/context-ab-quality-live.ts b/scripts/context-ab-quality-live.ts\nindex 198e58d8..da2d3fe0 100644\n--- a/scripts/context-ab-quality-live.ts\n+++ b/scripts/context-ab-quality-live.ts\n@@ -18,6 +18,23 @@ if (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\n const delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\n if (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\n const fixture = makeSyntheticLongContext();\n+const MAX_CALLS = 14;\n+const MAX_OUTPUT_TOKENS = 256;\n+const STOP_ESTIMATED_USD = 0.04;\n+// Standard text pricing, USD per million tokens. Recheck before each live study:\n+// https://ai.google.dev/gemini-api/docs/pricing\n+const standardRates = new Map([\n+  [\"gemini-2.5-flash\", { input: 0.30, output: 2.50 }],\n+  [\"gemini-2.5-flash-lite\", { input: 0.10, output: 0.40 }],\n+]);\n+const rates = standardRates.get(model);\n+if (!rates) throw new Error(\"No verified standard text price for model\");\n+const validCount = (value: unknown): value is number =>\n+  typeof value === \"number\" && Number.isSafeInteger(value) && value >= 0;\n+let stopReason: string | null = null;\n+let estimatedUsd = 0;\n+let usageMissing = 0;\n+const usageByVariant = { A: { inputTokens: 0, outputTokens: 0 }, B: { inputTokens: 0, outputTokens: 0 } };\n const useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\n const totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\n const scenarioCounts: Record<string,Record<string,boolean | number>> = {};\n@@ -25,29 +42,59 @@ const exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\n const reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\n const reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\n let count=0;\n-for (const scenario of qualityScenarios) {\n+scenarios: for (const scenario of qualityScenarios) {\n   const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n   const replies=recentModelReplies(scenarioHistory);\n   const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n   const metrics:Record<string,boolean | number>={};\n   const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n   for (const variant of [\"A\",\"B\"] as const) {\n+    if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");\n+    const instruction = variants[variant] + '\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。';\n+    const body = JSON.stringify({\n+      systemInstruction: { parts: [{ text: instruction }] },\n+      contents: [...scenarioHistory.map(h => ({ role: h.role, parts: [{ text: h.text }] })),\n+        { role: \"user\", parts: [{ text: scenario.userText }] }],\n+      generationConfig: { responseMimeType: \"application/json\", temperature: 0,\n+        maxOutputTokens: MAX_OUTPUT_TOKENS, thinkingConfig: { thinkingBudget: 0 } },\n+    });\n+    // Reserve one token per UTF-8 byte including message framing, for text-only requests.\n+    const reservedUsd = (Buffer.byteLength(body, \"utf8\") * rates.input + MAX_OUTPUT_TOKENS * rates.output) / 1_000_000;\n+    if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) {\n+      stopReason = \"budget\";\n+      scenarioCounts[scenario.id] = metrics;\n+      break scenarios;\n+    }\n     if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n     const stats=totals[variant]; stats.calls++;\n+    let usageAccounted = false;\n     try {\n       const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{\n         method:\"POST\",\n         headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n         signal:AbortSignal.timeout(30000),\n-        body:JSON.stringify({\n-          systemInstruction:{parts:[{text:variants[variant]+`\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。`}]},\n-          contents:[...scenarioHistory.map(h=>({role:h.role,parts:[{text:h.text}]})),{role:\"user\",parts:[{text:scenario.userText}]}],\n-          generationConfig:{responseMimeType:\"application/json\",temperature:0},\n-        }),\n+        body,\n       });\n       metrics[variant+\"HttpStatus\"]=response.status;\n       if(response.ok)stats.http200++;\n-      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[]};\n+      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[];usageMetadata?:{promptTokenCount?:number;candidatesTokenCount?:number;thoughtsTokenCount?:number}};\n+      const usage=payload.usageMetadata;\n+      if (usage && validCount(usage.promptTokenCount) && validCount(usage.candidatesTokenCount) &&\n+          (usage.thoughtsTokenCount === undefined || validCount(usage.thoughtsTokenCount))) {\n+        const input=usage.promptTokenCount!;\n+        const output=usage.candidatesTokenCount! + (usage.thoughtsTokenCount ?? 0);\n+        usageByVariant[variant].inputTokens+=input;\n+        usageByVariant[variant].outputTokens+=output;\n+        estimatedUsd+=(input*rates.input+output*rates.output)/1_000_000;\n+        usageAccounted = true;\n+        metrics[variant+\"InputTokens\"]=input;\n+        metrics[variant+\"OutputTokens\"]=output;\n+      } else {\n+        usageMissing++;\n+        estimatedUsd+=reservedUsd;\n+        usageAccounted = true;\n+        metrics[variant+\"UsageMissing\"]=true;\n+      }\n       const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??\"\").join(\"\")??\"\";\n       let parsed:unknown;\n       try{parsed=JSON.parse(raw);}catch{parsed=null;}\n@@ -64,10 +111,16 @@ for (const scenario of qualityScenarios) {\n       metrics[variant+\"Passed\"]=passed;\n       if(passed)stats.passed++;\n     }catch{\n+      if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\n       metrics[variant+\"HttpStatus\"]=0;\n       metrics[variant+\"Passed\"]=false;\n       metrics[variant+\"RequestError\"]=true;\n     }\n+    if (usageMissing || estimatedUsd >= STOP_ESTIMATED_USD) {\n+      stopReason = usageMissing ? \"usage-unknown\" : \"budget\";\n+      scenarioCounts[scenario.id] = metrics;\n+      break scenarios;\n+    }\n   }\n   scenarioCounts[scenario.id]=metrics;\n   if (exportReview && captured.A && captured.B) {\n@@ -76,7 +129,7 @@ for (const scenario of qualityScenarios) {\n     reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n   }\n }\n-console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",totals,scenarioCounts,notes:\"Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n+console.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",callsMade:count,maxCalls:MAX_CALLS,estimatedUsd,stopEstimatedUsd:STOP_ESTIMATED_USD,stopReason,usageMissing,usageByVariant,totals,scenarioCounts,notes:\"Estimated costs are not Google invoices. Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n \n if (exportReview) {\n   mkdirSync(\"ab-review-output\",{recursive:true});\n@@ -84,3 +137,5 @@ if (exportReview) {\n   writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n   console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n }\n+\n+if (stopReason) process.exitCode = 1;\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/scripts/context-ab-quality-live.ts",
+      "source": {
+        "path": "scripts/context-ab-quality-live.ts",
+        "coverage": "全文",
+        "text": "/**\n * Isolated synthetic quality A/B. No Supabase, production chat, or user data.\n * Live API requests require MISAKI_AB_LIVE=YES and GEMINI_API_KEY.\n * Only aggregate numeric pass/fail counts are logged; no model text.\n */\nimport { writeFileSync, mkdirSync } from \"node:fs\";\nimport { randomInt } from \"node:crypto\";\nimport { qualityScenarios, assessQualityReply } from \"../lib/context-ab-quality.ts\";\nimport { makePromptVariants } from \"../lib/context-ab-prompt.ts\";\nimport { makeSyntheticLongContext } from \"../lib/context-ab-long-fixture.ts\";\nimport { makeLongQualityHistory, recentModelReplies } from \"../lib/context-ab-quality-long-history.ts\";\n\nif (process.env.MISAKI_AB_LIVE !== \"YES\") throw new Error(\"Explicit live opt-in required\");\nconst apiKey = process.env.GEMINI_API_KEY;\nif (!apiKey) throw new Error(\"GEMINI_API_KEY is required\");\nconst model = process.env.MISAKI_AB_MODEL;\nif (!model) throw new Error(\"MISAKI_AB_MODEL is required\");\nconst delayMs = Number(process.env.MISAKI_AB_DELAY_MS ?? \"10000\");\nif (!Number.isSafeInteger(delayMs) || delayMs < 0 || delayMs > 120000) throw new Error(\"Invalid delay\");\nconst fixture = makeSyntheticLongContext();\nconst MAX_CALLS = 14;\nconst MAX_OUTPUT_TOKENS = 256;\nconst STOP_ESTIMATED_USD = 0.04;\n// Standard text pricing, USD per million tokens. Recheck before each live study:\n// https://ai.google.dev/gemini-api/docs/pricing\nconst standardRates = new Map([\n  [\"gemini-2.5-flash\", { input: 0.30, output: 2.50 }],\n  [\"gemini-2.5-flash-lite\", { input: 0.10, output: 0.40 }],\n]);\nconst rates = standardRates.get(model);\nif (!rates) throw new Error(\"No verified standard text price for model\");\nconst validCount = (value: unknown): value is number =>\n  typeof value === \"number\" && Number.isSafeInteger(value) && value >= 0;\nlet stopReason: string | null = null;\nlet estimatedUsd = 0;\nlet usageMissing = 0;\nconst usageByVariant = { A: { inputTokens: 0, outputTokens: 0 }, B: { inputTokens: 0, outputTokens: 0 } };\nconst useLongHistory = process.env.MISAKI_AB_QUALITY_HISTORY === \"long\";\nconst totals = { A: {calls:0,http200:0,jsonValid:0,passed:0}, B: {calls:0,http200:0,jsonValid:0,passed:0} };\nconst scenarioCounts: Record<string,Record<string,boolean | number>> = {};\nconst exportReview = process.env.MISAKI_AB_EXPORT_REVIEW === \"YES\";\nconst reviewItems: Array<{scenarioId:string; description:string; userText:string; response1:string; response2:string}> = [];\nconst reviewKeys: Array<{scenarioId:string; response1:\"A\"|\"B\"; response2:\"A\"|\"B\"}> = [];\nlet count=0;\nscenarios: for (const scenario of qualityScenarios) {\n  const scenarioHistory = useLongHistory ? makeLongQualityHistory(scenario) : scenario.history;\n  const replies=recentModelReplies(scenarioHistory);\n  const variants=makePromptVariants(fixture.systemPromptTemplate,replies);\n  const metrics:Record<string,boolean | number>={};\n  const captured: Partial<Record<\"A\"|\"B\",string>> = {};\n  for (const variant of [\"A\",\"B\"] as const) {\n    if (count >= MAX_CALLS) throw new Error(\"Maximum Gemini call count reached\");\n    const instruction = variants[variant] + '\\n\\n【出力形式】必ずJSONオブジェクトで返してください。会話本文は文字列の reply キーに入れてください。例: {\"reply\":\"こんにちは\"}。他のキーは任意です。';\n    const body = JSON.stringify({\n      systemInstruction: { parts: [{ text: instruction }] },\n      contents: [...scenarioHistory.map(h => ({ role: h.role, parts: [{ text: h.text }] })),\n        { role: \"user\", parts: [{ text: scenario.userText }] }],\n      generationConfig: { responseMimeType: \"application/json\", temperature: 0,\n        maxOutputTokens: MAX_OUTPUT_TOKENS, thinkingConfig: { thinkingBudget: 0 } },\n    });\n    // Reserve one token per UTF-8 byte including message framing, for text-only requests.\n    const reservedUsd = (Buffer.byteLength(body, \"utf8\") * rates.input + MAX_OUTPUT_TOKENS * rates.output) / 1_000_000;\n    if (estimatedUsd + reservedUsd > STOP_ESTIMATED_USD) {\n      stopReason = \"budget\";\n      scenarioCounts[scenario.id] = metrics;\n      break scenarios;\n    }\n    if (count++ && delayMs) await new Promise(resolve=>setTimeout(resolve,delayMs));\n    const stats=totals[variant]; stats.calls++;\n    let usageAccounted = false;\n    try {\n      const response=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{\n        method:\"POST\",\n        headers:{\"Content-Type\":\"application/json\",\"x-goog-api-key\":apiKey},\n        signal:AbortSignal.timeout(30000),\n        body,\n      });\n      metrics[variant+\"HttpStatus\"]=response.status;\n      if(response.ok)stats.http200++;\n      const payload=await response.json() as {candidates?:{content?:{parts?:{text?:string}[]}}[];usageMetadata?:{promptTokenCount?:number;candidatesTokenCount?:number;thoughtsTokenCount?:number}};\n      const usage=payload.usageMetadata;\n      if (usage && validCount(usage.promptTokenCount) && validCount(usage.candidatesTokenCount) &&\n          (usage.thoughtsTokenCount === undefined || validCount(usage.thoughtsTokenCount))) {\n        const input=usage.promptTokenCount!;\n        const output=usage.candidatesTokenCount! + (usage.thoughtsTokenCount ?? 0);\n        usageByVariant[variant].inputTokens+=input;\n        usageByVariant[variant].outputTokens+=output;\n        estimatedUsd+=(input*rates.input+output*rates.output)/1_000_000;\n        usageAccounted = true;\n        metrics[variant+\"InputTokens\"]=input;\n        metrics[variant+\"OutputTokens\"]=output;\n      } else {\n        usageMissing++;\n        estimatedUsd+=reservedUsd;\n        usageAccounted = true;\n        metrics[variant+\"UsageMissing\"]=true;\n      }\n      const raw=payload.candidates?.[0]?.content?.parts?.map(p=>p.text??\"\").join(\"\")??\"\";\n      let parsed:unknown;\n      try{parsed=JSON.parse(raw);}catch{parsed=null;}\n      const valid=parsed!==null && typeof parsed===\"object\";\n      if(valid)stats.jsonValid++;\n      const reply=valid && typeof (parsed as {reply?:unknown}).reply===\"string\" ? (parsed as {reply:string}).reply : \"\";\n      if (exportReview && response.ok) captured[variant]=reply;\n      const result=assessQualityReply(scenario,reply);\n      metrics[variant+\"ReplyFieldPresent\"]=valid && typeof (parsed as {reply?:unknown}).reply===\"string\";\n      metrics[variant+\"Nonempty\"]=result.nonempty;\n      metrics[variant+\"ExpectedFactsPresent\"]=result.expectedFactsPresent;\n      metrics[variant+\"UnsupportedClaimsAbsent\"]=result.unsupportedClaimsAbsent;\n      const passed=response.ok && valid && result.nonempty && result.expectedFactsPresent && result.unsupportedClaimsAbsent;\n      metrics[variant+\"Passed\"]=passed;\n      if(passed)stats.passed++;\n    }catch{\n      if (!usageAccounted) { estimatedUsd += reservedUsd; usageMissing++; }\n      metrics[variant+\"HttpStatus\"]=0;\n      metrics[variant+\"Passed\"]=false;\n      metrics[variant+\"RequestError\"]=true;\n    }\n    if (usageMissing || estimatedUsd >= STOP_ESTIMATED_USD) {\n      stopReason = usageMissing ? \"usage-unknown\" : \"budget\";\n      scenarioCounts[scenario.id] = metrics;\n      break scenarios;\n    }\n  }\n  scenarioCounts[scenario.id]=metrics;\n  if (exportReview && captured.A && captured.B) {\n    const swap=randomInt(2)===1;\n    reviewItems.push({scenarioId:scenario.id,description:scenario.description,userText:scenario.userText,response1:swap?captured.B:captured.A,response2:swap?captured.A:captured.B});\n    reviewKeys.push({scenarioId:scenario.id,response1:swap?\"B\":\"A\",response2:swap?\"A\":\"B\"});\n  }\n}\nconsole.log(JSON.stringify({mode:\"synthetic-quality-ab\",model,delayMs,historyMode:useLongHistory?\"long\":\"short\",callsMade:count,maxCalls:MAX_CALLS,estimatedUsd,stopEstimatedUsd:STOP_ESTIMATED_USD,stopReason,usageMissing,usageByVariant,totals,scenarioCounts,notes:\"Estimated costs are not Google invoices. Heuristic checks only; no human quality judgment and not a Production-equivalent prompt.\"},null,2));\n\nif (exportReview) {\n  mkdirSync(\"ab-review-output\",{recursive:true});\n  writeFileSync(\"ab-review-output/blind-review.json\",JSON.stringify({notice:\"Synthetic scenarios only. Human ratings are not automatic quality proof.\",items:reviewItems},null,2),{mode:0o600});\n  writeFileSync(\"ab-review-output/blind-key.json\",JSON.stringify(reviewKeys,null,2),{mode:0o600});\n  console.log(JSON.stringify({reviewExported:true,reviewPairs:reviewItems.length,replyTextLogged:false}));\n}\n\nif (stopReason) process.exitCode = 1;\n",
+        "sha256": "49766c650df6b85330b74441849e559da89fb0e71d7c7012fc07fe58799ac6f7"
+      }
+    },
+    {
+      "path": "tests/context-ab-quality-budget.test.ts",
+      "status": "modified",
+      "additions": 48,
+      "deletions": 0,
+      "patch": "diff --git a/tests/context-ab-quality-budget.test.ts b/tests/context-ab-quality-budget.test.ts\nnew file mode 100644\nindex 00000000..e8ae2db0\n--- /dev/null\n+++ b/tests/context-ab-quality-budget.test.ts\n@@ -0,0 +1,48 @@\n+import test from \"node:test\";\n+import assert from \"node:assert/strict\";\n+import { spawnSync } from \"node:child_process\";\n+\n+const stub = `\n+globalThis.fetch = async (_url, init) => {\n+  const { generationConfig } = JSON.parse(init.body);\n+  if (generationConfig.thinkingConfig.thinkingBudget !== 0 || generationConfig.maxOutputTokens !== 256) {\n+    process.exit(98);\n+  }\n+  console.error(\"stub-call\");\n+  const usage = { promptTokenCount: 100, candidatesTokenCount: 10, thoughtsTokenCount: 2 };\n+  if (process.env.PROBE === \"budget\") usage.promptTokenCount = 150000;\n+  if (process.env.PROBE === \"invalid\") usage.candidatesTokenCount = -1;\n+  if (process.env.PROBE === \"timeout\") throw Error(\"synthetic timeout\");\n+  return Response.json({usageMetadata: usage, candidates: []});\n+};`;\n+const preload = \"data:text/javascript,\" + encodeURIComponent(stub);\n+\n+for (const [model, probe, calls, stopReason] of [\n+  [\"unknown\", \"unknown\", 0, \"unknown\"],\n+  [\"gemini-2.5-flash\", \"ok\", 14, null],\n+  [\"gemini-2.5-flash-lite\", \"ok\", 14, null],\n+  [\"gemini-2.5-flash\", \"budget\", 1, \"budget\"],\n+  [\"gemini-2.5-flash\", \"invalid\", 1, \"usage-unknown\"],\n+  [\"gemini-2.5-flash\", \"timeout\", 1, \"usage-unknown\"],\n+] as const) {\n+  test(`offline budget guard: ${model} / ${probe}`, () => {\n+    const run = spawnSync(process.execPath, [\"--experimental-strip-types\", \"--import\", preload,\n+      \"scripts/context-ab-quality-live.ts\"], {\n+      encoding: \"utf8\",\n+      env: { MISAKI_AB_LIVE: \"YES\", GEMINI_[REDACTED], MISAKI_AB_DELAY_MS: \"0\",\n+        MISAKI_AB_MODEL: model, PROBE: probe },\n+    });\n+    assert.equal(run.status, stopReason ? 1 : 0, run.stderr);\n+    assert.equal(run.stderr.split(\"stub-call\").length - 1, calls);\n+    if (probe === \"unknown\") {\n+      assert.match(run.stderr, /No verified standard text price/);\n+      return;\n+    }\n+    const summary = JSON.parse(run.stdout);\n+    assert.equal(summary.stopReason, stopReason);\n+    if (probe === \"ok\") {\n+      const expected = 14 * (model.endsWith(\"lite\") ? 14.8 : 60) / 1_000_000;\n+      assert.ok(Math.abs(summary.estimatedUsd - expected) < 1e-10);\n+    }\n+  });\n+}\n",
+      "patch_coverage": "git merge-baseから対象HEADへの差分（最大60000文字）",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality-budget.test.ts",
+      "source": {
+        "path": "tests/context-ab-quality-budget.test.ts",
+        "coverage": "全文",
+        "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport { spawnSync } from \"node:child_process\";\n\nconst stub = `\nglobalThis.fetch = async (_url, init) => {\n  const { generationConfig } = JSON.parse(init.body);\n  if (generationConfig.thinkingConfig.thinkingBudget !== 0 || generationConfig.maxOutputTokens !== 256) {\n    process.exit(98);\n  }\n  console.error(\"stub-call\");\n  const usage = { promptTokenCount: 100, candidatesTokenCount: 10, thoughtsTokenCount: 2 };\n  if (process.env.PROBE === \"budget\") usage.promptTokenCount = 150000;\n  if (process.env.PROBE === \"invalid\") usage.candidatesTokenCount = -1;\n  if (process.env.PROBE === \"timeout\") throw Error(\"synthetic timeout\");\n  return Response.json({usageMetadata: usage, candidates: []});\n};`;\nconst preload = \"data:text/javascript,\" + encodeURIComponent(stub);\n\nfor (const [model, probe, calls, stopReason] of [\n  [\"unknown\", \"unknown\", 0, \"unknown\"],\n  [\"gemini-2.5-flash\", \"ok\", 14, null],\n  [\"gemini-2.5-flash-lite\", \"ok\", 14, null],\n  [\"gemini-2.5-flash\", \"budget\", 1, \"budget\"],\n  [\"gemini-2.5-flash\", \"invalid\", 1, \"usage-unknown\"],\n  [\"gemini-2.5-flash\", \"timeout\", 1, \"usage-unknown\"],\n] as const) {\n  test(`offline budget guard: ${model} / ${probe}`, () => {\n    const run = spawnSync(process.execPath, [\"--experimental-strip-types\", \"--import\", preload,\n      \"scripts/context-ab-quality-live.ts\"], {\n      encoding: \"utf8\",\n      env: { MISAKI_AB_LIVE: \"YES\", GEMINI_[REDACTED], MISAKI_AB_DELAY_MS: \"0\",\n        MISAKI_AB_MODEL: model, PROBE: probe },\n    });\n    assert.equal(run.status, stopReason ? 1 : 0, run.stderr);\n    assert.equal(run.stderr.split(\"stub-call\").length - 1, calls);\n    if (probe === \"unknown\") {\n      assert.match(run.stderr, /No verified standard text price/);\n      return;\n    }\n    const summary = JSON.parse(run.stdout);\n    assert.equal(summary.stopReason, stopReason);\n    if (probe === \"ok\") {\n      const expected = 14 * (model.endsWith(\"lite\") ? 14.8 : 60) / 1_000_000;\n      assert.ok(Math.abs(summary.estimatedUsd - expected) < 1e-10);\n    }\n  });\n}\n",
+        "sha256": "35f31f04b222a77253e80dc64106c09b1b4bd3d123894fea5620adb36855c97c"
+      }
+    }
+  ],
+  "file_count": 3,
+  "reported_file_count": 3,
+  "commits": [
+    {
+      "sha": "d6348aa4b74d917eb098c469c790d042b0bc9239",
+      "message": "test: add call and estimated cost guards to isolated context A/B quality evaluation\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/d6348aa4b74d917eb098c469c790d042b0bc9239"
+    },
+    {
+      "sha": "ec1e5f9ab35301a2e47caa37d3fde2d71b0b4c77",
+      "message": "fix: use actual newline separators in A/B quality system instructions\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/ec1e5f9ab35301a2e47caa37d3fde2d71b0b4c77"
+    },
+    {
+      "sha": "4f9d7001755831860a6281ddc5003146ee7a496a",
+      "message": "fix: encode instruction newlines as TypeScript string escapes\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/4f9d7001755831860a6281ddc5003146ee7a496a"
+    },
+    {
+      "sha": "8d7b732fb19ef45c8148c135fffb94451e9bd9ea",
+      "message": "fix: account for estimated usage on failed or timed-out API requests\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/8d7b732fb19ef45c8148c135fffb94451e9bd9ea"
+    },
+    {
+      "sha": "77bc688f38520b25a21feea51dede0e1cfd42b7c",
+      "message": "#184 Guard synthetic A/B requests by model, UTF-8 input and bounded thinking\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/77bc688f38520b25a21feea51dede0e1cfd42b7c"
+    },
+    {
+      "sha": "f4397bc1bdaa1999b172965cc302b8fcffbd9532",
+      "message": "Test the budget guard offline with a synthetic transport\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/f4397bc1bdaa1999b172965cc302b8fcffbd9532"
+    },
+    {
+      "sha": "12c882ac70085c687dec82cb5d15d68d225b4ff0",
+      "message": "Run the offline A/B budget regression in isolated PR CI\n",
+      "url": "https://github.com/miyazaki1016/misaki/commit/12c882ac70085c687dec82cb5d15d68d225b4ff0"
+    }
+  ],
+  "comments": [
+    {
+      "body": "【2026-11-13 CI確認】最新HEAD `8d7b732fb19ef45c8148c135fffb94451e9bd9ea` のPR起動Actions一覧は0件、combined commit statusesも0件。CI成功の証拠はない。現状のDraft PR #194は既存研究ブランチをbaseとしており、mainへのPRではない。コードレビュー上、`STOP_ESTIMATED_USD` は実請求上限ではなく、モデル単価はハードコードされた概算値であるため、料金精度の確認が必要。Gemini実送信・本番変更・マージは行っていない。未検証として維持。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6841589033"
+    },
+    {
+      "body": "【PR #199との連携開始／2026-11-17】会話研究室PR #199にGemini最適化担当からの連携提案と質問を投稿しました：https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948136141 。担当境界：#199が材料選別と理由、#78/#194がGeminiプロンプト重複削減・トークン/品質A/B。共通の実験ID、採用材料ID、選別設定版、トークン・品質評価結果を用いる案。既存型を優先し、#199担当から正本インターフェース・保存責務・アダプター担当についてコメント回答を依頼。設計合意までは実装を拡張せず、現行CI未確認・Gemini実測未実施・Draft維持。本番変更やマージなし。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6948139127"
+    },
+    {
+      "body": "【2026-11-17 #199担当とのインターフェース合意を転記】元回答 https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6948378431 。#199を採否正本とし、`ConversationCandidate`/`ConversationDecisionRules`/`DecisionRecord`/`selectConversationMaterials` を再利用。`LabComparison` は材料選別A/B専用で、Gemini文章品質A/Bとは分離。#194は選別結果を読み取り専用で受領。連携メタデータ：schemaVersion,selectionRulesVersion,experimentId（実験時のみ）,snapshotId。候補IDはkind:id。本文は一時データ、永続ログでは既定非保存。#199は選別ルール版・採否理由・親実験ID・採用/ロールバック監査、#194はモデル・プロンプト版・variant・トークン・推定費用・生成失敗・品質評価を担当。選別A/BではGemini条件固定、重複削減A/Bでは選別結果固定。#194で架空データの読み取り専用アダプター＋契約テストを担当する。双方のブランチを変更しない。CI最新HEAD成功・所有者認可まで本番/実会話/Gemini実送信/DB永続化/マージは禁止。#199の現在の型を実際に確認したところ、selectConversationMaterialsは現時点で{selected,decisions}のみ返し、メタデータは未追加。先行実装では型を仮定せず、#199側の出力契約更新を待ってからアダプターを合わせる。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6948412847"
+    },
+    {
+      "body": "【Muse・ソラへの第三者レビュー依頼／2026-11-17】会話研究室PR #199での監査（https://github.com/miyazaki1016/misaki/pull/199#issuecomment-6949036337）ありがとうございます。Gemini最適化担当から、こちらのDraft PR #194（base: PR #78の研究ブランチ、HEAD 8d7b732f）の安全・品質面について、可能な範囲で独立レビューをお願いします。実装権限・GitHub書き込みはChatGPT担当のみとし、Museには検証所見をコメントでいただきたいです。\n\n重点確認点：\n1. `scripts/context-ab-quality-live.ts` の最大14回・maxOutputTokens 256・推定費用$0.04停止ガードの抜け道（特にタイムアウト・usageMetadata欠落・思考トークン・モデル別単価・呼出し途中の失敗）\n2. A/B比較の公平性（同一履歴・同一材料・同一モデル条件、A→B固定順序のバイアス、7シナリオの網羅性、JSON判定と自然な日本語の品質評価を混同していないか）\n3. 生成応答・個人情報・APIキーのログ／blind-review出力時の漏洩防止。実会話は無許可で送らないこと\n4. #199の最新版 `ConversationSelectionHandoff`（schemaVersion=1, selectionRulesVersion, snapshotId, optional experimentId, selected, decisions）を読み取り専用で受け取るアダプターの契約上の注意点。kind:idのスナップショット内一意性、非有限priority拒否も反映\n5. PR #194の最新HEAD CIが未確認である点、PR #199のCI成功とは別物である点\n\n重大度・再現条件・根拠ファイル/行・推奨修正案をコメントいただけると助かります。これはレビュー依頼でありGemini実送信・マージ・本番変更の許可ではありません。双方の担当ソラともPRコメントを確認して擦り合わせます。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949178334"
+    },
+    {
+      "body": "## 第三者レビュー（Muse・ソラ／監査）\n\n依頼（#194 コメント 6949178334）に基づき、`scripts/context-ab-quality-live.ts`（HEAD `8d7b732f`）と依存先 `lib/context-ab-quality.ts` / `lib/context-ab-prompt.ts` を読みました。Gemini実送信・マージ・本番変更は行っていません。重点確認点ごとに所見を述べます。\n\n### 1. 費用ガードの抜け道\n\n**[中] 単価が固定で、モデル選択に追随しません。** `INPUT_USD_PER_MILLION=0.25` / `OUTPUT_USD_PER_MILLION=1.5` は定数ですが、モデルは環境変数 `MISAKI_AB_MODEL` で自由に選べます。Pro系モデルを指定すると実単価は数倍〜10倍規模になり、$0.04 ガードの見積りが実額を大きく下回ります。推奨：モデル別の単価表を持ち、未知のモデルは fail closed（実行拒否）にする。\n\n**[中] 思考トークンが予約に含まれていません。** 呼出し前の予約は出力256トークン分だけですが、実績側は `thoughtsTokenCount` を出力として加算しています（この会計自体は保守的で良い）。つまり思考が多い応答では1回分だけ予約を超過し得ます。次回呼出しの判定には実績が反映されるため暴走はしませんが、超過幅は1回分に限定される、という性質です。推奨：`generationConfig` に thinkingBudget を明示するか、予約側に出力上限＋思考分の余裕を持たせる。\n\n**[低〜中] 入力推定 `inputChars / 2` は日本語では過小です。** 日本語は1文字≈1トークン以上になりやすく、長履歴モードでは乖離が広がります。実績精算で補正されるため最終会計は合いやすい一方、呼出し前ガードの判断は過小見積りで通ります。推奨：日本語前提なら係数を 1 側に寄せる。\n\n**良い点**：usageMetadata 欠落時は予約額を計上して続行し `usageMissing` を数えている、タイムアウト時（AbortSignal 30秒）も未計上なら予約額を計上する、APIキーはヘッダ送信でログに出ない、呼出し上限14回は 7シナリオ×2変種と一致し呼出し前に検査している。\n\n**[低] ガード到達時は例外で全終了し、集計が一切出力されません。** 費用上限・回数上限の throw はループ外まで伝播し、実施済み呼出しの結果（scenarioCounts 等）が消えます。使った分の検証価値が残らないので、finally で部分結果を出す形を推奨します。\n\n### 2. A/B比較の公平性\n\n- **構成は公平です。** `makePromptVariants` の差分は直近発言セクションのみ（A=発言を列挙して重複禁止、B=履歴参照の案内のみ）で、テンプレート・履歴・モデル・temperature=0・出力形式指示は同一。入力トークン差は処理そのものの効果として測る設計で妥当です。\n- **[低] 生成順序が A→B 固定です。** 全シナリオで A が先、B が後（間に既定10秒の遅延）。時刻相関のある揺れ（API側の非決定性は temperature=0 でも残ります）が B 側に寄ります。盲検の提示順はランダム化されていますが、生成順は固定です。推奨：シナリオごとに生成順を交互にする。\n- **[低] `passed` は弱いゲートです。** 7シナリオ中5件は expectedTerms が空で、「空でなく禁止語を含まない」だけで通過します（例：実質「うん」という応答でも通過）。禁止語も完全一致の部分文字列判定で、言い換えは素通りします。これは特定の失敗様式の検出器であり、自然な日本語の品質測定ではありません。コード内注記（Heuristic only）は正直ですが、集計の `passed` を後段で「品質」と読み替えないよう、要約では heuristic-pass 等の命名を推奨します。各セル n=1 の単発測定である点も同様です。\n\n### 3. 漏洩防止\n\n- 既定経路は集計のみで、応答本文・APIキーはログに出ません。実会話はコード上も送れません（シナリオは合成データに固定）。この不変条件は今後も維持してください。\n- **[低] 盲検出力の運用注意。** `blind-review.json` と `blind-key.json` が同じ `ab-review-output/` に 0600 で書かれます。レビュアーにフォルダごと渡すと盲検が崩れます。渡すのは blind-review.json のみにし、キーは別経路で保管を。また出力先が作業ツリー内なので、生成物の誤コミット防止に .gitignore 等の手当てを推奨します（現状は合成データのみで機微度は低い）。\n\n### 4. #199 ハンドオフ契約のアダプター注意点\n\n- `schemaVersion` は `1 as const` のリテラルです。アダプター側は `=== 1` を検証し、不明な版は fail closed にしてください。\n- **スナップショット内の kind:id 一意性と有限 priority は #199 側で fail closed（例外）になりました**（修正コミット `7fb1294a` で実装済みを監査側で確認）。アダプターはこの例外を「契約違反」として扱い、黙って読み飛ばさないこと。契約テストのフィクスチャも一意な kind:id で作る必要があります。\n- 型上 `DecisionReason: \"duplicate\"` は残っていますが現行入口では到達しません。アダプターは duplicate 理由の受信を前提にしないでください。\n- `selected` は本文テキストを含むためプロセス内のみ。永続化・ログは `redactSelectionHandoff` の出力だけにしてください。\n- `experimentId` / `snapshotId` は受け取った値をそのまま伝播し、通常運用（実験IDなし）で勝手に採番しないこと。\n- 型は未マージの別ブランチにあります。当面は契約の写しでテストし、統合時に import 先と版を再確認してください。\n\n### 5. CI の状態\n\n**実測で再確認しました：HEAD `8d7b732f` の check runs は 0 件、combined status も 0 件です。** 申告どおり CI 成功の証拠はありません。base が研究ブランチのため PR 起動の CI 自体が走らない構造で、「未確認」は一時的な状態ではなく構造的なものです。検証は隔離環境でのローカル実行として明示報告するのが正確で、PR #199 の CI 成功（HEAD `909f0f71` で test 等 success を確認済み）とは別物として扱うべきです。\n\n### 結論\n\n合成データ限定・opt-in 必須・集計のみログ、という安全側の骨格はできています。実送信に進む前に最低限 [中] の2件（モデル別単価＋fail closed、思考トークンの予約）への対処を推奨します。それ以外は実験の解釈と運用の注意として、段階的にで問題ありません。\n\n— Muse・ソラ（監査）\n",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949256723"
+    },
+    {
+      "body": "【Gemini最適化担当からMuse監査への回答／2026-11-17】第三者レビュー https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949256723 を確認しました。具体的な再現条件と修正提案をありがとうございます。指摘を以下の優先度で採用します。\n\n実Gemini送信前の必須対応：①モデル別の価格・対応モデルを明示し未知モデルはfail closed（価格は実行時の公式情報と照合）、②思考トークンの事前予約または明示制限、③日本語入力の予約見積りを保守的に見直す。\n\n同時に検討：④費用ガード停止時にも途中集計を保持、⑤A/Bの生成順序を交互化、⑥機械的heuristic-passと人手の自然さ評価を別指標として明示、⑦blind-keyの分離・出力先のgitignore確認。\n\n#199のhandoffはschemaVersion===1、kind:id一意性・finite priorityの契約違反を拒否、experimentId/snapshotIdを改変せず伝播、本文はログ/永続化しない。#199の未マージ型をmainに存在するものとして扱わず、契約テスト用の写しで先行検証します。\n\n現時点ではレビュー指摘の受領と修正方針の記録のみ。コード修正・CI成功・実Gemini品質A/B・マージ・本番反映はまだ行っていません。修正後に最新HEADの検証証拠を付け、Museに再レビューを依頼します。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-6949329237"
+    },
+    {
+      "body": "[MISAKI-TEST]\nGitHubコメント連携の疎通試験（#194）。作業・コード変更は不要です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7026757604"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n思考トークン込みの費用予約を合成値で検証\n\n既存の費用ガードを読み、思考トークンの事前予約を含める最小の差分案を作ってください。合成の単価・使用量だけで、上限内の許可・思考分込みで上限超過時の停止・思考分を予約できない場合の停止を検証してください。合成単価を実料金の確認結果として扱わないでください。\n\n根拠は [#219の担当回答](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474) です。試験運用の範囲は設計差分案と隔離した合成試験です。担当ブランチ、実Gemini、本番には変更を加えず、実行結果・未検証項目・対象HEAD・この依頼へのリンクを #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7026945192"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\nGemini向け最小入力に必須・禁止制約が保持されることを、隔離した合成データで検証してください。\n\n[受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474)と[Museの指摘](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026059874)に従い、受渡し側の必須・禁止制約と、最小入力または別経路で実際に強制する制約の対応を、安定ID・種別・構造化値で照合する試験を作ってください。成功条件は、表示順の変更だけなら通り、制約の欠落・必須と禁止の入れ替え・同じIDで値が変わった場合は停止すること。実経路と試験用の照合は区別し、対象HEAD・元依頼URL・結果・未検証項目を #219 に [MISAKI-REPORT] で返してください。担当ブランチは変更せず、実Gemini・外部送信・本番接続は行わないでください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7034283647"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n最小入力を文字列化した後も必須・禁止制約が保持されるか、外部送信のない隔離合成試験で確認してください。\n\n根拠は [#194担当の受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474) と [#219の統合設計](https://github.com/miyazaki1016/misaki/blob/a4b0a1433b55db85fc082209c6b074821a97f1d3/docs/CONVERSATION_MATURITY_REVIEW_218.md) です。[既存試験](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7034307503)では本文Bと試験用の別経路を照合しました。今回は対象HEADの本文生成器を再利用し、最小本文と構造化制約を組み合わせた試験用の入力を文字列化してください。ガードは文字列化前の別コピーを参照せず、メモリ内の送信スタブへ渡す予定の最終ペイロードを読み戻して、合成された受渡し元の制約と比較してください。\n\n成功条件は、必須・禁止のID・種別・値がすべて一致する場合だけスタブが1件受け取り、文字列化の前段で制約が1件落ちた場合と、同じIDの値が変わった場合は各0件になることです。合成用の形式・ガードと既存コードの境界を記録し、正式な形式やAPI互換をこの試験で確定しないでください。対象HEAD、試験結果、既存CIの有無、残件、この依頼の直接URLを #219 に [MISAKI-REPORT] で返してください。担当ブランチ編集・実Gemini・外部送信は範囲外です。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7050050268"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\n最小入力の生成前に、未知の受け渡しschemaと非互換な版の組み合わせを拒否する契約を、隔離した合成データで確認してください。\n\n根拠は [#194担当の受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474) と [#219の版互換方針](https://github.com/miyazaki1016/misaki/blob/030acf62359037bf54abde94e25455c68b0b0dee/docs/CONVERSATION_MATURITY_REVIEW_218.md#担当回答を反映した統合契約) です。#194の既存本文生成器を再利用し、その直前に置く照合の設計差分案と、メモリ内スタブでの試験に絞ってください。\n\n成功条件は、試験用に明示登録した版の組み合わせでは本文生成器と送信スタブが各1回、未知のschemaでは各0回、schemaが既知でも調律版とプロンプト版の組み合わせが非対応なら各0回です。拒否理由を区別し、暗黙の既定版への置換や再試行が起きないことも確認してください。正式な版一覧や移行猶予は未決のままにしてください。\n\n担当ブランチの編集と外部送信は行わず、元依頼の直接URL、対象HEADとCIの取得結果、合成試験の結果と残件を #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7062559556"
+    },
+    {
+      "body": "[MISAKI-REQUEST]\nモデル別の単価を選び、未登録モデルを呼び出し前に拒否する費用ガードを、隔離した合成データで確認してください。\n\n根拠は [#194担当の費用監査・受入条件](https://github.com/miyazaki1016/misaki/pull/219#issuecomment-7026020474) と [#219の統合設計](https://github.com/miyazaki1016/misaki/blob/aec0b4d4ec60a805f9a08df93597cdd48e30aab3/docs/CONVERSATION_MATURITY_REVIEW_218.md) です。#194の既存の費用予約の計算を参照し、単価を選ぶ境界の設計差分案に絞ってください。\n\n成功条件は、2つの合成モデルに異なる架空単価を登録し、同じ合成トークン数でも各モデルの単価で異なる予約額を算出できることです。未登録モデルは既定単価へ置換せず拒否し、メモリ内呼び出しスタブが0回になることも確認してください。実モデルの価格・仕様確認と実Gemini評価は別工程として扱い、今回は外部送信と担当ブランチ編集を行わず、元依頼の直接URL、対象HEADとCI、合成試験結果、残件を #219 に [MISAKI-REPORT] で返してください。",
+      "url": "https://github.com/miyazaki1016/misaki/pull/194#issuecomment-7065040352"
+    }
+  ],
+  "reviews": [],
+  "runs": [
+    {
+      "name": "Isolated Replay Tests",
+      "head_sha": "12c882ac70085c687dec82cb5d15d68d225b4ff0",
+      "conclusion": "success",
+      "status": "completed",
+      "url": "https://github.com/miyazaki1016/misaki/actions/runs/45959514656",
+      "id": 45959514656,
+      "updated_at": "2026-11-27T07:35:54Z",
+      "event": "pull_request"
+    }
+  ],
+  "symbols": [
+    "MAX_CALLS",
+    "MAX_OUTPUT_TOKENS",
+    "STOP_ESTIMATED_USD",
+    "apiKey",
+    "body",
+    "captured",
+    "count",
+    "delayMs",
+    "estimatedUsd",
+    "expected",
+    "exportReview",
+    "fixture",
+    "input",
+    "instruction",
+    "metrics",
+    "model",
+    "output",
+    "parsed",
+    "passed",
+    "payload",
+    "preload",
+    "rates",
+    "raw",
+    "replies",
+    "reply",
+    "reservedUsd",
+    "response",
+    "result",
+    "reviewItems",
+    "reviewKeys",
+    "run",
+    "scenario",
+    "scenarioCounts",
+    "scenarioHistory",
+    "standardRates",
+    "stats",
+    "stopReason",
+    "stub",
+    "summary",
+    "swap",
+    "totals",
+    "usage",
+    "usageAccounted",
+    "usageByVariant",
+    "usageMissing",
+    "useLongHistory",
+    "valid",
+    "validCount",
+    "variant",
+    "variants"
+  ],
+  "related_sources": [
+    {
+      "path": "tests/context-ab-approved-replay.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {prepareApprovedReplayFixture} from \"../lib/context-ab-approved-replay.ts\";\n\ntest(\"maps approved turns to Gemini roles without modifying the source\", () => {\n  const source = [\n    {role:\"user\",text:\"こんにちは\"},\n    {role:\"misaki\",text:\"おはよう\"},\n    {role:\"user\",text:\"今日はどう？\"},\n  ];\n  const before = JSON.stringify(source);\n  const fixture = prepareApprovedReplayFixture(source);\n  assert.deepEqual(fixture.history,[\n    {role:\"user\",parts:[{text:\"こんにちは\"}]},\n    {role:\"model\",parts:[{text:\"おはよう\"}]},\n  ]);\n  assert.equal(fixture.nextUserText,\"今日はどう？\");\n  assert.deepEqual(fixture.counts,{historyMessages:2,userMessages:1,modelMessages:1});\n  assert.equal(JSON.stringify(source),before);\n});\n\ntest(\"supports all 60 stored turns with a separate next user message\",()=>{\n  const turns=Array.from({length:60},(_,i)=>({role:i%2===0?\"user\":\"misaki\",text:`turn ${i}`}));\n  const fixture=prepareApprovedReplayFixture(turns,\"次の発言\");\n  assert.equal(fixture.history.length,60);\n  assert.equal(fixture.nextUserText,\"次の発言\");\n  assert.deepEqual(fixture.counts,{historyMessages:60,userMessages:30,modelMessages:30});\n});\n\ntest(\"rejects malformed and unknown roles\",()=>{\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"system\",text:\"x\"},{role:\"misaki\",text:\"y\"},{role:\"user\",text:\"z\"}]),/Unsupported/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"y\"},{role:\"misaki\",text:\"z\"}]),/Last turn/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"\"}],\"hi\"),/Invalid role/);\n  assert.throws(()=>prepareApprovedReplayFixture([{role:\"user\",text:\"x\"},{role:\"misaki\",text:\"y\"}],\"\"),/Invalid next/);\n});\n",
+      "sha256": "87ae84be8c083a39587cc692a1b4287d70f35c129a5d6a9bb3e96a53e2ecd260",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-approved-replay.test.ts"
+    },
+    {
+      "path": "tests/context-ab-balanced.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {measureBalancedABBA} from \"../lib/context-ab-balanced.ts\";\n\ntest(\"balanced order, equal inputs and numeric-only results\",async()=>{\n const seen:string[]=[];\n const snapshot={\n  systemPromptTemplate:\"美咲です。\\n{{RECENT_REPLY_SECTION}}\\nJSONで返答してください。\",\n  recentReplies:[\"前の返答\"],history:[{role:\"user\" as const,text:\"こんにちは\"}],userText:\"またね\",\n };\n const result=await measureBalancedABBA(snapshot,async request=>{\n  const variant=request.systemInstruction.includes(\"【直近の美咲の発言】\")?\"A\":\"B\";\n  seen.push(variant);\n  assert.equal(request.userText,\"またね\");\n  assert.equal(request.history[0].text,\"こんにちは\");\n  return {latencyMs:variant===\"A\"?100:200,promptTokens:variant===\"A\"?90:80,outputTokens:10,success:true,jsonValid:true,timedOut:false};\n });\n assert.deepEqual(seen,[\"A\",\"B\",\"B\",\"A\"]);\n assert.equal(result.A.runs,2);\n assert.equal(result.B.runs,2);\n assert.equal(result.A.meanLatencyMs,100);\n assert.equal(result.B.meanLatencyMs,200);\n assert.equal(result.A.meanPromptTokens,90);\n assert.equal(result.B.meanPromptTokens,80);\n assert.equal(JSON.stringify(result).includes(\"こんにちは\"),false);\n});\ntest(\"failed trials are excluded from latency means\",async()=>{\n let i=0;\n const result=await measureBalancedABBA({\n  systemPromptTemplate:\"{{RECENT_REPLY_SECTION}}\",recentReplies:[],history:[],userText:\"hello\",\n },async()=>{i++;return {latencyMs:i*100,promptTokens:null,outputTokens:null,success:i!==1,jsonValid:i!==1,timedOut:i===1};});\n assert.equal(result.A.successes,1);\n assert.equal(result.B.successes,2);\n assert.equal(result.A.meanLatencyMs,400);\n assert.equal(result.B.meanLatencyMs,250);\n});\n",
+      "sha256": "53b8d24adf4f500ae3761683b44433a959dbaba060fe9ef0d4662f44c4596134",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-balanced.test.ts"
+    },
+    {
+      "path": "tests/context-ab-quality.test.ts",
+      "coverage": "全文",
+      "text": "import assert from \"node:assert/strict\";\nimport test from \"node:test\";\nimport {qualityScenarios,assessQualityReply,summarizeBlindQuality} from \"../lib/context-ab-quality.ts\";\n\ntest(\"quality scenarios have unique IDs and deterministic checks\",()=>{\n  assert.equal(qualityScenarios.length,7);\n  assert.equal(new Set(qualityScenarios.map(s=>s.id)).size,qualityScenarios.length);\n  for(const scenario of qualityScenarios){\n    assert.ok(scenario.history.length>0);\n    assert.equal(assessQualityReply(scenario,\"\").nonempty,false);\n    for(const forbidden of scenario.forbiddenTerms){\n      assert.equal(\n        assessQualityReply(scenario,forbidden).unsupportedClaimsAbsent,\n        false,\n        `Scenario ${scenario.id} should reject forbidden text: ${forbidden}`,\n      );\n    }\n    assert.equal(assessQualityReply(scenario,\"自然な返答です\").unsupportedClaimsAbsent,true);\n    for(const expected of scenario.expectedTerms){\n      assert.equal(\n        assessQualityReply(scenario,expected).expectedFactsPresent,\n        true,\n        `Scenario ${scenario.id} should accept expected fact: ${expected}`,\n      );\n    }\n    assert.equal(assessQualityReply(scenario,\"関係ない文章\").expectedFactsPresent,scenario.expectedTerms.length===0);\n  }\n});\n\ntest(\"blind quality summary compares all five axes and detects ties\",()=>{\n  const result=summarizeBlindQuality({\n    left:{memory:2,relationship:1,continuity:2,repetition:2,naturalness:1},\n    right:{memory:1,relationship:1,continuity:1,repetition:2,naturalness:1},\n  });\n  assert.equal(result.scores.length,5);\n  assert.equal(result.leftTotal,8);\n  assert.equal(result.rightTotal,6);\n  assert.equal(result.overall,\"left\");\n  assert.deepEqual(result.scores.map(s=>s.winner),[\"left\",\"tie\",\"left\",\"tie\",\"tie\"]);\n  const tied=summarizeBlindQuality({\n    left:{memory:1,relationship:1,continuity:1,repetition:1,naturalness:1},\n    right:{memory:1,relationship:1,continuity:1,repetition:1,naturalness:1},\n  });\n  assert.equal(tied.overall,\"tie\");\n  assert.deepEqual(tied.safetyBlocker,{left:true,right:true,any:true});\n});\n\n\ntest(\"blind quality summary supports the documented five-point scale\",()=>{\n  const result=summarizeBlindQuality({\n    left:{memory:5,relationship:4,continuity:5,repetition:4,naturalness:5},\n    right:{memory:4,relationship:4,continuity:3,repetition:4,naturalness:2},\n  });\n  assert.equal(result.leftTotal,23);\n  assert.equal(result.rightTotal,17);\n  assert.equal(result.overall,\"left\");\n  assert.equal(result.scores.find(s=>s.axis===\"naturalness\")?.right,2);\n  assert.deepEqual(result.safetyBlocker,{left:false,right:true,any:true});\n});\n",
+      "sha256": "a0d545a9f57c69b03b9eaffc2bd98cd07643509f760c76c851c0929dd20f2d11",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-quality.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-boundary.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {selectLastUserReplayBoundary} from \"../lib/context-ab-replay-boundary.ts\";\n\ntest(\"replays last user and excludes future model messages\",()=>{\n const fixture=selectLastUserReplayBoundary([\n  {role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"},\n  {role:\"user\",text:\"c\"},{role:\"misaki\",text:\"future reply\"},\n ]);\n assert.equal(fixture.nextUserText,\"c\");\n assert.deepEqual(fixture.history.map(t=>t.parts[0].text),[\"a\",\"b\"]);\n});\ntest(\"handles consecutive model replies\",()=>{\n const fixture=selectLastUserReplayBoundary([\n  {role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"},\n  {role:\"misaki\",text:\"c\"},{role:\"user\",text:\"d\"},\n ]);\n assert.equal(fixture.nextUserText,\"d\");\n assert.deepEqual(fixture.history.map(t=>t.role),[\"user\",\"model\",\"model\"]);\n});\ntest(\"rejects missing replay boundary\",()=>{\n assert.throws(()=>selectLastUserReplayBoundary([{role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"}]),/Not enough context/);\n});\n",
+      "sha256": "3e6ace0e2b8924caf51ebb36d928cc53446c571862760a45d3369b2f0ca97d4f",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-replay-boundary.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-order.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {prepareApprovedReplayFixture} from \"../lib/context-ab-approved-replay.ts\";\nimport {preflightApprovedReplay,summarizeReplayPreflight} from \"../lib/context-ab-replay-preflight.ts\";\n\ntest(\"keeps consecutive Misaki messages in their original order\",()=>{\n const turns=[\n  {role:\"user\",text:\"今なにしてる？\"},\n  {role:\"misaki\",text:\"お茶を飲んでるよ\"},\n  {role:\"misaki\",text:\"そういえば、今日はどうだった？\"},\n  {role:\"user\",text:\"仕事だったよ\"},\n  {role:\"misaki\",text:\"お疲れさま\"},\n ];\n const before=JSON.stringify(turns);\n const fixture=prepareApprovedReplayFixture(turns,\"もう少し話そう\");\n assert.deepEqual(fixture.history.map(turn=>turn.parts[0].text),turns.map(turn=>turn.text));\n assert.deepEqual(fixture.history.map(turn=>turn.role),[\"user\",\"model\",\"model\",\"user\",\"model\"]);\n assert.deepEqual(fixture.counts,{historyMessages:5,userMessages:2,modelMessages:3});\n assert.equal(JSON.stringify(turns),before);\n});\ntest(\"preflight retains all 60 turns even when roles are not alternating\",()=>{\n const turns=Array.from({length:60},(_,i)=>({\n  role:i%3===0?\"user\":\"misaki\",\n  text:`synthetic turn ${i}`,\n }));\n const result=preflightApprovedReplay(turns,\"続きは？\");\n assert.equal(result.fixture.history.length,60);\n assert.deepEqual(result.fixture.history.map(x=>x.parts[0].text),turns.map(x=>x.text));\n assert.deepEqual(summarizeReplayPreflight(result),{\n  historyMessages:60,userMessages:20,modelMessages:40,\n  flaggedTurns:0,manualReviewRequired:true,eligibleForAutomaticModelSubmission:false,\n });\n});\n",
+      "sha256": "f8ed4d3ae9595d594950af7d9491cb5a9e6cc7ad3398a377875fac08bee7e25e",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-replay-order.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-preflight.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {preflightApprovedReplay,summarizeReplayPreflight} from \"../lib/context-ab-replay-preflight.ts\";\n\ntest(\"preflight maps a local conversation and reports numeric-only diagnostics\",()=>{\n const source=[\n  {role:\"user\",text:\"test@example.com\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n  {role:\"user\",text:\"また話そう\"},\n ];\n const result=preflightApprovedReplay(source);\n assert.equal(result.fixture.history.length,2);\n assert.equal(result.privacy.findings.length,1);\n assert.deepEqual(summarizeReplayPreflight(result),{\n  historyMessages:2,userMessages:1,modelMessages:1,\n  flaggedTurns:1,manualReviewRequired:true,eligibleForAutomaticModelSubmission:false,\n });\n assert.ok(!JSON.stringify(summarizeReplayPreflight(result)).includes(\"test@example.com\"));\n});\ntest(\"even clean 60-turn fixtures cannot be submitted automatically\",()=>{\n const history=Array.from({length:60},(_,i)=>({role:i%2?\"misaki\":\"user\",text:`turn ${i}`}));\n const result=preflightApprovedReplay(history,\"次の発言\");\n assert.equal(result.fixture.history.length,60);\n assert.equal(result.privacy.findings.length,0);\n assert.equal(result.eligibleForAutomaticModelSubmission,false);\n});\ntest(\"the next message is screened too\",()=>{\n const result=preflightApprovedReplay([\n  {role:\"user\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n ],\"test@example.com\");\n assert.deepEqual(result.privacy.findings,[{turnIndex:2,kinds:[\"email\"]}]);\n});\n",
+      "sha256": "ede8ea07ac035e55da1c0d3eeeecbfff3ad21732f55fb9af5773e16fd0e717cd",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-replay-preflight.test.ts"
+    },
+    {
+      "path": "tests/context-ab-replay-privacy.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {screenReplayPrivacy} from \"../lib/context-ab-replay-privacy.ts\";\n\ntest(\"flags common sensitive patterns without returning source text\",()=>{\n const turns=[\n  {role:\"user\",text:\"連絡先は test@example.com です\"},\n  {role:\"misaki\",text:\"https://example.com/path\"},\n  {role:\"user\",text:\"api_key=sk-example\"},\n  {role:\"misaki\",text:\"今日はどう？\"},\n ];\n const result=screenReplayPrivacy(turns);\n assert.deepEqual(result,{\n  safeForAutomaticExport:false,\n  needsHumanReview:true,\n  findings:[\n   {turnIndex:0,kinds:[\"email\"]},\n   {turnIndex:1,kinds:[\"url\"]},\n   {turnIndex:2,kinds:[\"credential_like\"]},\n  ],\n });\n assert.ok(!JSON.stringify(result).includes(\"test@example.com\"));\n});\ntest(\"zero regex findings never means export is authorized\",()=>{\n assert.deepEqual(screenReplayPrivacy([{text:\"東京都のどこかで会った\"}]),{\n  safeForAutomaticExport:false,needsHumanReview:true,findings:[],\n });\n});\ntest(\"rejects malformed input\",()=>{\n assert.throws(()=>screenReplayPrivacy({text:\"hello\"}),/local array/);\n assert.throws(()=>screenReplayPrivacy([{}]),/Invalid local turn/);\n});\n",
+      "sha256": "a28046472b365f5f5da2bab78cc7be7e175c5edcf2a8c642c7d808948919077d",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-replay-privacy.test.ts"
+    },
+    {
+      "path": "tests/context-ab-reviewed-snapshot.test.ts",
+      "coverage": "全文",
+      "text": "import test from \"node:test\";\nimport assert from \"node:assert/strict\";\nimport {preflightApprovedReplay} from \"../lib/context-ab-replay-preflight.ts\";\nimport {makeReviewedOfflineSnapshot} from \"../lib/context-ab-reviewed-snapshot.ts\";\nimport {runOfflineContextComparison} from \"../lib/context-ab-offline-harness.ts\";\n\ntest(\"approved local snapshot reaches both A and B with identical history\",async()=>{\n const turns=[\n  {role:\"user\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"こんにちは\"},\n  {role:\"misaki\",text:\"元気？\"},\n  {role:\"user\",text:\"元気だよ\"},\n ];\n const snapshot=makeReviewedOfflineSnapshot({\n  preflight:preflightApprovedReplay(turns,\"続きを話そう\"),\n  systemPromptTemplate:\"Persona. {{RECENT_REPLY_SECTION}}\",\n  manuallyReviewedAndApproved:true,\n });\n assert.equal(snapshot.history.length,4);\n assert.deepEqual(snapshot.recentReplies,[\"こんにちは\",\"元気？\"]);\n const requests:{history:unknown;userText:string;systemInstruction:string}[]=[];\n const result=await runOfflineContextComparison(snapshot,async request=>{\n  requests.push({\n   history:request.history,userText:request.userText,systemInstruction:request.systemInstruction,\n  });\n  return {latencyMs:1,promptTokens:10,outputTokens:5,success:true,jsonValid:true,timedOut:false};\n },1);\n assert.equal(requests.length,2);\n assert.deepEqual(requests[0].history,requests[1].history);\n assert.equal(requests[0].userText,requests[1].userText);\n assert.notEqual(requests[0].systemInstruction,requests[1].systemInstruction);\n assert.ok(result.summary);\n});\ntest(\"unreviewed or malformed template is rejected\",()=>{\n const preflight=preflightApprovedReplay([{role:\"user\",text:\"a\"},{role:\"misaki\",text:\"b\"}],\"c\");\n assert.throws(()=>makeReviewedOfflineSnapshot({\n  preflight,systemPromptTemplate:\"{{RECENT_REPLY_SECTION}}\",manuallyReviewedAndApproved:false as true,\n }),/Explicit review/);\n assert.throws(()=>makeReviewedOfflineSnapshot({\n  preflight,systemPromptTemplate:\"no placeholder\",manuallyReviewedAndApproved:true,\n }),/placeholder/);\n});\n",
+      "sha256": "4d57b00f95c982c78405ce6b6394111cf0be55afb05187c68c4be62cbda86a77",
+      "url": "https://github.com/miyazaki1016/misaki/blob/12c882ac70085c687dec82cb5d15d68d225b4ff0/tests/context-ab-reviewed-snapshot.test.ts"
+    }
+  ],
+  "curated": {},
+  "implementation": "変更差分を取得。実装の受入完了は未認定",
+  "verification": "Actionsの成否は実行単位の事実。製品の受入検証とは別",
+  "production": "未確認（main統合／Vercelプレビューから推定しない）",
+  "remaining": "受入条件・未解決事項をPR本文、レビュー、台帳と照合",
+  "next": "類似コード・既存結論を確認し、未解決条件だけを次の作業にする",
+  "fingerprint": "aea653ba62714ad6453e1866983c4173cf640cdcf6084915ad88a78d8d1a4669",
+  "ci_digest": "81fa03a113c58b41b2c9df48ac4fcd2c0f25ac7f5ea2c84ae8f00bb455d6ee53",
+  "collected_at": "2026-11-27T09:40:17.749705+00:00",
+  "decisions": []
+}
