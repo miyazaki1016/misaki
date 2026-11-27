@@ -3,6 +3,7 @@ name: Isolated Replay Tests
 on:
   pull_request:
     paths:
+      - "scripts/context-ab-quality-live.ts"
       - "lib/context-ab-*.ts"
       - "tests/context-ab-*.test.ts"
       - ".github/workflows/isolated-replay-tests.yml"
@@ -21,6 +22,8 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
+      - name: Run offline cost guard tests
+        run: node --test --experimental-strip-types tests/context-ab-quality-budget.test.ts
       - name: Run offline replay tests only
         run: node --test --experimental-strip-types tests/context-ab-approved-replay.test.ts tests/context-ab-replay-privacy.test.ts tests/context-ab-replay-preflight.test.ts tests/context-ab-replay-order.test.ts tests/context-ab-reviewed-snapshot.test.ts tests/context-ab-replay-boundary.test.ts tests/context-ab-balanced.test.ts
       - name: Run deterministic synthetic quality regression checks
