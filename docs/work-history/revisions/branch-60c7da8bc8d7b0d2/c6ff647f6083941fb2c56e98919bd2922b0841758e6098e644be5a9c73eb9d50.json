@@ -1,0 +1,316 @@
+{
+  "id": "branch-60c7da8bc8d7b0d2",
+  "title": "docs/conversation-maturity-218",
+  "head": "6dec8e6ba75a34f83f9fc413f4300a53b6c92be4",
+  "head_ref": "docs/conversation-maturity-218",
+  "linked_prs": [
+    219
+  ],
+  "files": [
+    {
+      "path": "docs/CONVERSATION_MATURITY_REVIEW_218.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/docs/CONVERSATION_MATURITY_REVIEW_218.md"
+    },
+    {
+      "path": "tests/relationship-source-of-truth-contract.test.cjs",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/relationship-source-of-truth-contract.test.cjs"
+    },
+    {
+      "path": "tests/three-block-one-pass.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block-one-pass.test.ts"
+    },
+    {
+      "path": "tests/three-block/one-pass.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/one-pass.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/lib/conversation-lab-comparison.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/lib/conversation-lab-comparison.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/lib/conversation-lab-decision.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/lib/conversation-lab-decision.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/lib/conversation-lab-handoff.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/lib/conversation-lab-handoff.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/lib/conversation-lab-pipeline.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/lib/conversation-lab-pipeline.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/lib/conversation-lab-scope.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/lib/conversation-lab-scope.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/tests/conversation-lab-comparison.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/tests/conversation-lab-comparison.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/tests/conversation-lab-decision.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/tests/conversation-lab-decision.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/tests/conversation-lab-handoff.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/tests/conversation-lab-handoff.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/tests/conversation-lab-pipeline.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/tests/conversation-lab-pipeline.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/selection/tests/conversation-lab-scope.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/selection/tests/conversation-lab-scope.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-approved-replay.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-approved-replay.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-balanced.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-balanced.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-blind-quality.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-blind-quality.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-offline-harness.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-offline-harness.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-prompt.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-prompt.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-quality-long-history.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-quality-long-history.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-quality.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-quality.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-replay-boundary.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-replay-boundary.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-replay-preflight.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-replay-preflight.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-replay-privacy.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-replay-privacy.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-results.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-results.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/lib/context-ab-reviewed-snapshot.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/lib/context-ab-reviewed-snapshot.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/scripts/run-synthetic-quality-checks.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/scripts/run-synthetic-quality-checks.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-approved-replay.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-approved-replay.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-balanced.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-balanced.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-blind-quality.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-blind-quality.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-offline-harness.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-offline-harness.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-prompt.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-prompt.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-quality-long-history.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-quality-long-history.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-quality.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-quality.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-replay-boundary.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-replay-boundary.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-replay-order.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-replay-order.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-replay-preflight.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-replay-preflight.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-replay-privacy.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-replay-privacy.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-results.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-results.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/slimming/tests/context-ab-reviewed-snapshot.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/slimming/tests/context-ab-reviewed-snapshot.test.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/tuning/lib/conversation-tuning-preview.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/tuning/lib/conversation-tuning-preview.ts"
+    },
+    {
+      "path": "tests/three-block/vendor/tuning/tests/conversation-tuning-preview.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/6dec8e6ba75a34f83f9fc413f4300a53b6c92be4/tests/three-block/vendor/tuning/tests/conversation-tuning-preview.test.ts"
+    }
+  ],
+  "commits": "6dec8e6ba75a34f83f9fc413f4300a53b6c92be4 test: run Misaki three-block conversation path in isolation\n0bc925c58abf1c678b7deaeac0509d95c33f55ab docs: record relationship authority and integration flow decisions\n6755c477105bfcd431abb0f9bcefeeffebb5b2cd test: add isolated relationship source-of-truth contract fixtures\n7ef2172bbd81d3181797e0abc669600fe19ba5bf docs: record 2026-11-24 #219 integration verification\n4f42ece4e7c8136dfdad027e0c7776fb35462f47 docs: record 2026-11-23 14:29 integration verification for #219\n32b0693133e550f4139b798f97fee040a2267850 docs: record 2026-11-23 integration follow-up for #219\n1ea2c26a2197e1956f0b26d6c1dfaf640ce76763 docs: record latest #219 integration follow-up\n2b83a2aae764fb5f92460d1dab7f3c6339862e76 docs: record overdue #199 integration follow-up\n549609ac0a08cc02773f4b06852de6bf15ad88ae docs: refresh Nov 22 integration status and audit follow-up\n6524c90f6913c84a5b20056d251b777e99d4c7dc docs: record Nov 22 integration follow-up and isolated send-boundary contract\nd162427d81f1c27983ce2dd320c21dbb3d54581d docs: label verification snapshot as pre-edit\n3286cb7003ac3c7d5cde85c1f4fdc8d71b89d425 docs: refresh conversation maturity verification evidence\n0cd039a958911594de8a1a927041425078ae0a7c docs: record engine audit findings and unresolved integration boundaries\na799c366d6b4063f809fcbeaf758f4330301749f docs: モデル別費用予約と上限停止の試験結果を記録\naec0b4d4ec60a805f9a08df93597cdd48e30aab3 docs: 調律A/Bの制約保持と横断試験を記録\n5a12b04acadb98ec16c285ccbb4c5319b3b1ebe8 docs: 監査用と配信用の受け渡し分離の試験結果を記録\n737ea329de2af71b7d86a7bca3260e8b91e3ac8f docs: 最小入力の版互換試験結果を記録\n030acf62359037bf54abde94e25455c68b0b0dee docs: 共通デフォルト切替時の調律版固定の試験結果を記録\n3d3ed4eb3b212e1549158d11c98a105c696fc428 docs: 共有キャッシュ分離の合成試験結果を記録\n759a47bfc052d8a46835e648d38158932fd285b2 docs: record ordinary rollback and silence integration check\n8960f8095ebecdca8f4d0928652bd5d70beec00a docs: record tuning rollback contract evidence\n9502217715568dad0b81a442e6882ec15bf71d7b docs: record question permission contract evidence\n376363e769e533c5dcb05feb928d7bbc638a72bb docs: record snapshot binding and silence contract evidence\ne1aab2fd9de88abf062d9f2ef913d319fe607ae3 docs: record concurrent tuning publication contract evidence\nbb9810c456ac416eee306331ddb24997fe6f31cd docs: record serialized constraint contract evidence\na4b0a1433b55db85fc082209c6b074821a97f1d3 docs: record pinned tuning version read contract evidence\n8ce828a66656b2af1b804dcf15ea6ae3acbaf78a docs: record synthetic check with remaining valid material\n7fe9cb238551037aea31ed90e17e19a99fb055bd docs: record material expiry and cancellation contract evidence\n2a9df867936b2e599a69a1ebd87fc97f2a60cf52 docs: record successful reuse preflight review\n8964cb16a464c11ef803e9c5186b3b6322ed9285 docs: record Muse audit and implementation gates\n31e588c4c8249d1102045e85dcca8c7095164561 docs: record minimal prompt constraint contract test\n9a7d03cc63124b53acc36f23cf6a67cb23875c58 docs: record tuning session pinning contract test\n8380fcccd203a8e71f2b7cf0e1628d26990dfce6 docs: record conversation revocation contract test\n35ed3b3cb89b60020b7d31c703fa05ed9a787571 docs: record synthetic verification results for conversation integration\n1c47841cf77d4562f53c898649c93084c49c4968 docs: reconcile conversation contract and audit review\n34f5790f2eb295b2360a162c0672f968850d5ec6 docs: align conversation integration contract for issue 218\n957d449ce56fa28700cd5e06014cf12f568dc1ee docs: start three-block conversation maturity review for issue 218",
+  "topics": [
+    "記憶・会話",
+    "開発管理"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "47203b3d253c0caca29b2a749b6fde2322d894413335e81b884678fbc4d6c88a",
+  "collected_at": "2026-11-27T00:47:12.805808+00:00"
+}
