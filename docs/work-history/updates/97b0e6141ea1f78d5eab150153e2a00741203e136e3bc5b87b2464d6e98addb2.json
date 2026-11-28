@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-11-28T08:55:00.888837+00:00",
+  "changes": [
+    {
+      "id": "pr-219",
+      "previous": "11f65101f7fbc55b51492858bc46ef12151beb189888eedbc6c6186e46e58e4d",
+      "revision": "8f59874e4034385a1617df4799c2b4e585588884a7b95925519e80e1fa2a1aa4"
+    },
+    {
+      "id": "pr-146",
+      "previous": "7e207f8fc49263ff2a145a919446367c22a1a6caaf2a1641f08ba9fe695164d6",
+      "revision": "f0c228929de2107fa010364c9e53018c695f569f944dbf90e417ec6d259768b3"
+    },
+    {
+      "id": "branch-0632d4cc74411c0e",
+      "previous": "f701a3548624e6df52320b825852753566d428526d2e241ac1c3443fb0d8199a",
+      "revision": "d84e7ff52cd15d78e7b4d5ca207e9f1942830b8b3627bc8c631525904d5075c7"
+    }
+  ]
+}
