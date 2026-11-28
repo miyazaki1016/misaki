@@ -1,12 +1,12 @@
 {
   "repository": "miyazaki1016/misaki",
-  "generated_at": "2026-11-27T09:40:17.749705+00:00",
+  "generated_at": "2026-11-28T03:43:06.114387+00:00",
   "coverage": {
     "prs": 199,
     "pr_cases": 199,
     "branches": 42,
     "errors": [],
-    "api_calls": 17
+    "api_calls": 1
   },
   "cases": [
     {
