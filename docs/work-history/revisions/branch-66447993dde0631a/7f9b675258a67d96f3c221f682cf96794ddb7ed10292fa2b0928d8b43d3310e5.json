@@ -1,0 +1,71 @@
+{
+  "id": "branch-66447993dde0631a",
+  "title": "feature/conversation-tuning-220",
+  "head": "74780ba0100d629ec7046a097deaecb430b35a30",
+  "head_ref": "feature/conversation-tuning-220",
+  "linked_prs": [
+    221
+  ],
+  "files": [
+    {
+      "path": "app/api/conversation-tuning/access/route.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/app/api/conversation-tuning/access/route.ts"
+    },
+    {
+      "path": "components/ConversationTuningPreview.tsx",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/components/ConversationTuningPreview.tsx"
+    },
+    {
+      "path": "docs/CONVERSATION_TUNING_APP_220.md",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/docs/CONVERSATION_TUNING_APP_220.md"
+    },
+    {
+      "path": "lib/conversation-tuning-owner-auth.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/lib/conversation-tuning-owner-auth.ts"
+    },
+    {
+      "path": "lib/conversation-tuning-preview.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/lib/conversation-tuning-preview.ts"
+    },
+    {
+      "path": "tests/conversation-tuning-owner-auth.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/tests/conversation-tuning-owner-auth.test.ts"
+    },
+    {
+      "path": "tests/conversation-tuning-preview.test.ts",
+      "source": {
+        "coverage": "同一HEADのPR案件に原文収録"
+      },
+      "url": "https://github.com/miyazaki1016/misaki/blob/74780ba0100d629ec7046a097deaecb430b35a30/tests/conversation-tuning-preview.test.ts"
+    }
+  ],
+  "commits": "74780ba0100d629ec7046a097deaecb430b35a30 test: enforce cross-character rejection in preview-only A/B fixtures\ne95355c132c189e7cd575139e85af1c6bf4c260a test: enforce cross-character rejection in preview-only A/B fixtures\n51703028407fdf4117c26044858a22b8e5dbe138 feat: bind synthetic tuning preview drafts and fixtures to required character scope\n280c7d67eeb54cd8a48196f26484a7731f613304 fix: explicitly narrow failed owner auth result for TypeScript\n1d7a85a6f1a35d12cf1cd1a4a1f57ae245d3aae9 fix: validate owner UUID in canonical groups so valid owner auth reaches bearer check\nf5e6e95c1da0a5c659cb62743ac2e270628b9eb0 docs: design tuning app for isolated multi-character scopes while prioritizing Misaki\n65791d19018fd0ba48914bfe73ded703f4f9d41d feat: expose fail-closed read-only owner access probe for tuning preview\n2911aa28de61123ccd21ea4030ce1d5ac5e317dc test: keep owner gate node-test compatible while server route remains unmounted\nf1b4f5167e0537ff2fe920888c840e5525c4ec23 test: assert owner gate denies unconfigured and malformed access\n93da58d67fdefa090d3c664381c5ad1fa3299ba0 feat: add fail-closed server-only owner authorization helper for future tuning route\nc850948e9a6a3b46dffb3f6af19159912396bbab fix: reject malformed selected facts in isolated preview\n9912865a7b9cc8f1076e33caf7a9fc8bc7072f95 test: use repository node:test runner for tuning contract\n6f046d238fab5962465397c40bccbfced3403bb2 feat: add unrouted isolated tuning slider and A/B fixture component\n4124e1a57b7a4f85ce2ac340c85ea910ccb736a0 test: cover isolated tuning A/B validation and invalid values\n54c7390ded556a405961568c952f3c5fb1b6bc64 feat: add fail-closed preview-only tuning contract\n14d7e6bdcae2382e861f996f1c27d19602d4ffa1 docs: define isolated conversation tuning preview and versioned rollout contract",
+  "topics": [
+    "記憶・会話",
+    "認証・安全性"
+  ],
+  "state": "ブランチ差分（PR関連あり）",
+  "production": "未確認",
+  "implementation": "mainとの差分を収録。差分ゼロも記録",
+  "next": "関連PR・mainとの同等実装を照合。ブランチの存在だけで未完成扱いしない",
+  "fingerprint": "8d93976932cff64e1087a938d927e678b8eb31111c715fe1b9de6fa9e8466782",
+  "collected_at": "2026-11-28T05:15:57.829440+00:00"
+}
